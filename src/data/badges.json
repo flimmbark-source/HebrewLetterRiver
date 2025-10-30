@@ -1,0 +1,42 @@
+[
+  {
+    "id": "first-flow",
+    "name": "First Flow",
+    "summary": "Play a full run of Hebrew Letter River.",
+    "tiers": [
+      { "tier": 1, "label": "Bronze Current", "goal": 1, "stars": 10 },
+      { "tier": 2, "label": "Silver Surge", "goal": 5, "stars": 25 },
+      { "tier": 3, "label": "Golden Torrent", "goal": 15, "stars": 60 }
+    ]
+  },
+  {
+    "id": "steady-streak",
+    "name": "Streak Keeper",
+    "summary": "Log in and play on consecutive days.",
+    "tiers": [
+      { "tier": 1, "label": "Weekend Wave", "goal": 3, "stars": 15 },
+      { "tier": 2, "label": "Moonlit Run", "goal": 7, "stars": 40 },
+      { "tier": 3, "label": "Eternal River", "goal": 21, "stars": 120 }
+    ]
+  },
+  {
+    "id": "letter-master",
+    "name": "Letter Master",
+    "summary": "Catch letters without missing.",
+    "tiers": [
+      { "tier": 1, "label": "Focused Splash", "goal": 10, "stars": 20 },
+      { "tier": 2, "label": "Precision Flow", "goal": 30, "stars": 60 },
+      { "tier": 3, "label": "Perfect Current", "goal": 75, "stars": 150 }
+    ]
+  },
+  {
+    "id": "gem-chaser",
+    "name": "Gem Chaser",
+    "summary": "Win bonus rounds and gather river gems.",
+    "tiers": [
+      { "tier": 1, "label": "Sparkling Stream", "goal": 5, "stars": 30 },
+      { "tier": 2, "label": "Shimmering Rapid", "goal": 15, "stars": 80 },
+      { "tier": 3, "label": "Radiant Cascade", "goal": 40, "stars": 200 }
+    ]
+  }
+]

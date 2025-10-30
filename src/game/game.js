@@ -1,3 +1,5 @@
+import { emit } from '../lib/eventBus.js';
+
 const trackedTimeouts = new Set();
 const trackedIntervals = new Set();
 
@@ -242,7 +244,13 @@ export function setupGame({ onReturnToMenu } = {}) {
     item.element.isDropped = true;
     if (!isBonusRound && !sessionStats[droppedHebrew]) sessionStats[droppedHebrew] = { correct: 0, incorrect: 0 };
 
-    if (isBonusRound || droppedSound === targetSound) {
+    const isCorrect = isBonusRound || droppedSound === targetSound;
+    if (isBonusRound) {
+      bonusCaughtInSession += 1;
+      emit('game:bonus-catch', { count: bonusCaughtInSession, score });
+    }
+
+    if (isCorrect) {
       updateScore(isBonusRound ? 25 : 10);
       targetBox.classList.add('feedback-correct');
       if (!isBonusRound) sessionStats[droppedHebrew].correct++;
@@ -264,6 +272,15 @@ export function setupGame({ onReturnToMenu } = {}) {
       ghostEl.style.top = `${boxRect.top - gameRect.top}px`;
       ghostEl.classList.add('ghost-rise');
       trackTimeout(() => ghostEl.classList.remove('ghost-rise'), 2000);
+    }
+
+    if (!isBonusRound) {
+      emit('game:letter-result', {
+        hebrew: droppedHebrew,
+        correct: isCorrect,
+        mode: gameMode,
+        roundId
+      });
     }
 
     item.element.removeEventListener('animationend', item.missHandler);
@@ -330,6 +347,7 @@ export function setupGame({ onReturnToMenu } = {}) {
   let scoreForNextLevel;
   let gameActive;
   let fallDuration;
+  let baseSpeedSetting;
   let isBonusRound;
   let gameMode;
   let introductionsEnabled;
@@ -341,6 +359,7 @@ export function setupGame({ onReturnToMenu } = {}) {
   let sessionStats;
   let forcedStartItem = null;
   let hasIntroducedForItemInLevel;
+  let bonusCaughtInSession = 0;
   const initialLives = 3;
   const learnPhaseDuration = 2500;
   const levelUpThreshold = 50;
@@ -371,13 +390,15 @@ export function setupGame({ onReturnToMenu } = {}) {
     lives = initialLives;
     level = 1;
     scoreForNextLevel = levelUpThreshold;
-    fallDuration = parseInt(gameSpeedSlider.value, 10);
+    baseSpeedSetting = parseInt(gameSpeedSlider.value, 10);
+    fallDuration = baseSpeedSetting;
     isBonusRound = false;
     seenItems = new Set(['א', 'בּ', 'ל']);
     learningOrder = [];
     lastItemSound = null;
     sessionStats = {};
     hasIntroducedForItemInLevel = false;
+    bonusCaughtInSession = 0;
 
     updateScore(0, true);
     updateLives();
@@ -396,7 +417,8 @@ export function setupGame({ onReturnToMenu } = {}) {
     lives = initialLives;
     level = 1;
     scoreForNextLevel = levelUpThreshold;
-    fallDuration = parseInt(document.getElementById('game-speed-slider').value, 10);
+    baseSpeedSetting = parseInt(document.getElementById('game-speed-slider').value, 10);
+    fallDuration = baseSpeedSetting;
     gameActive = true;
     isBonusRound = false;
     seenItems = new Set(['א', 'בּ', 'ל']);
@@ -404,6 +426,7 @@ export function setupGame({ onReturnToMenu } = {}) {
     currentRound = null;
     sessionStats = {};
     hasIntroducedForItemInLevel = false;
+    bonusCaughtInSession = 0;
 
     gameMode = document.querySelector('input[name="gameMode"]:checked').value;
     introductionsEnabled = document.getElementById('toggle-introductions').checked;
@@ -429,6 +452,14 @@ export function setupGame({ onReturnToMenu } = {}) {
     activeItems.clear();
 
     spawnNextRound();
+    emit('game:session-start', {
+      mode: gameMode,
+      settings: {
+        mode: gameMode,
+        speed: baseSpeedSetting,
+        introductions: introductionsEnabled
+      }
+    });
   }
 
   function endGame() {
@@ -438,6 +469,18 @@ export function setupGame({ onReturnToMenu } = {}) {
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
     clearAllTimers();
+
+    emit('game:session-complete', {
+      mode: gameMode,
+      score,
+      stats: sessionStats,
+      bonusCaught: bonusCaughtInSession,
+      settings: {
+        mode: gameMode,
+        speed: baseSpeedSetting,
+        introductions: introductionsEnabled
+      }
+    });
 
     displayLearningSummary();
     setupView.classList.add('hidden');
@@ -547,6 +590,7 @@ export function setupGame({ onReturnToMenu } = {}) {
       levelEl.classList.add('text-2xl');
       updateLevelDisplay();
     }, 1800);
+    emit('game:level-up', { level, mode: gameMode });
   }
 
   function updateLevelDisplay() {
@@ -711,6 +755,13 @@ export function setupGame({ onReturnToMenu } = {}) {
     if (isMiss && !isBonusRound) {
       lives--;
       updateLives(true);
+      emit('game:letter-result', {
+        hebrew: key,
+        correct: false,
+        mode: gameMode,
+        roundId,
+        reason: 'timeout'
+      });
     }
     if (lives <= 0) {
       endGame();
@@ -901,7 +952,13 @@ export function setupGame({ onReturnToMenu } = {}) {
     item.element.isDropped = true;
     if (!isBonusRound && !sessionStats[droppedHebrew]) sessionStats[droppedHebrew] = { correct: 0, incorrect: 0 };
 
-    if (isBonusRound || droppedSound === targetSound) {
+    const isCorrect = isBonusRound || droppedSound === targetSound;
+    if (isBonusRound) {
+      bonusCaughtInSession += 1;
+      emit('game:bonus-catch', { count: bonusCaughtInSession, score });
+    }
+
+    if (isCorrect) {
       updateScore(isBonusRound ? 25 : 10);
       targetBox.classList.add('feedback-correct');
       if (!isBonusRound) sessionStats[droppedHebrew].correct++;
@@ -926,6 +983,15 @@ export function setupGame({ onReturnToMenu } = {}) {
       }, 2000);
     }
 
+    if (!isBonusRound) {
+      emit('game:letter-result', {
+        hebrew: droppedHebrew,
+        correct: isCorrect,
+        mode: gameMode,
+        roundId
+      });
+    }
+
     item.element.removeEventListener('animationend', item.missHandler);
     trackTimeout(() => {
       targetBox.classList.remove('feedback-correct', 'feedback-incorrect');
@@ -947,5 +1013,20 @@ export function setupGame({ onReturnToMenu } = {}) {
     onReturnToMenu?.();
   });
 
-  return { resetToSetupScreen };
+  function setGameMode(value) {
+    const radio = document.querySelector(`input[name="gameMode"][value="${value}"]`);
+    if (radio) {
+      radio.checked = true;
+      gameMode = value;
+      updateModalSubtitle();
+    }
+  }
+
+  function forceStartByHebrew(symbol) {
+    const allItems = [...hebrewAlphabet, ...Object.values(vowelSyllables).flat()];
+    const match = allItems.find((entry) => entry.hebrew === symbol);
+    if (match) forcedStartItem = match;
+  }
+
+  return { resetToSetupScreen, startGame, setGameMode, forceStartByHebrew };
 }

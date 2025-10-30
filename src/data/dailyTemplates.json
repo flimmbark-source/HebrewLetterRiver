@@ -1,0 +1,23 @@
+[
+  {
+    "id": "warmup",
+    "title": "Warm-Up",
+    "description": "Play two quick runs to stir the current.",
+    "goal": 2,
+    "type": "sessions"
+  },
+  {
+    "id": "focus",
+    "title": "Focus",
+    "description": "Catch five perfect matches featuring {{letter}}.",
+    "goal": 5,
+    "type": "letterPerfect"
+  },
+  {
+    "id": "spice",
+    "title": "Spice",
+    "description": "Win a round with the {{constraint}} active.",
+    "goal": 1,
+    "type": "constraint"
+  }
+]
