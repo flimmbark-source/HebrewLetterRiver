@@ -8,15 +8,17 @@ import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/ti
 function TaskCard({ task, accent }) {
   const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
   return (
-    <div className="rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-inner">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{task.title}</p>
-          <h3 className="mt-2 text-xl font-semibold text-white">{task.description}</h3>
+    <div className="rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-inner sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-2">
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">{task.title}</p>
+          <h3 className="text-lg font-semibold text-white sm:text-xl">{task.description}</h3>
         </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${accent}`}>{task.completed ? 'Complete' : 'In Progress'}</span>
+        <span className={`self-start rounded-full px-3 py-1 text-xs font-semibold sm:text-sm ${accent}`}>
+          {task.completed ? 'Complete' : 'In Progress'}
+        </span>
       </div>
-      <div className="mt-5 h-2 rounded-full bg-slate-800">
+      <div className="mt-4 h-2 rounded-full bg-slate-800">
         <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" style={{ width: `${percentage}%` }} />
       </div>
       <p className="mt-3 text-sm text-slate-300">
@@ -68,41 +70,43 @@ export default function HomeView() {
   const nextResetTime = formatJerusalemTime(nextResetDate, { timeZoneName: 'short' });
 
   return (
-    <div className="space-y-10">
-      <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-8 shadow-2xl">
+    <div className="space-y-8 sm:space-y-10">
+      <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-6 shadow-2xl sm:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-3">
-            <p className="text-sm uppercase tracking-[0.2em] text-cyan-300">Today&apos;s Daily Quest</p>
-            <h1 className="text-4xl font-bold text-white">Flow through all three river challenges.</h1>
-            <p className="max-w-2xl text-slate-300">
+          <div className="space-y-3 text-center sm:text-left">
+            <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">Today&apos;s Daily Quest</p>
+            <h1 className="text-3xl font-bold text-white sm:text-4xl">Flow through all three river challenges.</h1>
+            <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">
               Keep your streak alive and claim fresh stars by completing the Warm-Up, Focus, and Spice quests tailored just for you.
             </p>
           </div>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-4">
             <button
               onClick={() => openGame({ mode: 'letters' })}
-              className="rounded-full bg-cyan-500 px-6 py-3 text-lg font-semibold text-slate-900 shadow-lg transition hover:bg-cyan-400 hover:shadow-cyan-500/30"
+              className="w-full rounded-full bg-cyan-500 px-5 py-3 text-base font-semibold text-slate-900 shadow-lg transition hover:bg-cyan-400 hover:shadow-cyan-500/30 sm:w-auto sm:px-6 sm:text-lg"
             >
               Start a New Run
             </button>
             <button
               onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
-              className="rounded-full border border-cyan-500/60 px-6 py-3 text-lg font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200"
+              className="w-full rounded-full border border-cyan-500/60 px-5 py-3 text-base font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 sm:w-auto sm:px-6 sm:text-lg"
             >
               Practice Focus Letter
             </button>
+          </div>
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
-        <h2 className="text-lg font-semibold text-slate-200">Progress today</h2>
+      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6">
+        <h2 className="text-base font-semibold text-slate-200 sm:text-lg">Progress today</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <p className="text-sm text-slate-400">Streak</p>
-            <p className="mt-2 text-3xl font-semibold text-white">{streak.current} days</p>
-            <p className="mt-1 text-xs text-slate-500">Resets at 00:00 Asia/Jerusalem ({nextResetTime})</p>
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Streak</p>
+            <p className="mt-2 text-2xl font-semibold text-white sm:text-3xl">{streak.current} days</p>
+            <p className="mt-1 text-xs text-slate-500 sm:text-sm">Resets at 00:00 Asia/Jerusalem ({nextResetTime})</p>
           </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <p className="text-sm text-slate-400">Star meter</p>
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Star meter</p>
             <div className="mt-3 h-2 rounded-full bg-slate-800">
               <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-sky-500" style={{ width: `${starsProgress * 100}%` }} />
             </div>
@@ -111,14 +115,14 @@ export default function HomeView() {
             </p>
             <p className="mt-1 text-xs text-slate-500">Earn stars by unlocking badge tiers.</p>
           </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <p className="text-sm text-slate-400">Latest badge</p>
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Latest badge</p>
             {latestBadge ? (
               <div className="mt-2 space-y-1">
-                <p className="text-lg font-semibold text-white">{latestBadge.name}</p>
+                <p className="text-base font-semibold text-white sm:text-lg">{latestBadge.name}</p>
                 <p className="text-sm text-cyan-300">{latestBadge.label}</p>
-                <p className="text-xs text-slate-400">Tier {latestBadge.tier} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
-                <p className="text-xs text-slate-500">{latestBadge.summary}</p>
+                <p className="text-xs text-slate-400 sm:text-sm">Tier {latestBadge.tier} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
+                <p className="text-xs text-slate-500 sm:text-sm">{latestBadge.summary}</p>
               </div>
             ) : (
               <p className="mt-3 text-sm text-slate-400">Play a session to start unlocking achievements.</p>
@@ -126,7 +130,7 @@ export default function HomeView() {
           </div>
         </div>
       </section>
-      <section className="grid gap-6 lg:grid-cols-3">
+      <section className="grid gap-5 sm:gap-6 lg:grid-cols-3">
         {daily?.tasks?.map((task) => (
           <TaskCard
             key={task.id}

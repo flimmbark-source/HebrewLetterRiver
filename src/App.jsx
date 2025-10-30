@@ -13,14 +13,14 @@ function Navigation() {
   ];
 
   return (
-    <nav className="rounded-full border border-slate-800 bg-slate-900/60 p-1 text-sm text-slate-300 shadow-inner">
-      <ul className="flex items-center gap-1">
+    <nav className="w-full rounded-full border border-slate-800 bg-slate-900/60 p-1 text-xs text-slate-300 shadow-inner sm:w-auto sm:text-sm">
+      <ul className="flex flex-wrap items-center gap-1 sm:flex-nowrap">
         {links.map((link) => (
           <li key={link.to} className="flex-1">
             <NavLink
               to={link.to}
               className={({ isActive }) =>
-                `block rounded-full px-4 py-2 text-center font-medium transition ${
+                `block rounded-full px-3 py-2 text-center text-sm font-medium transition sm:px-4 sm:text-base ${
                   isActive ? 'bg-cyan-500 text-slate-900 shadow-cyan-500/40 shadow-lg' : 'hover:bg-slate-800/80 hover:text-white'
                 }`
               }
@@ -36,11 +36,11 @@ function Navigation() {
 
 function Shell() {
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:gap-10 sm:px-6 sm:py-10">
       <header className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white hebrew-font">Hebrew Letter River</h1>
-          <p className="text-sm text-slate-400">Flow, learn, and celebrate every catch.</p>
+        <div className="text-center sm:text-left">
+          <h1 className="text-3xl font-bold text-white hebrew-font sm:text-4xl">Hebrew Letter River</h1>
+          <p className="text-sm text-slate-400 sm:text-base">Flow, learn, and celebrate every catch.</p>
         </div>
         <Navigation />
       </header>
@@ -51,7 +51,7 @@ function Shell() {
           <Route path="/achievements" element={<AchievementsView />} />
         </Routes>
       </main>
-      <footer className="pb-6 text-center text-xs text-slate-600">Reset happens daily at 00:00 Asia/Jerusalem.</footer>
+      <footer className="pb-6 text-center text-xs text-slate-600 sm:text-sm">Reset happens daily at 00:00 Asia/Jerusalem.</footer>
     </div>
   );
 }
