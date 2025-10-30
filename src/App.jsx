@@ -54,7 +54,7 @@ function Shell() {
   const handlePlay = React.useCallback(
     (event) => {
       event.preventDefault();
-      openGame({ autostart: true });
+      openGame({ autostart: false });
     },
     [openGame]
   );
