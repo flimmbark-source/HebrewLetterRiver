@@ -59,15 +59,18 @@ export function GameProvider({ children }) {
               }`}
             >
               <div className="absolute inset-0 bg-slate-950/85 backdrop-blur" onClick={closeGame} />
-              <div className="absolute inset-0 flex items-center justify-center p-4">
-                <div
-                  ref={containerRef}
-                  className={`relative w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl transition-transform ${
-                    isVisible ? 'scale-100' : 'scale-95'
-                  }`}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <GameCanvas />
+              <div className="absolute inset-0 overflow-y-auto">
+                <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
+                  <div
+                    ref={containerRef}
+                    className={`relative h-full w-full max-w-5xl overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl transition-transform sm:rounded-3xl ${
+                      isVisible ? 'scale-100' : 'scale-95'
+                    }`}
+                    style={{ maxHeight: 'calc(100vh - 2rem)' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <GameCanvas />
+                  </div>
                 </div>
               </div>
             </div>,
@@ -80,34 +83,40 @@ export function GameProvider({ children }) {
 
 function GameCanvas() {
   return (
-    <div id="game-view" className="w-full h-full overflow-hidden">
-      <div id="game-container" className="relative flex h-full min-h-[600px] flex-col bg-slate-900">
-        <button
-          id="back-to-menu-button"
-          className="absolute left-4 top-4 z-40 flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/90 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-700"
-        >
-          <span className="text-lg">←</span>
-          <span>Leave Game</span>
-        </button>
+    <div id="game-view" className="flex h-full w-full flex-col overflow-hidden">
+      <div
+        id="game-container"
+        className="relative flex h-full min-h-[calc(100vh-4rem)] flex-col bg-slate-900 sm:min-h-[600px]"
+        style={{ maxHeight: 'calc(100vh - 2rem)' }}
+      >
+        <div className="relative flex flex-col">
+          <div id="top-bar" className="flex items-center bg-slate-800/90 px-6 py-4 text-base shadow-lg">
+            <div className="flex-1 text-center">
+              <div className="inline-flex items-baseline gap-2">
+                <span className="font-semibold text-slate-300">Level</span>
+                <span id="level" className="text-2xl font-bold text-yellow-400">
+                  1
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-6">
+              <div className="text-left">
+                <span className="font-semibold text-slate-300">Score</span>
+                <span id="score" className="ml-2 text-2xl font-bold text-cyan-400">
+                  0
+                </span>
+              </div>
+              <div id="lives-container" className="flex items-center gap-2" />
+            </div>
+          </div>
 
-        <div id="top-bar" className="flex items-center bg-slate-800/90 px-6 py-4 text-base shadow-lg">
-          <div className="flex-1 text-center">
-            <div className="inline-flex items-baseline gap-2">
-              <span className="font-semibold text-slate-300">Level</span>
-              <span id="level" className="text-2xl font-bold text-yellow-400">
-                1
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="text-left">
-              <span className="font-semibold text-slate-300">Score</span>
-              <span id="score" className="ml-2 text-2xl font-bold text-cyan-400">
-                0
-              </span>
-            </div>
-            <div id="lives-container" className="flex items-center gap-2" />
-          </div>
+          <button
+            id="back-to-menu-button"
+            className="mx-6 mt-3 flex items-center justify-center gap-2 rounded-full border border-slate-700 bg-slate-800/90 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-700 sm:absolute sm:left-4 sm:top-4 sm:mx-0 sm:mt-0"
+          >
+            <span className="text-lg">←</span>
+            <span>Leave Game</span>
+          </button>
         </div>
 
         <div id="play-area" className="relative flex-1 overflow-hidden bg-slate-900">
@@ -125,16 +134,17 @@ function GameCanvas() {
 
         <div
           id="choices-container"
-          className="grid w-full flex-shrink-0 grid-cols-2 gap-3 bg-slate-900 px-6 pb-6 pt-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+          className="grid w-full flex-shrink-0 grid-cols-2 gap-3 bg-slate-900 px-4 pb-6 pt-4 sm:grid-cols-3 sm:px-6 md:grid-cols-4 lg:grid-cols-5"
         />
 
         <div
           id="modal"
-          className="fixed inset-0 z-30 flex items-center justify-center bg-black/80 p-4 text-white"
+          className="fixed inset-0 z-30 flex items-center justify-center overflow-y-auto bg-black/80 p-4 text-white sm:p-6"
         >
           <div
             id="modal-content"
-            className="relative w-full max-w-3xl rounded-3xl border border-slate-700 bg-slate-900/95 p-6 shadow-2xl"
+            className="relative w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900/95 p-5 shadow-2xl sm:rounded-3xl sm:p-6"
+            style={{ maxHeight: 'calc(100vh - 3rem)' }}
           >
             <button
               id="accessibility-btn"
@@ -145,40 +155,40 @@ function GameCanvas() {
 
             <div id="setup-view" className="space-y-6">
               <div className="space-y-2 text-center">
-                <h1 className="text-4xl font-bold text-cyan-300 hebrew-font">Hebrew Letter River</h1>
-                <p id="modal-subtitle" className="text-sm text-slate-400">
+                <h1 className="text-3xl font-bold text-cyan-300 hebrew-font sm:text-4xl">Hebrew Letter River</h1>
+                <p id="modal-subtitle" className="text-sm text-slate-400 sm:text-base">
                   Drag the moving letter to the correct box!
                 </p>
               </div>
 
-              <p className="text-center text-lg text-slate-300">Choose what you want to practice:</p>
+              <p className="text-center text-base text-slate-300 sm:text-lg">Choose what you want to practice:</p>
 
               <div className="mx-auto grid max-w-2xl gap-3 sm:grid-cols-2">
                 <label className="setup-label cursor-pointer">
                   <input type="radio" name="gameMode" value="letters" defaultChecked className="hidden" />
                   <div className="flex h-full flex-col rounded-2xl border-2 border-slate-600 bg-slate-800/70 p-4 transition hover:border-cyan-400/80">
-                    <span className="text-lg font-semibold text-white">Letters Only</span>
+                    <span className="text-base font-semibold text-white sm:text-lg">Letters Only</span>
                     <p className="mt-1 text-sm text-slate-400">Master the 22 core letters.</p>
                   </div>
                 </label>
                 <label className="setup-label cursor-pointer">
                   <input type="radio" name="gameMode" value="vowels1" className="hidden" />
                   <div className="flex h-full flex-col rounded-2xl border-2 border-slate-600 bg-slate-800/70 p-4 transition hover:border-cyan-400/80">
-                    <span className="text-lg font-semibold text-white">'A' &amp; 'O' Vowels</span>
+                    <span className="text-base font-semibold text-white sm:text-lg">'A' &amp; 'O' Vowels</span>
                     <p className="mt-1 text-sm text-slate-400">Practice Patach and Holam.</p>
                   </div>
                 </label>
                 <label className="setup-label cursor-pointer">
                   <input type="radio" name="gameMode" value="vowels2" className="hidden" />
                   <div className="flex h-full flex-col rounded-2xl border-2 border-slate-600 bg-slate-800/70 p-4 transition hover:border-cyan-400/80">
-                    <span className="text-lg font-semibold text-white">'E' &amp; 'I' Vowels</span>
+                    <span className="text-base font-semibold text-white sm:text-lg">'E' &amp; 'I' Vowels</span>
                     <p className="mt-1 text-sm text-slate-400">Practice Segol and Hirik.</p>
                   </div>
                 </label>
                 <label className="setup-label cursor-pointer">
                   <input type="radio" name="gameMode" value="expert" className="hidden" />
                   <div className="flex h-full flex-col rounded-2xl border-2 border-slate-600 bg-slate-800/70 p-4 transition hover:border-cyan-400/80">
-                    <span className="text-lg font-semibold text-white">Expert Mode</span>
+                    <span className="text-base font-semibold text-white sm:text-lg">Expert Mode</span>
                     <p className="mt-1 text-sm text-slate-400">Mix of letters &amp; vowels.</p>
                   </div>
                 </label>
@@ -193,7 +203,7 @@ function GameCanvas() {
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <button
                 id="start-button"
-                className="w-full rounded-full bg-cyan-500 px-6 py-3 text-lg font-semibold text-slate-900 transition hover:bg-cyan-400 sm:w-auto"
+                className="w-full rounded-full bg-cyan-500 px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-cyan-400 sm:w-auto sm:text-lg"
               >
                 Start Game
               </button>
