@@ -82,21 +82,6 @@ export default function HomeView() {
           </div>
         </div>
       </section>
-
-      <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
-          <h2 className="text-lg font-semibold text-white">Why the river remembers</h2>
-          <p className="mt-3 text-slate-300">
-            Each session feeds your personal focus map. Your daily Focus quest highlights the letter that needs a little extra love, so you always know where to aim next.
-          </p>
-        </div>
-        <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
-          <h2 className="text-lg font-semibold text-white">Stay in rhythm</h2>
-          <p className="mt-3 text-slate-300">
-            Warm-Up runs keep the current steady, while Spice quests challenge you with playful constraints. Complete all three for a confetti-worthy celebration.
-          </p>
-        </div>
-      </section>
     </div>
   );
 }

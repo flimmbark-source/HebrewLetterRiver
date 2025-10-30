@@ -61,7 +61,7 @@ export default function DailyView() {
               onClick={() => openGame({ mode: 'letters' })}
               className="rounded-full bg-cyan-500 px-6 py-3 text-lg font-semibold text-slate-900 shadow-lg transition hover:bg-cyan-400 hover:shadow-cyan-500/30"
             >
-              Start a Warm-Up Run
+              Start a New Run
             </button>
             <button
               onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
