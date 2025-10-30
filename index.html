@@ -37,26 +37,30 @@
     </div>
   </div>
 
-  <div id="game-view" class="hidden px-3 sm:px-4 pb-4">
-    <div id="game-container" class="w-full text-center relative max-w-6xl mx-auto">
-      <button id="back-to-menu-button" class="absolute -top-2 sm:top-0 -left-2 sm:left-0 z-40 bg-slate-800/90 border border-slate-700 text-sm sm:text-base px-3 sm:px-4 py-2 rounded-full flex items-center gap-2 hover:bg-slate-700 transition">
+  <div id="game-view" class="hidden w-full h-[100dvh] overflow-hidden">
+    <div id="game-container" class="w-full h-full text-center relative flex flex-col">
+      <button id="back-to-menu-button" class="absolute top-4 left-4 z-40 bg-slate-800/90 border border-slate-700 text-sm sm:text-base px-3 sm:px-4 py-2 rounded-full flex items-center gap-2 hover:bg-slate-700 transition">
         <span class="text-lg">←</span>
         <span>Main Menu</span>
       </button>
 
-      <div class="flex justify-between items-center bg-slate-800 p-3 rounded-lg mb-3 sm:mb-4 text-base sm:text-lg">
-        <div>
-          <span class="font-bold text-slate-300">Score:</span>
-          <span id="score" class="font-bold text-cyan-400 text-xl sm:text-2xl inline-block">0</span>
+      <div id="top-bar" class="flex items-center justify-between bg-slate-800 px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg shadow-lg">
+        <div class="flex items-center gap-4">
+          <div>
+            <span class="font-bold text-slate-300">Level:</span>
+            <span id="level" class="font-bold text-yellow-400 text-xl sm:text-2xl inline-block">1</span>
+          </div>
         </div>
-        <div>
-          <span class="font-bold text-slate-300">Level:</span>
-          <span id="level" class="font-bold text-yellow-400 text-xl sm:text-2xl inline-block">1</span>
+        <div class="flex items-center gap-6">
+          <div>
+            <span class="font-bold text-slate-300">Score:</span>
+            <span id="score" class="font-bold text-cyan-400 text-xl sm:text-2xl inline-block">0</span>
+          </div>
+          <div id="lives-container" class="flex items-center gap-2"></div>
         </div>
-        <div id="lives-container" class="flex space-x-2"></div>
       </div>
 
-      <div id="play-area" class="relative bg-slate-800 rounded-lg w-full overflow-hidden">
+      <div id="play-area" class="relative flex-1 bg-slate-800 w-full overflow-hidden">
         <div id="learn-overlay" class="absolute top-2 sm:top-4 left-1/2 w-auto bg-slate-900/95 flex items-center justify-center py-2 sm:py-3 px-4 sm:px-8 rounded-lg z-20 gap-3 sm:gap-6 border border-slate-700">
           <div id="learn-letter" class="text-4xl sm:text-6xl font-bold text-cyan-400 hebrew-font"></div>
           <div class="flex flex-col text-center">
@@ -66,7 +70,7 @@
         </div>
       </div>
 
-      <div id="choices-container" class="grid gap-3 mt-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"></div>
+      <div id="choices-container" class="grid gap-3 p-4 sm:p-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 w-full flex-shrink-0"></div>
 
       <div id="modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-3 sm:p-4 z-30 overflow-y-auto overscroll-contain">
         <div id="modal-content" class="text-center bg-slate-800 p-4 sm:p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg md:max-w-2xl relative mx-auto">

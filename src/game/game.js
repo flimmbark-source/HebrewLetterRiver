@@ -173,7 +173,7 @@ export function setupGame({ onReturnToMenu } = {}) {
 
       const ghost = ensureDragGhost();
       ghost.textContent = itemEl.textContent;
-      ghost.className = itemEl.classList.contains('falling-gem') ? 'text-5xl' : 'hebrew-font text-6xl';
+      ghost.className = itemEl.classList.contains('falling-gem') ? 'text-5xl' : 'hebrew-font text-3xl';
       ghost.style.opacity = '0.95';
 
       itemEl.style.visibility = 'hidden';
@@ -661,7 +661,7 @@ export function setupGame({ onReturnToMenu } = {}) {
     itemEl.textContent = itemData.hebrew;
     const reducedMotion = reducedMotionToggle.checked;
     const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
-    itemEl.className = `falling-letter text-6xl sm:text-7xl font-bold hebrew-font text-cyan-300 ${animationName}`;
+    itemEl.className = `falling-letter font-bold hebrew-font text-cyan-300 ${animationName}`;
     itemEl.style.top = `${Math.random() * 70}%`;
     itemEl.style.animationDuration = `${parseInt(gameSpeedSlider.value, 10)}s`;
     itemEl.draggable = true;
