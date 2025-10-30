@@ -46,33 +46,7 @@ export default function DailyView() {
 
   return (
     <div className="space-y-10">
-      <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-8 shadow-2xl">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="space-y-3">
-            <p className="text-sm uppercase tracking-[0.2em] text-cyan-300">Daily Quest Board</p>
-            <h1 className="text-4xl font-bold text-white">Warm-Up · Focus · Spice</h1>
-            <p className="max-w-2xl text-slate-300">
-              Complete all three quests before midnight in Jerusalem to bank today&apos;s streak bonus and unlock extra stars.
-            </p>
-            <p className="text-xs text-cyan-300">Next reset at {nextResetLabel}</p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <button
-              onClick={() => openGame({ mode: 'letters' })}
-              className="rounded-full bg-cyan-500 px-6 py-3 text-lg font-semibold text-slate-900 shadow-lg transition hover:bg-cyan-400 hover:shadow-cyan-500/30"
-            >
-              Start a New Run
-            </button>
-            <button
-              onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
-              className="rounded-full border border-cyan-500/60 px-6 py-3 text-lg font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200"
-            >
-              Practice Focus Letter
-            </button>
-          </div>
-        </div>
-      </section>
-
+      
       <section className="grid gap-6 lg:grid-cols-3">
         {daily?.tasks?.map((task) => (
           <TaskCard

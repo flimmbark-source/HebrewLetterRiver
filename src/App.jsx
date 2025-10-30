@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import HomeView from './views/HomeView.jsx';
-import DailyView from './views/DailyView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import { ProgressProvider } from './context/ProgressContext.jsx';
@@ -10,7 +9,6 @@ import { GameProvider } from './context/GameContext.jsx';
 function Navigation() {
   const links = [
     { to: '/home', label: 'Home' },
-    { to: '/daily', label: 'Daily Quests' },
     { to: '/achievements', label: 'Achievements' }
   ];
 
@@ -50,7 +48,6 @@ function Shell() {
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomeView />} />
-          <Route path="/daily" element={<DailyView />} />
           <Route path="/achievements" element={<AchievementsView />} />
         </Routes>
       </main>
