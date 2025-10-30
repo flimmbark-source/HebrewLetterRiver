@@ -173,7 +173,7 @@ export function setupGame({ onReturnToMenu } = {}) {
 
       const ghost = ensureDragGhost();
       ghost.textContent = itemEl.textContent;
-      ghost.className = itemEl.classList.contains('falling-gem') ? 'text-5xl' : 'hebrew-font text-3xl';
+      ghost.className = itemEl.classList.contains('falling-gem') ? 'text-5xl' : 'hebrew-font text-6xl';
       ghost.style.opacity = '0.95';
 
       itemEl.style.visibility = 'hidden';

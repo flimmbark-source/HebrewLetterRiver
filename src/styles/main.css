@@ -26,7 +26,7 @@ body {
   flex-shrink: 0;
 }
 .falling-letter {
-  font-size: clamp(26px, 7vw, 52px);
+  font-size: clamp(45px, 14vw, 76px);
   line-height: 1;
 }
 .falling-gem {
