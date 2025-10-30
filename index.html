@@ -10,1025 +10,150 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&family=Inter:wght@400;700&display=swap" rel="stylesheet" />
-  <!-- iOS standalone & status bar -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
-<!-- Dynamic viewport to reduce iOS 100vh issues -->
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <style>
-    html, body { width: 100%; overflow-x: hidden; } /* prevent sideways drift */
-    body {
-      font-family: 'Inter', sans-serif;
-      /* allow normal touch scrolling; we still disable on drag items below */
-      touch-action: manipulation;
-    }
-    .hebrew-font { font-family: 'Heebo', sans-serif; }
-    /* Was: height: 40vh; min-height: 350px; */
-    #play-area {
-     height: 55vh;           /* more presence on phones */
-     min-height: 420px;      /* taller floor for small devices */
-    }
-
-      /* Big moving glyphs */
-.falling-letter {
-  /* text-6xl/7xl felt small on some phones; use fluid size instead */
-  font-size: clamp(76px, 22vw, 154px);
-  line-height: 1;
-}
-.falling-gem {
-  font-size: clamp(76px, 18vw, 120px);
-  line-height: 1;
-}
-
-/* Learn overlay sizes */
-#learn-letter { font-size: clamp(40px, 12vw, 96px); }
-#learn-name   { font-size: clamp(18px, 5vw, 28px);  }
-#learn-sound  { font-size: clamp(14px, 4.5vw, 22px); }
-
-/* Bigger, tappable targets */
-.catcher-box {
-  font-size: clamp(18px, 4.6vw, 24px);
-  padding: clamp(14px, 4vw, 22px) 10px;
-}
-
-/* Setup cards copy size bump */
-.setup-label span { font-size: clamp(16px, 4.2vw, 20px); }
-.setup-label p    { font-size: clamp(12px, 3.6vw, 16px); }
-
-/* Score/Level numbers pop more */
-#score, #level {
-  font-size: clamp(22px, 6vw, 30px);
-}
-
-    .falling-letter, .falling-gem {
-      position: absolute; cursor: grab; user-select: none;
-      /* keep drag items from causing page scroll */
-      touch-action: none;
-      animation-timing-function: linear; animation-fill-mode: forwards;
-      transition: transform 0.2s ease-out;
-    }
-    .falling-letter.dragging { transform: scale(1.2); box-shadow: 0 0 20px rgba(103,232,249,.5); }
-    .falling-gem.dragging   { transform: scale(1.2); box-shadow: 0 0 20px rgba(254,240,138,.7); }
-
-    /* Finger-drag preview that follows your touch */
-    #drag-ghost {
-    position: fixed;
-    z-index: 1000;
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-    will-change: transform;
-    }
-
-    /* --- Path animations (dynamic width) --- */
-@keyframes river-flow-1{
-  0%   { transform: translateX(-100px); opacity: 0; }
-  7%   { transform: translateX(30px)  translateY(10px)  rotate(-8deg); opacity: 1; }
-  25%  { transform: translateX(120px) translateY(-35px) rotate(10deg); }
-  39%  { transform: translateX(250px) translateY(25px)  rotate(-5deg); }
-  95%  { transform: translateX(calc(100dvw - 100px)) translateY(-40px) rotate(8deg); opacity: 1; }
-  100% { transform: translateX(calc(100dvw + 100px)) translateY(0) rotate(0); opacity: 0; }
-}
-.river-flow-1 { animation-name: river-flow-1; }
-
-@keyframes river-flow-2{
-  0%   { transform: translateX(-100px); opacity: 0; }
-  7%   { transform: translateX(25px)  translateY(-10px) rotate(5deg);  opacity: 1; }
-  28%  { transform: translateX(150px) translateY(40px)  rotate(-12deg); }
-  42%  { transform: translateX(280px) translateY(-20px) rotate(8deg); }
-  95%  { transform: translateX(calc(100dvw - 100px)) translateY(30px)  rotate(-10deg); opacity: 1; }
-  100% { transform: translateX(calc(100dvw + 100px)); opacity: 0; }
-}
-.river-flow-2 { animation-name: river-flow-2; }
-
-@keyframes simple-flow{
-  0%    { transform: translateX(-100px); opacity: 0; }
-  5%,95%{ opacity: 1; }
-  100%  { transform: translateX(calc(100dvw + 100px)); opacity: 0; }
-}
-.simple-flow { animation-name: simple-flow; }
-
-    .catcher-box.drag-over{transform:scale(1.05);border-color:#67E8F9}
-    .feedback-correct{animation:pop-correct .4s ease-out}
-    .feedback-incorrect{animation:flash-red .4s ease-out}
-    .life-lost-shake{animation:shake .5s ease-in-out}
-    .flash-level-up{animation:flash-yellow 1.8s ease-out}
-    .ghost-rise{animation:rise-and-fade 2s ease-out forwards}
-    .score-pop{animation:pop-score .3s ease-out}
-
-    /* Learn overlay entry */
-    #learn-overlay{
-      transition: transform .4s ease-out, opacity .4s ease-out;
-      transform: translate(-50%,-100%); opacity:0; pointer-events:none;
-    }
-    #learn-overlay.visible{ transform: translate(-50%,0); opacity:1; }
-
-    /* Juicing */
-    @keyframes pop-correct{50%{background:#10B981;transform:scale(1.1)}100%{transform:scale(1)}}
-    @keyframes pop-score{50%{transform:scale(1.5)}}
-    @keyframes flash-red{50%{background:#EF4444}}
-    @keyframes shake{
-      10%,90%{transform:translateX(-5px)}20%,80%{transform:translateX(5px)}
-      30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}
-    }
-    @keyframes flash-yellow{
-      0%{transform:scale(1)}
-      20%{transform:scale(1.5);color:#FEF08A}
-      80%{transform:scale(1.2);color:#FEF08A}
-      100%{transform:scale(1)}
-    }
-    @keyframes rise-and-fade{0%{transform:translateY(0) scale(.8);opacity:1}100%{transform:translateY(-60px) scale(1.1);opacity:0}}
-
-    /* Setup label: full-width on phones, wrap nicely on tablets/desktop */
-    .setup-label{
-      display:flex; align-items:center; padding:.75rem;
-      background:#334155; border-radius:.5rem; cursor:pointer; transition:background-color .2s;
-      border:2px solid #475569; flex:1 1 100%; /* <- was 200px; makes each label full width on mobile */
-    }
-    @media (min-width: 640px){ .setup-label{ flex-basis: 260px; } } /* wrap to 2+ columns on sm+ */
-
-    .setup-label:hover{ background:#475569; }
-    .setup-label input:checked ~ div{ border-color:#22D3EE; }
-    .setup-label input:checked ~ div > span{ color:#67E8F9; }
-
-    /* High Contrast */
-    body.high-contrast{background:#000;color:#FFF}
-    .high-contrast #play-area,
-    .high-contrast .bg-slate-800,
-    .high-contrast .bg-slate-700,
-    .high-contrast #modal-content,
-    .high-contrast #accessibility-view { background:#111; border-color:#FFF; }
-    .high-contrast .text-cyan-400{ color:#FFFF00 }
-    .high-contrast .text-slate-400, .high-contrast .text-slate-300{ color:#DDD }
-  </style>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
 </head>
-
-<body class="bg-slate-900 text-white flex items-center justify-center min-h-screen p-3 sm:p-4 overflow-hidden">
-  <div id="game-container" class="w-full h-full text-center relative">
-      
-    <!-- Top bar -->
-    <div class="flex justify-between items-center bg-slate-800 p-3 rounded-lg mb-3 sm:mb-4 text-base sm:text-lg">
-      <div>
-        <span class="font-bold text-slate-300">Score:</span>
-        <span id="score" class="font-bold text-cyan-400 text-xl sm:text-2xl inline-block">0</span>
+<body class="bg-slate-900 text-white min-h-screen overflow-hidden">
+  <div id="main-menu-view" class="flex items-center justify-center px-4">
+    <div class="menu-card max-w-xl w-full rounded-3xl border border-slate-700 shadow-2xl p-8 sm:p-12 text-center space-y-6">
+      <h1 class="text-4xl sm:text-5xl font-bold text-cyan-400 hebrew-font">Hebrew Letter River</h1>
+      <p class="text-lg text-slate-300">
+        Dive into flowing letters, learn their sounds, and test your reflexes in a playful Hebrew learning adventure.
+      </p>
+      <div class="grid gap-4 text-left text-sm text-slate-200 sm:grid-cols-2">
+        <div class="p-4 bg-slate-800/70 rounded-2xl border border-slate-700">
+          <h2 class="text-xl font-semibold text-cyan-300 mb-1">Practice Modes</h2>
+          <p>Choose between consonants, vowel blends, or go all-in with expert mode.</p>
+        </div>
+        <div class="p-4 bg-slate-800/70 rounded-2xl border border-slate-700">
+          <h2 class="text-xl font-semibold text-cyan-300 mb-1">Accessibility Ready</h2>
+          <p>Adjust contrast, motion, speed, and intro prompts to suit every learner.</p>
+        </div>
       </div>
-      <div>
-        <span class="font-bold text-slate-300">Level:</span>
-        <span id="level" class="font-bold text-yellow-400 text-xl sm:text-2xl inline-block">1</span>
-      </div>
-      <div id="lives-container" class="flex space-x-2"></div>
+      <button id="main-menu-start-button" class="w-full sm:w-auto bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-3 px-6 rounded-full text-lg transition-transform hover:scale-105">
+        Enter the River
+      </button>
     </div>
-
-    <!-- Play area -->
-    <div id="play-area" class="relative bg-slate-800 rounded-lg w-full overflow-hidden">
-      <div id="learn-overlay" class="absolute top-2 sm:top-4 left-1/2 w-auto bg-slate-900/95 flex items-center justify-center py-2 sm:py-3 px-4 sm:px-8 rounded-lg z-20 gap-3 sm:gap-6 border border-slate-700">
-        <div id="learn-letter" class="text-4xl sm:text-6xl font-bold text-cyan-400 hebrew-font"></div>
-        <div class="flex flex-col text-center">
-          <div id="learn-name" class="text-lg sm:text-2xl text-white"></div>
-          <div id="learn-sound" class="text-sm sm:text-lg text-slate-300"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Choices (responsive columns; avoids dynamic Tailwind class at runtime) -->
-    <div id="choices-container" class="grid gap-3 mt-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"></div>
-
-    <!-- Modal: use fixed + scroll on small screens -->
-    <div id="modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-3 sm:p-4 z-30 overflow-y-auto overscroll-contain">
-      <div id="modal-content" class="text-center bg-slate-800 p-4 sm:p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg md:max-w-2xl relative mx-auto">
-        <button id="accessibility-btn" class="absolute top-3 right-3 sm:top-4 sm:right-4 text-2xl text-slate-400 hover:text-cyan-400 transition">⚙️</button>
-
-        <div id="setup-view">
-          <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-cyan-400 hebrew-font mb-2">Hebrew Letter River</h1>
-          <p id="modal-subtitle" class="text-slate-400 mb-4 sm:mb-6 text-sm sm:text-base"></p>
-          <p class="text-lg sm:text-xl text-slate-300 mb-4 sm:mb-6">Choose what you want to practice:</p>
-
-          <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 justify-center text-left max-w-lg mx-auto">
-            <label class="setup-label">
-              <input type="radio" name="gameMode" value="letters" checked class="hidden" />
-              <div class="flex-grow p-3 border-2 border-slate-600 rounded-md">
-                <span class="font-bold text-white">Letters Only</span>
-                <p class="text-sm text-slate-400">Master the 22 core letters.</p>
-              </div>
-            </label>
-
-            <label class="setup-label">
-              <input type="radio" name="gameMode" value="vowels1" class="hidden" />
-              <div class="flex-grow p-3 border-2 border-slate-600 rounded-md">
-                <span class="font-bold text-white">'A' &amp; 'O' Vowels</span>
-                <p class="text-sm text-slate-400">Practice Patach and Holam.</p>
-              </div>
-            </label>
-
-            <label class="setup-label">
-              <input type="radio" name="gameMode" value="vowels2" class="hidden" />
-              <div class="flex-grow p-3 border-2 border-slate-600 rounded-md">
-                <span class="font-bold text-white">'E' &amp; 'I' Vowels</span>
-                <p class="text-sm text-slate-400">Practice Segol and Hirik.</p>
-              </div>
-            </label>
-
-            <label class="setup-label">
-              <input type="radio" name="gameMode" value="expert" class="hidden" />
-              <div class="flex-grow p-3 border-2 border-slate-600 rounded-md">
-                <span class="font-bold text-white">Expert Mode</span>
-                <p class="text-sm text-slate-400">Mix of all letters &amp; vowels.</p>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <div id="game-over-view" class="hidden">
-          <h2 class="text-3xl sm:text-5xl font-bold text-cyan-400 mb-4 hebrew-font">Game Over</h2>
-          <div class="learning-summary-container my-6"></div>
-        </div>
-
-        <button id="start-button" class="bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-3 px-6 sm:px-8 rounded-lg text-lg sm:text-xl transition-transform hover:scale-105 mt-4 sm:mt-6 w-full sm:w-auto">
-          Start Game
-        </button>
-        <button id="install-btn" class="bg-yellow-400 text-slate-900 font-bold py-3 px-4 rounded-lg mt-3 hidden">
-  Install App
-        </button>
-      </div>
-    </div>
-
-    <!-- Accessibility popover -->
-    <div id="accessibility-view" class="hidden absolute z-40 text-left p-4 bg-slate-800 rounded-lg shadow-lg w-72 border border-slate-600">
-      <button id="close-accessibility-btn" class="absolute top-2 right-3 text-2xl text-slate-400 hover:text-white">&times;</button>
-      <h3 class="text-lg font-bold text-cyan-400 mb-4 text-center">Accessibility Options</h3>
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <label for="toggle-introductions" class="text-slate-300">Show Introductions</label>
-          <input type="checkbox" id="toggle-introductions" class="h-5 w-5 rounded bg-slate-600 border-slate-500 text-cyan-500 focus:ring-cyan-600" checked />
-        </div>
-        <div class="flex items-center justify-between">
-          <label for="high-contrast-toggle" class="text-slate-300">High Contrast Mode</label>
-          <input type="checkbox" id="high-contrast-toggle" class="h-5 w-5 rounded bg-slate-600 border-slate-500 text-cyan-500 focus:ring-cyan-600" />
-        </div>
-        <div class="flex items-center justify-between">
-          <label for="reduced-motion-toggle" class="text-slate-300">Reduced Motion</label>
-          <input type="checkbox" id="reduced-motion-toggle" class="h-5 w-5 rounded bg-slate-600 border-slate-500 text-cyan-500 focus:ring-cyan-600" />
-        </div>
-        <div class="flex flex-col">
-          <label for="game-speed-slider" class="text-slate-300 mb-2">Game Speed (<span id="speed-label">Normal</span>)</label>
-          <input type="range" id="game-speed-slider" min="10" max="24" value="17" class="w-full" />
-        </div>
-      </div>
-    </div>
-
-    <div id="summary-tooltip" class="hidden absolute z-50 p-2 bg-slate-900 text-white rounded-md shadow-lg pointer-events-none border border-slate-600 text-center"></div>
-    <div id="correct-answer-ghost" class="absolute text-green-400 text-xl font-bold pointer-events-none opacity-0 whitespace-nowrap"></div>
   </div>
 
-  <!-- JS (unchanged except: choices grid + unseenItems fix) -->
-  <script>
-    // DOM elements
-    const scoreEl = document.getElementById('score');
-    const levelEl = document.getElementById('level');
-    const livesContainer = document.getElementById('lives-container');
-    const choicesContainer = document.getElementById('choices-container');
-    const modal = document.getElementById('modal');
-    const startButton = document.getElementById('start-button');
-    const playArea = document.getElementById('play-area');
-    const learnOverlay = document.getElementById('learn-overlay');
-    const learnLetterEl = document.getElementById('learn-letter');
-    const learnName = document.getElementById('learn-name');
-    const learnSound = document.getElementById('learn-sound');
-    const ghostEl = document.getElementById('correct-answer-ghost');
-    const modalSubtitle = document.getElementById('modal-subtitle');
-    const setupView = document.getElementById('setup-view');
-    const gameOverView = document.getElementById('game-over-view');
-    const gameContainer = document.getElementById('game-container');
-    const summaryTooltip = document.getElementById('summary-tooltip');
-
-    const accessibilityBtn = document.getElementById('accessibility-btn');
-    const accessibilityView = document.getElementById('accessibility-view');
-    const closeAccessibilityBtn = document.getElementById('close-accessibility-btn');
-    const highContrastToggle = document.getElementById('high-contrast-toggle');
-    const reducedMotionToggle = document.getElementById('reduced-motion-toggle');
-    const gameSpeedSlider = document.getElementById('game-speed-slider');
-    const speedLabel = document.getElementById('speed-label');
-
-    // Data
-    const hebrewAlphabet = [
-      { hebrew: 'א', sound: 'Silent (A)', name: 'Aleph' }, { hebrew: 'בּ', sound: 'B', name: 'Bet' },
-      { hebrew: 'ב', sound: 'V', name: 'Vet' }, { hebrew: 'ג', sound: 'G', name: 'Gimel' },
-      { hebrew: 'ד', sound: 'D', name: 'Dalet' }, { hebrew: 'ה', sound: 'H', name: 'Heh' },
-      { hebrew: 'ו', sound: 'Vav', name: 'Vav' }, { hebrew: 'ז', sound: 'Zayin' },
-      { hebrew: 'ח', sound: 'Ch', name: 'Chet' }, { hebrew: 'ט', sound: 'T', name: 'Tet' },
-      { hebrew: 'י', sound: 'Y', name: 'Yud' }, { hebrew: 'כּ', sound: 'K', name: 'Kaf' },
-      { hebrew: 'כ', sound: 'Ch (Khaf)', name: 'Chaf' }, { hebrew: 'ך', sound: 'Ch (Final)', name: 'Final Chaf' },
-      { hebrew: 'ל', sound: 'L', name: 'Lamed' }, { hebrew: 'מ', sound: 'M', name: 'Mem' },
-      { hebrew: 'ם', sound: 'M (Final)', name: 'Final Mem' }, { hebrew: 'נ', sound: 'N', name: 'Nun' },
-      { hebrew: 'ן', sound: 'N (Final)', name: 'Final Nun' }, { hebrew: 'ס', sound: 'S', name: 'Samech' },
-      { hebrew: 'ע', sound: 'Silent (Ayin)', name: 'Ayin' }, { hebrew: 'פּ', sound: 'P', name: 'Pei' },
-      { hebrew: 'פ', sound: 'F', name: 'Fei' }, { hebrew: 'ף', sound: 'F (Final)', name: 'Final Fei' },
-      { hebrew: 'צ', sound: 'Tz', name: 'Tzadi' }, { hebrew: 'ץ', sound: 'Tz (Final)', name: 'Final Tzadi' },
-      { hebrew: 'ק', sound: 'K (Qof)', name: 'Kuf' }, { hebrew: 'ר', sound: 'R', name: 'Resh' },
-      { hebrew: 'שׁ', sound: 'Sh', name: 'Shin' }, { hebrew: 'שׂ', sound: 'S (Sin)', name: 'Sin' },
-      { hebrew: 'ת', sound: 'T', name: 'Tav' }
-    ];
-
-    if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js");
-  });
-}
-// PWA install flow
-let deferredPrompt = null;
-const installBtn = document.getElementById('install-btn');
-
-// Listen for Chrome/Edge "beforeinstallprompt"
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();                  // we'll show our own UI
-  deferredPrompt = e;
-  installBtn.classList.remove('hidden'); // reveal the button
-});
-
-// Button triggers the prompt
-installBtn.addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  installBtn.disabled = true;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  // outcome is 'accepted' or 'dismissed'
-  deferredPrompt = null;
-  installBtn.classList.add('hidden');
-  installBtn.disabled = false;
-});
-
-// Optional: hide button once installed
-window.addEventListener('appinstalled', () => {
-  deferredPrompt = null;
-  installBtn.classList.add('hidden');
-});
-
-
- // === Mobile-friendly Pointer Drag Layer ===
-let dropZones = [];        // live list of catcher boxes for hit-testing
-let activeDrag = null;     // {el, data}
-let dragGhost = null;      // ghost element that follows the finger
-let hoverZone = null;      // currently hovered drop zone
-
-function ensureDragGhost() {
-  if (dragGhost) return dragGhost;
-  dragGhost = document.createElement('div');
-  dragGhost.id = 'drag-ghost';
-  document.body.appendChild(dragGhost);
-  return dragGhost;
-}
-
-function refreshDropZones() {
-  dropZones = Array.from(document.querySelectorAll('.catcher-box')).map(el => ({
-    el,
-    rect: el.getBoundingClientRect(),
-  }));
-}
-
-function zoneAt(x, y) {
-  for (let i = 0; i < dropZones.length; i++) {
-    const { el, rect } = dropZones[i];
-    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return el;
-  }
-  return null;
-}
-
-function startPointerDrag(itemEl, payload /* {sound,id,roundId,hebrew} */) {
-  function onDown(e) {
-    if (e.button !== undefined && e.button !== 0) return;
-    e.preventDefault();
-    itemEl.setPointerCapture?.(e.pointerId);
-
-    itemEl.style.animationPlayState = 'paused';
-    itemEl.classList.add('dragging');
-
-    activeDrag = { el: itemEl, data: payload };
-
-    const ghost = ensureDragGhost();
-    ghost.textContent = itemEl.textContent;
-    ghost.className = itemEl.classList.contains('falling-gem') ? 'text-5xl' : 'hebrew-font text-6xl';
-    ghost.style.opacity = '0.95';
-
-    itemEl.style.visibility = 'hidden';
-    onMove(e);
-  }
-
-  function onMove(e) {
-    if (!activeDrag) return;
-    const x = e.clientX, y = e.clientY;
-    const ghost = ensureDragGhost();
-    ghost.style.left = x + 'px';
-    ghost.style.top  = y + 'px';
-
-    const z = zoneAt(x, y);
-    if (z !== hoverZone) {
-      hoverZone?.classList.remove('drag-over');
-      z?.classList.add('drag-over');
-      hoverZone = z;
-    }
-  }
-
-  function onUp(e) {
-    if (!activeDrag) return;
-    itemEl.releasePointerCapture?.(e.pointerId);
-
-    const x = e.clientX, y = e.clientY;
-    const target = zoneAt(x, y);
-    hoverZone?.classList.remove('drag-over');
-    hoverZone = null;
-
-    itemEl.classList.remove('dragging');
-    itemEl.style.visibility = '';
-    itemEl.style.animationPlayState = 'running';
-    if (dragGhost) { dragGhost.remove(); dragGhost = null; }
-
-    if (target) programmaticDrop(target, activeDrag.data);
-    activeDrag = null;
-  }
-
-  itemEl.addEventListener('pointerdown', onDown);
-  itemEl.addEventListener('pointermove', onMove);
-  itemEl.addEventListener('pointerup', onUp);
-  itemEl.addEventListener('pointercancel', onUp);
-  itemEl.addEventListener('lostpointercapture', onUp);
-}
-
-// Call into your existing drop logic without a native drop event
-function programmaticDrop(targetBox, payload /* {sound,id,roundId,hebrew} */) {
-  handleProgrammaticDrop({ preventDefault: () => {}, currentTarget: targetBox }, payload);
-}
-
-// SAME result as handleDrop, but uses `payload` directly (no DataTransfer)
-function handleProgrammaticDrop(e, payload) {
-  const targetBox = e.currentTarget;
-  targetBox.classList.remove('drag-over');
-
-  const { sound: droppedSound, id: droppedId, roundId, hebrew: droppedHebrew } = payload;
-  if (!gameActive || !activeItems.has(droppedId)) return;
-
-  const targetSound = targetBox.dataset.sound;
-  const item = activeItems.get(droppedId);
-
-  item.element.isDropped = true;
-  if (!isBonusRound && !sessionStats[droppedHebrew]) sessionStats[droppedHebrew] = { correct: 0, incorrect: 0 };
-
-  if (isBonusRound || droppedSound === targetSound) {
-    updateScore(isBonusRound ? 25 : 10);
-    targetBox.classList.add('feedback-correct');
-    if (!isBonusRound) sessionStats[droppedHebrew].correct++;
-  } else {
-    lives--; updateLives(true);
-    targetBox.classList.add('feedback-incorrect');
-    if (!isBonusRound) sessionStats[droppedHebrew].incorrect++;
-
-    const correctSound = item.data.sound;
-    const boxRect = targetBox.getBoundingClientRect();
-    const gameRect = gameContainer.getBoundingClientRect();
-    ghostEl.textContent = correctSound;
-
-    ghostEl.style.display = 'block';
-    const ghostWidth = ghostEl.offsetWidth;
-    ghostEl.style.display = '';
-    ghostEl.style.left = `${boxRect.left - gameRect.left + (boxRect.width/2) - (ghostWidth/2)}px`;
-    ghostEl.style.top  = `${boxRect.top  - gameRect.top}px`;
-    ghostEl.classList.add('ghost-rise');
-    setTimeout(() => ghostEl.classList.remove('ghost-rise'), 2000);
-  }
-
-  item.element.removeEventListener('animationend', item.missHandler);
-  setTimeout(() => {
-    targetBox.classList.remove('feedback-correct', 'feedback-incorrect');
-    onItemHandled(droppedId, roundId, false);
-  }, 400);
-}
-
-
-    const consonants = {
-      'א': { name: 'Aleph', sound: '' }, 'ב': { name: 'Bet/Vet', sound: 'B/V'}, 'ג': { name: 'Gimel', sound: 'G'},
-      'ד': { name: 'Dalet', sound: 'D'}, 'ה': { name: 'Heh', sound: 'H'}, 'ו': { name: 'Vav', sound: 'V'},
-      'ז': { name: 'Zayin', sound: 'Z'}, 'ח': { name: 'Chet', sound: 'Ch'}, 'ט': { name: 'Tet', sound: 'T'},
-      'י': { name: 'Yud', sound: 'Y'}, 'כ': { name: 'Kaf/Chaf', sound: 'K/Ch'}, 'ך': { name: 'Final Chaf', sound: 'Ch'},
-      'ל': { name: 'Lamed', sound: 'L'}, 'מ': { name: 'Mem', sound: 'M'}, 'ם': { name: 'Final Mem', sound: 'M'},
-      'נ': { name: 'Nun', sound: 'N'}, 'ן': { name: 'Final Nun', sound: 'N'}, 'ס': { name: 'Samech', sound: 'S'},
-      'ע': { name: 'Ayin', sound: ''}, 'פ': { name: 'Pei/Fei', sound: 'P/F'}, 'ף': { name: 'Final Fei', sound: 'F'},
-      'צ': { name: 'Tzadi', sound: 'Tz'}, 'ץ': { name: 'Final Tzadi', sound: 'Tz'}, 'ק': { name: 'Kuf', sound: 'K'},
-      'ר': { name: 'Resh', sound: 'R'}, 'ש': { name: 'Shin/Sin', sound: 'Sh/S'}, 'ת': { name: 'Tav', sound: 'T'}
-    };
-
-    const vowels = {
-      'a': { name: 'Patach', mark: '\u05B7' },
-      'o': { name: 'Holam', mark: '\u05B9' },
-      'e': { name: 'Segol', mark: '\u05B6' },
-      'i': { name: 'Hirik', mark: '\u05B4' }
-    };
-
-    const vowelSyllables = { vowels1: [], vowels2: [] };
-    function generateSyllables(){
-      const letterPool = ['ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ','ס','פ','צ','ק','ר','ש','ת'];
-      letterPool.forEach(c=>{
-        const baseSound = consonants[c].sound.split('/')[0];
-        if(!baseSound) return;
-        vowelSyllables.vowels1.push({ hebrew: c + vowels.a.mark, sound: baseSound + 'a', name: `${consonants[c].name} + ${vowels.a.name}`});
-        vowelSyllables.vowels1.push({ hebrew: c + vowels.o.mark, sound: baseSound + 'o', name: `${consonants[c].name} + ${vowels.o.name}`});
-        vowelSyllables.vowels2.push({ hebrew: c + vowels.e.mark, sound: baseSound + 'e', name: `${consonants[c].name} + ${vowels.e.name}`});
-        vowelSyllables.vowels2.push({ hebrew: c + vowels.i.mark, sound: baseSound + 'i', name: `${consonants[c].name} + ${vowels.i.name}`});
-      });
-    }
-    generateSyllables();
-
-    // Game State
-    let score, lives, level, scoreForNextLevel, gameActive, fallDuration, isBonusRound, gameMode, introductionsEnabled;
-    let activeItems = new Map();
-    let seenItems;
-    let learningOrder = [];
-    let lastItemSound;
-    let currentRound;
-    let sessionStats;
-    let forcedStartItem = null;
-    let hasIntroducedForItemInLevel;
-    const initialLives = 3;
-    const learnPhaseDuration = 2500;
-    const levelUpThreshold = 50;
-
-    function startGame(){
-      score = 0; lives = initialLives; level = 1;
-      scoreForNextLevel = levelUpThreshold;
-      fallDuration = parseInt(document.getElementById('game-speed-slider').value);
-      gameActive = true; isBonusRound = false;
-      seenItems = new Set(['א','בּ','ל']);
-      lastItemSound = null; currentRound = null; sessionStats = {};
-      hasIntroducedForItemInLevel = false;
-
-      gameMode = document.querySelector('input[name="gameMode"]:checked').value;
-      introductionsEnabled = document.getElementById('toggle-introductions').checked;
-
-      // Build the learning queue
-      let gameItemPool;
-      if (gameMode === 'letters') gameItemPool = hebrewAlphabet;
-      else if (gameMode === 'expert') gameItemPool = [...hebrewAlphabet, ...Object.values(vowelSyllables).flat()];
-      else gameItemPool = vowelSyllables[gameMode];
-
-      learningOrder = gameItemPool.filter(item => !seenItems.has(item.hebrew));
-      for (let i = learningOrder.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [learningOrder[i], learningOrder[j]] = [learningOrder[j], learningOrder[i]];
-      }
-
-      updateScore(0, true); updateLives(); updateLevelDisplay();
-      modal.classList.add('hidden'); learnOverlay.classList.remove('visible');
-
-      activeItems.forEach(item => item.element.remove());
-      activeItems.clear();
-
-      spawnNextRound();
-    }
-
-    function endGame(){
-      gameActive = false;
-      if (currentRound && currentRound.timers) currentRound.timers.forEach(clearTimeout);
-      activeItems.forEach(item => item.element.remove());
-      activeItems.clear();
-
-      displayLearningSummary();
-      setupView.classList.add('hidden');
-      gameOverView.classList.remove('hidden');
-      startButton.textContent = 'Play Again';
-      modal.classList.remove('hidden');
-    }
-
-    function displayLearningSummary(){
-      gameOverView.innerHTML = `
-        <h2 class="text-3xl sm:text-5xl font-bold text-cyan-400 mb-4 hebrew-font">Game Over</h2>
-        <p id="final-score" class="text-2xl text-white mb-6">Final Score: ${score}</p>
-        <div class="learning-summary-container my-6"></div>
-      `;
-      const summaryContainer = gameOverView.querySelector('.learning-summary-container');
-
-      const seenInSession = Object.keys(sessionStats);
-      if (seenInSession.length === 0) {
-        summaryContainer.innerHTML = '<p class="text-slate-400">No stats to show for this round.</p>';
-        return;
-      }
-
-      const encounteredContainer = document.createElement('div');
-      encounteredContainer.className = 'flex flex-wrap gap-2 justify-center mb-6';
-      const allItems = [...hebrewAlphabet, ...Object.values(vowelSyllables).flat()];
-
-      seenInSession.forEach(key=>{
-        const span = document.createElement('span');
-        span.className = 'hebrew-font text-3xl p-2 bg-slate-700 rounded-md cursor-pointer';
-        span.textContent = key;
-
-        span.addEventListener('mouseenter',(e)=>{
-          const itemData = allItems.find(i=>i.hebrew===e.target.textContent);
-          if(!itemData) return;
-          summaryTooltip.innerHTML = `<div class="font-bold">${itemData.name}</div><div>"${itemData.sound}"</div>`;
-          const targetRect = e.target.getBoundingClientRect();
-          const containerRect = gameContainer.getBoundingClientRect();
-          summaryTooltip.style.left = `${targetRect.left - containerRect.left + targetRect.width/2 - summaryTooltip.offsetWidth/2}px`;
-          summaryTooltip.style.top  = `${targetRect.top  - containerRect.top  - summaryTooltip.offsetHeight - 8}px`;
-          summaryTooltip.classList.remove('hidden');
-        });
-        span.addEventListener('mouseleave',()=>summaryTooltip.classList.add('hidden'));
-        encounteredContainer.appendChild(span);
-      });
-
-      const encounteredTitle = document.createElement('h3');
-      encounteredTitle.className = 'text-xl font-bold text-cyan-400 mb-2';
-      encounteredTitle.textContent = 'Items Encountered';
-      summaryContainer.appendChild(encounteredTitle);
-      summaryContainer.appendChild(encounteredContainer);
-
-      let weakestLink = null, maxIncorrect = 0;
-      for (const key in sessionStats) {
-        if (sessionStats[key].incorrect > maxIncorrect) {
-          maxIncorrect = sessionStats[key].incorrect; weakestLink = key;
-        }
-      }
-
-      if (weakestLink && maxIncorrect > 0) {
-        const weakestLinkItem = allItems.find(l=>l.hebrew===weakestLink);
-        if (weakestLinkItem) {
-          const weakestLinkContainer = document.createElement('div');
-          weakestLinkContainer.innerHTML = `
-            <h3 class="text-xl font-bold text-cyan-400 mb-2">Weakest Link</h3>
-            <div class="flex items-center justify-center gap-4">
-              <span class="hebrew-font text-5xl">${weakestLink}</span>
-              <button id="practice-weakest-btn" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold py-2 px-4 rounded-lg">Practice This</button>
-            </div>`;
-          summaryContainer.appendChild(weakestLinkContainer);
-          document.getElementById('practice-weakest-btn').addEventListener('click',()=>{
-            forcedStartItem = weakestLinkItem; startGame();
-          });
-        }
-      }
-    }
-
-    function updateScore(points=0, reset=false){
-      if (reset) score = 0; else score += points;
-      scoreEl.textContent = score;
-      if(points>0){ scoreEl.classList.add('score-pop'); setTimeout(()=>scoreEl.classList.remove('score-pop'),300); }
-      if (score >= scoreForNextLevel && !isBonusRound) levelUp();
-    }
-
-    function levelUp(){
-      level++; hasIntroducedForItemInLevel = false;
-      scoreForNextLevel += levelUpThreshold;
-      if (fallDuration > 7) fallDuration -= 1;
-      isBonusRound = level % 5 === 0 && gameMode === 'letters';
-      const levelUpText = isBonusRound ? "Bonus Round!" : "Level Up!";
-
-      const levelLabel = levelEl.previousElementSibling;
-      levelLabel.classList.add('hidden');
-      levelEl.textContent = levelUpText;
-      levelEl.classList.add('flash-level-up','text-3xl');
-      levelEl.classList.remove('text-2xl');
-      setTimeout(()=>{
-        levelLabel.classList.remove('hidden');
-        levelEl.classList.remove('flash-level-up','text-3xl');
-        levelEl.classList.add('text-2xl');
-        updateLevelDisplay();
-      },1800);
-    }
-
-    function updateLevelDisplay(){ levelEl.textContent = level; }
-
-    function updateLives(isLost=false){
-      livesContainer.innerHTML = '';
-      for(let i=0;i<initialLives;i++){
-        const heart = document.createElement('span');
-        heart.textContent = '❤️';
-        heart.className = `transition-opacity duration-300 ${i < lives ? 'opacity-100' : 'opacity-20'}`;
-        livesContainer.appendChild(heart);
-      }
-      if (isLost) {
-        gameContainer.classList.add('life-lost-shake');
-        setTimeout(()=>gameContainer.classList.remove('life-lost-shake'),500);
-      }
-    }
-
-    function spawnNextRound(){
-      if (!gameActive) return;
-      if (isBonusRound) { spawnBonusRound(); return; }
-
-      let roundItems = [];
-      const key = 'hebrew';
-
-      let itemPool;
-      if (gameMode === 'letters') itemPool = hebrewAlphabet;
-      else if (gameMode === 'expert') itemPool = [...hebrewAlphabet, ...Object.values(vowelSyllables).flat()];
-      else itemPool = vowelSyllables[gameMode];
-
-      let seenSoFar = [...itemPool.filter(l=>seenItems.has(l[key]))];
-
-      const totalItemsInRound = level;
-      const shouldIntroduceNew = !hasIntroducedForItemInLevel && learningOrder.length > 0;
-
-      if (forcedStartItem && level === 1) {
-        roundItems.push(forcedStartItem);
-        forcedStartItem = null;
-        hasIntroducedForItemInLevel = true;
-      } else if (shouldIntroduceNew) {
-        if (level === 1) {
-          if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
-          if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
-        } else {
-          roundItems.push(learningOrder.shift());
-        }
-        hasIntroducedForItemInLevel = true;
-      }
-
-      while (roundItems.length < totalItemsInRound && seenSoFar.length > 0) {
-        const chosenIndex = Math.floor(Math.random() * seenSoFar.length);
-        const reviewItem = seenSoFar.splice(chosenIndex,1)[0];
-        if (!roundItems.some(item=>item[key]===reviewItem[key])) roundItems.push(reviewItem);
-      }
-
-      // Fallbacks (FIX: removed reference to undefined `unseenItems`; use learningOrder instead)
-      if (roundItems.length === 0 && seenSoFar.length > 0) {
-        roundItems.push(seenSoFar[Math.floor(Math.random()*seenSoFar.length)]);
-      } else if (roundItems.length === 0 && learningOrder.length > 0) {
-        roundItems.push(learningOrder.shift());
-      }
-
-      currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [] };
-      generateChoices(roundItems, itemPool);
-      processItemsForRound(roundItems, currentRound.id);
-    }
-
-    function processItemsForRound(items, roundId){
-      let totalDelay = 0;
-      const key = 'hebrew';
-      items.forEach(itemData=>{
-        if (currentRound.id !== roundId) return;
-        const isNewItem = !seenItems.has(itemData[key]);
-        let delayForNext = 500;
-
-        if (isNewItem && introductionsEnabled) {
-          const showTime = totalDelay;
-          const t1 = setTimeout(()=>{
-            if (!gameActive || currentRound.id !== roundId) return;
-            learnLetterEl.textContent = itemData.hebrew;
-            learnName.textContent = itemData.name;
-            learnSound.textContent = `Sound: "${itemData.sound}"`;
-            learnOverlay.classList.add('visible');
-            startItemDrop(itemData, roundId);
-          }, showTime);
-          currentRound.timers.push(t1);
-
-          const t2 = setTimeout(()=>{ learnOverlay.classList.remove('visible'); }, showTime +  learnPhaseDuration);
-          currentRound.timers.push(t2);
-          delayForNext = learnPhaseDuration + 500;
-        } else {
-          const t3 = setTimeout(()=>{ if (gameActive && currentRound.id === roundId) startItemDrop(itemData, roundId); }, totalDelay);
-          currentRound.timers.push(t3);
-        }
-        totalDelay += delayForNext;
-      });
-    }
-
-    function startItemDrop(itemData, roundId){
-      if(!gameActive) return;
-      const itemId = `item-${Date.now()}-${Math.random()}`;
-      const itemEl = document.createElement('div');
-      itemEl.id = itemId; itemEl.isDropped = false; itemEl.textContent = itemData.hebrew;
-      const reducedMotion = document.getElementById('reduced-motion-toggle').checked;
-      const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1','river-flow-2'][Math.floor(Math.random()*2)];
-      itemEl.className = `falling-letter text-6xl sm:text-7xl font-bold hebrew-font text-cyan-300 ${animationName}`;
-      itemEl.style.top = `${Math.random()*70}%`;
-      itemEl.style.animationDuration = `${parseInt(document.getElementById('game-speed-slider').value)}s`;
-      itemEl.draggable = true;
-      itemEl.addEventListener('dragstart',(e)=>{
-        const dragData = JSON.stringify({ sound: itemData.sound, id: itemId, roundId: roundId, hebrew: itemData.hebrew });
-        e.dataTransfer.setData('application/json', dragData);
-        itemEl.style.animationPlayState = 'paused';
-        itemEl.classList.add('dragging');
-        setTimeout(()=>{ itemEl.style.visibility = 'hidden'; }, 0);
-      });
-      itemEl.addEventListener('dragend', ()=>{
-        itemEl.classList.remove('dragging');
-        if(!itemEl.isDropped){ itemEl.style.visibility='visible'; itemEl.style.animationPlayState='running'; }
-      });
-      const missHandler = ()=>onItemHandled(itemId, roundId, true);
-      itemEl.addEventListener('animationend', missHandler);
-      activeItems.set(itemId, { data:itemData, element:itemEl, missHandler });
-      playArea.appendChild(itemEl);
-      startPointerDrag(itemEl, { sound: itemData.sound, id: itemId, roundId, hebrew: itemData.hebrew });
-    }
-
-    function onItemHandled(itemId, roundId, isMiss){
-      if (!activeItems.has(itemId)) return;
-      if (roundId === 'bonus') {
-        const item = activeItems.get(itemId);
-        item.element.remove(); activeItems.delete(itemId); return;
-      }
-      if (!currentRound || currentRound.id !== roundId) return;
-
-      const item = activeItems.get(itemId);
-      const key = item.data.hebrew;
-      if(!sessionStats[key]) sessionStats[key] = { correct:0, incorrect:0 };
-      if(isMiss) sessionStats[key].incorrect++;
-      seenItems.add(key);
-
-      item.element.remove(); activeItems.delete(itemId);
-      currentRound.handledCount++;
-
-      if (isMiss && !isBonusRound) { lives--; updateLives(true); }
-      if (lives <= 0) { endGame(); return; }
-      if (currentRound.handledCount === currentRound.items.length) {
-        if (isBonusRound) isBonusRound = false;
-        spawnNextRound();
-      }
-    }
-
-    function generateChoices(correctItems, itemPool){
-      choicesContainer.innerHTML = '';
-      if (correctItems.length === 0) return;
-
-      const correctChoices = correctItems.filter((item, idx, self)=> idx === self.findIndex(i=>i.sound===item.sound));
-      const correctSounds = new Set(correctChoices.map(i=>i.sound));
-      let finalChoices = [...correctChoices];
-
-      let distractorPool = itemPool.filter(i=>!correctSounds.has(i.sound));
-      distractorPool.sort(()=>0.5 - Math.random());
-
-      let i = 0;
-      while (finalChoices.length < 4 && i < distractorPool.length) { finalChoices.push(distractorPool[i]); i++; }
-
-      // NOTE: keep a fixed responsive grid (we predeclared grid-cols-2/3/4/5 in HTML to avoid Tailwind JIT issues from dynamic class names)
-      finalChoices.sort(()=>0.5 - Math.random());
-
-      finalChoices.forEach(choice=>{
-        const box = document.createElement('div');
-        box.textContent = choice.sound; box.dataset.sound = choice.sound;
-        box.className = 'catcher-box bg-slate-700 text-white font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-slate-600';
-        box.addEventListener('dragover', (e)=>{ e.preventDefault(); box.classList.add('drag-over'); });
-        box.addEventListener('dragleave', ()=> box.classList.remove('drag-over'));
-        box.addEventListener('drop', handleDrop);
-        choicesContainer.appendChild(box);
-        });
-    refreshDropZones();
-    }
-
-    function handleDrop(e){
-      e.preventDefault();
-      const targetBox = e.currentTarget;
-      targetBox.classList.remove('drag-over');
-      const { sound: droppedSound, id: droppedId, roundId, hebrew: droppedHebrew } = JSON.parse(e.dataTransfer.getData('application/json'));
-      if (!gameActive || !activeItems.has(droppedId)) return;
-
-      const targetSound = targetBox.dataset.sound;
-      const item = activeItems.get(droppedId);
-
-      item.element.isDropped = true;
-      if(!isBonusRound && !sessionStats[droppedHebrew]) sessionStats[droppedHebrew] = {correct:0, incorrect:0};
-
-      if (isBonusRound || droppedSound === targetSound) {
-        updateScore(isBonusRound ? 25 : 10);
-        targetBox.classList.add('feedback-correct');
-        if(!isBonusRound) sessionStats[droppedHebrew].correct++;
-      } else {
-        lives--; updateLives(true);
-        targetBox.classList.add('feedback-incorrect');
-        if(!isBonusRound) sessionStats[droppedHebrew].incorrect++;
-
-        const correctSound = item.data.sound;
-        const boxRect = targetBox.getBoundingClientRect();
-        const gameRect = gameContainer.getBoundingClientRect();
-        ghostEl.textContent = correctSound;
-        ghostEl.style.display = 'block';
-        const ghostWidth = ghostEl.offsetWidth;
-        ghostEl.style.display = '';
-        ghostEl.style.left = `${boxRect.left - gameRect.left + (boxRect.width/2) - (ghostWidth/2)}px`;
-        ghostEl.style.top  = `${boxRect.top  - gameRect.top}px`;
-        ghostEl.classList.add('ghost-rise');
-        setTimeout(()=>{ ghostEl.classList.remove('ghost-rise'); }, 2000);
-      }
-
-      item.element.removeEventListener('animationend', item.missHandler);
-      setTimeout(()=>{
-        targetBox.classList.remove('feedback-correct','feedback-incorrect');
-        onItemHandled(droppedId, roundId, false);
-      }, 400);
-    }
-
-    // Bonus round
- function spawnBonusRound(){
-   if(!gameActive) return;
-   activeItems.forEach(item=>item.element.remove()); activeItems.clear();
-   choicesContainer.innerHTML = '';
-
-   learnLetterEl.textContent = '💎';
-   learnName.textContent = 'Bonus Round!';
-   learnSound.textContent = 'Catch the gems!';
-   learnOverlay.classList.add('visible');
--  refreshDropZones();
-
-   const bonusCatcher = document.createElement('div');
-   bonusCatcher.textContent = 'Catch Here!';
-   bonusCatcher.dataset.sound = 'bonus-gem';
-   bonusCatcher.className = 'catcher-box bg-yellow-500 text-slate-900 font-bold py-6 px-2 rounded-lg text-lg transition-all border-2 border-yellow-400 col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5';
-   bonusCatcher.addEventListener('dragover', (e)=>{ e.preventDefault(); bonusCatcher.classList.add('drag-over'); });
-   bonusCatcher.addEventListener('dragleave', ()=> bonusCatcher.classList.remove('drag-over'));
-   bonusCatcher.addEventListener('drop', handleDrop);
-   choicesContainer.appendChild(bonusCatcher);
-   refreshDropZones();
-     
-      let timeLeft = 10;
-      const bonusDuration = 10000;
-      const bonusTimerInterval = setInterval(()=>{
-        timeLeft--; learnSound.textContent = `Time left: ${timeLeft}`;
-        if (timeLeft <= 0) clearInterval(bonusTimerInterval);
-      },1000);
-
-      const gemSpawner = setInterval(()=>{
-        if(!gameActive){ clearInterval(gemSpawner); return; }
-        startGemDrop();
-      },400);
-
-      setTimeout(()=>{
-        clearInterval(gemSpawner); clearInterval(bonusTimerInterval);
-        setTimeout(()=>{
-          if(!gameActive) return;
-          learnOverlay.classList.remove('visible');
-          isBonusRound = false;
-          document.querySelectorAll('.falling-gem').forEach(gem=>gem.remove());
-          spawnNextRound();
-        },2000);
-      }, bonusDuration);
-    }
-
-    function startGemDrop(){
-      if(!gameActive) return;
-      const itemId = `gem-${Date.now()}-${Math.random()}`;
-      const itemEl = document.createElement('div');
-      itemEl.id = itemId; itemEl.isDropped = false; itemEl.textContent = '💎';
-      const reducedMotion = document.getElementById('reduced-motion-toggle').checked;
-      const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1','river-flow-2'][Math.floor(Math.random()*2)];
-      itemEl.className = `falling-gem text-4xl sm:text-5xl ${animationName}`;
-      itemEl.style.top = `${Math.random()*70}%`;
-      const bonusSpeed = Math.max(5, parseInt(document.getElementById('game-speed-slider').value) - 5);
-      itemEl.style.animationDuration = `${bonusSpeed}s`;
-      itemEl.draggable = true;
-      itemEl.addEventListener('dragstart',(e)=>{
-        const dragData = JSON.stringify({ sound:'bonus-gem', id:itemId, roundId:'bonus', hebrew:'gem' });
-        e.dataTransfer.setData('application/json', dragData);
-        itemEl.style.animationPlayState='paused';
-        itemEl.classList.add('dragging');
-        setTimeout(()=>{ itemEl.style.visibility='hidden'; },0);
-      });
-        
-      itemEl.addEventListener('dragend',()=>{
-        itemEl.classList.remove('dragging');
-        if(!itemEl.isDropped){ itemEl.style.visibility='visible'; itemEl.style.animationPlayState='running'; }
-      });
-      const missHandler = ()=>onItemHandled(itemId,'bonus',true);
-      itemEl.addEventListener('animationend', missHandler);
-      activeItems.set(itemId, { data:{sound:'bonus-gem'}, element:itemEl, missHandler });
-      playArea.appendChild(itemEl);
-    startPointerDrag(itemEl, { sound: 'bonus-gem', id: itemId, roundId: 'bonus', hebrew: 'gem' });
-    }
-
-    // Accessibility & setup
-    accessibilityBtn.addEventListener('click', ()=>{
-      const btnRect = accessibilityBtn.getBoundingClientRect();
-      const containerRect = gameContainer.getBoundingClientRect();
-      accessibilityView.style.top  = `${btnRect.bottom - containerRect.top + 5}px`;
-      accessibilityView.style.right= `${containerRect.right - btnRect.right}px`;
-      accessibilityView.classList.toggle('hidden');
-    });
-    closeAccessibilityBtn.addEventListener('click', ()=> accessibilityView.classList.add('hidden'));
-    highContrastToggle.addEventListener('change', (e)=> document.body.classList.toggle('high-contrast', e.target.checked));
-
-    gameSpeedSlider.addEventListener('input',(e)=>{
-      const v = parseInt(e.target.value);
-      if (v > 20) speedLabel.textContent = 'Slow';
-      else if (v < 14) speedLabel.textContent = 'Fast';
-      else speedLabel.textContent = 'Normal';
-    });
-
-    function updateModalSubtitle(){
-      const selectedMode = document.querySelector('input[name="gameMode"]:checked').value;
-      let text = "Drag the moving ";
-      text += (selectedMode.startsWith('vowel') || selectedMode === 'expert') ? "item to the correct box!" : "letter to the correct box!";
-      modalSubtitle.textContent = text;
-    }
-    document.querySelectorAll('input[name="gameMode"]').forEach(r=> r.addEventListener('change', updateModalSubtitle));
-
-    startButton.addEventListener('click', ()=>{
-      if (startButton.textContent === 'Play Again') {
-        gameOverView.classList.add('hidden');
-        setupView.classList.remove('hidden');
-        accessibilityView.classList.add('hidden');
-        startButton.textContent = 'Start Game';
-        updateModalSubtitle();
-      } else {
-        startGame();
-      }
-    });
-
-    updateLives();
-    updateModalSubtitle();
-  </script>
+  <div id="game-view" class="hidden px-3 sm:px-4 pb-4">
+    <div id="game-container" class="w-full text-center relative max-w-6xl mx-auto">
+      <button id="back-to-menu-button" class="absolute -top-2 sm:top-0 -left-2 sm:left-0 z-40 bg-slate-800/90 border border-slate-700 text-sm sm:text-base px-3 sm:px-4 py-2 rounded-full flex items-center gap-2 hover:bg-slate-700 transition">
+        <span class="text-lg">←</span>
+        <span>Main Menu</span>
+      </button>
+
+      <div class="flex justify-between items-center bg-slate-800 p-3 rounded-lg mb-3 sm:mb-4 text-base sm:text-lg">
+        <div>
+          <span class="font-bold text-slate-300">Score:</span>
+          <span id="score" class="font-bold text-cyan-400 text-xl sm:text-2xl inline-block">0</span>
+        </div>
+        <div>
+          <span class="font-bold text-slate-300">Level:</span>
+          <span id="level" class="font-bold text-yellow-400 text-xl sm:text-2xl inline-block">1</span>
+        </div>
+        <div id="lives-container" class="flex space-x-2"></div>
+      </div>
+
+      <div id="play-area" class="relative bg-slate-800 rounded-lg w-full overflow-hidden">
+        <div id="learn-overlay" class="absolute top-2 sm:top-4 left-1/2 w-auto bg-slate-900/95 flex items-center justify-center py-2 sm:py-3 px-4 sm:px-8 rounded-lg z-20 gap-3 sm:gap-6 border border-slate-700">
+          <div id="learn-letter" class="text-4xl sm:text-6xl font-bold text-cyan-400 hebrew-font"></div>
+          <div class="flex flex-col text-center">
+            <div id="learn-name" class="text-lg sm:text-2xl text-white"></div>
+            <div id="learn-sound" class="text-sm sm:text-lg text-slate-300"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="choices-container" class="grid gap-3 mt-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"></div>
+
+      <div id="modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-3 sm:p-4 z-30 overflow-y-auto overscroll-contain">
+        <div id="modal-content" class="text-center bg-slate-800 p-4 sm:p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg md:max-w-2xl relative mx-auto">
+          <button id="accessibility-btn" class="absolute top-3 right-3 sm:top-4 sm:right-4 text-2xl text-slate-400 hover:text-cyan-400 transition">⚙️</button>
+
+          <div id="setup-view">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-cyan-400 hebrew-font mb-2">Hebrew Letter River</h1>
+            <p id="modal-subtitle" class="text-slate-400 mb-4 sm:mb-6 text-sm sm:text-base"></p>
+            <p class="text-lg sm:text-xl text-slate-300 mb-4 sm:mb-6">Choose what you want to practice:</p>
+
+            <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 justify-center text-left max-w-lg mx-auto">
+              <label class="setup-label">
+                <input type="radio" name="gameMode" value="letters" checked class="hidden" />
+                <div class="flex-grow p-3 border-2 border-slate-600 rounded-md">
+                  <span class="font-bold text-white">Letters Only</span>
+                  <p class="text-sm text-slate-400">Master the 22 core letters.</p>
+                </div>
+              </label>
+
+              <label class="setup-label">
+                <input type="radio" name="gameMode" value="vowels1" class="hidden" />
+                <div class="flex-grow p-3 border-2 border-slate-600 rounded-md">
+                  <span class="font-bold text-white">'A' &amp; 'O' Vowels</span>
+                  <p class="text-sm text-slate-400">Practice Patach and Holam.</p>
+                </div>
+              </label>
+
+              <label class="setup-label">
+                <input type="radio" name="gameMode" value="vowels2" class="hidden" />
+                <div class="flex-grow p-3 border-2 border-slate-600 rounded-md">
+                  <span class="font-bold text-white">'E' &amp; 'I' Vowels</span>
+                  <p class="text-sm text-slate-400">Practice Segol and Hirik.</p>
+                </div>
+              </label>
+
+              <label class="setup-label">
+                <input type="radio" name="gameMode" value="expert" class="hidden" />
+                <div class="flex-grow p-3 border-2 border-slate-600 rounded-md">
+                  <span class="font-bold text-white">Expert Mode</span>
+                  <p class="text-sm text-slate-400">Mix of all letters &amp; vowels.</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div id="game-over-view" class="hidden">
+            <h2 class="text-3xl sm:text-5xl font-bold text-cyan-400 mb-4 hebrew-font">Game Over</h2>
+            <div class="learning-summary-container my-6"></div>
+          </div>
+
+          <button id="start-button" class="bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-3 px-6 sm:px-8 rounded-lg text-lg sm:text-xl transition-transform hover:scale-105 mt-4 sm:mt-6 w-full sm:w-auto">
+            Start Game
+          </button>
+          <button id="install-btn" class="bg-yellow-400 text-slate-900 font-bold py-3 px-4 rounded-lg mt-3 hidden">
+            Install App
+          </button>
+        </div>
+      </div>
+
+      <div id="accessibility-view" class="hidden absolute z-40 text-left p-4 bg-slate-800 rounded-lg shadow-lg w-72 border border-slate-600">
+        <button id="close-accessibility-btn" class="absolute top-2 right-3 text-2xl text-slate-400 hover:text-white">&times;</button>
+        <h3 class="text-lg font-bold text-cyan-400 mb-4 text-center">Accessibility Options</h3>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <label for="toggle-introductions" class="text-slate-300">Show Introductions</label>
+            <input type="checkbox" id="toggle-introductions" class="h-5 w-5 rounded bg-slate-600 border-slate-500 text-cyan-500 focus:ring-cyan-600" checked />
+          </div>
+          <div class="flex items-center justify-between">
+            <label for="high-contrast-toggle" class="text-slate-300">High Contrast Mode</label>
+            <input type="checkbox" id="high-contrast-toggle" class="h-5 w-5 rounded bg-slate-600 border-slate-500 text-cyan-500 focus:ring-cyan-600" />
+          </div>
+          <div class="flex items-center justify-between">
+            <label for="reduced-motion-toggle" class="text-slate-300">Reduced Motion</label>
+            <input type="checkbox" id="reduced-motion-toggle" class="h-5 w-5 rounded bg-slate-600 border-slate-500 text-cyan-500 focus:ring-cyan-600" />
+          </div>
+          <div class="flex flex-col">
+            <label for="game-speed-slider" class="text-slate-300 mb-2">Game Speed (<span id="speed-label">Normal</span>)</label>
+            <input type="range" id="game-speed-slider" min="10" max="24" value="17" class="w-full" />
+          </div>
+        </div>
+      </div>
+
+      <div id="summary-tooltip" class="hidden absolute z-50 p-2 bg-slate-900 text-white rounded-md shadow-lg pointer-events-none border border-slate-600 text-center"></div>
+      <div id="correct-answer-ghost" class="absolute text-green-400 text-xl font-bold pointer-events-none opacity-0 whitespace-nowrap"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
