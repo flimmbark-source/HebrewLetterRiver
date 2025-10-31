@@ -8,7 +8,6 @@ import { ProgressProvider } from './context/ProgressContext.jsx';
 import { GameProvider, useGame } from './context/GameContext.jsx';
 import { LocalizationProvider, useLocalization } from './context/LocalizationContext.jsx';
 import { LanguageProvider, useLanguage } from './context/LanguageContext.jsx';
-import { getDictionary, translate as translateFromDictionary } from './i18n/index.js';
 
 function HomeIcon(props) {
   return (
@@ -86,14 +85,9 @@ function LanguageOnboardingModal() {
     markLanguageSelected,
     languageOptions
   } = useLanguage();
-  const englishDictionary = React.useMemo(() => getDictionary('english'), []);
+  const { t: translateOnboarding } = useLocalization();
   const [pendingPracticeId, setPendingPracticeId] = React.useState(languageId);
   const [pendingAppId, setPendingAppId] = React.useState(appLanguageId);
-
-  const translateOnboarding = React.useCallback(
-    (key, replacements) => translateFromDictionary(englishDictionary, key, replacements),
-    [englishDictionary]
-  );
 
   React.useEffect(() => {
     setPendingPracticeId(languageId);
