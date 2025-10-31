@@ -31,6 +31,7 @@ const englishPack = {
   id: 'english',
   name: 'English',
   metadata: {
+    dictionaryId: 'english',
     fontClass: 'language-font-latin',
     textDirection: 'ltr',
     accessibility: {

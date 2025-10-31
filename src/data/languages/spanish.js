@@ -31,6 +31,7 @@ const spanishPack = {
   id: 'spanish',
   name: 'Spanish',
   metadata: {
+    dictionaryId: 'spanish',
     fontClass: 'language-font-latin',
     textDirection: 'ltr',
     accessibility: {

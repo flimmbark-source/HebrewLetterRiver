@@ -31,6 +31,7 @@ const bengaliPack = {
   id: 'bengali',
   name: 'Bengali',
   metadata: {
+    dictionaryId: 'bengali',
     fontClass: 'language-font-bengali',
     textDirection: 'ltr',
     accessibility: {

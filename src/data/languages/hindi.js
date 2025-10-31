@@ -31,6 +31,7 @@ const hindiPack = {
   id: 'hindi',
   name: 'Hindi',
   metadata: {
+    dictionaryId: 'hindi',
     fontClass: 'language-font-devanagari',
     textDirection: 'ltr',
     accessibility: {

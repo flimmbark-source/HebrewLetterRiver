@@ -1,0 +1,189 @@
+{
+  "language": {
+    "id": "mandarin",
+    "name": "普通话 中文"
+  },
+  "app": {
+    "title": "希伯来语字母河",
+    "tagline": "流动、学习并庆祝每一次捕获。",
+    "nav": {
+      "home": "家",
+      "play": "玩",
+      "achievements": "成就",
+      "learn": "学习"
+    },
+    "languagePicker": {
+      "label": "应用程序语言",
+      "helper": "设置界面语言。",
+      "onboardingTitle": "选择您的语言",
+      "onboardingSubtitle": "选择您想要练习的界面语言和字母表。",
+      "confirm": "开始学习"
+    },
+    "practicePicker": {
+      "label": "练习语言",
+      "helper": "选择您想要探索的语言包。"
+    },
+    "footer": {
+      "resetNotice": "重置时间为每天 00:00 亚洲/耶路撒冷。"
+    }
+  },
+  "home": {
+    "hero": {
+      "dailyTitle": "今天的每日任务",
+      "heading": "完成所有三条河流的挑战。",
+      "description": "通过完成专为您量身定制的热身、专注和香料任务，保持您的连胜并获得新的星星。"
+    },
+    "languagePicker": {
+      "label": "练习语言",
+      "helper": "随时切换以使用另一个脚本进行训练。"
+    },
+    "cta": {
+      "start": "开始新的跑步",
+      "practice": "实践焦点信"
+    }
+  },
+  "game": {
+    "labels": {
+      "level": "等级",
+      "score": "分数"
+    },
+    "controls": {
+      "leave": "离开游戏",
+      "start": "开始游戏",
+      "playAgain": "再玩一次",
+      "install": "安装应用程序",
+      "accessibility": "辅助功能选项",
+      "close": "关闭"
+    },
+    "setup": {
+      "title": "希伯来语字母河",
+      "subtitleFallback": "把移动的{{noun}}拖到正确的方框！",
+      "prompt": "选择你想要练习的内容：",
+      "installDescription": "安装应用程序",
+      "defaultNoun": "字",
+      "defaultModeLabel": "核心实践",
+      "defaultModeDescription": "练习主要角色。"
+    },
+    "modes": {
+      "letters": {
+        "label": "仅限信件",
+        "description": "练习核心字母集。",
+        "noun": "信"
+      },
+      "vowels1": {
+        "label": "“A”和“O”元音",
+        "description": "练习 Patach 和 Holam 元音标记。",
+        "noun": "物品"
+      },
+      "vowels2": {
+        "label": "“E”和“I”元音",
+        "description": "练习 Segol 和 Hirik 元音标记。",
+        "noun": "物品"
+      },
+      "expert": {
+        "label": "专家模式",
+        "description": "混合字母和元音以获得额外的挑战。",
+        "noun": "物品"
+      },
+      "hiragana": {
+        "label": "平假名",
+        "description": "练习基本的平假名字符。",
+        "noun": "特点"
+      },
+      "characters": {
+        "label": "人物",
+        "description": "练习基本人物。",
+        "noun": "字"
+      }
+    },
+    "accessibility": {
+      "showIntroductions": "展会介绍",
+      "highContrast": "高对比度模式",
+      "reducedMotion": "减少运动",
+      "speed": "游戏速度",
+      "speedFast": "快速地",
+      "speedNormal": "普通的",
+      "speedSlow": "慢的",
+      "gear": "辅助功能设置"
+    },
+    "bonus": {
+      "title": "奖金回合！",
+      "instruction": "抓住宝石！",
+      "catchHere": "抓住这里！",
+      "timeLeft": "剩余时间：{{seconds}}",
+      "gemAria": "奖励宝石"
+    },
+    "summary": {
+      "heading": "遇到的物品",
+      "empty": "本轮没有可显示的统计数据。",
+      "gameOver": "游戏结束",
+      "finalScore": "最终得分：{{score}}",
+      "weakestLink": "最薄弱的环节",
+      "weakestLinkDescription": "下次重点关注这个项目。",
+      "characterLabel": "字符 {{symbol}}",
+      "characterLabelWithPronunciation": "字符 {{symbol}} 发音为 {{pronunciation}}",
+      "soundLabel": "声音：{{sound}}",
+      "learningRecap": "学习回顾",
+      "practice": "练习这个"
+    },
+    "status": {
+      "bonusRound": "奖金回合！",
+      "bonusInstruction": "抓住宝石！",
+      "lives": "生活",
+      "levelUp": "升级！"
+    }
+  },
+  "achievements": {
+    "title": "成就",
+    "description": "推进每一层以收集星星。每一个里程碑都会为您沿着希伯来字母河顺流而下的旅程提供动力。",
+    "tier": "等级",
+    "tierProgress": "层 {{current}} / {{total}}",
+    "next": "下一页：{{label}}",
+    "complete": "所有层级均已完成",
+    "earnStars": "解锁此级别后，可赚取 +{{stars}} ⭐。",
+    "maxed": "完全掌握徽章——享受光芒！"
+  },
+  "learn": {
+    "title": "学习",
+    "intro": "深入学习精心策划的课程来掌握每个字母。新的学习模块即将在这里出现！",
+    "body": "在那之前，继续探索河流并定期回来查看指导练习课程、发音技巧和文化见解。"
+  },
+  "badges": {
+    "firstFlow": {
+      "name": "第一流",
+      "summary": "完整播放 {{gameName}}。",
+      "tiers": {
+        "1": "青铜电流",
+        "2": "银价飙升",
+        "3": "金色洪流"
+      }
+    },
+    "steadyStreak": {
+      "name": "连胜保持者",
+      "summary": "连续几天登录并玩。",
+      "tiers": {
+        "1": "周末浪潮",
+        "2": "月光奔跑",
+        "3": "永恒之河"
+      }
+    },
+    "letterMaster": {
+      "name": "信大师",
+      "summary": "抓住物品而不丢失。",
+      "tiers": {
+        "1": "聚焦飞溅",
+        "2": "精密流量",
+        "3": "完美电流"
+      }
+    },
+    "gemChaser": {
+      "name": "宝石追逐者",
+      "summary": "赢得奖励回合并收集河流宝石。",
+      "tiers": {
+        "1": "波光粼粼的溪流",
+        "2": "快速闪烁",
+        "3": "辐射级联"
+      }
+    }
+  }
+}

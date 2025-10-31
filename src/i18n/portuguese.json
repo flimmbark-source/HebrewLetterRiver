@@ -1,0 +1,189 @@
+{
+  "language": {
+    "id": "portuguese",
+    "name": "Português"
+  },
+  "app": {
+    "title": "Rio Letra Hebraica",
+    "tagline": "Flua, aprenda e comemore cada captura.",
+    "nav": {
+      "home": "Lar",
+      "play": "Jogar",
+      "achievements": "Conquistas",
+      "learn": "Aprender"
+    },
+    "languagePicker": {
+      "label": "Idioma do aplicativo",
+      "helper": "Defina o idioma da interface.",
+      "onboardingTitle": "Escolha seus idiomas",
+      "onboardingSubtitle": "Escolha o idioma da interface e o alfabeto que deseja praticar.",
+      "confirm": "Comece a aprender"
+    },
+    "practicePicker": {
+      "label": "Pratique a linguagem",
+      "helper": "Escolha qual pacote de idiomas você deseja explorar."
+    },
+    "footer": {
+      "resetNotice": "O reset acontece diariamente às 00:00 Ásia/Jerusalém."
+    }
+  },
+  "home": {
+    "hero": {
+      "dailyTitle": "A missão diária de hoje",
+      "heading": "Flua através de todos os três desafios do rio.",
+      "description": "Mantenha sua sequência viva e conquiste novas estrelas completando as missões de Aquecimento, Foco e Especiarias feitas sob medida para você."
+    },
+    "languagePicker": {
+      "label": "Pratique a linguagem",
+      "helper": "Mude a qualquer momento para treinar em outro script."
+    },
+    "cta": {
+      "start": "Comece uma nova corrida",
+      "practice": "Carta de foco prático"
+    }
+  },
+  "game": {
+    "labels": {
+      "level": "Nível",
+      "score": "Pontuação"
+    },
+    "controls": {
+      "leave": "Sair do jogo",
+      "start": "Iniciar jogo",
+      "playAgain": "Jogue novamente",
+      "install": "Instalar aplicativo",
+      "accessibility": "Opções de acessibilidade",
+      "close": "Fechar"
+    },
+    "setup": {
+      "title": "Rio Letra Hebraica",
+      "subtitleFallback": "Arraste a {{noun}} em movimento para o espaço correto.",
+      "prompt": "Escolha o que você quer praticar:",
+      "installDescription": "Instalar aplicativo",
+      "defaultNoun": "letra",
+      "defaultModeLabel": "Prática Básica",
+      "defaultModeDescription": "Pratique o conjunto principal de personagens."
+    },
+    "modes": {
+      "letters": {
+        "label": "Somente letras",
+        "description": "Pratique o conjunto básico de letras.",
+        "noun": "letra"
+      },
+      "vowels1": {
+        "label": "Vogais 'A' e 'O'",
+        "description": "Pratique as marcas vocálicas Patach e Holam.",
+        "noun": "item"
+      },
+      "vowels2": {
+        "label": "Vogais 'E' e 'I'",
+        "description": "Pratique as marcas vocálicas Segol e Hirik.",
+        "noun": "item"
+      },
+      "expert": {
+        "label": "Modo Especialista",
+        "description": "Misture letras e vogais para um desafio extra.",
+        "noun": "item"
+      },
+      "hiragana": {
+        "label": "Hiragana",
+        "description": "Pratique os caracteres básicos do hiragana.",
+        "noun": "personagem"
+      },
+      "characters": {
+        "label": "Personagens",
+        "description": "Pratique caracteres essenciais.",
+        "noun": "personagem"
+      }
+    },
+    "accessibility": {
+      "showIntroductions": "Mostrar apresentações",
+      "highContrast": "Modo de alto contraste",
+      "reducedMotion": "Movimento Reduzido",
+      "speed": "Velocidade do jogo",
+      "speedFast": "Rápido",
+      "speedNormal": "Normal",
+      "speedSlow": "Lento",
+      "gear": "Configurações de acessibilidade"
+    },
+    "bonus": {
+      "title": "Rodada de bônus!",
+      "instruction": "Pegue as joias!",
+      "catchHere": "Pegue aqui!",
+      "timeLeft": "Tempo restante: {{seconds}}",
+      "gemAria": "Joia bônus"
+    },
+    "summary": {
+      "heading": "Itens encontrados",
+      "empty": "Não há estatísticas para mostrar para esta rodada.",
+      "gameOver": "Game Over",
+      "finalScore": "Pontuação final: {{score}}",
+      "weakestLink": "Elo mais fraco",
+      "weakestLinkDescription": "Concentre-se neste item na próxima vez.",
+      "characterLabel": "Personagem {{symbol}}",
+      "characterLabelWithPronunciation": "Caractere {{symbol}} pronunciado {{pronunciation}}",
+      "soundLabel": "Som: {{sound}}",
+      "learningRecap": "Recapitulação da aprendizagem",
+      "practice": "Pratique isso"
+    },
+    "status": {
+      "bonusRound": "Rodada de bônus!",
+      "bonusInstruction": "Pegue as joias!",
+      "lives": "Vidas",
+      "levelUp": "Suba de nível!"
+    }
+  },
+  "achievements": {
+    "title": "Conquistas",
+    "description": "Avance através de cada nível para coletar estrelas. Cada marco alimenta sua jornada pelo Rio das Letras Hebraicas.",
+    "tier": "Nível",
+    "tierProgress": "Camada {{current}} / {{total}}",
+    "next": "Próximo: {{label}}",
+    "complete": "Todas as camadas concluídas",
+    "earnStars": "Ganhe +{{stars}} ⭐ ao desbloquear este nível.",
+    "maxed": "Distintivo totalmente dominado – aproveite o brilho!"
+  },
+  "learn": {
+    "title": "Aprender",
+    "intro": "Mergulhe em lições selecionadas para dominar cada letra. Novos módulos de aprendizagem aparecerão aqui em breve!",
+    "body": "Até então, continue explorando o rio e volte regularmente para sessões práticas guiadas, dicas de pronúncia e insights culturais."
+  },
+  "badges": {
+    "firstFlow": {
+      "name": "Primeiro Fluxo",
+      "summary": "Jogue uma rodada completa de {{gameName}}.",
+      "tiers": {
+        "1": "Corrente de Bronze",
+        "2": "Surto de Prata",
+        "3": "Torrente Dourada"
+      }
+    },
+    "steadyStreak": {
+      "name": "Guardião de Sequências",
+      "summary": "Faça login e jogue em dias consecutivos.",
+      "tiers": {
+        "1": "Onda de fim de semana",
+        "2": "Corrida ao luar",
+        "3": "Rio Eterno"
+      }
+    },
+    "letterMaster": {
+      "name": "Mestre da Carta",
+      "summary": "Pegue itens sem errar.",
+      "tiers": {
+        "1": "Respingo Focado",
+        "2": "Fluxo de Precisão",
+        "3": "Corrente Perfeita"
+      }
+    },
+    "gemChaser": {
+      "name": "Caçador de Gemas",
+      "summary": "Ganhe rodadas de bônus e colete joias do rio.",
+      "tiers": {
+        "1": "Fluxo Espumante",
+        "2": "Cintilante Rápido",
+        "3": "Cascata Radiante"
+      }
+    }
+  }
+}

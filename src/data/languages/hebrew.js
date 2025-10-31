@@ -105,6 +105,7 @@ const hebrewPack = {
   id: 'hebrew',
   name: 'Hebrew',
   metadata: {
+    dictionaryId: 'hebrew',
     fontClass: 'language-font-hebrew',
     textDirection: 'rtl',
     accessibility: {

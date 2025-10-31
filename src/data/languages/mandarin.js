@@ -31,6 +31,7 @@ const mandarinPack = {
   id: 'mandarin',
   name: 'Mandarin Chinese',
   metadata: {
+    dictionaryId: 'mandarin',
     fontClass: 'language-font-han',
     textDirection: 'ltr',
     accessibility: {

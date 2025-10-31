@@ -31,6 +31,7 @@ const frenchPack = {
   id: 'french',
   name: 'French',
   metadata: {
+    dictionaryId: 'french',
     fontClass: 'language-font-latin',
     textDirection: 'ltr',
     accessibility: {

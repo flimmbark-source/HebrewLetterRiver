@@ -1,0 +1,189 @@
+{
+  "language": {
+    "id": "spanish",
+    "name": "Español"
+  },
+  "app": {
+    "title": "Río de letras hebreas",
+    "tagline": "Fluye, aprende y celebra cada captura.",
+    "nav": {
+      "home": "Hogar",
+      "play": "Jugar",
+      "achievements": "Logros",
+      "learn": "Aprender"
+    },
+    "languagePicker": {
+      "label": "Idioma de la aplicación",
+      "helper": "Configure el idioma de la interfaz.",
+      "onboardingTitle": "Elige tus idiomas",
+      "onboardingSubtitle": "Elige el idioma de la interfaz y el alfabeto que deseas practicar.",
+      "confirm": "Empezar a aprender"
+    },
+    "practicePicker": {
+      "label": "Practica el idioma",
+      "helper": "Elija qué paquete de idioma desea explorar."
+    },
+    "footer": {
+      "resetNotice": "El reinicio se realiza diariamente a las 00:00 Asia/Jerusalén."
+    }
+  },
+  "home": {
+    "hero": {
+      "dailyTitle": "La misión diaria de hoy",
+      "heading": "Fluye a través de los tres desafíos del río.",
+      "description": "Mantenga viva su racha y consiga nuevas estrellas completando las misiones de Calentamiento, Concentración y Condimento diseñadas especialmente para usted."
+    },
+    "languagePicker": {
+      "label": "Practica el idioma",
+      "helper": "Cambie en cualquier momento para entrenar en otro guión."
+    },
+    "cta": {
+      "start": "Iniciar una nueva ejecución",
+      "practice": "Carta de enfoque de práctica"
+    }
+  },
+  "game": {
+    "labels": {
+      "level": "Nivel",
+      "score": "Puntaje"
+    },
+    "controls": {
+      "leave": "Salir del juego",
+      "start": "Iniciar juego",
+      "playAgain": "Jugar de nuevo",
+      "install": "Instalar aplicación",
+      "accessibility": "Opciones de accesibilidad",
+      "close": "Cerca"
+    },
+    "setup": {
+      "title": "Río de letras hebreas",
+      "subtitleFallback": "Arrastra la {{noun}} en movimiento a la casilla correcta.",
+      "prompt": "Elige lo que quieres practicar:",
+      "installDescription": "Instalar aplicación",
+      "defaultNoun": "letra",
+      "defaultModeLabel": "Práctica básica",
+      "defaultModeDescription": "Practica el conjunto principal de personajes."
+    },
+    "modes": {
+      "letters": {
+        "label": "Sólo letras",
+        "description": "Practica el conjunto básico de letras.",
+        "noun": "letra"
+      },
+      "vowels1": {
+        "label": "Vocales 'A' y 'O'",
+        "description": "Practica las vocales Patach y Holam.",
+        "noun": "artículo"
+      },
+      "vowels2": {
+        "label": "Vocales 'E' e 'I'",
+        "description": "Practica las vocales Segol y Hirik.",
+        "noun": "artículo"
+      },
+      "expert": {
+        "label": "Modo experto",
+        "description": "Mezcla letras y vocales para un desafío adicional.",
+        "noun": "artículo"
+      },
+      "hiragana": {
+        "label": "hiragana",
+        "description": "Practica los caracteres hiragana básicos.",
+        "noun": "personaje"
+      },
+      "characters": {
+        "label": "Personajes",
+        "description": "Practica los personajes esenciales.",
+        "noun": "personaje"
+      }
+    },
+    "accessibility": {
+      "showIntroductions": "Mostrar presentaciones",
+      "highContrast": "Modo de alto contraste",
+      "reducedMotion": "Movimiento reducido",
+      "speed": "Velocidad del juego",
+      "speedFast": "Rápido",
+      "speedNormal": "Normal",
+      "speedSlow": "Lento",
+      "gear": "Configuración de accesibilidad"
+    },
+    "bonus": {
+      "title": "¡Ronda de bonificación!",
+      "instruction": "¡Atrapa las gemas!",
+      "catchHere": "¡Atrapa aquí!",
+      "timeLeft": "Tiempo restante: {{seconds}}",
+      "gemAria": "Gema extra"
+    },
+    "summary": {
+      "heading": "Artículos encontrados",
+      "empty": "No hay estadísticas para mostrar para esta ronda.",
+      "gameOver": "Juego terminado",
+      "finalScore": "Puntuación final: {{score}}",
+      "weakestLink": "Eslabón más débil",
+      "weakestLinkDescription": "Concéntrate en este elemento la próxima vez.",
+      "characterLabel": "Carácter {{symbol}}",
+      "characterLabelWithPronunciation": "Carácter {{symbol}} pronunciado {{pronunciation}}",
+      "soundLabel": "Sonido: {{sound}}",
+      "learningRecap": "Resumen de aprendizaje",
+      "practice": "Practica esto"
+    },
+    "status": {
+      "bonusRound": "¡Ronda de bonificación!",
+      "bonusInstruction": "¡Atrapa las gemas!",
+      "lives": "Vidas",
+      "levelUp": "¡Elevar a mismo nivel!"
+    }
+  },
+  "achievements": {
+    "title": "Logros",
+    "description": "Avanza por cada nivel para recolectar estrellas. Cada hito impulsa tu viaje por el río Letra Hebrea.",
+    "tier": "Nivel",
+    "tierProgress": "Nivel {{current}} / {{total}}",
+    "next": "Siguiente: {{label}}",
+    "complete": "Todos los niveles completos",
+    "earnStars": "Gana +{{stars}} ⭐ cuando desbloqueas este nivel.",
+    "maxed": "Insignia completamente dominada: ¡disfruta del brillo!"
+  },
+  "learn": {
+    "title": "Aprender",
+    "intro": "Sumérgete en lecciones seleccionadas para dominar cada letra. ¡Pronto aparecerán aquí nuevos módulos de aprendizaje!",
+    "body": "Hasta entonces, siga explorando el río y visítelo periódicamente para disfrutar de sesiones de práctica guiada, consejos de pronunciación y conocimientos culturales."
+  },
+  "badges": {
+    "firstFlow": {
+      "name": "Primer flujo",
+      "summary": "Juega una serie completa de {{gameName}}.",
+      "tiers": {
+        "1": "Corriente de Bronce",
+        "2": "Oleada de plata",
+        "3": "Torrente Dorado"
+      }
+    },
+    "steadyStreak": {
+      "name": "Guardián de la racha",
+      "summary": "Inicia sesión y juega en días consecutivos.",
+      "tiers": {
+        "1": "Ola de fin de semana",
+        "2": "Carrera iluminada por la luna",
+        "3": "Río eterno"
+      }
+    },
+    "letterMaster": {
+      "name": "Maestro de letras",
+      "summary": "Atrapa elementos sin perderlos.",
+      "tiers": {
+        "1": "Salpicadura enfocada",
+        "2": "Flujo de precisión",
+        "3": "corriente perfecta"
+      }
+    },
+    "gemChaser": {
+      "name": "Cazador de gemas",
+      "summary": "Gana rondas de bonificación y reúne gemas de río.",
+      "tiers": {
+        "1": "Corriente chispeante",
+        "2": "Rápido brillante",
+        "3": "Cascada Radiante"
+      }
+    }
+  }
+}

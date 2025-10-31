@@ -31,6 +31,7 @@ const arabicPack = {
   id: 'arabic',
   name: 'Standard Arabic',
   metadata: {
+    dictionaryId: 'arabic',
     fontClass: 'language-font-arabic',
     textDirection: 'rtl',
     accessibility: {
