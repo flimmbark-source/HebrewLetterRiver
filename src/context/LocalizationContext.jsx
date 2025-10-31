@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import { loadLanguage } from '../lib/languageLoader.js';
 import { getDictionary, translate as translateFromDictionary } from '../i18n/index.js';
+import { useLanguage } from './LanguageContext.jsx';
 
 const LocalizationContext = createContext({
   languagePack: loadLanguage(),
@@ -9,7 +10,8 @@ const LocalizationContext = createContext({
 });
 
 export function LocalizationProvider({ children }) {
-  const languagePack = useMemo(() => loadLanguage(), []);
+  const { languageId } = useLanguage();
+  const languagePack = useMemo(() => loadLanguage(languageId), [languageId]);
   const dictionary = useMemo(() => getDictionary(languagePack.id), [languagePack.id]);
 
   const value = useMemo(

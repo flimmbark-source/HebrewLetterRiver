@@ -7,6 +7,7 @@ import { ToastProvider } from './context/ToastContext.jsx';
 import { ProgressProvider } from './context/ProgressContext.jsx';
 import { GameProvider, useGame } from './context/GameContext.jsx';
 import { LocalizationProvider, useLocalization } from './context/LocalizationContext.jsx';
+import { LanguageProvider, useLanguage } from './context/LanguageContext.jsx';
 
 function HomeIcon(props) {
   return (
@@ -49,9 +50,83 @@ function BookIcon(props) {
   );
 }
 
+function LanguageSelect({ selectId, value, onChange, label, helperText, selectClassName = '' }) {
+  const { languageOptions } = useLanguage();
+
+  return (
+    <div className="flex flex-col gap-2">
+      {label ? (
+        <label htmlFor={selectId} className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+          {label}
+        </label>
+      ) : null}
+      <select
+        id={selectId}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={`w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 shadow-inner focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 sm:text-base ${selectClassName}`}
+      >
+        {languageOptions.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.name}
+          </option>
+        ))}
+      </select>
+      {helperText ? <p className="text-xs text-slate-400">{helperText}</p> : null}
+    </div>
+  );
+}
+
+function LanguageOnboardingModal() {
+  const { hasSelectedLanguage, languageId, setLanguageId, markLanguageSelected } = useLanguage();
+  const { t } = useLocalization();
+  const [pendingId, setPendingId] = React.useState(languageId);
+
+  React.useEffect(() => {
+    setPendingId(languageId);
+  }, [languageId]);
+
+  if (hasSelectedLanguage) return null;
+
+  const handleChange = (nextId) => {
+    setPendingId(nextId);
+    setLanguageId(nextId);
+  };
+
+  const handleContinue = () => {
+    markLanguageSelected();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 py-6 backdrop-blur">
+      <div className="w-full max-w-lg rounded-3xl border border-slate-800 bg-slate-900/95 p-6 text-center shadow-2xl sm:p-8">
+        <h2 className="text-2xl font-bold text-white sm:text-3xl">{t('app.languagePicker.onboardingTitle')}</h2>
+        <p className="mt-3 text-sm text-slate-300 sm:text-base">{t('app.languagePicker.onboardingSubtitle')}</p>
+        <div className="mt-6">
+          <LanguageSelect
+            selectId="onboarding-language"
+            value={pendingId}
+            onChange={handleChange}
+            label={t('app.languagePicker.label')}
+            helperText={t('app.languagePicker.helper')}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={handleContinue}
+          className="mt-6 w-full rounded-full bg-cyan-500 px-5 py-3 text-base font-semibold text-slate-900 transition hover:bg-cyan-400 sm:w-auto sm:px-8"
+        >
+          {t('app.languagePicker.confirm')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Shell() {
   const { openGame } = useGame();
   const { t, languagePack } = useLocalization();
+  const { languageId, selectLanguage } = useLanguage();
   const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = languagePack.metadata?.textDirection ?? 'ltr';
 
@@ -74,10 +149,20 @@ function Shell() {
       style={{ paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}
       dir={direction}
     >
-      <header className="flex flex-col gap-4 sm:gap-6">
+      <LanguageOnboardingModal />
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
         <div className="text-center sm:text-left">
           <h1 className={`text-3xl font-bold text-white sm:text-4xl ${fontClass}`}>{t('app.title')}</h1>
           <p className="text-sm text-slate-400 sm:text-base">{t('app.tagline')}</p>
+        </div>
+        <div className="sm:min-w-[220px] sm:text-right">
+          <LanguageSelect
+            selectId="header-language"
+            value={languageId}
+            onChange={selectLanguage}
+            label={t('app.languagePicker.label')}
+            selectClassName="bg-slate-900/60"
+          />
         </div>
       </header>
       <main className="flex-1 pb-6">
@@ -122,16 +207,18 @@ function Shell() {
 
 export default function App() {
   return (
-    <LocalizationProvider>
-      <ToastProvider>
-        <ProgressProvider>
-          <GameProvider>
-            <div className="min-h-screen bg-slate-950 text-white">
-              <Shell />
-            </div>
-          </GameProvider>
-        </ProgressProvider>
-      </ToastProvider>
-    </LocalizationProvider>
+    <LanguageProvider>
+      <LocalizationProvider>
+        <ToastProvider>
+          <ProgressProvider>
+            <GameProvider>
+              <div className="min-h-screen bg-slate-950 text-white">
+                <Shell />
+              </div>
+            </GameProvider>
+          </ProgressProvider>
+        </ToastProvider>
+      </LocalizationProvider>
+    </LanguageProvider>
   );
 }

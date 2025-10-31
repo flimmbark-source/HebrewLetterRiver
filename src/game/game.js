@@ -316,7 +316,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     const isCorrect = isBonusRound || droppedSound === targetSound;
     if (isBonusRound) {
       bonusCaughtInSession += 1;
-      emit('game:bonus-catch', { count: bonusCaughtInSession, score });
+      emit('game:bonus-catch', { count: bonusCaughtInSession, score, languageId: activeLanguage.id });
     }
 
     if (isCorrect) {
@@ -350,7 +350,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         sound: item.data.sound,
         correct: isCorrect,
         mode: gameMode,
-        roundId
+        roundId,
+        languageId: activeLanguage.id
       });
     }
 
@@ -494,7 +495,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         mode: gameMode,
         speed: baseSpeedSetting,
         introductions: introductionsEnabled
-      }
+      },
+      languageId: activeLanguage.id
     });
   }
 
@@ -515,7 +517,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         mode: gameMode,
         speed: baseSpeedSetting,
         introductions: introductionsEnabled
-      }
+      },
+      languageId: activeLanguage.id
     });
 
     displayLearningSummary();
@@ -825,7 +828,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         correct: false,
         mode: gameMode,
         roundId,
-        reason: 'timeout'
+        reason: 'timeout',
+        languageId: activeLanguage.id
       });
     }
     if (lives <= 0) {
@@ -1047,7 +1051,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     const isCorrect = isBonusRound || droppedSound === targetSound;
     if (isBonusRound) {
       bonusCaughtInSession += 1;
-      emit('game:bonus-catch', { count: bonusCaughtInSession, score });
+      emit('game:bonus-catch', { count: bonusCaughtInSession, score, languageId: activeLanguage.id });
     }
 
     if (isCorrect) {
@@ -1082,7 +1086,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         sound: item.data.sound,
         correct: isCorrect,
         mode: gameMode,
-        roundId
+        roundId,
+        languageId: activeLanguage.id
       });
     }
 
