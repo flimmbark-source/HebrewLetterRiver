@@ -4,7 +4,7 @@
     "name": "English"
   },
   "app": {
-    "title": "Hebrew Letter River",
+    "title": "World Letter River",
     "tagline": "Flow, learn, and celebrate every catch.",
     "nav": {
       "home": "Home",
@@ -56,7 +56,7 @@
       "close": "Close"
     },
     "setup": {
-      "title": "Hebrew Letter River",
+    "title": "World Letter River",
       "subtitleFallback": "Drag the moving item to the correct box!",
       "prompt": "Choose what you want to practice:",
       "installDescription": "Install App",
@@ -135,7 +135,7 @@
   },
   "achievements": {
     "title": "Achievements",
-    "description": "Advance through each tier to collect stars. Every milestone fuels your journey down the Hebrew Letter River.",
+    "description": "Advance through each tier to collect stars. Every milestone fuels your journey down the World Letter River.",
     "tier": "Tier",
     "tierProgress": "Tier {{current}} / {{total}}",
     "next": "Next: {{label}}",
