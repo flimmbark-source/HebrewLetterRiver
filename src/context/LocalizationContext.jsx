@@ -5,22 +5,25 @@ import { useLanguage } from './LanguageContext.jsx';
 
 const LocalizationContext = createContext({
   languagePack: loadLanguage(),
+  interfaceLanguagePack: loadLanguage(),
   dictionary: getDictionary('english'),
   t: (key, replacements) => translateFromDictionary(getDictionary('english'), key, replacements)
 });
 
 export function LocalizationProvider({ children }) {
-  const { languageId } = useLanguage();
+  const { languageId, appLanguageId } = useLanguage();
   const languagePack = useMemo(() => loadLanguage(languageId), [languageId]);
-  const dictionary = useMemo(() => getDictionary(languagePack.id), [languagePack.id]);
+  const interfaceLanguagePack = useMemo(() => loadLanguage(appLanguageId), [appLanguageId]);
+  const dictionary = useMemo(() => getDictionary(appLanguageId), [appLanguageId]);
 
   const value = useMemo(
     () => ({
       languagePack,
+      interfaceLanguagePack,
       dictionary,
       t: (key, replacements = {}) => translateFromDictionary(dictionary, key, replacements)
     }),
-    [languagePack, dictionary]
+    [languagePack, interfaceLanguagePack, dictionary]
   );
 
   return <LocalizationContext.Provider value={value}>{children}</LocalizationContext.Provider>;

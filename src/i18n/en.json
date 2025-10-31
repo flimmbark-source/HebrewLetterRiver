@@ -13,11 +13,15 @@
       "learn": "Learn"
     },
     "languagePicker": {
-      "label": "Language",
-      "helper": "Choose which language pack you want to explore.",
-      "onboardingTitle": "Choose Your Language",
-      "onboardingSubtitle": "Select the alphabet or script you want to practice first.",
+      "label": "App Language",
+      "helper": "Set the interface language.",
+      "onboardingTitle": "Choose Your Languages",
+      "onboardingSubtitle": "Pick the interface language and the alphabet you want to practice.",
       "confirm": "Start learning"
+    },
+    "practicePicker": {
+      "label": "Practice Language",
+      "helper": "Choose which language pack you want to explore."
     },
     "footer": {
       "resetNotice": "Reset happens daily at 00:00 Asia/Jerusalem."

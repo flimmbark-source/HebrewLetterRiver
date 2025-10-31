@@ -13,11 +13,15 @@
       "learn": "לימוד"
     },
     "languagePicker": {
-      "label": "שפה",
-      "helper": "בחרו את חבילת השפה שתרצו לחקור.",
-      "onboardingTitle": "בחרו שפה לתרגול",
-      "onboardingSubtitle": "בחרו את האלפבית או הכתב שבו תרצו להתחיל.",
+      "label": "שפת הממשק",
+      "helper": "הגדירו את שפת הממשק.",
+      "onboardingTitle": "בחרו את השפות שלכם",
+      "onboardingSubtitle": "בחרו את שפת הממשק ואת האלפבית שתרצו לתרגל.",
       "confirm": "התחילו ללמוד"
+    },
+    "practicePicker": {
+      "label": "שפת תרגול",
+      "helper": "בחרו את חבילת השפה שתרצו לחקור."
     },
     "footer": {
       "resetNotice": "האיפוס מתרחש מדי יום בשעה 00:00 אזור זמן ירושלים."

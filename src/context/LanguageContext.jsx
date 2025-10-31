@@ -2,13 +2,17 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { defaultLanguageId, languagePacks } from '../data/languages/index.js';
 import { loadState, saveState } from '../lib/storage.js';
 
-const STORAGE_KEY = 'preferences.language';
+const PRACTICE_STORAGE_KEY = 'preferences.practiceLanguage';
+const APP_STORAGE_KEY = 'preferences.appLanguage';
 
 const LanguageContext = createContext({
   languageId: defaultLanguageId,
+  appLanguageId: defaultLanguageId,
   languageOptions: [],
   setLanguageId: () => {},
   selectLanguage: () => {},
+  setAppLanguageId: () => {},
+  selectAppLanguage: () => {},
   markLanguageSelected: () => {},
   hasSelectedLanguage: false
 });
@@ -20,11 +24,18 @@ function buildLanguageOptions() {
 }
 
 export function LanguageProvider({ children }) {
-  const stored = loadState(STORAGE_KEY, null);
-  const initialId = stored?.id ?? defaultLanguageId;
-  const initialConfirmed = stored?.confirmed === true;
+  const storedPractice = loadState(PRACTICE_STORAGE_KEY, null);
+  const storedApp = loadState(APP_STORAGE_KEY, null);
+  const legacyPreferences = loadState('preferences.language', null);
 
-  const [languageId, setLanguageIdState] = useState(initialId);
+  const initialPracticeId = storedPractice?.id ?? legacyPreferences?.id ?? defaultLanguageId;
+  const initialAppId = storedApp?.id ?? legacyPreferences?.id ?? defaultLanguageId;
+  const initialConfirmed =
+    (storedPractice?.confirmed ?? legacyPreferences?.confirmed) === true &&
+    (storedApp?.confirmed ?? legacyPreferences?.confirmed) === true;
+
+  const [languageId, setLanguageIdState] = useState(initialPracticeId);
+  const [appLanguageId, setAppLanguageIdState] = useState(initialAppId);
   const [hasSelectedLanguage, setHasSelectedLanguage] = useState(initialConfirmed);
 
   const setLanguageId = useCallback((nextId) => {
@@ -36,26 +47,52 @@ export function LanguageProvider({ children }) {
     setHasSelectedLanguage(true);
   }, []);
 
+  const setAppLanguageId = useCallback((nextId) => {
+    setAppLanguageIdState(nextId);
+  }, []);
+
+  const selectAppLanguage = useCallback((nextId) => {
+    setAppLanguageIdState(nextId);
+    setHasSelectedLanguage(true);
+  }, []);
+
   const markLanguageSelected = useCallback(() => {
     setHasSelectedLanguage(true);
   }, []);
 
   useEffect(() => {
-    saveState(STORAGE_KEY, { id: languageId, confirmed: hasSelectedLanguage });
+    saveState(PRACTICE_STORAGE_KEY, { id: languageId, confirmed: hasSelectedLanguage });
   }, [languageId, hasSelectedLanguage]);
+
+  useEffect(() => {
+    saveState(APP_STORAGE_KEY, { id: appLanguageId, confirmed: hasSelectedLanguage });
+  }, [appLanguageId, hasSelectedLanguage]);
 
   const languageOptions = useMemo(() => buildLanguageOptions(), []);
 
   const value = useMemo(
     () => ({
       languageId,
+      appLanguageId,
       languageOptions,
       hasSelectedLanguage,
       setLanguageId,
       selectLanguage,
+      setAppLanguageId,
+      selectAppLanguage,
       markLanguageSelected
     }),
-    [languageId, languageOptions, hasSelectedLanguage, setLanguageId, selectLanguage, markLanguageSelected]
+    [
+      languageId,
+      appLanguageId,
+      languageOptions,
+      hasSelectedLanguage,
+      setLanguageId,
+      selectLanguage,
+      setAppLanguageId,
+      selectAppLanguage,
+      markLanguageSelected
+    ]
   );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
