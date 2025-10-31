@@ -39,13 +39,23 @@ export default function HomeView() {
   const latestBadge = useMemo(() => {
     if (!player.latestBadge) return null;
     const badge = badgesCatalog.find((item) => item.id === player.latestBadge.id);
-    if (!badge) return null;
+    const tierSpec = badge?.tiers?.find((item) => item.tier === player.latestBadge.tier);
+
+    const nameKey = player.latestBadge.nameKey ?? badge?.nameKey;
+    const labelKey = player.latestBadge.labelKey ?? tierSpec?.labelKey;
+    const summaryKey = player.latestBadge.summaryKey ?? badge?.summaryKey;
+
+    const name = nameKey ? t(nameKey) : player.latestBadge.name ?? badge?.name ?? player.latestBadge.id;
+    const label = labelKey ? t(labelKey) : player.latestBadge.label ?? tierSpec?.label ?? '';
+    const summary = summaryKey ? t(summaryKey) : player.latestBadge.summary ?? badge?.summary ?? '';
+
     return {
       ...player.latestBadge,
-      name: badge.name,
-      summary: badge.summary
+      name,
+      label,
+      summary
     };
-  }, [player.latestBadge]);
+  }, [player.latestBadge, t]);
 
   const focusLetter = useMemo(() => {
     const focusTask = daily?.tasks?.find((task) => task.id === 'focus');

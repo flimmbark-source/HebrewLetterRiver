@@ -169,7 +169,7 @@ function pickConstraint() {
 
 export function ProgressProvider({ children }) {
   const { addToast } = useToast();
-  const { languagePack } = useLocalization();
+  const { languagePack, t } = useLocalization();
 
   const assets = useMemo(() => createLanguageAssets(languagePack), [languagePack]);
   const storagePrefix = useMemo(() => `progress.${languagePack.id}`, [languagePack.id]);
@@ -192,7 +192,18 @@ export function ProgressProvider({ children }) {
       ...source,
       totals: { ...defaultPlayer.totals, ...(source.totals ?? {}) },
       letters: assets.normalizeLetterStats(source.letters ?? {}),
-      latestBadge: source.latestBadge ?? null
+      latestBadge: (() => {
+        if (!source.latestBadge) return null;
+        const badge = badgeSpecById[source.latestBadge.id];
+        if (!badge) return source.latestBadge;
+        const tierSpec = badge.tiers.find((item) => item.tier === source.latestBadge.tier);
+        return {
+          ...source.latestBadge,
+          nameKey: source.latestBadge.nameKey ?? badge.nameKey,
+          labelKey: source.latestBadge.labelKey ?? tierSpec?.labelKey,
+          summaryKey: source.latestBadge.summaryKey ?? badge.summaryKey
+        };
+      })()
     };
     if (!stored) {
       saveState(`${storagePrefix}.player`, hydrated);
@@ -369,19 +380,28 @@ export function ProgressProvider({ children }) {
       return result;
     });
     if (earnedTier) {
+      const badgeName = badgeSpec.nameKey ? t(badgeSpec.nameKey) : badgeSpec.name ?? badgeId;
+      const tierLabel = earnedTier.labelKey ? t(earnedTier.labelKey) : earnedTier.label ?? `Tier ${earnedTier.tier}`;
+      const badgeSummary = badgeSpec.summaryKey ? t(badgeSpec.summaryKey) : badgeSpec.summary;
+
       setPlayer((prev) => ({
         ...prev,
         stars: prev.stars + (earnedTier.stars ?? 0),
         latestBadge: {
           id: badgeId,
           tier: earnedTier.tier,
-          label: earnedTier.label,
-          earnedAt: new Date().toISOString()
+          earnedAt: new Date().toISOString(),
+          nameKey: badgeSpec.nameKey,
+          labelKey: earnedTier.labelKey,
+          summaryKey: badgeSpec.summaryKey,
+          name: badgeName,
+          label: tierLabel,
+          summary: badgeSummary
         }
       }));
       addToast({
         tone: 'success',
-        title: `${badgeSpecById[badgeId].name} · ${earnedTier.label}`,
+        title: `${badgeName} · ${tierLabel}`,
         description: `Tier ${earnedTier.tier} unlocked! +${earnedTier.stars} ⭐`,
         icon: '🏅'
       });
