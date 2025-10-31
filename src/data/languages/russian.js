@@ -31,6 +31,7 @@ const russianPack = {
   id: 'russian',
   name: 'Russian',
   metadata: {
+    dictionaryId: 'russian',
     fontClass: 'language-font-cyrillic',
     textDirection: 'ltr',
     accessibility: {

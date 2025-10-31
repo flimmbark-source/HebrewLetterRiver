@@ -31,6 +31,7 @@ const japanesePack = {
   id: 'japanese',
   name: 'Japanese',
   metadata: {
+    dictionaryId: 'japanese',
     fontClass: 'language-font-japanese',
     textDirection: 'ltr',
     accessibility: {

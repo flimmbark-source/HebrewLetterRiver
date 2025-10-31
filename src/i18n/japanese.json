@@ -1,0 +1,189 @@
+{
+  "language": {
+    "id": "japanese",
+    "name": "日本語"
+  },
+  "app": {
+    "title": "ヘブライ文字の川",
+    "tagline": "流れ、学び、獲物をすべて祝いましょう。",
+    "nav": {
+      "home": "家",
+      "play": "遊ぶ",
+      "achievements": "業績",
+      "learn": "学ぶ"
+    },
+    "languagePicker": {
+      "label": "アプリの言語",
+      "helper": "インターフェース言語を設定します。",
+      "onboardingTitle": "言語を選択してください",
+      "onboardingSubtitle": "練習したいインターフェース言語とアルファベットを選択してください。",
+      "confirm": "学習を開始する"
+    },
+    "practicePicker": {
+      "label": "言語を練習する",
+      "helper": "探索したい言語パックを選択してください。"
+    },
+    "footer": {
+      "resetNotice": "リセットは毎日 00:00 アジア/エルサレムに行われます。"
+    }
+  },
+  "home": {
+    "hero": {
+      "dailyTitle": "今日のデイリークエスト",
+      "heading": "3 つの川のチャレンジをすべて通過します。",
+      "description": "あなた専用にカスタマイズされたウォームアップ、集中、スパイスのクエストを完了して、連勝記録を維持し、フレッシュスターを獲得しましょう。"
+    },
+    "languagePicker": {
+      "label": "言語を練習する",
+      "helper": "いつでも切り替えて、別のスクリプトでトレーニングできます。"
+    },
+    "cta": {
+      "start": "新しい実行を開始する",
+      "practice": "練習用フォーカスレター"
+    }
+  },
+  "game": {
+    "labels": {
+      "level": "レベル",
+      "score": "スコア"
+    },
+    "controls": {
+      "leave": "ゲームから離れる",
+      "start": "ゲームを開始する",
+      "playAgain": "もう一度プレイする",
+      "install": "アプリをインストールする",
+      "accessibility": "アクセシビリティのオプション",
+      "close": "近い"
+    },
+    "setup": {
+      "title": "ヘブライ文字の川",
+      "subtitleFallback": "動く{{noun}}を正しい枠にドラッグしましょう。",
+      "prompt": "練習したい内容を選択してください:",
+      "installDescription": "アプリをインストールする",
+      "defaultNoun": "文字",
+      "defaultModeLabel": "コアプラクティス",
+      "defaultModeDescription": "主要な文字セットを練習します。"
+    },
+    "modes": {
+      "letters": {
+        "label": "文字のみ",
+        "description": "基本的な文字セットを練習します。",
+        "noun": "手紙"
+      },
+      "vowels1": {
+        "label": "「A」と「O」の母音",
+        "description": "パタッチとホーラムの母音記号を練習します。",
+        "noun": "アイテム"
+      },
+      "vowels2": {
+        "label": "「E」と「I」の母音",
+        "description": "セゴル語とヒリク語の母音記号を練習します。",
+        "noun": "アイテム"
+      },
+      "expert": {
+        "label": "エキスパートモード",
+        "description": "文字と母音を混ぜてさらなるチャレンジをしてみましょう。",
+        "noun": "アイテム"
+      },
+      "hiragana": {
+        "label": "ひらがな",
+        "description": "基本的なひらがなを練習します。",
+        "noun": "文字"
+      },
+      "characters": {
+        "label": "キャラクター",
+        "description": "重要な文字を練習します。",
+        "noun": "キャラクター"
+      }
+    },
+    "accessibility": {
+      "showIntroductions": "ショーの紹介",
+      "highContrast": "ハイコントラストモード",
+      "reducedMotion": "モーションの軽減",
+      "speed": "ゲームスピード",
+      "speedFast": "速い",
+      "speedNormal": "普通",
+      "speedSlow": "遅い",
+      "gear": "アクセシビリティ設定"
+    },
+    "bonus": {
+      "title": "ボーナスラウンド！",
+      "instruction": "宝石を捕まえよう！",
+      "catchHere": "ここで捕まえてください！",
+      "timeLeft": "残り時間: {{seconds}}",
+      "gemAria": "ボーナスジェム"
+    },
+    "summary": {
+      "heading": "遭遇したアイテム",
+      "empty": "このラウンドに表示する統計はありません。",
+      "gameOver": "ゲームオーバー",
+      "finalScore": "最終スコア: {{score}}",
+      "weakestLink": "最も弱いリンク",
+      "weakestLinkDescription": "次回はこの項目に焦点を当てます。",
+      "characterLabel": "キャラクター {{symbol}}",
+      "characterLabelWithPronunciation": "文字 {{symbol}} は {{pronunciation}} と発音されました",
+      "soundLabel": "サウンド: {{sound}}",
+      "learningRecap": "学習の要約",
+      "practice": "これを練習してください"
+    },
+    "status": {
+      "bonusRound": "ボーナスラウンド！",
+      "bonusInstruction": "宝石を捕まえよう！",
+      "lives": "生きる",
+      "levelUp": "レベルアップ！"
+    }
+  },
+  "achievements": {
+    "title": "業績",
+    "description": "各層を進んでスターを集めてください。あらゆるマイルストーンが、ヘブライ文字川を下る旅の原動力となります。",
+    "tier": "階層",
+    "tierProgress": "ティア {{current}} / {{total}}",
+    "next": "次へ: {{label}}",
+    "complete": "すべての階層が完了しました",
+    "earnStars": "このティアのロックを解除すると、+{{stars}} ⭐を獲得できます。",
+    "maxed": "バッジを完全にマスター — 輝きをお楽しみください!"
+  },
+  "learn": {
+    "title": "学ぶ",
+    "intro": "厳選されたレッスンに飛び込んで、それぞれの文字をマスターしましょう。新しい学習モジュールが間もなくここに登場します!",
+    "body": "それまでは川の探索を続け、ガイド付きの練習セッション、発音のヒント、文化的な洞察を定期的にチェックしてください。"
+  },
+  "badges": {
+    "firstFlow": {
+      "name": "最初の流れ",
+      "summary": "{{gameName}} を最後までプレイします。",
+      "tiers": {
+        "1": "ブロンズカレント",
+        "2": "シルバーサージ",
+        "3": "ゴールデン・トレント"
+      }
+    },
+    "steadyStreak": {
+      "name": "ストリークキーパー",
+      "summary": "連続した日にログインしてプレイしてください。",
+      "tiers": {
+        "1": "ウィークエンドウェーブ",
+        "2": "ムーンリット・ラン",
+        "3": "永遠の川"
+      }
+    },
+    "letterMaster": {
+      "name": "レターマスター",
+      "summary": "アイテムを逃さずキャッチ。",
+      "tiers": {
+        "1": "集中スプラッシュ",
+        "2": "精密流量",
+        "3": "完璧な電流"
+      }
+    },
+    "gemChaser": {
+      "name": "ジェムチェイサー",
+      "summary": "ボーナスラウンドに勝利し、リバージェムを集めてください。",
+      "tiers": {
+        "1": "スパークリングストリーム",
+        "2": "きらめく急流",
+        "3": "ラディアントカスケード"
+      }
+    }
+  }
+}

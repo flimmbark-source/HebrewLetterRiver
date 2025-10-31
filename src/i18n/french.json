@@ -1,0 +1,189 @@
+{
+  "language": {
+    "id": "french",
+    "name": "Français"
+  },
+  "app": {
+    "title": "Lettre hébraïque rivière",
+    "tagline": "Coulez, apprenez et célébrez chaque prise.",
+    "nav": {
+      "home": "Maison",
+      "play": "Jouer",
+      "achievements": "Réalisations",
+      "learn": "Apprendre"
+    },
+    "languagePicker": {
+      "label": "Langue de l'application",
+      "helper": "Définissez la langue de l'interface.",
+      "onboardingTitle": "Choisissez vos langues",
+      "onboardingSubtitle": "Choisissez la langue de l'interface et l'alphabet que vous souhaitez pratiquer.",
+      "confirm": "Commencez à apprendre"
+    },
+    "practicePicker": {
+      "label": "Langue de pratique",
+      "helper": "Choisissez le pack de langue que vous souhaitez explorer."
+    },
+    "footer": {
+      "resetNotice": "La réinitialisation a lieu quotidiennement à 00h00 Asie/Jérusalem."
+    }
+  },
+  "home": {
+    "hero": {
+      "dailyTitle": "La quête quotidienne du jour",
+      "heading": "Parcourez les trois défis de la rivière.",
+      "description": "Maintenez votre séquence en vie et remportez de nouvelles étoiles en accomplissant les quêtes d'échauffement, de concentration et d'épices conçues spécialement pour vous."
+    },
+    "languagePicker": {
+      "label": "Langue de pratique",
+      "helper": "Changez à tout moment pour vous entraîner dans un autre script."
+    },
+    "cta": {
+      "start": "Commencer une nouvelle course",
+      "practice": "Lettre de mise au point pratique"
+    }
+  },
+  "game": {
+    "labels": {
+      "level": "Niveau",
+      "score": "Score"
+    },
+    "controls": {
+      "leave": "Quitter le jeu",
+      "start": "Commencer le jeu",
+      "playAgain": "Rejouer",
+      "install": "Installer l'application",
+      "accessibility": "Options d'accessibilité",
+      "close": "Fermer"
+    },
+    "setup": {
+      "title": "Lettre hébraïque rivière",
+      "subtitleFallback": "Faites glisser la {{noun}} en mouvement vers la bonne case.",
+      "prompt": "Choisissez ce que vous souhaitez pratiquer :",
+      "installDescription": "Installer l'application",
+      "defaultNoun": "lettre",
+      "defaultModeLabel": "Pratique de base",
+      "defaultModeDescription": "Pratiquez l’ensemble principal des personnages."
+    },
+    "modes": {
+      "letters": {
+        "label": "Lettres uniquement",
+        "description": "Pratiquez l’ensemble de lettres de base.",
+        "noun": "lettre"
+      },
+      "vowels1": {
+        "label": "Voyelles « A » et « O »",
+        "description": "Pratiquez les marques de voyelles Patach et Holam.",
+        "noun": "article"
+      },
+      "vowels2": {
+        "label": "Voyelles « E » et « I »",
+        "description": "Pratiquez les marques de voyelles Segol et Hirik.",
+        "noun": "article"
+      },
+      "expert": {
+        "label": "Mode expert",
+        "description": "Mélangez les lettres et les voyelles pour un défi supplémentaire.",
+        "noun": "article"
+      },
+      "hiragana": {
+        "label": "Hiragana",
+        "description": "Pratiquez les caractères hiragana de base.",
+        "noun": "personnage"
+      },
+      "characters": {
+        "label": "Personnages",
+        "description": "Pratiquez les caractères essentiels.",
+        "noun": "personnage"
+      }
+    },
+    "accessibility": {
+      "showIntroductions": "Afficher les présentations",
+      "highContrast": "Mode contraste élevé",
+      "reducedMotion": "Mouvement réduit",
+      "speed": "Vitesse de jeu",
+      "speedFast": "Rapide",
+      "speedNormal": "Normale",
+      "speedSlow": "Lent",
+      "gear": "Paramètres d'accessibilité"
+    },
+    "bonus": {
+      "title": "Tour bonus !",
+      "instruction": "Attrapez les gemmes !",
+      "catchHere": "Attrapez ici !",
+      "timeLeft": "Temps restant : {{seconds}}",
+      "gemAria": "Gemme bonus"
+    },
+    "summary": {
+      "heading": "Objets rencontrés",
+      "empty": "Aucune statistique à afficher pour ce tour.",
+      "gameOver": "Jeu terminé",
+      "finalScore": "Note finale : {{score}}",
+      "weakestLink": "Maillon le plus faible",
+      "weakestLinkDescription": "Concentrez-vous sur cet élément la prochaine fois.",
+      "characterLabel": "Caractère {{symbol}}",
+      "characterLabelWithPronunciation": "Caractère {{symbol}} prononcé {{pronunciation}}",
+      "soundLabel": "Son : {{sound}}",
+      "learningRecap": "Récapitulatif de l'apprentissage",
+      "practice": "Pratiquez ceci"
+    },
+    "status": {
+      "bonusRound": "Tour bonus !",
+      "bonusInstruction": "Attrapez les gemmes !",
+      "lives": "Vies",
+      "levelUp": "Montez de niveau !"
+    }
+  },
+  "achievements": {
+    "title": "Réalisations",
+    "description": "Avancez dans chaque niveau pour collecter des étoiles. Chaque étape alimente votre voyage sur la rivière des lettres hébraïques.",
+    "tier": "Étage",
+    "tierProgress": "Niveau {{current}} / {{total}}",
+    "next": "Suivant : {{label}}",
+    "complete": "Tous les niveaux sont terminés",
+    "earnStars": "Gagnez +{{stars}} ⭐ lorsque vous débloquez ce niveau.",
+    "maxed": "Badge entièrement maîtrisé — profitez de l'éclat !"
+  },
+  "learn": {
+    "title": "Apprendre",
+    "intro": "Plongez dans des leçons organisées pour maîtriser chaque lettre. De nouveaux modules d'apprentissage apparaîtront bientôt ici !",
+    "body": "D'ici là, continuez à explorer la rivière et revenez régulièrement pour des séances de pratique guidée, des conseils de prononciation et des informations culturelles."
+  },
+  "badges": {
+    "firstFlow": {
+      "name": "Premier flux",
+      "summary": "Jouez une partie complète de {{gameName}}.",
+      "tiers": {
+        "1": "Courant de bronze",
+        "2": "Vague d'argent",
+        "3": "Torrent doré"
+      }
+    },
+    "steadyStreak": {
+      "name": "Gardien de séquence",
+      "summary": "Connectez-vous et jouez plusieurs jours consécutifs.",
+      "tiers": {
+        "1": "Vague du week-end",
+        "2": "Course au clair de lune",
+        "3": "Rivière éternelle"
+      }
+    },
+    "letterMaster": {
+      "name": "Maître des lettres",
+      "summary": "Attrapez des objets sans les manquer.",
+      "tiers": {
+        "1": "Splash ciblé",
+        "2": "Débit de précision",
+        "3": "Courant parfait"
+      }
+    },
+    "gemChaser": {
+      "name": "Chasseur de gemmes",
+      "summary": "Gagnez des tours bonus et récupérez des gemmes de rivière.",
+      "tiers": {
+        "1": "Flux étincelant",
+        "2": "Rapide chatoyant",
+        "3": "Cascade Radieuse"
+      }
+    }
+  }
+}

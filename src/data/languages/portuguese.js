@@ -31,6 +31,7 @@ const portuguesePack = {
   id: 'portuguese',
   name: 'Portuguese',
   metadata: {
+    dictionaryId: 'portuguese',
     fontClass: 'language-font-latin',
     textDirection: 'ltr',
     accessibility: {
