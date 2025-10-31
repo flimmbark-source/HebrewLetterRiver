@@ -11,9 +11,9 @@ export function GameProvider({ children }) {
   const containerRef = useRef(null);
   const gameApiRef = useRef(null);
   const [hasMounted, setHasMounted] = useState(false);
-  const { languagePack, t, dictionary } = useLocalization();
+  const { languagePack, interfaceLanguagePack, t, dictionary } = useLocalization();
   const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
-  const direction = languagePack.metadata?.textDirection ?? 'ltr';
+  const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
 
   useEffect(() => {
     setHasMounted(true);

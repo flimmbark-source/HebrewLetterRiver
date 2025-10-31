@@ -51,9 +51,7 @@ function BookIcon(props) {
   );
 }
 
-function LanguageSelect({ selectId, value, onChange, label, helperText, selectClassName = '' }) {
-  const { languageOptions } = useLanguage();
-
+function LanguageSelect({ selectId, value, onChange, label, helperText, selectClassName = '', options = [] }) {
   return (
     <div className="flex flex-col gap-2">
       {label ? (
@@ -67,7 +65,7 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
         onChange={(event) => onChange(event.target.value)}
         className={`w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 shadow-inner focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 sm:text-base ${selectClassName}`}
       >
-        {languageOptions.map((option) => (
+        {options.map((option) => (
           <option key={option.id} value={option.id}>
             {option.name}
           </option>
@@ -79,9 +77,18 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
 }
 
 function LanguageOnboardingModal() {
-  const { hasSelectedLanguage, languageId, setLanguageId, markLanguageSelected } = useLanguage();
+  const {
+    hasSelectedLanguage,
+    languageId,
+    setLanguageId,
+    appLanguageId,
+    setAppLanguageId,
+    markLanguageSelected,
+    languageOptions
+  } = useLanguage();
   const englishDictionary = React.useMemo(() => getDictionary('english'), []);
-  const [pendingId, setPendingId] = React.useState(languageId);
+  const [pendingPracticeId, setPendingPracticeId] = React.useState(languageId);
+  const [pendingAppId, setPendingAppId] = React.useState(appLanguageId);
 
   const translateOnboarding = React.useCallback(
     (key, replacements) => translateFromDictionary(englishDictionary, key, replacements),
@@ -89,14 +96,23 @@ function LanguageOnboardingModal() {
   );
 
   React.useEffect(() => {
-    setPendingId(languageId);
+    setPendingPracticeId(languageId);
   }, [languageId]);
+
+  React.useEffect(() => {
+    setPendingAppId(appLanguageId);
+  }, [appLanguageId]);
 
   if (hasSelectedLanguage) return null;
 
   const handleChange = (nextId) => {
-    setPendingId(nextId);
+    setPendingPracticeId(nextId);
     setLanguageId(nextId);
+  };
+
+  const handleAppLanguageChange = (nextId) => {
+    setPendingAppId(nextId);
+    setAppLanguageId(nextId);
   };
 
   const handleContinue = () => {
@@ -112,13 +128,22 @@ function LanguageOnboardingModal() {
         <p className="mt-3 text-sm text-slate-300 sm:text-base">
           {translateOnboarding('app.languagePicker.onboardingSubtitle')}
         </p>
-        <div className="mt-6">
+        <div className="mt-6 space-y-5 text-left">
           <LanguageSelect
-            selectId="onboarding-language"
-            value={pendingId}
-            onChange={handleChange}
+            selectId="onboarding-app-language"
+            value={pendingAppId}
+            onChange={handleAppLanguageChange}
             label={translateOnboarding('app.languagePicker.label')}
             helperText={translateOnboarding('app.languagePicker.helper')}
+            options={languageOptions}
+          />
+          <LanguageSelect
+            selectId="onboarding-language"
+            value={pendingPracticeId}
+            onChange={handleChange}
+            label={translateOnboarding('app.practicePicker.label')}
+            helperText={translateOnboarding('app.practicePicker.helper')}
+            options={languageOptions}
           />
         </div>
         <button
@@ -135,10 +160,10 @@ function LanguageOnboardingModal() {
 
 function Shell() {
   const { openGame } = useGame();
-  const { t, languagePack } = useLocalization();
-  const { languageId, selectLanguage } = useLanguage();
-  const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
-  const direction = languagePack.metadata?.textDirection ?? 'ltr';
+  const { t, interfaceLanguagePack } = useLocalization();
+  const { appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
+  const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
+  const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
 
   const handlePlay = React.useCallback(
     (event) => {
@@ -168,10 +193,11 @@ function Shell() {
         <div className="sm:min-w-[220px] sm:text-right">
           <LanguageSelect
             selectId="header-language"
-            value={languageId}
-            onChange={selectLanguage}
+            value={appLanguageId}
+            onChange={selectAppLanguage}
             label={t('app.languagePicker.label')}
             selectClassName="bg-slate-900/60"
+            options={languageOptions}
           />
         </div>
       </header>
