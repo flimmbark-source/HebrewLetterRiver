@@ -1,5 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { defaultLanguageId, languagePacks } from '../data/languages/index.js';
+import {
+  defaultAppLanguageId,
+  defaultLanguageId,
+  languagePacks
+} from '../data/languages/index.js';
 import { loadState, saveState } from '../lib/storage.js';
 
 const PRACTICE_STORAGE_KEY = 'preferences.practiceLanguage';
@@ -7,7 +11,7 @@ const APP_STORAGE_KEY = 'preferences.appLanguage';
 
 const LanguageContext = createContext({
   languageId: defaultLanguageId,
-  appLanguageId: defaultLanguageId,
+  appLanguageId: defaultAppLanguageId,
   languageOptions: [],
   setLanguageId: () => {},
   selectLanguage: () => {},
@@ -29,7 +33,7 @@ export function LanguageProvider({ children }) {
   const legacyPreferences = loadState('preferences.language', null);
 
   const initialPracticeId = storedPractice?.id ?? legacyPreferences?.id ?? defaultLanguageId;
-  const initialAppId = storedApp?.id ?? legacyPreferences?.id ?? defaultLanguageId;
+  const initialAppId = storedApp?.id ?? legacyPreferences?.id ?? defaultAppLanguageId;
   const initialConfirmed =
     (storedPractice?.confirmed ?? legacyPreferences?.confirmed) === true &&
     (storedApp?.confirmed ?? legacyPreferences?.confirmed) === true;

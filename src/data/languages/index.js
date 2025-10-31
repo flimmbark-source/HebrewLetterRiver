@@ -25,6 +25,7 @@ export const languagePacks = {
 };
 
 export const defaultLanguageId = hebrewPack.id;
+export const defaultAppLanguageId = englishPack.id;
 
 export function getLanguageDefinition(languageId) {
   return languagePacks[languageId] ?? null;

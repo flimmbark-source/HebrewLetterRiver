@@ -1,13 +1,18 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import { loadLanguage } from '../lib/languageLoader.js';
-import { getDictionary, translate as translateFromDictionary } from '../i18n/index.js';
+import {
+  getDictionary,
+  translate as translateFromDictionary
+} from '../i18n/index.js';
+import { defaultAppLanguageId } from '../data/languages/index.js';
 import { useLanguage } from './LanguageContext.jsx';
 
 const LocalizationContext = createContext({
   languagePack: loadLanguage(),
-  interfaceLanguagePack: loadLanguage(),
-  dictionary: getDictionary('english'),
-  t: (key, replacements) => translateFromDictionary(getDictionary('english'), key, replacements)
+  interfaceLanguagePack: loadLanguage(defaultAppLanguageId),
+  dictionary: getDictionary(defaultAppLanguageId),
+  t: (key, replacements) =>
+    translateFromDictionary(getDictionary(defaultAppLanguageId), key, replacements)
 });
 
 export function LocalizationProvider({ children }) {

@@ -1,24 +1,42 @@
-import en from './en.json';
-import he from './he.json';
+import { languagePacks, defaultAppLanguageId } from '../data/languages/index.js';
 
-const fallback = en;
+const dictionaryModules = import.meta.glob('./*.json', { eager: true });
 
-const dictionaries = {
-  english: en,
-  hebrew: he,
-  mandarin: en,
-  hindi: en,
-  spanish: en,
-  french: en,
-  arabic: en,
-  bengali: en,
-  portuguese: en,
-  russian: en,
-  japanese: en
-};
+const loadedDictionaries = Object.entries(dictionaryModules).reduce((acc, [path, module]) => {
+  const dictionary = module?.default ?? module;
+  if (!dictionary || typeof dictionary !== 'object') return acc;
+  const idFromMeta = dictionary?.language?.id;
+  const filename = path.replace('./', '').replace(/\.json$/i, '');
+  const resolvedId = idFromMeta || filename;
+  if (resolvedId) {
+    acc[resolvedId] = dictionary;
+  }
+  return acc;
+}, {});
+
+const fallbackId = defaultAppLanguageId;
+const fallbackDictionary =
+  loadedDictionaries[fallbackId] ?? Object.values(loadedDictionaries)[0] ?? {};
+
+function resolveDictionaryId(languageId) {
+  const pack = languagePacks[languageId];
+  const requestedId = pack?.metadata?.dictionaryId ?? languageId;
+  if (requestedId && requestedId in loadedDictionaries) {
+    return requestedId;
+  }
+  if (fallbackId in loadedDictionaries) {
+    return fallbackId;
+  }
+  const availableIds = Object.keys(loadedDictionaries);
+  return availableIds.length > 0 ? availableIds[0] : null;
+}
 
 export function getDictionary(languageId) {
-  return dictionaries[languageId] ?? fallback;
+  const dictionaryId = resolveDictionaryId(languageId);
+  if (dictionaryId && dictionaryId in loadedDictionaries) {
+    return loadedDictionaries[dictionaryId];
+  }
+  return fallbackDictionary;
 }
 
 export function translate(dictionary, key, replacements = {}) {
