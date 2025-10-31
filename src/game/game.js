@@ -244,12 +244,13 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   let dropZones = [];
   let activeBucketCount = 0;
-  const MIN_BUCKET_WIDTH = 128;
+  const BUCKET_MIN_WIDTH_FALLBACK = 96;
   const LAYOUT_GAP_FALLBACK = 12;
   let pendingBucketLayoutHandle = null;
   let pendingBucketLayoutIsAnimationFrame = false;
   let bucketResizeObserver = null;
   let bucketResizeHandler = null;
+  let bucketMeasurementElement = null;
   let activeDrag = null;
   let dragGhost = null;
   let hoverZone = null;
@@ -263,6 +264,49 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     dragGhost.id = 'drag-ghost';
     document.body.appendChild(dragGhost);
     return dragGhost;
+  }
+
+  function ensureBucketMeasurementElement() {
+    if (bucketMeasurementElement && bucketMeasurementElement.isConnected) {
+      return bucketMeasurementElement;
+    }
+    if (typeof document === 'undefined' || !document.body) return null;
+    bucketMeasurementElement = document.createElement('div');
+    bucketMeasurementElement.style.position = 'absolute';
+    bucketMeasurementElement.style.visibility = 'hidden';
+    bucketMeasurementElement.style.pointerEvents = 'none';
+    bucketMeasurementElement.style.left = '-9999px';
+    bucketMeasurementElement.style.top = '0';
+    bucketMeasurementElement.style.width = 'max-content';
+    bucketMeasurementElement.style.maxWidth = 'max-content';
+    bucketMeasurementElement.style.whiteSpace = 'nowrap';
+    bucketMeasurementElement.style.boxSizing = 'border-box';
+    document.body.appendChild(bucketMeasurementElement);
+    return bucketMeasurementElement;
+  }
+
+  function getBucketMinWidth() {
+    if (!choicesContainer || typeof window === 'undefined') {
+      return BUCKET_MIN_WIDTH_FALLBACK;
+    }
+    const buckets = choicesContainer.querySelectorAll('.catcher-box');
+    if (!buckets.length) return BUCKET_MIN_WIDTH_FALLBACK;
+    const measurementElement = ensureBucketMeasurementElement();
+    if (!measurementElement) return BUCKET_MIN_WIDTH_FALLBACK;
+    let maxWidth = 0;
+    buckets.forEach((bucket) => {
+      measurementElement.className = bucket.className;
+      measurementElement.innerHTML = bucket.innerHTML;
+      const ariaLabel = bucket.getAttribute('aria-label');
+      if (ariaLabel) measurementElement.setAttribute('aria-label', ariaLabel);
+      else measurementElement.removeAttribute('aria-label');
+      const rect = measurementElement.getBoundingClientRect();
+      if (rect.width > maxWidth) maxWidth = rect.width;
+    });
+    if (!Number.isFinite(maxWidth) || maxWidth <= 0) {
+      return BUCKET_MIN_WIDTH_FALLBACK;
+    }
+    return Math.ceil(maxWidth);
   }
 
   function refreshDropZones() {
@@ -312,21 +356,22 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     if (typeof window === 'undefined') return;
     const containerWidth = choicesContainer.clientWidth;
     if (containerWidth <= 0) return;
+    const minBucketWidth = getBucketMinWidth();
     const computed = window.getComputedStyle?.(choicesContainer);
     const gapValueRaw = computed?.columnGap || computed?.gap || `${LAYOUT_GAP_FALLBACK}px`;
     const gapValue = parseFloat(gapValueRaw) || LAYOUT_GAP_FALLBACK;
     const totalGap = gapValue * Math.max(count - 1, 0);
     const availableWidth = containerWidth - totalGap;
-    if (availableWidth / count >= MIN_BUCKET_WIDTH) {
-      choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(0, 1fr))`;
+    if (availableWidth / count >= minBucketWidth) {
+      choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(${minBucketWidth}px, 1fr))`;
       return;
     }
     const numerator = containerWidth + gapValue;
     const maxColumns = Math.max(
       1,
-      Math.min(count, Math.floor(numerator / (MIN_BUCKET_WIDTH + gapValue)))
+      Math.min(count, Math.floor(numerator / (minBucketWidth + gapValue)))
     );
-    choicesContainer.style.gridTemplateColumns = `repeat(${maxColumns}, minmax(0, 1fr))`;
+    choicesContainer.style.gridTemplateColumns = `repeat(${maxColumns}, minmax(${minBucketWidth}px, 1fr))`;
   }
 
   if (choicesContainer) {
