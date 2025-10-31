@@ -64,6 +64,38 @@
       "defaultModeLabel": "Core Practice",
       "defaultModeDescription": "Practice the main set of characters."
     },
+    "modes": {
+      "letters": {
+        "label": "Letters Only",
+        "description": "Practice the core set of letters.",
+        "noun": "letter"
+      },
+      "vowels1": {
+        "label": "'A' & 'O' Vowels",
+        "description": "Practice the Patach and Holam vowel marks.",
+        "noun": "item"
+      },
+      "vowels2": {
+        "label": "'E' & 'I' Vowels",
+        "description": "Practice the Segol and Hirik vowel marks.",
+        "noun": "item"
+      },
+      "expert": {
+        "label": "Expert Mode",
+        "description": "Mix letters and vowels for an extra challenge.",
+        "noun": "item"
+      },
+      "hiragana": {
+        "label": "Hiragana",
+        "description": "Practice the basic hiragana characters.",
+        "noun": "character"
+      },
+      "characters": {
+        "label": "Characters",
+        "description": "Practice essential characters.",
+        "noun": "character"
+      }
+    },
     "accessibility": {
       "showIntroductions": "Show Introductions",
       "highContrast": "High Contrast Mode",

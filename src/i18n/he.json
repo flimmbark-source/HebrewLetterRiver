@@ -64,6 +64,38 @@
       "defaultModeLabel": "תרגול בסיסי",
       "defaultModeDescription": "תרגלו את מערך התווים המרכזי."
     },
+    "modes": {
+      "letters": {
+        "label": "אותיות בלבד",
+        "description": "תרגלו את קבוצת האותיות המרכזית.",
+        "noun": "אות"
+      },
+      "vowels1": {
+        "label": "תנועות \"א\" ו-\"ו\"",
+        "description": "תרגלו את פתח וחולם.",
+        "noun": "פריט"
+      },
+      "vowels2": {
+        "label": "תנועות \"אֵ\" ו-\"אִ\"",
+        "description": "תרגלו את סגול וחיריק.",
+        "noun": "פריט"
+      },
+      "expert": {
+        "label": "מצב מומחה",
+        "description": "ערבבו בין אותיות לתנועות לאתגר נוסף.",
+        "noun": "פריט"
+      },
+      "hiragana": {
+        "label": "היראגאנה",
+        "description": "תרגלו את תווי ההיראגאנה הבסיסיים.",
+        "noun": "תו"
+      },
+      "characters": {
+        "label": "תווים",
+        "description": "תרגלו תווים חיוניים.",
+        "noun": "תו"
+      }
+    },
     "accessibility": {
       "showIntroductions": "הצג הצגות",
       "highContrast": "ניגודיות גבוהה",
