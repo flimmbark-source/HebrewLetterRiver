@@ -1,4 +1,5 @@
 import { emit } from '../lib/eventBus.js';
+import { loadLanguage } from '../lib/languageLoader.js';
 
 const trackedTimeouts = new Set();
 const trackedIntervals = new Set();
@@ -37,7 +38,7 @@ function clearAllTimers() {
   trackedIntervals.clear();
 }
 
-export function setupGame({ onReturnToMenu } = {}) {
+export function setupGame({ onReturnToMenu, languagePack } = {}) {
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
   const livesContainer = document.getElementById('lives-container');
@@ -69,39 +70,21 @@ export function setupGame({ onReturnToMenu } = {}) {
     throw new Error('Game elements failed to initialize.');
   }
 
-  const hebrewAlphabet = [
-    { hebrew: 'א', sound: 'Silent (A)', name: 'Aleph' },
-    { hebrew: 'בּ', sound: 'B', name: 'Bet' },
-    { hebrew: 'ב', sound: 'V', name: 'Vet' },
-    { hebrew: 'ג', sound: 'G', name: 'Gimel' },
-    { hebrew: 'ד', sound: 'D', name: 'Dalet' },
-    { hebrew: 'ה', sound: 'H', name: 'Heh' },
-    { hebrew: 'ו', sound: 'Vav', name: 'Vav' },
-    { hebrew: 'ז', sound: 'Z', name: 'Zayin' },
-    { hebrew: 'ח', sound: 'Ch', name: 'Chet' },
-    { hebrew: 'ט', sound: 'T', name: 'Tet' },
-    { hebrew: 'י', sound: 'Y', name: 'Yud' },
-    { hebrew: 'כּ', sound: 'K', name: 'Kaf' },
-    { hebrew: 'כ', sound: 'Ch (Khaf)', name: 'Chaf' },
-    { hebrew: 'ך', sound: 'Ch (Final)', name: 'Final Chaf' },
-    { hebrew: 'ל', sound: 'L', name: 'Lamed' },
-    { hebrew: 'מ', sound: 'M', name: 'Mem' },
-    { hebrew: 'ם', sound: 'M (Final)', name: 'Final Mem' },
-    { hebrew: 'נ', sound: 'N', name: 'Nun' },
-    { hebrew: 'ן', sound: 'N (Final)', name: 'Final Nun' },
-    { hebrew: 'ס', sound: 'S', name: 'Samech' },
-    { hebrew: 'ע', sound: 'Silent (Ayin)', name: 'Ayin' },
-    { hebrew: 'פּ', sound: 'P', name: 'Pei' },
-    { hebrew: 'פ', sound: 'F', name: 'Fei' },
-    { hebrew: 'ף', sound: 'F (Final)', name: 'Final Fei' },
-    { hebrew: 'צ', sound: 'Tz', name: 'Tzadi' },
-    { hebrew: 'ץ', sound: 'Tz (Final)', name: 'Final Tzadi' },
-    { hebrew: 'ק', sound: 'K (Qof)', name: 'Kuf' },
-    { hebrew: 'ר', sound: 'R', name: 'Resh' },
-    { hebrew: 'שׁ', sound: 'Sh', name: 'Shin' },
-    { hebrew: 'שׂ', sound: 'S (Sin)', name: 'Sin' },
-    { hebrew: 'ת', sound: 'T', name: 'Tav' }
-  ];
+  const activeLanguage = languagePack ?? loadLanguage();
+  const practiceModes = activeLanguage.practiceModes ?? [];
+  const modeItems = activeLanguage.modeItems ?? {};
+  const baseItems = activeLanguage.items ?? [];
+  const allLanguageItems = activeLanguage.allItems ?? [];
+  const itemsById = activeLanguage.itemsById ?? {};
+  const itemsBySymbol = activeLanguage.itemsBySymbol ?? {};
+  const introductionsConfig = activeLanguage.introductions ?? {};
+  const subtitleTemplate = introductionsConfig.subtitleTemplate ?? 'Drag the moving {{noun}} to the correct box!';
+  const nounFallback = introductionsConfig.nounFallback ?? 'item';
+  const modeNounMap = practiceModes.reduce((acc, mode) => {
+    acc[mode.id] = mode.noun ?? nounFallback;
+    return acc;
+  }, {});
+  const initialKnownIds = introductionsConfig.initiallyKnownIds ?? [];
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -235,14 +218,16 @@ export function setupGame({ onReturnToMenu } = {}) {
     const targetBox = e.currentTarget;
     targetBox.classList.remove('drag-over');
 
-    const { sound: droppedSound, id: droppedId, roundId, hebrew: droppedHebrew } = payload;
+    const { sound: droppedSound, id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol } = payload;
     if (!gameActive || !activeItems.has(droppedId)) return;
 
     const targetSound = targetBox.dataset.sound;
     const item = activeItems.get(droppedId);
 
     item.element.isDropped = true;
-    if (!isBonusRound && !sessionStats[droppedHebrew]) sessionStats[droppedHebrew] = { correct: 0, incorrect: 0 };
+    if (!isBonusRound && droppedItemId && !sessionStats[droppedItemId]) {
+      sessionStats[droppedItemId] = { correct: 0, incorrect: 0 };
+    }
 
     const isCorrect = isBonusRound || droppedSound === targetSound;
     if (isBonusRound) {
@@ -253,12 +238,12 @@ export function setupGame({ onReturnToMenu } = {}) {
     if (isCorrect) {
       updateScore(isBonusRound ? 25 : 10);
       targetBox.classList.add('feedback-correct');
-      if (!isBonusRound) sessionStats[droppedHebrew].correct++;
+      if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].correct++;
     } else {
       lives--;
       updateLives(true);
       targetBox.classList.add('feedback-incorrect');
-      if (!isBonusRound) sessionStats[droppedHebrew].incorrect++;
+      if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
 
       const correctSound = item.data.sound;
       const boxRect = targetBox.getBoundingClientRect();
@@ -276,7 +261,9 @@ export function setupGame({ onReturnToMenu } = {}) {
 
     if (!isBonusRound) {
       emit('game:letter-result', {
-        hebrew: droppedHebrew,
+        itemId: droppedItemId,
+        symbol: droppedSymbol,
+        sound: item.data.sound,
         correct: isCorrect,
         mode: gameMode,
         roundId
@@ -289,57 +276,6 @@ export function setupGame({ onReturnToMenu } = {}) {
       onItemHandled(droppedId, roundId, false);
     }, 400);
   }
-
-  const consonants = {
-    א: { name: 'Aleph', sound: '' },
-    ב: { name: 'Bet/Vet', sound: 'B/V' },
-    ג: { name: 'Gimel', sound: 'G' },
-    ד: { name: 'Dalet', sound: 'D' },
-    ה: { name: 'Heh', sound: 'H' },
-    ו: { name: 'Vav', sound: 'V' },
-    ז: { name: 'Zayin', sound: 'Z' },
-    ח: { name: 'Chet', sound: 'Ch' },
-    ט: { name: 'Tet', sound: 'T' },
-    י: { name: 'Yud', sound: 'Y' },
-    כ: { name: 'Kaf/Chaf', sound: 'K/Ch' },
-    ך: { name: 'Final Chaf', sound: 'Ch' },
-    ל: { name: 'Lamed', sound: 'L' },
-    מ: { name: 'Mem', sound: 'M' },
-    ם: { name: 'Final Mem', sound: 'M' },
-    נ: { name: 'Nun', sound: 'N' },
-    ן: { name: 'Final Nun', sound: 'N' },
-    ס: { name: 'Samech', sound: 'S' },
-    ע: { name: 'Ayin', sound: '' },
-    פ: { name: 'Pei/Fei', sound: 'P/F' },
-    ף: { name: 'Final Fei', sound: 'F' },
-    צ: { name: 'Tzadi', sound: 'Tz' },
-    ץ: { name: 'Final Tzadi', sound: 'Tz' },
-    ק: { name: 'Kuf', sound: 'K' },
-    ר: { name: 'Resh', sound: 'R' },
-    ש: { name: 'Shin/Sin', sound: 'Sh/S' },
-    ת: { name: 'Tav', sound: 'T' }
-  };
-
-  const vowels = {
-    a: { name: 'Patach', mark: '\u05B7' },
-    o: { name: 'Holam', mark: '\u05B9' },
-    e: { name: 'Segol', mark: '\u05B6' },
-    i: { name: 'Hirik', mark: '\u05B4' }
-  };
-
-  const vowelSyllables = { vowels1: [], vowels2: [] };
-  function generateSyllables() {
-    const letterPool = ['ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת'];
-    letterPool.forEach((c) => {
-      const baseSound = consonants[c].sound.split('/')[0];
-      if (!baseSound) return;
-      vowelSyllables.vowels1.push({ hebrew: c + vowels.a.mark, sound: baseSound + 'a', name: `${consonants[c].name} + ${vowels.a.name}` });
-      vowelSyllables.vowels1.push({ hebrew: c + vowels.o.mark, sound: baseSound + 'o', name: `${consonants[c].name} + ${vowels.o.name}` });
-      vowelSyllables.vowels2.push({ hebrew: c + vowels.e.mark, sound: baseSound + 'e', name: `${consonants[c].name} + ${vowels.e.name}` });
-      vowelSyllables.vowels2.push({ hebrew: c + vowels.i.mark, sound: baseSound + 'i', name: `${consonants[c].name} + ${vowels.i.name}` });
-    });
-  }
-  generateSyllables();
 
   let score;
   let lives;
@@ -363,6 +299,24 @@ export function setupGame({ onReturnToMenu } = {}) {
   const initialLives = 3;
   const learnPhaseDuration = 2500;
   const levelUpThreshold = 50;
+
+  function clonePool(items = []) {
+    return items.map((item) => ({ ...item }));
+  }
+
+  function getModePool(modeId) {
+    if (modeItems[modeId]?.length) return clonePool(modeItems[modeId]);
+    if (modeItems.letters?.length) return clonePool(modeItems.letters);
+    return clonePool(baseItems);
+  }
+
+  function resolveItemById(itemId) {
+    return itemsById[itemId] ?? null;
+  }
+
+  function resolveItemBySymbol(symbol) {
+    return itemsBySymbol[symbol] ?? null;
+  }
 
   function resetToSetupScreen() {
     gameActive = false;
@@ -393,7 +347,7 @@ export function setupGame({ onReturnToMenu } = {}) {
     baseSpeedSetting = parseInt(gameSpeedSlider.value, 10);
     fallDuration = baseSpeedSetting;
     isBonusRound = false;
-    seenItems = new Set(['א', 'בּ', 'ל']);
+    seenItems = new Set(initialKnownIds);
     learningOrder = [];
     lastItemSound = null;
     sessionStats = {};
@@ -421,7 +375,7 @@ export function setupGame({ onReturnToMenu } = {}) {
     fallDuration = baseSpeedSetting;
     gameActive = true;
     isBonusRound = false;
-    seenItems = new Set(['א', 'בּ', 'ל']);
+    seenItems = new Set(initialKnownIds);
     lastItemSound = null;
     currentRound = null;
     sessionStats = {};
@@ -431,12 +385,9 @@ export function setupGame({ onReturnToMenu } = {}) {
     gameMode = document.querySelector('input[name="gameMode"]:checked').value;
     introductionsEnabled = document.getElementById('toggle-introductions').checked;
 
-    let gameItemPool;
-    if (gameMode === 'letters') gameItemPool = hebrewAlphabet;
-    else if (gameMode === 'expert') gameItemPool = [...hebrewAlphabet, ...Object.values(vowelSyllables).flat()];
-    else gameItemPool = vowelSyllables[gameMode];
+    const gameItemPool = getModePool(gameMode);
 
-    learningOrder = gameItemPool.filter((item) => !seenItems.has(item.hebrew));
+    learningOrder = gameItemPool.filter((item) => !seenItems.has(item.id));
     for (let i = learningOrder.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [learningOrder[i], learningOrder[j]] = [learningOrder[j], learningOrder[i]];
@@ -505,16 +456,15 @@ export function setupGame({ onReturnToMenu } = {}) {
 
     const encounteredContainer = document.createElement('div');
     encounteredContainer.className = 'flex flex-wrap gap-2 justify-center mb-6';
-    const allItems = [...hebrewAlphabet, ...Object.values(vowelSyllables).flat()];
 
     seenInSession.forEach((key) => {
+      const itemData = resolveItemById(key);
+      if (!itemData) return;
       const span = document.createElement('span');
       span.className = 'hebrew-font text-3xl p-2 bg-slate-700 rounded-md cursor-pointer';
-      span.textContent = key;
+      span.textContent = itemData.symbol ?? '';
 
       span.addEventListener('mouseenter', (event) => {
-        const itemData = allItems.find((i) => i.hebrew === event.target.textContent);
-        if (!itemData) return;
         summaryTooltip.innerHTML = `<div class="font-bold">${itemData.name}</div><div>"${itemData.sound}"</div>`;
         const targetRect = event.target.getBoundingClientRect();
         const containerRect = gameContainer.getBoundingClientRect();
@@ -542,18 +492,18 @@ export function setupGame({ onReturnToMenu } = {}) {
     }
 
     if (weakestLink && maxIncorrect > 0) {
-      const weakestLinkItem = allItems.find((l) => l.hebrew === weakestLink);
+      const weakestLinkItem = resolveItemById(weakestLink);
       if (weakestLinkItem) {
         const weakestLinkContainer = document.createElement('div');
         weakestLinkContainer.innerHTML = `
             <h3 class="text-xl font-bold text-cyan-400 mb-2">Weakest Link</h3>
             <div class="flex items-center justify-center gap-4">
-              <span class="hebrew-font text-5xl">${weakestLink}</span>
+              <span class="hebrew-font text-5xl">${weakestLinkItem.symbol ?? ''}</span>
               <button id="practice-weakest-btn" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold py-2 px-4 rounded-lg">Practice This</button>
             </div>`;
         summaryContainer.appendChild(weakestLinkContainer);
         document.getElementById('practice-weakest-btn').addEventListener('click', () => {
-          forcedStartItem = weakestLinkItem;
+          forcedStartItem = { ...weakestLinkItem };
           startGame();
         });
       }
@@ -619,14 +569,10 @@ export function setupGame({ onReturnToMenu } = {}) {
     }
 
     let roundItems = [];
-    const key = 'hebrew';
 
-    let itemPool;
-    if (gameMode === 'letters') itemPool = hebrewAlphabet;
-    else if (gameMode === 'expert') itemPool = [...hebrewAlphabet, ...Object.values(vowelSyllables).flat()];
-    else itemPool = vowelSyllables[gameMode];
+    const itemPool = getModePool(gameMode);
 
-    let seenSoFar = [...itemPool.filter((l) => seenItems.has(l[key]))];
+    let seenSoFar = itemPool.filter((item) => seenItems.has(item.id));
     const totalItemsInRound = level;
     const shouldIntroduceNew = !hasIntroducedForItemInLevel && learningOrder.length > 0;
 
@@ -647,7 +593,7 @@ export function setupGame({ onReturnToMenu } = {}) {
     while (roundItems.length < totalItemsInRound && seenSoFar.length > 0) {
       const chosenIndex = Math.floor(Math.random() * seenSoFar.length);
       const reviewItem = seenSoFar.splice(chosenIndex, 1)[0];
-      if (!roundItems.some((item) => item[key] === reviewItem[key])) roundItems.push(reviewItem);
+      if (!roundItems.some((item) => item.id === reviewItem.id)) roundItems.push(reviewItem);
     }
 
     if (roundItems.length === 0 && seenSoFar.length > 0) {
@@ -663,17 +609,16 @@ export function setupGame({ onReturnToMenu } = {}) {
 
   function processItemsForRound(items, roundId) {
     let totalDelay = 0;
-    const key = 'hebrew';
     items.forEach((itemData) => {
       if (currentRound.id !== roundId) return;
-      const isNewItem = !seenItems.has(itemData[key]);
+      const isNewItem = !seenItems.has(itemData.id);
       let delayForNext = 500;
 
       if (isNewItem && introductionsEnabled) {
         const showTime = totalDelay;
         const t1 = trackTimeout(() => {
           if (!gameActive || currentRound.id !== roundId) return;
-          learnLetterEl.textContent = itemData.hebrew;
+          learnLetterEl.textContent = itemData.symbol;
           learnName.textContent = itemData.name;
           learnSound.textContent = `Sound: "${itemData.sound}"`;
           learnOverlay.classList.add('visible');
@@ -698,11 +643,11 @@ export function setupGame({ onReturnToMenu } = {}) {
 
   function startItemDrop(itemData, roundId) {
     if (!gameActive) return;
-    const itemId = `item-${Date.now()}-${Math.random()}`;
+    const elementId = `item-${Date.now()}-${Math.random()}`;
     const itemEl = document.createElement('div');
-    itemEl.id = itemId;
+    itemEl.id = elementId;
     itemEl.isDropped = false;
-    itemEl.textContent = itemData.hebrew;
+    itemEl.textContent = itemData.symbol;
     const reducedMotion = reducedMotionToggle.checked;
     const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
     itemEl.className = `falling-letter font-bold hebrew-font text-cyan-300 ${animationName}`;
@@ -710,7 +655,13 @@ export function setupGame({ onReturnToMenu } = {}) {
     itemEl.style.animationDuration = `${parseInt(gameSpeedSlider.value, 10)}s`;
     itemEl.draggable = true;
     itemEl.addEventListener('dragstart', (e) => {
-      const dragData = JSON.stringify({ sound: itemData.sound, id: itemId, roundId, hebrew: itemData.hebrew });
+      const dragData = JSON.stringify({
+        sound: itemData.sound,
+        id: elementId,
+        roundId,
+        itemId: itemData.id,
+        symbol: itemData.symbol
+      });
       e.dataTransfer.setData('application/json', dragData);
       itemEl.style.animationPlayState = 'paused';
       itemEl.classList.add('dragging');
@@ -725,11 +676,17 @@ export function setupGame({ onReturnToMenu } = {}) {
         itemEl.style.animationPlayState = 'running';
       }
     });
-    const missHandler = () => onItemHandled(itemId, roundId, true);
+    const missHandler = () => onItemHandled(elementId, roundId, true);
     itemEl.addEventListener('animationend', missHandler);
-    activeItems.set(itemId, { data: itemData, element: itemEl, missHandler });
+    activeItems.set(elementId, { data: itemData, element: itemEl, missHandler });
     playArea.appendChild(itemEl);
-    startPointerDrag(itemEl, { sound: itemData.sound, id: itemId, roundId, hebrew: itemData.hebrew });
+    startPointerDrag(itemEl, {
+      sound: itemData.sound,
+      id: elementId,
+      roundId,
+      itemId: itemData.id,
+      symbol: itemData.symbol
+    });
   }
 
   function onItemHandled(itemId, roundId, isMiss) {
@@ -743,20 +700,23 @@ export function setupGame({ onReturnToMenu } = {}) {
     if (!currentRound || currentRound.id !== roundId) return;
 
     const item = activeItems.get(itemId);
-    const key = item.data.hebrew;
-    if (!sessionStats[key]) sessionStats[key] = { correct: 0, incorrect: 0 };
-    if (isMiss) sessionStats[key].incorrect++;
-    seenItems.add(key);
+    const itemData = item?.data ?? {};
+    const key = itemData.id;
+    if (!isBonusRound && key && !sessionStats[key]) sessionStats[key] = { correct: 0, incorrect: 0 };
+    if (!isBonusRound && key && isMiss) sessionStats[key].incorrect++;
+    if (key) seenItems.add(key);
 
     item.element.remove();
     activeItems.delete(itemId);
     currentRound.handledCount++;
 
-    if (isMiss && !isBonusRound) {
+    if (isMiss && !isBonusRound && key) {
       lives--;
       updateLives(true);
       emit('game:letter-result', {
-        hebrew: key,
+        itemId: key,
+        symbol: itemData.symbol,
+        sound: itemData.sound,
         correct: false,
         mode: gameMode,
         roundId,
@@ -866,9 +826,9 @@ export function setupGame({ onReturnToMenu } = {}) {
 
   function startGemDrop() {
     if (!gameActive) return;
-    const itemId = `gem-${Date.now()}-${Math.random()}`;
+    const elementId = `gem-${Date.now()}-${Math.random()}`;
     const itemEl = document.createElement('div');
-    itemEl.id = itemId;
+    itemEl.id = elementId;
     itemEl.isDropped = false;
     itemEl.textContent = '💎';
     const reducedMotion = reducedMotionToggle.checked;
@@ -879,7 +839,13 @@ export function setupGame({ onReturnToMenu } = {}) {
     itemEl.style.animationDuration = `${bonusSpeed}s`;
     itemEl.draggable = true;
     itemEl.addEventListener('dragstart', (e) => {
-      const dragData = JSON.stringify({ sound: 'bonus-gem', id: itemId, roundId: 'bonus', hebrew: 'gem' });
+      const dragData = JSON.stringify({
+        sound: 'bonus-gem',
+        id: elementId,
+        roundId: 'bonus',
+        itemId: 'bonus-gem',
+        symbol: '💎'
+      });
       e.dataTransfer.setData('application/json', dragData);
       itemEl.style.animationPlayState = 'paused';
       itemEl.classList.add('dragging');
@@ -895,11 +861,17 @@ export function setupGame({ onReturnToMenu } = {}) {
         itemEl.style.animationPlayState = 'running';
       }
     });
-    const missHandler = () => onItemHandled(itemId, 'bonus', true);
+    const missHandler = () => onItemHandled(elementId, 'bonus', true);
     itemEl.addEventListener('animationend', missHandler);
-    activeItems.set(itemId, { data: { sound: 'bonus-gem' }, element: itemEl, missHandler });
+    activeItems.set(elementId, { data: { sound: 'bonus-gem', id: 'bonus-gem', symbol: '💎' }, element: itemEl, missHandler });
     playArea.appendChild(itemEl);
-    startPointerDrag(itemEl, { sound: 'bonus-gem', id: itemId, roundId: 'bonus', hebrew: 'gem' });
+    startPointerDrag(itemEl, {
+      sound: 'bonus-gem',
+      id: elementId,
+      roundId: 'bonus',
+      itemId: 'bonus-gem',
+      symbol: '💎'
+    });
   }
 
   accessibilityBtn?.addEventListener('click', () => {
@@ -920,9 +892,12 @@ export function setupGame({ onReturnToMenu } = {}) {
   });
 
   function updateModalSubtitle() {
-    const selectedMode = document.querySelector('input[name="gameMode"]:checked').value;
-    let text = 'Drag the moving ';
-    text += selectedMode.startsWith('vowel') || selectedMode === 'expert' ? 'item to the correct box!' : 'letter to the correct box!';
+    const selectedInput = document.querySelector('input[name="gameMode"]:checked');
+    const selectedMode = selectedInput?.value ?? 'letters';
+    const noun = modeNounMap[selectedMode] ?? nounFallback;
+    const text = subtitleTemplate.includes('{{noun}}')
+      ? subtitleTemplate.replace('{{noun}}', noun)
+      : subtitleTemplate;
     modalSubtitle.textContent = text;
   }
   document.querySelectorAll('input[name="gameMode"]').forEach((r) => r.addEventListener('change', updateModalSubtitle));
@@ -943,14 +918,18 @@ export function setupGame({ onReturnToMenu } = {}) {
     e.preventDefault();
     const targetBox = e.currentTarget;
     targetBox.classList.remove('drag-over');
-    const { sound: droppedSound, id: droppedId, roundId, hebrew: droppedHebrew } = JSON.parse(e.dataTransfer.getData('application/json'));
+    const { sound: droppedSound, id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol } = JSON.parse(
+      e.dataTransfer.getData('application/json')
+    );
     if (!gameActive || !activeItems.has(droppedId)) return;
 
     const targetSound = targetBox.dataset.sound;
     const item = activeItems.get(droppedId);
 
     item.element.isDropped = true;
-    if (!isBonusRound && !sessionStats[droppedHebrew]) sessionStats[droppedHebrew] = { correct: 0, incorrect: 0 };
+    if (!isBonusRound && droppedItemId && !sessionStats[droppedItemId]) {
+      sessionStats[droppedItemId] = { correct: 0, incorrect: 0 };
+    }
 
     const isCorrect = isBonusRound || droppedSound === targetSound;
     if (isBonusRound) {
@@ -961,12 +940,12 @@ export function setupGame({ onReturnToMenu } = {}) {
     if (isCorrect) {
       updateScore(isBonusRound ? 25 : 10);
       targetBox.classList.add('feedback-correct');
-      if (!isBonusRound) sessionStats[droppedHebrew].correct++;
+      if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].correct++;
     } else {
       lives--;
       updateLives(true);
       targetBox.classList.add('feedback-incorrect');
-      if (!isBonusRound) sessionStats[droppedHebrew].incorrect++;
+      if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
 
       const correctSound = item.data.sound;
       const boxRect = targetBox.getBoundingClientRect();
@@ -985,7 +964,9 @@ export function setupGame({ onReturnToMenu } = {}) {
 
     if (!isBonusRound) {
       emit('game:letter-result', {
-        hebrew: droppedHebrew,
+        itemId: droppedItemId,
+        symbol: droppedSymbol,
+        sound: item.data.sound,
         correct: isCorrect,
         mode: gameMode,
         roundId
@@ -1023,9 +1004,8 @@ export function setupGame({ onReturnToMenu } = {}) {
   }
 
   function forceStartByHebrew(symbol) {
-    const allItems = [...hebrewAlphabet, ...Object.values(vowelSyllables).flat()];
-    const match = allItems.find((entry) => entry.hebrew === symbol);
-    if (match) forcedStartItem = match;
+    const match = resolveItemBySymbol(symbol) ?? allLanguageItems.find((entry) => entry.symbol === symbol);
+    if (match) forcedStartItem = { ...match };
   }
 
   return { resetToSetupScreen, startGame, setGameMode, forceStartByHebrew };

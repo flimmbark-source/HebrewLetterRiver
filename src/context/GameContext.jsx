@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { setupGame } from '../game/game.js';
+import { loadLanguage } from '../lib/languageLoader.js';
 
 const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
 
@@ -10,6 +11,7 @@ export function GameProvider({ children }) {
   const containerRef = useRef(null);
   const gameApiRef = useRef(null);
   const [hasMounted, setHasMounted] = useState(false);
+  const languagePack = useMemo(() => loadLanguage(), []);
 
   useEffect(() => {
     setHasMounted(true);
@@ -22,7 +24,8 @@ export function GameProvider({ children }) {
       gameApiRef.current = setupGame({
         onReturnToMenu: () => {
           setIsVisible(false);
-        }
+        },
+        languagePack
       });
     }
     const api = gameApiRef.current;
@@ -32,7 +35,7 @@ export function GameProvider({ children }) {
     if (options?.autostart) {
       requestAnimationFrame(() => api.startGame());
     }
-  }, [isVisible, options]);
+  }, [isVisible, options, languagePack]);
 
   const openGame = useCallback((openOptions = {}) => {
     setOptions(openOptions);
