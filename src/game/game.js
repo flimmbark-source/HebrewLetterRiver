@@ -77,32 +77,76 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const t = translate
     ? (key, replacements) => translate(key, replacements)
     : (key, replacements) => translateWithDictionary(activeDictionary, key, replacements);
-  let practiceModes = activeLanguage.practiceModes ?? [];
+  const translateWithFallback = (key, fallback, replacements = {}) => {
+    const result = t(key, replacements);
+    if (!result || result === key) return fallback;
+    return result;
+  };
+  let practiceModes = (activeLanguage.practiceModes ?? []).map((mode) => ({ ...mode }));
   const modeItems = { ...(activeLanguage.modeItems ?? {}) };
   const baseItems = activeLanguage.items ?? [];
   const allLanguageItems = activeLanguage.allItems ?? [];
   const itemsById = activeLanguage.itemsById ?? {};
   const itemsBySymbol = activeLanguage.itemsBySymbol ?? {};
   const introductionsConfig = activeLanguage.introductions ?? {};
-  const subtitleTemplate = introductionsConfig.subtitleTemplate ?? t('game.setup.subtitleFallback');
-  const nounFallback = introductionsConfig.nounFallback ?? t('game.setup.defaultNoun');
+  const defaultSubtitle = translateWithFallback(
+    'game.setup.subtitleFallback',
+    introductionsConfig.subtitleTemplate ?? 'Drag the moving item to the correct box!'
+  );
+  const subtitleTemplate = translateWithFallback(
+    `game.introductions.${activeLanguage.id}.subtitle`,
+    defaultSubtitle
+  );
+  const defaultNoun = translateWithFallback(
+    'game.setup.defaultNoun',
+    introductionsConfig.nounFallback ?? 'item'
+  );
+  const nounFallback = translateWithFallback(
+    `game.introductions.${activeLanguage.id}.nounFallback`,
+    introductionsConfig.nounFallback ?? defaultNoun
+  );
   const initialKnownIds = introductionsConfig.initiallyKnownIds ?? [];
   const metadata = activeLanguage.metadata ?? {};
   const fontClass = metadata.fontClass ?? 'language-font-hebrew';
   const accessibilityHints = metadata.accessibility ?? {};
   const letterDescriptionTemplate = accessibilityHints.letterDescriptionTemplate ?? null;
 
+  const defaultModeLabel = translateWithFallback(
+    'game.setup.defaultModeLabel',
+    'Core Practice'
+  );
+  const defaultModeDescription = translateWithFallback(
+    'game.setup.defaultModeDescription',
+    'Practice the main set of characters.'
+  );
+
   if (!practiceModes.length) {
     practiceModes = [
       {
         id: 'letters',
-        label: t('game.setup.defaultModeLabel'),
-        description: t('game.setup.defaultModeDescription'),
+        label: defaultModeLabel,
+        description: defaultModeDescription,
         type: 'consonants',
         noun: nounFallback
       }
     ];
   }
+
+  practiceModes = practiceModes.map((mode) => {
+    const label = translateWithFallback(
+      `game.modes.${mode.id}.label`,
+      mode.label ?? defaultModeLabel
+    );
+    const description = translateWithFallback(
+      `game.modes.${mode.id}.description`,
+      mode.description ?? defaultModeDescription
+    );
+    const noun = translateWithFallback(
+      `game.modes.${mode.id}.noun`,
+      mode.noun ?? nounFallback
+    );
+    return { ...mode, label, description, noun };
+  });
 
   if (!modeItems.letters && baseItems.length) {
     modeItems.letters = baseItems.map((item) => ({ ...item }));
