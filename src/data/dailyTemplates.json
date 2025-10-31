@@ -1,22 +1,22 @@
 [
   {
     "id": "warmup",
-    "title": "Warm-Up",
-    "description": "Play two quick runs to stir the current.",
+    "titleKey": "daily.tasks.warmup.title",
+    "descriptionKey": "daily.tasks.warmup.description",
     "goal": 2,
     "type": "sessions"
   },
   {
     "id": "focus",
-    "title": "Focus",
-    "description": "Catch five perfect matches featuring {{letter}}.",
+    "titleKey": "daily.tasks.focus.title",
+    "descriptionKey": "daily.tasks.focus.description",
     "goal": 5,
     "type": "letterPerfect"
   },
   {
     "id": "spice",
-    "title": "Spice",
-    "description": "Win a round with the {{constraint}} active.",
+    "titleKey": "daily.tasks.spice.title",
+    "descriptionKey": "daily.tasks.spice.description",
     "goal": 1,
     "type": "constraint"
   }

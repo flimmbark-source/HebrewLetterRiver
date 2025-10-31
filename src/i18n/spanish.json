@@ -185,5 +185,26 @@
         "3": "Cascada Radiante"
       }
     }
+  },
+  "daily": {
+    "tasks": {
+      "warmup": {
+        "title": "Warm-Up",
+        "description": "Play two quick runs to stir the current."
+      },
+      "focus": {
+        "title": "Focus",
+        "description": "Catch five perfect matches featuring {{letter}}."
+      },
+      "spice": {
+        "title": "Spice",
+        "description": "Win a round with the {{constraint}} active."
+      }
+    },
+    "constraints": {
+      "expert-mode": "Expert Mode run",
+      "fast-flow": "Fast Flow speed (18+)",
+      "no-intros": "No Introductions enabled"
+    }
   }
 }
