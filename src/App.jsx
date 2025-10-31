@@ -83,6 +83,11 @@ function LanguageOnboardingModal() {
   const englishDictionary = React.useMemo(() => getDictionary('english'), []);
   const [pendingId, setPendingId] = React.useState(languageId);
 
+  const translateOnboarding = React.useCallback(
+    (key, replacements) => translateFromDictionary(englishDictionary, key, replacements),
+    [englishDictionary]
+  );
+
   React.useEffect(() => {
     setPendingId(languageId);
   }, [languageId]);
@@ -97,11 +102,6 @@ function LanguageOnboardingModal() {
   const handleContinue = () => {
     markLanguageSelected();
   };
-
-  const translateOnboarding = React.useCallback(
-    (key, replacements) => translateFromDictionary(englishDictionary, key, replacements),
-    [englishDictionary]
-  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 py-6 backdrop-blur">
