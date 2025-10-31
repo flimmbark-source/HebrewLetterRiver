@@ -1,14 +1,33 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import badgesCatalog from '../data/badges.json';
 import dailyTemplates from '../data/dailyTemplates.json';
-import { letters, letterMap } from '../data/letters.js';
 import { on } from '../lib/eventBus.js';
+import { loadLanguage } from '../lib/languageLoader.js';
 import { celebrate } from '../lib/celebration.js';
 import { loadState, saveState } from '../lib/storage.js';
 import { differenceInJerusalemDays, getJerusalemDateKey, millisUntilNextJerusalemMidnight } from '../lib/time.js';
 import { useToast } from './ToastContext.jsx';
 
 const ProgressContext = createContext(null);
+
+const languagePack = loadLanguage();
+const baseLanguageItems = languagePack.items ?? [];
+const allLanguageItems = languagePack.allItems ?? baseLanguageItems;
+const itemsById = languagePack.itemsById ?? {};
+const itemsBySymbol = languagePack.itemsBySymbol ?? {};
+
+function toLetterInfo(item) {
+  if (!item) return null;
+  return {
+    id: item.id,
+    hebrew: item.symbol ?? item.id,
+    name: item.name ?? item.id,
+    sound: item.sound ?? ''
+  };
+}
+
+const fallbackLetterInfo =
+  toLetterInfo(baseLanguageItems[0] ?? allLanguageItems[0]) ?? { id: null, hebrew: '', name: '', sound: '' };
 
 const badgeSpecById = badgesCatalog.reduce((acc, badge) => {
   acc[badge.id] = badge;
@@ -47,26 +66,62 @@ const spiceConstraints = [
 function getWeakestLetter(letterStats) {
   const entries = Object.entries(letterStats ?? {});
   if (entries.length === 0) {
-    return { hebrew: letters[0].hebrew, name: letters[0].name };
+    return fallbackLetterInfo;
   }
   let weakest = entries[0][0];
   let weakestScore = Infinity;
-  entries.forEach(([symbol, stats]) => {
+  entries.forEach(([itemId, stats]) => {
     const total = (stats.correct ?? 0) + (stats.incorrect ?? 0);
     if (total === 0) return;
     const accuracy = (stats.correct ?? 0) / total;
     const penalty = total < 3 ? accuracy + 0.15 : accuracy;
     if (penalty < weakestScore) {
       weakestScore = penalty;
-      weakest = symbol;
+      weakest = itemId;
     }
   });
-  const info = letterMap[weakest] ?? { hebrew: weakest, name: weakest };
+  const info = toLetterInfo(itemsById[weakest] ?? itemsBySymbol[weakest]) ?? fallbackLetterInfo;
   return info;
 }
 
 function pickConstraint() {
   return spiceConstraints[Math.floor(Math.random() * spiceConstraints.length)];
+}
+
+function normalizeLetterStats(rawStats) {
+  const normalized = {};
+  Object.entries(rawStats ?? {}).forEach(([key, value]) => {
+    if (!value) return;
+    const target = { correct: value.correct ?? 0, incorrect: value.incorrect ?? 0 };
+    if (itemsById[key]) {
+      normalized[key] = target;
+      return;
+    }
+    const symbolMatch = itemsBySymbol[key];
+    if (symbolMatch?.id) {
+      const existing = normalized[symbolMatch.id] ?? { correct: 0, incorrect: 0 };
+      normalized[symbolMatch.id] = {
+        correct: existing.correct + target.correct,
+        incorrect: existing.incorrect + target.incorrect
+      };
+    }
+  });
+  return normalized;
+}
+
+function normalizeDailyData(daily) {
+  if (!daily?.tasks) return daily;
+  const tasks = daily.tasks.map((task) => {
+    if (task.id === 'focus' && task.meta?.letter) {
+      const original = task.meta.letter;
+      const itemId = itemsById[original]
+        ? original
+        : itemsBySymbol[original]?.id ?? original;
+      return { ...task, meta: { ...task.meta, letter: itemId } };
+    }
+    return task;
+  });
+  return { ...daily, tasks };
 }
 
 function hydratePlayer() {
@@ -76,7 +131,7 @@ function hydratePlayer() {
     ...defaultPlayer,
     ...stored,
     totals: { ...defaultPlayer.totals, ...(stored.totals ?? {}) },
-    letters: stored.letters ?? {},
+    letters: normalizeLetterStats(stored.letters ?? {}),
     latestBadge: stored.latestBadge ?? null
   };
 }
@@ -101,13 +156,13 @@ function hydrateDaily(focusLetter, constraint) {
   const todayKey = getJerusalemDateKey();
   const stored = loadState('daily', null);
   if (stored && stored.dateKey === todayKey) {
-    return stored;
+    return normalizeDailyData(stored);
   }
   return generateDaily(todayKey, focusLetter, constraint);
 }
 
 function generateDaily(dateKey, focusLetterInfo, constraint) {
-  const focusLetter = focusLetterInfo ?? getWeakestLetter({});
+  const focusLetter = focusLetterInfo ?? fallbackLetterInfo;
   const selectedConstraint = constraint ?? pickConstraint();
   const tasks = dailyTemplates.map((template) => {
     if (template.id === 'focus') {
@@ -116,7 +171,7 @@ function generateDaily(dateKey, focusLetterInfo, constraint) {
         ...template,
         description: template.description.replace('{{letter}}', label),
         progress: 0,
-        meta: { letter: focusLetter.hebrew },
+        meta: { letter: focusLetter.id ?? focusLetter.hebrew },
         completed: false
       };
     }
@@ -298,14 +353,15 @@ export function ProgressProvider({ children }) {
       });
     });
     const offLetter = on('game:letter-result', (payload) => {
-      if (!payload) return;
+      const itemId = payload?.itemId;
+      if (!itemId) return;
       setPlayer((prev) => {
-        const current = prev.letters[payload.hebrew] ?? { correct: 0, incorrect: 0 };
+        const current = prev.letters[itemId] ?? { correct: 0, incorrect: 0 };
         return {
           ...prev,
           letters: {
             ...prev.letters,
-            [payload.hebrew]: {
+            [itemId]: {
               correct: current.correct + (payload.correct ? 1 : 0),
               incorrect: current.incorrect + (!payload.correct ? 1 : 0)
             }
@@ -318,7 +374,14 @@ export function ProgressProvider({ children }) {
       });
       if (payload.correct) {
         trackBadgeProgress('letter-master', 1);
-        markDailyProgress((task) => task.id === 'focus' && task.meta?.letter === payload.hebrew);
+        markDailyProgress((task) => {
+          if (task.id !== 'focus') return false;
+          const target = task.meta?.letter;
+          if (!target) return false;
+          if (target === itemId) return true;
+          const symbolMatch = itemsBySymbol[target]?.id;
+          return symbolMatch ? symbolMatch === itemId : false;
+        });
       }
     });
     const offBonus = on('game:bonus-catch', () => {
