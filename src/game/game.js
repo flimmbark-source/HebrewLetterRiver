@@ -244,6 +244,13 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   });
 
   let dropZones = [];
+  let activeBucketCount = 0;
+  const MIN_BUCKET_WIDTH = 128;
+  const LAYOUT_GAP_FALLBACK = 12;
+  let pendingBucketLayoutHandle = null;
+  let pendingBucketLayoutIsAnimationFrame = false;
+  let bucketResizeObserver = null;
+  let bucketResizeHandler = null;
   let activeDrag = null;
   let dragGhost = null;
   let hoverZone = null;
@@ -263,6 +270,77 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       el,
       rect: el.getBoundingClientRect()
     }));
+  }
+
+  function clearPendingBucketLayout() {
+    if (pendingBucketLayoutHandle === null) return;
+    if (pendingBucketLayoutIsAnimationFrame) {
+      if (typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function') {
+        window.cancelAnimationFrame(pendingBucketLayoutHandle);
+      }
+    } else if (typeof window !== 'undefined') {
+      window.clearTimeout?.(pendingBucketLayoutHandle);
+    }
+    pendingBucketLayoutHandle = null;
+  }
+
+  function scheduleBucketLayoutUpdate() {
+    if (!choicesContainer) return;
+    clearPendingBucketLayout();
+    const runUpdate = () => {
+      pendingBucketLayoutHandle = null;
+      applyBucketLayout();
+      if (activeBucketCount > 0) {
+        refreshDropZones();
+      }
+    };
+    if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+      pendingBucketLayoutIsAnimationFrame = true;
+      pendingBucketLayoutHandle = window.requestAnimationFrame(runUpdate);
+    } else if (typeof window !== 'undefined') {
+      pendingBucketLayoutIsAnimationFrame = false;
+      pendingBucketLayoutHandle = window.setTimeout(runUpdate, 50);
+    }
+  }
+
+  function applyBucketLayout(count = activeBucketCount) {
+    if (!choicesContainer) return;
+    if (!count) {
+      choicesContainer.style.removeProperty('grid-template-columns');
+      return;
+    }
+    if (typeof window === 'undefined') return;
+    const containerWidth = choicesContainer.clientWidth;
+    if (containerWidth <= 0) return;
+    const computed = window.getComputedStyle?.(choicesContainer);
+    const gapValueRaw = computed?.columnGap || computed?.gap || `${LAYOUT_GAP_FALLBACK}px`;
+    const gapValue = parseFloat(gapValueRaw) || LAYOUT_GAP_FALLBACK;
+    const totalGap = gapValue * Math.max(count - 1, 0);
+    const availableWidth = containerWidth - totalGap;
+    if (availableWidth / count >= MIN_BUCKET_WIDTH) {
+      choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(0, 1fr))`;
+      return;
+    }
+    const numerator = containerWidth + gapValue;
+    const maxColumns = Math.max(
+      1,
+      Math.min(count, Math.floor(numerator / (MIN_BUCKET_WIDTH + gapValue)))
+    );
+    choicesContainer.style.gridTemplateColumns = `repeat(${maxColumns}, minmax(0, 1fr))`;
+  }
+
+  if (choicesContainer) {
+    if (typeof ResizeObserver !== 'undefined') {
+      bucketResizeObserver?.disconnect();
+      bucketResizeObserver = new ResizeObserver(() => scheduleBucketLayoutUpdate());
+      bucketResizeObserver.observe(choicesContainer);
+    } else if (typeof window !== 'undefined') {
+      if (bucketResizeHandler) {
+        window.removeEventListener('resize', bucketResizeHandler);
+      }
+      bucketResizeHandler = () => scheduleBucketLayoutUpdate();
+      window.addEventListener('resize', bucketResizeHandler);
+    }
   }
 
   function getDisplaySymbol(item = {}) {
@@ -482,6 +560,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
     choicesContainer.innerHTML = '';
+    activeBucketCount = 0;
+    applyBucketLayout(0);
+    refreshDropZones();
+    clearPendingBucketLayout();
     learnOverlay.classList.remove('visible');
     ghostEl.classList.remove('ghost-rise');
     summaryTooltip.classList.add('hidden');
@@ -913,6 +995,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   function generateChoices(correctItems, itemPool) {
     choicesContainer.innerHTML = '';
+    activeBucketCount = 0;
+    applyBucketLayout(0);
+    clearPendingBucketLayout();
+    refreshDropZones();
     if (correctItems.length === 0) return;
 
     const uniqueCorrect = new Map();
@@ -953,6 +1039,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       box.addEventListener('drop', handleDrop);
       choicesContainer.appendChild(box);
     });
+    activeBucketCount = finalChoices.length;
+    applyBucketLayout();
+    clearPendingBucketLayout();
     refreshDropZones();
   }
 
@@ -961,6 +1050,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
     choicesContainer.innerHTML = '';
+    activeBucketCount = 0;
+    applyBucketLayout(0);
+    clearPendingBucketLayout();
 
     learnLetterEl.textContent = '💎';
     learnName.textContent = t('game.bonus.title');
@@ -980,6 +1072,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     bonusCatcher.addEventListener('dragleave', () => bonusCatcher.classList.remove('drag-over'));
     bonusCatcher.addEventListener('drop', handleDrop);
     choicesContainer.appendChild(bonusCatcher);
+    activeBucketCount = 1;
+    applyBucketLayout();
+    clearPendingBucketLayout();
     refreshDropZones();
 
     let timeLeft = 10;
