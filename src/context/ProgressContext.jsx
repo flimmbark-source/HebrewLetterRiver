@@ -48,7 +48,20 @@ const defaultStreak = {
   lastPlayedDateKey: null
 };
 
-function createLanguageAssets(languagePack) {
+function createLanguageAssets(languagePack, localization = {}) {
+  const { t: translateFn } = localization ?? {};
+  const translate = typeof translateFn === 'function' ? translateFn : null;
+
+  function translateKey(key, fallback, replacements = {}) {
+    if (!key) return fallback ?? '';
+    if (translate) {
+      const result = translate(key, replacements);
+      if (result && result !== key) {
+        return result;
+      }
+    }
+    return fallback ?? (typeof key === 'string' ? key : '');
+  }
   const baseLanguageItems = languagePack.items ?? [];
   const allLanguageItems = languagePack.allItems ?? baseLanguageItems;
   const itemsById = languagePack.itemsById ?? {};
@@ -98,15 +111,60 @@ function createLanguageAssets(languagePack) {
     return normalized;
   }
 
+  function getConstraintLabel(constraintId) {
+    const constraint = spiceConstraints.find((item) => item.id === constraintId);
+    if (!constraint) return constraintId;
+    return translateKey(constraint.labelKey, constraint.fallbackLabel);
+  }
+
   function normalizeDailyData(daily) {
     if (!daily?.tasks) return daily;
     const tasks = daily.tasks.map((task) => {
+      let nextTask = task;
       if (task.id === 'focus' && task.meta?.letter) {
         const original = task.meta.letter;
         const itemId = itemsById[original] ? original : itemsBySymbol[original]?.id ?? original;
-        return { ...task, meta: { ...task.meta, letter: itemId } };
+        if (itemId !== original) {
+          nextTask = { ...task, meta: { ...task.meta, letter: itemId } };
+        }
       }
-      return task;
+
+      const template = dailyTemplates.find((entry) => entry.id === task.id) ?? {};
+      const translation = nextTask.translation ?? {};
+      const titleKey = translation.titleKey ?? template.titleKey ?? null;
+      const descriptionKey = translation.descriptionKey ?? template.descriptionKey ?? null;
+      let replacements = { ...(translation.replacements ?? {}) };
+
+      if (nextTask.id === 'focus') {
+        const letterId = nextTask.meta?.letter;
+        const info = letterId ? toLetterInfo(itemsById[letterId] ?? itemsBySymbol[letterId]) : null;
+        if (info) {
+          replacements = { ...replacements, letter: `${info.hebrew} · ${info.name}` };
+        }
+      }
+
+      if (nextTask.id === 'spice') {
+        const constraintId = nextTask.meta?.constraintId;
+        if (constraintId) {
+          replacements = { ...replacements, constraint: getConstraintLabel(constraintId) };
+        }
+      }
+
+      const title = titleKey ? translateKey(titleKey, nextTask.title, replacements) : nextTask.title;
+      const description = descriptionKey
+        ? translateKey(descriptionKey, nextTask.description, replacements)
+        : nextTask.description;
+
+      return {
+        ...nextTask,
+        title,
+        description,
+        translation: {
+          titleKey,
+          descriptionKey,
+          replacements
+        }
+      };
     });
     return { ...daily, tasks };
   }
@@ -115,26 +173,40 @@ function createLanguageAssets(languagePack) {
     const focusLetter = focusLetterInfo ?? fallbackLetterInfo;
     const selectedConstraint = constraint ?? pickConstraint();
     const tasks = dailyTemplates.map((template) => {
+      const baseTranslation = {
+        titleKey: template.titleKey ?? null,
+        descriptionKey: template.descriptionKey ?? null
+      };
+      let replacements = {};
+      let meta = template.meta ?? {};
+
       if (template.id === 'focus') {
         const label = `${focusLetter.hebrew} · ${focusLetter.name}`;
-        return {
-          ...template,
-          description: template.description.replace('{{letter}}', label),
-          progress: 0,
-          meta: { letter: focusLetter.id ?? focusLetter.hebrew },
-          completed: false
-        };
+        replacements = { letter: label };
+        meta = { ...meta, letter: focusLetter.id ?? focusLetter.hebrew };
       }
       if (template.id === 'spice') {
-        return {
-          ...template,
-          description: template.description.replace('{{constraint}}', selectedConstraint.label),
-          progress: 0,
-          meta: { constraintId: selectedConstraint.id },
-          completed: false
-        };
+        replacements = { constraint: getConstraintLabel(selectedConstraint.id) };
+        meta = { ...meta, constraintId: selectedConstraint.id };
       }
-      return { ...template, progress: 0, completed: false };
+      const title = baseTranslation.titleKey
+        ? translateKey(baseTranslation.titleKey, null, replacements)
+        : template.title;
+      const description = baseTranslation.descriptionKey
+        ? translateKey(baseTranslation.descriptionKey, null, replacements)
+        : template.description;
+      return {
+        ...template,
+        title,
+        description,
+        progress: 0,
+        meta,
+        completed: false,
+        translation: {
+          ...baseTranslation,
+          replacements
+        }
+      };
     });
     return {
       dateKey,
@@ -158,9 +230,24 @@ function createLanguageAssets(languagePack) {
 }
 
 const spiceConstraints = [
-  { id: 'expert-mode', label: 'Expert Mode run', predicate: (session) => session?.settings?.mode === 'expert' },
-  { id: 'fast-flow', label: 'Fast Flow speed (18+)', predicate: (session) => (session?.settings?.speed ?? 0) >= 18 },
-  { id: 'no-intros', label: 'No Introductions enabled', predicate: (session) => session?.settings?.introductions === false }
+  {
+    id: 'expert-mode',
+    labelKey: 'daily.constraints.expert-mode',
+    fallbackLabel: 'Expert Mode run',
+    predicate: (session) => session?.settings?.mode === 'expert'
+  },
+  {
+    id: 'fast-flow',
+    labelKey: 'daily.constraints.fast-flow',
+    fallbackLabel: 'Fast Flow speed (18+)',
+    predicate: (session) => (session?.settings?.speed ?? 0) >= 18
+  },
+  {
+    id: 'no-intros',
+    labelKey: 'daily.constraints.no-intros',
+    fallbackLabel: 'No Introductions enabled',
+    predicate: (session) => session?.settings?.introductions === false
+  }
 ];
 
 function pickConstraint() {
@@ -169,9 +256,9 @@ function pickConstraint() {
 
 export function ProgressProvider({ children }) {
   const { addToast } = useToast();
-  const { languagePack, t } = useLocalization();
+  const { languagePack, dictionary, t } = useLocalization();
 
-  const assets = useMemo(() => createLanguageAssets(languagePack), [languagePack]);
+  const assets = useMemo(() => createLanguageAssets(languagePack, { dictionary, t }), [languagePack, dictionary, t]);
   const storagePrefix = useMemo(() => `progress.${languagePack.id}`, [languagePack.id]);
   const initialPlayerRef = useRef(null);
   const hydratedPrefixRef = useRef(storagePrefix);

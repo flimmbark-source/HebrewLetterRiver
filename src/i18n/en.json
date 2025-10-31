@@ -56,7 +56,7 @@
       "close": "Close"
     },
     "setup": {
-    "title": "World Letter River",
+      "title": "World Letter River",
       "subtitleFallback": "Drag the moving item to the correct box!",
       "prompt": "Choose what you want to practice:",
       "installDescription": "Install App",
@@ -184,6 +184,27 @@
         "2": "Shimmering Rapid",
         "3": "Radiant Cascade"
       }
+    }
+  },
+  "daily": {
+    "tasks": {
+      "warmup": {
+        "title": "Warm-Up",
+        "description": "Play two quick runs to stir the current."
+      },
+      "focus": {
+        "title": "Focus",
+        "description": "Catch five perfect matches featuring {{letter}}."
+      },
+      "spice": {
+        "title": "Spice",
+        "description": "Win a round with the {{constraint}} active."
+      }
+    },
+    "constraints": {
+      "expert-mode": "Expert Mode run",
+      "fast-flow": "Fast Flow speed (18+)",
+      "no-intros": "No Introductions enabled"
     }
   }
 }
