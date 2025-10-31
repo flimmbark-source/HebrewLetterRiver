@@ -784,7 +784,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
           if (!gameActive || currentRound.id !== roundId) return;
           learnLetterEl.textContent = itemData.symbol;
           const transliteration = itemData.transliteration ?? itemData.name ?? '';
-          const pronunciation = itemData.pronunciation ?? itemData.sound ?? '';
+          const pronunciation = getDisplayLabel(itemData);
           learnName.textContent = transliteration;
           learnSound.textContent = pronunciation ? t('game.summary.soundLabel', { sound: pronunciation }) : '';
           learnOverlay.classList.add('visible');
