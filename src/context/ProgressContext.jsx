@@ -137,9 +137,23 @@ function createLanguageAssets(languagePack, localization = {}) {
 
       if (nextTask.id === 'focus') {
         const letterId = nextTask.meta?.letter;
-        const info = letterId ? toLetterInfo(itemsById[letterId] ?? itemsBySymbol[letterId]) : null;
-        if (info) {
-          replacements = { ...replacements, letter: `${info.hebrew} · ${info.name}` };
+        let info = null;
+        if (letterId) {
+          const fallbackInfo =
+            typeof letterId === 'string'
+              ? { id: letterId, symbol: letterId, name: letterId, sound: '' }
+              : null;
+          info =
+            toLetterInfo(itemsById[letterId] ?? itemsBySymbol[letterId] ?? fallbackInfo) ??
+            (fallbackInfo ? toLetterInfo(fallbackInfo) : null);
+        }
+        const finalInfo = info ?? fallbackLetterInfo;
+        const labelParts = [finalInfo.hebrew, finalInfo.name].filter(
+          (part, index, arr) => part && arr.indexOf(part) === index
+        );
+        const label = labelParts.length > 0 ? labelParts.join(' · ') : finalInfo.id ?? '';
+        if (label) {
+          replacements = { ...replacements, letter: label };
         }
       }
 
