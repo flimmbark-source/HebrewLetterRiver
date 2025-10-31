@@ -221,6 +221,27 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     }));
   }
 
+  function getDisplaySymbol(item = {}) {
+    return item.symbol ?? item.transliteration ?? item.name ?? item.sound ?? '';
+  }
+
+  function getDisplayPronunciation(item = {}) {
+    return item.pronunciation ?? item.sound ?? '';
+  }
+
+  function getCharacterAriaLabel(item = {}) {
+    const symbol = getDisplaySymbol(item);
+    if (!symbol) return '';
+    const pronunciation = getDisplayPronunciation(item);
+    if (pronunciation) {
+      return t('game.summary.characterLabelWithPronunciation', {
+        symbol,
+        pronunciation
+      });
+    }
+    return t('game.summary.characterLabel', { symbol });
+  }
+
   function zoneAt(x, y) {
     for (let i = 0; i < dropZones.length; i++) {
       const { el, rect } = dropZones[i];
@@ -302,10 +323,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     const targetBox = e.currentTarget;
     targetBox.classList.remove('drag-over');
 
-    const { sound: droppedSound, id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol } = payload;
+    const { id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol } = payload;
     if (!gameActive || !activeItems.has(droppedId)) return;
 
-    const targetSound = targetBox.dataset.sound;
+    const targetItemId = targetBox.dataset.itemId;
     const item = activeItems.get(droppedId);
 
     item.element.isDropped = true;
@@ -313,7 +334,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       sessionStats[droppedItemId] = { correct: 0, incorrect: 0 };
     }
 
-    const isCorrect = isBonusRound || droppedSound === targetSound;
+    const isCorrect = isBonusRound || targetItemId === droppedItemId;
     if (isBonusRound) {
       bonusCaughtInSession += 1;
       emit('game:bonus-catch', { count: bonusCaughtInSession, score, languageId: activeLanguage.id });
@@ -329,10 +350,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       targetBox.classList.add('feedback-incorrect');
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
 
-      const correctSound = item.data.pronunciation ?? item.data.sound ?? '';
+      const correctSymbol = getDisplaySymbol(item.data);
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
-      ghostEl.textContent = correctSound ? t('game.summary.soundLabel', { sound: correctSound }) : '';
+      ghostEl.textContent = correctSymbol ? getCharacterAriaLabel(item.data) : '';
 
       ghostEl.style.display = 'block';
       const ghostWidth = ghostEl.offsetWidth;
@@ -846,11 +867,16 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     choicesContainer.innerHTML = '';
     if (correctItems.length === 0) return;
 
-    const correctChoices = correctItems.filter((item, idx, self) => idx === self.findIndex((i) => i.sound === item.sound));
-    const correctSounds = new Set(correctChoices.map((i) => i.sound));
+    const uniqueCorrect = new Map();
+    correctItems.forEach((item) => {
+      if (!item || uniqueCorrect.has(item.id)) return;
+      uniqueCorrect.set(item.id, item);
+    });
+    const correctChoices = Array.from(uniqueCorrect.values());
+    const correctIds = new Set(correctChoices.map((i) => i.id));
     let finalChoices = [...correctChoices];
 
-    let distractorPool = itemPool.filter((i) => !correctSounds.has(i.sound));
+    let distractorPool = itemPool.filter((i) => !correctIds.has(i.id));
     distractorPool.sort(() => 0.5 - Math.random());
 
     let i = 0;
@@ -863,11 +889,12 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
     finalChoices.forEach((choice) => {
       const box = document.createElement('div');
-      const displayPronunciation = choice.pronunciation ?? choice.sound;
-      box.textContent = displayPronunciation;
-      box.dataset.sound = choice.sound;
+      const displaySymbol = getDisplaySymbol(choice);
+      box.textContent = displaySymbol;
+      box.dataset.itemId = choice.id;
       box.className = 'catcher-box bg-slate-700 text-white font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-slate-600';
-      box.setAttribute('aria-label', t('game.summary.soundLabel', { sound: displayPronunciation }));
+      const ariaLabel = getCharacterAriaLabel(choice);
+      if (ariaLabel) box.setAttribute('aria-label', ariaLabel);
       box.addEventListener('dragover', (e) => {
         e.preventDefault();
         box.classList.add('drag-over');
@@ -893,7 +920,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
     const bonusCatcher = document.createElement('div');
     bonusCatcher.textContent = t('game.bonus.catchHere');
-    bonusCatcher.dataset.sound = 'bonus-gem';
+    bonusCatcher.dataset.itemId = 'bonus-gem';
     bonusCatcher.className = 'catcher-box bg-yellow-500 text-slate-900 font-bold py-6 px-2 rounded-lg text-lg transition-all border-2 border-yellow-400 col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5';
     bonusCatcher.setAttribute('aria-label', t('game.bonus.catchHere'));
     bonusCatcher.addEventListener('dragover', (e) => {
@@ -1035,12 +1062,12 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     e.preventDefault();
     const targetBox = e.currentTarget;
     targetBox.classList.remove('drag-over');
-    const { sound: droppedSound, id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol } = JSON.parse(
+    const { id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol } = JSON.parse(
       e.dataTransfer.getData('application/json')
     );
     if (!gameActive || !activeItems.has(droppedId)) return;
 
-    const targetSound = targetBox.dataset.sound;
+    const targetItemId = targetBox.dataset.itemId;
     const item = activeItems.get(droppedId);
 
     item.element.isDropped = true;
@@ -1048,7 +1075,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       sessionStats[droppedItemId] = { correct: 0, incorrect: 0 };
     }
 
-    const isCorrect = isBonusRound || droppedSound === targetSound;
+    const isCorrect = isBonusRound || targetItemId === droppedItemId;
     if (isBonusRound) {
       bonusCaughtInSession += 1;
       emit('game:bonus-catch', { count: bonusCaughtInSession, score, languageId: activeLanguage.id });
@@ -1064,10 +1091,11 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       targetBox.classList.add('feedback-incorrect');
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
 
-      const correctSound = item.data.sound;
+      const correctSymbol = getDisplaySymbol(item.data);
+      const characterLabel = getCharacterAriaLabel(item.data);
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
-      ghostEl.textContent = correctSound;
+      ghostEl.textContent = characterLabel || correctSymbol;
       ghostEl.style.display = 'block';
       const ghostWidth = ghostEl.offsetWidth;
       ghostEl.style.display = '';
