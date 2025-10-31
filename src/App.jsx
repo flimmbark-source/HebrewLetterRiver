@@ -6,6 +6,7 @@ import LearnView from './views/LearnView.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import { ProgressProvider } from './context/ProgressContext.jsx';
 import { GameProvider, useGame } from './context/GameContext.jsx';
+import { LocalizationProvider, useLocalization } from './context/LocalizationContext.jsx';
 
 function HomeIcon(props) {
   return (
@@ -50,6 +51,9 @@ function BookIcon(props) {
 
 function Shell() {
   const { openGame } = useGame();
+  const { t, languagePack } = useLocalization();
+  const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
+  const direction = languagePack.metadata?.textDirection ?? 'ltr';
 
   const handlePlay = React.useCallback(
     (event) => {
@@ -68,11 +72,12 @@ function Shell() {
     <div
       className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-28 pt-8 sm:px-6 sm:pt-10"
       style={{ paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}
+      dir={direction}
     >
       <header className="flex flex-col gap-4 sm:gap-6">
         <div className="text-center sm:text-left">
-          <h1 className="text-3xl font-bold text-white hebrew-font sm:text-4xl">Hebrew Letter River</h1>
-          <p className="text-sm text-slate-400 sm:text-base">Flow, learn, and celebrate every catch.</p>
+          <h1 className={`text-3xl font-bold text-white sm:text-4xl ${fontClass}`}>{t('app.title')}</h1>
+          <p className="text-sm text-slate-400 sm:text-base">{t('app.tagline')}</p>
         </div>
       </header>
       <main className="flex-1 pb-6">
@@ -90,7 +95,7 @@ function Shell() {
         <div className="mx-auto flex w-full max-w-3xl justify-between gap-2">
           <NavLink to="/home" className={tabClass}>
             <HomeIcon className="h-5 w-5" />
-            <span>Home</span>
+            <span>{t('app.nav.home')}</span>
           </NavLink>
           <button
             type="button"
@@ -98,33 +103,35 @@ function Shell() {
             className="flex flex-1 flex-col items-center gap-1 rounded-2xl bg-cyan-500/10 px-4 py-2 text-xs font-medium text-cyan-300 transition hover:bg-cyan-500/20 hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:text-sm"
           >
             <PlayIcon className="h-5 w-5" />
-            <span>Play</span>
+            <span>{t('app.nav.play')}</span>
           </button>
           <NavLink to="/achievements" className={tabClass}>
             <TrophyIcon className="h-5 w-5" />
-            <span>Achievements</span>
+            <span>{t('app.nav.achievements')}</span>
           </NavLink>
           <NavLink to="/learn" className={tabClass}>
             <BookIcon className="h-5 w-5" />
-            <span>Learn</span>
+            <span>{t('app.nav.learn')}</span>
           </NavLink>
         </div>
       </nav>
-      <footer className="pb-6 text-center text-xs text-slate-600 sm:text-sm">Reset happens daily at 00:00 Asia/Jerusalem.</footer>
+      <footer className="pb-6 text-center text-xs text-slate-600 sm:text-sm">{t('app.footer.resetNotice')}</footer>
     </div>
   );
 }
 
 export default function App() {
   return (
-    <ToastProvider>
-      <ProgressProvider>
-        <GameProvider>
-          <div className="min-h-screen bg-slate-950 text-white">
-            <Shell />
-          </div>
-        </GameProvider>
-      </ProgressProvider>
-    </ToastProvider>
+    <LocalizationProvider>
+      <ToastProvider>
+        <ProgressProvider>
+          <GameProvider>
+            <div className="min-h-screen bg-slate-950 text-white">
+              <Shell />
+            </div>
+          </GameProvider>
+        </ProgressProvider>
+      </ToastProvider>
+    </LocalizationProvider>
   );
 }

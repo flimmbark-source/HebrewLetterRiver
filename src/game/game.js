@@ -1,5 +1,6 @@
 import { emit } from '../lib/eventBus.js';
 import { loadLanguage } from '../lib/languageLoader.js';
+import { getDictionary, translate as translateWithDictionary, formatTemplate } from '../i18n/index.js';
 
 const trackedTimeouts = new Set();
 const trackedIntervals = new Set();
@@ -38,7 +39,7 @@ function clearAllTimers() {
   trackedIntervals.clear();
 }
 
-export function setupGame({ onReturnToMenu, languagePack } = {}) {
+export function setupGame({ onReturnToMenu, languagePack, translate, dictionary } = {}) {
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
   const livesContainer = document.getElementById('lives-container');
@@ -65,26 +66,107 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
   const speedLabel = document.getElementById('speed-label');
   const installBtn = document.getElementById('install-btn');
   const backToMenuButton = document.getElementById('back-to-menu-button');
+  const modeOptionsContainer = document.getElementById('mode-options');
 
   if (!scoreEl || !levelEl) {
     throw new Error('Game elements failed to initialize.');
   }
 
   const activeLanguage = languagePack ?? loadLanguage();
-  const practiceModes = activeLanguage.practiceModes ?? [];
-  const modeItems = activeLanguage.modeItems ?? {};
+  const activeDictionary = dictionary ?? getDictionary(activeLanguage.id);
+  const t = translate
+    ? (key, replacements) => translate(key, replacements)
+    : (key, replacements) => translateWithDictionary(activeDictionary, key, replacements);
+  let practiceModes = activeLanguage.practiceModes ?? [];
+  const modeItems = { ...(activeLanguage.modeItems ?? {}) };
   const baseItems = activeLanguage.items ?? [];
   const allLanguageItems = activeLanguage.allItems ?? [];
   const itemsById = activeLanguage.itemsById ?? {};
   const itemsBySymbol = activeLanguage.itemsBySymbol ?? {};
   const introductionsConfig = activeLanguage.introductions ?? {};
-  const subtitleTemplate = introductionsConfig.subtitleTemplate ?? 'Drag the moving {{noun}} to the correct box!';
-  const nounFallback = introductionsConfig.nounFallback ?? 'item';
+  const subtitleTemplate = introductionsConfig.subtitleTemplate ?? t('game.setup.subtitleFallback');
+  const nounFallback = introductionsConfig.nounFallback ?? t('game.setup.defaultNoun');
+  const initialKnownIds = introductionsConfig.initiallyKnownIds ?? [];
+  const metadata = activeLanguage.metadata ?? {};
+  const fontClass = metadata.fontClass ?? 'language-font-hebrew';
+  const accessibilityHints = metadata.accessibility ?? {};
+  const letterDescriptionTemplate = accessibilityHints.letterDescriptionTemplate ?? null;
+
+  if (!practiceModes.length) {
+    practiceModes = [
+      {
+        id: 'letters',
+        label: t('game.setup.defaultModeLabel'),
+        description: t('game.setup.defaultModeDescription'),
+        type: 'consonants',
+        noun: nounFallback
+      }
+    ];
+  }
+
+  if (!modeItems.letters && baseItems.length) {
+    modeItems.letters = baseItems.map((item) => ({ ...item }));
+  }
+
   const modeNounMap = practiceModes.reduce((acc, mode) => {
     acc[mode.id] = mode.noun ?? nounFallback;
     return acc;
   }, {});
-  const initialKnownIds = introductionsConfig.initiallyKnownIds ?? [];
+
+  function renderPracticeModes() {
+    if (!modeOptionsContainer) return;
+    modeOptionsContainer.innerHTML = '';
+
+    practiceModes.forEach((mode, index) => {
+      const label = document.createElement('label');
+      label.className = 'setup-label cursor-pointer';
+
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'gameMode';
+      input.value = mode.id;
+      input.className = 'hidden';
+      input.checked = index === 0;
+      input.defaultChecked = index === 0;
+
+      const card = document.createElement('div');
+      card.className =
+        'flex h-full flex-col rounded-2xl border-2 border-slate-600 bg-slate-800/70 p-4 transition hover:border-cyan-400/80';
+
+      const title = document.createElement('span');
+      title.className = `text-base font-semibold text-white sm:text-lg ${fontClass}`;
+      title.textContent = mode.label;
+      card.appendChild(title);
+
+      if (mode.description) {
+        const description = document.createElement('p');
+        description.className = 'mt-1 text-sm text-slate-400';
+        description.textContent = mode.description;
+        card.appendChild(description);
+      }
+
+      label.appendChild(input);
+      label.appendChild(card);
+      modeOptionsContainer.appendChild(label);
+
+      input.addEventListener('change', () => {
+        gameMode = input.value;
+        updateModalSubtitle();
+      });
+    });
+
+    const selectedInput = modeOptionsContainer.querySelector('input[name="gameMode"]:checked');
+    if (selectedInput) {
+      gameMode = selectedInput.value;
+    } else {
+      const firstRadio = modeOptionsContainer.querySelector('input[name="gameMode"]');
+      if (firstRadio) {
+        firstRadio.checked = true;
+        gameMode = firstRadio.value;
+      }
+    }
+    updateModalSubtitle();
+  }
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -121,6 +203,8 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
   let activeDrag = null;
   let dragGhost = null;
   let hoverZone = null;
+  let gameMode = practiceModes[0]?.id ?? 'letters';
+  let isRestartMode = false;
 
   function ensureDragGhost() {
     if (dragGhost) return dragGhost;
@@ -158,7 +242,7 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
 
       const ghost = ensureDragGhost();
       ghost.textContent = itemEl.textContent;
-      ghost.className = itemEl.classList.contains('falling-gem') ? 'text-5xl' : 'hebrew-font text-6xl';
+      ghost.className = itemEl.classList.contains('falling-gem') ? 'text-5xl' : `${fontClass} text-6xl`;
       ghost.style.opacity = '0.95';
 
       itemEl.style.visibility = 'hidden';
@@ -245,10 +329,10 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
       targetBox.classList.add('feedback-incorrect');
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
 
-      const correctSound = item.data.sound;
+      const correctSound = item.data.pronunciation ?? item.data.sound ?? '';
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
-      ghostEl.textContent = correctSound;
+      ghostEl.textContent = correctSound ? t('game.summary.soundLabel', { sound: correctSound }) : '';
 
       ghostEl.style.display = 'block';
       const ghostWidth = ghostEl.offsetWidth;
@@ -285,7 +369,6 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
   let fallDuration;
   let baseSpeedSetting;
   let isBonusRound;
-  let gameMode;
   let introductionsEnabled;
   let activeItems = new Map();
   let seenItems;
@@ -358,7 +441,8 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
     updateLives();
     updateLevelDisplay();
 
-    startButton.textContent = 'Start Game';
+    startButton.textContent = t('game.controls.start');
+    isRestartMode = false;
     setupView.classList.remove('hidden');
     gameOverView.classList.add('hidden');
     accessibilityView.classList.add('hidden');
@@ -382,7 +466,8 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
     hasIntroducedForItemInLevel = false;
     bonusCaughtInSession = 0;
 
-    gameMode = document.querySelector('input[name="gameMode"]:checked').value;
+    const selectedModeInput = document.querySelector('input[name="gameMode"]:checked');
+    gameMode = selectedModeInput?.value ?? gameMode ?? practiceModes[0]?.id ?? 'letters';
     introductionsEnabled = document.getElementById('toggle-introductions').checked;
 
     const gameItemPool = getModePool(gameMode);
@@ -436,21 +521,22 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
     displayLearningSummary();
     setupView.classList.add('hidden');
     gameOverView.classList.remove('hidden');
-    startButton.textContent = 'Play Again';
+    startButton.textContent = t('game.controls.playAgain');
+    isRestartMode = true;
     modal.classList.remove('hidden');
   }
 
   function displayLearningSummary() {
     gameOverView.innerHTML = `
-        <h2 class="text-3xl sm:text-5xl font-bold text-cyan-400 mb-4 hebrew-font">Game Over</h2>
-        <p id="final-score" class="text-2xl text-white mb-6">Final Score: ${score}</p>
+        <h2 class="text-3xl sm:text-5xl font-bold text-cyan-400 mb-4 ${fontClass}">${t('game.summary.gameOver')}</h2>
+        <p id="final-score" class="text-2xl text-white mb-6">${t('game.summary.finalScore', { score })}</p>
         <div class="learning-summary-container my-6"></div>
       `;
     const summaryContainer = gameOverView.querySelector('.learning-summary-container');
 
     const seenInSession = Object.keys(sessionStats);
     if (seenInSession.length === 0) {
-      summaryContainer.innerHTML = '<p class="text-slate-400">No stats to show for this round.</p>';
+      summaryContainer.innerHTML = `<p class="text-slate-400">${t('game.summary.empty')}</p>`;
       return;
     }
 
@@ -461,11 +547,16 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
       const itemData = resolveItemById(key);
       if (!itemData) return;
       const span = document.createElement('span');
-      span.className = 'hebrew-font text-3xl p-2 bg-slate-700 rounded-md cursor-pointer';
+      span.className = `${fontClass} text-3xl p-2 bg-slate-700 rounded-md cursor-pointer`;
       span.textContent = itemData.symbol ?? '';
 
       span.addEventListener('mouseenter', (event) => {
-        summaryTooltip.innerHTML = `<div class="font-bold">${itemData.name}</div><div>"${itemData.sound}"</div>`;
+        const transliteration = itemData.transliteration ?? itemData.name ?? '';
+        const pronunciation = itemData.pronunciation ?? itemData.sound ?? '';
+        summaryTooltip.innerHTML = `
+          <div class="font-bold">${transliteration}</div>
+          <div>${t('game.summary.soundLabel', { sound: pronunciation })}</div>
+        `;
         const targetRect = event.target.getBoundingClientRect();
         const containerRect = gameContainer.getBoundingClientRect();
         summaryTooltip.style.left = `${targetRect.left - containerRect.left + targetRect.width / 2 - summaryTooltip.offsetWidth / 2}px`;
@@ -478,7 +569,7 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
 
     const encounteredTitle = document.createElement('h3');
     encounteredTitle.className = 'text-xl font-bold text-cyan-400 mb-2';
-    encounteredTitle.textContent = 'Items Encountered';
+    encounteredTitle.textContent = t('game.summary.heading');
     summaryContainer.appendChild(encounteredTitle);
     summaryContainer.appendChild(encounteredContainer);
 
@@ -496,10 +587,11 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
       if (weakestLinkItem) {
         const weakestLinkContainer = document.createElement('div');
         weakestLinkContainer.innerHTML = `
-            <h3 class="text-xl font-bold text-cyan-400 mb-2">Weakest Link</h3>
+            <h3 class="text-xl font-bold text-cyan-400 mb-2">${t('game.summary.weakestLink')}</h3>
+            <p class="mb-3 text-sm text-slate-400">${t('game.summary.weakestLinkDescription')}</p>
             <div class="flex items-center justify-center gap-4">
-              <span class="hebrew-font text-5xl">${weakestLinkItem.symbol ?? ''}</span>
-              <button id="practice-weakest-btn" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold py-2 px-4 rounded-lg">Practice This</button>
+              <span class="${fontClass} text-5xl">${weakestLinkItem.symbol ?? ''}</span>
+              <button id="practice-weakest-btn" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold py-2 px-4 rounded-lg">${t('game.summary.practice')}</button>
             </div>`;
         summaryContainer.appendChild(weakestLinkContainer);
         document.getElementById('practice-weakest-btn').addEventListener('click', () => {
@@ -527,7 +619,7 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
     scoreForNextLevel += levelUpThreshold;
     if (fallDuration > 7) fallDuration -= 1;
     isBonusRound = level % 5 === 0 && gameMode === 'letters';
-    const levelUpText = isBonusRound ? 'Bonus Round!' : 'Level Up!';
+    const levelUpText = isBonusRound ? t('game.status.bonusRound') : t('game.status.levelUp');
 
     const levelLabel = levelEl.previousElementSibling;
     levelLabel.classList.add('hidden');
@@ -619,8 +711,10 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
         const t1 = trackTimeout(() => {
           if (!gameActive || currentRound.id !== roundId) return;
           learnLetterEl.textContent = itemData.symbol;
-          learnName.textContent = itemData.name;
-          learnSound.textContent = `Sound: "${itemData.sound}"`;
+          const transliteration = itemData.transliteration ?? itemData.name ?? '';
+          const pronunciation = itemData.pronunciation ?? itemData.sound ?? '';
+          learnName.textContent = transliteration;
+          learnSound.textContent = pronunciation ? t('game.summary.soundLabel', { sound: pronunciation }) : '';
           learnOverlay.classList.add('visible');
           startItemDrop(itemData, roundId);
         }, showTime);
@@ -650,10 +744,21 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
     itemEl.textContent = itemData.symbol;
     const reducedMotion = reducedMotionToggle.checked;
     const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
-    itemEl.className = `falling-letter font-bold hebrew-font text-cyan-300 ${animationName}`;
+    itemEl.className = `falling-letter font-bold ${fontClass} text-cyan-300 ${animationName}`;
     itemEl.style.top = `${Math.random() * 70}%`;
     itemEl.style.animationDuration = `${parseInt(gameSpeedSlider.value, 10)}s`;
     itemEl.draggable = true;
+    const pronunciation = itemData.pronunciation ?? itemData.sound ?? '';
+    const transliteration = itemData.transliteration ?? itemData.name ?? '';
+    const ariaLabel = letterDescriptionTemplate
+      ? formatTemplate(letterDescriptionTemplate, {
+          symbol: itemData.symbol ?? '',
+          name: itemData.name ?? '',
+          transliteration,
+          pronunciation
+        })
+      : `${transliteration} ${pronunciation}`.trim();
+    if (ariaLabel) itemEl.setAttribute('aria-label', ariaLabel);
     itemEl.addEventListener('dragstart', (e) => {
       const dragData = JSON.stringify({
         sound: itemData.sound,
@@ -754,9 +859,11 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
 
     finalChoices.forEach((choice) => {
       const box = document.createElement('div');
-      box.textContent = choice.sound;
+      const displayPronunciation = choice.pronunciation ?? choice.sound;
+      box.textContent = displayPronunciation;
       box.dataset.sound = choice.sound;
       box.className = 'catcher-box bg-slate-700 text-white font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-slate-600';
+      box.setAttribute('aria-label', t('game.summary.soundLabel', { sound: displayPronunciation }));
       box.addEventListener('dragover', (e) => {
         e.preventDefault();
         box.classList.add('drag-over');
@@ -775,15 +882,16 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
     choicesContainer.innerHTML = '';
 
     learnLetterEl.textContent = '💎';
-    learnName.textContent = 'Bonus Round!';
-    learnSound.textContent = 'Catch the gems!';
+    learnName.textContent = t('game.bonus.title');
+    learnSound.textContent = t('game.bonus.instruction');
     learnOverlay.classList.add('visible');
     refreshDropZones();
 
     const bonusCatcher = document.createElement('div');
-    bonusCatcher.textContent = 'Catch Here!';
+    bonusCatcher.textContent = t('game.bonus.catchHere');
     bonusCatcher.dataset.sound = 'bonus-gem';
     bonusCatcher.className = 'catcher-box bg-yellow-500 text-slate-900 font-bold py-6 px-2 rounded-lg text-lg transition-all border-2 border-yellow-400 col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5';
+    bonusCatcher.setAttribute('aria-label', t('game.bonus.catchHere'));
     bonusCatcher.addEventListener('dragover', (e) => {
       e.preventDefault();
       bonusCatcher.classList.add('drag-over');
@@ -797,7 +905,7 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
     const bonusDuration = 10000;
     const bonusTimerInterval = trackInterval(() => {
       timeLeft--;
-      learnSound.textContent = `Time left: ${timeLeft}`;
+      learnSound.textContent = t('game.bonus.timeLeft', { seconds: Math.max(timeLeft, 0) });
       if (timeLeft <= 0) clearTrackedInterval(bonusTimerInterval);
     }, 1000);
 
@@ -838,6 +946,7 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
     const bonusSpeed = Math.max(5, parseInt(gameSpeedSlider.value, 10) - 5);
     itemEl.style.animationDuration = `${bonusSpeed}s`;
     itemEl.draggable = true;
+    itemEl.setAttribute('aria-label', t('game.bonus.gemAria'));
     itemEl.addEventListener('dragstart', (e) => {
       const dragData = JSON.stringify({
         sound: 'bonus-gem',
@@ -884,30 +993,34 @@ export function setupGame({ onReturnToMenu, languagePack } = {}) {
   closeAccessibilityBtn?.addEventListener('click', () => accessibilityView.classList.add('hidden'));
   highContrastToggle?.addEventListener('change', (e) => document.body.classList.toggle('high-contrast', e.target.checked));
 
+  const speedSlowLabel = t('game.accessibility.speedSlow');
+  const speedFastLabel = t('game.accessibility.speedFast');
+  const speedNormalLabel = t('game.accessibility.speedNormal');
+
   gameSpeedSlider?.addEventListener('input', (e) => {
     const v = parseInt(e.target.value, 10);
-    if (v > 20) speedLabel.textContent = 'Slow';
-    else if (v < 14) speedLabel.textContent = 'Fast';
-    else speedLabel.textContent = 'Normal';
+    if (v > 20) speedLabel.textContent = speedSlowLabel;
+    else if (v < 14) speedLabel.textContent = speedFastLabel;
+    else speedLabel.textContent = speedNormalLabel;
   });
 
   function updateModalSubtitle() {
     const selectedInput = document.querySelector('input[name="gameMode"]:checked');
     const selectedMode = selectedInput?.value ?? 'letters';
     const noun = modeNounMap[selectedMode] ?? nounFallback;
-    const text = subtitleTemplate.includes('{{noun}}')
-      ? subtitleTemplate.replace('{{noun}}', noun)
-      : subtitleTemplate;
-    modalSubtitle.textContent = text;
+    const text = formatTemplate(subtitleTemplate, { noun });
+    if (modalSubtitle) modalSubtitle.textContent = text;
   }
-  document.querySelectorAll('input[name="gameMode"]').forEach((r) => r.addEventListener('change', updateModalSubtitle));
+
+  renderPracticeModes();
 
   startButton?.addEventListener('click', () => {
-    if (startButton.textContent === 'Play Again') {
+    if (isRestartMode) {
       gameOverView.classList.add('hidden');
       setupView.classList.remove('hidden');
       accessibilityView.classList.add('hidden');
-      startButton.textContent = 'Start Game';
+      startButton.textContent = t('game.controls.start');
+      isRestartMode = false;
       updateModalSubtitle();
     } else {
       startGame();

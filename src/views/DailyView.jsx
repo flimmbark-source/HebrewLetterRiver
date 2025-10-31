@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useProgress } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
 import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
+import { useLocalization } from '../context/LocalizationContext.jsx';
 
 function TaskCard({ task, accent }) {
   const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
@@ -27,6 +28,8 @@ function TaskCard({ task, accent }) {
 export default function DailyView() {
   const { daily, getWeakestLetter } = useProgress();
   const { openGame } = useGame();
+  const { languagePack } = useLocalization();
+  const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
 
   const nextResetDate = useMemo(() => new Date(Date.now() + millisUntilNextJerusalemMidnight()), [daily?.dateKey]);
   const nextResetLabel = formatJerusalemTime(nextResetDate, { timeZoneName: 'short' });
@@ -62,7 +65,7 @@ export default function DailyView() {
         <ul className="mt-3 space-y-2 text-sm text-slate-300">
           <li>• Warm-Up completes when you finish two full game sessions.</li>
           <li>
-            • Focus tracks perfect catches featuring <span className="hebrew-font text-2xl text-cyan-300">{focusLetter}</span> — drop with precision.
+            • Focus tracks perfect catches featuring <span className={`${fontClass} text-2xl text-cyan-300`}>{focusLetter}</span> — drop with precision.
           </li>
           <li>• Spice checks your constraint — toggle the setting before you press start and finish a session to clear it.</li>
         </ul>
