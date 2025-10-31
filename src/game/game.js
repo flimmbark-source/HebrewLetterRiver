@@ -105,7 +105,6 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     `game.introductions.${activeLanguage.id}.nounFallback`,
     introductionsConfig.nounFallback ?? defaultNoun
   );
-  const initialKnownIds = introductionsConfig.initiallyKnownIds ?? [];
   const metadata = activeLanguage.metadata ?? {};
   const fontClass = metadata.fontClass ?? 'language-font-hebrew';
   const accessibilityHints = metadata.accessibility ?? {};
@@ -582,7 +581,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     baseSpeedSetting = parseInt(gameSpeedSlider.value, 10);
     fallDuration = baseSpeedSetting;
     isBonusRound = false;
-    seenItems = new Set(initialKnownIds);
+    seenItems = new Set();
     learningOrder = [];
     lastItemSound = null;
     sessionStats = {};
@@ -611,7 +610,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     fallDuration = baseSpeedSetting;
     gameActive = true;
     isBonusRound = false;
-    seenItems = new Set(initialKnownIds);
+    seenItems = new Set();
     lastItemSound = null;
     currentRound = null;
     sessionStats = {};
