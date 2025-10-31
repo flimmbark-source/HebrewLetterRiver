@@ -174,7 +174,9 @@ export function ProgressProvider({ children }) {
   const assets = useMemo(() => createLanguageAssets(languagePack), [languagePack]);
   const storagePrefix = useMemo(() => `progress.${languagePack.id}`, [languagePack.id]);
   const initialPlayerRef = useRef(null);
-  const languageHydratedRef = useRef(false);
+  const hydratedPrefixRef = useRef(storagePrefix);
+  const isInitialHydrationRef = useRef(true);
+  const [isHydrationComplete, setIsHydrationComplete] = useState(false);
 
   const hydratePlayer = useCallback(() => {
     const stored = loadState(`${storagePrefix}.player`, null);
@@ -286,24 +288,14 @@ export function ProgressProvider({ children }) {
   const [lastSession, setLastSession] = useState(null);
 
   useEffect(() => {
-    saveState(`${storagePrefix}.player`, player);
-  }, [player, storagePrefix]);
+    hydratedPrefixRef.current = storagePrefix;
+    setIsHydrationComplete(false);
+  }, [storagePrefix]);
 
   useEffect(() => {
-    saveState(`${storagePrefix}.badges`, badges);
-  }, [badges, storagePrefix]);
-
-  useEffect(() => {
-    saveState(`${storagePrefix}.streak`, streak);
-  }, [streak, storagePrefix]);
-
-  useEffect(() => {
-    saveState(`${storagePrefix}.daily`, daily);
-  }, [daily, storagePrefix]);
-
-  useEffect(() => {
-    if (!languageHydratedRef.current) {
-      languageHydratedRef.current = true;
+    if (isInitialHydrationRef.current) {
+      isInitialHydrationRef.current = false;
+      setIsHydrationComplete(true);
       return;
     }
     const nextPlayer = hydratePlayer();
@@ -316,7 +308,30 @@ export function ProgressProvider({ children }) {
     setStreak(nextStreak);
     setDaily(nextDaily);
     setLastSession(null);
-  }, [hydratePlayer, hydrateBadges, hydrateStreak, hydrateDaily]);
+    if (hydratedPrefixRef.current === storagePrefix) {
+      setIsHydrationComplete(true);
+    }
+  }, [hydratePlayer, hydrateBadges, hydrateStreak, hydrateDaily, storagePrefix]);
+
+  useEffect(() => {
+    if (!isHydrationComplete) return;
+    saveState(`${storagePrefix}.player`, player);
+  }, [player, storagePrefix, isHydrationComplete]);
+
+  useEffect(() => {
+    if (!isHydrationComplete) return;
+    saveState(`${storagePrefix}.badges`, badges);
+  }, [badges, storagePrefix, isHydrationComplete]);
+
+  useEffect(() => {
+    if (!isHydrationComplete) return;
+    saveState(`${storagePrefix}.streak`, streak);
+  }, [streak, storagePrefix, isHydrationComplete]);
+
+  useEffect(() => {
+    if (!isHydrationComplete) return;
+    saveState(`${storagePrefix}.daily`, daily);
+  }, [daily, storagePrefix, isHydrationComplete]);
 
   useEffect(() => {
     const key = getJerusalemDateKey();
