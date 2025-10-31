@@ -203,7 +203,7 @@
     },
     "constraints": {
       "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed (18+)",
+      "fast-flow": "Fast Flow speed active",
       "no-intros": "No Introductions enabled"
     }
   }

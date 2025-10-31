@@ -239,7 +239,7 @@ const spiceConstraints = [
   {
     id: 'fast-flow',
     labelKey: 'daily.constraints.fast-flow',
-    fallbackLabel: 'Fast Flow speed (18+)',
+    fallbackLabel: 'Fast Flow speed active',
     predicate: (session) => (session?.settings?.speed ?? 0) >= 18
   },
   {
