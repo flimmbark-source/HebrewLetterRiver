@@ -12,8 +12,30 @@
       "achievements": "Achievements",
       "learn": "Learn"
     },
+    "languagePicker": {
+      "label": "Language",
+      "helper": "Choose which language pack you want to explore.",
+      "onboardingTitle": "Choose Your Language",
+      "onboardingSubtitle": "Select the alphabet or script you want to practice first.",
+      "confirm": "Start learning"
+    },
     "footer": {
       "resetNotice": "Reset happens daily at 00:00 Asia/Jerusalem."
+    }
+  },
+  "home": {
+    "hero": {
+      "dailyTitle": "Today's Daily Quest",
+      "heading": "Flow through all three river challenges.",
+      "description": "Keep your streak alive and claim fresh stars by completing the Warm-Up, Focus, and Spice quests tailored just for you."
+    },
+    "languagePicker": {
+      "label": "Practice Language",
+      "helper": "Switch anytime to train in another script."
+    },
+    "cta": {
+      "start": "Start a New Run",
+      "practice": "Practice Focus Letter"
     }
   },
   "game": {

@@ -1,20 +1,14 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import badgesCatalog from '../data/badges.json';
 import dailyTemplates from '../data/dailyTemplates.json';
 import { on } from '../lib/eventBus.js';
-import { loadLanguage } from '../lib/languageLoader.js';
 import { celebrate } from '../lib/celebration.js';
-import { loadState, saveState } from '../lib/storage.js';
+import { loadState, saveState, removeState } from '../lib/storage.js';
 import { differenceInJerusalemDays, getJerusalemDateKey, millisUntilNextJerusalemMidnight } from '../lib/time.js';
 import { useToast } from './ToastContext.jsx';
+import { useLocalization } from './LocalizationContext.jsx';
 
 const ProgressContext = createContext(null);
-
-const languagePack = loadLanguage();
-const baseLanguageItems = languagePack.items ?? [];
-const allLanguageItems = languagePack.allItems ?? baseLanguageItems;
-const itemsById = languagePack.itemsById ?? {};
-const itemsBySymbol = languagePack.itemsBySymbol ?? {};
 
 function toLetterInfo(item) {
   if (!item) return null;
@@ -25,9 +19,6 @@ function toLetterInfo(item) {
     sound: item.sound ?? ''
   };
 }
-
-const fallbackLetterInfo =
-  toLetterInfo(baseLanguageItems[0] ?? allLanguageItems[0]) ?? { id: null, hebrew: '', name: '', sound: '' };
 
 const badgeSpecById = badgesCatalog.reduce((acc, badge) => {
   acc[badge.id] = badge;
@@ -57,179 +48,277 @@ const defaultStreak = {
   lastPlayedDateKey: null
 };
 
+function createLanguageAssets(languagePack) {
+  const baseLanguageItems = languagePack.items ?? [];
+  const allLanguageItems = languagePack.allItems ?? baseLanguageItems;
+  const itemsById = languagePack.itemsById ?? {};
+  const itemsBySymbol = languagePack.itemsBySymbol ?? {};
+  const fallbackLetterInfo =
+    toLetterInfo(baseLanguageItems[0] ?? allLanguageItems[0]) ?? { id: null, hebrew: '', name: '', sound: '' };
+
+  function getWeakestLetter(letterStats) {
+    const entries = Object.entries(letterStats ?? {});
+    if (entries.length === 0) {
+      return fallbackLetterInfo;
+    }
+    let weakest = entries[0][0];
+    let weakestScore = Infinity;
+    entries.forEach(([itemId, stats]) => {
+      const total = (stats.correct ?? 0) + (stats.incorrect ?? 0);
+      if (total === 0) return;
+      const accuracy = (stats.correct ?? 0) / total;
+      const penalty = total < 3 ? accuracy + 0.15 : accuracy;
+      if (penalty < weakestScore) {
+        weakestScore = penalty;
+        weakest = itemId;
+      }
+    });
+    const info = toLetterInfo(itemsById[weakest] ?? itemsBySymbol[weakest]) ?? fallbackLetterInfo;
+    return info;
+  }
+
+  function normalizeLetterStats(rawStats) {
+    const normalized = {};
+    Object.entries(rawStats ?? {}).forEach(([key, value]) => {
+      if (!value) return;
+      const target = { correct: value.correct ?? 0, incorrect: value.incorrect ?? 0 };
+      if (itemsById[key]) {
+        normalized[key] = target;
+        return;
+      }
+      const symbolMatch = itemsBySymbol[key];
+      if (symbolMatch?.id) {
+        const existing = normalized[symbolMatch.id] ?? { correct: 0, incorrect: 0 };
+        normalized[symbolMatch.id] = {
+          correct: existing.correct + target.correct,
+          incorrect: existing.incorrect + target.incorrect
+        };
+      }
+    });
+    return normalized;
+  }
+
+  function normalizeDailyData(daily) {
+    if (!daily?.tasks) return daily;
+    const tasks = daily.tasks.map((task) => {
+      if (task.id === 'focus' && task.meta?.letter) {
+        const original = task.meta.letter;
+        const itemId = itemsById[original] ? original : itemsBySymbol[original]?.id ?? original;
+        return { ...task, meta: { ...task.meta, letter: itemId } };
+      }
+      return task;
+    });
+    return { ...daily, tasks };
+  }
+
+  function generateDaily(dateKey, focusLetterInfo, constraint) {
+    const focusLetter = focusLetterInfo ?? fallbackLetterInfo;
+    const selectedConstraint = constraint ?? pickConstraint();
+    const tasks = dailyTemplates.map((template) => {
+      if (template.id === 'focus') {
+        const label = `${focusLetter.hebrew} · ${focusLetter.name}`;
+        return {
+          ...template,
+          description: template.description.replace('{{letter}}', label),
+          progress: 0,
+          meta: { letter: focusLetter.id ?? focusLetter.hebrew },
+          completed: false
+        };
+      }
+      if (template.id === 'spice') {
+        return {
+          ...template,
+          description: template.description.replace('{{constraint}}', selectedConstraint.label),
+          progress: 0,
+          meta: { constraintId: selectedConstraint.id },
+          completed: false
+        };
+      }
+      return { ...template, progress: 0, completed: false };
+    });
+    return {
+      dateKey,
+      tasks,
+      completed: false,
+      completedAt: null
+    };
+  }
+
+  return {
+    baseLanguageItems,
+    allLanguageItems,
+    itemsById,
+    itemsBySymbol,
+    fallbackLetterInfo,
+    getWeakestLetter,
+    normalizeLetterStats,
+    normalizeDailyData,
+    generateDaily
+  };
+}
+
 const spiceConstraints = [
   { id: 'expert-mode', label: 'Expert Mode run', predicate: (session) => session?.settings?.mode === 'expert' },
   { id: 'fast-flow', label: 'Fast Flow speed (18+)', predicate: (session) => (session?.settings?.speed ?? 0) >= 18 },
   { id: 'no-intros', label: 'No Introductions enabled', predicate: (session) => session?.settings?.introductions === false }
 ];
 
-function getWeakestLetter(letterStats) {
-  const entries = Object.entries(letterStats ?? {});
-  if (entries.length === 0) {
-    return fallbackLetterInfo;
-  }
-  let weakest = entries[0][0];
-  let weakestScore = Infinity;
-  entries.forEach(([itemId, stats]) => {
-    const total = (stats.correct ?? 0) + (stats.incorrect ?? 0);
-    if (total === 0) return;
-    const accuracy = (stats.correct ?? 0) / total;
-    const penalty = total < 3 ? accuracy + 0.15 : accuracy;
-    if (penalty < weakestScore) {
-      weakestScore = penalty;
-      weakest = itemId;
-    }
-  });
-  const info = toLetterInfo(itemsById[weakest] ?? itemsBySymbol[weakest]) ?? fallbackLetterInfo;
-  return info;
-}
-
 function pickConstraint() {
   return spiceConstraints[Math.floor(Math.random() * spiceConstraints.length)];
 }
 
-function normalizeLetterStats(rawStats) {
-  const normalized = {};
-  Object.entries(rawStats ?? {}).forEach(([key, value]) => {
-    if (!value) return;
-    const target = { correct: value.correct ?? 0, incorrect: value.incorrect ?? 0 };
-    if (itemsById[key]) {
-      normalized[key] = target;
-      return;
-    }
-    const symbolMatch = itemsBySymbol[key];
-    if (symbolMatch?.id) {
-      const existing = normalized[symbolMatch.id] ?? { correct: 0, incorrect: 0 };
-      normalized[symbolMatch.id] = {
-        correct: existing.correct + target.correct,
-        incorrect: existing.incorrect + target.incorrect
-      };
-    }
-  });
-  return normalized;
-}
-
-function normalizeDailyData(daily) {
-  if (!daily?.tasks) return daily;
-  const tasks = daily.tasks.map((task) => {
-    if (task.id === 'focus' && task.meta?.letter) {
-      const original = task.meta.letter;
-      const itemId = itemsById[original]
-        ? original
-        : itemsBySymbol[original]?.id ?? original;
-      return { ...task, meta: { ...task.meta, letter: itemId } };
-    }
-    return task;
-  });
-  return { ...daily, tasks };
-}
-
-function hydratePlayer() {
-  const stored = loadState('player', null);
-  if (!stored) return { ...defaultPlayer };
-  return {
-    ...defaultPlayer,
-    ...stored,
-    totals: { ...defaultPlayer.totals, ...(stored.totals ?? {}) },
-    letters: normalizeLetterStats(stored.letters ?? {}),
-    latestBadge: stored.latestBadge ?? null
-  };
-}
-
-function hydrateBadges() {
-  const stored = loadState('badges', null);
-  if (!stored) return { ...defaultBadges };
-  const hydrated = { ...defaultBadges };
-  Object.keys(stored).forEach((key) => {
-    hydrated[key] = { ...defaultBadges[key], ...stored[key] };
-  });
-  return hydrated;
-}
-
-function hydrateStreak() {
-  const stored = loadState('streak', null);
-  if (!stored) return { ...defaultStreak };
-  return { ...defaultStreak, ...stored };
-}
-
-function hydrateDaily(focusLetter, constraint) {
-  const todayKey = getJerusalemDateKey();
-  const stored = loadState('daily', null);
-  if (stored && stored.dateKey === todayKey) {
-    return normalizeDailyData(stored);
-  }
-  return generateDaily(todayKey, focusLetter, constraint);
-}
-
-function generateDaily(dateKey, focusLetterInfo, constraint) {
-  const focusLetter = focusLetterInfo ?? fallbackLetterInfo;
-  const selectedConstraint = constraint ?? pickConstraint();
-  const tasks = dailyTemplates.map((template) => {
-    if (template.id === 'focus') {
-      const label = `${focusLetter.hebrew} · ${focusLetter.name}`;
-      return {
-        ...template,
-        description: template.description.replace('{{letter}}', label),
-        progress: 0,
-        meta: { letter: focusLetter.id ?? focusLetter.hebrew },
-        completed: false
-      };
-    }
-    if (template.id === 'spice') {
-      return {
-        ...template,
-        description: template.description.replace('{{constraint}}', selectedConstraint.label),
-        progress: 0,
-        meta: { constraintId: selectedConstraint.id },
-        completed: false
-      };
-    }
-    return { ...template, progress: 0, completed: false };
-  });
-  return {
-    dateKey,
-    tasks,
-    completed: false,
-    completedAt: null
-  };
-}
-
 export function ProgressProvider({ children }) {
   const { addToast } = useToast();
-  const [player, setPlayer] = useState(() => hydratePlayer());
+  const { languagePack } = useLocalization();
+
+  const assets = useMemo(() => createLanguageAssets(languagePack), [languagePack]);
+  const storagePrefix = useMemo(() => `progress.${languagePack.id}`, [languagePack.id]);
+  const initialPlayerRef = useRef(null);
+  const languageHydratedRef = useRef(false);
+
+  const hydratePlayer = useCallback(() => {
+    const stored = loadState(`${storagePrefix}.player`, null);
+    let source = stored;
+    if (!source) {
+      const legacy = loadState('player', null);
+      if (legacy) {
+        source = legacy;
+        removeState('player');
+      }
+    }
+    if (!source) return { ...defaultPlayer };
+    const hydrated = {
+      ...defaultPlayer,
+      ...source,
+      totals: { ...defaultPlayer.totals, ...(source.totals ?? {}) },
+      letters: assets.normalizeLetterStats(source.letters ?? {}),
+      latestBadge: source.latestBadge ?? null
+    };
+    if (!stored) {
+      saveState(`${storagePrefix}.player`, hydrated);
+    }
+    return hydrated;
+  }, [storagePrefix, assets]);
+
+  const hydrateBadges = useCallback(() => {
+    const stored = loadState(`${storagePrefix}.badges`, null);
+    let source = stored;
+    if (!source) {
+      const legacy = loadState('badges', null);
+      if (legacy) {
+        source = legacy;
+        removeState('badges');
+      }
+    }
+    if (!source) return { ...defaultBadges };
+    const hydrated = { ...defaultBadges };
+    Object.keys(source).forEach((key) => {
+      hydrated[key] = { ...defaultBadges[key], ...source[key] };
+    });
+    if (!stored) {
+      saveState(`${storagePrefix}.badges`, hydrated);
+    }
+    return hydrated;
+  }, [storagePrefix]);
+
+  const hydrateStreak = useCallback(() => {
+    const stored = loadState(`${storagePrefix}.streak`, null);
+    let source = stored;
+    if (!source) {
+      const legacy = loadState('streak', null);
+      if (legacy) {
+        source = legacy;
+        removeState('streak');
+      }
+    }
+    if (!source) return { ...defaultStreak };
+    const hydrated = { ...defaultStreak, ...source };
+    if (!stored) {
+      saveState(`${storagePrefix}.streak`, hydrated);
+    }
+    return hydrated;
+  }, [storagePrefix]);
+
+  const hydrateDaily = useCallback(
+    (currentPlayer) => {
+      const todayKey = getJerusalemDateKey();
+      const stored = loadState(`${storagePrefix}.daily`, null);
+      let source = stored;
+      if (!source) {
+        const legacy = loadState('daily', null);
+        if (legacy) {
+          source = legacy;
+          removeState('daily');
+        }
+      }
+      if (source && source.dateKey === todayKey) {
+        const normalized = assets.normalizeDailyData(source);
+        if (!stored) {
+          saveState(`${storagePrefix}.daily`, normalized);
+        }
+        return normalized;
+      }
+      const weakest = assets.getWeakestLetter(currentPlayer?.letters);
+      return assets.generateDaily(todayKey, weakest, pickConstraint());
+    },
+    [storagePrefix, assets]
+  );
+
+  const [player, setPlayer] = useState(() => {
+    const loaded = hydratePlayer();
+    initialPlayerRef.current = loaded;
+    return loaded;
+  });
   const [badges, setBadges] = useState(() => hydrateBadges());
   const [streak, setStreak] = useState(() => hydrateStreak());
-  const [daily, setDaily] = useState(() => hydrateDaily(getWeakestLetter(player.letters), pickConstraint()));
+  const [daily, setDaily] = useState(() => hydrateDaily(initialPlayerRef.current));
   const [lastSession, setLastSession] = useState(null);
 
   useEffect(() => {
-    saveState('player', player);
-  }, [player]);
+    saveState(`${storagePrefix}.player`, player);
+  }, [player, storagePrefix]);
 
   useEffect(() => {
-    saveState('badges', badges);
-  }, [badges]);
+    saveState(`${storagePrefix}.badges`, badges);
+  }, [badges, storagePrefix]);
 
   useEffect(() => {
-    saveState('streak', streak);
-  }, [streak]);
+    saveState(`${storagePrefix}.streak`, streak);
+  }, [streak, storagePrefix]);
 
   useEffect(() => {
-    saveState('daily', daily);
-  }, [daily]);
+    saveState(`${storagePrefix}.daily`, daily);
+  }, [daily, storagePrefix]);
+
+  useEffect(() => {
+    if (!languageHydratedRef.current) {
+      languageHydratedRef.current = true;
+      return;
+    }
+    const nextPlayer = hydratePlayer();
+    const nextBadges = hydrateBadges();
+    const nextStreak = hydrateStreak();
+    const nextDaily = hydrateDaily(nextPlayer);
+    initialPlayerRef.current = nextPlayer;
+    setPlayer(nextPlayer);
+    setBadges(nextBadges);
+    setStreak(nextStreak);
+    setDaily(nextDaily);
+    setLastSession(null);
+  }, [hydratePlayer, hydrateBadges, hydrateStreak, hydrateDaily]);
 
   useEffect(() => {
     const key = getJerusalemDateKey();
     if (daily.dateKey !== key) {
-      const weakest = getWeakestLetter(player.letters);
-      setDaily(generateDaily(key, weakest, pickConstraint()));
+      const weakest = assets.getWeakestLetter(player.letters);
+      setDaily(assets.generateDaily(key, weakest, pickConstraint()));
     }
     const timeout = setTimeout(() => {
-      const weakest = getWeakestLetter(player.letters);
-      setDaily(generateDaily(getJerusalemDateKey(), weakest, pickConstraint()));
+      const weakest = assets.getWeakestLetter(player.letters);
+      setDaily(assets.generateDaily(getJerusalemDateKey(), weakest, pickConstraint()));
     }, millisUntilNextJerusalemMidnight());
     return () => clearTimeout(timeout);
-  }, [daily.dateKey, player.letters]);
+  }, [daily.dateKey, player.letters, assets]);
 
   function updateStreakForSession(dateKey) {
     let shouldAdvanceBadge = false;
@@ -379,7 +468,7 @@ export function ProgressProvider({ children }) {
           const target = task.meta?.letter;
           if (!target) return false;
           if (target === itemId) return true;
-          const symbolMatch = itemsBySymbol[target]?.id;
+          const symbolMatch = assets.itemsBySymbol[target]?.id;
           return symbolMatch ? symbolMatch === itemId : false;
         });
       }
@@ -393,7 +482,7 @@ export function ProgressProvider({ children }) {
       offLetter();
       offBonus();
     };
-  }, [streak.current]);
+  }, [streak.current, assets]);
 
   const value = useMemo(
     () => ({
@@ -402,10 +491,10 @@ export function ProgressProvider({ children }) {
       streak,
       daily,
       setDaily,
-      getWeakestLetter: () => getWeakestLetter(player.letters),
+      getWeakestLetter: () => assets.getWeakestLetter(player.letters),
       lastSession
     }),
-    [player, badges, streak, daily, lastSession]
+    [assets, player, badges, streak, daily, lastSession]
   );
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;

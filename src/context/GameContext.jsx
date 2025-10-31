@@ -20,6 +20,13 @@ export function GameProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    if (!gameApiRef.current) return;
+    const api = gameApiRef.current;
+    api.resetToSetupScreen?.();
+    gameApiRef.current = null;
+  }, [languagePack.id]);
+
+  useEffect(() => {
     if (!isVisible) return;
     if (!containerRef.current) return;
     if (!gameApiRef.current) {
@@ -77,7 +84,7 @@ export function GameProvider({ children }) {
                     onClick={(e) => e.stopPropagation()}
                     dir={direction}
                   >
-                    <GameCanvas fontClass={fontClass} />
+                    <GameCanvas key={languagePack.id} fontClass={fontClass} />
                   </div>
                 </div>
               </div>
