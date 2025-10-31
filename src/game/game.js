@@ -225,6 +225,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     return item.symbol ?? item.transliteration ?? item.name ?? item.sound ?? '';
   }
 
+  function getDisplayLabel(item = {}) {
+    return item.sound ?? item.pronunciation ?? item.name ?? item.transliteration ?? '';
+  }
+
   function getDisplayPronunciation(item = {}) {
     return item.pronunciation ?? item.sound ?? '';
   }
@@ -890,7 +894,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     finalChoices.forEach((choice) => {
       const box = document.createElement('div');
       const displaySymbol = getDisplaySymbol(choice);
-      box.textContent = displaySymbol;
+      const displayLabel = getDisplayLabel(choice);
+      const labelText = displayLabel || displaySymbol;
+      box.textContent = labelText;
       box.dataset.itemId = choice.id;
       box.className = 'catcher-box bg-slate-700 text-white font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-slate-600';
       const ariaLabel = getCharacterAriaLabel(choice);
