@@ -1,42 +1,42 @@
 [
   {
     "id": "first-flow",
-    "name": "First Flow",
-    "summary": "Play a full run of Hebrew Letter River.",
+    "nameKey": "badges.firstFlow.name",
+    "summaryKey": "badges.firstFlow.summary",
     "tiers": [
-      { "tier": 1, "label": "Bronze Current", "goal": 1, "stars": 10 },
-      { "tier": 2, "label": "Silver Surge", "goal": 5, "stars": 25 },
-      { "tier": 3, "label": "Golden Torrent", "goal": 15, "stars": 60 }
+      { "tier": 1, "labelKey": "badges.firstFlow.tiers.1", "goal": 1, "stars": 10 },
+      { "tier": 2, "labelKey": "badges.firstFlow.tiers.2", "goal": 5, "stars": 25 },
+      { "tier": 3, "labelKey": "badges.firstFlow.tiers.3", "goal": 15, "stars": 60 }
     ]
   },
   {
     "id": "steady-streak",
-    "name": "Streak Keeper",
-    "summary": "Log in and play on consecutive days.",
+    "nameKey": "badges.steadyStreak.name",
+    "summaryKey": "badges.steadyStreak.summary",
     "tiers": [
-      { "tier": 1, "label": "Weekend Wave", "goal": 3, "stars": 15 },
-      { "tier": 2, "label": "Moonlit Run", "goal": 7, "stars": 40 },
-      { "tier": 3, "label": "Eternal River", "goal": 21, "stars": 120 }
+      { "tier": 1, "labelKey": "badges.steadyStreak.tiers.1", "goal": 3, "stars": 15 },
+      { "tier": 2, "labelKey": "badges.steadyStreak.tiers.2", "goal": 7, "stars": 40 },
+      { "tier": 3, "labelKey": "badges.steadyStreak.tiers.3", "goal": 21, "stars": 120 }
     ]
   },
   {
     "id": "letter-master",
-    "name": "Letter Master",
-    "summary": "Catch letters without missing.",
+    "nameKey": "badges.letterMaster.name",
+    "summaryKey": "badges.letterMaster.summary",
     "tiers": [
-      { "tier": 1, "label": "Focused Splash", "goal": 10, "stars": 20 },
-      { "tier": 2, "label": "Precision Flow", "goal": 30, "stars": 60 },
-      { "tier": 3, "label": "Perfect Current", "goal": 75, "stars": 150 }
+      { "tier": 1, "labelKey": "badges.letterMaster.tiers.1", "goal": 10, "stars": 20 },
+      { "tier": 2, "labelKey": "badges.letterMaster.tiers.2", "goal": 30, "stars": 60 },
+      { "tier": 3, "labelKey": "badges.letterMaster.tiers.3", "goal": 75, "stars": 150 }
     ]
   },
   {
     "id": "gem-chaser",
-    "name": "Gem Chaser",
-    "summary": "Win bonus rounds and gather river gems.",
+    "nameKey": "badges.gemChaser.name",
+    "summaryKey": "badges.gemChaser.summary",
     "tiers": [
-      { "tier": 1, "label": "Sparkling Stream", "goal": 5, "stars": 30 },
-      { "tier": 2, "label": "Shimmering Rapid", "goal": 15, "stars": 80 },
-      { "tier": 3, "label": "Radiant Cascade", "goal": 40, "stars": 200 }
+      { "tier": 1, "labelKey": "badges.gemChaser.tiers.1", "goal": 5, "stars": 30 },
+      { "tier": 2, "labelKey": "badges.gemChaser.tiers.2", "goal": 15, "stars": 80 },
+      { "tier": 3, "labelKey": "badges.gemChaser.tiers.3", "goal": 40, "stars": 200 }
     ]
   }
 ]

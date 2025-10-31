@@ -38,7 +38,10 @@ export function loadLanguage(languageId = defaultLanguageId) {
   const consonants = Array.isArray(pack.consonants) ? pack.consonants : [];
   const baseItems = consonants.map((item) =>
     cloneItem(item, {
-      type: 'consonant'
+      type: 'consonant',
+      transliteration: item.transliteration ?? item.name ?? item.id,
+      pronunciation: item.pronunciation ?? item.sound ?? item.name ?? item.id,
+      sound: item.sound ?? item.pronunciation ?? item.name ?? item.id
     })
   );
 
@@ -70,6 +73,8 @@ export function loadLanguage(languageId = defaultLanguageId) {
           symbol,
           name: `${base.name} + ${marker.name}`,
           sound,
+          transliteration: `${base.name} ${marker.name}`,
+          pronunciation: sound,
           type: 'syllable',
           markerId: marker.id,
           baseId: base.id
@@ -103,6 +108,7 @@ export function loadLanguage(languageId = defaultLanguageId) {
     id: pack.id,
     name: pack.name,
     introductions: pack.introductions ?? {},
+    metadata: pack.metadata ?? {},
     practiceModes,
     vowels: {
       markers,

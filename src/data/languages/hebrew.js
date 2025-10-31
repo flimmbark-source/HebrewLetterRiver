@@ -104,6 +104,13 @@ export const hebrewIntroductions = {
 const hebrewPack = {
   id: 'hebrew',
   name: 'Hebrew',
+  metadata: {
+    fontClass: 'language-font-hebrew',
+    textDirection: 'rtl',
+    accessibility: {
+      letterDescriptionTemplate: 'האות {{symbol}} נהגית {{pronunciation}}'
+    }
+  },
   consonants: hebrewConsonants,
   vowels: {
     markers: hebrewVowelMarkers,

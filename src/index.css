@@ -10,3 +10,35 @@ body {
 .hebrew-font {
   @apply font-hebrew;
 }
+
+.language-font-hebrew {
+  @apply font-hebrew;
+}
+
+.language-font-latin {
+  @apply font-sans;
+}
+
+.language-font-han {
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.language-font-devanagari {
+  font-family: 'Hind', 'Noto Sans Devanagari', sans-serif;
+}
+
+.language-font-arabic {
+  font-family: 'Amiri', 'Scheherazade', 'Noto Naskh Arabic', serif;
+}
+
+.language-font-bengali {
+  font-family: 'Noto Sans Bengali', 'SolaimanLipi', sans-serif;
+}
+
+.language-font-cyrillic {
+  font-family: 'Noto Sans', 'PT Sans', 'Segoe UI', sans-serif;
+}
+
+.language-font-japanese {
+  font-family: 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+}

@@ -1,0 +1,129 @@
+{
+  "language": {
+    "id": "english",
+    "name": "English"
+  },
+  "app": {
+    "title": "Hebrew Letter River",
+    "tagline": "Flow, learn, and celebrate every catch.",
+    "nav": {
+      "home": "Home",
+      "play": "Play",
+      "achievements": "Achievements",
+      "learn": "Learn"
+    },
+    "footer": {
+      "resetNotice": "Reset happens daily at 00:00 Asia/Jerusalem."
+    }
+  },
+  "game": {
+    "labels": {
+      "level": "Level",
+      "score": "Score"
+    },
+    "controls": {
+      "leave": "Leave Game",
+      "start": "Start Game",
+      "playAgain": "Play Again",
+      "install": "Install App",
+      "accessibility": "Accessibility Options",
+      "close": "Close"
+    },
+    "setup": {
+      "title": "Hebrew Letter River",
+      "subtitleFallback": "Drag the moving item to the correct box!",
+      "prompt": "Choose what you want to practice:",
+      "installDescription": "Install App",
+      "defaultNoun": "item",
+      "defaultModeLabel": "Core Practice",
+      "defaultModeDescription": "Practice the main set of characters."
+    },
+    "accessibility": {
+      "showIntroductions": "Show Introductions",
+      "highContrast": "High Contrast Mode",
+      "reducedMotion": "Reduced Motion",
+      "speed": "Game Speed",
+      "speedFast": "Fast",
+      "speedNormal": "Normal",
+      "speedSlow": "Slow",
+      "gear": "Accessibility Settings"
+    },
+    "bonus": {
+      "title": "Bonus Round!",
+      "instruction": "Catch the gems!",
+      "catchHere": "Catch Here!",
+      "timeLeft": "Time left: {{seconds}}",
+      "gemAria": "Bonus gem"
+    },
+    "summary": {
+      "heading": "Items Encountered",
+      "empty": "No stats to show for this round.",
+      "gameOver": "Game Over",
+      "finalScore": "Final Score: {{score}}",
+      "weakestLink": "Weakest Link",
+      "weakestLinkDescription": "Focus on this item next time.",
+      "soundLabel": "Sound: {{sound}}",
+      "learningRecap": "Learning Recap",
+      "practice": "Practice This"
+    },
+    "status": {
+      "bonusRound": "Bonus Round!",
+      "bonusInstruction": "Catch the gems!",
+      "lives": "Lives",
+      "levelUp": "Level Up!"
+    }
+  },
+  "achievements": {
+    "title": "Achievements",
+    "description": "Advance through each tier to collect stars. Every milestone fuels your journey down the Hebrew Letter River.",
+    "tier": "Tier",
+    "tierProgress": "Tier {{current}} / {{total}}",
+    "next": "Next: {{label}}",
+    "complete": "All tiers complete",
+    "earnStars": "Earn +{{stars}} ⭐ when you unlock this tier.",
+    "maxed": "Badge fully mastered — enjoy the glow!"
+  },
+  "learn": {
+    "title": "Learn",
+    "intro": "Dive into curated lessons to master each letter. Fresh learning modules will appear here soon!",
+    "body": "Until then, keep exploring the river and check back regularly for guided practice sessions, pronunciation tips, and cultural insights."
+  },
+  "badges": {
+    "firstFlow": {
+      "name": "First Flow",
+      "summary": "Play a full run of {{gameName}}.",
+      "tiers": {
+        "1": "Bronze Current",
+        "2": "Silver Surge",
+        "3": "Golden Torrent"
+      }
+    },
+    "steadyStreak": {
+      "name": "Streak Keeper",
+      "summary": "Log in and play on consecutive days.",
+      "tiers": {
+        "1": "Weekend Wave",
+        "2": "Moonlit Run",
+        "3": "Eternal River"
+      }
+    },
+    "letterMaster": {
+      "name": "Letter Master",
+      "summary": "Catch items without missing.",
+      "tiers": {
+        "1": "Focused Splash",
+        "2": "Precision Flow",
+        "3": "Perfect Current"
+      }
+    },
+    "gemChaser": {
+      "name": "Gem Chaser",
+      "summary": "Win bonus rounds and gather river gems.",
+      "tiers": {
+        "1": "Sparkling Stream",
+        "2": "Shimmering Rapid",
+        "3": "Radiant Cascade"
+      }
+    }
+  }
+}
