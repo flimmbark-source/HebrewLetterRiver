@@ -8,6 +8,7 @@ import { ProgressProvider } from './context/ProgressContext.jsx';
 import { GameProvider, useGame } from './context/GameContext.jsx';
 import { LocalizationProvider, useLocalization } from './context/LocalizationContext.jsx';
 import { LanguageProvider, useLanguage } from './context/LanguageContext.jsx';
+import { getDictionary, translate as translateFromDictionary } from './i18n/index.js';
 
 function HomeIcon(props) {
   return (
@@ -79,7 +80,7 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
 
 function LanguageOnboardingModal() {
   const { hasSelectedLanguage, languageId, setLanguageId, markLanguageSelected } = useLanguage();
-  const { t } = useLocalization();
+  const englishDictionary = React.useMemo(() => getDictionary('english'), []);
   const [pendingId, setPendingId] = React.useState(languageId);
 
   React.useEffect(() => {
@@ -97,18 +98,27 @@ function LanguageOnboardingModal() {
     markLanguageSelected();
   };
 
+  const translateOnboarding = React.useCallback(
+    (key, replacements) => translateFromDictionary(englishDictionary, key, replacements),
+    [englishDictionary]
+  );
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 py-6 backdrop-blur">
       <div className="w-full max-w-lg rounded-3xl border border-slate-800 bg-slate-900/95 p-6 text-center shadow-2xl sm:p-8">
-        <h2 className="text-2xl font-bold text-white sm:text-3xl">{t('app.languagePicker.onboardingTitle')}</h2>
-        <p className="mt-3 text-sm text-slate-300 sm:text-base">{t('app.languagePicker.onboardingSubtitle')}</p>
+        <h2 className="text-2xl font-bold text-white sm:text-3xl">
+          {translateOnboarding('app.languagePicker.onboardingTitle')}
+        </h2>
+        <p className="mt-3 text-sm text-slate-300 sm:text-base">
+          {translateOnboarding('app.languagePicker.onboardingSubtitle')}
+        </p>
         <div className="mt-6">
           <LanguageSelect
             selectId="onboarding-language"
             value={pendingId}
             onChange={handleChange}
-            label={t('app.languagePicker.label')}
-            helperText={t('app.languagePicker.helper')}
+            label={translateOnboarding('app.languagePicker.label')}
+            helperText={translateOnboarding('app.languagePicker.helper')}
           />
         </div>
         <button
@@ -116,7 +126,7 @@ function LanguageOnboardingModal() {
           onClick={handleContinue}
           className="mt-6 w-full rounded-full bg-cyan-500 px-5 py-3 text-base font-semibold text-slate-900 transition hover:bg-cyan-400 sm:w-auto sm:px-8"
         >
-          {t('app.languagePicker.confirm')}
+          {translateOnboarding('app.languagePicker.confirm')}
         </button>
       </div>
     </div>
