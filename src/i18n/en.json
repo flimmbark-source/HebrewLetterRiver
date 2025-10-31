@@ -84,6 +84,8 @@
       "finalScore": "Final Score: {{score}}",
       "weakestLink": "Weakest Link",
       "weakestLinkDescription": "Focus on this item next time.",
+      "characterLabel": "Character {{symbol}}",
+      "characterLabelWithPronunciation": "Character {{symbol}} pronounced {{pronunciation}}",
       "soundLabel": "Sound: {{sound}}",
       "learningRecap": "Learning Recap",
       "practice": "Practice This"

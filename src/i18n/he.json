@@ -84,6 +84,8 @@
       "finalScore": "ניקוד סופי: {{score}}",
       "weakestLink": "הקישור החלש",
       "weakestLinkDescription": "התמקדו בפריט הזה בפעם הבאה.",
+      "characterLabel": "תו {{symbol}}",
+      "characterLabelWithPronunciation": "תו {{symbol}} נהגה {{pronunciation}}",
       "soundLabel": "צליל: {{sound}}",
       "learningRecap": "סיכום לימוד",
       "practice": "תרגלו זאת"
