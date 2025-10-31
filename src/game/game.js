@@ -251,6 +251,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let bucketResizeObserver = null;
   let bucketResizeHandler = null;
   let bucketMeasurementElement = null;
+  let cachedBucketMinWidth = null;
   let activeDrag = null;
   let dragGhost = null;
   let hoverZone = null;
@@ -285,7 +286,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     return bucketMeasurementElement;
   }
 
-  function getBucketMinWidth() {
+  function measureBucketMinWidth() {
     if (!choicesContainer || typeof window === 'undefined') {
       return BUCKET_MIN_WIDTH_FALLBACK;
     }
@@ -309,11 +310,20 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     return Math.ceil(maxWidth);
   }
 
+  function getBucketMinWidth() {
+    if (cachedBucketMinWidth !== null) {
+      return cachedBucketMinWidth;
+    }
+    cachedBucketMinWidth = measureBucketMinWidth();
+    return cachedBucketMinWidth;
+  }
+
+  function invalidateBucketMinWidth() {
+    cachedBucketMinWidth = null;
+  }
+
   function refreshDropZones() {
-    dropZones = Array.from(document.querySelectorAll('.catcher-box')).map((el) => ({
-      el,
-      rect: el.getBoundingClientRect()
-    }));
+    dropZones = Array.from(document.querySelectorAll('.catcher-box'));
   }
 
   function clearPendingBucketLayout() {
@@ -333,6 +343,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     clearPendingBucketLayout();
     const runUpdate = () => {
       pendingBucketLayoutHandle = null;
+      invalidateBucketMinWidth();
       applyBucketLayout();
       if (activeBucketCount > 0) {
         refreshDropZones();
@@ -425,7 +436,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   function zoneAt(x, y) {
     for (let i = 0; i < dropZones.length; i++) {
-      const { el, rect } = dropZones[i];
+      const el = dropZones[i];
+      const rect = el.getBoundingClientRect();
       if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return el;
     }
     return null;
@@ -617,6 +629,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     choicesContainer.innerHTML = '';
     activeBucketCount = 0;
     applyBucketLayout(0);
+    invalidateBucketMinWidth();
     refreshDropZones();
     clearPendingBucketLayout();
     learnOverlay.classList.remove('visible');
@@ -1053,6 +1066,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     activeBucketCount = 0;
     applyBucketLayout(0);
     clearPendingBucketLayout();
+    invalidateBucketMinWidth();
     refreshDropZones();
     if (correctItems.length === 0) return;
 
@@ -1095,6 +1109,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       choicesContainer.appendChild(box);
     });
     activeBucketCount = finalChoices.length;
+    invalidateBucketMinWidth();
     applyBucketLayout();
     clearPendingBucketLayout();
     refreshDropZones();
@@ -1108,6 +1123,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     activeBucketCount = 0;
     applyBucketLayout(0);
     clearPendingBucketLayout();
+    invalidateBucketMinWidth();
 
     learnLetterEl.textContent = '💎';
     learnName.textContent = t('game.bonus.title');
@@ -1128,6 +1144,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     bonusCatcher.addEventListener('drop', handleDrop);
     choicesContainer.appendChild(bonusCatcher);
     activeBucketCount = 1;
+    invalidateBucketMinWidth();
     applyBucketLayout();
     clearPendingBucketLayout();
     refreshDropZones();
