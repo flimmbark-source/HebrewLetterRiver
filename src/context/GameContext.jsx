@@ -73,7 +73,7 @@ export function GameProvider({ children }) {
               }`}
             >
               <div className="absolute inset-0 bg-slate-950/85 backdrop-blur" onClick={closeGame} />
-              <div className="absolute inset-0 overflow-y-auto">
+              <div className="absolute inset-0 overflow-y-auto overscroll-contain">
                 <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
                   <div
                     ref={containerRef}
