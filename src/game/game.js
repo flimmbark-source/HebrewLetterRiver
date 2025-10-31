@@ -255,6 +255,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let hoverZone = null;
   let gameMode = practiceModes[0]?.id ?? 'letters';
   let isRestartMode = false;
+  let visualViewportResizeHandler = null;
 
   function ensureDragGhost() {
     if (dragGhost) return dragGhost;
@@ -333,12 +334,22 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       bucketResizeObserver?.disconnect();
       bucketResizeObserver = new ResizeObserver(() => scheduleBucketLayoutUpdate());
       bucketResizeObserver.observe(choicesContainer);
-    } else if (typeof window !== 'undefined') {
+    }
+    if (typeof window !== 'undefined') {
       if (bucketResizeHandler) {
         window.removeEventListener('resize', bucketResizeHandler);
       }
       bucketResizeHandler = () => scheduleBucketLayoutUpdate();
       window.addEventListener('resize', bucketResizeHandler);
+
+      const viewport = window.visualViewport;
+      if (viewport) {
+        if (visualViewportResizeHandler) {
+          viewport.removeEventListener('resize', visualViewportResizeHandler);
+        }
+        visualViewportResizeHandler = () => scheduleBucketLayoutUpdate();
+        viewport.addEventListener('resize', visualViewportResizeHandler);
+      }
     }
   }
 
