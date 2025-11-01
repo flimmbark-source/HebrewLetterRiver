@@ -248,6 +248,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const LAYOUT_GAP_FALLBACK = 12;
   let pendingBucketLayoutHandle = null;
   let pendingBucketLayoutIsAnimationFrame = false;
+  let isApplyingBucketLayout = false;
+  let rerunBucketLayout = false;
   let bucketResizeObserver = null;
   let bucketResizeHandler = null;
   let bucketMeasurementElement = null;
@@ -340,13 +342,26 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   function scheduleBucketLayoutUpdate() {
     if (!choicesContainer) return;
+    if (isApplyingBucketLayout) {
+      rerunBucketLayout = true;
+      return;
+    }
     clearPendingBucketLayout();
     const runUpdate = () => {
       pendingBucketLayoutHandle = null;
-      invalidateBucketMinWidth();
-      applyBucketLayout();
-      if (activeBucketCount > 0) {
-        refreshDropZones();
+      isApplyingBucketLayout = true;
+      try {
+        invalidateBucketMinWidth();
+        applyBucketLayout();
+        if (activeBucketCount > 0) {
+          refreshDropZones();
+        }
+      } finally {
+        isApplyingBucketLayout = false;
+        if (rerunBucketLayout) {
+          rerunBucketLayout = false;
+          scheduleBucketLayoutUpdate();
+        }
       }
     };
     if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
