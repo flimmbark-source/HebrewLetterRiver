@@ -106,7 +106,20 @@ function GameCanvas({ fontClass }) {
         style={{ maxHeight: 'calc(100vh - 2rem)' }}
       >
         <div className="relative flex flex-col">
-          <div id="top-bar" className="flex items-center bg-slate-800/90 px-6 py-4 text-base shadow-lg">
+          <div
+            id="top-bar"
+            className="flex items-center gap-4 bg-slate-800/90 px-4 py-3 text-sm shadow-lg sm:gap-6 sm:px-6 sm:py-4 sm:text-base"
+          >
+            <button
+              id="back-to-menu-button"
+              type="button"
+              className="flex shrink-0 items-center justify-center gap-2 rounded-full border border-slate-700 bg-slate-800/90 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:px-4 sm:text-sm"
+            >
+              <span className="text-lg" aria-hidden="true">
+                ←
+              </span>
+              <span>{t('game.controls.exitToMenu')}</span>
+            </button>
             <div className="flex-1 text-center">
               <div className="inline-flex items-baseline gap-2">
                 <span className="font-semibold text-slate-300">{t('game.labels.level')}</span>
@@ -115,7 +128,7 @@ function GameCanvas({ fontClass }) {
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex shrink-0 items-center gap-4 sm:gap-6">
               <div className="text-left">
                 <span className="font-semibold text-slate-300">{t('game.labels.score')}</span>
                 <span id="score" className="ml-2 text-2xl font-bold text-cyan-400">
@@ -125,14 +138,6 @@ function GameCanvas({ fontClass }) {
               <div id="lives-container" className="flex items-center gap-2" />
             </div>
           </div>
-
-          <button
-            id="back-to-menu-button"
-            className="mx-6 mt-3 flex items-center justify-center gap-2 rounded-full border border-slate-700 bg-slate-800/90 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-700 sm:absolute sm:left-4 sm:top-4 sm:mx-0 sm:mt-0"
-          >
-            <span className="text-lg">←</span>
-            <span>{t('game.controls.leave')}</span>
-          </button>
         </div>
 
         <div id="play-area" className="relative flex-1 overflow-hidden bg-slate-900">
@@ -186,14 +191,20 @@ function GameCanvas({ fontClass }) {
               <div id="game-over-view" className="relative hidden pt-12 text-center">
                 <button
                   id="game-over-exit-button"
-                  className="absolute left-0 top-0 flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/90 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 sm:text-sm"
+                  type="button"
+                  className="absolute left-0 top-0 flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/90 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:text-sm"
                 >
-                  <span className="text-lg">←</span>
+                  <span className="text-lg" aria-hidden="true">
+                    ←
+                  </span>
                   <span>{t('game.controls.exitToMenu')}</span>
                 </button>
                 <h2 id="game-over-heading" className={`mb-4 text-4xl font-bold text-cyan-400 ${fontClass}`}>
                   {t('game.summary.gameOver')}
                 </h2>
+                <p id="final-score" className="mb-6 text-2xl text-white">
+                  {t('game.summary.finalScore', { score: 0 })}
+                </p>
                 <div className="learning-summary-container my-6" />
               </div>
 

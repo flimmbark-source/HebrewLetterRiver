@@ -765,12 +765,20 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   }
 
   function displayLearningSummary() {
-    gameOverView.innerHTML = `
-        <h2 class="text-3xl sm:text-5xl font-bold text-cyan-400 mb-4 ${fontClass}">${t('game.summary.gameOver')}</h2>
-        <p id="final-score" class="text-2xl text-white mb-6">${t('game.summary.finalScore', { score })}</p>
-        <div class="learning-summary-container my-6"></div>
-      `;
+    const headingEl = document.getElementById('game-over-heading');
+    if (headingEl) {
+      headingEl.textContent = t('game.summary.gameOver');
+    }
+
+    const finalScoreEl = document.getElementById('final-score');
+    if (finalScoreEl) {
+      finalScoreEl.textContent = t('game.summary.finalScore', { score });
+    }
+
     const summaryContainer = gameOverView.querySelector('.learning-summary-container');
+    if (!summaryContainer) return;
+
+    summaryContainer.innerHTML = '';
 
     const seenInSession = Object.keys(sessionStats);
     if (seenInSession.length === 0) {
