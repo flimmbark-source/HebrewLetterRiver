@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import badgesCatalog from '../data/badges.json';
-import { useProgress } from '../context/ProgressContext.jsx';
+import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -30,7 +30,7 @@ function TaskCard({ task, accent }) {
 }
 
 export default function HomeView() {
-  const { player, streak, daily, getWeakestLetter } = useProgress();
+  const { player, streak, daily, getWeakestLetter, starLevelSize } = useProgress();
 
   const { openGame } = useGame();
   const { t } = useLocalization();
@@ -63,11 +63,12 @@ export default function HomeView() {
     return getWeakestLetter().hebrew;
   }, [daily?.tasks, getWeakestLetter]);
   
-  const starsTarget = useMemo(() => {
-    if (!player.stars) return 50;
-    const base = Math.ceil(player.stars / 50) * 50;
-    return Math.max(base, 50);
-  }, [player.stars]);
+  const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
+  const totalStarsEarned = player.totalStarsEarned ?? player.stars ?? 0;
+  const level = player.level ?? Math.floor(totalStarsEarned / starsPerLevel) + 1;
+  const levelProgress = player.levelProgress ?? (totalStarsEarned % starsPerLevel);
+  const starsProgress = starsPerLevel > 0 ? Math.min(levelProgress / starsPerLevel, 1) : 0;
+  const formatNumber = useCallback((value) => Math.max(0, Math.floor(value ?? 0)).toLocaleString(), []);
 
   if (!daily) {
     return (
@@ -77,7 +78,6 @@ export default function HomeView() {
     );
   }
 
-  const starsProgress = Math.min(player.stars / starsTarget, 1);
   const nextResetDate = useMemo(() => new Date(Date.now() + millisUntilNextJerusalemMidnight()), [daily?.dateKey]);
   const nextResetTime = formatJerusalemTime(nextResetDate, { timeZoneName: 'short' });
 
@@ -134,14 +134,18 @@ export default function HomeView() {
             <p className="mt-1 text-xs text-slate-500 sm:text-sm">Resets at 00:00 Asia/Jerusalem ({nextResetTime})</p>
           </div>
           <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Star meter</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Star level</p>
+            <div className="mt-2 flex items-baseline justify-between">
+              <p className="text-2xl font-semibold text-white sm:text-3xl">Level {level}</p>
+              <p className="text-xs text-slate-500 sm:text-sm">{formatNumber(totalStarsEarned)} ⭐ total</p>
+            </div>
             <div className="mt-3 h-2 rounded-full bg-slate-800">
               <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-sky-500" style={{ width: `${starsProgress * 100}%` }} />
             </div>
             <p className="mt-2 text-sm text-slate-300">
-              {player.stars} ⭐ / {starsTarget}
+              {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐ to next level
             </p>
-            <p className="mt-1 text-xs text-slate-500">Earn stars by unlocking badge tiers.</p>
+            <p className="mt-1 text-xs text-slate-500">Claim badge tiers and daily rewards to earn more stars.</p>
           </div>
           <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Latest badge</p>

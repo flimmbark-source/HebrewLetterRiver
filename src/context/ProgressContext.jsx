@@ -8,6 +8,9 @@ import { differenceInJerusalemDays, getJerusalemDateKey, millisUntilNextJerusale
 import { useToast } from './ToastContext.jsx';
 import { useLocalization } from './LocalizationContext.jsx';
 
+export const STAR_LEVEL_SIZE = 50;
+export const DAILY_REWARD_STARS = 30;
+
 const ProgressContext = createContext(null);
 
 function toLetterInfo(item) {
@@ -25,9 +28,19 @@ const badgeSpecById = badgesCatalog.reduce((acc, badge) => {
   return acc;
 }, {});
 
+function calculateLevelInfo(totalStars) {
+  const total = Math.max(0, Math.floor(Number.isFinite(totalStars) ? totalStars : 0));
+  const level = Math.floor(total / STAR_LEVEL_SIZE) + 1;
+  const levelProgress = total % STAR_LEVEL_SIZE;
+  return { level, levelProgress, total };
+}
+
 const defaultPlayer = {
   name: 'River Explorer',
   stars: 0,
+  level: 1,
+  levelProgress: 0,
+  totalStarsEarned: 0,
   totals: {
     sessions: 0,
     perfectCatches: 0,
@@ -38,7 +51,7 @@ const defaultPlayer = {
 };
 
 const defaultBadges = badgesCatalog.reduce((acc, badge) => {
-  acc[badge.id] = { tier: 0, progress: 0 };
+  acc[badge.id] = { tier: 0, progress: 0, unclaimed: [] };
   return acc;
 }, {});
 
@@ -180,7 +193,17 @@ function createLanguageAssets(languagePack, localization = {}) {
         }
       };
     });
-    return { ...daily, tasks };
+    const rewardStars = Number.isFinite(daily.rewardStars) ? daily.rewardStars : DAILY_REWARD_STARS;
+    const rewardClaimed = Boolean(daily.rewardClaimed);
+    const rewardClaimable = daily.rewardClaimable ?? (daily.completed && !rewardClaimed);
+    return {
+      ...daily,
+      tasks,
+      rewardStars,
+      rewardClaimed,
+      rewardClaimable,
+      claimedAt: daily.claimedAt ?? null
+    };
   }
 
   function generateDaily(dateKey, focusLetterInfo, constraint) {
@@ -226,7 +249,11 @@ function createLanguageAssets(languagePack, localization = {}) {
       dateKey,
       tasks,
       completed: false,
-      completedAt: null
+      completedAt: null,
+      rewardStars: DAILY_REWARD_STARS,
+      rewardClaimable: false,
+      rewardClaimed: false,
+      claimedAt: null
     };
   }
 
@@ -290,9 +317,15 @@ export function ProgressProvider({ children }) {
       }
     }
     if (!source) return { ...defaultPlayer };
+    const storedTotal = Number.isFinite(source?.totalStarsEarned) ? source.totalStarsEarned : source?.stars ?? 0;
+    const { level, levelProgress, total } = calculateLevelInfo(storedTotal);
     const hydrated = {
       ...defaultPlayer,
       ...source,
+      stars: Number.isFinite(source?.stars) ? source.stars : total,
+      totalStarsEarned: total,
+      level,
+      levelProgress,
       totals: { ...defaultPlayer.totals, ...(source.totals ?? {}) },
       letters: assets.normalizeLetterStats(source.letters ?? {}),
       latestBadge: (() => {
@@ -327,7 +360,20 @@ export function ProgressProvider({ children }) {
     if (!source) return { ...defaultBadges };
     const hydrated = { ...defaultBadges };
     Object.keys(source).forEach((key) => {
-      hydrated[key] = { ...defaultBadges[key], ...source[key] };
+      const entry = source[key] ?? {};
+      const unclaimed = Array.isArray(entry.unclaimed)
+        ? entry.unclaimed.map((item) => ({
+            tier: Number.isFinite(item?.tier) ? item.tier : 0,
+            stars: Number.isFinite(item?.stars) ? item.stars : 0,
+            goal: Number.isFinite(item?.goal) ? item.goal : 0,
+            earnedAt: item?.earnedAt ?? null
+          }))
+        : [];
+      hydrated[key] = {
+        tier: Number.isFinite(entry.tier) ? entry.tier : 0,
+        progress: Number.isFinite(entry.progress) ? entry.progress : 0,
+        unclaimed
+      };
     });
     if (!stored) {
       saveState(`${storagePrefix}.badges`, hydrated);
@@ -447,6 +493,44 @@ export function ProgressProvider({ children }) {
     return () => clearTimeout(timeout);
   }, [daily.dateKey, player.letters, assets]);
 
+  const applyStarsToPlayer = useCallback(
+    (stars, options = {}) => {
+      if (!Number.isFinite(stars) || stars <= 0) {
+        return { success: false, levelUp: false };
+      }
+      let levelUp = false;
+      let levelValue = null;
+      setPlayer((prev) => {
+        const baseTotal = Number.isFinite(prev.totalStarsEarned) ? prev.totalStarsEarned : prev.stars ?? 0;
+        const totalStarsEarned = baseTotal + stars;
+        const { level, levelProgress } = calculateLevelInfo(totalStarsEarned);
+        levelValue = level;
+        levelUp = level > (prev.level ?? 1);
+        const nextPlayer = {
+          ...prev,
+          stars: (prev.stars ?? 0) + stars,
+          totalStarsEarned,
+          level,
+          levelProgress
+        };
+        if (options.latestBadge) {
+          nextPlayer.latestBadge = options.latestBadge;
+        }
+        return nextPlayer;
+      });
+      if (levelUp) {
+        addToast({
+          tone: 'success',
+          title: 'Level up!',
+          description: `You reached level ${levelValue}!`,
+          icon: '🌟'
+        });
+      }
+      return { success: true, levelUp, level: levelValue };
+    },
+    [addToast]
+  );
+
   function updateStreakForSession(dateKey) {
     let shouldAdvanceBadge = false;
     setStreak((prev) => {
@@ -473,18 +557,27 @@ export function ProgressProvider({ children }) {
   function trackBadgeProgress(badgeId, delta = 1) {
     const badgeSpec = badgeSpecById[badgeId];
     if (!badgeSpec) return;
-    let earnedTier = null;
+    const earnedTiers = [];
     setBadges((prev) => {
-      const current = prev[badgeId] ?? { tier: 0, progress: 0 };
-      let tier = current.tier;
-      let progress = current.progress + delta;
+      const current = prev[badgeId] ?? { tier: 0, progress: 0, unclaimed: [] };
+      let tier = Number.isFinite(current.tier) ? current.tier : 0;
+      let progress = (current.progress ?? 0) + delta;
+      const unclaimed = Array.isArray(current.unclaimed) ? [...current.unclaimed] : [];
       const result = { ...prev };
       while (tier < badgeSpec.tiers.length) {
         const target = badgeSpec.tiers[tier].goal;
         if (progress >= target) {
           progress -= target;
           tier += 1;
-          earnedTier = badgeSpec.tiers[tier - 1];
+          const tierSpec = badgeSpec.tiers[tier - 1];
+          const reward = {
+            tier: tierSpec.tier,
+            stars: tierSpec.stars ?? 0,
+            goal: tierSpec.goal ?? target,
+            earnedAt: new Date().toISOString()
+          };
+          unclaimed.push(reward);
+          earnedTiers.push(reward);
         } else {
           break;
         }
@@ -492,36 +585,20 @@ export function ProgressProvider({ children }) {
       if (tier >= badgeSpec.tiers.length) {
         progress = badgeSpec.tiers[badgeSpec.tiers.length - 1].goal;
       }
-      result[badgeId] = { tier, progress };
+      result[badgeId] = { tier, progress, unclaimed };
       return result;
     });
-    if (earnedTier) {
+    if (earnedTiers.length > 0) {
+      const latestReward = earnedTiers[earnedTiers.length - 1];
+      const tierSpec = badgeSpec.tiers.find((item) => item.tier === latestReward.tier) ?? latestReward;
       const badgeName = badgeSpec.nameKey ? t(badgeSpec.nameKey) : badgeSpec.name ?? badgeId;
-      const tierLabel = earnedTier.labelKey ? t(earnedTier.labelKey) : earnedTier.label ?? `Tier ${earnedTier.tier}`;
-      const badgeSummary = badgeSpec.summaryKey ? t(badgeSpec.summaryKey) : badgeSpec.summary;
-
-      setPlayer((prev) => ({
-        ...prev,
-        stars: prev.stars + (earnedTier.stars ?? 0),
-        latestBadge: {
-          id: badgeId,
-          tier: earnedTier.tier,
-          earnedAt: new Date().toISOString(),
-          nameKey: badgeSpec.nameKey,
-          labelKey: earnedTier.labelKey,
-          summaryKey: badgeSpec.summaryKey,
-          name: badgeName,
-          label: tierLabel,
-          summary: badgeSummary
-        }
-      }));
+      const tierLabel = tierSpec.labelKey ? t(tierSpec.labelKey) : tierSpec.label ?? `Tier ${latestReward.tier}`;
       addToast({
-        tone: 'success',
+        tone: 'info',
         title: `${badgeName} · ${tierLabel}`,
-        description: `Tier ${earnedTier.tier} unlocked! +${earnedTier.stars} ⭐`,
-        icon: '🏅'
+        description: `Tier ${latestReward.tier} ready to claim! +${latestReward.stars} ⭐`,
+        icon: '⭐'
       });
-      celebrate();
     }
   }
 
@@ -540,19 +617,110 @@ export function ProgressProvider({ children }) {
       });
       const completed = tasks.every((task) => task.completed);
       const completedAt = completed && !prev.completed ? new Date().toISOString() : prev.completedAt;
-      const nextDaily = { ...prev, tasks, completed, completedAt: completed ? completedAt : prev.completedAt };
+      const rewardStars = Number.isFinite(prev.rewardStars) ? prev.rewardStars : DAILY_REWARD_STARS;
+      const rewardClaimed = Boolean(prev.rewardClaimed);
+      const rewardClaimable = completed && !rewardClaimed;
+      const nextDaily = {
+        ...prev,
+        tasks,
+        completed,
+        completedAt: completed ? completedAt : prev.completedAt,
+        rewardStars,
+        rewardClaimed,
+        rewardClaimable
+      };
       if (completed && !prev.completed) {
         addToast({
-          tone: 'success',
+          tone: 'info',
           title: 'Daily Quest Complete',
-          description: 'You cleared all three quests today! 🌊',
-          icon: '🎉'
+          description: `Claim +${rewardStars} ⭐ from the daily badge!`,
+          icon: '⭐'
         });
-        celebrate({ particleCount: 120 });
       }
       return nextDaily;
     });
   }
+
+  const claimBadgeReward = useCallback(
+    (badgeId, tier) => {
+      const badgeSpec = badgeSpecById[badgeId];
+      if (!badgeSpec) return { success: false };
+      let reward = null;
+      setBadges((prev) => {
+        const state = prev[badgeId];
+        if (!state) return prev;
+        const unclaimed = Array.isArray(state.unclaimed) ? [...state.unclaimed] : [];
+        const index =
+          typeof tier === 'number'
+            ? unclaimed.findIndex((entry) => entry.tier === tier)
+            : 0;
+        if (index < 0 || index >= unclaimed.length) return prev;
+        reward = unclaimed.splice(index, 1)[0];
+        return {
+          ...prev,
+          [badgeId]: {
+            ...state,
+            unclaimed
+          }
+        };
+      });
+      if (!reward) return { success: false };
+      const tierSpec = badgeSpec.tiers.find((item) => item.tier === reward.tier) ?? reward;
+      const badgeName = badgeSpec.nameKey ? t(badgeSpec.nameKey) : badgeSpec.name ?? badgeId;
+      const tierLabel = tierSpec.labelKey ? t(tierSpec.labelKey) : tierSpec.label ?? `Tier ${reward.tier}`;
+      const summary = badgeSpec.summaryKey ? t(badgeSpec.summaryKey) : badgeSpec.summary ?? '';
+      applyStarsToPlayer(reward.stars, {
+        latestBadge: {
+          id: badgeId,
+          tier: reward.tier,
+          earnedAt: reward.earnedAt ?? new Date().toISOString(),
+          nameKey: badgeSpec.nameKey,
+          labelKey: tierSpec.labelKey,
+          summaryKey: badgeSpec.summaryKey,
+          name: badgeName,
+          label: tierLabel,
+          summary
+        }
+      });
+      addToast({
+        tone: 'success',
+        title: `${badgeName} · ${tierLabel}`,
+        description: `Claimed +${reward.stars} ⭐`,
+        icon: '🏅'
+      });
+      celebrate({ particleCount: 140, spread: 75, originY: 0.55 });
+      return { success: true, reward };
+    },
+    [addToast, applyStarsToPlayer, t]
+  );
+
+  const claimDailyReward = useCallback(() => {
+    let starsAwarded = null;
+    let wasClaimed = false;
+    setDaily((prev) => {
+      if (!prev || !prev.completed || prev.rewardClaimed || !prev.rewardClaimable) return prev;
+      starsAwarded = Number.isFinite(prev.rewardStars) ? prev.rewardStars : DAILY_REWARD_STARS;
+      wasClaimed = true;
+      return {
+        ...prev,
+        rewardClaimed: true,
+        rewardClaimable: false,
+        claimedAt: new Date().toISOString()
+      };
+    });
+    if (!wasClaimed || !Number.isFinite(starsAwarded) || starsAwarded <= 0) {
+      return { success: false };
+    }
+    applyStarsToPlayer(starsAwarded);
+    addToast({
+      tone: 'success',
+      title: 'Daily reward claimed',
+      description: `+${starsAwarded} ⭐ added to your profile`,
+      icon: '🎉'
+    });
+    celebrate({ particleCount: 120, spread: 80, originY: 0.6 });
+    return { success: true, stars: starsAwarded };
+  }, [applyStarsToPlayer, addToast]);
 
   useEffect(() => {
     const offSessionStart = on('game:session-start', (payload) => {
@@ -627,10 +795,13 @@ export function ProgressProvider({ children }) {
       streak,
       daily,
       setDaily,
+      starLevelSize: STAR_LEVEL_SIZE,
       getWeakestLetter: () => assets.getWeakestLetter(player.letters),
-      lastSession
+      lastSession,
+      claimBadgeReward,
+      claimDailyReward
     }),
-    [assets, player, badges, streak, daily, lastSession]
+    [assets, player, badges, streak, daily, lastSession, claimBadgeReward, claimDailyReward]
   );
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;
