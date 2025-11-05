@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import badgesCatalog from '../data/badges.json';
 import dailyTemplates from '../data/dailyTemplates.json';
-import { on } from '../lib/eventBus.js';
+import { emit, on } from '../lib/eventBus.js';
 import { celebrate } from '../lib/celebration.js';
 import { loadState, saveState, removeState } from '../lib/storage.js';
 import { differenceInJerusalemDays, getJerusalemDateKey, millisUntilNextJerusalemMidnight } from '../lib/time.js';
@@ -498,14 +498,17 @@ export function ProgressProvider({ children }) {
       if (!Number.isFinite(stars) || stars <= 0) {
         return { success: false, levelUp: false };
       }
+      const { latestBadge = null, source = null, metadata = null } = options ?? {};
       let levelUp = false;
       let levelValue = null;
+      let totalStarsEarnedValue = null;
       setPlayer((prev) => {
         const baseTotal = Number.isFinite(prev.totalStarsEarned) ? prev.totalStarsEarned : prev.stars ?? 0;
         const totalStarsEarned = baseTotal + stars;
         const { level, levelProgress } = calculateLevelInfo(totalStarsEarned);
         levelValue = level;
         levelUp = level > (prev.level ?? 1);
+        totalStarsEarnedValue = totalStarsEarned;
         const nextPlayer = {
           ...prev,
           stars: (prev.stars ?? 0) + stars,
@@ -513,8 +516,8 @@ export function ProgressProvider({ children }) {
           level,
           levelProgress
         };
-        if (options.latestBadge) {
-          nextPlayer.latestBadge = options.latestBadge;
+        if (latestBadge) {
+          nextPlayer.latestBadge = latestBadge;
         }
         return nextPlayer;
       });
@@ -526,6 +529,14 @@ export function ProgressProvider({ children }) {
           icon: '🌟'
         });
       }
+      emit('progress:stars-awarded', {
+        stars,
+        totalStarsEarned: totalStarsEarnedValue,
+        level: levelValue,
+        levelUp,
+        source,
+        metadata
+      });
       return { success: true, levelUp, level: levelValue };
     },
     [addToast]
@@ -680,7 +691,9 @@ export function ProgressProvider({ children }) {
           name: badgeName,
           label: tierLabel,
           summary
-        }
+        },
+        source: 'badge',
+        metadata: { badgeId, tier: reward.tier }
       });
       addToast({
         tone: 'success',
@@ -697,10 +710,12 @@ export function ProgressProvider({ children }) {
   const claimDailyReward = useCallback(() => {
     let starsAwarded = null;
     let wasClaimed = false;
+    let rewardDateKey = null;
     setDaily((prev) => {
       if (!prev || !prev.completed || prev.rewardClaimed || !prev.rewardClaimable) return prev;
       starsAwarded = Number.isFinite(prev.rewardStars) ? prev.rewardStars : DAILY_REWARD_STARS;
       wasClaimed = true;
+      rewardDateKey = prev.dateKey ?? null;
       return {
         ...prev,
         rewardClaimed: true,
@@ -711,7 +726,7 @@ export function ProgressProvider({ children }) {
     if (!wasClaimed || !Number.isFinite(starsAwarded) || starsAwarded <= 0) {
       return { success: false };
     }
-    applyStarsToPlayer(starsAwarded);
+    applyStarsToPlayer(starsAwarded, { source: 'daily', metadata: { dateKey: rewardDateKey } });
     addToast({
       tone: 'success',
       title: 'Daily reward claimed',

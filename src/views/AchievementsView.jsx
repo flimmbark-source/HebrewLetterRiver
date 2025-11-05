@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
+import { on } from '../lib/eventBus.js';
 
 function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
   const totalTiers = badge.tiers.length;
@@ -170,19 +171,38 @@ export default function AchievementsView() {
     }, 1200);
   }, []);
 
-  const handleBadgeClaim = useCallback((badgeId, tier) => claimBadgeReward(badgeId, tier), [claimBadgeReward]);
+  useEffect(() => {
+    const off = on('progress:stars-awarded', (payload) => {
+      if (!payload || !Number.isFinite(payload.stars) || payload.stars <= 0) {
+        return;
+      }
+      triggerProfileCelebration();
+    });
+    return () => {
+      if (typeof off === 'function') {
+        off();
+      }
+    };
+  }, [triggerProfileCelebration]);
+
+  const handleBadgeClaim = useCallback(
+    (badgeId, tier) =>
+      Promise.resolve(claimBadgeReward(badgeId, tier)).then((result) => {
+        if (result?.success) {
+          triggerProfileCelebration();
+        }
+        return result;
+      }),
+    [claimBadgeReward, triggerProfileCelebration]
+  );
 
   const handleDailyClaim = useCallback(() => {
     if (!daily?.rewardClaimable || dailyClaiming) return;
     setDailyClaiming(true);
-    Promise.resolve(claimDailyReward()).then((result) => {
-      if (result?.success) {
-        triggerProfileCelebration();
-      }
-    }).finally(() => {
+    Promise.resolve(claimDailyReward()).finally(() => {
       setDailyClaiming(false);
     });
-  }, [daily?.rewardClaimable, dailyClaiming, claimDailyReward, triggerProfileCelebration]);
+  }, [daily?.rewardClaimable, dailyClaiming, claimDailyReward]);
 
   const profileHighlightClass = profileCelebrating ? 'ring-2 ring-amber-400/70 shadow-amber-300/30 animate-pulse' : '';
 
