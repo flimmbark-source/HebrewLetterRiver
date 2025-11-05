@@ -163,10 +163,21 @@ function GameCanvas({ fontClass }) {
             className="fixed inset-0 z-30 flex items-center justify-center overflow-y-auto bg-black/80 p-4 text-white sm:p-6"
           >
             <div
-            id="modal-content"
-            className="relative w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900/95 p-5 shadow-2xl sm:rounded-3xl sm:p-6"
-            style={{ maxHeight: 'calc(100vh - 3rem)' }}
+              id="modal-content"
+              className="relative w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900/95 p-5 shadow-2xl sm:rounded-3xl sm:p-6"
+              style={{ maxHeight: 'calc(100vh - 3rem)' }}
             >
+              <button
+                id="setup-exit-button"
+                type="button"
+                className="absolute left-4 top-4 flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/90 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:text-sm"
+              >
+                <span className="text-lg" aria-hidden="true">
+                  ←
+                </span>
+                <span>{t('game.controls.exitToMenu')}</span>
+              </button>
+
               <button
                 id="accessibility-btn"
                 className="absolute right-4 top-4 text-2xl text-slate-400 transition hover:text-cyan-400"
@@ -175,7 +186,7 @@ function GameCanvas({ fontClass }) {
                 ⚙️
               </button>
 
-              <div id="setup-view" className="space-y-6">
+              <div id="setup-view" className="space-y-6 pt-14 sm:pt-16">
                 <div className="space-y-2 text-center">
                   <h1 className={`text-3xl font-bold text-cyan-300 sm:text-4xl ${fontClass}`}>{t('game.setup.title')}</h1>
                   <p id="modal-subtitle" className="text-sm text-slate-400 sm:text-base">

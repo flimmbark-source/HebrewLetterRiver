@@ -66,6 +66,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const speedLabel = document.getElementById('speed-label');
   const installBtn = document.getElementById('install-btn');
   const backToMenuButton = document.getElementById('back-to-menu-button');
+  const setupExitButton = document.getElementById('setup-exit-button');
   const gameOverExitButton = document.getElementById('game-over-exit-button');
   const modeOptionsContainer = document.getElementById('mode-options');
 
@@ -682,6 +683,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     setupView.classList.remove('hidden');
     gameOverView.classList.add('hidden');
     accessibilityView.classList.add('hidden');
+    setupExitButton?.classList.remove('hidden');
     modal.classList.remove('hidden');
     refreshDropZones();
   }
@@ -717,6 +719,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     updateScore(0, true);
     updateLives();
     updateLevelDisplay();
+    setupExitButton?.classList.add('hidden');
     modal.classList.add('hidden');
     learnOverlay.classList.remove('visible');
 
@@ -761,6 +764,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     gameOverView.classList.remove('hidden');
     startButton.textContent = t('game.controls.playAgain');
     isRestartMode = true;
+    setupExitButton?.classList.add('hidden');
     modal.classList.remove('hidden');
   }
 
@@ -1293,6 +1297,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       accessibilityView.classList.add('hidden');
       startButton.textContent = t('game.controls.start');
       isRestartMode = false;
+      setupExitButton?.classList.remove('hidden');
       updateModalSubtitle();
     } else {
       startGame();
@@ -1382,6 +1387,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   };
 
   backToMenuButton?.addEventListener('click', handleReturnToMenu);
+  setupExitButton?.addEventListener('click', handleReturnToMenu);
   gameOverExitButton?.addEventListener('click', handleReturnToMenu);
 
   function setGameMode(value) {
