@@ -51,8 +51,10 @@ export default function DailyView() {
     return getWeakestLetter().hebrew;
   }, [daily?.tasks, getWeakestLetter]);
 
-  const dailyClaimable = daily?.rewardClaimable && !daily?.rewardClaimed;
-  const rewardStars = daily?.rewardStars ?? 0;
+  const rewardStars = Number.isFinite(daily?.rewardStars) ? daily.rewardStars : 0;
+  const rewardClaimed = Boolean(daily?.rewardClaimed);
+  const rewardClaimable = daily?.rewardClaimable ?? (Boolean(daily?.completed) && !rewardClaimed);
+  const dailyClaimable = rewardClaimable && !rewardClaimed;
   const formatNumber = useCallback((value) => Math.max(0, Math.floor(value ?? 0)).toLocaleString(), []);
 
   const handleClaim = useCallback(() => {
