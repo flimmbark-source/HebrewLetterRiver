@@ -253,6 +253,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let rerunBucketLayout = false;
   let bucketResizeObserver = null;
   let bucketResizeHandler = null;
+  let playAreaResizeObserver = null;
+  let playAreaResizeHandler = null;
   let bucketMeasurementElement = null;
   let cachedBucketMinWidth = null;
   let activeDrag = null;
@@ -287,6 +289,13 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     bucketMeasurementElement.style.boxSizing = 'border-box';
     document.body.appendChild(bucketMeasurementElement);
     return bucketMeasurementElement;
+  }
+
+  function updateRiverWidth() {
+    if (!playArea) return;
+    const width = playArea.offsetWidth;
+    if (!Number.isFinite(width)) return;
+    playArea.style.setProperty('--river-width', `${width}px`);
   }
 
   function measureBucketMinWidth() {
@@ -399,6 +408,24 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       Math.min(count, Math.floor(numerator / (minBucketWidth + gapValue)))
     );
     choicesContainer.style.gridTemplateColumns = `repeat(${maxColumns}, minmax(${minBucketWidth}px, 1fr))`;
+  }
+
+  if (playArea) {
+    updateRiverWidth();
+
+    if (typeof ResizeObserver !== 'undefined') {
+      playAreaResizeObserver?.disconnect();
+      playAreaResizeObserver = new ResizeObserver(() => updateRiverWidth());
+      playAreaResizeObserver.observe(playArea);
+    }
+
+    if (typeof window !== 'undefined') {
+      if (playAreaResizeHandler) {
+        window.removeEventListener('resize', playAreaResizeHandler);
+      }
+      playAreaResizeHandler = () => updateRiverWidth();
+      window.addEventListener('resize', playAreaResizeHandler);
+    }
   }
 
   if (choicesContainer) {
