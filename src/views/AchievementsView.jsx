@@ -145,7 +145,11 @@ export default function AchievementsView() {
       }, 0),
     [badges]
   );
-  const unclaimedDailyStars = daily?.rewardClaimable && !daily?.rewardClaimed ? daily?.rewardStars ?? 0 : 0;
+  const rewardStars = Number.isFinite(daily?.rewardStars) ? daily.rewardStars : 0;
+  const rewardClaimed = Boolean(daily?.rewardClaimed);
+  const rewardClaimable = daily?.rewardClaimable ?? (Boolean(daily?.completed) && !rewardClaimed);
+  const canClaimDaily = rewardClaimable && !rewardClaimed;
+  const unclaimedDailyStars = canClaimDaily ? rewardStars : 0;
   const unclaimedTotal = unclaimedBadgeStars + unclaimedDailyStars;
 
   const [profileCelebrating, setProfileCelebrating] = useState(false);
@@ -197,12 +201,12 @@ export default function AchievementsView() {
   );
 
   const handleDailyClaim = useCallback(() => {
-    if (!daily?.rewardClaimable || dailyClaiming) return;
+    if (!canClaimDaily || dailyClaiming) return;
     setDailyClaiming(true);
     Promise.resolve(claimDailyReward()).finally(() => {
       setDailyClaiming(false);
     });
-  }, [daily?.rewardClaimable, dailyClaiming, claimDailyReward]);
+  }, [canClaimDaily, dailyClaiming, claimDailyReward]);
 
   const profileHighlightClass = profileCelebrating ? 'ring-2 ring-amber-400/70 shadow-amber-300/30 animate-pulse' : '';
 
@@ -265,7 +269,7 @@ export default function AchievementsView() {
               disabled={dailyClaiming}
               className="rounded-full bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {dailyClaiming ? 'Claiming…' : 'Claim Daily Reward'}
+              {dailyClaiming ? 'Claiming…' : `Claim +${formatNumber(unclaimedDailyStars)} ⭐`}
             </button>
           </div>
         )}
