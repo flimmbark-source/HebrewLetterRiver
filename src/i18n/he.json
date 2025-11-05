@@ -49,6 +49,7 @@
     },
     "controls": {
       "leave": "יציאה מהמשחק",
+      "exitToMenu": "יציאה לתפריט",
       "start": "התחל משחק",
       "playAgain": "שחק שוב",
       "install": "התקן אפליקציה",

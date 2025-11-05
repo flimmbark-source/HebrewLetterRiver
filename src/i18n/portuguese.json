@@ -49,6 +49,7 @@
     },
     "controls": {
       "leave": "Sair do jogo",
+      "exitToMenu": "Sair para o menu",
       "start": "Iniciar jogo",
       "playAgain": "Jogue novamente",
       "install": "Instalar aplicativo",

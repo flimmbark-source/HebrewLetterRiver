@@ -183,7 +183,14 @@ function GameCanvas({ fontClass }) {
                 <div id="mode-options" className="mx-auto grid max-w-2xl gap-3 sm:grid-cols-2" />
               </div>
 
-              <div id="game-over-view" className="hidden text-center">
+              <div id="game-over-view" className="relative hidden pt-12 text-center">
+                <button
+                  id="game-over-exit-button"
+                  className="absolute left-0 top-0 flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/90 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 sm:text-sm"
+                >
+                  <span className="text-lg">←</span>
+                  <span>{t('game.controls.exitToMenu')}</span>
+                </button>
                 <h2 id="game-over-heading" className={`mb-4 text-4xl font-bold text-cyan-400 ${fontClass}`}>
                   {t('game.summary.gameOver')}
                 </h2>

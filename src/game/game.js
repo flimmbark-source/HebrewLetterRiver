@@ -66,6 +66,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const speedLabel = document.getElementById('speed-label');
   const installBtn = document.getElementById('install-btn');
   const backToMenuButton = document.getElementById('back-to-menu-button');
+  const gameOverExitButton = document.getElementById('game-over-exit-button');
   const modeOptionsContainer = document.getElementById('mode-options');
 
   if (!scoreEl || !levelEl) {
@@ -1367,10 +1368,13 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   updateModalSubtitle();
   refreshDropZones();
 
-  backToMenuButton?.addEventListener('click', () => {
+  const handleReturnToMenu = () => {
     resetToSetupScreen();
     onReturnToMenu?.();
-  });
+  };
+
+  backToMenuButton?.addEventListener('click', handleReturnToMenu);
+  gameOverExitButton?.addEventListener('click', handleReturnToMenu);
 
   function setGameMode(value) {
     const radio = document.querySelector(`input[name="gameMode"][value="${value}"]`);
