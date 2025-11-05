@@ -49,6 +49,7 @@
     },
     "controls": {
       "leave": "ゲームから離れる",
+      "exitToMenu": "メニューに戻る",
       "start": "ゲームを開始する",
       "playAgain": "もう一度プレイする",
       "install": "アプリをインストールする",
