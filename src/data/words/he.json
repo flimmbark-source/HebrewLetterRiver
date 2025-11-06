@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "language": "Hebrew",
+    "iso3": "heb"
+  },
+  "words": [
+    {"id":"house","native":"בית","romanization":"bayit"},
+    {"id":"dog","native":"כלב","romanization":"kelev"},
+    {"id":"cat","native":"חתול","romanization":"chatul"},
+    {"id":"milk","native":"חלב","romanization":"chalav"}
+  ]
+}
