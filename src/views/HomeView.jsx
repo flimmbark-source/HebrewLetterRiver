@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
@@ -6,10 +6,59 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
 
-function TaskCard({ task, accent }) {
+function TaskCard({
+  task,
+  accent,
+  showReward = false,
+  rewardStars = 0,
+  rewardClaimed = false,
+  canClaimReward = false,
+  claimingReward = false,
+  onClaimReward
+}) {
   const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
+  const rewardValue = Number.isFinite(rewardStars) ? Math.max(0, rewardStars) : 0;
+  const formattedReward = rewardValue.toLocaleString();
+  const clickable = showReward && canClaimReward && typeof onClaimReward === 'function';
+  const highlightClass = showReward
+    ? canClaimReward
+      ? 'border-amber-400/40 ring-1 ring-amber-300/60 shadow-amber-300/20'
+      : rewardClaimed
+      ? 'border-emerald-400/40'
+      : ''
+    : '';
+
+  const handleCardClick = () => {
+    if (!clickable || claimingReward) return;
+    onClaimReward();
+  };
+
+  const handleKeyDown = (event) => {
+    if (!clickable || claimingReward) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClaimReward();
+    }
+  };
+
+  const handleClaimClick = (event) => {
+    if (event) {
+      event.stopPropagation();
+    }
+    if (!clickable || claimingReward) return;
+    onClaimReward();
+  };
+
   return (
-    <div className="rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-inner sm:p-6">
+    <div
+      className={`rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-inner transition sm:p-6 ${highlightClass} ${
+        clickable ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/70' : ''
+      }`}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+    >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
           <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">{task.title}</p>
@@ -25,12 +74,34 @@ function TaskCard({ task, accent }) {
       <p className="mt-3 text-sm text-slate-300">
         {task.progress ?? 0} / {task.goal}
       </p>
+      {showReward && rewardValue > 0 && (
+        <div className="mt-4 space-y-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
+          <div className="flex items-center justify-between text-sm text-amber-100">
+            <span>Daily reward</span>
+            <span>+{formattedReward} ⭐</span>
+          </div>
+          {canClaimReward ? (
+            <button
+              type="button"
+              onClick={handleClaimClick}
+              disabled={claimingReward}
+              className="w-full rounded-full bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {claimingReward ? 'Claiming…' : `Claim +${formattedReward} ⭐`}
+            </button>
+          ) : (
+            <p className="text-xs text-amber-100/80">
+              {rewardClaimed ? 'Reward collected' : 'Complete the remaining quests to claim.'}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
 export default function HomeView() {
-  const { player, streak, daily, getWeakestLetter, starLevelSize } = useProgress();
+  const { player, streak, daily, getWeakestLetter, starLevelSize, claimDailyReward } = useProgress();
 
   const { openGame } = useGame();
   const { t } = useLocalization();
@@ -69,6 +140,20 @@ export default function HomeView() {
   const levelProgress = player.levelProgress ?? (totalStarsEarned % starsPerLevel);
   const starsProgress = starsPerLevel > 0 ? Math.min(levelProgress / starsPerLevel, 1) : 0;
   const formatNumber = useCallback((value) => Math.max(0, Math.floor(value ?? 0)).toLocaleString(), []);
+  const rewardStars = Number.isFinite(daily?.rewardStars) ? daily.rewardStars : 0;
+  const rewardClaimed = Boolean(daily?.rewardClaimed);
+  const rewardClaimable = daily?.rewardClaimable ?? (Boolean(daily?.completed) && !rewardClaimed);
+  const canClaimDaily = rewardClaimable && !rewardClaimed;
+  const [dailyClaiming, setDailyClaiming] = useState(false);
+
+  const handleDailyClaim = useCallback(() => {
+    if (!canClaimDaily || dailyClaiming) return;
+    setDailyClaiming(true);
+    Promise.resolve(claimDailyReward())
+      .finally(() => {
+        setDailyClaiming(false);
+      });
+  }, [canClaimDaily, dailyClaiming, claimDailyReward]);
 
   if (!daily) {
     return (
@@ -163,11 +248,17 @@ export default function HomeView() {
         </div>
       </section>
       <section className="grid gap-5 sm:gap-6 lg:grid-cols-3">
-        {daily?.tasks?.map((task) => (
+        {daily?.tasks?.map((task, index) => (
           <TaskCard
             key={task.id}
             task={task}
             accent={task.completed ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40' : 'bg-cyan-500/10 text-cyan-200 border border-cyan-500/20'}
+            showReward={index === 0}
+            rewardStars={rewardStars}
+            rewardClaimed={rewardClaimed}
+            canClaimReward={canClaimDaily}
+            claimingReward={dailyClaiming}
+            onClaimReward={handleDailyClaim}
           />
         ))}
       </section>
