@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
@@ -105,7 +104,6 @@ export default function HomeView() {
   const { player, streak, daily, getWeakestLetter, starLevelSize, claimDailyReward } = useProgress();
 
   const { openGame } = useGame();
-  const navigate = useNavigate();
   const { t } = useLocalization();
   const { languageId, selectLanguage, languageOptions } = useLanguage();
 
@@ -147,19 +145,6 @@ export default function HomeView() {
   const rewardClaimable = daily?.rewardClaimable ?? (Boolean(daily?.completed) && !rewardClaimed);
   const canClaimDaily = rewardClaimable && !rewardClaimed;
   const [dailyClaiming, setDailyClaiming] = useState(false);
-  const [selectedMode, setSelectedMode] = useState('letters');
-
-  const modeHelperText = selectedMode === 'letters'
-    ? 'Match moving letters to keep your streak growing.'
-    : 'Drag Hebrew words into their matching English buckets.';
-
-  const handleStartClick = useCallback(() => {
-    if (selectedMode === 'letters') {
-      openGame({ mode: 'letters' });
-      return;
-    }
-    navigate('/whole-word-river');
-  }, [navigate, openGame, selectedMode]);
 
   const handleDailyClaim = useCallback(() => {
     if (!canClaimDaily || dailyClaiming) return;
@@ -185,22 +170,10 @@ export default function HomeView() {
     <div className="space-y-8 sm:space-y-10">
       <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-6 shadow-2xl sm:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
-              <label htmlFor="home-mode-select" className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                Selected Mode
-              </label>
-              <select
-                id="home-mode-select"
-                value={selectedMode}
-                onChange={(event) => setSelectedMode(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 sm:text-base"
-              >
-                <option value="letters">Letter River</option>
-                <option value="words">Whole Word River</option>
-              </select>
-              <p className="mt-2 text-xs text-slate-400">{modeHelperText}</p>
-            </div>
+          <div className="space-y-3 text-center sm:text-left">
+            <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.hero.dailyTitle')}</p>
+            <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
+            <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[260px]">
             <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
@@ -222,19 +195,17 @@ export default function HomeView() {
               <p className="mt-2 text-xs text-slate-400">{t('home.languagePicker.helper')}</p>
             </div>
             <button
-              onClick={handleStartClick}
+              onClick={() => openGame({ mode: 'letters' })}
               className="w-full rounded-full bg-cyan-500 px-5 py-3 text-base font-semibold text-slate-900 shadow-lg transition hover:bg-cyan-400 hover:shadow-cyan-500/30 sm:w-auto sm:px-6 sm:text-lg"
             >
-              Start Game
+              {t('home.cta.start')}
             </button>
-            {selectedMode === 'letters' ? (
-              <button
-                onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
-                className="w-full rounded-full border border-cyan-500/60 px-5 py-3 text-base font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 sm:w-auto sm:px-6 sm:text-lg"
-              >
-                {t('home.cta.practice')}
-              </button>
-            ) : null}
+            <button
+              onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
+              className="w-full rounded-full border border-cyan-500/60 px-5 py-3 text-base font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 sm:w-auto sm:px-6 sm:text-lg"
+            >
+              {t('home.cta.practice')}
+            </button>
           </div>
         </div>
       </section>
