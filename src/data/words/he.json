@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "nativeLanguage": "Hebrew",
+    "isoCode": "he"
+  },
+  "words": [
+    { "id": "house", "native": "בית" },
+    { "id": "dog", "native": "כלב" },
+    { "id": "cat", "native": "חתול" },
+    { "id": "milk", "native": "חלב" }
+  ]
+}
