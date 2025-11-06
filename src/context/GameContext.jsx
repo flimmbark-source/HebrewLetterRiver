@@ -1,7 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { setupGame } from '../game/game.js';
-import { buildWholeWordMode } from '../lib/wordModeLoader.js';
 import { useLocalization } from './LocalizationContext.jsx';
 
 const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
@@ -13,7 +12,6 @@ export function GameProvider({ children }) {
   const gameApiRef = useRef(null);
   const [hasMounted, setHasMounted] = useState(false);
   const { languagePack, interfaceLanguagePack, t, dictionary } = useLocalization();
-  const wordModeConfigRef = useRef(null);
   const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
 
@@ -29,10 +27,6 @@ export function GameProvider({ children }) {
   }, [languagePack.id]);
 
   useEffect(() => {
-    wordModeConfigRef.current = buildWholeWordMode(languagePack.id, interfaceLanguagePack.id);
-  }, [languagePack.id, interfaceLanguagePack.id]);
-
-  useEffect(() => {
     if (!isVisible) return;
     if (!containerRef.current) return;
     if (!gameApiRef.current) {
@@ -42,8 +36,7 @@ export function GameProvider({ children }) {
         },
         languagePack,
         translate: t,
-        dictionary,
-        wordModeConfig: wordModeConfigRef.current
+        dictionary
       });
     }
     const api = gameApiRef.current;

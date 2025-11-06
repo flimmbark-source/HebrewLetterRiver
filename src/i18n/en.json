@@ -37,12 +37,6 @@
       "label": "Practice Language",
       "helper": "Switch anytime to train in another script."
     },
-    "modePicker": {
-      "label": "Game Mode",
-      "helper": "Choose what drifts down the river.",
-      "letterRiver": "Letter River",
-      "wholeWordRiver": "Whole Word River"
-    },
     "cta": {
       "start": "Start a New Run",
       "practice": "Practice Focus Letter"
@@ -96,11 +90,6 @@
         "label": "Hiragana",
         "description": "Practice the basic hiragana characters.",
         "noun": "character"
-      },
-      "whole-words": {
-        "label": "Whole Word River",
-        "description": "Match drifting words to their meanings.",
-        "noun": "word"
       },
       "characters": {
         "label": "Characters",
