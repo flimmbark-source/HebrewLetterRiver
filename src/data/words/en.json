@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "nativeLanguage": "English",
+    "isoCode": "en"
+  },
+  "words": [
+    { "id": "house", "native": "house" },
+    { "id": "dog", "native": "dog" },
+    { "id": "cat", "native": "cat" },
+    { "id": "milk", "native": "milk" }
+  ]
+}

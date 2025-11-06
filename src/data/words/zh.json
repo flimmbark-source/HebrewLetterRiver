@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "nativeLanguage": "Mandarin Chinese",
+    "isoCode": "zh"
+  },
+  "words": [
+    { "id": "house", "native": "房子" },
+    { "id": "dog", "native": "狗" },
+    { "id": "cat", "native": "猫" },
+    { "id": "milk", "native": "牛奶" }
+  ]
+}

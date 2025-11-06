@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "nativeLanguage": "Spanish",
+    "isoCode": "es"
+  },
+  "words": [
+    { "id": "house", "native": "casa" },
+    { "id": "dog", "native": "perro" },
+    { "id": "cat", "native": "gato" },
+    { "id": "milk", "native": "leche" }
+  ]
+}

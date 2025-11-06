@@ -1,5 +1,6 @@
 import { emit } from '../lib/eventBus.js';
 import { loadLanguage } from '../lib/languageLoader.js';
+import { WHOLE_WORD_MODE_ID } from '../lib/wordModeLoader.js';
 import { getDictionary, translate as translateWithDictionary, formatTemplate } from '../i18n/index.js';
 
 const trackedTimeouts = new Set();
@@ -39,7 +40,7 @@ function clearAllTimers() {
   trackedIntervals.clear();
 }
 
-export function setupGame({ onReturnToMenu, languagePack, translate, dictionary } = {}) {
+export function setupGame({ onReturnToMenu, languagePack, translate, dictionary, wordModeConfig } = {}) {
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
   const livesContainer = document.getElementById('lives-container');
@@ -121,6 +122,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     'Practice the main set of characters.'
   );
 
+  if (wordModeConfig?.mode && wordModeConfig?.items?.length) {
+    practiceModes.push({ ...wordModeConfig.mode });
+  }
+
   if (!practiceModes.length) {
     practiceModes = [
       {
@@ -157,6 +162,17 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     acc[mode.id] = mode.noun ?? nounFallback;
     return acc;
   }, {});
+
+  if (wordModeConfig?.items?.length) {
+    const clonedItems = wordModeConfig.items.map((item) => ({ ...item }));
+    modeItems[wordModeConfig.mode.id] = clonedItems;
+    clonedItems.forEach((item) => {
+      itemsById[item.id] = item;
+      itemsBySymbol[item.symbol] = item;
+      allLanguageItems.push({ ...item });
+    });
+    modeNounMap[wordModeConfig.mode.id] = wordModeConfig.mode.noun ?? nounFallback;
+  }
 
   function renderPracticeModes() {
     if (!modeOptionsContainer) return;
@@ -458,7 +474,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   }
 
   function getDisplayLabel(item = {}) {
-    return item.sound ?? item.pronunciation ?? item.name ?? item.transliteration ?? '';
+    return item.translation ?? item.sound ?? item.pronunciation ?? item.name ?? item.transliteration ?? '';
   }
 
   function getDisplayPronunciation(item = {}) {
@@ -895,7 +911,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     hasIntroducedForItemInLevel = false;
     scoreForNextLevel += levelUpThreshold;
     if (fallDuration > 7) fallDuration -= 1;
-    isBonusRound = level % 5 === 0 && gameMode === 'letters';
+    const isBonusEligible = gameMode === 'letters' || gameMode === WHOLE_WORD_MODE_ID;
+    isBonusRound = level % 5 === 0 && isBonusEligible;
     const levelUpText = isBonusRound ? t('game.status.bonusRound') : t('game.status.levelUp');
 
     const levelLabel = levelEl.previousElementSibling;

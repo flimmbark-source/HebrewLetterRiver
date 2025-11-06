@@ -106,6 +106,30 @@ export default function HomeView() {
   const { openGame } = useGame();
   const { t } = useLocalization();
   const { languageId, selectLanguage, languageOptions } = useLanguage();
+  const [selectedMode, setSelectedMode] = useState('letters');
+
+  const gameModeOptions = useMemo(() => {
+    const letterLabel = t('home.modePicker.letterRiver');
+    const wordLabel = t('home.modePicker.wholeWordRiver');
+    const resolvedLetterLabel =
+      letterLabel && letterLabel !== 'home.modePicker.letterRiver' ? letterLabel : 'Letter River';
+    const resolvedWordLabel =
+      wordLabel && wordLabel !== 'home.modePicker.wholeWordRiver' ? wordLabel : 'Whole Word River';
+    return [
+      { id: 'letters', label: resolvedLetterLabel },
+      { id: 'whole-words', label: resolvedWordLabel }
+    ];
+  }, [t]);
+
+  const modeHelper = useMemo(() => {
+    const helper = t('home.modePicker.helper');
+    return helper && helper !== 'home.modePicker.helper' ? helper : 'Choose what drifts down the river.';
+  }, [t]);
+
+  const modeLabel = useMemo(() => {
+    const label = t('home.modePicker.label');
+    return label && label !== 'home.modePicker.label' ? label : 'Game Mode';
+  }, [t]);
 
   const latestBadge = useMemo(() => {
     if (!player.latestBadge) return null;
@@ -194,18 +218,38 @@ export default function HomeView() {
               </select>
               <p className="mt-2 text-xs text-slate-400">{t('home.languagePicker.helper')}</p>
             </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
+              <label htmlFor="home-mode-select" className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                {modeLabel}
+              </label>
+              <select
+                id="home-mode-select"
+                value={selectedMode}
+                onChange={(event) => setSelectedMode(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 sm:text-base"
+              >
+                {gameModeOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-2 text-xs text-slate-400">{modeHelper}</p>
+            </div>
             <button
-              onClick={() => openGame({ mode: 'letters' })}
+              onClick={() => openGame({ mode: selectedMode })}
               className="w-full rounded-full bg-cyan-500 px-5 py-3 text-base font-semibold text-slate-900 shadow-lg transition hover:bg-cyan-400 hover:shadow-cyan-500/30 sm:w-auto sm:px-6 sm:text-lg"
             >
               {t('home.cta.start')}
             </button>
-            <button
-              onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
-              className="w-full rounded-full border border-cyan-500/60 px-5 py-3 text-base font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 sm:w-auto sm:px-6 sm:text-lg"
-            >
-              {t('home.cta.practice')}
-            </button>
+            {selectedMode === 'letters' ? (
+              <button
+                onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
+                className="w-full rounded-full border border-cyan-500/60 px-5 py-3 text-base font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 sm:w-auto sm:px-6 sm:text-lg"
+              >
+                {t('home.cta.practice')}
+              </button>
+            ) : null}
           </div>
         </div>
       </section>

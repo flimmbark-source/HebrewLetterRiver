@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "nativeLanguage": "Japanese",
+    "isoCode": "ja"
+  },
+  "words": [
+    { "id": "house", "native": "家" },
+    { "id": "dog", "native": "犬" },
+    { "id": "cat", "native": "猫" },
+    { "id": "milk", "native": "牛乳" }
+  ]
+}
