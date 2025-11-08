@@ -42,3 +42,25 @@ body {
 .language-font-japanese {
   font-family: 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
 }
+
+@keyframes word-river-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-4px);
+  }
+}
+
+@layer utilities {
+  .animate-shake-soft {
+    animation: word-river-shake 0.36s ease-in-out;
+  }
+}

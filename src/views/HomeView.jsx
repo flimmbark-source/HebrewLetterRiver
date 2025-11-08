@@ -150,6 +150,7 @@ export default function HomeView() {
   const starsProgress = starsPerLevel > 0 ? Math.min(levelProgress / starsPerLevel, 1) : 0;
   const formatNumber = useCallback((value) => Math.max(0, Math.floor(value ?? 0)).toLocaleString(), []);
   const [claimingTaskId, setClaimingTaskId] = useState(null);
+  const [selectedMode, setSelectedMode] = useState('letter');
 
   const handleDailyClaim = useCallback(
     (taskId) => {
@@ -161,6 +162,33 @@ export default function HomeView() {
     },
     [claimingTaskId, claimDailyReward]
   );
+
+  const modeOptions = useMemo(
+    () => [
+      {
+        id: 'letter',
+        label: t('home.modes.letter'),
+        description: t('home.modes.letterDescription')
+      },
+      {
+        id: 'word',
+        label: t('home.modes.word'),
+        description: t('home.modes.wordDescription')
+      }
+    ],
+    [t]
+  );
+
+  const selectedModeConfig = modeOptions.find((mode) => mode.id === selectedMode) ?? modeOptions[0];
+  const isWordMode = selectedMode === 'word';
+
+  const handleStartRun = useCallback(() => {
+    if (isWordMode) {
+      openGame({ experience: 'word-river' });
+      return;
+    }
+    openGame({ mode: 'letters' });
+  }, [isWordMode, openGame]);
 
   if (!daily) {
     return (
@@ -178,10 +206,33 @@ export default function HomeView() {
     <div className="space-y-8 sm:space-y-10">
       <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-6 shadow-2xl sm:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-3 text-center sm:text-left">
-            <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.hero.dailyTitle')}</p>
-            <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
-            <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
+          <div className="space-y-4 text-center sm:text-left">
+            <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.modes.label')}</p>
+            <div className="flex flex-col gap-3 sm:max-w-xl">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {modeOptions.map((mode) => {
+                  const active = mode.id === selectedMode;
+                  return (
+                    <button
+                      key={mode.id}
+                      type="button"
+                      onClick={() => setSelectedMode(mode.id)}
+                      aria-pressed={active}
+                      className={`rounded-2xl border px-5 py-4 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 ${
+                        active
+                          ? 'border-cyan-400/80 bg-cyan-500/15 text-cyan-100 shadow-cyan-400/30'
+                          : 'border-slate-700/70 bg-slate-900/70 text-slate-200 hover:border-cyan-400/60 hover:text-white'
+                      }`}
+                    >
+                      <span className="text-lg font-semibold sm:text-xl">{mode.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {selectedModeConfig?.description ? (
+                <p className="text-sm text-slate-300 sm:text-base">{selectedModeConfig.description}</p>
+              ) : null}
+            </div>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[260px]">
             <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
@@ -203,17 +254,19 @@ export default function HomeView() {
               <p className="mt-2 text-xs text-slate-400">{t('home.languagePicker.helper')}</p>
             </div>
             <button
-              onClick={() => openGame({ mode: 'letters' })}
+              onClick={handleStartRun}
               className="w-full rounded-full bg-cyan-500 px-5 py-3 text-base font-semibold text-slate-900 shadow-lg transition hover:bg-cyan-400 hover:shadow-cyan-500/30 sm:w-auto sm:px-6 sm:text-lg"
             >
-              {t('home.cta.start')}
+              {isWordMode ? t('home.cta.startWord') : t('home.cta.startLetter')}
             </button>
-            <button
-              onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
-              className="w-full rounded-full border border-cyan-500/60 px-5 py-3 text-base font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 sm:w-auto sm:px-6 sm:text-lg"
-            >
-              {t('home.cta.practice')}
-            </button>
+            {!isWordMode ? (
+              <button
+                onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
+                className="w-full rounded-full border border-cyan-500/60 px-5 py-3 text-base font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 sm:w-auto sm:px-6 sm:text-lg"
+              >
+                {t('home.cta.practice')}
+              </button>
+            ) : null}
           </div>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { setupGame } from '../game/game.js';
+import WordRiverGame from '../game/WordRiverGame.jsx';
 import { useLocalization } from './LocalizationContext.jsx';
 
 const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
@@ -27,8 +28,10 @@ export function GameProvider({ children }) {
   }, [languagePack.id]);
 
   useEffect(() => {
+    const experience = options?.experience ?? 'letter-river';
     if (!isVisible) return;
     if (!containerRef.current) return;
+    if (experience !== 'letter-river') return;
     if (!gameApiRef.current) {
       gameApiRef.current = setupGame({
         onReturnToMenu: () => {
@@ -84,7 +87,12 @@ export function GameProvider({ children }) {
                     onClick={(e) => e.stopPropagation()}
                     dir={direction}
                   >
-                    <GameCanvas key={languagePack.id} fontClass={fontClass} />
+                    <GameCanvas
+                      key={`${languagePack.id}-${options?.experience ?? 'letter-river'}`}
+                      fontClass={fontClass}
+                      experience={options?.experience ?? 'letter-river'}
+                      onExit={closeGame}
+                    />
                   </div>
                 </div>
               </div>
@@ -96,7 +104,10 @@ export function GameProvider({ children }) {
   );
 }
 
-function GameCanvas({ fontClass }) {
+function GameCanvas({ fontClass, experience, onExit }) {
+  if (experience === 'word-river') {
+    return <WordRiverGame fontClass={fontClass} onExit={onExit} />;
+  }
   const { t } = useLocalization();
   return (
     <div id="game-view" className="flex h-full w-full flex-col overflow-hidden">
