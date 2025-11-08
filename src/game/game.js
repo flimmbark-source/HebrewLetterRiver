@@ -588,9 +588,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
 
       const correctSymbol = getDisplaySymbol(item.data);
+      const fallbackLabel = getDisplayLabel(item.data);
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
-      ghostEl.textContent = correctSymbol ? getCharacterAriaLabel(item.data) : '';
+      ghostEl.textContent = correctSymbol || fallbackLabel;
 
       ghostEl.style.display = 'block';
       const ghostWidth = ghostEl.offsetWidth;
@@ -1365,10 +1366,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
 
       const correctSymbol = getDisplaySymbol(item.data);
-      const characterLabel = getCharacterAriaLabel(item.data);
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
-      ghostEl.textContent = characterLabel || correctSymbol;
+      const fallbackLabel = getDisplayLabel(item.data);
+      ghostEl.textContent = correctSymbol || fallbackLabel;
       ghostEl.style.display = 'block';
       const ghostWidth = ghostEl.offsetWidth;
       ghostEl.style.display = '';
