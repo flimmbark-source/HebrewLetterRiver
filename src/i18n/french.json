@@ -29,9 +29,19 @@
   },
   "home": {
     "hero": {
-      "dailyTitle": "La quête quotidienne du jour",
-      "heading": "Parcourez les trois défis de la rivière.",
-      "description": "Maintenez votre séquence en vie et remportez de nouvelles étoiles en accomplissant les quêtes d'échauffement, de concentration et d'épices conçues spécialement pour vous."
+      "heading": "Choose your river adventure.",
+      "description": "Start with single letters or dive into full words.",
+      "modeSelectTitle": "Select a mode",
+      "modes": {
+        "letters": {
+          "title": "Letter River",
+          "description": "Catch drifting letters and drop them into the right buckets."
+        },
+        "words": {
+          "title": "Word River",
+          "description": "Assemble full words and match them to their meanings."
+        }
+      }
     },
     "languagePicker": {
       "label": "Langue de pratique",
@@ -206,6 +216,27 @@
       "expert-mode": "Expert Mode run",
       "fast-flow": "Fast Flow speed active",
       "no-intros": "No Introductions enabled"
+    }
+  },
+  "wordRiver": {
+    "title": "Word River",
+    "subtitle": "Build each word and connect it with its meaning.",
+    "phases": {
+      "letters": "Phase 1 · Build the word",
+      "match": "Phase 2 · Match the meaning"
+    },
+    "instructions": {
+      "letters": "Drag drifting letters into each bucket to build the word in your practice language.",
+      "match": "Drag the completed words to the emoji or meaning that matches."
+    },
+    "notifications": {
+      "roundComplete": "Round complete! New words are on the way."
+    },
+    "actions": {
+      "back": "Back to Home"
+    },
+    "targets": {
+      "fallback": "Meaning"
     }
   }
 }

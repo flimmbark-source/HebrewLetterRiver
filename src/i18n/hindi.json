@@ -29,9 +29,19 @@
   },
   "home": {
     "hero": {
-      "dailyTitle": "आज की दैनिक खोज",
-      "heading": "तीनों नदी चुनौतियों से गुज़रें।",
-      "description": "केवल आपके लिए तैयार किए गए वार्म-अप, फोकस और स्पाइस क्वेस्ट को पूरा करके अपनी स्ट्रीक को जीवित रखें और नए सितारों का दावा करें।"
+      "heading": "Choose your river adventure.",
+      "description": "Start with single letters or dive into full words.",
+      "modeSelectTitle": "Select a mode",
+      "modes": {
+        "letters": {
+          "title": "Letter River",
+          "description": "Catch drifting letters and drop them into the right buckets."
+        },
+        "words": {
+          "title": "Word River",
+          "description": "Assemble full words and match them to their meanings."
+        }
+      }
     },
     "languagePicker": {
       "label": "भाषा का अभ्यास करें",
@@ -206,6 +216,27 @@
       "expert-mode": "Expert Mode run",
       "fast-flow": "Fast Flow speed active",
       "no-intros": "No Introductions enabled"
+    }
+  },
+  "wordRiver": {
+    "title": "Word River",
+    "subtitle": "Build each word and connect it with its meaning.",
+    "phases": {
+      "letters": "Phase 1 · Build the word",
+      "match": "Phase 2 · Match the meaning"
+    },
+    "instructions": {
+      "letters": "Drag drifting letters into each bucket to build the word in your practice language.",
+      "match": "Drag the completed words to the emoji or meaning that matches."
+    },
+    "notifications": {
+      "roundComplete": "Round complete! New words are on the way."
+    },
+    "actions": {
+      "back": "Back to Home"
+    },
+    "targets": {
+      "fallback": "Meaning"
     }
   }
 }
