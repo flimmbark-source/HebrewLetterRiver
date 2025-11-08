@@ -29,9 +29,19 @@
   },
   "home": {
     "hero": {
-      "dailyTitle": "La misión diaria de hoy",
-      "heading": "Fluye a través de los tres desafíos del río.",
-      "description": "Mantenga viva su racha y consiga nuevas estrellas completando las misiones de Calentamiento, Concentración y Condimento diseñadas especialmente para usted."
+      "heading": "Choose your river adventure.",
+      "description": "Start with single letters or dive into full words.",
+      "modeSelectTitle": "Select a mode",
+      "modes": {
+        "letters": {
+          "title": "Letter River",
+          "description": "Catch drifting letters and drop them into the right buckets."
+        },
+        "words": {
+          "title": "Word River",
+          "description": "Assemble full words and match them to their meanings."
+        }
+      }
     },
     "languagePicker": {
       "label": "Practica el idioma",
@@ -40,6 +50,27 @@
     "cta": {
       "start": "Iniciar una nueva ejecución",
       "practice": "Carta de enfoque de práctica"
+    }
+  },
+  "wordRiver": {
+    "title": "Word River",
+    "subtitle": "Build each word and connect it with its meaning.",
+    "phases": {
+      "letters": "Phase 1 · Build the word",
+      "match": "Phase 2 · Match the meaning"
+    },
+    "instructions": {
+      "letters": "Drag drifting letters into each bucket to build the word in your practice language.",
+      "match": "Drag the completed words to the emoji or meaning that matches."
+    },
+    "notifications": {
+      "roundComplete": "Round complete! New words are on the way."
+    },
+    "actions": {
+      "back": "Back to Home"
+    },
+    "targets": {
+      "fallback": "Meaning"
     }
   },
   "game": {

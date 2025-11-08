@@ -1,10 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
+import { classNames } from '../lib/classNames.js';
 
 function TaskCard({
   task,
@@ -57,13 +59,17 @@ function TaskCard({
     onClaimReward();
   };
 
+  const containerClass = classNames(
+    'rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner transition',
+    'hover:border-cyan-500/40',
+    'sm:p-6',
+    highlightClass,
+    clickable && ['cursor-pointer', 'focus:outline-none', 'focus-visible:ring-2', 'focus-visible:ring-amber-200/70']
+  );
+
   return (
     <div
-      className={`rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner transition hover:border-cyan-500/40 sm:p-6 ${
-        highlightClass
-      } ${
-        clickable ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/70' : ''
-      }`}
+      className={containerClass}
       role={clickable ? 'button' : undefined}
       tabIndex={clickable ? 0 : undefined}
       onClick={handleCardClick}
@@ -98,7 +104,12 @@ function TaskCard({
               type="button"
               onClick={handleClaimClick}
               disabled={!canClaimReward || claimingReward}
-              className="w-full rounded-xl border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/20 focus:outline-none focus:ring-2 focus:ring-amber-300/60 disabled:cursor-not-allowed disabled:opacity-60"
+              className={classNames(
+                'w-full rounded-xl border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-100 transition',
+                'hover:bg-amber-400/20',
+                'focus:outline-none focus:ring-2 focus:ring-amber-300/60',
+                'disabled:cursor-not-allowed disabled:opacity-60'
+              )}
             >
               {claimingReward ? 'Claiming…' : `Claim +${formattedReward} ⭐`}
             </button>
@@ -115,6 +126,7 @@ export default function HomeView() {
   const { openGame } = useGame();
   const { t } = useLocalization();
   const { languageId, selectLanguage, languageOptions } = useLanguage();
+  const navigate = useNavigate();
 
   const latestBadge = useMemo(() => {
     if (!player.latestBadge) return null;
@@ -176,12 +188,51 @@ export default function HomeView() {
 
   return (
     <div className="space-y-8 sm:space-y-10">
-      <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-6 shadow-2xl sm:p-8">
+      <section
+        className={classNames(
+          'rounded-3xl border border-cyan-500/20',
+          'bg-gradient-to-br from-slate-900 to-slate-950',
+          'p-6 shadow-2xl',
+          'sm:p-8'
+        )}
+      >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-3 text-center sm:text-left">
-            <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.hero.dailyTitle')}</p>
-            <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
-            <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
+          <div className="space-y-5 text-center sm:text-left">
+            <div className="space-y-3">
+              <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
+              <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
+            </div>
+            <div className="space-y-3">
+              <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.hero.modeSelectTitle')}</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => openGame({ mode: 'letters' })}
+                  className={classNames(
+                    'group rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-left transition',
+                    'hover:border-cyan-400/60 hover:shadow-cyan-500/20'
+                  )}
+                >
+                  <span className="block text-lg font-semibold text-white">{t('home.hero.modes.letters.title')}</span>
+                  <span className="mt-1 block text-sm text-slate-300 group-hover:text-slate-200">
+                    {t('home.hero.modes.letters.description')}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/word-river')}
+                  className={classNames(
+                    'group rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-left transition',
+                    'hover:border-cyan-400/60 hover:shadow-cyan-500/20'
+                  )}
+                >
+                  <span className="block text-lg font-semibold text-white">{t('home.hero.modes.words.title')}</span>
+                  <span className="mt-1 block text-sm text-slate-300 group-hover:text-slate-200">
+                    {t('home.hero.modes.words.description')}
+                  </span>
+                </button>
+              </div>
+            </div>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[260px]">
             <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
@@ -192,7 +243,11 @@ export default function HomeView() {
                 id="home-language-select"
                 value={languageId}
                 onChange={(event) => selectLanguage(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 sm:text-base"
+                className={classNames(
+                  'mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100',
+                  'focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40',
+                  'sm:text-base'
+                )}
               >
                 {languageOptions.map((option) => (
                   <option key={option.id} value={option.id}>
@@ -204,13 +259,21 @@ export default function HomeView() {
             </div>
             <button
               onClick={() => openGame({ mode: 'letters' })}
-              className="w-full rounded-full bg-cyan-500 px-5 py-3 text-base font-semibold text-slate-900 shadow-lg transition hover:bg-cyan-400 hover:shadow-cyan-500/30 sm:w-auto sm:px-6 sm:text-lg"
+              className={classNames(
+                'w-full rounded-full bg-cyan-500 px-5 py-3 text-base font-semibold text-slate-900 shadow-lg transition',
+                'hover:bg-cyan-400 hover:shadow-cyan-500/30',
+                'sm:w-auto sm:px-6 sm:text-lg'
+              )}
             >
               {t('home.cta.start')}
             </button>
             <button
               onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
-              className="w-full rounded-full border border-cyan-500/60 px-5 py-3 text-base font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 sm:w-auto sm:px-6 sm:text-lg"
+              className={classNames(
+                'w-full rounded-full border border-cyan-500/60 px-5 py-3 text-base font-semibold text-cyan-300 transition',
+                'hover:border-cyan-400 hover:text-cyan-200',
+                'sm:w-auto sm:px-6 sm:text-lg'
+              )}
             >
               {t('home.cta.practice')}
             </button>
