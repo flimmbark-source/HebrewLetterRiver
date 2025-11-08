@@ -33,42 +33,13 @@
       "heading": "完成所有三条河流的挑战。",
       "description": "通过完成专为您量身定制的热身、专注和香料任务，保持您的连胜并获得新的星星。"
     },
-    "modes": {
-      "label": "选择你的旅程",
-      "letter": "字母之河",
-      "letterDescription": "捕捉漂浮的字母，强化识别能力。",
-      "word": "词语之河",
-      "wordDescription": "组合词汇，并将每个词与它的含义配对。"
-    },
     "languagePicker": {
       "label": "练习语言",
       "helper": "随时切换以使用另一个脚本进行训练。"
     },
     "cta": {
-      "startLetter": "开始字母之河",
-      "startWord": "开始词语之河",
+      "start": "开始新的跑步",
       "practice": "实践焦点信"
-    }
-  },
-  "wordRiver": {
-    "title": "词语之河",
-    "phase": {
-      "assemble": "阶段一 · 拼出词语",
-      "match": "阶段二 · 匹配含义"
-    },
-    "instructions": {
-      "assemble": "将漂浮的字母拖入每个桶中拼出词语。",
-      "match": "把完成的词语拖到对应的图像上。",
-      "previewMatch": "完成全部词语即可解锁匹配挑战。"
-    },
-    "round": "第 {{round}} 回合",
-    "roundComplete": "本回合完成！",
-    "readyNext": "新的词语即将到来…",
-    "words": {
-      "house": { "translation": "家" },
-      "dog": { "translation": "狗" },
-      "milk": { "translation": "牛奶" },
-      "sun": { "translation": "太阳" }
     }
   },
   "game": {

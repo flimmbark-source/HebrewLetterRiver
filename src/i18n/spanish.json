@@ -33,42 +33,13 @@
       "heading": "Fluye a través de los tres desafíos del río.",
       "description": "Mantenga viva su racha y consiga nuevas estrellas completando las misiones de Calentamiento, Concentración y Condimento diseñadas especialmente para usted."
     },
-    "modes": {
-      "label": "Elige tu recorrido",
-      "letter": "Río de letras",
-      "letterDescription": "Atrapa letras flotantes para reforzar el reconocimiento.",
-      "word": "Río de palabras",
-      "wordDescription": "Forma vocabulario y relaciona cada palabra con su significado."
-    },
     "languagePicker": {
       "label": "Practica el idioma",
       "helper": "Cambie en cualquier momento para entrenar en otro guión."
     },
     "cta": {
-      "startLetter": "Iniciar Río de letras",
-      "startWord": "Iniciar Río de palabras",
+      "start": "Iniciar una nueva ejecución",
       "practice": "Carta de enfoque de práctica"
-    }
-  },
-  "wordRiver": {
-    "title": "Río de palabras",
-    "phase": {
-      "assemble": "Fase 1 · Armar la palabra",
-      "match": "Fase 2 · Emparejar el significado"
-    },
-    "instructions": {
-      "assemble": "Arrastra las letras flotantes a cada cubeta para deletrear la palabra.",
-      "match": "Arrastra cada palabra completa hasta la imagen correspondiente.",
-      "previewMatch": "Completa todas las palabras para revelar el reto de emparejar."
-    },
-    "round": "Ronda {{round}}",
-    "roundComplete": "¡Ronda completada!",
-    "readyNext": "Llegan nuevas palabras…",
-    "words": {
-      "house": { "translation": "casa" },
-      "dog": { "translation": "perro" },
-      "milk": { "translation": "leche" },
-      "sun": { "translation": "sol" }
     }
   },
   "game": {

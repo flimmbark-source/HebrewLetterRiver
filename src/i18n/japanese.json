@@ -33,42 +33,13 @@
       "heading": "3 つの川のチャレンジをすべて通過します。",
       "description": "あなた専用にカスタマイズされたウォームアップ、集中、スパイスのクエストを完了して、連勝記録を維持し、フレッシュスターを獲得しましょう。"
     },
-    "modes": {
-      "label": "旅を選ぼう",
-      "letter": "レターリバー",
-      "letterDescription": "流れる文字をつかんで認識力を鍛えよう。",
-      "word": "ワードリバー",
-      "wordDescription": "ことばを組み立て、意味にぴったりの絵と結び付けよう。"
-    },
     "languagePicker": {
       "label": "言語を練習する",
       "helper": "いつでも切り替えて、別のスクリプトでトレーニングできます。"
     },
     "cta": {
-      "startLetter": "レターリバーを始める",
-      "startWord": "ワードリバーを始める",
+      "start": "新しい実行を開始する",
       "practice": "練習用フォーカスレター"
-    }
-  },
-  "wordRiver": {
-    "title": "ワードリバー",
-    "phase": {
-      "assemble": "第1フェーズ・ことばを組み立てよう",
-      "match": "第2フェーズ・意味にマッチさせよう"
-    },
-    "instructions": {
-      "assemble": "流れてくる文字をバケツにドラッグしてことばを完成させよう。",
-      "match": "完成したことばを対応するアイコンにドラッグしよう。",
-      "previewMatch": "すべてのことばを完成させてマッチングチャレンジを解放しよう。"
-    },
-    "round": "ラウンド {{round}}",
-    "roundComplete": "ラウンドクリア！",
-    "readyNext": "新しいことばが流れてくるよ…",
-    "words": {
-      "house": { "translation": "家" },
-      "dog": { "translation": "犬" },
-      "milk": { "translation": "牛乳" },
-      "sun": { "translation": "太陽" }
     }
   },
   "game": {

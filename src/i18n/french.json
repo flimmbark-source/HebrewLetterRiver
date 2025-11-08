@@ -33,42 +33,13 @@
       "heading": "Parcourez les trois défis de la rivière.",
       "description": "Maintenez votre séquence en vie et remportez de nouvelles étoiles en accomplissant les quêtes d'échauffement, de concentration et d'épices conçues spécialement pour vous."
     },
-    "modes": {
-      "label": "Choisissez votre parcours",
-      "letter": "Rivière des lettres",
-      "letterDescription": "Attrapez les lettres flottantes pour renforcer votre reconnaissance.",
-      "word": "Rivière des mots",
-      "wordDescription": "Assemblez du vocabulaire et associez chaque mot à son sens."
-    },
     "languagePicker": {
       "label": "Langue de pratique",
       "helper": "Changez à tout moment pour vous entraîner dans un autre script."
     },
     "cta": {
-      "startLetter": "Lancer la Rivière des lettres",
-      "startWord": "Lancer la Rivière des mots",
+      "start": "Commencer une nouvelle course",
       "practice": "Lettre de mise au point pratique"
-    }
-  },
-  "wordRiver": {
-    "title": "Rivière des mots",
-    "phase": {
-      "assemble": "Phase 1 · Assemblez le mot",
-      "match": "Phase 2 · Associez le sens"
-    },
-    "instructions": {
-      "assemble": "Faites glisser les lettres flottantes dans chaque seau pour épeler le mot.",
-      "match": "Faites glisser chaque mot complété vers l'image correspondante.",
-      "previewMatch": "Complétez tous les mots pour révéler le défi d'association."
-    },
-    "round": "Manche {{round}}",
-    "roundComplete": "Manche terminée !",
-    "readyNext": "De nouveaux mots arrivent…",
-    "words": {
-      "house": { "translation": "maison" },
-      "dog": { "translation": "chien" },
-      "milk": { "translation": "lait" },
-      "sun": { "translation": "soleil" }
     }
   },
   "game": {
