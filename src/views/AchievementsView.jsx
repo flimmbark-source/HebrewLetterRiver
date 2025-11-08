@@ -145,11 +145,13 @@ export default function AchievementsView() {
       }, 0),
     [badges]
   );
-  const rewardStars = Number.isFinite(daily?.rewardStars) ? daily.rewardStars : 0;
-  const rewardClaimed = Boolean(daily?.rewardClaimed);
-  const rewardClaimable = daily?.rewardClaimable ?? (Boolean(daily?.completed) && !rewardClaimed);
-  const canClaimDaily = rewardClaimable && !rewardClaimed;
-  const unclaimedDailyStars = canClaimDaily ? rewardStars : 0;
+  const dailyTasks = daily?.tasks ?? [];
+  const unclaimedDailyStars = dailyTasks.reduce((sum, task) => {
+    if (!task.rewardClaimable || task.rewardClaimed) return sum;
+    const rewardStars = Number.isFinite(task.rewardStars) ? task.rewardStars : 0;
+    return sum + rewardStars;
+  }, 0);
+  const canClaimDaily = unclaimedDailyStars > 0;
   const unclaimedTotal = unclaimedBadgeStars + unclaimedDailyStars;
 
   const [profileCelebrating, setProfileCelebrating] = useState(false);
