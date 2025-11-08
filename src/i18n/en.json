@@ -33,13 +33,42 @@
       "heading": "Flow through all three river challenges.",
       "description": "Keep your streak alive and claim fresh stars by completing the Warm-Up, Focus, and Spice quests tailored just for you."
     },
+    "modes": {
+      "label": "Choose your journey",
+      "letter": "Letter River",
+      "letterDescription": "Catch drifting letters to sharpen recognition.",
+      "word": "Word River",
+      "wordDescription": "Assemble vocabulary words and match their meanings."
+    },
     "languagePicker": {
       "label": "Practice Language",
       "helper": "Switch anytime to train in another script."
     },
     "cta": {
-      "start": "Start a New Run",
+      "startLetter": "Start Letter River",
+      "startWord": "Start Word River",
       "practice": "Practice Focus Letter"
+    }
+  },
+  "wordRiver": {
+    "title": "Word River",
+    "phase": {
+      "assemble": "Phase 1 · Assemble the word",
+      "match": "Phase 2 · Match the meaning"
+    },
+    "instructions": {
+      "assemble": "Drag drifting letters into each bucket to spell the word.",
+      "match": "Drag each completed word onto its matching picture.",
+      "previewMatch": "Complete every word to reveal the matching challenge."
+    },
+    "round": "Round {{round}}",
+    "roundComplete": "Round Complete!",
+    "readyNext": "New words incoming…",
+    "words": {
+      "house": { "translation": "house" },
+      "dog": { "translation": "dog" },
+      "milk": { "translation": "milk" },
+      "sun": { "translation": "sun" }
     }
   },
   "game": {

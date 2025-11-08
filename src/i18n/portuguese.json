@@ -33,13 +33,42 @@
       "heading": "Flua através de todos os três desafios do rio.",
       "description": "Mantenha sua sequência viva e conquiste novas estrelas completando as missões de Aquecimento, Foco e Especiarias feitas sob medida para você."
     },
+    "modes": {
+      "label": "Escolha sua jornada",
+      "letter": "Rio das Letras",
+      "letterDescription": "Capture letras flutuantes para reforçar o reconhecimento.",
+      "word": "Rio das Palavras",
+      "wordDescription": "Monte vocabulário e combine cada palavra com seu significado."
+    },
     "languagePicker": {
       "label": "Pratique a linguagem",
       "helper": "Mude a qualquer momento para treinar em outro script."
     },
     "cta": {
-      "start": "Comece uma nova corrida",
+      "startLetter": "Iniciar Rio das Letras",
+      "startWord": "Iniciar Rio das Palavras",
       "practice": "Carta de foco prático"
+    }
+  },
+  "wordRiver": {
+    "title": "Rio das Palavras",
+    "phase": {
+      "assemble": "Fase 1 · Monte a palavra",
+      "match": "Fase 2 · Combine o significado"
+    },
+    "instructions": {
+      "assemble": "Arraste as letras flutuantes para cada balde para formar a palavra.",
+      "match": "Arraste cada palavra completa para a imagem correspondente.",
+      "previewMatch": "Complete todas as palavras para revelar o desafio de associação."
+    },
+    "round": "Rodada {{round}}",
+    "roundComplete": "Rodada concluída!",
+    "readyNext": "Novas palavras a caminho…",
+    "words": {
+      "house": { "translation": "casa" },
+      "dog": { "translation": "cão" },
+      "milk": { "translation": "leite" },
+      "sun": { "translation": "sol" }
     }
   },
   "game": {
