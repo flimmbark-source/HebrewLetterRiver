@@ -8,7 +8,8 @@ import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/ti
 
 function TaskCard({
   task,
-  accent,
+  questNumber = 1,
+  totalQuests = 1,
   showReward = false,
   rewardStars = 0,
   rewardClaimed = false,
@@ -27,6 +28,18 @@ function TaskCard({
       ? 'border-emerald-400/40'
       : ''
     : '';
+  const questLabel = `Quest ${questNumber} of ${totalQuests}`;
+  const rewardSummary = rewardValue > 0 ? ` · +${formattedReward} ⭐` : '';
+  const statusLabel = canClaimReward
+    ? `Claim Daily Reward${rewardSummary}`
+    : rewardClaimed
+    ? 'Daily reward collected'
+    : task.completed
+    ? 'Waiting on other quests…'
+    : 'Complete this quest to unlock the daily reward.';
+  const statusPillClass = 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200';
+  const currentProgress = Math.min(task.progress ?? 0, task.goal);
+  const progressValue = `${currentProgress} / ${task.goal}`;
 
   const handleCardClick = () => {
     if (!clickable || claimingReward) return;
@@ -51,9 +64,9 @@ function TaskCard({
 
   return (
     <div
-      className={`rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-inner transition sm:p-6 ${highlightClass} ${
-        clickable ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/70' : ''
-      }`}
+      className={`rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner transition hover:border-cyan-500/40 sm:p-6 ${
+        highlightClass
+      } ${clickable ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/70' : ''}`}
       role={clickable ? 'button' : undefined}
       tabIndex={clickable ? 0 : undefined}
       onClick={handleCardClick}
@@ -64,18 +77,19 @@ function TaskCard({
           <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">{task.title}</p>
           <h3 className="text-lg font-semibold text-white sm:text-xl">{task.description}</h3>
         </div>
-        <span className={`self-start rounded-full px-3 py-1 text-xs font-semibold sm:text-sm ${accent}`}>
-          {task.completed ? 'Complete' : 'In Progress'}
+        <span className={`self-start rounded-full border px-3 py-1 text-xs font-semibold sm:text-sm ${statusPillClass}`}>
+          {questLabel}
         </span>
       </div>
-      <div className="mt-4 h-2 rounded-full bg-slate-800">
-        <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" style={{ width: `${percentage}%` }} />
+      <div className="mt-5 h-2 rounded-full bg-slate-800">
+        <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400" style={{ width: `${percentage}%` }} />
       </div>
-      <p className="mt-3 text-sm text-slate-300">
-        {task.progress ?? 0} / {task.goal}
-      </p>
+      <div className="mt-4 flex items-center justify-between text-sm text-slate-300">
+        <span>{statusLabel}</span>
+        <span>{progressValue}</span>
+      </div>
       {showReward && rewardValue > 0 && (
-        <div className="mt-4 space-y-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
+        <div className="mt-4 space-y-3 rounded-2xl border border-amber-400/50 bg-amber-400/10 p-4">
           <div className="flex items-center justify-between text-sm text-amber-100">
             <span>Daily reward</span>
             <span>+{formattedReward} ⭐</span>
@@ -85,14 +99,12 @@ function TaskCard({
               type="button"
               onClick={handleClaimClick}
               disabled={claimingReward}
-              className="w-full rounded-full bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/20 focus:outline-none focus:ring-2 focus:ring-amber-300/60 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {claimingReward ? 'Claiming…' : `Claim +${formattedReward} ⭐`}
+              {claimingReward ? 'Claiming…' : `Claim Daily Reward${rewardSummary}`}
             </button>
           ) : (
-            <p className="text-xs text-amber-100/80">
-              {rewardClaimed ? 'Reward collected' : 'Complete the remaining quests to claim.'}
-            </p>
+            rewardClaimed && <p className="text-xs text-amber-100/80">Reward collected</p>
           )}
         </div>
       )}
@@ -165,6 +177,7 @@ export default function HomeView() {
 
   const nextResetDate = useMemo(() => new Date(Date.now() + millisUntilNextJerusalemMidnight()), [daily?.dateKey]);
   const nextResetTime = formatJerusalemTime(nextResetDate, { timeZoneName: 'short' });
+  const totalQuests = daily?.tasks?.length ?? 0;
 
   return (
     <div className="space-y-8 sm:space-y-10">
@@ -252,8 +265,9 @@ export default function HomeView() {
           <TaskCard
             key={task.id}
             task={task}
-            accent={task.completed ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40' : 'bg-cyan-500/10 text-cyan-200 border border-cyan-500/20'}
-            showReward={index === 0}
+            questNumber={index + 1}
+            totalQuests={totalQuests}
+            showReward
             rewardStars={rewardStars}
             rewardClaimed={rewardClaimed}
             canClaimReward={canClaimDaily}
