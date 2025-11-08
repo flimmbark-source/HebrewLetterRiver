@@ -4,23 +4,62 @@ import { useGame } from '../context/GameContext.jsx';
 import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 
-function TaskCard({ task, accent }) {
+function TaskCard({ task, accent, onClaim, claiming }) {
   const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
+  const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
+  const formattedReward = rewardValue.toLocaleString();
+  const claimable = Boolean(task.rewardClaimable) && !task.rewardClaimed;
+  const statusLabel = task.rewardClaimed
+    ? 'Reward collected'
+    : claimable
+    ? `Claim +${formattedReward} ⭐`
+    : task.completed
+    ? 'Quest complete'
+    : 'In progress…';
   return (
-    <div className="rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-inner">
+    <div
+      className={`rounded-3xl border bg-slate-900/70 p-6 shadow-inner transition ${
+        claimable ? 'border-amber-400/40 ring-1 ring-amber-300/60' : 'border-slate-800'
+      }`}
+    >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{task.title}</p>
           <h3 className="mt-2 text-xl font-semibold text-white">{task.description}</h3>
         </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${accent}`}>{task.completed ? 'Complete' : 'In Progress'}</span>
+        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${accent}`}>
+          {task.completed ? 'Complete' : 'In Progress'}
+        </span>
       </div>
       <div className="mt-5 h-2 rounded-full bg-slate-800">
         <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" style={{ width: `${percentage}%` }} />
       </div>
-      <p className="mt-3 text-sm text-slate-300">
-        {task.progress ?? 0} / {task.goal}
-      </p>
+      <div className="mt-3 flex items-center justify-between text-sm text-slate-300">
+        <span>{statusLabel}</span>
+        <span>
+          {task.progress ?? 0} / {task.goal}
+        </span>
+      </div>
+      {rewardValue > 0 && (
+        <div className="mt-4 space-y-3 rounded-2xl border border-amber-400/50 bg-amber-400/10 p-4">
+          <div className="flex items-center justify-between text-sm text-amber-100">
+            <span>Quest reward</span>
+            <span>+{formattedReward} ⭐</span>
+          </div>
+          {task.rewardClaimed ? (
+            <p className="text-xs text-amber-100/80">Reward collected</p>
+          ) : (
+            <button
+              type="button"
+              onClick={() => (claimable && !claiming && onClaim ? onClaim(task.id) : null)}
+              disabled={!claimable || claiming}
+              className="w-full rounded-xl border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/20 focus:outline-none focus:ring-2 focus:ring-amber-300/60 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {claiming ? 'Claiming…' : `Claim +${formattedReward} ⭐`}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -33,6 +72,7 @@ export default function DailyView() {
 
   const [celebrating, setCelebrating] = useState(false);
   const [claiming, setClaiming] = useState(false);
+  const [claimingTaskId, setClaimingTaskId] = useState(null);
   const celebrationTimer = useRef(null);
 
   useEffect(() => {
@@ -51,30 +91,53 @@ export default function DailyView() {
     return getWeakestLetter().hebrew;
   }, [daily?.tasks, getWeakestLetter]);
 
-  const rewardStars = Number.isFinite(daily?.rewardStars) ? daily.rewardStars : 0;
-  const rewardClaimed = Boolean(daily?.rewardClaimed);
-  const rewardClaimable = daily?.rewardClaimable ?? (Boolean(daily?.completed) && !rewardClaimed);
-  const dailyClaimable = rewardClaimable && !rewardClaimed;
+  const tasks = daily?.tasks ?? [];
+  const claimableTasks = tasks.filter((task) => task.rewardClaimable && !task.rewardClaimed);
+  const rewardStars = claimableTasks.reduce(
+    (sum, task) => sum + (Number.isFinite(task.rewardStars) ? task.rewardStars : 0),
+    0
+  );
+  const rewardClaimed = tasks.length > 0 && tasks.every((task) => task.rewardClaimed);
+  const dailyClaimable = claimableTasks.length > 0;
   const formatNumber = useCallback((value) => Math.max(0, Math.floor(value ?? 0)).toLocaleString(), []);
 
-  const handleClaim = useCallback(() => {
-    if (!dailyClaimable || claiming) return;
+  const triggerCelebration = useCallback(() => {
+    setCelebrating(true);
+    if (celebrationTimer.current) {
+      clearTimeout(celebrationTimer.current);
+    }
+    celebrationTimer.current = setTimeout(() => {
+      setCelebrating(false);
+      celebrationTimer.current = null;
+    }, 1200);
+  }, []);
+
+  const handleClaimAll = useCallback(() => {
+    if (!dailyClaimable || claiming || claimingTaskId) return;
     setClaiming(true);
     Promise.resolve(claimDailyReward()).then((result) => {
       if (result?.success) {
-        setCelebrating(true);
-        if (celebrationTimer.current) {
-          clearTimeout(celebrationTimer.current);
-        }
-        celebrationTimer.current = setTimeout(() => {
-          setCelebrating(false);
-          celebrationTimer.current = null;
-        }, 1200);
+        triggerCelebration();
       }
     }).finally(() => {
       setClaiming(false);
     });
-  }, [claimDailyReward, claiming, dailyClaimable]);
+  }, [claimDailyReward, claiming, dailyClaimable, triggerCelebration]);
+
+  const handleClaimTask = useCallback(
+    (taskId) => {
+      if (!taskId || claiming || claimingTaskId) return;
+      setClaimingTaskId(taskId);
+      Promise.resolve(claimDailyReward(taskId)).then((result) => {
+        if (result?.success) {
+          triggerCelebration();
+        }
+      }).finally(() => {
+        setClaimingTaskId(null);
+      });
+    },
+    [claimDailyReward, claimingTaskId, triggerCelebration]
+  );
 
   const rewardHighlightClass = celebrating
     ? 'ring-2 ring-amber-400/70 shadow-amber-300/30 animate-pulse'
@@ -102,35 +165,39 @@ export default function DailyView() {
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Daily badge</p>
             <h2 className="text-2xl font-semibold text-white sm:text-3xl">
-              {dailyClaimable ? 'Claim your stars' : daily?.rewardClaimed ? 'Reward collected' : 'Complete quests to earn stars'}
+              {dailyClaimable ? 'Claim your stars' : rewardClaimed ? 'Rewards collected' : 'Complete quests to earn stars'}
             </h2>
             <p className="text-sm text-slate-300">
-              Finish all three quests to bank +{formatNumber(rewardStars)} ⭐ toward your profile level.
+              {dailyClaimable
+                ? `You have +${formatNumber(rewardStars)} ⭐ ready across completed quests.`
+                : 'Finish quests to unlock their star rewards.'}
             </p>
           </div>
           {dailyClaimable ? (
             <button
               type="button"
-              onClick={handleClaim}
-              disabled={claiming}
+              onClick={handleClaimAll}
+              disabled={claiming || Boolean(claimingTaskId)}
               className="rounded-full bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {claiming ? 'Claiming…' : `Claim +${formatNumber(rewardStars)} ⭐`}
+              {claiming ? 'Claiming…' : `Claim all +${formatNumber(rewardStars)} ⭐`}
             </button>
           ) : (
             <span className="rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-300">
-              {daily?.rewardClaimed ? `Claimed ${claimedDate ?? 'today'}` : 'Keep going!'}
+              {rewardClaimed ? `Claimed ${claimedDate ?? 'today'}` : 'Keep going!'}
             </span>
           )}
         </div>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
-        {daily?.tasks?.map((task) => (
+        {tasks.map((task) => (
           <TaskCard
             key={task.id}
             task={task}
             accent={task.completed ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40' : 'bg-cyan-500/10 text-cyan-200 border border-cyan-500/20'}
+            onClaim={handleClaimTask}
+            claiming={claiming || claimingTaskId === task.id}
           />
         ))}
       </section>

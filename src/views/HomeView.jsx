@@ -10,44 +10,39 @@ function TaskCard({
   task,
   questNumber = 1,
   totalQuests = 1,
-  showReward = false,
-  rewardStars = 0,
-  rewardClaimed = false,
-  canClaimReward = false,
   claimingReward = false,
   onClaimReward
 }) {
   const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
-  const rewardValue = Number.isFinite(rewardStars) ? Math.max(0, rewardStars) : 0;
+  const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
   const formattedReward = rewardValue.toLocaleString();
-  const clickable = showReward && canClaimReward && typeof onClaimReward === 'function';
-  const highlightClass = showReward
-    ? canClaimReward
-      ? 'border-amber-400/40 ring-1 ring-amber-300/60 shadow-amber-300/20'
-      : rewardClaimed
-      ? 'border-emerald-400/40'
-      : ''
+  const canClaimReward = Boolean(task.rewardClaimable) && !task.rewardClaimed && typeof onClaimReward === 'function';
+  const clickable = canClaimReward && !claimingReward;
+  const highlightClass = canClaimReward
+    ? 'border-amber-400/40 ring-1 ring-amber-300/60 shadow-amber-300/20'
+    : task.rewardClaimed
+    ? 'border-emerald-400/40'
     : '';
   const questLabel = `Quest ${questNumber} of ${totalQuests}`;
-  const rewardSummary = rewardValue > 0 ? ` · +${formattedReward} ⭐` : '';
-  const statusLabel = canClaimReward
-    ? `Claim Daily Reward${rewardSummary}`
-    : rewardClaimed
-    ? 'Daily reward collected'
-    : task.completed
-    ? 'Waiting on other quests…'
-    : 'Complete this quest to unlock the daily reward.';
   const statusPillClass = 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200';
   const currentProgress = Math.min(task.progress ?? 0, task.goal);
   const progressValue = `${currentProgress} / ${task.goal}`;
 
+  const statusLabel = task.rewardClaimed
+    ? 'Reward collected'
+    : canClaimReward
+    ? `Quest complete! Claim +${formattedReward} ⭐`
+    : task.completed
+    ? 'Quest complete'
+    : 'In progress…';
+
   const handleCardClick = () => {
-    if (!clickable || claimingReward) return;
+    if (!clickable) return;
     onClaimReward();
   };
 
   const handleKeyDown = (event) => {
-    if (!clickable || claimingReward) return;
+    if (!clickable) return;
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       onClaimReward();
@@ -58,7 +53,7 @@ function TaskCard({
     if (event) {
       event.stopPropagation();
     }
-    if (!clickable || claimingReward) return;
+    if (!clickable) return;
     onClaimReward();
   };
 
@@ -66,7 +61,9 @@ function TaskCard({
     <div
       className={`rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner transition hover:border-cyan-500/40 sm:p-6 ${
         highlightClass
-      } ${clickable ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/70' : ''}`}
+      } ${
+        clickable ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/70' : ''
+      }`}
       role={clickable ? 'button' : undefined}
       tabIndex={clickable ? 0 : undefined}
       onClick={handleCardClick}
@@ -88,23 +85,23 @@ function TaskCard({
         <span>{statusLabel}</span>
         <span>{progressValue}</span>
       </div>
-      {showReward && rewardValue > 0 && (
+      {rewardValue > 0 && (
         <div className="mt-4 space-y-3 rounded-2xl border border-amber-400/50 bg-amber-400/10 p-4">
           <div className="flex items-center justify-between text-sm text-amber-100">
-            <span>Daily reward</span>
+            <span>Quest reward</span>
             <span>+{formattedReward} ⭐</span>
           </div>
-          {canClaimReward ? (
+          {task.rewardClaimed ? (
+            <p className="text-xs text-amber-100/80">Reward collected</p>
+          ) : (
             <button
               type="button"
               onClick={handleClaimClick}
-              disabled={claimingReward}
+              disabled={!canClaimReward || claimingReward}
               className="w-full rounded-xl border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/20 focus:outline-none focus:ring-2 focus:ring-amber-300/60 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {claimingReward ? 'Claiming…' : `Claim Daily Reward${rewardSummary}`}
+              {claimingReward ? 'Claiming…' : `Claim +${formattedReward} ⭐`}
             </button>
-          ) : (
-            rewardClaimed && <p className="text-xs text-amber-100/80">Reward collected</p>
           )}
         </div>
       )}
@@ -152,20 +149,18 @@ export default function HomeView() {
   const levelProgress = player.levelProgress ?? (totalStarsEarned % starsPerLevel);
   const starsProgress = starsPerLevel > 0 ? Math.min(levelProgress / starsPerLevel, 1) : 0;
   const formatNumber = useCallback((value) => Math.max(0, Math.floor(value ?? 0)).toLocaleString(), []);
-  const rewardStars = Number.isFinite(daily?.rewardStars) ? daily.rewardStars : 0;
-  const rewardClaimed = Boolean(daily?.rewardClaimed);
-  const rewardClaimable = daily?.rewardClaimable ?? (Boolean(daily?.completed) && !rewardClaimed);
-  const canClaimDaily = rewardClaimable && !rewardClaimed;
-  const [dailyClaiming, setDailyClaiming] = useState(false);
+  const [claimingTaskId, setClaimingTaskId] = useState(null);
 
-  const handleDailyClaim = useCallback(() => {
-    if (!canClaimDaily || dailyClaiming) return;
-    setDailyClaiming(true);
-    Promise.resolve(claimDailyReward())
-      .finally(() => {
-        setDailyClaiming(false);
+  const handleDailyClaim = useCallback(
+    (taskId) => {
+      if (!taskId || claimingTaskId) return;
+      setClaimingTaskId(taskId);
+      Promise.resolve(claimDailyReward(taskId)).finally(() => {
+        setClaimingTaskId(null);
       });
-  }, [canClaimDaily, dailyClaiming, claimDailyReward]);
+    },
+    [claimingTaskId, claimDailyReward]
+  );
 
   if (!daily) {
     return (
@@ -267,12 +262,8 @@ export default function HomeView() {
             task={task}
             questNumber={index + 1}
             totalQuests={totalQuests}
-            showReward
-            rewardStars={rewardStars}
-            rewardClaimed={rewardClaimed}
-            canClaimReward={canClaimDaily}
-            claimingReward={dailyClaiming}
-            onClaimReward={handleDailyClaim}
+            claimingReward={claimingTaskId === task.id}
+            onClaimReward={() => handleDailyClaim(task.id)}
           />
         ))}
       </section>

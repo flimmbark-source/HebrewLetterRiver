@@ -11,6 +11,15 @@ import { useLocalization } from './LocalizationContext.jsx';
 export const STAR_LEVEL_SIZE = 50;
 export const DAILY_REWARD_STARS = 30;
 
+function distributeRewardStars(total, count) {
+  if (!Number.isFinite(total) || total <= 0 || !Number.isFinite(count) || count <= 0) {
+    return new Array(Math.max(0, count)).fill(0);
+  }
+  const base = Math.floor(total / count);
+  const remainder = total - base * count;
+  return Array.from({ length: count }, (_, index) => base + (index < remainder ? 1 : 0));
+}
+
 const ProgressContext = createContext(null);
 
 function toLetterInfo(item) {
@@ -132,7 +141,9 @@ function createLanguageAssets(languagePack, localization = {}) {
 
   function normalizeDailyData(daily) {
     if (!daily?.tasks) return daily;
-    const tasks = daily.tasks.map((task) => {
+    const totalReward = Number.isFinite(daily.rewardStars) ? daily.rewardStars : DAILY_REWARD_STARS;
+    const rewardDistribution = distributeRewardStars(totalReward, daily.tasks.length);
+    const tasks = daily.tasks.map((task, index) => {
       let nextTask = task;
       if (task.id === 'focus' && task.meta?.letter) {
         const original = task.meta.letter;
@@ -182,10 +193,22 @@ function createLanguageAssets(languagePack, localization = {}) {
         ? translateKey(descriptionKey, nextTask.description, replacements)
         : nextTask.description;
 
+      const rewardStars = Number.isFinite(nextTask.rewardStars)
+        ? Math.max(0, Math.floor(nextTask.rewardStars))
+        : Math.max(0, rewardDistribution[index] ?? 0);
+      const rewardClaimed = Boolean(nextTask.rewardClaimed);
+      const rewardClaimable =
+        nextTask.rewardClaimable ?? (Boolean(nextTask.completed) && !rewardClaimed);
+      const claimedAt = nextTask.claimedAt ?? null;
+
       return {
         ...nextTask,
         title,
         description,
+        rewardStars,
+        rewardClaimed,
+        rewardClaimable: rewardClaimed ? false : rewardClaimable,
+        claimedAt,
         translation: {
           titleKey,
           descriptionKey,
@@ -193,9 +216,9 @@ function createLanguageAssets(languagePack, localization = {}) {
         }
       };
     });
-    const rewardStars = Number.isFinite(daily.rewardStars) ? daily.rewardStars : DAILY_REWARD_STARS;
-    const rewardClaimed = Boolean(daily.rewardClaimed);
-    const rewardClaimable = daily.rewardClaimable ?? (daily.completed && !rewardClaimed);
+    const rewardStars = tasks.reduce((sum, task) => sum + (Number.isFinite(task.rewardStars) ? task.rewardStars : 0), 0);
+    const rewardClaimed = tasks.length > 0 ? tasks.every((task) => task.rewardClaimed) : Boolean(daily.rewardClaimed);
+    const rewardClaimable = tasks.some((task) => task.rewardClaimable && !task.rewardClaimed);
     return {
       ...daily,
       tasks,
@@ -209,7 +232,8 @@ function createLanguageAssets(languagePack, localization = {}) {
   function generateDaily(dateKey, focusLetterInfo, constraint) {
     const focusLetter = focusLetterInfo ?? fallbackLetterInfo;
     const selectedConstraint = constraint ?? pickConstraint();
-    const tasks = dailyTemplates.map((template) => {
+    const rewardDistribution = distributeRewardStars(DAILY_REWARD_STARS, dailyTemplates.length);
+    const tasks = dailyTemplates.map((template, index) => {
       const baseTranslation = {
         titleKey: template.titleKey ?? null,
         descriptionKey: template.descriptionKey ?? null
@@ -239,6 +263,10 @@ function createLanguageAssets(languagePack, localization = {}) {
         progress: 0,
         meta,
         completed: false,
+        rewardStars: rewardDistribution[index] ?? 0,
+        rewardClaimable: false,
+        rewardClaimed: false,
+        claimedAt: null,
         translation: {
           ...baseTranslation,
           replacements
@@ -614,23 +642,37 @@ export function ProgressProvider({ children }) {
   }
 
   function markDailyProgress(predicate) {
+    const newlyClaimable = [];
     setDaily((prev) => {
       if (!prev) return prev;
       const tasks = prev.tasks.map((task) => {
         if (task.completed) return task;
         if (!predicate(task)) return task;
         const nextProgress = Math.min(task.goal, (task.progress ?? 0) + 1);
+        const completed = nextProgress >= task.goal;
+        const becameClaimable = completed && !task.rewardClaimed && !task.rewardClaimable;
+        if (becameClaimable) {
+          newlyClaimable.push({
+            id: task.id,
+            title: task.title,
+            rewardStars: Number.isFinite(task.rewardStars) ? task.rewardStars : 0
+          });
+        }
         return {
           ...task,
           progress: nextProgress,
-          completed: nextProgress >= task.goal
+          completed,
+          rewardClaimable: completed && !task.rewardClaimed
         };
       });
       const completed = tasks.every((task) => task.completed);
       const completedAt = completed && !prev.completed ? new Date().toISOString() : prev.completedAt;
-      const rewardStars = Number.isFinite(prev.rewardStars) ? prev.rewardStars : DAILY_REWARD_STARS;
-      const rewardClaimed = Boolean(prev.rewardClaimed);
-      const rewardClaimable = completed && !rewardClaimed;
+      const rewardStars = tasks.reduce(
+        (sum, task) => sum + (Number.isFinite(task.rewardStars) ? task.rewardStars : 0),
+        0
+      );
+      const rewardClaimed = tasks.every((task) => task.rewardClaimed);
+      const rewardClaimable = tasks.some((task) => task.rewardClaimable && !task.rewardClaimed);
       const nextDaily = {
         ...prev,
         tasks,
@@ -640,15 +682,19 @@ export function ProgressProvider({ children }) {
         rewardClaimed,
         rewardClaimable
       };
-      if (completed && !prev.completed) {
-        addToast({
-          tone: 'info',
-          title: 'Daily Quest Complete',
-          description: `Claim +${rewardStars} ⭐ from the daily badge!`,
-          icon: '⭐'
-        });
-      }
       return nextDaily;
+    });
+    newlyClaimable.forEach((task) => {
+      const rewardValue = Math.max(0, Math.floor(task.rewardStars ?? 0));
+      addToast({
+        tone: 'info',
+        title: `${task.title} complete`,
+        description:
+          rewardValue > 0
+            ? `Claim +${rewardValue} ⭐ from this quest!`
+            : 'Quest complete! Claim your reward.',
+        icon: '⭐'
+      });
     });
   }
 
@@ -707,35 +753,75 @@ export function ProgressProvider({ children }) {
     [addToast, applyStarsToPlayer, t]
   );
 
-  const claimDailyReward = useCallback(() => {
-    let starsAwarded = null;
-    let wasClaimed = false;
-    let rewardDateKey = null;
-    setDaily((prev) => {
-      if (!prev || !prev.completed || prev.rewardClaimed || !prev.rewardClaimable) return prev;
-      starsAwarded = Number.isFinite(prev.rewardStars) ? prev.rewardStars : DAILY_REWARD_STARS;
-      wasClaimed = true;
-      rewardDateKey = prev.dateKey ?? null;
-      return {
-        ...prev,
-        rewardClaimed: true,
-        rewardClaimable: false,
-        claimedAt: new Date().toISOString()
-      };
-    });
-    if (!wasClaimed || !Number.isFinite(starsAwarded) || starsAwarded <= 0) {
-      return { success: false };
-    }
-    applyStarsToPlayer(starsAwarded, { source: 'daily', metadata: { dateKey: rewardDateKey } });
-    addToast({
-      tone: 'success',
-      title: 'Daily reward claimed',
-      description: `+${starsAwarded} ⭐ added to your profile`,
-      icon: '🎉'
-    });
-    celebrate({ particleCount: 120, spread: 80, originY: 0.6 });
-    return { success: true, stars: starsAwarded };
-  }, [applyStarsToPlayer, addToast]);
+  const claimDailyReward = useCallback(
+    (taskId = null) => {
+      let starsAwarded = 0;
+      let claimedTasks = [];
+      let rewardDateKey = null;
+      let allClaimedAt = null;
+      setDaily((prev) => {
+        if (!prev?.tasks?.length) return prev;
+        const tasks = prev.tasks.map((task) => {
+          const eligible =
+            task.completed &&
+            !task.rewardClaimed &&
+            task.rewardClaimable &&
+            (taskId === null || task.id === taskId);
+          if (!eligible) return task;
+          const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
+          starsAwarded += rewardValue;
+          claimedTasks.push(task.id);
+          rewardDateKey = rewardDateKey ?? prev.dateKey ?? null;
+          return {
+            ...task,
+            rewardClaimable: false,
+            rewardClaimed: true,
+            claimedAt: new Date().toISOString()
+          };
+        });
+        if (claimedTasks.length === 0) {
+          return prev;
+        }
+        const completed = tasks.every((task) => task.completed);
+        const rewardClaimed = tasks.every((task) => task.rewardClaimed);
+        const rewardClaimable = tasks.some((task) => task.rewardClaimable && !task.rewardClaimed);
+        if (rewardClaimed) {
+          allClaimedAt = new Date().toISOString();
+        }
+        const rewardStars = tasks.reduce(
+          (sum, task) => sum + (Number.isFinite(task.rewardStars) ? task.rewardStars : 0),
+          0
+        );
+        return {
+          ...prev,
+          tasks,
+          completed,
+          rewardStars,
+          rewardClaimed,
+          rewardClaimable,
+          claimedAt: rewardClaimed ? allClaimedAt : prev.claimedAt
+        };
+      });
+      if (claimedTasks.length === 0) {
+        return { success: false };
+      }
+      if (Number.isFinite(starsAwarded) && starsAwarded > 0) {
+        applyStarsToPlayer(starsAwarded, {
+          source: 'daily',
+          metadata: { dateKey: rewardDateKey, tasks: claimedTasks }
+        });
+        addToast({
+          tone: 'success',
+          title: claimedTasks.length > 1 ? 'Daily rewards claimed' : 'Daily reward claimed',
+          description: `+${starsAwarded} ⭐ added to your profile`,
+          icon: '🎉'
+        });
+        celebrate({ particleCount: 120, spread: 80, originY: 0.6 });
+      }
+      return { success: true, stars: starsAwarded, tasks: claimedTasks };
+    },
+    [applyStarsToPlayer, addToast]
+  );
 
   useEffect(() => {
     const offSessionStart = on('game:session-start', (payload) => {
