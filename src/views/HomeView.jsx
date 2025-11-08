@@ -183,10 +183,52 @@ export default function HomeView() {
     <div className="space-y-8 sm:space-y-10">
       <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-6 shadow-2xl sm:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-3 text-center sm:text-left">
-            <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.hero.dailyTitle')}</p>
-            <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
-            <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
+          <div className="space-y-5 text-center sm:text-left">
+            <div className="space-y-3">
+              <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.modes.label')}</p>
+              <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.modes.heading')}</h1>
+              <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.modes.subheading')}</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-cyan-500/40 bg-slate-900/70 p-5 text-left shadow-inner transition hover:border-cyan-400/80">
+                <div className="flex flex-col gap-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">{t('home.modes.letterLabel')}</p>
+                    <h2 className="text-xl font-semibold text-white sm:text-2xl">{t('home.modes.letter')}</h2>
+                    <p className="mt-1 text-sm text-slate-300 sm:text-base">{t('home.modes.letterDescription')}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={() => openGame({ mode: 'letters' })}
+                      className="rounded-full bg-cyan-500 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg transition hover:bg-cyan-400 hover:shadow-cyan-500/30 sm:px-6 sm:text-base"
+                    >
+                      {t('home.modes.letterAction')}
+                    </button>
+                    <button
+                      onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
+                      className="rounded-full border border-cyan-500/60 px-5 py-2 text-sm font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 sm:px-6 sm:text-base"
+                    >
+                      {t('home.cta.practice')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 text-left shadow-inner transition hover:border-cyan-400/60">
+                <div className="flex flex-col gap-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-sky-300">{t('home.modes.wordLabel')}</p>
+                    <h2 className="text-xl font-semibold text-white sm:text-2xl">{t('home.modes.word')}</h2>
+                    <p className="mt-1 text-sm text-slate-300 sm:text-base">{t('home.modes.wordDescription')}</p>
+                  </div>
+                  <button
+                    onClick={() => openGame({ mode: 'words' })}
+                    className="w-fit rounded-full border border-sky-400/70 px-5 py-2 text-sm font-semibold text-sky-200 transition hover:border-sky-300 hover:text-sky-100 sm:px-6 sm:text-base"
+                  >
+                    {t('home.modes.wordAction')}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[260px]">
             <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
@@ -207,18 +249,6 @@ export default function HomeView() {
               </select>
               <p className="mt-2 text-xs text-slate-400">{t('home.languagePicker.helper')}</p>
             </div>
-            <button
-              onClick={() => openGame({ mode: 'letters' })}
-              className="w-full rounded-full bg-cyan-500 px-5 py-3 text-base font-semibold text-slate-900 shadow-lg transition hover:bg-cyan-400 hover:shadow-cyan-500/30 sm:w-auto sm:px-6 sm:text-lg"
-            >
-              {t('home.cta.start')}
-            </button>
-            <button
-              onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
-              className="w-full rounded-full border border-cyan-500/60 px-5 py-3 text-base font-semibold text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 sm:w-auto sm:px-6 sm:text-lg"
-            >
-              {t('home.cta.practice')}
-            </button>
           </div>
         </div>
       </section>

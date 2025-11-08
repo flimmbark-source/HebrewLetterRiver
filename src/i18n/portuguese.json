@@ -33,6 +33,19 @@
       "heading": "Flua através de todos os três desafios do rio.",
       "description": "Mantenha sua sequência viva e conquiste novas estrelas completando as missões de Aquecimento, Foco e Especiarias feitas sob medida para você."
     },
+    "modes": {
+      "label": "Choose your river",
+      "heading": "Pick a mode to begin",
+      "subheading": "Swap between letter drills and vocabulary journeys whenever you like.",
+      "letterLabel": "Core Game",
+      "letter": "Letter River",
+      "letterDescription": "Catch drifting letters, train reflexes, and chase a new high score.",
+      "letterAction": "Play Letter River",
+      "wordLabel": "New Mode",
+      "word": "Word River",
+      "wordDescription": "Build complete words, then match them with their meanings.",
+      "wordAction": "Launch Word River"
+    },
     "languagePicker": {
       "label": "Pratique a linguagem",
       "helper": "Mude a qualquer momento para treinar em outro script."
@@ -132,6 +145,32 @@
       "bonusInstruction": "Pegue as joias!",
       "lives": "Vidas",
       "levelUp": "Suba de nível!"
+    }
+  },
+  "wordRiver": {
+    "heading": "Word River",
+    "phaseLabels": {
+      "assemble": "Phase 1 · Letter Assembly",
+      "match": "Phase 2 · Meaning Match"
+    },
+    "instructions": {
+      "assemble": "Drag the floating letters into each word card.",
+      "match": "Drag every completed word onto its matching picture."
+    },
+    "emptyState": {
+      "title": "Word River is coming soon",
+      "description": "We’re still preparing vocabulary for this language. Try switching practice languages to explore the river."
+    },
+    "status": {
+      "roundComplete": "Round complete! New words incoming..."
+    },
+    "words": {
+      "house": "house",
+      "dog": "dog",
+      "milk": "milk",
+      "sun": "sun",
+      "tree": "tree",
+      "book": "book"
     }
   },
   "achievements": {

@@ -33,6 +33,19 @@
       "heading": "तीनों नदी चुनौतियों से गुज़रें।",
       "description": "केवल आपके लिए तैयार किए गए वार्म-अप, फोकस और स्पाइस क्वेस्ट को पूरा करके अपनी स्ट्रीक को जीवित रखें और नए सितारों का दावा करें।"
     },
+    "modes": {
+      "label": "Choose your river",
+      "heading": "Pick a mode to begin",
+      "subheading": "Swap between letter drills and vocabulary journeys whenever you like.",
+      "letterLabel": "Core Game",
+      "letter": "Letter River",
+      "letterDescription": "Catch drifting letters, train reflexes, and chase a new high score.",
+      "letterAction": "Play Letter River",
+      "wordLabel": "New Mode",
+      "word": "Word River",
+      "wordDescription": "Build complete words, then match them with their meanings.",
+      "wordAction": "Launch Word River"
+    },
     "languagePicker": {
       "label": "भाषा का अभ्यास करें",
       "helper": "किसी अन्य स्क्रिप्ट में प्रशिक्षित करने के लिए किसी भी समय स्विच करें।"
@@ -132,6 +145,32 @@
       "bonusInstruction": "रत्न पकड़ो!",
       "lives": "ज़िंदगियाँ",
       "levelUp": "ऊपर का स्तर!"
+    }
+  },
+  "wordRiver": {
+    "heading": "Word River",
+    "phaseLabels": {
+      "assemble": "Phase 1 · Letter Assembly",
+      "match": "Phase 2 · Meaning Match"
+    },
+    "instructions": {
+      "assemble": "Drag the floating letters into each word card.",
+      "match": "Drag every completed word onto its matching picture."
+    },
+    "emptyState": {
+      "title": "Word River is coming soon",
+      "description": "We’re still preparing vocabulary for this language. Try switching practice languages to explore the river."
+    },
+    "status": {
+      "roundComplete": "Round complete! New words incoming..."
+    },
+    "words": {
+      "house": "house",
+      "dog": "dog",
+      "milk": "milk",
+      "sun": "sun",
+      "tree": "tree",
+      "book": "book"
     }
   },
   "achievements": {

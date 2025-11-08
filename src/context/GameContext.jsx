@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { setupGame } from '../game/game.js';
+import WordRiverGame from '../game/WordRiverGame.jsx';
 import { useLocalization } from './LocalizationContext.jsx';
 
 const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
@@ -20,14 +21,16 @@ export function GameProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    if (options?.mode === 'words') return;
     if (!gameApiRef.current) return;
     const api = gameApiRef.current;
     api.resetToSetupScreen?.();
     gameApiRef.current = null;
-  }, [languagePack.id]);
+  }, [languagePack.id, options?.mode]);
 
   useEffect(() => {
     if (!isVisible) return;
+    if (options?.mode === 'words') return;
     if (!containerRef.current) return;
     if (!gameApiRef.current) {
       gameApiRef.current = setupGame({
@@ -84,7 +87,15 @@ export function GameProvider({ children }) {
                     onClick={(e) => e.stopPropagation()}
                     dir={direction}
                   >
-                    <GameCanvas key={languagePack.id} fontClass={fontClass} />
+                    {options?.mode === 'words' ? (
+                      <WordRiverGame
+                        key={`word-river-${languagePack.id}`}
+                        languagePack={languagePack}
+                        onClose={closeGame}
+                      />
+                    ) : (
+                      <GameCanvas key={languagePack.id} fontClass={fontClass} />
+                    )}
                   </div>
                 </div>
               </div>
