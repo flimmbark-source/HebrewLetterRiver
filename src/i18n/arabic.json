@@ -33,6 +33,19 @@
       "heading": "تتدفق عبر تحديات الأنهار الثلاثة.",
       "description": "حافظ على استمرارية خطك واحصل على نجوم جدد من خلال إكمال مهام الإحماء والتركيز والتوابل المصممة خصيصًا لك."
     },
+    "modes": {
+      "label": "Choose your river",
+      "heading": "Pick a mode to begin",
+      "subheading": "Swap between letter drills and vocabulary journeys whenever you like.",
+      "letterLabel": "Core Game",
+      "letter": "Letter River",
+      "letterDescription": "Catch drifting letters, train reflexes, and chase a new high score.",
+      "letterAction": "Play Letter River",
+      "wordLabel": "New Mode",
+      "word": "Word River",
+      "wordDescription": "Build complete words, then match them with their meanings.",
+      "wordAction": "Launch Word River"
+    },
     "languagePicker": {
       "label": "ممارسة اللغة",
       "helper": "قم بالتبديل في أي وقت للتدريب على برنامج نصي آخر."
@@ -132,6 +145,32 @@
       "bonusInstruction": "قبض على الأحجار الكريمة!",
       "lives": "حياة",
       "levelUp": "المستوى الأعلى!"
+    }
+  },
+  "wordRiver": {
+    "heading": "Word River",
+    "phaseLabels": {
+      "assemble": "Phase 1 · Letter Assembly",
+      "match": "Phase 2 · Meaning Match"
+    },
+    "instructions": {
+      "assemble": "Drag the floating letters into each word card.",
+      "match": "Drag every completed word onto its matching picture."
+    },
+    "emptyState": {
+      "title": "Word River is coming soon",
+      "description": "We’re still preparing vocabulary for this language. Try switching practice languages to explore the river."
+    },
+    "status": {
+      "roundComplete": "Round complete! New words incoming..."
+    },
+    "words": {
+      "house": "house",
+      "dog": "dog",
+      "milk": "milk",
+      "sun": "sun",
+      "tree": "tree",
+      "book": "book"
     }
   },
   "achievements": {
