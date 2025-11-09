@@ -35,6 +35,7 @@ function buildRoundState(set) {
         id: `${word.id}-slot-${index}`,
         char: symbol,
         filledChar: null,
+        filledOriginLetterId: null,
         flashKey: null
       }))
     };
@@ -208,8 +209,16 @@ function WordBucketSlot({
     enabled: isLettersPhase && filled,
     payload: filled
       ? {
-          letter: { id: `${bucketId}-${slot.id}-filled`, char: slot.filledChar },
-          origin: { type: 'bucket', bucketId, slotId: slot.id }
+          letter: {
+            id: slot.filledOriginLetterId ?? `${bucketId}-${slot.id}-filled`,
+            char: slot.filledChar
+          },
+          origin: {
+            type: 'bucket',
+            bucketId,
+            slotId: slot.id,
+            letterId: slot.filledOriginLetterId ?? null
+          }
         }
       : null,
     getDropZones,
@@ -494,6 +503,18 @@ export default function WordRiverView() {
   const handleLetterDrop = useCallback(({ letter, zone, origin }) => {
     if (!zone?.data) return { accepted: false };
     const zoneData = zone.data;
+    const originLetterId = (() => {
+      if (!origin) return null;
+      if (origin.type === 'river') {
+        return origin.letterId ?? letter.id ?? null;
+      }
+      if (origin.type === 'bucket') {
+        const sourceBucket = bucketStates.find((bucket) => bucket.id === origin.bucketId);
+        const sourceSlot = sourceBucket?.slots.find((slot) => slot.id === origin.slotId);
+        return sourceSlot?.filledOriginLetterId ?? origin.letterId ?? null;
+      }
+      return null;
+    })();
 
     if (zoneData.type === 'slot') {
       const targetBucketId = zoneData.bucketId;
@@ -518,7 +539,12 @@ export default function WordRiverView() {
               ...bucket,
               slots: bucket.slots.map((slot) => {
                 if (slot.id === targetSlotId) {
-                  return { ...slot, filledChar: letter.char, flashKey: Date.now() };
+                  return {
+                    ...slot,
+                    filledChar: letter.char,
+                    filledOriginLetterId: originLetterId ?? slot.filledOriginLetterId ?? null,
+                    flashKey: Date.now()
+                  };
                 }
                 if (
                   origin?.type === 'bucket' &&
@@ -526,7 +552,7 @@ export default function WordRiverView() {
                   origin.slotId === slot.id &&
                   origin.slotId !== targetSlotId
                 ) {
-                  return { ...slot, filledChar: null, flashKey: null };
+                  return { ...slot, filledChar: null, filledOriginLetterId: null, flashKey: null };
                 }
                 return slot;
               })
@@ -535,7 +561,9 @@ export default function WordRiverView() {
             return {
               ...bucket,
               slots: bucket.slots.map((slot) =>
-                slot.id === origin.slotId ? { ...slot, filledChar: null, flashKey: null } : slot
+                slot.id === origin.slotId
+                  ? { ...slot, filledChar: null, filledOriginLetterId: null, flashKey: null }
+                  : slot
               )
             };
           }
@@ -544,7 +572,7 @@ export default function WordRiverView() {
         return nextBuckets;
       });
       if (accepted) {
-        removeLetterFromRiver(letter.id);
+        removeLetterFromRiver(originLetterId ?? letter.id);
         return { accepted: true };
       }
       setBucketShakes((prev) => ({ ...prev, [targetBucketId]: Date.now() }));
@@ -568,7 +596,12 @@ export default function WordRiverView() {
               ...bucket,
               slots: bucket.slots.map((slot, index) => {
                 if (index === nextIndex) {
-                  return { ...slot, filledChar: letter.char, flashKey: Date.now() };
+                  return {
+                    ...slot,
+                    filledChar: letter.char,
+                    filledOriginLetterId: originLetterId ?? slot.filledOriginLetterId ?? null,
+                    flashKey: Date.now()
+                  };
                 }
                 if (
                   origin?.type === 'bucket' &&
@@ -576,7 +609,7 @@ export default function WordRiverView() {
                   origin.slotId === slot.id &&
                   origin.slotId !== nextSlot.id
                 ) {
-                  return { ...slot, filledChar: null, flashKey: null };
+                  return { ...slot, filledChar: null, filledOriginLetterId: null, flashKey: null };
                 }
                 return slot;
               })
@@ -585,7 +618,9 @@ export default function WordRiverView() {
             return {
               ...bucket,
               slots: bucket.slots.map((slot) =>
-                slot.id === origin.slotId ? { ...slot, filledChar: null, flashKey: null } : slot
+                slot.id === origin.slotId
+                  ? { ...slot, filledChar: null, filledOriginLetterId: null, flashKey: null }
+                  : slot
               )
             };
           }
@@ -594,7 +629,7 @@ export default function WordRiverView() {
         return nextBuckets;
       });
       if (accepted) {
-        removeLetterFromRiver(letter.id);
+        removeLetterFromRiver(originLetterId ?? letter.id);
         return { accepted: true };
       }
       setBucketShakes((prev) => ({ ...prev, [targetBucketId]: Date.now() }));
@@ -602,7 +637,7 @@ export default function WordRiverView() {
     }
 
     return { accepted: false };
-  }, [removeLetterFromRiver]);
+  }, [bucketStates, removeLetterFromRiver]);
 
   useEffect(() => {
     if (phase !== LETTER_PHASE) return undefined;
