@@ -500,40 +500,51 @@ export default function WordRiverView() {
     setLetterQueue((prev) => prev.filter((item) => item.id !== letterId));
   }, []);
 
-  const handleLetterDrop = useCallback(({ letter, zone, origin }) => {
-    if (!zone?.data) return { accepted: false };
-    const zoneData = zone.data;
-    const originLetterId = (() => {
-      if (!origin) return null;
-      if (origin.type === 'river') {
-        return origin.letterId ?? letter.id ?? null;
-      }
-      if (origin.type === 'bucket') {
-        const sourceBucket = bucketStates.find((bucket) => bucket.id === origin.bucketId);
-        const sourceSlot = sourceBucket?.slots.find((slot) => slot.id === origin.slotId);
-        return sourceSlot?.filledOriginLetterId ?? origin.letterId ?? null;
-      }
-      return null;
-    })();
-
-    if (zoneData.type === 'slot') {
-      const targetBucketId = zoneData.bucketId;
-      const targetSlotId = zoneData.slotId;
-      let accepted = false;
-      setBucketStates((prev) => {
-        const targetBucketIndex = prev.findIndex((bucket) => bucket.id === targetBucketId);
-        if (targetBucketIndex === -1) return prev;
-        const targetBucket = prev[targetBucketIndex];
-        const targetSlot = targetBucket.slots.find((slot) => slot.id === targetSlotId);
-        if (!targetSlot) return prev;
-        if (
-          targetSlot.filledChar &&
-          !(origin?.type === 'bucket' && origin.bucketId === targetBucketId && origin.slotId === targetSlotId)
-        ) {
-          return prev;
+  const handleLetterDrop = useCallback(
+    ({ letter, zone, origin }) => {
+      if (!zone?.data) return { accepted: false };
+      const zoneData = zone.data;
+      const originLetterId = (() => {
+        if (!origin) return null;
+        if (origin.type === 'river') {
+          return origin.letterId ?? letter.id ?? null;
         }
-        accepted = true;
-        const nextBuckets = prev.map((bucket) => {
+        if (origin.type === 'bucket') {
+          const sourceBucket = bucketStates.find((bucket) => bucket.id === origin.bucketId);
+          const sourceSlot = sourceBucket?.slots.find((slot) => slot.id === origin.slotId);
+          return sourceSlot?.filledOriginLetterId ?? origin.letterId ?? null;
+        }
+        return null;
+      })();
+
+      const removeOriginLetter = () => {
+        if (origin?.type === 'river') {
+          removeLetterFromRiver(originLetterId ?? letter.id);
+        }
+      };
+
+      if (zoneData.type === 'slot') {
+        const targetBucketId = zoneData.bucketId;
+        const targetSlotId = zoneData.slotId;
+        const targetBucket = bucketStates.find((bucket) => bucket.id === targetBucketId);
+        const targetSlot = targetBucket?.slots.find((slot) => slot.id === targetSlotId);
+        const isSameOriginSlot =
+          origin?.type === 'bucket' &&
+          origin.bucketId === targetBucketId &&
+          origin.slotId === targetSlotId;
+
+        if (!targetBucket || !targetSlot) {
+          removeOriginLetter();
+          return { accepted: false };
+        }
+
+        if (targetSlot.filledChar && !isSameOriginSlot) {
+          removeOriginLetter();
+          setBucketShakes((prev) => ({ ...prev, [targetBucketId]: Date.now() }));
+          return { accepted: false };
+        }
+
+        const nextBuckets = bucketStates.map((bucket) => {
           if (bucket.id === targetBucketId) {
             return {
               ...bucket,
@@ -557,7 +568,8 @@ export default function WordRiverView() {
                 return slot;
               })
             };
-          } else if (origin?.type === 'bucket' && origin.bucketId === bucket.id) {
+          }
+          if (origin?.type === 'bucket' && origin.bucketId === bucket.id) {
             return {
               ...bucket,
               slots: bucket.slots.map((slot) =>
@@ -569,28 +581,28 @@ export default function WordRiverView() {
           }
           return bucket;
         });
-        return nextBuckets;
-      });
-      if (accepted) {
-        removeLetterFromRiver(originLetterId ?? letter.id);
+
+        setBucketStates(nextBuckets);
+        removeOriginLetter();
         return { accepted: true };
       }
-      setBucketShakes((prev) => ({ ...prev, [targetBucketId]: Date.now() }));
-      return { accepted: false };
-    }
 
-    if (zoneData.type === 'bucket') {
-      const targetBucketId = zoneData.bucketId;
-      let accepted = false;
-      setBucketStates((prev) => {
-        const targetBucketIndex = prev.findIndex((bucket) => bucket.id === targetBucketId);
-        if (targetBucketIndex === -1) return prev;
-        const targetBucket = prev[targetBucketIndex];
+      if (zoneData.type === 'bucket') {
+        const targetBucketId = zoneData.bucketId;
+        const targetBucket = bucketStates.find((bucket) => bucket.id === targetBucketId);
+        if (!targetBucket) {
+          removeOriginLetter();
+          return { accepted: false };
+        }
         const nextIndex = targetBucket.slots.findIndex((slot) => !slot.filledChar);
-        if (nextIndex === -1) return prev;
+        if (nextIndex === -1) {
+          removeOriginLetter();
+          setBucketShakes((prev) => ({ ...prev, [targetBucketId]: Date.now() }));
+          return { accepted: false };
+        }
+
         const nextSlot = targetBucket.slots[nextIndex];
-        accepted = true;
-        const nextBuckets = prev.map((bucket) => {
+        const nextBuckets = bucketStates.map((bucket) => {
           if (bucket.id === targetBucketId) {
             return {
               ...bucket,
@@ -614,7 +626,8 @@ export default function WordRiverView() {
                 return slot;
               })
             };
-          } else if (origin?.type === 'bucket' && origin.bucketId === bucket.id) {
+          }
+          if (origin?.type === 'bucket' && origin.bucketId === bucket.id) {
             return {
               ...bucket,
               slots: bucket.slots.map((slot) =>
@@ -626,18 +639,17 @@ export default function WordRiverView() {
           }
           return bucket;
         });
-        return nextBuckets;
-      });
-      if (accepted) {
-        removeLetterFromRiver(originLetterId ?? letter.id);
+
+        setBucketStates(nextBuckets);
+        removeOriginLetter();
         return { accepted: true };
       }
-      setBucketShakes((prev) => ({ ...prev, [targetBucketId]: Date.now() }));
-      return { accepted: false };
-    }
 
-    return { accepted: false };
-  }, [bucketStates, removeLetterFromRiver]);
+      removeOriginLetter();
+      return { accepted: false };
+    },
+    [bucketStates, removeLetterFromRiver]
+  );
 
   useEffect(() => {
     if (phase !== LETTER_PHASE) return undefined;
