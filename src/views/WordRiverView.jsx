@@ -149,11 +149,11 @@ function DriftingLetter({ letter, fontClass, getDropZones, onLetterDrop }) {
 
   useRiverPointerDrag(ref, {
     enabled: true,
-    payload: { letter },
+    payload: { letter, origin: { type: 'river', letterId: letter.id } },
     getDropZones,
     ghostClassName: `${fontClass} text-6xl font-semibold text-cyan-200 drop-shadow-lg px-2 py-1`,
     getGhostContent: () => letter.char,
-    onDrop: ({ zone }) => onLetterDrop({ letter, zone }),
+    onDrop: ({ zone, payload }) => onLetterDrop({ letter: payload.letter ?? letter, zone, origin: payload.origin }),
     freezeWhileDragging: true,
     onDragStart: () => {
       isDraggingRef.current = true;
@@ -180,6 +180,67 @@ function DriftingLetter({ letter, fontClass, getDropZones, onLetterDrop }) {
   );
 }
 
+function WordBucketSlot({
+  bucketId,
+  slot,
+  phase,
+  fontClass,
+  registerDropZone,
+  getDropZones,
+  onLetterDrop
+}) {
+  const ref = useRef(null);
+  const isLettersPhase = phase === LETTER_PHASE;
+  const filled = Boolean(slot.filledChar);
+
+  useEffect(() => {
+    if (!isLettersPhase) return undefined;
+    const element = ref.current;
+    if (!element) return undefined;
+    const unregister = registerDropZone({
+      element,
+      data: { type: 'slot', bucketId, slotId: slot.id }
+    });
+    return unregister;
+  }, [isLettersPhase, registerDropZone, bucketId, slot.id]);
+
+  useRiverPointerDrag(ref, {
+    enabled: isLettersPhase && filled,
+    payload: filled
+      ? {
+          letter: { id: `${bucketId}-${slot.id}-filled`, char: slot.filledChar },
+          origin: { type: 'bucket', bucketId, slotId: slot.id }
+        }
+      : null,
+    getDropZones,
+    ghostClassName: `${fontClass} text-6xl font-semibold text-cyan-200 drop-shadow-lg px-2 py-1`,
+    getGhostContent: () => slot.filledChar ?? '',
+    onDrop: ({ zone, payload }) => {
+      if (!payload?.letter?.char) return { accepted: false };
+      return onLetterDrop({ letter: payload.letter, zone, origin: payload.origin });
+    },
+    freezeWhileDragging: true
+  });
+
+  const slotClasses = [
+    'word-river-slot',
+    'flex h-12 w-12 items-center justify-center rounded-xl border-2 text-2xl font-semibold transition-all',
+    fontClass,
+    filled ? 'word-river-slot-filled text-white' : 'word-river-slot-empty text-slate-500',
+    filled ? 'word-river-slot-draggable' : ''
+  ].filter(Boolean);
+
+  if (slot.flashKey) {
+    slotClasses.push('animate-slot-glow');
+  }
+
+  return (
+    <div ref={ref} className={slotClasses.join(' ')}>
+      <span>{slot.filledChar ?? ''}</span>
+    </div>
+  );
+}
+
 function WordBucket({
   bucket,
   phase,
@@ -187,6 +248,7 @@ function WordBucket({
   registerDropZone,
   getDropZones,
   onBucketDrop,
+  onLetterDrop,
   isMatched,
   shakeKey
 }) {
@@ -226,23 +288,18 @@ function WordBucket({
     freezeWhileDragging: true
   });
 
-  const slotItems = bucket.slots.map((slot) => {
-    const filled = Boolean(slot.filledChar);
-    const slotClasses = [
-      'word-river-slot',
-      'flex h-12 w-12 items-center justify-center rounded-xl border-2 text-2xl font-semibold transition-all',
-      fontClass,
-      filled ? 'word-river-slot-filled text-white' : 'word-river-slot-empty text-slate-500'
-    ];
-    if (slot.flashKey) {
-      slotClasses.push('animate-slot-glow');
-    }
-    return (
-      <div key={slot.id} className={slotClasses.join(' ')}>
-        <span>{slot.filledChar ?? ''}</span>
-      </div>
-    );
-  });
+  const slotItems = bucket.slots.map((slot) => (
+    <WordBucketSlot
+      key={slot.id}
+      bucketId={bucket.id}
+      slot={slot}
+      phase={phase}
+      fontClass={fontClass}
+      registerDropZone={registerDropZone}
+      getDropZones={getDropZones}
+      onLetterDrop={onLetterDrop}
+    />
+  ));
 
   const containerClasses = [
     'word-river-bucket',
@@ -414,38 +471,124 @@ export default function WordRiverView() {
 
   const getDropZones = useCallback(() => dropZonesRef.current, []);
 
-  const handleLetterDrop = useCallback(
-    ({ letter, zone }) => {
-      if (!zone?.data?.bucketId) return { accepted: false };
-      const targetBucketId = zone.data.bucketId;
+  const handleLetterDrop = useCallback(({ letter, zone, origin }) => {
+    if (!zone?.data) return { accepted: false };
+    const zoneData = zone.data;
+
+    if (zoneData.type === 'slot') {
+      const targetBucketId = zoneData.bucketId;
+      const targetSlotId = zoneData.slotId;
       let accepted = false;
-      setBucketStates((prev) =>
-        prev.map((bucket) => {
-          if (bucket.id !== targetBucketId) return bucket;
-          const nextIndex = bucket.slots.findIndex((slot) => !slot.filledChar);
-          if (nextIndex === -1) return bucket;
-          const expectedChar = bucket.slots[nextIndex].char;
-          if (expectedChar !== letter.char) {
-            return bucket;
+      setBucketStates((prev) => {
+        const targetBucketIndex = prev.findIndex((bucket) => bucket.id === targetBucketId);
+        if (targetBucketIndex === -1) return prev;
+        const targetBucket = prev[targetBucketIndex];
+        const targetSlot = targetBucket.slots.find((slot) => slot.id === targetSlotId);
+        if (!targetSlot) return prev;
+        if (targetSlot.char !== letter.char) return prev;
+        if (
+          targetSlot.filledChar &&
+          !(origin?.type === 'bucket' && origin.bucketId === targetBucketId && origin.slotId === targetSlotId)
+        ) {
+          return prev;
+        }
+        accepted = true;
+        const nextBuckets = prev.map((bucket) => {
+          if (bucket.id === targetBucketId) {
+            return {
+              ...bucket,
+              slots: bucket.slots.map((slot) => {
+                if (slot.id === targetSlotId) {
+                  return { ...slot, filledChar: letter.char, flashKey: Date.now() };
+                }
+                if (
+                  origin?.type === 'bucket' &&
+                  origin.bucketId === targetBucketId &&
+                  origin.slotId === slot.id &&
+                  origin.slotId !== targetSlotId
+                ) {
+                  return { ...slot, filledChar: null, flashKey: null };
+                }
+                return slot;
+              })
+            };
+          } else if (origin?.type === 'bucket' && origin.bucketId === bucket.id) {
+            return {
+              ...bucket,
+              slots: bucket.slots.map((slot) =>
+                slot.id === origin.slotId ? { ...slot, filledChar: null, flashKey: null } : slot
+              )
+            };
           }
-          accepted = true;
-          const nextSlots = bucket.slots.map((slot, slotIndex) =>
-            slotIndex === nextIndex
-              ? { ...slot, filledChar: letter.char, flashKey: Date.now() }
-              : slot
-          );
-          return { ...bucket, slots: nextSlots };
-        })
-      );
+          return bucket;
+        });
+        return nextBuckets;
+      });
       if (accepted) {
-        setLetters((prev) => prev.filter((item) => item.id !== letter.id));
+        if (origin?.type === 'river') {
+          setLetters((prev) => prev.filter((item) => item.id !== letter.id));
+        }
         return { accepted: true };
       }
       setBucketShakes((prev) => ({ ...prev, [targetBucketId]: Date.now() }));
       return { accepted: false };
-    },
-    []
-  );
+    }
+
+    if (zoneData.type === 'bucket') {
+      const targetBucketId = zoneData.bucketId;
+      let accepted = false;
+      setBucketStates((prev) => {
+        const targetBucketIndex = prev.findIndex((bucket) => bucket.id === targetBucketId);
+        if (targetBucketIndex === -1) return prev;
+        const targetBucket = prev[targetBucketIndex];
+        const nextIndex = targetBucket.slots.findIndex((slot) => !slot.filledChar);
+        if (nextIndex === -1) return prev;
+        const nextSlot = targetBucket.slots[nextIndex];
+        if (nextSlot.char !== letter.char) return prev;
+        accepted = true;
+        const nextBuckets = prev.map((bucket) => {
+          if (bucket.id === targetBucketId) {
+            return {
+              ...bucket,
+              slots: bucket.slots.map((slot, index) => {
+                if (index === nextIndex) {
+                  return { ...slot, filledChar: letter.char, flashKey: Date.now() };
+                }
+                if (
+                  origin?.type === 'bucket' &&
+                  origin.bucketId === targetBucketId &&
+                  origin.slotId === slot.id &&
+                  origin.slotId !== nextSlot.id
+                ) {
+                  return { ...slot, filledChar: null, flashKey: null };
+                }
+                return slot;
+              })
+            };
+          } else if (origin?.type === 'bucket' && origin.bucketId === bucket.id) {
+            return {
+              ...bucket,
+              slots: bucket.slots.map((slot) =>
+                slot.id === origin.slotId ? { ...slot, filledChar: null, flashKey: null } : slot
+              )
+            };
+          }
+          return bucket;
+        });
+        return nextBuckets;
+      });
+      if (accepted) {
+        if (origin?.type === 'river') {
+          setLetters((prev) => prev.filter((item) => item.id !== letter.id));
+        }
+        return { accepted: true };
+      }
+      setBucketShakes((prev) => ({ ...prev, [targetBucketId]: Date.now() }));
+      return { accepted: false };
+    }
+
+    return { accepted: false };
+  }, []);
 
   useEffect(() => {
     if (phase !== LETTER_PHASE) return undefined;
@@ -543,6 +686,7 @@ export default function WordRiverView() {
                   registerDropZone={registerDropZone}
                   getDropZones={getDropZones}
                   onBucketDrop={handleBucketDrop}
+                  onLetterDrop={handleLetterDrop}
                   isMatched={Boolean(matches[bucket.id])}
                   shakeKey={bucketShakes[bucket.id]}
                 />
@@ -560,6 +704,7 @@ export default function WordRiverView() {
                     registerDropZone={registerDropZone}
                     getDropZones={getDropZones}
                     onBucketDrop={handleBucketDrop}
+                    onLetterDrop={handleLetterDrop}
                     isMatched={Boolean(matches[bucket.id])}
                     shakeKey={bucketShakes[bucket.id]}
                   />
