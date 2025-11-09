@@ -121,7 +121,7 @@ function TaskCard({
 }
 
 export default function HomeView() {
-  const { player, streak, daily, getWeakestLetter, starLevelSize, claimDailyReward } = useProgress();
+  const { player, streak, daily, starLevelSize, claimDailyReward } = useProgress();
 
   const { openGame } = useGame();
   const { t } = useLocalization();
@@ -149,12 +149,6 @@ export default function HomeView() {
     };
   }, [player.latestBadge, t]);
 
-  const focusLetter = useMemo(() => {
-    const focusTask = daily?.tasks?.find((task) => task.id === 'focus');
-    if (focusTask?.meta?.letter) return focusTask.meta.letter;
-    return getWeakestLetter().hebrew;
-  }, [daily?.tasks, getWeakestLetter]);
-  
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
   const totalStarsEarned = player.totalStarsEarned ?? player.stars ?? 0;
   const level = player.level ?? Math.floor(totalStarsEarned / starsPerLevel) + 1;
@@ -257,26 +251,6 @@ export default function HomeView() {
               </select>
               <p className="mt-2 text-xs text-slate-400">{t('home.languagePicker.helper')}</p>
             </div>
-            <button
-              onClick={() => openGame({ mode: 'letters' })}
-              className={classNames(
-                'w-full rounded-full bg-cyan-500 px-5 py-3 text-base font-semibold text-slate-900 shadow-lg transition',
-                'hover:bg-cyan-400 hover:shadow-cyan-500/30',
-                'sm:w-auto sm:px-6 sm:text-lg'
-              )}
-            >
-              {t('home.cta.start')}
-            </button>
-            <button
-              onClick={() => openGame({ mode: 'letters', forceLetter: focusLetter })}
-              className={classNames(
-                'w-full rounded-full border border-cyan-500/60 px-5 py-3 text-base font-semibold text-cyan-300 transition',
-                'hover:border-cyan-400 hover:text-cyan-200',
-                'sm:w-auto sm:px-6 sm:text-lg'
-              )}
-            >
-              {t('home.cta.practice')}
-            </button>
           </div>
         </div>
       </section>
