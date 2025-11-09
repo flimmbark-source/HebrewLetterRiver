@@ -195,6 +195,12 @@ function WordBucketSlot({
   const filled = Boolean(slot.filledChar);
 
   useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    element.style.visibility = '';
+  }, [slot.filledChar]);
+
+  useEffect(() => {
     if (!isLettersPhase) return undefined;
     const element = ref.current;
     if (!element) return undefined;
