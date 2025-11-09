@@ -485,6 +485,12 @@ export default function WordRiverView() {
 
   const getDropZones = useCallback(() => dropZonesRef.current, []);
 
+  const removeLetterFromRiver = useCallback((letterId) => {
+    if (!letterId) return;
+    setLetters((prev) => prev.filter((item) => item.id !== letterId));
+    setLetterQueue((prev) => prev.filter((item) => item.id !== letterId));
+  }, []);
+
   const handleLetterDrop = useCallback(({ letter, zone, origin }) => {
     if (!zone?.data) return { accepted: false };
     const zoneData = zone.data;
@@ -538,9 +544,7 @@ export default function WordRiverView() {
         return nextBuckets;
       });
       if (accepted) {
-        if (origin?.type === 'river') {
-          setLetters((prev) => prev.filter((item) => item.id !== letter.id));
-        }
+        removeLetterFromRiver(letter.id);
         return { accepted: true };
       }
       setBucketShakes((prev) => ({ ...prev, [targetBucketId]: Date.now() }));
@@ -590,9 +594,7 @@ export default function WordRiverView() {
         return nextBuckets;
       });
       if (accepted) {
-        if (origin?.type === 'river') {
-          setLetters((prev) => prev.filter((item) => item.id !== letter.id));
-        }
+        removeLetterFromRiver(letter.id);
         return { accepted: true };
       }
       setBucketShakes((prev) => ({ ...prev, [targetBucketId]: Date.now() }));
@@ -600,7 +602,7 @@ export default function WordRiverView() {
     }
 
     return { accepted: false };
-  }, []);
+  }, [removeLetterFromRiver]);
 
   useEffect(() => {
     if (phase !== LETTER_PHASE) return undefined;
