@@ -245,11 +245,13 @@ function WordBucket({
   bucket,
   phase,
   fontClass,
+  textDirection,
   registerDropZone,
   getDropZones,
   onBucketDrop,
   onLetterDrop,
   isMatched,
+  isCompletedCorrectly,
   shakeKey
 }) {
   const ref = useRef(null);
@@ -303,21 +305,32 @@ function WordBucket({
 
   const containerClasses = [
     'word-river-bucket',
-    'rounded-2xl border border-slate-700 bg-slate-900/70 p-4 text-center shadow-inner transition-all',
+    'relative rounded-2xl border border-slate-700 bg-slate-900/70 p-4 text-center shadow-inner transition-all',
     isMatchPhase ? 'cursor-grab word-river-draggable select-none' : '',
     isMatched ? 'pointer-events-none opacity-0' : '',
-    shakeKey ? 'word-bucket-shake' : ''
+    shakeKey ? 'word-bucket-shake' : '',
+    isCompletedCorrectly && phase === LETTER_PHASE ? 'border-emerald-400/60 shadow-emerald-400/30' : ''
   ]
     .filter(Boolean)
     .join(' ');
 
+  const slotContainerClasses = classNames(
+    'mt-3 flex flex-wrap justify-center gap-2',
+    textDirection === 'rtl' ? 'flex-row-reverse' : null
+  );
+
   return (
     <div ref={ref} className={containerClasses}>
+      {isCompletedCorrectly && phase === LETTER_PHASE ? (
+        <div className="pointer-events-none absolute right-4 top-4 rounded-full bg-emerald-500/10 px-2 py-1 text-sm font-semibold text-emerald-300" aria-hidden="true">
+          ✓
+        </div>
+      ) : null}
       <div className="space-y-1">
         <div className={`text-xl font-semibold text-white ${fontClass}`}>{bucket.practiceWord}</div>
         {phase === LETTER_PHASE ? <div className="text-sm text-slate-300">{bucket.appWord}</div> : null}
       </div>
-      <div className="mt-3 flex flex-wrap justify-center gap-2">{slotItems}</div>
+      <div className={slotContainerClasses}>{slotItems}</div>
     </div>
   );
 }
@@ -370,6 +383,7 @@ export default function WordRiverView() {
   const { languagePack, t } = useLocalization();
   const { addToast } = useToast();
   const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
+  const textDirection = languagePack.metadata?.textDirection ?? 'ltr';
   const totalSets = WORD_RIVER_SETS.length || 1;
   const [phase, setPhase] = useState(LETTER_PHASE);
   const [roundIndex, setRoundIndex] = useState(0);
@@ -485,7 +499,6 @@ export default function WordRiverView() {
         const targetBucket = prev[targetBucketIndex];
         const targetSlot = targetBucket.slots.find((slot) => slot.id === targetSlotId);
         if (!targetSlot) return prev;
-        if (targetSlot.char !== letter.char) return prev;
         if (
           targetSlot.filledChar &&
           !(origin?.type === 'bucket' && origin.bucketId === targetBucketId && origin.slotId === targetSlotId)
@@ -544,7 +557,6 @@ export default function WordRiverView() {
         const nextIndex = targetBucket.slots.findIndex((slot) => !slot.filledChar);
         if (nextIndex === -1) return prev;
         const nextSlot = targetBucket.slots[nextIndex];
-        if (nextSlot.char !== letter.char) return prev;
         accepted = true;
         const nextBuckets = prev.map((bucket) => {
           if (bucket.id === targetBucketId) {
@@ -592,16 +604,15 @@ export default function WordRiverView() {
 
   useEffect(() => {
     if (phase !== LETTER_PHASE) return undefined;
-    if (letters.length !== 0) return undefined;
     if (letterQueue.length === 0) return undefined;
-    const releaseCount = Math.min(LETTER_RELEASE_BATCH, letterQueue.length);
-    const nextBatch = letterQueue.slice(0, releaseCount);
-    const timeout = setTimeout(() => {
-      setLetters(nextBatch);
-      setLetterQueue((prev) => prev.slice(releaseCount));
-    }, 250);
-    return () => clearTimeout(timeout);
-  }, [letters, letterQueue, phase]);
+    if (letters.length >= LETTER_RELEASE_BATCH) return undefined;
+    const releaseCount = Math.min(LETTER_RELEASE_BATCH - letters.length, letterQueue.length);
+    if (releaseCount <= 0) return undefined;
+    const nextLetters = letterQueue.slice(0, releaseCount);
+    setLetters((prevLetters) => [...prevLetters, ...nextLetters]);
+    setLetterQueue((prevQueue) => prevQueue.slice(releaseCount));
+    return undefined;
+  }, [letters.length, letterQueue, phase]);
 
   const handleBucketDrop = useCallback(
     ({ bucket, zone }) => {
@@ -616,6 +627,20 @@ export default function WordRiverView() {
     },
     []
   );
+
+  const bucketCompletions = useMemo(() => {
+    const status = {};
+    bucketStates.forEach((bucket) => {
+      const isFilled = bucket.slots.every((slot) => slot.filledChar);
+      if (!isFilled) {
+        status[bucket.id] = false;
+        return;
+      }
+      const spelledWord = bucket.slots.map((slot) => slot.filledChar ?? '').join('');
+      status[bucket.id] = spelledWord === bucket.practiceWord;
+    });
+    return status;
+  }, [bucketStates]);
 
   const unmatchedBuckets = bucketStates.filter((bucket) => !matches[bucket.id]);
 
@@ -683,11 +708,13 @@ export default function WordRiverView() {
                   bucket={bucket}
                   phase={phase}
                   fontClass={fontClass}
+                  textDirection={textDirection}
                   registerDropZone={registerDropZone}
                   getDropZones={getDropZones}
                   onBucketDrop={handleBucketDrop}
                   onLetterDrop={handleLetterDrop}
                   isMatched={Boolean(matches[bucket.id])}
+                  isCompletedCorrectly={Boolean(bucketCompletions[bucket.id])}
                   shakeKey={bucketShakes[bucket.id]}
                 />
               ))}
@@ -701,11 +728,13 @@ export default function WordRiverView() {
                     bucket={bucket}
                     phase={phase}
                     fontClass={fontClass}
+                    textDirection={textDirection}
                     registerDropZone={registerDropZone}
                     getDropZones={getDropZones}
                     onBucketDrop={handleBucketDrop}
                     onLetterDrop={handleLetterDrop}
                     isMatched={Boolean(matches[bucket.id])}
+                    isCompletedCorrectly={Boolean(bucketCompletions[bucket.id])}
                     shakeKey={bucketShakes[bucket.id]}
                   />
                 ))}
