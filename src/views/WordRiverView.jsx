@@ -46,9 +46,9 @@ function buildRoundState(set) {
       char: slot.char,
       bucketId: bucket.id,
       topOffset: Math.random() * 70,
-      animationName: Math.random() > 0.5 ? 'river-flow-1' : 'river-flow-2',
-      duration: 12 + Math.random() * 8,
-      delay: -Math.random() * 8
+      driftSeed: Math.random(),
+      speed: 45 + Math.random() * 55,
+      direction: Math.random() > 0.5 ? 1 : -1
     }))
   );
 
@@ -60,6 +60,92 @@ function buildRoundState(set) {
 
 function DriftingLetter({ letter, fontClass, getDropZones, onLetterDrop }) {
   const ref = useRef(null);
+  const animationRef = useRef(null);
+  const lastTimestampRef = useRef(null);
+  const positionRef = useRef(0);
+  const boundsRef = useRef({ maxOffset: 0 });
+  const initializedRef = useRef(false);
+  const isDraggingRef = useRef(false);
+  const seedRef = useRef(
+    typeof letter.driftSeed === 'number' ? Math.min(Math.max(letter.driftSeed, 0), 1) : Math.random()
+  );
+  const baseSpeedRef = useRef(Math.max(20, Math.abs(letter.speed ?? 60)));
+  const velocityRef = useRef(null);
+
+  if (velocityRef.current === null) {
+    const initialDirection = letter.direction ?? (Math.random() > 0.5 ? 1 : -1);
+    const normalizedDirection = initialDirection >= 0 ? 1 : -1;
+    velocityRef.current = baseSpeedRef.current * normalizedDirection;
+  }
+
+  const updateTransform = useCallback(() => {
+    const element = ref.current;
+    if (!element) return;
+    element.style.transform = `translateX(${positionRef.current}px)`;
+  }, []);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return undefined;
+    const parent = element.parentElement;
+    if (!parent) return undefined;
+
+    const updateBounds = () => {
+      const parentRect = parent.getBoundingClientRect();
+      const elementRect = element.getBoundingClientRect();
+      const maxOffset = Math.max(0, parentRect.width - elementRect.width);
+      boundsRef.current.maxOffset = maxOffset;
+      if (!initializedRef.current) {
+        const initialOffset = maxOffset * seedRef.current;
+        positionRef.current = Math.min(Math.max(initialOffset, 0), maxOffset);
+        initializedRef.current = true;
+      } else {
+        positionRef.current = Math.min(Math.max(positionRef.current, 0), maxOffset);
+      }
+      updateTransform();
+    };
+
+    updateBounds();
+
+    const observer = new ResizeObserver(updateBounds);
+    observer.observe(parent);
+
+    const step = (timestamp) => {
+      if (!ref.current) return;
+      if (isDraggingRef.current) {
+        lastTimestampRef.current = timestamp;
+        animationRef.current = requestAnimationFrame(step);
+        return;
+      }
+      if (lastTimestampRef.current === null) {
+        lastTimestampRef.current = timestamp;
+      }
+      const delta = (timestamp - lastTimestampRef.current) / 1000;
+      lastTimestampRef.current = timestamp;
+      positionRef.current += velocityRef.current * delta;
+      const maxOffset = boundsRef.current.maxOffset ?? 0;
+      if (positionRef.current <= 0) {
+        positionRef.current = 0;
+        velocityRef.current = Math.abs(baseSpeedRef.current);
+      } else if (positionRef.current >= maxOffset) {
+        positionRef.current = maxOffset;
+        velocityRef.current = -Math.abs(baseSpeedRef.current);
+      }
+      updateTransform();
+      animationRef.current = requestAnimationFrame(step);
+    };
+
+    animationRef.current = requestAnimationFrame(step);
+
+    return () => {
+      observer.disconnect();
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      lastTimestampRef.current = null;
+    };
+  }, [updateTransform]);
 
   useRiverPointerDrag(ref, {
     enabled: true,
@@ -68,17 +154,24 @@ function DriftingLetter({ letter, fontClass, getDropZones, onLetterDrop }) {
     ghostClassName: `${fontClass} text-6xl font-semibold text-cyan-200 drop-shadow-lg px-2 py-1`,
     getGhostContent: () => letter.char,
     onDrop: ({ zone }) => onLetterDrop({ letter, zone }),
-    freezeWhileDragging: true
+    freezeWhileDragging: true,
+    onDragStart: () => {
+      isDraggingRef.current = true;
+      lastTimestampRef.current = null;
+    },
+    onDragEnd: () => {
+      isDraggingRef.current = false;
+      lastTimestampRef.current = null;
+    }
   });
 
   return (
     <div
       ref={ref}
-      className={`falling-letter ${fontClass} text-cyan-300 ${letter.animationName}`}
+      className={`falling-letter ${fontClass} text-cyan-300`}
       style={{
         top: `${letter.topOffset}%`,
-        animationDuration: `${letter.duration}s`,
-        animationDelay: `${letter.delay}s`
+        left: 0
       }}
       aria-hidden="true"
     >
