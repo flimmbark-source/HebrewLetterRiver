@@ -350,3 +350,267 @@ body.high-contrast { background: #000; color: #fff; }
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(12px);
 }
+.word-river-scene {
+  position: relative;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+.word-river-scene-background {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(125, 211, 252, 0.15), rgba(15, 23, 42, 0.95));
+  filter: saturate(110%);
+}
+.word-river-scene-background.scene-kitchen {
+  background: linear-gradient(160deg, rgba(15, 118, 110, 0.65), rgba(15, 23, 42, 0.95)),
+    radial-gradient(circle at 20% 20%, rgba(217, 249, 157, 0.15), transparent 60%);
+}
+.word-river-scene-overlay {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.word-river-scene-header {
+  padding: 1.25rem 1.5rem 0.5rem;
+}
+.word-river-scene-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(165, 243, 252, 0.9);
+}
+.word-river-scene-layer {
+  position: relative;
+  flex: 1;
+  margin: 0 1.5rem 1.5rem;
+  border-radius: 1.5rem;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+.word-river-scene-object {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 2px solid rgba(94, 234, 212, 0.25);
+  background: rgba(8, 47, 73, 0.55);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+.word-river-scene-object:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.word-river-scene-object:focus-visible {
+  outline: 3px solid rgba(34, 211, 238, 0.8);
+  outline-offset: 4px;
+}
+.word-river-scene-object:not(:disabled):hover {
+  transform: translate(-50%, -50%) scale(1.05);
+  border-color: rgba(125, 211, 252, 0.55);
+  box-shadow: 0 18px 42px rgba(56, 189, 248, 0.3);
+}
+.word-river-scene-object.active {
+  transform: translate(-50%, -50%) scale(1.08);
+  border-color: rgba(165, 243, 252, 0.75);
+  box-shadow: 0 24px 48px rgba(8, 145, 178, 0.35);
+}
+.word-river-scene-object-icon {
+  width: 100%;
+  height: 100%;
+  padding: 1.2rem;
+}
+.word-river-scene-object-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 35%, rgba(165, 243, 252, 0.4), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.word-river-scene-object:not(:disabled):hover .word-river-scene-object-glow,
+.word-river-scene-object.learned .word-river-scene-object-glow {
+  opacity: 1;
+}
+.word-river-scene-object-learned {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(16, 185, 129, 0.8);
+  color: #ecfeff;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.3);
+}
+.word-river-focus-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: linear-gradient(180deg, rgba(8, 47, 73, 0.65), rgba(15, 23, 42, 0.9));
+  backdrop-filter: blur(14px);
+  pointer-events: none;
+}
+.word-river-focus-overlay > * {
+  pointer-events: auto;
+}
+.word-river-focus-meaning,
+.word-river-focus-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+  color: #e2e8f0;
+}
+.word-river-focus-icon {
+  width: clamp(160px, 40vw, 240px);
+  height: clamp(160px, 40vw, 240px);
+  border-radius: 2.5rem;
+  background: radial-gradient(circle at 50% 40%, rgba(59, 130, 246, 0.35), rgba(15, 23, 42, 0.95));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 30px 60px rgba(37, 99, 235, 0.25);
+}
+.word-river-focus-icon.success {
+  box-shadow: 0 40px 80px rgba(16, 185, 129, 0.35);
+  background: radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.4), rgba(15, 23, 42, 0.95));
+}
+.word-river-focus-gloss {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  background: rgba(14, 165, 233, 0.25);
+  color: #f0fdfa;
+}
+.word-river-success-word {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 700;
+  color: #f8fafc;
+  text-shadow: 0 14px 28px rgba(16, 185, 129, 0.45);
+}
+.word-river-success-gloss {
+  font-size: 1.1rem;
+  color: rgba(224, 242, 254, 0.85);
+}
+.word-river-spelling {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: clamp(1rem, 5vw, 2.25rem);
+}
+.word-river-spelling-audio {
+  display: flex;
+  justify-content: flex-end;
+}
+.word-river-audio-button {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 2px solid rgba(125, 211, 252, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  background: rgba(8, 47, 73, 0.6);
+  color: rgba(165, 243, 252, 0.95);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.word-river-audio-button:hover,
+.word-river-audio-button:focus-visible {
+  border-color: rgba(165, 243, 252, 0.8);
+  transform: scale(1.05);
+  box-shadow: 0 12px 28px rgba(56, 189, 248, 0.25);
+  outline: none;
+}
+.word-river-spelling-focus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.word-river-spelling-bucket {
+  width: clamp(140px, 32vw, 190px);
+  height: clamp(140px, 32vw, 190px);
+  border-radius: 2rem;
+  background: rgba(8, 47, 73, 0.6);
+  border: 2px solid rgba(125, 211, 252, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 40px rgba(8, 145, 178, 0.25);
+}
+.word-river-spelling-ghost {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(148, 163, 184, 0.45);
+}
+.word-river-spelling-slots {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.word-river-spelling-slot {
+  min-width: 56px;
+  min-height: 56px;
+  border-radius: 1.25rem;
+  border: 2px dashed rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.7);
+  color: rgba(226, 232, 240, 0.85);
+}
+.word-river-spelling-slot-filled {
+  border-style: solid;
+  border-color: rgba(103, 232, 249, 0.75);
+  background: rgba(6, 182, 212, 0.2);
+  box-shadow: 0 12px 28px rgba(6, 182, 212, 0.25);
+}
+.word-river-spelling-slot-empty.drag-over,
+.word-river-spelling-slot-filled.drag-over {
+  transform: scale(1.05);
+  border-color: rgba(103, 232, 249, 0.85);
+}
+.word-river-spelling-river {
+  position: relative;
+  flex: 1;
+  border-radius: 1.75rem;
+  background: linear-gradient(180deg, rgba(14, 116, 144, 0.35), rgba(15, 23, 42, 0.85));
+  overflow: hidden;
+}
+.word-river-floating-letter {
+  animation: word-river-drift var(--drift-duration, 9s) ease-in-out infinite alternate;
+}
+@keyframes word-river-drift {
+  0% {
+    transform: translate(-10px, 0);
+  }
+  100% {
+    transform: translate(var(--drift-distance, 40px), 0);
+  }
+}
