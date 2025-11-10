@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import WordRiverObjectIcon from './WordRiverObjectIcon.jsx';
+import { classNames } from '../../lib/classNames.js';
 
 function SceneObjectButton({ object, learned, active, disabled, onSelect }) {
   return (
@@ -57,8 +58,12 @@ export default function WordRiverSceneView({
   disabled,
   activeObjectId
 }) {
+  const sceneClassName = classNames('word-river-scene', {
+    'word-river-scene-dimmed': disabled && Boolean(activeObjectId)
+  });
+
   return (
-    <div className="word-river-scene" aria-label={scene.label}>
+    <div className={sceneClassName} aria-label={scene.label}>
       <div className={`word-river-scene-background scene-${scene.backgroundId}`} aria-hidden="true" />
       <div className="word-river-scene-overlay">
         <div className="word-river-scene-header">
