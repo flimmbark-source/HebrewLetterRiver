@@ -290,10 +290,18 @@ body.high-contrast { background: #000; color: #fff; }
   inset: 0;
   background: radial-gradient(circle at 30% 30%, rgba(125, 211, 252, 0.15), rgba(15, 23, 42, 0.95));
   filter: saturate(110%);
+  overflow: hidden;
+  pointer-events: none;
 }
 .word-river-scene-background.scene-kitchen {
   background: linear-gradient(160deg, rgba(15, 118, 110, 0.65), rgba(15, 23, 42, 0.95)),
     radial-gradient(circle at 20% 20%, rgba(217, 249, 157, 0.15), transparent 60%);
+}
+.word-river-scene-background-art svg {
+  width: 120%;
+  height: auto;
+  max-width: none;
+  opacity: 0.9;
 }
 .word-river-scene-overlay {
   position: relative;
@@ -323,6 +331,16 @@ body.high-contrast { background: #000; color: #fff; }
   background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(12px);
   overflow: hidden;
+}
+.word-river-scene-empty {
+  display: flex;
+  min-height: 420px;
+  align-items: center;
+  justify-content: center;
+  color: rgba(148, 163, 184, 0.85);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .word-river-scene-object {
   position: absolute;
