@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import WordRiverObjectIcon from './WordRiverObjectIcon.jsx';
+import WordRiverSceneBackground from './WordRiverSceneBackground.jsx';
 import { classNames } from '../../lib/classNames.js';
 
 function SceneObjectButton({ object, learned, active, disabled, onSelect }) {
@@ -58,13 +59,23 @@ export default function WordRiverSceneView({
   disabled,
   activeObjectId
 }) {
+  if (!scene) {
+    return (
+      <div className="word-river-scene" aria-live="polite">
+        <div className="word-river-scene-empty">Loading scene…</div>
+      </div>
+    );
+  }
+
   const sceneClassName = classNames('word-river-scene', {
     'word-river-scene-dimmed': disabled && Boolean(activeObjectId)
   });
 
   return (
     <div className={sceneClassName} aria-label={scene.label}>
-      <div className={`word-river-scene-background scene-${scene.backgroundId}`} aria-hidden="true" />
+      <div className={`word-river-scene-background scene-${scene.backgroundId}`} aria-hidden="true">
+        <WordRiverSceneBackground backgroundId={scene.backgroundId} />
+      </div>
       <div className="word-river-scene-overlay">
         <div className="word-river-scene-header">
           <div className="word-river-scene-label">{scene.label}</div>
@@ -104,7 +115,7 @@ WordRiverSceneView.propTypes = {
         }).isRequired
       }).isRequired
     ).isRequired
-  }).isRequired,
+  }),
   learnedObjectIds: PropTypes.arrayOf(PropTypes.string),
   onSelectObject: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
@@ -112,6 +123,7 @@ WordRiverSceneView.propTypes = {
 };
 
 WordRiverSceneView.defaultProps = {
+  scene: null,
   learnedObjectIds: [],
   disabled: false,
   activeObjectId: null
