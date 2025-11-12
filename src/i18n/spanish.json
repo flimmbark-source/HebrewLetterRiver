@@ -131,6 +131,7 @@
     "accessibility": {
       "showIntroductions": "Mostrar presentaciones",
       "highContrast": "Modo de alto contraste",
+      "randomLetters": "Send random letters (Letter River)",
       "reducedMotion": "Movimiento reducido",
       "speed": "Velocidad del juego",
       "speedFast": "Rápido",

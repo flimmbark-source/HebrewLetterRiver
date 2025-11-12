@@ -110,6 +110,7 @@
     "accessibility": {
       "showIntroductions": "Показать знакомства",
       "highContrast": "Режим высокой контрастности",
+      "randomLetters": "Send random letters (Letter River)",
       "reducedMotion": "Уменьшенное движение",
       "speed": "Скорость игры",
       "speedFast": "Быстрый",

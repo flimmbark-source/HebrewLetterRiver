@@ -61,6 +61,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const accessibilityView = document.getElementById('accessibility-view');
   const closeAccessibilityBtn = document.getElementById('close-accessibility-btn');
   const highContrastToggle = document.getElementById('high-contrast-toggle');
+  const randomLettersToggle = document.getElementById('random-letters-toggle');
   const reducedMotionToggle = document.getElementById('reduced-motion-toggle');
   const gameSpeedSlider = document.getElementById('game-speed-slider');
   const speedLabel = document.getElementById('speed-label');
@@ -639,6 +640,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let forcedStartItem = null;
   let hasIntroducedForItemInLevel;
   let bonusCaughtInSession = 0;
+  let randomLettersEnabled = randomLettersToggle?.checked ?? false;
   const initialLives = 3;
   const learnPhaseDuration = 2500;
   const levelUpThreshold = 50;
@@ -701,6 +703,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     sessionStats = {};
     hasIntroducedForItemInLevel = false;
     bonusCaughtInSession = 0;
+    randomLettersEnabled = randomLettersToggle?.checked ?? false;
 
     updateScore(0, true);
     updateLives();
@@ -731,6 +734,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     sessionStats = {};
     hasIntroducedForItemInLevel = false;
     bonusCaughtInSession = 0;
+    randomLettersEnabled = randomLettersToggle?.checked ?? false;
 
     const selectedModeInput = document.querySelector('input[name="gameMode"]:checked');
     gameMode = selectedModeInput?.value ?? gameMode ?? practiceModes[0]?.id ?? 'letters';
@@ -760,7 +764,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       settings: {
         mode: gameMode,
         speed: baseSpeedSetting,
-        introductions: introductionsEnabled
+        introductions: introductionsEnabled,
+        randomLetters: isRandomLettersModeActive()
       },
       languageId: activeLanguage.id
     });
@@ -782,7 +787,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       settings: {
         mode: gameMode,
         speed: baseSpeedSetting,
-        introductions: introductionsEnabled
+        introductions: introductionsEnabled,
+        randomLetters: isRandomLettersModeActive()
       },
       languageId: activeLanguage.id
     });
@@ -942,6 +948,28 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
     const itemPool = getModePool(gameMode);
 
+    if (isRandomLettersModeActive()) {
+      const totalItemsInRound = Math.max(1, level);
+
+      if (forcedStartItem && level === 1) {
+        roundItems.push(forcedStartItem);
+        forcedStartItem = null;
+      }
+
+      for (let i = roundItems.length; i < totalItemsInRound; i++) {
+        if (!itemPool.length) break;
+        const randomIndex = Math.floor(Math.random() * itemPool.length);
+        roundItems.push(itemPool[randomIndex]);
+      }
+
+      hasIntroducedForItemInLevel = roundItems.some((item) => item && !seenItems.has(item.id));
+
+      currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [] };
+      generateChoices(roundItems, itemPool);
+      processItemsForRound(roundItems, currentRound.id);
+      return;
+    }
+
     let seenSoFar = itemPool.filter((item) => seenItems.has(item.id));
     const totalItemsInRound = level;
     const shouldIntroduceNew = !hasIntroducedForItemInLevel && learningOrder.length > 0;
@@ -975,6 +1003,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [] };
     generateChoices(roundItems, itemPool);
     processItemsForRound(roundItems, currentRound.id);
+  }
+
+  function isRandomLettersModeActive() {
+    return randomLettersEnabled && gameMode === 'letters';
   }
 
   function processItemsForRound(items, roundId) {
@@ -1296,6 +1328,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   });
   closeAccessibilityBtn?.addEventListener('click', () => accessibilityView.classList.add('hidden'));
   highContrastToggle?.addEventListener('change', (e) => document.body.classList.toggle('high-contrast', e.target.checked));
+  randomLettersToggle?.addEventListener('change', (e) => {
+    randomLettersEnabled = e.target.checked;
+  });
 
   const speedSlowLabel = t('game.accessibility.speedSlow');
   const speedFastLabel = t('game.accessibility.speedFast');
