@@ -254,6 +254,10 @@ function GameCanvas({ fontClass }) {
               <input id="high-contrast-toggle" type="checkbox" className="h-5 w-5 rounded border-slate-600 bg-slate-700 text-cyan-400 focus:ring-cyan-500" />
             </label>
             <label className="flex items-center justify-between">
+              <span>{t('game.accessibility.randomLetters')}</span>
+              <input id="random-letters-toggle" type="checkbox" className="h-5 w-5 rounded border-slate-600 bg-slate-700 text-cyan-400 focus:ring-cyan-500" />
+            </label>
+            <label className="flex items-center justify-between">
               <span>{t('game.accessibility.reducedMotion')}</span>
               <input id="reduced-motion-toggle" type="checkbox" className="h-5 w-5 rounded border-slate-600 bg-slate-700 text-cyan-400 focus:ring-cyan-500" />
             </label>

@@ -110,6 +110,7 @@
     "accessibility": {
       "showIntroductions": "عرض المقدمات",
       "highContrast": "وضع التباين العالي",
+      "randomLetters": "Send random letters (Letter River)",
       "reducedMotion": "انخفاض الحركة",
       "speed": "سرعة اللعبة",
       "speedFast": "سريع",

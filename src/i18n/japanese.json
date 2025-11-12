@@ -110,6 +110,7 @@
     "accessibility": {
       "showIntroductions": "ショーの紹介",
       "highContrast": "ハイコントラストモード",
+      "randomLetters": "Send random letters (Letter River)",
       "reducedMotion": "モーションの軽減",
       "speed": "ゲームスピード",
       "speedFast": "速い",

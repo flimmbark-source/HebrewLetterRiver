@@ -110,6 +110,7 @@
     "accessibility": {
       "showIntroductions": "ভূমিকা দেখান",
       "highContrast": "উচ্চ কনট্রাস্ট মোড",
+      "randomLetters": "Send random letters (Letter River)",
       "reducedMotion": "গতি কমানো",
       "speed": "খেলার গতি",
       "speedFast": "দ্রুত",
