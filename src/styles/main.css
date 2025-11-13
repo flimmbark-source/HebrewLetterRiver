@@ -428,6 +428,7 @@ body.high-contrast { background: #000; color: #fff; }
 .word-river-focus-overlay {
   position: absolute;
   inset: 0;
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: center;
