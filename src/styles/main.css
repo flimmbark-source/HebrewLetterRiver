@@ -305,10 +305,11 @@ body.high-contrast { background: #000; color: #fff; }
 }
 .word-river-scene-overlay {
   position: relative;
-  z-index: 1;
+  z-index: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 100%;
 }
 .word-river-scene-header {
   padding: 1.25rem 1.5rem 0.5rem;
@@ -325,6 +326,7 @@ body.high-contrast { background: #000; color: #fff; }
 }
 .word-river-scene-layer {
   position: relative;
+  z-index: 1;
   flex: 1;
   margin: 0 1.5rem 1.5rem;
   border-radius: 1.5rem;
@@ -344,6 +346,7 @@ body.high-contrast { background: #000; color: #fff; }
 }
 .word-river-scene-object {
   position: absolute;
+  z-index: 2;
   transform: translate(-50%, -50%);
   width: 140px;
   height: 140px;
