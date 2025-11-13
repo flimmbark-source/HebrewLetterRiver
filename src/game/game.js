@@ -950,6 +950,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
     if (isRandomLettersModeActive()) {
       const totalItemsInRound = Math.max(1, level);
+      const availablePool = [...itemPool];
 
       if (forcedStartItem && level === 1) {
         roundItems.push(forcedStartItem);
@@ -957,9 +958,14 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       }
 
       for (let i = roundItems.length; i < totalItemsInRound; i++) {
-        if (!itemPool.length) break;
-        const randomIndex = Math.floor(Math.random() * itemPool.length);
-        roundItems.push(itemPool[randomIndex]);
+        if (!availablePool.length) {
+          if (!itemPool.length) break;
+          availablePool.push(...itemPool);
+        }
+        const randomIndex = Math.floor(Math.random() * availablePool.length);
+        const [selectedItem] = availablePool.splice(randomIndex, 1);
+        if (!selectedItem) break;
+        roundItems.push(selectedItem);
       }
 
       hasIntroducedForItemInLevel = roundItems.some((item) => item && !seenItems.has(item.id));
