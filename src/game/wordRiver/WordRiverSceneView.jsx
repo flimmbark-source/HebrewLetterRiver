@@ -34,6 +34,7 @@ SceneObjectButton.propTypes = {
     id: PropTypes.string.isRequired,
     svgId: PropTypes.string.isRequired,
     l2Word: PropTypes.string.isRequired,
+    l2Phonetics: PropTypes.arrayOf(PropTypes.string),
     l1Gloss: PropTypes.string.isRequired,
     position: PropTypes.shape({
       x: PropTypes.number.isRequired,
@@ -107,6 +108,7 @@ WordRiverSceneView.propTypes = {
         id: PropTypes.string.isRequired,
         svgId: PropTypes.string.isRequired,
         l2Word: PropTypes.string.isRequired,
+        l2Phonetics: PropTypes.arrayOf(PropTypes.string),
         l1Gloss: PropTypes.string.isRequired,
         audioKey: PropTypes.string.isRequired,
         position: PropTypes.shape({

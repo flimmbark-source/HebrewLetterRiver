@@ -120,6 +120,7 @@ WordRiverFocusOverlay.propTypes = {
   object: PropTypes.shape({
     svgId: PropTypes.string.isRequired,
     l2Word: PropTypes.string.isRequired,
+    l2Phonetics: PropTypes.arrayOf(PropTypes.string),
     l1Gloss: PropTypes.string.isRequired,
     audioKey: PropTypes.string.isRequired
   }),

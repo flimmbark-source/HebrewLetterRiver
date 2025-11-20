@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types';
 import WordRiverObjectIcon from './WordRiverObjectIcon.jsx';
 import { playWordAudio } from './audio.js';
+import { getHebrewPhoneticLabel, getWordPhonetics } from './phonetics.js';
 import { useRiverPointerDrag } from '../../hooks/useRiverPointerDrag.js';
 import { classNames } from '../../lib/classNames.js';
 
@@ -55,13 +56,16 @@ function computeLockedIndices(chars, difficultyType) {
   return result;
 }
 
-function buildSlots(word, difficultyType) {
+function buildSlots(word, difficultyType, phoneticSegments) {
   const chars = Array.from(word ?? '');
+  const labels = getWordPhonetics(word, phoneticSegments);
   const locked = computeLockedIndices(chars, difficultyType);
   return chars.map((char, index) => ({
     id: `slot-${index}-${char}`,
     char,
+    label: labels[index],
     filledChar: locked.has(index) ? char : null,
+    filledLabel: locked.has(index) ? labels[index] : null,
     sourceLetterId: locked.has(index) ? `locked-${index}` : null,
     locked: locked.has(index)
   }));
@@ -96,12 +100,13 @@ function generateRiverLetters(word, slots, difficulty) {
   const neededChars = [];
   slots.forEach((slot) => {
     if (!slot.locked) {
-      neededChars.push(slot.char);
+      neededChars.push({ char: slot.char, label: slot.label });
     }
   });
-  const baseLetters = neededChars.map((char, index) => ({
-    id: `needed-${index}-${char}-${Math.random().toString(36).slice(2, 7)}`,
-    char,
+  const baseLetters = neededChars.map((slotInfo, index) => ({
+    id: `needed-${index}-${slotInfo.char}-${Math.random().toString(36).slice(2, 7)}`,
+    char: slotInfo.char,
+    label: slotInfo.label,
     kind: 'target',
     top: 10 + Math.random() * 65,
     driftDistance: 30 + Math.random() * 40,
@@ -111,6 +116,7 @@ function generateRiverLetters(word, slots, difficulty) {
   const distractors = distractorChars.map((char, index) => ({
     id: `distractor-${index}-${char}-${Math.random().toString(36).slice(2, 7)}`,
     char,
+    label: getHebrewPhoneticLabel(char),
     kind: 'distractor',
     top: 10 + Math.random() * 65,
     driftDistance: 25 + Math.random() * 35,
@@ -144,7 +150,7 @@ function FloatingLetter({ letter, fontClass, getDropZones, onLetterDrop }) {
     payload: { letter, origin: { type: 'river', letterId: letter.id } },
     getDropZones,
     ghostClassName: `${fontClass} text-5xl font-semibold text-cyan-200 drop-shadow-lg px-2 py-1`,
-    getGhostContent: () => letter.char,
+    getGhostContent: () => letter.label,
     onDrop: ({ zone, payload }) => onLetterDrop({ letter: payload.letter, zone, origin: payload.origin }),
     freezeWhileDragging: true
   });
@@ -164,7 +170,7 @@ function FloatingLetter({ letter, fontClass, getDropZones, onLetterDrop }) {
       }}
       aria-hidden="true"
     >
-      {letter.char}
+      {letter.label}
     </div>
   );
 }
@@ -173,6 +179,7 @@ FloatingLetter.propTypes = {
   letter: PropTypes.shape({
     id: PropTypes.string.isRequired,
     char: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
     top: PropTypes.number.isRequired,
     driftDistance: PropTypes.number.isRequired,
     driftDuration: PropTypes.number.isRequired
@@ -203,12 +210,12 @@ function SpellingSlot({
   useRiverPointerDrag(ref, {
     enabled: Boolean(slot.filledChar) && !slot.locked,
     payload: {
-      letter: { id: slot.sourceLetterId ?? `filled-${slot.id}`, char: slot.filledChar },
+      letter: { id: slot.sourceLetterId ?? `filled-${slot.id}`, char: slot.filledChar, label: slot.filledLabel ?? slot.label },
       origin: { type: 'slot', slotId: slot.id, letterId: slot.sourceLetterId ?? null }
     },
     getDropZones,
     ghostClassName: `${fontClass} text-5xl font-semibold text-cyan-200 drop-shadow-lg px-2 py-1`,
-    getGhostContent: () => slot.filledChar ?? '',
+    getGhostContent: () => slot.filledLabel ?? slot.label ?? '',
     onDrop: ({ zone, payload }) => onLetterDrop({ letter: payload.letter, zone, origin: payload.origin }),
     freezeWhileDragging: true
   });
@@ -228,7 +235,7 @@ function SpellingSlot({
       )}
       dir={textDirection}
     >
-      {slot.filledChar ?? ''}
+      {slot.filledChar || slot.locked ? slot.filledLabel ?? slot.label ?? '' : ''}
     </div>
   );
 }
@@ -237,7 +244,9 @@ SpellingSlot.propTypes = {
   slot: PropTypes.shape({
     id: PropTypes.string.isRequired,
     char: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
     filledChar: PropTypes.string,
+    filledLabel: PropTypes.string,
     sourceLetterId: PropTypes.string,
     locked: PropTypes.bool
   }).isRequired,
@@ -256,19 +265,26 @@ export default function SpellingRiver({
   onCompleted
 }) {
   const difficultyConfig = getDifficultyConfig(difficulty);
-  const [slots, setSlots] = useState(() => buildSlots(object.l2Word, difficultyConfig.type));
-  const [letters, setLetters] = useState(() => generateRiverLetters(object.l2Word, buildSlots(object.l2Word, difficultyConfig.type), difficulty));
+  const [slots, setSlots] = useState(() => buildSlots(object.l2Word, difficultyConfig.type, object.l2Phonetics));
+  const [letters, setLetters] = useState(() =>
+    generateRiverLetters(object.l2Word, buildSlots(object.l2Word, difficultyConfig.type, object.l2Phonetics), difficulty)
+  );
   const riverRef = useRef(null);
   const cooldownRef = useRef(false);
   const { registerDropZone, getDropZones } = useDropZones();
   const completedRef = useRef(false);
 
   useEffect(() => {
-    const nextSlots = buildSlots(object.l2Word, difficultyConfig.type);
+    const nextSlots = buildSlots(object.l2Word, difficultyConfig.type, object.l2Phonetics);
     setSlots(nextSlots);
     setLetters(generateRiverLetters(object.l2Word, nextSlots, difficulty));
     playWordAudio(object.audioKey);
   }, [object, difficulty, difficultyConfig.type]);
+
+  const phoneticGhost = useMemo(
+    () => getWordPhonetics(object.l2Word, object.l2Phonetics).join(' '),
+    [object.l2Phonetics, object.l2Word]
+  );
 
   useEffect(() => {
     const element = riverRef.current;
@@ -307,7 +323,7 @@ export default function SpellingRiver({
         setSlots((prev) =>
           prev.map((slot) => {
             if (slot.id === origin.slotId) {
-              return { ...slot, filledChar: null, sourceLetterId: null };
+              return { ...slot, filledChar: null, filledLabel: null, sourceLetterId: null };
             }
             return slot;
           })
@@ -330,6 +346,7 @@ export default function SpellingRiver({
               letterToReturn = {
                 id: `${slot.sourceLetterId}-swap-${Math.random().toString(36).slice(2, 6)}`,
                 char: slot.filledChar,
+                label: slot.filledLabel ?? slot.label,
                 kind: 'target',
                 top: 15 + Math.random() * 60,
                 driftDistance: 20 + Math.random() * 40,
@@ -339,6 +356,7 @@ export default function SpellingRiver({
             return {
               ...slot,
               filledChar: letter.char,
+              filledLabel: letter.label,
               sourceLetterId: letter.id
             };
           })
@@ -347,7 +365,7 @@ export default function SpellingRiver({
           setSlots((prev) =>
             prev.map((slot) => {
               if (slot.id === origin.slotId && slot.id !== targetSlotId) {
-                return { ...slot, filledChar: null, sourceLetterId: null };
+                return { ...slot, filledChar: null, filledLabel: null, sourceLetterId: null };
               }
               return slot;
             })
@@ -393,7 +411,7 @@ export default function SpellingRiver({
         </div>
         {difficultyConfig.type === 'ghost' ? (
           <div className={classNames('word-river-spelling-ghost', fontClass)} dir={textDirection}>
-            {object.l2Word}
+            {phoneticGhost}
           </div>
         ) : null}
         <div
@@ -433,6 +451,7 @@ SpellingRiver.propTypes = {
   object: PropTypes.shape({
     svgId: PropTypes.string.isRequired,
     l2Word: PropTypes.string.isRequired,
+    l2Phonetics: PropTypes.arrayOf(PropTypes.string),
     audioKey: PropTypes.string.isRequired
   }).isRequired,
   difficulty: PropTypes.oneOf(['easy', 'medium', 'hard']).isRequired,
