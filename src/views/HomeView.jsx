@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
@@ -126,7 +125,6 @@ export default function HomeView() {
   const { openGame } = useGame();
   const { t } = useLocalization();
   const { languageId, selectLanguage, languageOptions } = useLanguage();
-  const navigate = useNavigate();
 
   const latestBadge = useMemo(() => {
     if (!player.latestBadge) return null;
@@ -198,7 +196,7 @@ export default function HomeView() {
             </div>
             <div className="space-y-3">
               <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.hero.modeSelectTitle')}</p>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-1">
                 <button
                   type="button"
                   onClick={() => openGame({ mode: 'letters' })}
@@ -210,19 +208,6 @@ export default function HomeView() {
                   <span className="block text-lg font-semibold text-white">{t('home.hero.modes.letters.title')}</span>
                   <span className="mt-1 block text-sm text-slate-300 group-hover:text-slate-200">
                     {t('home.hero.modes.letters.description')}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/word-river')}
-                  className={classNames(
-                    'group rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-left transition',
-                    'hover:border-cyan-400/60 hover:shadow-cyan-500/20'
-                  )}
-                >
-                  <span className="block text-lg font-semibold text-white">{t('home.hero.modes.words.title')}</span>
-                  <span className="mt-1 block text-sm text-slate-300 group-hover:text-slate-200">
-                    {t('home.hero.modes.words.description')}
                   </span>
                 </button>
               </div>
