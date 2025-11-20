@@ -389,7 +389,7 @@ export default function SpellingRiver({
       </div>
       <div className="word-river-spelling-focus">
         <div className="word-river-spelling-bucket">
-          <WordRiverObjectIcon svgId={object.svgId} className="h-full w-full" />
+          <WordRiverObjectIcon svgId={object.svgId} className="word-river-spelling-bucket-icon" />
         </div>
         {difficultyConfig.type === 'ghost' ? (
           <div className={classNames('word-river-spelling-ghost', fontClass)} dir={textDirection}>
