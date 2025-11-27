@@ -164,7 +164,7 @@ function GameCanvas({ fontClass }) {
           >
             <div
               id="modal-content"
-              className="relative w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900/95 p-5 shadow-2xl sm:rounded-3xl sm:p-6"
+              className="relative w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900/95 p-5 pb-20 shadow-2xl sm:rounded-3xl sm:p-6 sm:pb-24"
               style={{ maxHeight: 'calc(100vh - 3rem)' }}
             >
               <button

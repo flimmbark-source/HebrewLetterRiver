@@ -35,7 +35,7 @@ body {
 }
 #learn-letter { font-size: clamp(40px, 12vw, 96px); }
 #learn-name { font-size: clamp(18px, 5vw, 28px); }
-#learn-sound { font-size: clamp(14px, 4.5vw, 22px); }
+#learn-sound { font-size: clamp(14px, 4.5vw, 22px); margin-top: 16px; }
 .catcher-box {
   font-size: clamp(18px, 4.6vw, 24px);
   padding: clamp(14px, 4vw, 22px) 10px;
