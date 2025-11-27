@@ -7,11 +7,12 @@ body {
 /* === PROGRESS CARDS === */
 .progress-cards-container {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr; /* Mobile: 1 column */
   gap: var(--space-2); /* 16px between cards */
   margin-bottom: var(--space-3); /* 24px before quest section */
 }
 
+/* Desktop: 3 columns */
 @media (min-width: 768px) {
   .progress-cards-container {
     grid-template-columns: repeat(3, 1fr);
@@ -48,10 +49,18 @@ body {
 /* === QUEST CARDS === */
 .quest-cards-container {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr; /* Mobile: 1 column */
   gap: var(--space-2); /* 16px between cards */
 }
 
+/* Tablet: 2 columns */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .quest-cards-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Large Desktop: 3 columns */
 @media (min-width: 1024px) {
   .quest-cards-container {
     grid-template-columns: repeat(3, 1fr);
@@ -73,7 +82,7 @@ body {
 }
 
 .quest-title {
-  font-size: var(--text-lg); /* 18px */
+  font-size: clamp(1rem, 2.5vw, 1.125rem); /* Fluid: 16px to 18px */
   font-weight: var(--font-semibold); /* 600 */
   line-height: 1.4; /* Slightly more than tight for readability */
   margin-bottom: var(--space-2); /* 16px */
@@ -101,9 +110,16 @@ body {
 /* === MODE SELECTION CARDS === */
 .mode-cards-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr; /* Mobile: 1 column */
   gap: var(--space-2); /* 16px between cards */
   padding: 0; /* No padding - parent handles spacing */
+}
+
+/* Desktop/Tablet: 2 columns */
+@media (min-width: 640px) {
+  .mode-cards-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .mode-card {
@@ -134,15 +150,22 @@ body {
 /* === SOUND BUCKETS === */
 .sound-buckets-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr); /* Mobile: 2 columns */
   gap: var(--space-1); /* 8px between buckets */
   padding: var(--space-2); /* 16px from edges */
+}
+
+/* Desktop: 4 columns */
+@media (min-width: 768px) {
+  .sound-buckets-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .sound-bucket {
   padding: var(--space-2); /* 16px internal */
   border-radius: var(--radius-sm); /* 8px */
-  min-height: 80px; /* Ensure consistent height */
+  min-height: 80px; /* Exceeds 44px touch target - accessible */
 }
 
 .bucket-label {
@@ -164,6 +187,8 @@ body {
   font-size: var(--text-base); /* 16px */
   font-weight: var(--font-semibold); /* 600 */
   line-height: 1; /* Tight for buttons */
+  min-height: 44px; /* WCAG touch target minimum */
+  min-width: 44px;
 }
 
 .button.button-rounded {
@@ -186,29 +211,34 @@ body {
   font-size: var(--text-base); /* 16px */
   font-weight: var(--font-semibold); /* 600 */
   line-height: 1;
+  min-height: 44px; /* WCAG touch target minimum */
 }
 
 #back-to-menu-button,
 #setup-exit-button,
 #game-over-exit-button {
-  padding: var(--space-1) var(--space-2); /* 8px vertical, 16px horizontal */
+  padding: 12px var(--space-2); /* 12px vertical (increased from 8px), 16px horizontal */
   font-size: var(--text-xs); /* 12px */
   font-weight: var(--font-semibold); /* 600 */
   line-height: 1;
+  min-height: 44px; /* WCAG touch target minimum */
+  min-width: 44px;
 }
 
 /* === MODAL === */
 #modal-content {
   display: flex;
   flex-direction: column;
-  padding: var(--space-4); /* 32px all around */
+  padding: var(--space-2); /* Mobile: 16px all around */
   border-radius: var(--radius-lg); /* 16px */
   max-height: calc(100vh - 3rem);
+  max-width: 100%; /* Full width on mobile */
 }
 
 @media (min-width: 640px) {
   #modal-content {
-    padding: var(--space-6); /* 48px on larger screens */
+    padding: var(--space-6); /* Desktop: 48px on larger screens */
+    max-width: 48rem; /* Desktop: 3xl equivalent */
   }
 }
 
@@ -239,7 +269,7 @@ body {
 }
 
 .modal-title {
-  font-size: var(--text-3xl); /* 32px */
+  font-size: clamp(1.5rem, 4vw, 2rem); /* Fluid: 24px to 32px */
   font-weight: var(--font-bold); /* 700 */
   line-height: var(--line-height-tight); /* 1.2 */
   margin-bottom: var(--space-1); /* 8px */
@@ -275,7 +305,7 @@ body {
 }
 
 .score-value {
-  font-size: var(--text-2xl); /* 24px */
+  font-size: clamp(1.25rem, 3vw, 1.5rem); /* Fluid: 20px to 24px */
   font-weight: var(--font-bold); /* 700 */
   line-height: 1;
 }
@@ -309,6 +339,8 @@ body {
   display: grid;
   gap: var(--space-2); /* 16px between buckets */
   padding: var(--space-2); /* 16px from edges */
+  /* iOS safe area support for notched devices */
+  padding-bottom: max(var(--space-2), env(safe-area-inset-bottom));
 }
 .falling-letter {
   font-size: clamp(45px, 14vw, 76px);
@@ -325,7 +357,7 @@ body {
   font-size: clamp(18px, 4.6vw, 24px);
   padding: var(--space-2); /* 16px internal */
   border-radius: var(--radius-sm); /* 8px */
-  min-height: 80px; /* Ensure consistent height */
+  min-height: 80px; /* Exceeds 44px touch target - accessible */
 }
 .setup-label span { font-size: clamp(16px, 4.2vw, 20px); }
 .setup-label p { font-size: clamp(12px, 3.6vw, 16px); }
