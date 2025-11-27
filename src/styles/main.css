@@ -3,6 +3,143 @@ body {
   font-family: 'Inter', sans-serif;
   touch-action: manipulation;
 }
+
+/* === PROGRESS CARDS === */
+.progress-cards-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2); /* 16px between cards */
+  margin-bottom: var(--space-3); /* 24px before quest section */
+}
+
+@media (min-width: 768px) {
+  .progress-cards-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.progress-card {
+  padding: var(--space-2); /* 16px internal padding - CONSISTENT */
+  border-radius: var(--radius-md); /* 12px */
+}
+
+/* === QUEST CARDS === */
+.quest-cards-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2); /* 16px between cards */
+}
+
+@media (min-width: 1024px) {
+  .quest-cards-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.quest-card {
+  padding: var(--space-2); /* 16px internal - MATCHES progress cards */
+  border-radius: var(--radius-md); /* 12px */
+}
+
+/* === MODE SELECTION CARDS === */
+.mode-cards-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2); /* 16px between cards */
+  padding: var(--space-3); /* 24px around grid */
+}
+
+.mode-card {
+  padding: var(--space-2); /* 16px internal */
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md); /* 12px */
+}
+
+/* IMPORTANT: Prevent shift when selected (thicker border) */
+.mode-card.selected {
+  border: 3px solid rgb(94, 234, 212);
+  padding: calc(var(--space-2) - 1px); /* Compensate for 1px border difference */
+}
+
+/* === SOUND BUCKETS === */
+.sound-buckets-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-1); /* 8px between buckets */
+  padding: var(--space-2); /* 16px from edges */
+}
+
+.sound-bucket {
+  padding: var(--space-2); /* 16px internal */
+  border-radius: var(--radius-sm); /* 8px */
+  min-height: 80px; /* Ensure consistent height */
+}
+
+/* === BUTTONS === */
+.button {
+  padding: 12px var(--space-3); /* 12px vertical, 24px horizontal */
+}
+
+.button.button-rounded {
+  border-radius: var(--radius-sm); /* 8px */
+}
+
+.button-large {
+  padding: var(--space-2) var(--space-4); /* 16px vertical, 32px horizontal */
+}
+
+.button-small {
+  padding: var(--space-1) var(--space-2); /* 8px vertical, 16px horizontal */
+}
+
+/* Apply consistent padding using CSS variables to existing button IDs */
+#start-button {
+  padding: 12px var(--space-3); /* 12px vertical, 24px horizontal */
+}
+
+#back-to-menu-button,
+#setup-exit-button,
+#game-over-exit-button {
+  padding: var(--space-1) var(--space-2); /* 8px vertical, 16px horizontal */
+}
+
+/* === MODAL === */
+#modal-content {
+  padding: var(--space-4); /* 32px all around */
+  padding-bottom: calc(var(--space-4) + var(--space-6)); /* Extra padding at bottom for button visibility */
+  border-radius: var(--radius-lg); /* 16px */
+}
+
+@media (min-width: 640px) {
+  #modal-content {
+    padding: var(--space-6); /* 48px on larger screens */
+    padding-bottom: calc(var(--space-6) + var(--space-6)); /* Extra padding at bottom */
+  }
+}
+
+.modal-header, #setup-view, #game-over-view {
+  margin-bottom: var(--space-3); /* 24px */
+}
+
+.modal-footer {
+  margin-top: var(--space-3); /* 24px */
+}
+
+/* === GAME TOP BAR === */
+#top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2); /* 16px all around */
+  gap: var(--space-2); /* 16px between sections */
+}
+
+@media (min-width: 640px) {
+  #top-bar {
+    padding: var(--space-3); /* 24px all around on larger screens */
+    gap: var(--space-3); /* 24px between sections */
+  }
+}
 .hebrew-font { font-family: 'Heebo', sans-serif; }
 #game-view {
   min-height: 100dvh;
@@ -24,6 +161,9 @@ body {
 #choices-container {
   width: 100%;
   flex-shrink: 0;
+  display: grid;
+  gap: var(--space-2); /* 16px between buckets */
+  padding: var(--space-2); /* 16px from edges */
 }
 .falling-letter {
   font-size: clamp(45px, 14vw, 76px);
@@ -38,7 +178,9 @@ body {
 #learn-sound { font-size: clamp(14px, 4.5vw, 22px); margin-top: 16px; }
 .catcher-box {
   font-size: clamp(18px, 4.6vw, 24px);
-  padding: clamp(14px, 4vw, 22px) 10px;
+  padding: var(--space-2); /* 16px internal */
+  border-radius: var(--radius-sm); /* 8px */
+  min-height: 80px; /* Ensure consistent height */
 }
 .setup-label span { font-size: clamp(16px, 4.2vw, 20px); }
 .setup-label p { font-size: clamp(12px, 3.6vw, 16px); }
@@ -225,12 +367,12 @@ body {
 .setup-label {
   display: flex;
   align-items: center;
-  padding: 0.75rem;
-  background: #334155;
-  border-radius: 0.5rem;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
   cursor: pointer;
   transition: background-color 0.2s;
-  border: 2px solid #475569;
+  border: none;
   flex: 1 1 100%;
 }
 @media (min-width: 640px) {
@@ -238,13 +380,15 @@ body {
     flex-basis: 260px;
   }
 }
-.setup-label:hover {
-  background: #475569;
-}
-.setup-label input:checked ~ div {
+.setup-label:hover .mode-card {
   border-color: #22d3ee;
 }
-.setup-label input:checked ~ div > span {
+.setup-label input:checked ~ .mode-card {
+  border-width: 3px;
+  border-color: rgb(94, 234, 212);
+  padding: calc(var(--space-2) - 1px);
+}
+.setup-label input:checked ~ .mode-card > span {
   color: #67e8f9;
 }
 body.high-contrast { background: #000; color: #fff; }

@@ -177,7 +177,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
       const card = document.createElement('div');
       card.className =
-        'flex h-full flex-col rounded-2xl border-2 border-slate-600 bg-slate-800/70 p-4 transition hover:border-cyan-400/80';
+        'mode-card flex h-full flex-col border-slate-600 bg-slate-800/70 transition hover:border-cyan-400/80';
 
       const title = document.createElement('span');
       title.className = `text-base font-semibold text-white sm:text-lg ${fontClass}`;

@@ -18,7 +18,7 @@ function TaskCard({ task, accent, onClaim, claiming }) {
     : 'In progress…';
   return (
     <div
-      className={`rounded-3xl border bg-slate-900/70 p-6 shadow-inner transition ${
+      className={`quest-card rounded-3xl border bg-slate-900/70 shadow-inner transition ${
         claimable ? 'border-amber-400/40 ring-1 ring-amber-300/60' : 'border-slate-800'
       }`}
     >
@@ -190,7 +190,7 @@ export default function DailyView() {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3">
+      <section className="quest-cards-container">
         {tasks.map((task) => (
           <TaskCard
             key={task.id}
