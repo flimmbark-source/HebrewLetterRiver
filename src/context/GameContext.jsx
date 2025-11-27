@@ -164,8 +164,7 @@ function GameCanvas({ fontClass }) {
           >
             <div
               id="modal-content"
-              className="relative w-full max-w-3xl overflow-y-auto border border-slate-700 bg-slate-900/95 shadow-2xl"
-              style={{ maxHeight: 'calc(100vh - 3rem)' }}
+              className="relative w-full max-w-3xl border border-slate-700 bg-slate-900/95 shadow-2xl"
             >
               <button
                 id="setup-exit-button"
@@ -186,15 +185,15 @@ function GameCanvas({ fontClass }) {
                 ⚙️
               </button>
 
-              <div id="setup-view" className="space-y-6 pt-14 sm:pt-16">
+              <div id="setup-view" className="space-y-4 pt-14 sm:pt-16 sm:space-y-5">
                 <div className="space-y-2 text-center">
-                  <h1 className={`text-3xl font-bold text-cyan-300 sm:text-4xl ${fontClass}`}>{t('game.setup.title')}</h1>
-                  <p id="modal-subtitle" className="text-sm text-slate-400 sm:text-base">
+                  <h1 className={`text-2xl font-bold text-cyan-300 sm:text-3xl ${fontClass}`}>{t('game.setup.title')}</h1>
+                  <p id="modal-subtitle" className="text-sm text-slate-400">
                     {t('game.setup.subtitleFallback')}
                   </p>
                 </div>
 
-                <p className="text-center text-base text-slate-300 sm:text-lg">{t('game.setup.prompt')}</p>
+                <p className="text-center text-sm text-slate-300 sm:text-base">{t('game.setup.prompt')}</p>
 
                 <div id="mode-options" className="mode-cards-container mx-auto max-w-2xl" />
               </div>
@@ -219,7 +218,7 @@ function GameCanvas({ fontClass }) {
                 <div className="learning-summary-container my-6" />
               </div>
 
-              <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              <div className="mt-4 flex flex-shrink-0 flex-col items-center gap-3 sm:flex-row sm:justify-center">
                 <button
                   id="start-button"
                   className="w-full rounded-full bg-cyan-500 px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-cyan-400 sm:w-auto sm:text-lg"

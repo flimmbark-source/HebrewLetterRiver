@@ -46,7 +46,7 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-2); /* 16px between cards */
-  padding: var(--space-3); /* 24px around grid */
+  padding: 0; /* No padding - parent handles spacing */
 }
 
 .mode-card {
@@ -105,23 +105,42 @@ body {
 
 /* === MODAL === */
 #modal-content {
+  display: flex;
+  flex-direction: column;
   padding: var(--space-4); /* 32px all around */
-  padding-bottom: calc(var(--space-4) + var(--space-6)); /* Extra padding at bottom for button visibility */
   border-radius: var(--radius-lg); /* 16px */
+  max-height: calc(100vh - 3rem);
 }
 
 @media (min-width: 640px) {
   #modal-content {
     padding: var(--space-6); /* 48px on larger screens */
-    padding-bottom: calc(var(--space-6) + var(--space-6)); /* Extra padding at bottom */
   }
 }
 
-.modal-header, #setup-view, #game-over-view {
+#setup-view, #game-over-view {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-bottom: var(--space-3); /* 24px */
+  /* Add some padding for the scroll */
+  padding-right: 8px;
+  margin-right: -8px;
+}
+
+/* Ensure buttons container stays at bottom and is always visible */
+#modal-content > .mt-4,
+#modal-content > div:last-child {
+  flex-shrink: 0;
+}
+
+.modal-header {
+  flex-shrink: 0;
   margin-bottom: var(--space-3); /* 24px */
 }
 
 .modal-footer {
+  flex-shrink: 0;
   margin-top: var(--space-3); /* 24px */
 }
 
