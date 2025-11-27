@@ -23,6 +23,28 @@ body {
   border-radius: var(--radius-md); /* 12px */
 }
 
+.progress-card-label {
+  font-size: var(--text-xs); /* 12px */
+  font-weight: var(--font-semibold); /* 600 */
+  line-height: var(--line-height-tight); /* 1.2 */
+  letter-spacing: 0.05em; /* Slight spacing for all-caps */
+  text-transform: uppercase;
+  margin-bottom: var(--space-1); /* 8px */
+}
+
+.progress-card-value {
+  font-size: var(--text-2xl); /* 24px */
+  font-weight: var(--font-bold); /* 700 */
+  line-height: var(--line-height-tight); /* 1.2 */
+}
+
+.progress-card-subtext {
+  font-size: var(--text-xs); /* 12px */
+  font-weight: var(--font-normal); /* 400 */
+  line-height: var(--line-height-loose); /* 1.7 */
+  margin-top: var(--space-1); /* 8px */
+}
+
 /* === QUEST CARDS === */
 .quest-cards-container {
   display: grid;
@@ -39,6 +61,41 @@ body {
 .quest-card {
   padding: var(--space-2); /* 16px internal - MATCHES progress cards */
   border-radius: var(--radius-md); /* 12px */
+}
+
+.quest-category {
+  font-size: var(--text-xs); /* 12px */
+  font-weight: var(--font-bold); /* 700 */
+  line-height: var(--line-height-tight); /* 1.2 */
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-1); /* 8px */
+}
+
+.quest-title {
+  font-size: var(--text-lg); /* 18px */
+  font-weight: var(--font-semibold); /* 600 */
+  line-height: 1.4; /* Slightly more than tight for readability */
+  margin-bottom: var(--space-2); /* 16px */
+}
+
+.quest-progress-text {
+  font-size: var(--text-sm); /* 14px */
+  font-weight: var(--font-normal); /* 400 */
+  line-height: var(--line-height-normal); /* 1.5 */
+  margin-bottom: var(--space-1); /* 8px */
+}
+
+.quest-reward-text {
+  font-size: var(--text-xs); /* 12px */
+  font-weight: var(--font-semibold); /* 600 */
+  line-height: var(--line-height-tight); /* 1.2 */
+}
+
+.quest-badge {
+  font-size: var(--text-xs); /* 12px */
+  font-weight: var(--font-semibold); /* 600 */
+  line-height: 1; /* Tight for badges */
 }
 
 /* === MODE SELECTION CARDS === */
@@ -61,6 +118,19 @@ body {
   padding: calc(var(--space-2) - 1px); /* Compensate for 1px border difference */
 }
 
+.mode-card-title {
+  font-size: var(--text-xl); /* 20px */
+  font-weight: var(--font-semibold); /* 600 */
+  line-height: var(--line-height-tight); /* 1.2 */
+  margin-bottom: var(--space-1); /* 8px */
+}
+
+.mode-card-description {
+  font-size: var(--text-sm); /* 14px */
+  font-weight: var(--font-normal); /* 400 */
+  line-height: var(--line-height-normal); /* 1.5 */
+}
+
 /* === SOUND BUCKETS === */
 .sound-buckets-container {
   display: grid;
@@ -75,9 +145,25 @@ body {
   min-height: 80px; /* Ensure consistent height */
 }
 
+.bucket-label {
+  font-size: var(--text-lg); /* 18px */
+  font-weight: var(--font-semibold); /* 600 */
+  line-height: var(--line-height-tight); /* 1.2 */
+  margin-bottom: var(--space-1); /* 8px */
+}
+
+.bucket-sound {
+  font-size: var(--text-sm); /* 14px */
+  font-weight: var(--font-normal); /* 400 */
+  line-height: var(--line-height-normal); /* 1.5 */
+}
+
 /* === BUTTONS === */
-.button {
+.button, .btn-primary, .btn-secondary {
   padding: 12px var(--space-3); /* 12px vertical, 24px horizontal */
+  font-size: var(--text-base); /* 16px */
+  font-weight: var(--font-semibold); /* 600 */
+  line-height: 1; /* Tight for buttons */
 }
 
 .button.button-rounded {
@@ -86,21 +172,29 @@ body {
 
 .button-large {
   padding: var(--space-2) var(--space-4); /* 16px vertical, 32px horizontal */
+  font-size: var(--text-lg); /* 18px */
 }
 
 .button-small {
   padding: var(--space-1) var(--space-2); /* 8px vertical, 16px horizontal */
+  font-size: var(--text-sm); /* 14px */
 }
 
-/* Apply consistent padding using CSS variables to existing button IDs */
+/* Apply consistent typography to existing button IDs */
 #start-button {
   padding: 12px var(--space-3); /* 12px vertical, 24px horizontal */
+  font-size: var(--text-base); /* 16px */
+  font-weight: var(--font-semibold); /* 600 */
+  line-height: 1;
 }
 
 #back-to-menu-button,
 #setup-exit-button,
 #game-over-exit-button {
   padding: var(--space-1) var(--space-2); /* 8px vertical, 16px horizontal */
+  font-size: var(--text-xs); /* 12px */
+  font-weight: var(--font-semibold); /* 600 */
+  line-height: 1;
 }
 
 /* === MODAL === */
@@ -144,6 +238,20 @@ body {
   margin-top: var(--space-3); /* 24px */
 }
 
+.modal-title {
+  font-size: var(--text-3xl); /* 32px */
+  font-weight: var(--font-bold); /* 700 */
+  line-height: var(--line-height-tight); /* 1.2 */
+  margin-bottom: var(--space-1); /* 8px */
+}
+
+.modal-subtitle {
+  font-size: var(--text-base); /* 16px */
+  font-weight: var(--font-normal); /* 400 */
+  line-height: var(--line-height-normal); /* 1.5 */
+  margin-bottom: var(--space-4); /* 32px */
+}
+
 /* === GAME TOP BAR === */
 #top-bar {
   display: flex;
@@ -158,6 +266,24 @@ body {
     padding: var(--space-3); /* 24px all around on larger screens */
     gap: var(--space-3); /* 24px between sections */
   }
+}
+
+.level-indicator {
+  font-size: var(--text-lg); /* 18px */
+  font-weight: var(--font-bold); /* 700 */
+  line-height: 1;
+}
+
+.score-value {
+  font-size: var(--text-2xl); /* 24px */
+  font-weight: var(--font-bold); /* 700 */
+  line-height: 1;
+}
+
+.score-label {
+  font-size: var(--text-sm); /* 14px */
+  font-weight: var(--font-medium); /* 500 */
+  line-height: 1;
 }
 .hebrew-font { font-family: 'Heebo', sans-serif; }
 #game-view {

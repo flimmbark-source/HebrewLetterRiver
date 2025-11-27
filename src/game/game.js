@@ -180,13 +180,13 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         'mode-card flex h-full flex-col border-slate-600 bg-slate-800/70 transition hover:border-cyan-400/80';
 
       const title = document.createElement('span');
-      title.className = `text-base font-semibold text-white sm:text-lg ${fontClass}`;
+      title.className = `mode-card-title text-white ${fontClass}`;
       title.textContent = mode.label;
       card.appendChild(title);
 
       if (mode.description) {
         const description = document.createElement('p');
-        description.className = 'mt-1 text-sm text-slate-400';
+        description.className = 'mode-card-description text-slate-400';
         description.textContent = mode.description;
         card.appendChild(description);
       }

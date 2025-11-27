@@ -20,10 +20,28 @@
   --radius-lg: 16px;
   --radius-full: 9999px;
 
-  /* === TYPOGRAPHY === */
-  --line-height-tight: 1.2;
-  --line-height-normal: 1.5;
-  --line-height-loose: 1.7;
+  /* === TYPOGRAPHY SYSTEM === */
+
+  /* Font Sizes */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 32px;
+  --text-4xl: 40px;
+
+  /* Line Heights */
+  --line-height-tight: 1.2;   /* For headings */
+  --line-height-normal: 1.5;  /* For body text */
+  --line-height-loose: 1.7;   /* For small text */
+
+  /* Font Weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
 }
 
 html,

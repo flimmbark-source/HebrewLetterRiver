@@ -187,8 +187,8 @@ function GameCanvas({ fontClass }) {
 
               <div id="setup-view" className="space-y-4 pt-14 sm:pt-16 sm:space-y-5">
                 <div className="space-y-2 text-center">
-                  <h1 className={`text-2xl font-bold text-cyan-300 sm:text-3xl ${fontClass}`}>{t('game.setup.title')}</h1>
-                  <p id="modal-subtitle" className="text-sm text-slate-400">
+                  <h1 className={`modal-title text-cyan-300 ${fontClass}`}>{t('game.setup.title')}</h1>
+                  <p id="modal-subtitle" className="modal-subtitle text-slate-400">
                     {t('game.setup.subtitleFallback')}
                   </p>
                 </div>

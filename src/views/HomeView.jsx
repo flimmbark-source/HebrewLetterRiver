@@ -75,28 +75,28 @@ function TaskCard({
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">{task.title}</p>
-          <h3 className="text-lg font-semibold text-white sm:text-xl">{task.description}</h3>
+          <p className="quest-category text-slate-400">{task.title}</p>
+          <h3 className="quest-title text-white">{task.description}</h3>
         </div>
-        <span className={`self-start rounded-full border px-3 py-1 text-xs font-semibold sm:text-sm ${statusPillClass}`}>
+        <span className={`quest-badge self-start rounded-full border px-3 py-1 ${statusPillClass}`}>
           {questLabel}
         </span>
       </div>
       <div className="mt-5 h-2 rounded-full bg-slate-800">
         <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400" style={{ width: `${percentage}%` }} />
       </div>
-      <div className="mt-4 flex items-center justify-between text-sm text-slate-300">
-        <span>{statusLabel}</span>
-        <span>{progressValue}</span>
+      <div className="mt-4 flex items-center justify-between">
+        <span className="quest-progress-text text-slate-300">{statusLabel}</span>
+        <span className="quest-progress-text text-slate-300">{progressValue}</span>
       </div>
       {rewardValue > 0 && (
         <div className="mt-4 space-y-3 rounded-2xl border border-amber-400/50 bg-amber-400/10 p-4">
-          <div className="flex items-center justify-between text-sm text-amber-100">
-            <span>Quest reward</span>
-            <span>+{formattedReward} ⭐</span>
+          <div className="flex items-center justify-between">
+            <span className="quest-reward-text text-amber-100">Quest reward</span>
+            <span className="quest-reward-text text-amber-100">+{formattedReward} ⭐</span>
           </div>
           {task.rewardClaimed ? (
-            <p className="text-xs text-amber-100/80">Reward collected</p>
+            <p className="quest-reward-text text-amber-100/80">Reward collected</p>
           ) : (
             <button
               type="button"
@@ -243,15 +243,15 @@ export default function HomeView() {
         <h2 className="text-base font-semibold text-slate-200 sm:text-lg">Progress today</h2>
         <div className="progress-cards-container mt-4">
           <div className="progress-card border border-slate-800 bg-slate-900/70">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Streak</p>
-            <p className="mt-2 text-2xl font-semibold text-white sm:text-3xl">{streak.current} days</p>
-            <p className="mt-1 text-xs text-slate-500 sm:text-sm">Resets at 00:00 Asia/Jerusalem ({nextResetTime})</p>
+            <p className="progress-card-label text-slate-400">Streak</p>
+            <p className="progress-card-value text-white">{streak.current} days</p>
+            <p className="progress-card-subtext text-slate-500">Resets at 00:00 Asia/Jerusalem ({nextResetTime})</p>
           </div>
           <div className="progress-card border border-slate-800 bg-slate-900/70">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Star level</p>
+            <p className="progress-card-label text-slate-400">Star level</p>
             <div className="mt-2 flex items-baseline justify-between">
-              <p className="text-2xl font-semibold text-white sm:text-3xl">Level {level}</p>
-              <p className="text-xs text-slate-500 sm:text-sm">{formatNumber(totalStarsEarned)} ⭐ total</p>
+              <p className="progress-card-value text-white">Level {level}</p>
+              <p className="progress-card-subtext text-slate-500">{formatNumber(totalStarsEarned)} ⭐ total</p>
             </div>
             <div className="mt-3 h-2 rounded-full bg-slate-800">
               <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-sky-500" style={{ width: `${starsProgress * 100}%` }} />
@@ -259,16 +259,16 @@ export default function HomeView() {
             <p className="mt-2 text-sm text-slate-300">
               {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐ to next level
             </p>
-            <p className="mt-1 text-xs text-slate-500">Claim badge tiers and daily rewards to earn more stars.</p>
+            <p className="progress-card-subtext text-slate-500">Claim badge tiers and daily rewards to earn more stars.</p>
           </div>
           <div className="progress-card border border-slate-800 bg-slate-900/70">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Latest badge</p>
+            <p className="progress-card-label text-slate-400">Latest badge</p>
             {latestBadge ? (
               <div className="mt-2 space-y-1">
                 <p className="text-base font-semibold text-white sm:text-lg">{latestBadge.name}</p>
                 <p className="text-sm text-cyan-300">{latestBadge.label}</p>
-                <p className="text-xs text-slate-400 sm:text-sm">Tier {latestBadge.tier} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
-                <p className="text-xs text-slate-500 sm:text-sm">{latestBadge.summary}</p>
+                <p className="progress-card-subtext text-slate-400">Tier {latestBadge.tier} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
+                <p className="progress-card-subtext text-slate-500">{latestBadge.summary}</p>
               </div>
             ) : (
               <p className="mt-3 text-sm text-slate-400">Play a session to start unlocking achievements.</p>
