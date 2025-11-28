@@ -220,6 +220,14 @@
     }
   },
   "daily": {
+    "badge": {
+      "title": "Daily badge",
+      "claimStars": "Claim your stars",
+      "rewardsCollected": "Rewards collected",
+      "completeQuests": "Complete quests to earn stars",
+      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
+      "finishQuests": "Finish quests to unlock their star rewards."
+    },
     "tasks": {
       "warmup": {
         "title": "Warm-Up",

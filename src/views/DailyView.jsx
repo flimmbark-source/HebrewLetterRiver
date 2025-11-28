@@ -67,7 +67,7 @@ function TaskCard({ task, accent, onClaim, claiming }) {
 export default function DailyView() {
   const { daily, getWeakestLetter, claimDailyReward } = useProgress();
   const { openGame } = useGame();
-  const { languagePack } = useLocalization();
+  const { languagePack, t } = useLocalization();
   const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
 
   const [celebrating, setCelebrating] = useState(false);
@@ -163,14 +163,14 @@ export default function DailyView() {
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Daily badge</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">{t('daily.badge.title')}</p>
             <h2 className="text-2xl font-semibold text-white sm:text-3xl">
-              {dailyClaimable ? 'Claim your stars' : rewardClaimed ? 'Rewards collected' : 'Complete quests to earn stars'}
+              {dailyClaimable ? t('daily.badge.claimStars') : rewardClaimed ? t('daily.badge.rewardsCollected') : t('daily.badge.completeQuests')}
             </h2>
             <p className="text-sm text-slate-300">
               {dailyClaimable
-                ? `You have +${formatNumber(rewardStars)} ⭐ ready across completed quests.`
-                : 'Finish quests to unlock their star rewards.'}
+                ? t('daily.badge.starsReady', { stars: formatNumber(rewardStars) })
+                : t('daily.badge.finishQuests')}
             </p>
           </div>
           {dailyClaimable ? (

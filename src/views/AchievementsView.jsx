@@ -72,7 +72,7 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
     : '';
   const statusLabel = isMaxed
     ? translate('achievements.maxed')
-    : translate('achievements.next', { label: tierLabel });
+    : tierLabel;
   const currentDisplay = hasUnclaimed || isMaxed ? `${nextGoal} / ${nextGoal}` : `${currentProgressValue} / ${nextGoal}`;
 
   const canClaim = hasUnclaimed && unclaimed.length > 0;
@@ -105,14 +105,14 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
       tabIndex={canClaim ? 0 : undefined}
       aria-label={canClaim ? `Claim ${firstUnclaimed.stars} stars for ${tierProgressLabel}` : undefined}
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">{badgeName}</p>
+      <div className="space-y-2">
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">{badgeName}</p>
+        <div className="flex flex-wrap items-center gap-2">
           <h3 className="text-lg font-semibold text-white sm:text-xl">{badgeSummary}</h3>
+          <span className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200 sm:text-sm">
+            {isClaiming ? translate('achievements.claiming') : tierProgressLabel}
+          </span>
         </div>
-        <span className="self-start rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200 sm:text-sm">
-          {isClaiming ? translate('achievements.claiming') : tierProgressLabel}
-        </span>
       </div>
       {hasUnclaimed && (
         <div className="mt-4 flex items-center justify-between">
@@ -238,9 +238,8 @@ export default function AchievementsView() {
     <div className="space-y-8 sm:space-y-10">
       <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-6 shadow-2xl sm:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-          <div className="space-y-3">
+          <div>
             <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('achievements.title')}</h1>
-            <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('achievements.description')}</p>
           </div>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
             <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
+import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import HomeView from './views/HomeView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import LearnView from './views/LearnView.jsx';
@@ -154,11 +154,13 @@ function LanguageOnboardingModal() {
 }
 
 function Shell() {
+  const location = useLocation();
   const { openGame } = useGame();
   const { t, interfaceLanguagePack } = useLocalization();
   const { appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
+  const isAchievementsPage = location.pathname === '/achievements';
 
   const handlePlay = React.useCallback(
     (event) => {
@@ -185,16 +187,18 @@ function Shell() {
           <h1 className={`text-3xl font-bold text-white sm:text-4xl ${fontClass}`}>{t('app.title')}</h1>
           <p className="text-sm text-slate-400 sm:text-base">{t('app.tagline')}</p>
         </div>
-        <div className="sm:min-w-[220px] sm:text-right">
-          <LanguageSelect
-            selectId="header-language"
-            value={appLanguageId}
-            onChange={selectAppLanguage}
-            label={t('app.languagePicker.label')}
-            selectClassName="bg-slate-900/60"
-            options={languageOptions}
-          />
-        </div>
+        {!isAchievementsPage && (
+          <div className="sm:min-w-[220px] sm:text-right">
+            <LanguageSelect
+              selectId="header-language"
+              value={appLanguageId}
+              onChange={selectAppLanguage}
+              label={t('app.languagePicker.label')}
+              selectClassName="bg-slate-900/60"
+              options={languageOptions}
+            />
+          </div>
+        )}
       </header>
       <main className="mt-8 flex-1 pb-6 sm:mt-10">
         <Routes>
