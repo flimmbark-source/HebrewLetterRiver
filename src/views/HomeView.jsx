@@ -197,10 +197,7 @@ export default function HomeView() {
               <select
                 id="home-app-language-select"
                 value={appLanguageId}
-                onChange={(event) => {
-                  selectAppLanguage(event.target.value);
-                  setAppLanguageSelectorExpanded(false);
-                }}
+                onChange={(event) => selectAppLanguage(event.target.value)}
                 className="w-full rounded-2xl border-4 border-slate-600 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-inner focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/40"
               >
                 {languageOptions.map((option) => (
@@ -213,51 +210,30 @@ export default function HomeView() {
               <p className="mt-3 text-center text-xs text-slate-400">
                 {t('app.languagePicker.helper')}
               </p>
+
+              {/* Practice Language Selector */}
+              <div className="mt-5 rounded-2xl border border-slate-700 bg-slate-900/60 p-4 shadow-inner">
+                <label htmlFor="home-practice-language-select" className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                  {t('home.languagePicker.label')}
+                </label>
+                <select
+                  id="home-practice-language-select"
+                  value={languageId}
+                  onChange={(event) => selectLanguage(event.target.value)}
+                  className="mt-2 w-full rounded-xl border-4 border-slate-600 bg-slate-900 px-3 py-2 text-sm font-semibold text-white focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/40"
+                >
+                  {languageOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-xs font-semibold text-slate-400">{t('home.languagePicker.helper')}</p>
+              </div>
             </div>
           )}
         </div>
       </header>
-
-      {/* Main Content */}
-      <section
-        className={classNames(
-          'rounded-3xl border border-slate-800',
-          'bg-slate-900/60 shadow-inner',
-          'p-6',
-          'sm:p-8'
-        )}
-      >
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-          <div className="text-center sm:text-left">
-            <h2 className="text-2xl font-bold text-white sm:text-3xl">{t('home.hero.heading')}</h2>
-            <p className="mt-3 text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
-          </div>
-          <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[260px]">
-            <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-inner">
-              <label htmlFor="home-practice-language-select" className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                {t('home.languagePicker.label')}
-              </label>
-              <select
-                id="home-practice-language-select"
-                value={languageId}
-                onChange={(event) => selectLanguage(event.target.value)}
-                className={classNames(
-                  'mt-2 w-full rounded-xl border-4 border-slate-600 bg-slate-900 px-3 py-2 text-sm font-semibold text-white',
-                  'focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/40',
-                  'sm:text-base'
-                )}
-              >
-                {languageOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-2 text-xs font-semibold text-slate-400">{t('home.languagePicker.helper')}</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner sm:p-6">
         <h2 className="text-base font-bold text-white sm:text-lg">{t('home.progress.heading')}</h2>
