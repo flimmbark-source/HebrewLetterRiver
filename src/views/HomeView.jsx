@@ -180,7 +180,7 @@ export default function HomeView() {
           </button>
           {/* App Language Selector Popup */}
           {appLanguageSelectorExpanded && (
-            <div className="absolute right-0 top-full mt-2 w-80 rounded-3xl border-4 border-slate-700 bg-slate-800 p-5 shadow-2xl z-50">
+            <div className="absolute right-0 top-0 w-80 rounded-3xl border-4 border-slate-700 bg-slate-800 p-5 shadow-2xl z-50">
               {/* Close X Button */}
               <button
                 onClick={() => setAppLanguageSelectorExpanded(false)}

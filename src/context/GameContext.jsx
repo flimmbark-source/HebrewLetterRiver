@@ -162,21 +162,21 @@ function GameCanvas({ fontClass }) {
             id="modal"
             className="fixed inset-0 z-30 flex items-center justify-center overflow-y-auto bg-black/80 p-4 text-white sm:p-6"
           >
+            <button
+              id="setup-exit-button"
+              type="button"
+              className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/90 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:left-6 sm:top-6 sm:text-sm"
+            >
+              <span className="text-lg" aria-hidden="true">
+                ←
+              </span>
+              <span>{t('game.controls.exitToMenu')}</span>
+            </button>
+
             <div
               id="modal-content"
               className="relative w-full max-w-3xl border border-slate-700 bg-slate-900/95 shadow-2xl"
             >
-              <button
-                id="setup-exit-button"
-                type="button"
-                className="absolute left-4 top-4 flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/90 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:text-sm"
-              >
-                <span className="text-lg" aria-hidden="true">
-                  ←
-                </span>
-                <span>{t('game.controls.exitToMenu')}</span>
-              </button>
-
               <button
                 id="accessibility-btn"
                 className="absolute right-4 top-4 text-2xl text-slate-400 transition hover:text-cyan-400"
