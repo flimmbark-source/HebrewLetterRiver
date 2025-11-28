@@ -70,12 +70,34 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
     : hasUnclaimed
     ? 'border-amber-400/50 shadow-amber-500/10'
     : '';
-  const statusLabel = hasUnclaimed
-    ? `Claim ${tierLabel} · +${unclaimed[0].stars} ⭐`
-    : isMaxed
+  const statusLabel = isMaxed
     ? translate('achievements.maxed')
     : translate('achievements.next', { label: tierLabel });
   const currentDisplay = hasUnclaimed || isMaxed ? `${nextGoal} / ${nextGoal}` : `${currentProgressValue} / ${nextGoal}`;
+
+  const canClaim = hasUnclaimed && unclaimed.length > 0;
+  const firstUnclaimed = canClaim ? unclaimed[0] : null;
+  const isClaiming = firstUnclaimed && claimingTier === firstUnclaimed.tier;
+
+  const handleBadgeClick = (event) => {
+    if (event) {
+      event.stopPropagation();
+    }
+    if (!canClaim || isClaiming) return;
+    handleClaim(firstUnclaimed);
+  };
+
+  const handleBadgeKeyDown = (event) => {
+    if (!canClaim || isClaiming) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleClaim(firstUnclaimed);
+    }
+  };
+
+  const badgeClass = canClaim
+    ? 'cursor-pointer transition-all hover:bg-amber-400/20 hover:border-amber-400/60 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/70'
+    : 'cursor-default';
 
   return (
     <div
@@ -86,34 +108,37 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
           <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">{badgeName}</p>
           <h3 className="text-lg font-semibold text-white sm:text-xl">{badgeSummary}</h3>
         </div>
-        <span className="self-start rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200 sm:text-sm">
-          {tierProgressLabel}
-        </span>
+        <button
+          type="button"
+          className={`self-start rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200 sm:text-sm ${badgeClass}`}
+          onClick={handleBadgeClick}
+          onKeyDown={handleBadgeKeyDown}
+          disabled={!canClaim || isClaiming}
+          role="button"
+          tabIndex={0}
+          aria-label={canClaim ? `Claim ${firstUnclaimed.stars} stars for ${tierProgressLabel}` : tierProgressLabel}
+        >
+          {isClaiming ? 'Claiming…' : tierProgressLabel}
+        </button>
       </div>
-      <div className="mt-5 h-2 rounded-full bg-slate-800">
+      {hasUnclaimed && (
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-sm font-semibold text-amber-200">+{firstUnclaimed.stars} ⭐</span>
+          {unclaimed.length > 1 && (
+            <span className="text-xs text-amber-200/70">+{unclaimed.length - 1} more tier{unclaimed.length - 1 !== 1 ? 's' : ''}</span>
+          )}
+        </div>
+      )}
+      <div className="mt-4 h-2 rounded-full bg-slate-800">
         <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400" style={{ width: `${percent}%` }} />
       </div>
       <div className="mt-4 flex items-center justify-between text-sm text-slate-300">
         <span>{statusLabel}</span>
         <span>{currentDisplay}</span>
       </div>
-      {hasUnclaimed ? (
-        <div className="mt-4 space-y-2">
-          {unclaimed.map((reward) => (
-            <button
-              key={reward.tier}
-              type="button"
-              onClick={() => handleClaim(reward)}
-              disabled={claimingTier === reward.tier}
-              className="w-full rounded-xl border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/20 focus:outline-none focus:ring-2 focus:ring-amber-300/60 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {claimingTier === reward.tier ? 'Claiming…' : `Claim Tier ${reward.tier} · +${reward.stars} ⭐`}
-            </button>
-          ))}
-        </div>
-      ) : isMaxed ? (
+      {isMaxed ? (
         <p className="mt-2 text-xs text-emerald-300">{translate('achievements.maxed')}</p>
-      ) : (
+      ) : !hasUnclaimed && (
         <p className="mt-2 text-xs text-slate-500">{translate('achievements.earnStars', { stars: activeTier.stars })}</p>
       )}
     </div>

@@ -31,26 +31,11 @@ function TaskCard({
 
   const statusLabel = task.rewardClaimed
     ? 'Reward collected'
-    : canClaimReward
-    ? `Quest complete! Claim +${formattedReward} ⭐`
     : task.completed
     ? 'Quest complete'
     : 'In progress…';
 
-  const handleCardClick = () => {
-    if (!clickable) return;
-    onClaimReward();
-  };
-
-  const handleKeyDown = (event) => {
-    if (!clickable) return;
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      onClaimReward();
-    }
-  };
-
-  const handleClaimClick = (event) => {
+  const handleBadgeClick = (event) => {
     if (event) {
       event.stopPropagation();
     }
@@ -58,62 +43,65 @@ function TaskCard({
     onClaimReward();
   };
 
-  const containerClass = classNames(
-    'quest-card rounded-3xl border border-slate-800 bg-slate-900/60 shadow-inner transition',
-    'hover:border-cyan-500/40',
-    highlightClass,
-    clickable && ['cursor-pointer', 'focus:outline-none', 'focus-visible:ring-2', 'focus-visible:ring-amber-200/70']
+  const handleBadgeKeyDown = (event) => {
+    if (!clickable) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClaimReward();
+    }
+  };
+
+  const badgeClass = classNames(
+    'quest-badge self-start rounded-full border px-3 py-1',
+    statusPillClass,
+    clickable && [
+      'cursor-pointer',
+      'transition-all',
+      'hover:bg-amber-400/20',
+      'hover:border-amber-400/60',
+      'hover:scale-105',
+      'focus:outline-none',
+      'focus-visible:ring-2',
+      'focus-visible:ring-amber-200/70'
+    ],
+    !clickable && 'cursor-default'
   );
 
   return (
-    <div
-      className={containerClass}
-      role={clickable ? 'button' : undefined}
-      tabIndex={clickable ? 0 : undefined}
-      onClick={handleCardClick}
-      onKeyDown={handleKeyDown}
-    >
+    <div className="quest-card rounded-3xl border border-slate-800 bg-slate-900/60 shadow-inner transition hover:border-cyan-500/40">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
           <p className="quest-category text-slate-400">{task.title}</p>
           <h3 className="quest-title text-white">{task.description}</h3>
         </div>
-        <span className={`quest-badge self-start rounded-full border px-3 py-1 ${statusPillClass}`}>
-          {questLabel}
-        </span>
+        <button
+          type="button"
+          className={badgeClass}
+          onClick={handleBadgeClick}
+          onKeyDown={handleBadgeKeyDown}
+          disabled={!clickable || claimingReward}
+          role="button"
+          tabIndex={0}
+          aria-label={canClaimReward ? `Claim ${formattedReward} stars for ${questLabel}` : questLabel}
+        >
+          {claimingReward ? 'Claiming…' : questLabel}
+        </button>
       </div>
-      <div className="mt-5 h-2 rounded-full bg-slate-800">
+      {rewardValue > 0 && (
+        <div className="mt-4 flex items-center justify-between">
+          <span className="quest-reward-text text-amber-200">+{formattedReward} ⭐</span>
+          {task.rewardClaimed && (
+            <span className="quest-reward-text text-emerald-300">✓ Collected</span>
+          )}
+        </div>
+      )}
+      <div className="mt-4 h-2 rounded-full bg-slate-800">
         <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400" style={{ width: `${percentage}%` }} />
       </div>
       <div className="mt-4 flex items-center justify-between">
         <span className="quest-progress-text text-slate-300">{statusLabel}</span>
         <span className="quest-progress-text text-slate-300">{progressValue}</span>
       </div>
-      {rewardValue > 0 && (
-        <div className="mt-4 space-y-3 rounded-2xl border border-amber-400/50 bg-amber-400/10 p-4">
-          <div className="flex items-center justify-between">
-            <span className="quest-reward-text text-amber-100">Quest reward</span>
-            <span className="quest-reward-text text-amber-100">+{formattedReward} ⭐</span>
-          </div>
-          {task.rewardClaimed ? (
-            <p className="quest-reward-text text-amber-100/80">Reward collected</p>
-          ) : (
-            <button
-              type="button"
-              onClick={handleClaimClick}
-              disabled={!canClaimReward || claimingReward}
-              className={classNames(
-                'w-full rounded-xl border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-100 transition',
-                'hover:bg-amber-400/20',
-                'focus:outline-none focus:ring-2 focus:ring-amber-300/60',
-                'disabled:cursor-not-allowed disabled:opacity-60'
-              )}
-            >
-              {claimingReward ? 'Claiming…' : `Claim +${formattedReward} ⭐`}
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
