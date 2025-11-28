@@ -588,11 +588,12 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       targetBox.classList.add('feedback-incorrect');
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
 
-      const correctSymbol = getDisplaySymbol(item.data);
-      const fallbackLabel = getDisplayLabel(item.data);
+      // Find the correct bucket to show its sound/label
+      const correctBucket = choicesContainer.querySelector(`[data-item-id="${droppedItemId}"]`);
+      const correctLabel = correctBucket ? correctBucket.textContent : (getDisplayLabel(item.data) || getDisplaySymbol(item.data));
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
-      ghostEl.textContent = correctSymbol || fallbackLabel;
+      ghostEl.textContent = correctLabel;
 
       ghostEl.style.display = 'block';
       const ghostWidth = ghostEl.offsetWidth;
@@ -1406,11 +1407,12 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       targetBox.classList.add('feedback-incorrect');
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
 
-      const correctSymbol = getDisplaySymbol(item.data);
+      // Find the correct bucket to show its sound/label
+      const correctBucket = choicesContainer.querySelector(`[data-item-id="${droppedItemId}"]`);
+      const correctLabel = correctBucket ? correctBucket.textContent : (getDisplayLabel(item.data) || getDisplaySymbol(item.data));
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
-      const fallbackLabel = getDisplayLabel(item.data);
-      ghostEl.textContent = correctSymbol || fallbackLabel;
+      ghostEl.textContent = correctLabel;
       ghostEl.style.display = 'block';
       const ghostWidth = ghostEl.offsetWidth;
       ghostEl.style.display = '';

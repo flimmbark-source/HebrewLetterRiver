@@ -273,7 +273,7 @@ function GameCanvas({ fontClass }) {
           id="summary-tooltip"
           className="pointer-events-none absolute z-50 hidden rounded-xl border border-slate-600 bg-slate-900 px-3 py-2 text-center text-sm text-white shadow-lg"
         />
-        <div id="correct-answer-ghost" className="pointer-events-none absolute text-xl font-bold text-green-400 opacity-0" />
+        <div id="correct-answer-ghost" className="pointer-events-none absolute text-4xl font-bold text-green-400 opacity-0" />
       </div>
     </div>
   );
