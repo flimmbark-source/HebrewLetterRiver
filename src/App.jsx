@@ -168,10 +168,8 @@ function Shell() {
   );
 
   const tabClass = ({ isActive }) =>
-    `flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-xs font-bold transition-all sm:text-sm ${
-      isActive
-        ? 'bg-amber-400 text-amber-900 border-b-4 border-amber-600 shadow-md'
-        : 'text-amber-100 hover:text-white hover:bg-amber-800/30'
+    `flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-xs font-medium transition sm:text-sm ${
+      isActive ? 'bg-cyan-500/20 text-cyan-300 shadow-inner shadow-cyan-500/30' : 'text-slate-300 hover:text-white'
     }`;
 
   return (
@@ -191,7 +189,7 @@ function Shell() {
         </Routes>
       </main>
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t-4 border-amber-800 bg-gradient-to-t from-amber-900 to-amber-800 px-4 pt-3 shadow-2xl"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-800 bg-slate-950/95 px-4 pt-3 backdrop-blur"
         style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}
       >
         <div className="mx-auto flex w-full max-w-3xl justify-between gap-2">
@@ -202,7 +200,7 @@ function Shell() {
           <button
             type="button"
             onClick={handlePlay}
-            className="flex flex-1 flex-col items-center gap-1 rounded-2xl border-b-4 border-orange-700 bg-orange-500 px-4 py-2 text-xs font-bold text-white shadow-lg transition-all hover:bg-orange-400 active:translate-y-1 active:border-b-2 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-orange-300 sm:text-sm"
+            className="flex flex-1 flex-col items-center gap-1 rounded-2xl bg-cyan-500/10 px-4 py-2 text-xs font-medium text-cyan-300 transition hover:bg-cyan-500/20 hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:text-sm"
           >
             <PlayIcon className="h-5 w-5" />
             <span>{t('app.nav.play')}</span>
@@ -217,7 +215,7 @@ function Shell() {
           </NavLink>
         </div>
       </nav>
-      <footer className="pb-6 text-center text-xs font-semibold text-amber-800 sm:text-sm">{t('app.footer.resetNotice')}</footer>
+      <footer className="pb-6 text-center text-xs text-slate-600 sm:text-sm">{t('app.footer.resetNotice')}</footer>
     </div>
   );
 }
@@ -229,7 +227,7 @@ export default function App() {
         <ToastProvider>
           <ProgressProvider>
             <GameProvider>
-              <div className="min-h-screen bg-gradient-to-br from-amber-100 via-orange-50 to-amber-100">
+              <div className="min-h-screen bg-slate-950 text-white">
                 <Shell />
               </div>
             </GameProvider>
