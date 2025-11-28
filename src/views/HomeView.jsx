@@ -55,9 +55,6 @@ function TaskCard({
     ? t('home.quest.complete')
     : t('home.quest.inProgress');
 
-  const canClaimReward = Boolean(task.rewardClaimable) && !task.rewardClaimed && typeof onClaimReward === 'function';
-  const clickable = canClaimReward && !claimingReward;
-
   const cardClass = clickable
     ? 'cursor-pointer hover:scale-[1.02] bg-gradient-to-br from-cyan-900/40 to-slate-900/60 border-cyan-600/50 shadow-cyan-500/20 animate-pulse'
     : 'bg-slate-900/60 border-slate-800';
