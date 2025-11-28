@@ -55,15 +55,19 @@ function TaskCard({
     ? t('home.quest.complete')
     : t('home.quest.inProgress');
 
-  const handleBadgeClick = (event) => {
-    if (event) {
-      event.stopPropagation();
-    }
+  const canClaimReward = Boolean(task.rewardClaimable) && !task.rewardClaimed && typeof onClaimReward === 'function';
+  const clickable = canClaimReward && !claimingReward;
+
+  const cardClass = clickable
+    ? 'cursor-pointer hover:scale-[1.02] bg-gradient-to-br from-cyan-900/40 to-slate-900/60 border-cyan-600/50 shadow-cyan-500/20 animate-pulse'
+    : 'bg-slate-900/60 border-slate-800';
+
+  const handleCardClick = () => {
     if (!clickable) return;
     onClaimReward();
   };
 
-  const handleBadgeKeyDown = (event) => {
+  const handleCardKeyDown = (event) => {
     if (!clickable) return;
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -72,7 +76,14 @@ function TaskCard({
   };
 
   return (
-    <div className="quest-card rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner transition hover:border-cyan-500/40 sm:p-6">
+    <div
+      className={`quest-card rounded-3xl border p-5 shadow-inner transition sm:p-6 ${cardClass} ${clickable ? 'hover:border-cyan-500/60' : 'hover:border-cyan-500/40'}`}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      aria-label={clickable ? `Claim ${formattedReward} stars for quest` : undefined}
+    >
       <div className="flex items-start justify-between gap-4">
         <h3 className="text-base font-semibold text-white sm:text-lg">{task.description}</h3>
         <span className="flex-shrink-0 rounded-full border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-200">
@@ -82,7 +93,9 @@ function TaskCard({
       <div className="mt-4 flex items-center justify-between">
         <span className="text-sm text-slate-300">{progressValue}</span>
         {rewardValue > 0 && (
-          <span className="text-sm font-semibold text-amber-200">+{formattedReward} ⭐</span>
+          <span className={`text-sm font-semibold ${clickable ? 'text-amber-300 animate-pulse' : 'text-amber-200'}`}>
+            {clickable && '✨ '}+{formattedReward} ⭐{clickable && ' ✨'}
+          </span>
         )}
       </div>
       <div className="mt-2 h-2 rounded-full bg-slate-800">
