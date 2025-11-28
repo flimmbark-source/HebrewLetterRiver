@@ -170,7 +170,7 @@ function Shell() {
   const tabClass = ({ isActive }) =>
     `flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-xs font-bold transition-all sm:text-sm ${
       isActive
-        ? 'bg-cyan-600 text-white border-b-4 border-cyan-800 shadow-lg'
+        ? 'bg-cyan-500/20 text-cyan-300 border-b-4 border-cyan-700 shadow-lg'
         : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
     }`;
 
@@ -202,7 +202,7 @@ function Shell() {
           <button
             type="button"
             onClick={handlePlay}
-            className="flex flex-1 flex-col items-center gap-1 rounded-2xl border-b-4 border-cyan-700 bg-cyan-600 px-4 py-2 text-xs font-bold text-white shadow-lg transition-all hover:bg-cyan-500 active:translate-y-1 active:border-b-2 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:text-sm"
+            className="flex flex-1 flex-col items-center gap-1 rounded-2xl border-b-4 border-cyan-700 bg-cyan-500/20 px-4 py-2 text-xs font-bold text-cyan-300 shadow-lg transition-all hover:bg-cyan-500/30 active:translate-y-1 active:border-b-2 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:text-sm"
           >
             <PlayIcon className="h-5 w-5" />
             <span>{t('app.nav.play')}</span>

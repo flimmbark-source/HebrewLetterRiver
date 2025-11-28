@@ -71,59 +71,22 @@ function TaskCard({
     }
   };
 
-  const badgeClass = classNames(
-    'quest-badge self-start rounded-full border-b-4 px-3 py-1 text-xs font-bold shadow-lg transition-all sm:text-sm',
-    task.rewardClaimed
-      ? 'border-green-700 bg-green-600 text-white'
-      : 'border-cyan-700 bg-cyan-600 text-white',
-    clickable && [
-      'cursor-pointer',
-      'hover:bg-cyan-500',
-      'hover:border-cyan-600',
-      'hover:scale-105',
-      'active:translate-y-1',
-      'active:border-b-2',
-      'focus:outline-none',
-      'focus-visible:ring-2',
-      'focus-visible:ring-cyan-400'
-    ],
-    !clickable && 'cursor-default'
-  );
-
   return (
-    <div className="quest-card rounded-3xl border-4 border-slate-700 bg-slate-800 shadow-2xl transition hover:shadow-cyan-500/20">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <p className="quest-category text-xs font-bold uppercase tracking-wider text-slate-400">{task.title}</p>
-          <h3 className="quest-title text-lg font-bold text-white sm:text-xl">{task.description}</h3>
-        </div>
-        <button
-          type="button"
-          className={badgeClass}
-          onClick={handleBadgeClick}
-          onKeyDown={handleBadgeKeyDown}
-          disabled={!clickable || claimingReward}
-          role="button"
-          tabIndex={0}
-          aria-label={canClaimReward ? `Claim ${formattedReward} stars for ${questLabel}` : questLabel}
-        >
-          {claimingReward ? t('home.quest.claiming') : questLabel}
-        </button>
+    <div className="quest-card rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner transition hover:border-cyan-500/40 sm:p-6">
+      <div className="flex items-start justify-between gap-4">
+        <h3 className="text-base font-semibold text-white sm:text-lg">{task.description}</h3>
+        <span className="flex-shrink-0 rounded-full border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-200">
+          {questLabel}
+        </span>
       </div>
-      {rewardValue > 0 && (
-        <div className="mt-4 flex items-center justify-between">
-          <span className="quest-reward-text text-xl font-bold text-cyan-400">+{formattedReward} ⭐</span>
-          {task.rewardClaimed && (
-            <span className="quest-reward-text text-sm font-bold text-green-400">✓ {t('home.quest.collectedShort')}</span>
-          )}
-        </div>
-      )}
-      <div className="mt-4 h-4 rounded-full border-4 border-slate-700 bg-slate-900 shadow-inner">
-        <div className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300" style={{ width: `${percentage}%` }} />
+      <div className="mt-4 flex items-center justify-between">
+        <span className="text-sm text-slate-300">{progressValue}</span>
+        {rewardValue > 0 && (
+          <span className="text-sm font-semibold text-amber-200">+{formattedReward} ⭐</span>
+        )}
       </div>
-      <div className="mt-3 flex items-center justify-between text-sm font-semibold text-slate-400">
-        <span className="quest-progress-text">{statusLabel}</span>
-        <span className="quest-progress-text">{progressValue}</span>
+      <div className="mt-2 h-2 rounded-full bg-slate-800">
+        <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400 transition-all duration-300" style={{ width: `${percentage}%` }} />
       </div>
     </div>
   );
@@ -245,9 +208,9 @@ export default function HomeView() {
       {/* Main Content */}
       <section
         className={classNames(
-          'rounded-3xl border-4 border-slate-700',
-          'bg-gradient-to-br from-slate-900 to-slate-950',
-          'p-6 shadow-2xl',
+          'rounded-3xl border border-slate-800',
+          'bg-slate-900/60 shadow-inner',
+          'p-6',
           'sm:p-8'
         )}
       >
@@ -257,7 +220,7 @@ export default function HomeView() {
             <p className="mt-3 text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[260px]">
-            <div className="rounded-2xl border-4 border-slate-700 bg-slate-800 p-4 shadow-lg">
+            <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-inner">
               <label htmlFor="home-practice-language-select" className="text-xs font-bold uppercase tracking-wider text-slate-300">
                 {t('home.languagePicker.label')}
               </label>
@@ -283,28 +246,28 @@ export default function HomeView() {
         </div>
       </section>
 
-      <section className="rounded-3xl border-4 border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 p-5 shadow-2xl sm:p-6">
+      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner sm:p-6">
         <h2 className="text-base font-bold text-white sm:text-lg">{t('home.progress.heading')}</h2>
         <div className="progress-cards-container mt-4">
-          <div className="progress-card rounded-2xl border-4 border-slate-700 bg-slate-800 shadow-lg">
+          <div className="progress-card rounded-2xl border border-slate-800 bg-slate-900/60 p-4 shadow-inner">
             <p className="progress-card-label text-xs font-bold uppercase tracking-wider text-slate-400">{t('home.progress.streak')}</p>
             <p className="progress-card-value mt-2 text-3xl font-bold text-cyan-400">{t('home.progress.days', { count: streak.current })}</p>
             <p className="progress-card-subtext mt-1 text-xs font-semibold text-slate-500">{t('home.progress.resetsAt', { time: nextResetTime })}</p>
           </div>
-          <div className="progress-card rounded-2xl border-4 border-slate-700 bg-slate-800 shadow-lg">
+          <div className="progress-card rounded-2xl border border-slate-800 bg-slate-900/60 p-4 shadow-inner">
             <p className="progress-card-label text-xs font-bold uppercase tracking-wider text-slate-400">{t('home.progress.starLevel')}</p>
             <div className="mt-2 flex items-baseline justify-between">
               <p className="progress-card-value text-3xl font-bold text-cyan-400">{t('home.progress.level', { level })}</p>
               <p className="progress-card-subtext text-sm font-semibold text-slate-500">{t('home.progress.totalStars', { count: formatNumber(totalStarsEarned) })}</p>
             </div>
-            <div className="mt-3 h-4 rounded-full border-4 border-slate-700 bg-slate-900 shadow-inner">
-              <div className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300" style={{ width: `${starsProgress * 100}%` }} />
+            <div className="mt-3 h-2 rounded-full bg-slate-800">
+              <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400 transition-all duration-300" style={{ width: `${starsProgress * 100}%` }} />
             </div>
             <p className="mt-2 text-sm font-semibold text-slate-400">
               {t('home.progress.toNextLevel', { current: formatNumber(levelProgress), total: formatNumber(starsPerLevel) })}
             </p>
           </div>
-          <div className="progress-card rounded-2xl border-4 border-slate-700 bg-slate-800 shadow-lg">
+          <div className="progress-card rounded-2xl border border-slate-800 bg-slate-900/60 p-4 shadow-inner">
             <p className="progress-card-label text-xs font-bold uppercase tracking-wider text-slate-400">{t('home.progress.latestBadge')}</p>
             {latestBadge ? (
               <div className="mt-2 space-y-1">
