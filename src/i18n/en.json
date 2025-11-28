@@ -50,6 +50,27 @@
     "cta": {
       "start": "Start a New Run",
       "practice": "Practice Focus Letter"
+    },
+    "progress": {
+      "heading": "Progress today",
+      "streak": "Streak",
+      "days": "{{count}} days",
+      "resetsAt": "Resets at 00:00 Asia/Jerusalem ({{time}})",
+      "starLevel": "Star level",
+      "level": "Level {{level}}",
+      "totalStars": "{{count}} ⭐ total",
+      "toNextLevel": "{{current}} / {{total}} ⭐ to next level",
+      "latestBadge": "Latest badge",
+      "tier": "Tier {{tier}}",
+      "playToUnlock": "Play a session to start unlocking achievements."
+    },
+    "quest": {
+      "label": "Quest {{current}} of {{total}}",
+      "complete": "Quest complete",
+      "inProgress": "In progress…",
+      "collected": "Reward collected",
+      "collectedShort": "✓ Collected",
+      "claiming": "Claiming…"
     }
   },
   "wordRiver": {
@@ -174,7 +195,20 @@
     "next": "Next: {{label}}",
     "complete": "All tiers complete",
     "earnStars": "Earn +{{stars}} ⭐ when you unlock this tier.",
-    "maxed": "Badge fully mastered — enjoy the glow!"
+    "maxed": "Badge fully mastered — enjoy the glow!",
+    "claiming": "Claiming…",
+    "moreTiers": "+{{count}} more tier",
+    "moreTiersPlural": "+{{count}} more tiers",
+    "profile": {
+      "title": "Player Profile",
+      "description": "Track your star progress and claim rewards to rise through the River ranks.",
+      "starsToNextLevel": "Stars to next level",
+      "totalStarsEarned": "Total stars earned",
+      "currentStarBalance": "Current star balance",
+      "starsReadyToClaim": "Stars ready to claim",
+      "dailyBadgeReady": "Daily badge ready",
+      "claimStarsToLevel": "Claim +{{stars}} ⭐ to add them to your level."
+    }
   },
   "learn": {
     "title": "Learn",

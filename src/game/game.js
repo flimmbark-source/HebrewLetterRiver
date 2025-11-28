@@ -582,6 +582,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       updateScore(isBonusRound ? 25 : 10);
       targetBox.classList.add('feedback-correct');
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].correct++;
+      // Hide the letter immediately after correct drop
+      item.element.style.display = 'none';
     } else {
       lives--;
       updateLives(true);
@@ -602,6 +604,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       ghostEl.style.top = `${boxRect.top - gameRect.top}px`;
       ghostEl.classList.add('ghost-rise');
       trackTimeout(() => ghostEl.classList.remove('ghost-rise'), 2000);
+      // Hide the letter immediately after incorrect drop too
+      item.element.style.display = 'none';
     }
 
     if (!isBonusRound) {
@@ -1401,6 +1405,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       updateScore(isBonusRound ? 25 : 10);
       targetBox.classList.add('feedback-correct');
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].correct++;
+      // Hide the letter immediately after correct drop
+      item.element.style.display = 'none';
     } else {
       lives--;
       updateLives(true);
@@ -1422,6 +1428,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       trackTimeout(() => {
         ghostEl.classList.remove('ghost-rise');
       }, 2000);
+      // Hide the letter immediately after incorrect drop too
+      item.element.style.display = 'none';
     }
 
     if (!isBonusRound) {

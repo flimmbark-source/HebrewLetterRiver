@@ -79,15 +79,12 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
   const firstUnclaimed = canClaim ? unclaimed[0] : null;
   const isClaiming = firstUnclaimed && claimingTier === firstUnclaimed.tier;
 
-  const handleBadgeClick = (event) => {
-    if (event) {
-      event.stopPropagation();
-    }
+  const handleCardClick = () => {
     if (!canClaim || isClaiming) return;
     handleClaim(firstUnclaimed);
   };
 
-  const handleBadgeKeyDown = (event) => {
+  const handleCardKeyDown = (event) => {
     if (!canClaim || isClaiming) return;
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -95,37 +92,35 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
     }
   };
 
-  const badgeClass = canClaim
-    ? 'cursor-pointer transition-all hover:bg-amber-400/20 hover:border-amber-400/60 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/70'
-    : 'cursor-default';
+  const cardClass = canClaim
+    ? 'cursor-pointer hover:border-amber-400/40 hover:scale-[1.01]'
+    : 'cursor-default hover:border-cyan-500/40';
 
   return (
     <div
-      className={`rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner transition hover:border-cyan-500/40 sm:p-6 ${highlightClass}`}
+      className={`rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner transition sm:p-6 ${highlightClass} ${cardClass}`}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+      role={canClaim ? 'button' : undefined}
+      tabIndex={canClaim ? 0 : undefined}
+      aria-label={canClaim ? `Claim ${firstUnclaimed.stars} stars for ${tierProgressLabel}` : undefined}
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
           <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">{badgeName}</p>
           <h3 className="text-lg font-semibold text-white sm:text-xl">{badgeSummary}</h3>
         </div>
-        <button
-          type="button"
-          className={`self-start rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200 sm:text-sm ${badgeClass}`}
-          onClick={handleBadgeClick}
-          onKeyDown={handleBadgeKeyDown}
-          disabled={!canClaim || isClaiming}
-          role="button"
-          tabIndex={0}
-          aria-label={canClaim ? `Claim ${firstUnclaimed.stars} stars for ${tierProgressLabel}` : tierProgressLabel}
-        >
-          {isClaiming ? 'Claiming…' : tierProgressLabel}
-        </button>
+        <span className="self-start rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200 sm:text-sm">
+          {isClaiming ? translate('achievements.claiming') : tierProgressLabel}
+        </span>
       </div>
       {hasUnclaimed && (
         <div className="mt-4 flex items-center justify-between">
           <span className="text-sm font-semibold text-amber-200">+{firstUnclaimed.stars} ⭐</span>
           {unclaimed.length > 1 && (
-            <span className="text-xs text-amber-200/70">+{unclaimed.length - 1} more tier{unclaimed.length - 1 !== 1 ? 's' : ''}</span>
+            <span className="text-xs text-amber-200/70">
+              {translate(unclaimed.length - 1 === 1 ? 'achievements.moreTiers' : 'achievements.moreTiersPlural', { count: unclaimed.length - 1 })}
+            </span>
           )}
         </div>
       )}
@@ -251,14 +246,14 @@ export default function AchievementsView() {
       >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-3">
-            <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">Player Profile</p>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Level {level}</h2>
+            <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('achievements.profile.title')}</p>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">{t('home.progress.level', { level })}</h2>
             <p className="text-sm text-slate-300 sm:max-w-xl sm:text-base">
-              Track your star progress and claim rewards to rise through the River ranks.
+              {t('achievements.profile.description')}
             </p>
           </div>
           <div className="w-full rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-slate-200 shadow-inner sm:w-72">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Stars to next level</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('achievements.profile.starsToNextLevel')}</p>
             <div className="mt-3 h-2 rounded-full bg-slate-800">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400"
@@ -272,23 +267,23 @@ export default function AchievementsView() {
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Total stars earned</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('achievements.profile.totalStarsEarned')}</p>
             <p className="mt-2 text-2xl font-semibold text-white">{formatNumber(totalStarsEarned)}</p>
           </div>
           <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Current star balance</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('achievements.profile.currentStarBalance')}</p>
             <p className="mt-2 text-2xl font-semibold text-white">{formatNumber(playerStars)}</p>
           </div>
           <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Stars ready to claim</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('achievements.profile.starsReadyToClaim')}</p>
             <p className="mt-2 text-2xl font-semibold text-white">{formatNumber(unclaimedTotal)}</p>
           </div>
         </div>
         {unclaimedDailyStars > 0 && (
           <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-amber-400/40 bg-amber-400/10 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
-              <p className="text-sm font-semibold text-amber-100">Daily badge ready</p>
-              <p className="text-sm text-amber-100/80">Claim +{formatNumber(unclaimedDailyStars)} ⭐ to add them to your level.</p>
+              <p className="text-sm font-semibold text-amber-100">{t('achievements.profile.dailyBadgeReady')}</p>
+              <p className="text-sm text-amber-100/80">{t('achievements.profile.claimStarsToLevel', { stars: formatNumber(unclaimedDailyStars) })}</p>
             </div>
             <button
               type="button"
@@ -296,7 +291,7 @@ export default function AchievementsView() {
               disabled={dailyClaiming}
               className="rounded-full bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {dailyClaiming ? 'Claiming…' : `Claim +${formatNumber(unclaimedDailyStars)} ⭐`}
+              {dailyClaiming ? t('achievements.claiming') : `Claim +${formatNumber(unclaimedDailyStars)} ⭐`}
             </button>
           </div>
         )}

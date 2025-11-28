@@ -14,6 +14,7 @@ function TaskCard({
   claimingReward = false,
   onClaimReward
 }) {
+  const { t } = useLocalization();
   const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
   const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
   const formattedReward = rewardValue.toLocaleString();
@@ -24,16 +25,16 @@ function TaskCard({
     : task.rewardClaimed
     ? 'border-emerald-400/40'
     : '';
-  const questLabel = `Quest ${questNumber} of ${totalQuests}`;
+  const questLabel = t('home.quest.label', { current: questNumber, total: totalQuests });
   const statusPillClass = 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200';
   const currentProgress = Math.min(task.progress ?? 0, task.goal);
   const progressValue = `${currentProgress} / ${task.goal}`;
 
   const statusLabel = task.rewardClaimed
-    ? 'Reward collected'
+    ? t('home.quest.collected')
     : task.completed
-    ? 'Quest complete'
-    : 'In progress…';
+    ? t('home.quest.complete')
+    : t('home.quest.inProgress');
 
   const handleBadgeClick = (event) => {
     if (event) {
@@ -84,14 +85,14 @@ function TaskCard({
           tabIndex={0}
           aria-label={canClaimReward ? `Claim ${formattedReward} stars for ${questLabel}` : questLabel}
         >
-          {claimingReward ? 'Claiming…' : questLabel}
+          {claimingReward ? t('home.quest.claiming') : questLabel}
         </button>
       </div>
       {rewardValue > 0 && (
         <div className="mt-4 flex items-center justify-between">
           <span className="quest-reward-text text-amber-200">+{formattedReward} ⭐</span>
           {task.rewardClaimed && (
-            <span className="quest-reward-text text-emerald-300">✓ Collected</span>
+            <span className="quest-reward-text text-emerald-300">{t('home.quest.collectedShort')}</span>
           )}
         </div>
       )}
@@ -228,38 +229,37 @@ export default function HomeView() {
       </section>
 
       <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6">
-        <h2 className="text-base font-semibold text-slate-200 sm:text-lg">Progress today</h2>
+        <h2 className="text-base font-semibold text-slate-200 sm:text-lg">{t('home.progress.heading')}</h2>
         <div className="progress-cards-container mt-4">
           <div className="progress-card border border-slate-800 bg-slate-900/70">
-            <p className="progress-card-label text-slate-400">Streak</p>
-            <p className="progress-card-value text-white">{streak.current} days</p>
-            <p className="progress-card-subtext text-slate-500">Resets at 00:00 Asia/Jerusalem ({nextResetTime})</p>
+            <p className="progress-card-label text-slate-400">{t('home.progress.streak')}</p>
+            <p className="progress-card-value text-white">{t('home.progress.days', { count: streak.current })}</p>
+            <p className="progress-card-subtext text-slate-500">{t('home.progress.resetsAt', { time: nextResetTime })}</p>
           </div>
           <div className="progress-card border border-slate-800 bg-slate-900/70">
-            <p className="progress-card-label text-slate-400">Star level</p>
+            <p className="progress-card-label text-slate-400">{t('home.progress.starLevel')}</p>
             <div className="mt-2 flex items-baseline justify-between">
-              <p className="progress-card-value text-white">Level {level}</p>
-              <p className="progress-card-subtext text-slate-500">{formatNumber(totalStarsEarned)} ⭐ total</p>
+              <p className="progress-card-value text-white">{t('home.progress.level', { level })}</p>
+              <p className="progress-card-subtext text-slate-500">{t('home.progress.totalStars', { count: formatNumber(totalStarsEarned) })}</p>
             </div>
             <div className="mt-3 h-2 rounded-full bg-slate-800">
               <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-sky-500" style={{ width: `${starsProgress * 100}%` }} />
             </div>
             <p className="mt-2 text-sm text-slate-300">
-              {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐ to next level
+              {t('home.progress.toNextLevel', { current: formatNumber(levelProgress), total: formatNumber(starsPerLevel) })}
             </p>
-            <p className="progress-card-subtext text-slate-500">Claim badge tiers and daily rewards to earn more stars.</p>
           </div>
           <div className="progress-card border border-slate-800 bg-slate-900/70">
-            <p className="progress-card-label text-slate-400">Latest badge</p>
+            <p className="progress-card-label text-slate-400">{t('home.progress.latestBadge')}</p>
             {latestBadge ? (
               <div className="mt-2 space-y-1">
                 <p className="text-base font-semibold text-white sm:text-lg">{latestBadge.name}</p>
                 <p className="text-sm text-cyan-300">{latestBadge.label}</p>
-                <p className="progress-card-subtext text-slate-400">Tier {latestBadge.tier} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
+                <p className="progress-card-subtext text-slate-400">{t('home.progress.tier', { tier: latestBadge.tier })} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
                 <p className="progress-card-subtext text-slate-500">{latestBadge.summary}</p>
               </div>
             ) : (
-              <p className="mt-3 text-sm text-slate-400">Play a session to start unlocking achievements.</p>
+              <p className="mt-3 text-sm text-slate-400">{t('home.progress.playToUnlock')}</p>
             )}
           </div>
         </div>
