@@ -14,10 +14,24 @@ const bengaliLetters = [
 const bengaliPracticeModes = [
   {
     id: 'letters',
-    label: 'বর্ণমালা',
-    description: 'বাংলা বর্ণের উচ্চারণ চর্চা করুন।',
+    label: 'Bengali Letters',
+    description: 'Practice basic Bengali alphabet.',
     type: 'consonants',
-    noun: 'অক্ষর'
+    noun: 'letter'
+  },
+  {
+    id: 'vowelmarks',
+    label: 'Vowel Marks (Kar)',
+    description: 'Learn vowel diacritic marks.',
+    type: 'consonants',
+    noun: 'mark'
+  },
+  {
+    id: 'conjuncts',
+    label: 'Conjunct Forms',
+    description: 'Practice combined characters.',
+    type: 'consonants',
+    noun: 'conjunct'
   }
 ];
 

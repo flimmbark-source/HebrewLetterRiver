@@ -14,10 +14,24 @@ const spanishLetters = [
 const spanishPracticeModes = [
   {
     id: 'letters',
-    label: 'Alfabeto',
-    description: 'Repasa letras y sonidos esenciales.',
+    label: 'Alphabet',
+    description: 'Practice Spanish letters and sounds.',
     type: 'consonants',
-    noun: 'letra'
+    noun: 'letter'
+  },
+  {
+    id: 'accents',
+    label: 'Accents & Tildes',
+    description: 'Learn accent marks and ñ.',
+    type: 'consonants',
+    noun: 'accent'
+  },
+  {
+    id: 'pronunciation',
+    label: 'Pronunciation',
+    description: 'Practice special sound patterns.',
+    type: 'consonants',
+    noun: 'sound'
   }
 ];
 

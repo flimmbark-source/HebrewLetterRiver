@@ -14,10 +14,24 @@ const hindiLetters = [
 const hindiPracticeModes = [
   {
     id: 'letters',
-    label: 'मुख्य वर्ण',
-    description: 'देवनागरी के आधारभूत अक्षर सीखें।',
+    label: 'Devanagari Letters',
+    description: 'Practice basic Hindi consonants.',
     type: 'consonants',
-    noun: 'अक्षर'
+    noun: 'letter'
+  },
+  {
+    id: 'matras',
+    label: 'Vowels & Matras',
+    description: 'Learn vowel signs and marks.',
+    type: 'consonants',
+    noun: 'mark'
+  },
+  {
+    id: 'conjuncts',
+    label: 'Conjunct Letters',
+    description: 'Practice combined consonants.',
+    type: 'consonants',
+    noun: 'conjunct'
   }
 ];
 

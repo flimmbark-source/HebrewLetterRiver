@@ -15,9 +15,23 @@ const frenchPracticeModes = [
   {
     id: 'letters',
     label: 'Alphabet',
-    description: 'Révisez des lettres clés du français.',
+    description: 'Practice French letters and sounds.',
     type: 'consonants',
-    noun: 'lettre'
+    noun: 'letter'
+  },
+  {
+    id: 'accents',
+    label: 'Accents & Diacritics',
+    description: 'Learn é, è, ê, ç, and more.',
+    type: 'consonants',
+    noun: 'accent'
+  },
+  {
+    id: 'liaison',
+    label: 'Silent Letters',
+    description: 'Practice French pronunciation rules.',
+    type: 'consonants',
+    noun: 'pattern'
   }
 ];
 

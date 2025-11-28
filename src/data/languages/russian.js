@@ -14,10 +14,24 @@ const russianLetters = [
 const russianPracticeModes = [
   {
     id: 'letters',
-    label: 'Азбука',
-    description: 'Изучайте базовые буквы кириллицы.',
+    label: 'Cyrillic Letters',
+    description: 'Practice basic Cyrillic alphabet.',
     type: 'consonants',
-    noun: 'буква'
+    noun: 'letter'
+  },
+  {
+    id: 'cursive',
+    label: 'Cursive Script',
+    description: 'Practice Russian cursive writing.',
+    type: 'consonants',
+    noun: 'letter'
+  },
+  {
+    id: 'phonetics',
+    label: 'Phonetics',
+    description: 'Learn pronunciation patterns.',
+    type: 'consonants',
+    noun: 'sound'
   }
 ];
 
