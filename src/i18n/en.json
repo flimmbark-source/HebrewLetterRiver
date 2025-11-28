@@ -189,7 +189,7 @@
   },
   "achievements": {
     "title": "Achievements",
-    "description": "Advance through each tier to collect stars. Every milestone fuels your journey down the World Letter River.",
+    "description": "Advance through each tier to collect stars.",
     "tier": "Tier",
     "tierProgress": "Tier {{current}} / {{total}}",
     "next": "Next: {{label}}",

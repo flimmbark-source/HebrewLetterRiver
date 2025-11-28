@@ -125,7 +125,7 @@ export default function HomeView() {
 
     const name = nameKey ? t(nameKey) : player.latestBadge.name ?? badge?.name ?? player.latestBadge.id;
     const label = labelKey ? t(labelKey) : player.latestBadge.label ?? tierSpec?.label ?? '';
-    const summary = summaryKey ? t(summaryKey) : player.latestBadge.summary ?? badge?.summary ?? '';
+    const summary = summaryKey ? t(summaryKey, { gameName: t('app.title') }) : player.latestBadge.summary ?? badge?.summary ?? '';
 
     return {
       ...player.latestBadge,
@@ -177,12 +177,12 @@ export default function HomeView() {
         )}
       >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-5 text-center sm:text-left">
-            <div className="space-y-3">
+          <div className="space-y-6 text-center sm:space-y-7 sm:text-left">
+            <div className="space-y-4">
               <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
               <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.hero.modeSelectTitle')}</p>
               <div className="grid gap-3 sm:grid-cols-1">
                 <button

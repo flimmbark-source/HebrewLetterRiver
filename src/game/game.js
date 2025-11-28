@@ -758,6 +758,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     updateLevelDisplay();
     setupExitButton?.classList.add('hidden');
     modal.classList.add('hidden');
+    accessibilityView?.classList.add('hidden');
     learnOverlay.classList.remove('visible');
 
     activeItems.forEach((item) => item.element.remove());
