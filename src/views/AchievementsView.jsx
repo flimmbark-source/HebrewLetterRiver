@@ -106,14 +106,14 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
         </span>
       </div>
       <div className="mt-4">
-        <span className="text-sm text-slate-300">{currentDisplay}</span>
-        {hasUnclaimed && firstUnclaimed && (
-          <div className="mt-2">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-slate-300">{currentDisplay}</span>
+          {activeTier?.stars > 0 && (
             <span className={`text-sm font-semibold ${canClaim ? 'text-amber-300 animate-pulse' : 'text-amber-200'}`}>
-              {canClaim && '✨ '}+{firstUnclaimed.stars} ⭐{canClaim && ' ✨'}
+              {canClaim && '✨ '}+{activeTier.stars} ⭐{canClaim && ' ✨'}
             </span>
-          </div>
-        )}
+          )}
+        </div>
         <div className="mt-2 h-2 rounded-full bg-slate-800">
           <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400 transition-all duration-300" style={{ width: `${percent}%` }} />
         </div>
