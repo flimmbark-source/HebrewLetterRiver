@@ -152,7 +152,7 @@
     "accessibility": {
       "showIntroductions": "Show Introductions",
       "highContrast": "High Contrast Mode",
-      "randomLetters": "Send random letters (Letter River)",
+      "randomLetters": "Random Letters",
       "reducedMotion": "Reduced Motion",
       "speed": "Game Speed",
       "speedFast": "Fast",
@@ -208,6 +208,18 @@
       "starsReadyToClaim": "Stars ready to claim",
       "dailyBadgeReady": "Daily badge ready",
       "claimStarsToLevel": "Claim +{{stars}} ⭐ to add them to your level."
+    },
+    "levelNames": {
+      "1": "Patient Paddler",
+      "2": "Gentle Current",
+      "3": "Steady Stream",
+      "4": "Rising Rapids",
+      "5": "River Runner",
+      "6": "Wave Rider",
+      "7": "Cascade Chaser",
+      "8": "Torrent Tamer",
+      "9": "Waterfall Warrior",
+      "10": "River Master"
     }
   },
   "learn": {
@@ -254,6 +266,14 @@
     }
   },
   "daily": {
+    "badge": {
+      "title": "Daily badge",
+      "claimStars": "Claim your stars",
+      "rewardsCollected": "Rewards collected",
+      "completeQuests": "Complete quests to earn stars",
+      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
+      "finishQuests": "Finish quests to unlock their star rewards."
+    },
     "tasks": {
       "warmup": {
         "title": "Warm-Up",

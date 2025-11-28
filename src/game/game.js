@@ -1068,7 +1068,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
     itemEl.className = `falling-letter font-bold ${fontClass} text-cyan-300 ${animationName}`;
     itemEl.style.top = `${Math.random() * 70}%`;
-    itemEl.style.animationDuration = `${parseInt(gameSpeedSlider.value, 10)}s`;
+    // Invert slider value: 34 - value (so left=slow, right=fast)
+    const sliderValue = parseInt(gameSpeedSlider.value, 10);
+    const invertedSpeed = 34 - sliderValue;
+    itemEl.style.animationDuration = `${invertedSpeed}s`;
     itemEl.draggable = true;
     const pronunciation = itemData.pronunciation ?? itemData.sound ?? '';
     const transliteration = itemData.transliteration ?? itemData.name ?? '';
@@ -1350,8 +1353,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   gameSpeedSlider?.addEventListener('input', (e) => {
     const v = parseInt(e.target.value, 10);
-    if (v > 20) speedLabel.textContent = speedSlowLabel;
-    else if (v < 14) speedLabel.textContent = speedFastLabel;
+    // Invert: left=slow (10→24s), right=fast (24→10s)
+    if (v < 14) speedLabel.textContent = speedSlowLabel;
+    else if (v > 20) speedLabel.textContent = speedFastLabel;
     else speedLabel.textContent = speedNormalLabel;
   });
 
