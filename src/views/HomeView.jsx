@@ -177,29 +177,9 @@ export default function HomeView() {
         )}
       >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-5 text-center sm:text-left">
-            <div className="space-y-3">
-              <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
-              <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
-            </div>
-            <div className="mt-8 space-y-3 sm:mt-10">
-              <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.hero.modeSelectTitle')}</p>
-              <div className="grid gap-3 sm:grid-cols-1">
-                <button
-                  type="button"
-                  onClick={() => openGame()}
-                  className={classNames(
-                    'group rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-left transition',
-                    'hover:border-cyan-400/60 hover:shadow-cyan-500/20'
-                  )}
-                >
-                  <span className="block text-lg font-semibold text-white">{t('home.hero.modes.letters.title')}</span>
-                  <span className="mt-1 block text-sm text-slate-300 group-hover:text-slate-200">
-                    {t('home.hero.modes.letters.description')}
-                  </span>
-                </button>
-              </div>
-            </div>
+          <div className="text-center sm:text-left">
+            <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
+            <p className="mt-3 text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[260px]">
             <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">

@@ -236,65 +236,31 @@ export default function AchievementsView() {
 
   return (
     <div className="space-y-8 sm:space-y-10">
-      <section
-        className={`rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-inner transition sm:p-8 ${profileHighlightClass}`}
-      >
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-3">
-            <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('achievements.profile.title')}</p>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">{t('home.progress.level', { level })}</h2>
-            <p className="text-sm text-slate-300 sm:max-w-xl sm:text-base">
-              {t('achievements.profile.description')}
-            </p>
-          </div>
-          <div className="w-full rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-slate-200 shadow-inner sm:w-72">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('achievements.profile.starsToNextLevel')}</p>
-            <div className="mt-3 h-2 rounded-full bg-slate-800">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400"
-                style={{ width: `${levelPercent}%` }}
-              />
-            </div>
-            <p className="mt-2 text-sm text-slate-300">
-              {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐
-            </p>
-          </div>
-        </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('achievements.profile.totalStarsEarned')}</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{formatNumber(totalStarsEarned)}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('achievements.profile.currentStarBalance')}</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{formatNumber(playerStars)}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('achievements.profile.starsReadyToClaim')}</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{formatNumber(unclaimedTotal)}</p>
-          </div>
-        </div>
-        {unclaimedDailyStars > 0 && (
-          <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-amber-400/40 bg-amber-400/10 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-amber-100">{t('achievements.profile.dailyBadgeReady')}</p>
-              <p className="text-sm text-amber-100/80">{t('achievements.profile.claimStarsToLevel', { stars: formatNumber(unclaimedDailyStars) })}</p>
-            </div>
-            <button
-              type="button"
-              onClick={handleDailyClaim}
-              disabled={dailyClaiming}
-              className="rounded-full bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {dailyClaiming ? t('achievements.claiming') : `Claim +${formatNumber(unclaimedDailyStars)} ⭐`}
-            </button>
-          </div>
-        )}
-      </section>
-
       <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-6 shadow-2xl sm:p-8">
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('achievements.title')}</h1>
-        <p className="mt-3 text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('achievements.description')}</p>
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-3">
+            <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('achievements.title')}</h1>
+            <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('achievements.description')}</p>
+          </div>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('home.progress.starLevel')}</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{t('home.progress.level', { level })}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-slate-200 shadow-inner sm:min-w-[280px]">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('achievements.profile.starsToNextLevel')}</p>
+              <div className="mt-3 h-2 rounded-full bg-slate-800">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400"
+                  style={{ width: `${levelPercent}%` }}
+                />
+              </div>
+              <p className="mt-2 text-sm text-slate-300">
+                {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="grid gap-5 sm:gap-6 lg:grid-cols-2">
