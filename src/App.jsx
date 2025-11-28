@@ -55,7 +55,7 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
   return (
     <div className="flex flex-col gap-2">
       {label ? (
-        <label htmlFor={selectId} className="text-xs font-bold uppercase tracking-wider text-amber-700">
+        <label htmlFor={selectId} className="text-xs font-bold uppercase tracking-wider text-slate-300">
           {label}
         </label>
       ) : null}
@@ -63,7 +63,7 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
         id={selectId}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className={`w-full rounded-2xl border-4 border-amber-800/30 bg-white px-3 py-2 text-sm font-semibold text-amber-900 shadow-inner focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-200 sm:text-base ${selectClassName}`}
+        className={`w-full rounded-2xl border-4 border-slate-600 bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-inner focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/40 sm:text-base ${selectClassName}`}
       >
         {options.map((option) => (
           <option key={option.id} value={option.id}>
@@ -71,7 +71,7 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
           </option>
         ))}
       </select>
-      {helperText ? <p className="text-xs font-semibold text-amber-700">{helperText}</p> : null}
+      {helperText ? <p className="text-xs font-semibold text-slate-400">{helperText}</p> : null}
     </div>
   );
 }
@@ -116,11 +116,11 @@ function LanguageOnboardingModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 backdrop-blur">
-      <div className="w-full max-w-lg rounded-3xl border-4 border-amber-600/50 bg-gradient-to-br from-amber-50 to-orange-50 p-6 text-center shadow-2xl sm:p-8">
-        <h2 className="text-2xl font-bold text-amber-900 sm:text-3xl">
+      <div className="w-full max-w-lg rounded-3xl border-4 border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 p-6 text-center shadow-2xl sm:p-8">
+        <h2 className="text-2xl font-bold text-white sm:text-3xl">
           {translateOnboarding('app.languagePicker.onboardingTitle')}
         </h2>
-        <p className="mt-3 text-sm text-amber-800 sm:text-base">
+        <p className="mt-3 text-sm text-slate-300 sm:text-base">
           {translateOnboarding('app.languagePicker.onboardingSubtitle')}
         </p>
         <div className="mt-6 space-y-5 text-left">
@@ -144,7 +144,7 @@ function LanguageOnboardingModal() {
         <button
           type="button"
           onClick={handleContinue}
-          className="mt-6 w-full rounded-2xl border-b-4 border-orange-700 bg-orange-500 px-5 py-3 text-base font-bold text-white shadow-lg transition-all hover:bg-orange-400 active:translate-y-1 active:border-b-2 sm:w-auto sm:px-8"
+          className="mt-6 w-full rounded-2xl border-b-4 border-cyan-700 bg-cyan-600 px-5 py-3 text-base font-bold text-white shadow-lg transition-all hover:bg-cyan-500 active:translate-y-1 active:border-b-2 sm:w-auto sm:px-8"
         >
           {translateOnboarding('app.languagePicker.confirm')}
         </button>
@@ -168,8 +168,10 @@ function Shell() {
   );
 
   const tabClass = ({ isActive }) =>
-    `flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-xs font-medium transition sm:text-sm ${
-      isActive ? 'bg-cyan-500/20 text-cyan-300 shadow-inner shadow-cyan-500/30' : 'text-slate-300 hover:text-white'
+    `flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-xs font-bold transition-all sm:text-sm ${
+      isActive
+        ? 'bg-cyan-600 text-white border-b-4 border-cyan-800 shadow-lg'
+        : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
     }`;
 
   return (
@@ -189,7 +191,7 @@ function Shell() {
         </Routes>
       </main>
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-800 bg-slate-950/95 px-4 pt-3 backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-40 border-t-4 border-slate-800 bg-gradient-to-t from-slate-900 to-slate-800 px-4 pt-3 shadow-2xl"
         style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}
       >
         <div className="mx-auto flex w-full max-w-3xl justify-between gap-2">
@@ -200,7 +202,7 @@ function Shell() {
           <button
             type="button"
             onClick={handlePlay}
-            className="flex flex-1 flex-col items-center gap-1 rounded-2xl bg-cyan-500/10 px-4 py-2 text-xs font-medium text-cyan-300 transition hover:bg-cyan-500/20 hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:text-sm"
+            className="flex flex-1 flex-col items-center gap-1 rounded-2xl border-b-4 border-cyan-700 bg-cyan-600 px-4 py-2 text-xs font-bold text-white shadow-lg transition-all hover:bg-cyan-500 active:translate-y-1 active:border-b-2 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:text-sm"
           >
             <PlayIcon className="h-5 w-5" />
             <span>{t('app.nav.play')}</span>
@@ -215,7 +217,7 @@ function Shell() {
           </NavLink>
         </div>
       </nav>
-      <footer className="pb-6 text-center text-xs text-slate-600 sm:text-sm">{t('app.footer.resetNotice')}</footer>
+      <footer className="pb-6 text-center text-xs font-semibold text-slate-600 sm:text-sm">{t('app.footer.resetNotice')}</footer>
     </div>
   );
 }
@@ -227,7 +229,7 @@ export default function App() {
         <ToastProvider>
           <ProgressProvider>
             <GameProvider>
-              <div className="min-h-screen bg-slate-950 text-white">
+              <div className="min-h-screen bg-slate-950">
                 <Shell />
               </div>
             </GameProvider>
