@@ -17,6 +17,15 @@ function GlobeIcon({ className = '' }) {
   );
 }
 
+function XIcon({ className = '' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
 function TaskCard({
   task,
   questNumber = 1,
@@ -178,54 +187,7 @@ export default function HomeView() {
   const totalQuests = daily?.tasks?.length ?? 0;
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      {/* Letter River Header */}
-      <header className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('app.title')}</h1>
-        <div className="relative flex-shrink-0">
-          {appLanguageSelectorExpanded ? (
-            <div
-              onClick={() => setAppLanguageSelectorExpanded(false)}
-              className="cursor-pointer rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner transition hover:border-slate-700"
-            >
-              <label htmlFor="home-app-language-select" className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                {t('app.languagePicker.label')}
-              </label>
-              <select
-                id="home-app-language-select"
-                value={appLanguageId}
-                onChange={(event) => {
-                  event.stopPropagation();
-                  selectAppLanguage(event.target.value);
-                }}
-                onClick={(event) => event.stopPropagation()}
-                className={classNames(
-                  'mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100',
-                  'focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40',
-                  'sm:text-base sm:min-w-[200px]'
-                )}
-              >
-                {languageOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-2 text-xs text-slate-400">{t('app.languagePicker.helper')}</p>
-            </div>
-          ) : (
-            <button
-              onClick={() => setAppLanguageSelectorExpanded(true)}
-              className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-700 bg-slate-900/70 text-slate-300 transition hover:border-cyan-500/40 hover:bg-slate-800/70 hover:text-cyan-300"
-              aria-label={t('app.languagePicker.label')}
-            >
-              <GlobeIcon className="h-6 w-6" />
-            </button>
-          )}
-        </div>
-      </header>
-
-      {/* Main Content */}
+    <div className="space-y-8 sm:space-y-10">
       <section
         className={classNames(
           'rounded-3xl border border-cyan-500/20',
@@ -236,31 +198,40 @@ export default function HomeView() {
       >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="text-center sm:text-left">
-            <h2 className="text-2xl font-bold text-white sm:text-3xl">{t('home.hero.heading')}</h2>
+            <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
             <p className="mt-3 text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
           </div>
-          <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[260px]">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
-              <label htmlFor="home-practice-language-select" className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                {t('home.languagePicker.label')}
-              </label>
-              <select
-                id="home-practice-language-select"
-                value={languageId}
-                onChange={(event) => selectLanguage(event.target.value)}
-                className={classNames(
-                  'mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100',
-                  'focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40',
-                  'sm:text-base'
-                )}
+          <div className="flex flex-col gap-3 sm:w-auto sm:min-w-[260px]">
+            <div className="flex items-start gap-2">
+              <div className="flex-1 rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
+                <label htmlFor="home-practice-language-select" className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                  {t('home.languagePicker.label')}
+                </label>
+                <select
+                  id="home-practice-language-select"
+                  value={languageId}
+                  onChange={(event) => selectLanguage(event.target.value)}
+                  className={classNames(
+                    'mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100',
+                    'focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40',
+                    'sm:text-base'
+                  )}
+                >
+                  {languageOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-xs text-slate-400">{t('home.languagePicker.helper')}</p>
+              </div>
+              <button
+                onClick={() => setAppLanguageSelectorExpanded(true)}
+                className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-700 bg-slate-900/70 text-slate-300 shadow-lg transition-all hover:border-amber-500/60 hover:bg-slate-800/70 hover:text-amber-400 hover:scale-105 active:scale-95"
+                aria-label={t('app.languagePicker.label')}
               >
-                {languageOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-2 text-xs text-slate-400">{t('home.languagePicker.helper')}</p>
+                <GlobeIcon className="h-6 w-6" />
+              </button>
             </div>
           </div>
         </div>
