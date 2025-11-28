@@ -177,17 +177,17 @@ export default function HomeView() {
         )}
       >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-6 text-center sm:space-y-7 sm:text-left">
-            <div className="space-y-4">
+          <div className="space-y-5 text-center sm:text-left">
+            <div className="space-y-3">
               <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
               <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
             </div>
-            <div className="space-y-4">
+            <div className="mt-8 space-y-3 sm:mt-10">
               <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.hero.modeSelectTitle')}</p>
               <div className="grid gap-3 sm:grid-cols-1">
                 <button
                   type="button"
-                  onClick={() => openGame({ mode: 'letters' })}
+                  onClick={() => openGame()}
                   className={classNames(
                     'group rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-left transition',
                     'hover:border-cyan-400/60 hover:shadow-cyan-500/20'

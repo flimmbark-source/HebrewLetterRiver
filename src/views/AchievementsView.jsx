@@ -236,11 +236,6 @@ export default function AchievementsView() {
 
   return (
     <div className="space-y-8 sm:space-y-10">
-      <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-6 shadow-2xl sm:p-8">
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('achievements.title')}</h1>
-        <p className="mt-3 text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('achievements.description')}</p>
-      </section>
-
       <section
         className={`rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-inner transition sm:p-8 ${profileHighlightClass}`}
       >
@@ -295,6 +290,11 @@ export default function AchievementsView() {
             </button>
           </div>
         )}
+      </section>
+
+      <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-6 shadow-2xl sm:p-8">
+        <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('achievements.title')}</h1>
+        <p className="mt-3 text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('achievements.description')}</p>
       </section>
 
       <section className="grid gap-5 sm:gap-6 lg:grid-cols-2">
