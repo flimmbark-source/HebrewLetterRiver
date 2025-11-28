@@ -185,8 +185,8 @@ function GameCanvas({ fontClass }) {
                 ⚙️
               </button>
 
-              <div id="setup-view" className="space-y-4 pt-14 sm:pt-16 sm:space-y-5">
-                <div className="space-y-2 text-center">
+              <div id="setup-view" className="space-y-3 pt-12 sm:pt-14 sm:space-y-4">
+                <div className="space-y-1 text-center">
                   <h1 className={`modal-title text-cyan-300 ${fontClass}`}>{t('game.setup.title')}</h1>
                   <p id="modal-subtitle" className="modal-subtitle text-slate-400">
                     {t('game.setup.subtitleFallback')}
@@ -218,7 +218,7 @@ function GameCanvas({ fontClass }) {
                 <div className="learning-summary-container my-6" />
               </div>
 
-              <div className="mt-4 flex flex-shrink-0 flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              <div className="mt-2 flex flex-shrink-0 flex-col items-center gap-3 sm:flex-row sm:justify-center">
                 <button
                   id="start-button"
                   className="w-full rounded-full bg-cyan-500 px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-cyan-400 sm:w-auto sm:text-lg"

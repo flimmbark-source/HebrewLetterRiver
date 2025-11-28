@@ -396,7 +396,7 @@ body {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  margin-bottom: var(--space-3); /* 24px */
+  margin-bottom: var(--space-2); /* 16px - reduced to prevent overflow */
   /* Add some padding for the scroll */
   padding-right: 8px;
   margin-right: -8px;
@@ -429,7 +429,7 @@ body {
   font-size: var(--text-base); /* 16px */
   font-weight: var(--font-normal); /* 400 */
   line-height: var(--line-height-normal); /* 1.5 */
-  margin-bottom: var(--space-4); /* 32px */
+  margin-bottom: 0; /* Removed to prevent overflow */
 }
 
 /* Slide up animation for modals */
