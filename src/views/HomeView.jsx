@@ -14,6 +14,7 @@ function TaskCard({
   claimingReward = false,
   onClaimReward
 }) {
+  const { t } = useLocalization();
   const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
   const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
   const formattedReward = rewardValue.toLocaleString();
@@ -24,33 +25,18 @@ function TaskCard({
     : task.rewardClaimed
     ? 'border-emerald-400/40'
     : '';
-  const questLabel = `Quest ${questNumber} of ${totalQuests}`;
+  const questLabel = t('home.quest.label', { current: questNumber, total: totalQuests });
   const statusPillClass = 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200';
   const currentProgress = Math.min(task.progress ?? 0, task.goal);
   const progressValue = `${currentProgress} / ${task.goal}`;
 
   const statusLabel = task.rewardClaimed
-    ? 'Reward collected'
-    : canClaimReward
-    ? `Quest complete! Claim +${formattedReward} ⭐`
+    ? t('home.quest.collected')
     : task.completed
-    ? 'Quest complete'
-    : 'In progress…';
+    ? t('home.quest.complete')
+    : t('home.quest.inProgress');
 
-  const handleCardClick = () => {
-    if (!clickable) return;
-    onClaimReward();
-  };
-
-  const handleKeyDown = (event) => {
-    if (!clickable) return;
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      onClaimReward();
-    }
-  };
-
-  const handleClaimClick = (event) => {
+  const handleBadgeClick = (event) => {
     if (event) {
       event.stopPropagation();
     }
@@ -58,63 +44,65 @@ function TaskCard({
     onClaimReward();
   };
 
-  const containerClass = classNames(
-    'rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner transition',
-    'hover:border-cyan-500/40',
-    'sm:p-6',
-    highlightClass,
-    clickable && ['cursor-pointer', 'focus:outline-none', 'focus-visible:ring-2', 'focus-visible:ring-amber-200/70']
+  const handleBadgeKeyDown = (event) => {
+    if (!clickable) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClaimReward();
+    }
+  };
+
+  const badgeClass = classNames(
+    'quest-badge self-start rounded-full border px-3 py-1',
+    statusPillClass,
+    clickable && [
+      'cursor-pointer',
+      'transition-all',
+      'hover:bg-amber-400/20',
+      'hover:border-amber-400/60',
+      'hover:scale-105',
+      'focus:outline-none',
+      'focus-visible:ring-2',
+      'focus-visible:ring-amber-200/70'
+    ],
+    !clickable && 'cursor-default'
   );
 
   return (
-    <div
-      className={containerClass}
-      role={clickable ? 'button' : undefined}
-      tabIndex={clickable ? 0 : undefined}
-      onClick={handleCardClick}
-      onKeyDown={handleKeyDown}
-    >
+    <div className="quest-card rounded-3xl border border-slate-800 bg-slate-900/60 shadow-inner transition hover:border-cyan-500/40">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">{task.title}</p>
-          <h3 className="text-lg font-semibold text-white sm:text-xl">{task.description}</h3>
+          <p className="quest-category text-slate-400">{task.title}</p>
+          <h3 className="quest-title text-white">{task.description}</h3>
         </div>
-        <span className={`self-start rounded-full border px-3 py-1 text-xs font-semibold sm:text-sm ${statusPillClass}`}>
-          {questLabel}
-        </span>
-      </div>
-      <div className="mt-5 h-2 rounded-full bg-slate-800">
-        <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400" style={{ width: `${percentage}%` }} />
-      </div>
-      <div className="mt-4 flex items-center justify-between text-sm text-slate-300">
-        <span>{statusLabel}</span>
-        <span>{progressValue}</span>
+        <button
+          type="button"
+          className={badgeClass}
+          onClick={handleBadgeClick}
+          onKeyDown={handleBadgeKeyDown}
+          disabled={!clickable || claimingReward}
+          role="button"
+          tabIndex={0}
+          aria-label={canClaimReward ? `Claim ${formattedReward} stars for ${questLabel}` : questLabel}
+        >
+          {claimingReward ? t('home.quest.claiming') : questLabel}
+        </button>
       </div>
       {rewardValue > 0 && (
-        <div className="mt-4 space-y-3 rounded-2xl border border-amber-400/50 bg-amber-400/10 p-4">
-          <div className="flex items-center justify-between text-sm text-amber-100">
-            <span>Quest reward</span>
-            <span>+{formattedReward} ⭐</span>
-          </div>
-          {task.rewardClaimed ? (
-            <p className="text-xs text-amber-100/80">Reward collected</p>
-          ) : (
-            <button
-              type="button"
-              onClick={handleClaimClick}
-              disabled={!canClaimReward || claimingReward}
-              className={classNames(
-                'w-full rounded-xl border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-100 transition',
-                'hover:bg-amber-400/20',
-                'focus:outline-none focus:ring-2 focus:ring-amber-300/60',
-                'disabled:cursor-not-allowed disabled:opacity-60'
-              )}
-            >
-              {claimingReward ? 'Claiming…' : `Claim +${formattedReward} ⭐`}
-            </button>
+        <div className="mt-4 flex items-center justify-between">
+          <span className="quest-reward-text text-amber-200">+{formattedReward} ⭐</span>
+          {task.rewardClaimed && (
+            <span className="quest-reward-text text-emerald-300">{t('home.quest.collectedShort')}</span>
           )}
         </div>
       )}
+      <div className="mt-4 h-2 rounded-full bg-slate-800">
+        <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400" style={{ width: `${percentage}%` }} />
+      </div>
+      <div className="mt-4 flex items-center justify-between">
+        <span className="quest-progress-text text-slate-300">{statusLabel}</span>
+        <span className="quest-progress-text text-slate-300">{progressValue}</span>
+      </div>
     </div>
   );
 }
@@ -137,7 +125,7 @@ export default function HomeView() {
 
     const name = nameKey ? t(nameKey) : player.latestBadge.name ?? badge?.name ?? player.latestBadge.id;
     const label = labelKey ? t(labelKey) : player.latestBadge.label ?? tierSpec?.label ?? '';
-    const summary = summaryKey ? t(summaryKey) : player.latestBadge.summary ?? badge?.summary ?? '';
+    const summary = summaryKey ? t(summaryKey, { gameName: t('app.title') }) : player.latestBadge.summary ?? badge?.summary ?? '';
 
     return {
       ...player.latestBadge,
@@ -189,29 +177,9 @@ export default function HomeView() {
         )}
       >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-5 text-center sm:text-left">
-            <div className="space-y-3">
-              <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
-              <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
-            </div>
-            <div className="space-y-3">
-              <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">{t('home.hero.modeSelectTitle')}</p>
-              <div className="grid gap-3 sm:grid-cols-1">
-                <button
-                  type="button"
-                  onClick={() => openGame({ mode: 'letters' })}
-                  className={classNames(
-                    'group rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-left transition',
-                    'hover:border-cyan-400/60 hover:shadow-cyan-500/20'
-                  )}
-                >
-                  <span className="block text-lg font-semibold text-white">{t('home.hero.modes.letters.title')}</span>
-                  <span className="mt-1 block text-sm text-slate-300 group-hover:text-slate-200">
-                    {t('home.hero.modes.letters.description')}
-                  </span>
-                </button>
-              </div>
-            </div>
+          <div className="text-center sm:text-left">
+            <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('home.hero.heading')}</h1>
+            <p className="mt-3 text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[260px]">
             <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
@@ -241,43 +209,42 @@ export default function HomeView() {
       </section>
 
       <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6">
-        <h2 className="text-base font-semibold text-slate-200 sm:text-lg">Progress today</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Streak</p>
-            <p className="mt-2 text-2xl font-semibold text-white sm:text-3xl">{streak.current} days</p>
-            <p className="mt-1 text-xs text-slate-500 sm:text-sm">Resets at 00:00 Asia/Jerusalem ({nextResetTime})</p>
+        <h2 className="text-base font-semibold text-slate-200 sm:text-lg">{t('home.progress.heading')}</h2>
+        <div className="progress-cards-container mt-4">
+          <div className="progress-card border border-slate-800 bg-slate-900/70">
+            <p className="progress-card-label text-slate-400">{t('home.progress.streak')}</p>
+            <p className="progress-card-value text-white">{t('home.progress.days', { count: streak.current })}</p>
+            <p className="progress-card-subtext text-slate-500">{t('home.progress.resetsAt', { time: nextResetTime })}</p>
           </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Star level</p>
+          <div className="progress-card border border-slate-800 bg-slate-900/70">
+            <p className="progress-card-label text-slate-400">{t('home.progress.starLevel')}</p>
             <div className="mt-2 flex items-baseline justify-between">
-              <p className="text-2xl font-semibold text-white sm:text-3xl">Level {level}</p>
-              <p className="text-xs text-slate-500 sm:text-sm">{formatNumber(totalStarsEarned)} ⭐ total</p>
+              <p className="progress-card-value text-white">{t('home.progress.level', { level })}</p>
+              <p className="progress-card-subtext text-slate-500">{t('home.progress.totalStars', { count: formatNumber(totalStarsEarned) })}</p>
             </div>
             <div className="mt-3 h-2 rounded-full bg-slate-800">
               <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-sky-500" style={{ width: `${starsProgress * 100}%` }} />
             </div>
             <p className="mt-2 text-sm text-slate-300">
-              {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐ to next level
+              {t('home.progress.toNextLevel', { current: formatNumber(levelProgress), total: formatNumber(starsPerLevel) })}
             </p>
-            <p className="mt-1 text-xs text-slate-500">Claim badge tiers and daily rewards to earn more stars.</p>
           </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">Latest badge</p>
+          <div className="progress-card border border-slate-800 bg-slate-900/70">
+            <p className="progress-card-label text-slate-400">{t('home.progress.latestBadge')}</p>
             {latestBadge ? (
               <div className="mt-2 space-y-1">
                 <p className="text-base font-semibold text-white sm:text-lg">{latestBadge.name}</p>
                 <p className="text-sm text-cyan-300">{latestBadge.label}</p>
-                <p className="text-xs text-slate-400 sm:text-sm">Tier {latestBadge.tier} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
-                <p className="text-xs text-slate-500 sm:text-sm">{latestBadge.summary}</p>
+                <p className="progress-card-subtext text-slate-400">{t('home.progress.tier', { tier: latestBadge.tier })} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
+                <p className="progress-card-subtext text-slate-500">{latestBadge.summary}</p>
               </div>
             ) : (
-              <p className="mt-3 text-sm text-slate-400">Play a session to start unlocking achievements.</p>
+              <p className="mt-3 text-sm text-slate-400">{t('home.progress.playToUnlock')}</p>
             )}
           </div>
         </div>
       </section>
-      <section className="grid gap-5 sm:gap-6 lg:grid-cols-3">
+      <section className="quest-cards-container">
         {daily?.tasks?.map((task, index) => (
           <TaskCard
             key={task.id}

@@ -70,16 +70,40 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
     : hasUnclaimed
     ? 'border-amber-400/50 shadow-amber-500/10'
     : '';
-  const statusLabel = hasUnclaimed
-    ? `Claim ${tierLabel} · +${unclaimed[0].stars} ⭐`
-    : isMaxed
+  const statusLabel = isMaxed
     ? translate('achievements.maxed')
     : translate('achievements.next', { label: tierLabel });
   const currentDisplay = hasUnclaimed || isMaxed ? `${nextGoal} / ${nextGoal}` : `${currentProgressValue} / ${nextGoal}`;
 
+  const canClaim = hasUnclaimed && unclaimed.length > 0;
+  const firstUnclaimed = canClaim ? unclaimed[0] : null;
+  const isClaiming = firstUnclaimed && claimingTier === firstUnclaimed.tier;
+
+  const handleCardClick = () => {
+    if (!canClaim || isClaiming) return;
+    handleClaim(firstUnclaimed);
+  };
+
+  const handleCardKeyDown = (event) => {
+    if (!canClaim || isClaiming) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleClaim(firstUnclaimed);
+    }
+  };
+
+  const cardClass = canClaim
+    ? 'cursor-pointer hover:border-amber-400/40 hover:scale-[1.01]'
+    : 'cursor-default hover:border-cyan-500/40';
+
   return (
     <div
-      className={`rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner transition hover:border-cyan-500/40 sm:p-6 ${highlightClass}`}
+      className={`rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-inner transition sm:p-6 ${highlightClass} ${cardClass}`}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+      role={canClaim ? 'button' : undefined}
+      tabIndex={canClaim ? 0 : undefined}
+      aria-label={canClaim ? `Claim ${firstUnclaimed.stars} stars for ${tierProgressLabel}` : undefined}
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
@@ -87,33 +111,29 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
           <h3 className="text-lg font-semibold text-white sm:text-xl">{badgeSummary}</h3>
         </div>
         <span className="self-start rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200 sm:text-sm">
-          {tierProgressLabel}
+          {isClaiming ? translate('achievements.claiming') : tierProgressLabel}
         </span>
       </div>
-      <div className="mt-5 h-2 rounded-full bg-slate-800">
+      {hasUnclaimed && (
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-sm font-semibold text-amber-200">+{firstUnclaimed.stars} ⭐</span>
+          {unclaimed.length > 1 && (
+            <span className="text-xs text-amber-200/70">
+              {translate(unclaimed.length - 1 === 1 ? 'achievements.moreTiers' : 'achievements.moreTiersPlural', { count: unclaimed.length - 1 })}
+            </span>
+          )}
+        </div>
+      )}
+      <div className="mt-4 h-2 rounded-full bg-slate-800">
         <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400" style={{ width: `${percent}%` }} />
       </div>
       <div className="mt-4 flex items-center justify-between text-sm text-slate-300">
         <span>{statusLabel}</span>
         <span>{currentDisplay}</span>
       </div>
-      {hasUnclaimed ? (
-        <div className="mt-4 space-y-2">
-          {unclaimed.map((reward) => (
-            <button
-              key={reward.tier}
-              type="button"
-              onClick={() => handleClaim(reward)}
-              disabled={claimingTier === reward.tier}
-              className="w-full rounded-xl border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/20 focus:outline-none focus:ring-2 focus:ring-amber-300/60 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {claimingTier === reward.tier ? 'Claiming…' : `Claim Tier ${reward.tier} · +${reward.stars} ⭐`}
-            </button>
-          ))}
-        </div>
-      ) : isMaxed ? (
+      {isMaxed ? (
         <p className="mt-2 text-xs text-emerald-300">{translate('achievements.maxed')}</p>
-      ) : (
+      ) : !hasUnclaimed && (
         <p className="mt-2 text-xs text-slate-500">{translate('achievements.earnStars', { stars: activeTier.stars })}</p>
       )}
     </div>
@@ -217,64 +237,30 @@ export default function AchievementsView() {
   return (
     <div className="space-y-8 sm:space-y-10">
       <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-6 shadow-2xl sm:p-8">
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('achievements.title')}</h1>
-        <p className="mt-3 text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('achievements.description')}</p>
-      </section>
-
-      <section
-        className={`rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-inner transition sm:p-8 ${profileHighlightClass}`}
-      >
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-3">
-            <p className="text-xs uppercase tracking-[0.25em] text-cyan-300 sm:text-sm">Player Profile</p>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Level {level}</h2>
-            <p className="text-sm text-slate-300 sm:max-w-xl sm:text-base">
-              Track your star progress and claim rewards to rise through the River ranks.
-            </p>
+            <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('achievements.title')}</h1>
+            <p className="text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('achievements.description')}</p>
           </div>
-          <div className="w-full rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-slate-200 shadow-inner sm:w-72">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Stars to next level</p>
-            <div className="mt-3 h-2 rounded-full bg-slate-800">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400"
-                style={{ width: `${levelPercent}%` }}
-              />
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('home.progress.starLevel')}</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{t('home.progress.level', { level })}</p>
             </div>
-            <p className="mt-2 text-sm text-slate-300">
-              {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐
-            </p>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-slate-200 shadow-inner sm:min-w-[280px]">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{t('achievements.profile.starsToNextLevel')}</p>
+              <div className="mt-3 h-2 rounded-full bg-slate-800">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400"
+                  style={{ width: `${levelPercent}%` }}
+                />
+              </div>
+              <p className="mt-2 text-sm text-slate-300">
+                {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐
+              </p>
+            </div>
           </div>
         </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Total stars earned</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{formatNumber(totalStarsEarned)}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Current star balance</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{formatNumber(playerStars)}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Stars ready to claim</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{formatNumber(unclaimedTotal)}</p>
-          </div>
-        </div>
-        {unclaimedDailyStars > 0 && (
-          <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-amber-400/40 bg-amber-400/10 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-amber-100">Daily badge ready</p>
-              <p className="text-sm text-amber-100/80">Claim +{formatNumber(unclaimedDailyStars)} ⭐ to add them to your level.</p>
-            </div>
-            <button
-              type="button"
-              onClick={handleDailyClaim}
-              disabled={dailyClaiming}
-              className="rounded-full bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {dailyClaiming ? 'Claiming…' : `Claim +${formatNumber(unclaimedDailyStars)} ⭐`}
-            </button>
-          </div>
-        )}
       </section>
 
       <section className="grid gap-5 sm:gap-6 lg:grid-cols-2">

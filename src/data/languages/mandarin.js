@@ -13,11 +13,25 @@ const mandarinCharacters = [
 
 const mandarinPracticeModes = [
   {
-    id: 'characters',
-    label: '常用字',
-    description: '练习基础汉字。',
+    id: 'pinyin',
+    label: 'Pinyin',
+    description: 'Practice romanized pronunciation system.',
     type: 'consonants',
-    noun: '字'
+    noun: 'sound'
+  },
+  {
+    id: 'characters',
+    label: 'Basic Characters',
+    description: 'Learn essential Chinese characters.',
+    type: 'consonants',
+    noun: 'character'
+  },
+  {
+    id: 'radicals',
+    label: 'Radicals',
+    description: 'Practice character building blocks.',
+    type: 'consonants',
+    noun: 'radical'
   }
 ];
 

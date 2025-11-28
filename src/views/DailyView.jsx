@@ -18,36 +18,36 @@ function TaskCard({ task, accent, onClaim, claiming }) {
     : 'In progress…';
   return (
     <div
-      className={`rounded-3xl border bg-slate-900/70 p-6 shadow-inner transition ${
+      className={`quest-card rounded-3xl border bg-slate-900/70 shadow-inner transition ${
         claimable ? 'border-amber-400/40 ring-1 ring-amber-300/60' : 'border-slate-800'
       }`}
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{task.title}</p>
-          <h3 className="mt-2 text-xl font-semibold text-white">{task.description}</h3>
+          <p className="quest-category text-slate-400">{task.title}</p>
+          <h3 className="quest-title text-white">{task.description}</h3>
         </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${accent}`}>
+        <span className={`quest-badge rounded-full px-3 py-1 ${accent}`}>
           {task.completed ? 'Complete' : 'In Progress'}
         </span>
       </div>
       <div className="mt-5 h-2 rounded-full bg-slate-800">
         <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" style={{ width: `${percentage}%` }} />
       </div>
-      <div className="mt-3 flex items-center justify-between text-sm text-slate-300">
-        <span>{statusLabel}</span>
-        <span>
+      <div className="mt-3 flex items-center justify-between">
+        <span className="quest-progress-text text-slate-300">{statusLabel}</span>
+        <span className="quest-progress-text text-slate-300">
           {task.progress ?? 0} / {task.goal}
         </span>
       </div>
       {rewardValue > 0 && (
         <div className="mt-4 space-y-3 rounded-2xl border border-amber-400/50 bg-amber-400/10 p-4">
-          <div className="flex items-center justify-between text-sm text-amber-100">
-            <span>Quest reward</span>
-            <span>+{formattedReward} ⭐</span>
+          <div className="flex items-center justify-between">
+            <span className="quest-reward-text text-amber-100">Quest reward</span>
+            <span className="quest-reward-text text-amber-100">+{formattedReward} ⭐</span>
           </div>
           {task.rewardClaimed ? (
-            <p className="text-xs text-amber-100/80">Reward collected</p>
+            <p className="quest-reward-text text-amber-100/80">Reward collected</p>
           ) : (
             <button
               type="button"
@@ -190,7 +190,7 @@ export default function DailyView() {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3">
+      <section className="quest-cards-container">
         {tasks.map((task) => (
           <TaskCard
             key={task.id}

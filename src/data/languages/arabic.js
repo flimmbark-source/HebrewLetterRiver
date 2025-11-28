@@ -14,10 +14,24 @@ const arabicLetters = [
 const arabicPracticeModes = [
   {
     id: 'letters',
-    label: 'الحروف',
-    description: 'تعرّف على الحروف العربية الأساسية.',
+    label: 'Arabic Letters',
+    description: 'Practice basic Arabic alphabet.',
     type: 'consonants',
-    noun: 'حرف'
+    noun: 'letter'
+  },
+  {
+    id: 'letterforms',
+    label: 'Letter Forms',
+    description: 'Learn isolated, initial, medial, and final forms.',
+    type: 'consonants',
+    noun: 'form'
+  },
+  {
+    id: 'harakat',
+    label: 'Harakat (Diacritics)',
+    description: 'Practice vowel marks and diacritics.',
+    type: 'consonants',
+    noun: 'mark'
   }
 ];
 

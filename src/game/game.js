@@ -177,16 +177,16 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
       const card = document.createElement('div');
       card.className =
-        'flex h-full flex-col rounded-2xl border-2 border-slate-600 bg-slate-800/70 p-4 transition hover:border-cyan-400/80';
+        'mode-card flex h-full flex-col border-slate-600 bg-slate-800/70 transition hover:border-cyan-400/80';
 
       const title = document.createElement('span');
-      title.className = `text-base font-semibold text-white sm:text-lg ${fontClass}`;
+      title.className = `mode-card-title text-white ${fontClass}`;
       title.textContent = mode.label;
       card.appendChild(title);
 
       if (mode.description) {
         const description = document.createElement('p');
-        description.className = 'mt-1 text-sm text-slate-400';
+        description.className = 'mode-card-description text-slate-400';
         description.textContent = mode.description;
         card.appendChild(description);
       }
@@ -582,17 +582,20 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       updateScore(isBonusRound ? 25 : 10);
       targetBox.classList.add('feedback-correct');
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].correct++;
+      // Hide the letter immediately after correct drop
+      item.element.style.display = 'none';
     } else {
       lives--;
       updateLives(true);
       targetBox.classList.add('feedback-incorrect');
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
 
-      const correctSymbol = getDisplaySymbol(item.data);
-      const fallbackLabel = getDisplayLabel(item.data);
+      // Find the correct bucket to show its sound/label
+      const correctBucket = choicesContainer.querySelector(`[data-item-id="${droppedItemId}"]`);
+      const correctLabel = correctBucket ? correctBucket.textContent : (getDisplayLabel(item.data) || getDisplaySymbol(item.data));
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
-      ghostEl.textContent = correctSymbol || fallbackLabel;
+      ghostEl.textContent = correctLabel;
 
       ghostEl.style.display = 'block';
       const ghostWidth = ghostEl.offsetWidth;
@@ -601,6 +604,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       ghostEl.style.top = `${boxRect.top - gameRect.top}px`;
       ghostEl.classList.add('ghost-rise');
       trackTimeout(() => ghostEl.classList.remove('ghost-rise'), 2000);
+      // Hide the letter immediately after incorrect drop too
+      item.element.style.display = 'none';
     }
 
     if (!isBonusRound) {
@@ -753,6 +758,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     updateLevelDisplay();
     setupExitButton?.classList.add('hidden');
     modal.classList.add('hidden');
+    accessibilityView?.classList.add('hidden');
     learnOverlay.classList.remove('visible');
 
     activeItems.forEach((item) => item.element.remove());
@@ -1400,17 +1406,20 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       updateScore(isBonusRound ? 25 : 10);
       targetBox.classList.add('feedback-correct');
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].correct++;
+      // Hide the letter immediately after correct drop
+      item.element.style.display = 'none';
     } else {
       lives--;
       updateLives(true);
       targetBox.classList.add('feedback-incorrect');
       if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
 
-      const correctSymbol = getDisplaySymbol(item.data);
+      // Find the correct bucket to show its sound/label
+      const correctBucket = choicesContainer.querySelector(`[data-item-id="${droppedItemId}"]`);
+      const correctLabel = correctBucket ? correctBucket.textContent : (getDisplayLabel(item.data) || getDisplaySymbol(item.data));
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
-      const fallbackLabel = getDisplayLabel(item.data);
-      ghostEl.textContent = correctSymbol || fallbackLabel;
+      ghostEl.textContent = correctLabel;
       ghostEl.style.display = 'block';
       const ghostWidth = ghostEl.offsetWidth;
       ghostEl.style.display = '';
@@ -1420,6 +1429,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       trackTimeout(() => {
         ghostEl.classList.remove('ghost-rise');
       }, 2000);
+      // Hide the letter immediately after incorrect drop too
+      item.element.style.display = 'none';
     }
 
     if (!isBonusRound) {

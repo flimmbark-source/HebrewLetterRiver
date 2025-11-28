@@ -108,7 +108,7 @@ function GameCanvas({ fontClass }) {
         <div className="relative flex flex-col">
           <div
             id="top-bar"
-            className="flex items-center gap-4 bg-slate-800/90 px-4 py-3 text-sm shadow-lg sm:gap-6 sm:px-6 sm:py-4 sm:text-base"
+            className="bg-slate-800/90 text-sm shadow-lg sm:text-base"
           >
             <button
               id="back-to-menu-button"
@@ -164,8 +164,7 @@ function GameCanvas({ fontClass }) {
           >
             <div
               id="modal-content"
-              className="relative w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900/95 p-5 shadow-2xl sm:rounded-3xl sm:p-6"
-              style={{ maxHeight: 'calc(100vh - 3rem)' }}
+              className="relative w-full max-w-3xl border border-slate-700 bg-slate-900/95 shadow-2xl"
             >
               <button
                 id="setup-exit-button"
@@ -186,17 +185,17 @@ function GameCanvas({ fontClass }) {
                 ⚙️
               </button>
 
-              <div id="setup-view" className="space-y-6 pt-14 sm:pt-16">
-                <div className="space-y-2 text-center">
-                  <h1 className={`text-3xl font-bold text-cyan-300 sm:text-4xl ${fontClass}`}>{t('game.setup.title')}</h1>
-                  <p id="modal-subtitle" className="text-sm text-slate-400 sm:text-base">
+              <div id="setup-view" className="space-y-3 pt-12 sm:pt-14 sm:space-y-4">
+                <div className="space-y-1 text-center">
+                  <h1 className={`modal-title text-cyan-300 ${fontClass}`}>{t('game.setup.title')}</h1>
+                  <p id="modal-subtitle" className="modal-subtitle text-slate-400">
                     {t('game.setup.subtitleFallback')}
                   </p>
                 </div>
 
-                <p className="text-center text-base text-slate-300 sm:text-lg">{t('game.setup.prompt')}</p>
+                <p className="text-center text-sm text-slate-300 sm:text-base">{t('game.setup.prompt')}</p>
 
-                <div id="mode-options" className="mx-auto grid max-w-2xl gap-3 sm:grid-cols-2" />
+                <div id="mode-options" className="mode-cards-container mx-auto max-w-2xl" />
               </div>
 
               <div id="game-over-view" className="relative hidden pt-12 text-center">
@@ -219,7 +218,7 @@ function GameCanvas({ fontClass }) {
                 <div className="learning-summary-container my-6" />
               </div>
 
-              <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              <div className="mt-2 flex flex-shrink-0 flex-col items-center gap-3 sm:flex-row sm:justify-center">
                 <button
                   id="start-button"
                   className="w-full rounded-full bg-cyan-500 px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-cyan-400 sm:w-auto sm:text-lg"
@@ -274,7 +273,7 @@ function GameCanvas({ fontClass }) {
           id="summary-tooltip"
           className="pointer-events-none absolute z-50 hidden rounded-xl border border-slate-600 bg-slate-900 px-3 py-2 text-center text-sm text-white shadow-lg"
         />
-        <div id="correct-answer-ghost" className="pointer-events-none absolute text-xl font-bold text-green-400 opacity-0" />
+        <div id="correct-answer-ghost" className="pointer-events-none absolute text-4xl font-bold text-green-400 opacity-0" />
       </div>
     </div>
   );

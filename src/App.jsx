@@ -196,7 +196,7 @@ function Shell() {
           />
         </div>
       </header>
-      <main className="flex-1 pb-6">
+      <main className="mt-8 flex-1 pb-6 sm:mt-10">
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomeView />} />

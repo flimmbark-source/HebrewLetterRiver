@@ -14,10 +14,24 @@ const japaneseCharacters = [
 const japanesePracticeModes = [
   {
     id: 'hiragana',
-    label: 'ひらがな',
-    description: 'ひらがなの基本的な文字を練習しましょう。',
+    label: 'Hiragana',
+    description: 'Practice basic hiragana characters.',
     type: 'consonants',
-    noun: '文字'
+    noun: 'character'
+  },
+  {
+    id: 'katakana',
+    label: 'Katakana',
+    description: 'Practice katakana for foreign words.',
+    type: 'consonants',
+    noun: 'character'
+  },
+  {
+    id: 'romaji',
+    label: 'Romaji',
+    description: 'Practice romanized Japanese sounds.',
+    type: 'consonants',
+    noun: 'sound'
   }
 ];
 

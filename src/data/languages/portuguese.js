@@ -14,10 +14,24 @@ const portugueseLetters = [
 const portuguesePracticeModes = [
   {
     id: 'letters',
-    label: 'Alfabeto',
-    description: 'Pratique letras e sons fundamentais.',
+    label: 'Alphabet',
+    description: 'Practice Portuguese letters and sounds.',
     type: 'consonants',
-    noun: 'letra'
+    noun: 'letter'
+  },
+  {
+    id: 'accents',
+    label: 'Accents & Til',
+    description: 'Learn ã, õ, á, and accent marks.',
+    type: 'consonants',
+    noun: 'accent'
+  },
+  {
+    id: 'nasals',
+    label: 'Nasal Sounds',
+    description: 'Practice nh, lh, and nasal vowels.',
+    type: 'consonants',
+    noun: 'sound'
   }
 ];
 

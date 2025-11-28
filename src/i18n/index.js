@@ -42,6 +42,8 @@ export function getDictionary(languageId) {
 export function translate(dictionary, key, replacements = {}) {
   if (!dictionary) return key;
   const segments = Array.isArray(key) ? key : String(key).split('.');
+
+  // Try to find the value in the current dictionary
   let value = dictionary;
   for (const segment of segments) {
     if (value && typeof value === 'object' && segment in value) {
@@ -52,8 +54,26 @@ export function translate(dictionary, key, replacements = {}) {
     }
   }
 
+  // If not found, try fallback dictionary (English)
+  if (typeof value !== 'string' && dictionary !== fallbackDictionary) {
+    let fallbackValue = fallbackDictionary;
+    for (const segment of segments) {
+      if (fallbackValue && typeof fallbackValue === 'object' && segment in fallbackValue) {
+        fallbackValue = fallbackValue[segment];
+      } else {
+        fallbackValue = null;
+        break;
+      }
+    }
+    if (typeof fallbackValue === 'string') {
+      value = fallbackValue;
+    }
+  }
+
+  // If still not found, return the key itself
   if (typeof value !== 'string') return key;
 
+  // Replace placeholders with actual values
   return value.replace(/{{\s*(.+?)\s*}}/g, (match, token) => {
     const replacementKey = token.trim();
     return replacements[replacementKey] ?? match;
