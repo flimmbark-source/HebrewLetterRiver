@@ -6,6 +6,8 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
 import { classNames } from '../lib/classNames.js';
+import { PlayfulButton, PlayfulIconButton } from '../components/PlayfulButton.jsx';
+import { PlayfulContainer, PlayfulBadge } from '../components/PlayfulContainer.jsx';
 
 function GlobeIcon({ className = '' }) {
   return (
@@ -13,6 +15,15 @@ function GlobeIcon({ className = '' }) {
       <circle cx="12" cy="12" r="10" />
       <line x1="2" y1="12" x2="22" y2="12" />
       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  );
+}
+
+function XIcon({ className = '' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   );
 }
@@ -30,13 +41,7 @@ function TaskCard({
   const formattedReward = rewardValue.toLocaleString();
   const canClaimReward = Boolean(task.rewardClaimable) && !task.rewardClaimed && typeof onClaimReward === 'function';
   const clickable = canClaimReward && !claimingReward;
-  const highlightClass = canClaimReward
-    ? 'border-amber-400/40 ring-1 ring-amber-300/60 shadow-amber-300/20'
-    : task.rewardClaimed
-    ? 'border-emerald-400/40'
-    : '';
   const questLabel = t('home.quest.label', { current: questNumber, total: totalQuests });
-  const statusPillClass = 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200';
   const currentProgress = Math.min(task.progress ?? 0, task.goal);
   const progressValue = `${currentProgress} / ${task.goal}`;
 
@@ -46,74 +51,55 @@ function TaskCard({
     ? t('home.quest.complete')
     : t('home.quest.inProgress');
 
-  const handleBadgeClick = (event) => {
-    if (event) {
-      event.stopPropagation();
-    }
-    if (!clickable) return;
-    onClaimReward();
-  };
-
-  const handleBadgeKeyDown = (event) => {
-    if (!clickable) return;
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      onClaimReward();
-    }
-  };
-
-  const badgeClass = classNames(
-    'quest-badge self-start rounded-full border px-3 py-1',
-    statusPillClass,
-    clickable && [
-      'cursor-pointer',
-      'transition-all',
-      'hover:bg-amber-400/20',
-      'hover:border-amber-400/60',
-      'hover:scale-105',
-      'focus:outline-none',
-      'focus-visible:ring-2',
-      'focus-visible:ring-amber-200/70'
-    ],
-    !clickable && 'cursor-default'
-  );
-
   return (
-    <div className="quest-card rounded-3xl border border-slate-800 bg-slate-900/60 shadow-inner transition hover:border-cyan-500/40">
+    <PlayfulContainer
+      variant="card"
+      className={classNames(
+        'transition-all duration-200',
+        canClaimReward && 'ring-4 ring-playful-yellow-300 animate-pulse'
+      )}
+    >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
-          <p className="quest-category text-slate-400">{task.title}</p>
-          <h3 className="quest-title text-white">{task.description}</h3>
+          <p className="text-xs font-bold uppercase tracking-wider text-playful-brown-600">{task.title}</p>
+          <h3 className="text-lg font-bold text-playful-brown-900 sm:text-xl">{task.description}</h3>
         </div>
-        <button
-          type="button"
-          className={badgeClass}
-          onClick={handleBadgeClick}
-          onKeyDown={handleBadgeKeyDown}
-          disabled={!clickable || claimingReward}
-          role="button"
-          tabIndex={0}
-          aria-label={canClaimReward ? `Claim ${formattedReward} stars for ${questLabel}` : questLabel}
-        >
-          {claimingReward ? t('home.quest.claiming') : questLabel}
-        </button>
+        <PlayfulBadge variant={task.rewardClaimed ? 'green' : 'cyan'}>
+          {questLabel}
+        </PlayfulBadge>
       </div>
       {rewardValue > 0 && (
         <div className="mt-4 flex items-center justify-between">
-          <span className="quest-reward-text text-amber-200">+{formattedReward} ⭐</span>
+          <span className="text-xl font-bold text-playful-orange-600">+{formattedReward} ⭐</span>
           {task.rewardClaimed && (
-            <span className="quest-reward-text text-emerald-300">{t('home.quest.collectedShort')}</span>
+            <span className="text-sm font-bold text-green-600">✓ {t('home.quest.collectedShort')}</span>
           )}
         </div>
       )}
-      <div className="mt-4 h-2 rounded-full bg-slate-800">
-        <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400" style={{ width: `${percentage}%` }} />
+      <div className="mt-4 h-4 rounded-full border-2 border-playful-brown-300 bg-playful-beige shadow-inner">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-playful-orange-400 to-playful-yellow-400 transition-all duration-300"
+          style={{ width: `${percentage}%` }}
+        />
       </div>
-      <div className="mt-4 flex items-center justify-between">
-        <span className="quest-progress-text text-slate-300">{statusLabel}</span>
-        <span className="quest-progress-text text-slate-300">{progressValue}</span>
+      <div className="mt-3 flex items-center justify-between text-sm font-semibold text-playful-brown-700">
+        <span>{statusLabel}</span>
+        <span>{progressValue}</span>
       </div>
-    </div>
+      {canClaimReward && (
+        <div className="mt-4">
+          <PlayfulButton
+            variant="secondary"
+            size="sm"
+            onClick={onClaimReward}
+            disabled={claimingReward}
+            className="w-full"
+          >
+            {claimingReward ? t('home.quest.claiming') : `🎉 Claim +${formattedReward} ⭐`}
+          </PlayfulButton>
+        </div>
+      )}
+    </PlayfulContainer>
   );
 }
 
@@ -181,127 +167,130 @@ export default function HomeView() {
     <div className="space-y-6 sm:space-y-8">
       {/* Letter River Header */}
       <header className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('app.title')}</h1>
-        <div className="relative flex-shrink-0">
-          {appLanguageSelectorExpanded ? (
-            <div
-              onClick={() => setAppLanguageSelectorExpanded(false)}
-              className="cursor-pointer rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner transition hover:border-slate-700"
-            >
-              <label htmlFor="home-app-language-select" className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                {t('app.languagePicker.label')}
-              </label>
-              <select
-                id="home-app-language-select"
-                value={appLanguageId}
-                onChange={(event) => {
-                  event.stopPropagation();
-                  selectAppLanguage(event.target.value);
-                }}
-                onClick={(event) => event.stopPropagation()}
-                className={classNames(
-                  'mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100',
-                  'focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40',
-                  'sm:text-base sm:min-w-[200px]'
-                )}
-              >
-                {languageOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-2 text-xs text-slate-400">{t('app.languagePicker.helper')}</p>
-            </div>
-          ) : (
-            <button
-              onClick={() => setAppLanguageSelectorExpanded(true)}
-              className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-700 bg-slate-900/70 text-slate-300 transition hover:border-cyan-500/40 hover:bg-slate-800/70 hover:text-cyan-300"
-              aria-label={t('app.languagePicker.label')}
-            >
-              <GlobeIcon className="h-6 w-6" />
-            </button>
-          )}
-        </div>
+        <h1 className="text-3xl font-bold text-playful-brown-800 drop-shadow-sm sm:text-4xl">{t('app.title')}</h1>
+        <PlayfulIconButton
+          variant="secondary"
+          size="md"
+          onClick={() => setAppLanguageSelectorExpanded(true)}
+          aria-label={t('app.languagePicker.label')}
+        >
+          <GlobeIcon className="h-6 w-6" />
+        </PlayfulIconButton>
       </header>
 
-      {/* Main Content */}
-      <section
-        className={classNames(
-          'rounded-3xl border border-cyan-500/20',
-          'bg-gradient-to-br from-slate-900 to-slate-950',
-          'p-6 shadow-2xl',
-          'sm:p-8'
-        )}
-      >
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-          <div className="text-center sm:text-left">
-            <h2 className="text-2xl font-bold text-white sm:text-3xl">{t('home.hero.heading')}</h2>
-            <p className="mt-3 text-sm text-slate-300 sm:max-w-2xl sm:text-base">{t('home.hero.description')}</p>
-          </div>
-          <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[260px]">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-inner">
-              <label htmlFor="home-practice-language-select" className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                {t('home.languagePicker.label')}
-              </label>
-              <select
-                id="home-practice-language-select"
-                value={languageId}
-                onChange={(event) => selectLanguage(event.target.value)}
-                className={classNames(
-                  'mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-100',
-                  'focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40',
-                  'sm:text-base'
-                )}
-              >
-                {languageOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-2 text-xs text-slate-400">{t('home.languagePicker.helper')}</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* App Language Selector Overlay */}
+      {appLanguageSelectorExpanded && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+            onClick={() => setAppLanguageSelectorExpanded(false)}
+          />
+          {/* Overlay Panel */}
+          <div className="fixed left-1/2 top-1/2 z-50 w-[90%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-playful-xl border-4 border-playful-brown-600 bg-playful-cream p-6 shadow-playful-xl">
+            {/* Close Button */}
+            <button
+              onClick={() => setAppLanguageSelectorExpanded(false)}
+              className="absolute -right-3 -top-3 flex h-10 w-10 items-center justify-center rounded-full border-4 border-playful-brown-700 bg-playful-red-500 text-white shadow-playful transition-all hover:bg-playful-red-400 active:translate-y-1"
+              aria-label="Close"
+            >
+              <XIcon className="h-5 w-5" />
+            </button>
 
-      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6">
-        <h2 className="text-base font-semibold text-slate-200 sm:text-lg">{t('home.progress.heading')}</h2>
-        <div className="progress-cards-container mt-4">
-          <div className="progress-card border border-slate-800 bg-slate-900/70">
-            <p className="progress-card-label text-slate-400">{t('home.progress.streak')}</p>
-            <p className="progress-card-value text-white">{t('home.progress.days', { count: streak.current })}</p>
-            <p className="progress-card-subtext text-slate-500">{t('home.progress.resetsAt', { time: nextResetTime })}</p>
-          </div>
-          <div className="progress-card border border-slate-800 bg-slate-900/70">
-            <p className="progress-card-label text-slate-400">{t('home.progress.starLevel')}</p>
-            <div className="mt-2 flex items-baseline justify-between">
-              <p className="progress-card-value text-white">{t('home.progress.level', { level })}</p>
-              <p className="progress-card-subtext text-slate-500">{t('home.progress.totalStars', { count: formatNumber(totalStarsEarned) })}</p>
-            </div>
-            <div className="mt-3 h-2 rounded-full bg-slate-800">
-              <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-sky-500" style={{ width: `${starsProgress * 100}%` }} />
-            </div>
-            <p className="mt-2 text-sm text-slate-300">
-              {t('home.progress.toNextLevel', { current: formatNumber(levelProgress), total: formatNumber(starsPerLevel) })}
+            <h3 className="mb-4 text-center text-xl font-bold text-playful-brown-800">
+              {t('app.languagePicker.label')}
+            </h3>
+
+            <select
+              id="home-app-language-select"
+              value={appLanguageId}
+              onChange={(event) => {
+                selectAppLanguage(event.target.value);
+                setAppLanguageSelectorExpanded(false);
+              }}
+              className="w-full rounded-playful border-4 border-playful-brown-400 bg-white px-4 py-3 text-base font-semibold text-playful-brown-900 shadow-inner-playful focus:border-playful-orange-500 focus:outline-none focus:ring-4 focus:ring-playful-orange-200"
+            >
+              {languageOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+
+            <p className="mt-3 text-center text-sm text-playful-brown-600">
+              {t('app.languagePicker.helper')}
             </p>
           </div>
-          <div className="progress-card border border-slate-800 bg-slate-900/70">
-            <p className="progress-card-label text-slate-400">{t('home.progress.latestBadge')}</p>
+        </>
+      )}
+
+      {/* Main Content - Choose Your Adventure */}
+      <PlayfulContainer variant="wooden-header" title={t('home.hero.heading')}>
+        <p className="mb-6 text-center text-base text-playful-brown-700 sm:text-lg">
+          {t('home.hero.description')}
+        </p>
+
+        <div className="rounded-playful-lg border-4 border-playful-orange-200 bg-white p-4 shadow-inner-playful">
+          <label htmlFor="home-practice-language-select" className="mb-2 block text-xs font-bold uppercase tracking-wider text-playful-brown-600">
+            {t('home.languagePicker.label')}
+          </label>
+          <select
+            id="home-practice-language-select"
+            value={languageId}
+            onChange={(event) => selectLanguage(event.target.value)}
+            className="w-full rounded-playful border-4 border-playful-brown-400 bg-playful-beige px-4 py-3 text-base font-semibold text-playful-brown-900 shadow-inner-playful focus:border-playful-orange-500 focus:outline-none focus:ring-4 focus:ring-playful-orange-200"
+          >
+            {languageOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+          <p className="mt-2 text-xs font-semibold text-playful-brown-600">{t('home.languagePicker.helper')}</p>
+        </div>
+      </PlayfulContainer>
+
+      {/* Progress Section */}
+      <PlayfulContainer variant="panel">
+        <h2 className="mb-4 text-xl font-bold text-playful-brown-800 sm:text-2xl">{t('home.progress.heading')}</h2>
+        <div className="progress-cards-container">
+          <PlayfulContainer variant="card">
+            <p className="text-xs font-bold uppercase tracking-wider text-playful-brown-600">{t('home.progress.streak')}</p>
+            <p className="mt-2 text-3xl font-bold text-playful-orange-600">{t('home.progress.days', { count: streak.current })}</p>
+            <p className="mt-1 text-xs font-semibold text-playful-brown-500">{t('home.progress.resetsAt', { time: nextResetTime })}</p>
+          </PlayfulContainer>
+
+          <PlayfulContainer variant="card">
+            <p className="text-xs font-bold uppercase tracking-wider text-playful-brown-600">{t('home.progress.starLevel')}</p>
+            <div className="mt-2 flex items-baseline justify-between">
+              <p className="text-3xl font-bold text-playful-orange-600">{t('home.progress.level', { level })}</p>
+              <p className="text-sm font-semibold text-playful-brown-500">{t('home.progress.totalStars', { count: formatNumber(totalStarsEarned) })}</p>
+            </div>
+            <div className="mt-3 h-3 rounded-full border-2 border-playful-brown-300 bg-playful-beige shadow-inner">
+              <div className="h-full rounded-full bg-gradient-to-r from-playful-orange-400 to-playful-yellow-400" style={{ width: `${starsProgress * 100}%` }} />
+            </div>
+            <p className="mt-2 text-sm font-semibold text-playful-brown-700">
+              {t('home.progress.toNextLevel', { current: formatNumber(levelProgress), total: formatNumber(starsPerLevel) })}
+            </p>
+          </PlayfulContainer>
+
+          <PlayfulContainer variant="card">
+            <p className="text-xs font-bold uppercase tracking-wider text-playful-brown-600">{t('home.progress.latestBadge')}</p>
             {latestBadge ? (
               <div className="mt-2 space-y-1">
-                <p className="text-base font-semibold text-white sm:text-lg">{latestBadge.name}</p>
-                <p className="text-sm text-cyan-300">{latestBadge.label}</p>
-                <p className="progress-card-subtext text-slate-400">{t('home.progress.tier', { tier: latestBadge.tier })} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
-                <p className="progress-card-subtext text-slate-500">{latestBadge.summary}</p>
+                <p className="text-lg font-bold text-playful-brown-900">{latestBadge.name}</p>
+                <p className="text-sm font-semibold text-playful-orange-600">{latestBadge.label}</p>
+                <p className="text-xs font-semibold text-playful-brown-600">
+                  {t('home.progress.tier', { tier: latestBadge.tier })} · {new Date(latestBadge.earnedAt).toLocaleDateString()}
+                </p>
+                <p className="text-xs text-playful-brown-500">{latestBadge.summary}</p>
               </div>
             ) : (
-              <p className="mt-3 text-sm text-slate-400">{t('home.progress.playToUnlock')}</p>
+              <p className="mt-3 text-sm font-semibold text-playful-brown-500">{t('home.progress.playToUnlock')}</p>
             )}
-          </div>
+          </PlayfulContainer>
         </div>
-      </section>
+      </PlayfulContainer>
       <section className="quest-cards-container">
         {daily?.tasks?.map((task, index) => (
           <TaskCard
