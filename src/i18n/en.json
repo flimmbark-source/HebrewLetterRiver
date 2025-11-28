@@ -208,6 +208,18 @@
       "starsReadyToClaim": "Stars ready to claim",
       "dailyBadgeReady": "Daily badge ready",
       "claimStarsToLevel": "Claim +{{stars}} ⭐ to add them to your level."
+    },
+    "levelNames": {
+      "1": "Patient Paddler",
+      "2": "Gentle Current",
+      "3": "Steady Stream",
+      "4": "Rising Rapids",
+      "5": "River Runner",
+      "6": "Wave Rider",
+      "7": "Cascade Chaser",
+      "8": "Torrent Tamer",
+      "9": "Waterfall Warrior",
+      "10": "River Master"
     }
   },
   "learn": {

@@ -214,15 +214,32 @@ export default function AchievementsView() {
 
   const formatNumber = (value) => Math.max(0, Math.floor(value ?? 0)).toLocaleString();
 
+  const levelName = t(`achievements.levelNames.${Math.min(level, 10)}`, { defaultValue: t('achievements.levelNames.10') });
+
   return (
     <div className="space-y-8 sm:space-y-10">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-between">
+        {/* Left: Title */}
         <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('achievements.title')}</h1>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <p className="text-xs uppercase tracking-wider text-slate-400">{t('home.progress.starLevel')}</p>
-            <p className="mt-1 text-2xl font-semibold text-white">{t('home.progress.level', { level })}</p>
+
+        {/* Center: Level with name */}
+        <div className="flex flex-col items-center text-center">
+          <p className="text-2xl font-bold text-white">{t('home.progress.level', { level })}</p>
+          <p className="mt-1 text-sm font-semibold text-cyan-400">{levelName}</p>
+        </div>
+
+        {/* Right: Progress bar */}
+        <div className="w-full text-center sm:w-auto sm:min-w-[240px] sm:text-right">
+          <p className="text-xs uppercase tracking-wider text-slate-400">{t('achievements.profile.starsToNextLevel')}</p>
+          <div className="mt-2 h-2 rounded-full bg-slate-800">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400"
+              style={{ width: `${levelPercent}%` }}
+            />
           </div>
+          <p className="mt-2 text-sm font-semibold text-slate-300">
+            {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐
+          </p>
         </div>
       </header>
 
