@@ -44,6 +44,9 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "Recently Learned Letters"
+    },
     "languagePicker": {
       "label": "Practice Language",
       "helper": "Switch anytime to train in another script."
@@ -227,6 +230,12 @@
     "title": "Learn",
     "intro": "Dive into curated lessons to master each letter. Fresh learning modules will appear here soon!",
     "body": "Until then, keep exploring the river and check back regularly for guided practice sessions, pronunciation tips, and cultural insights."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Configure your preferences",
+    "languageSettings": "Language Settings",
+    "gameSettings": "Game Settings"
   },
   "badges": {
     "firstFlow": {

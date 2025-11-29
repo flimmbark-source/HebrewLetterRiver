@@ -44,6 +44,12 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "Lettres récemment apprises"
+    },
+    "progress": {
+      "level": "Niveau {{level}}"
+    },
     "languagePicker": {
       "label": "Langue de pratique",
       "helper": "Changez à tout moment pour vous entraîner dans un autre script."
@@ -248,5 +254,11 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Configurez vos préférences",
+    "languageSettings": "Paramètres de langue",
+    "gameSettings": "Paramètres du jeu"
   }
 }

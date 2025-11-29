@@ -211,7 +211,7 @@ export default function HomeView() {
       {/* Hero Card */}
       <section className="section" style={{ marginTop: '20px',  }}></section>
       <section className="hero-card" style={{ position: 'relative' }}>
-        <h1 className="hero-title">Recently Learned Letters</h1>
+        <h1 className="hero-title">{t('home.recentLetters.title')}</h1>
         <div className="hero-body" style={{ display: 'flex', gap: '12px', fontSize: '24px', flexWrap: 'wrap' }}>
           {recentLetters.map((letter, index) => (
             <span

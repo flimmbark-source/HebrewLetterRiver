@@ -44,6 +44,9 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "Letras aprendidas recientemente"
+    },
     "languagePicker": {
       "label": "Practica el idioma",
       "helper": "Cambie en cualquier momento para entrenar en otro guión."
@@ -181,6 +184,12 @@
     "title": "Aprender",
     "intro": "Sumérgete en lecciones seleccionadas para dominar cada letra. ¡Pronto aparecerán aquí nuevos módulos de aprendizaje!",
     "body": "Hasta entonces, siga explorando el río y visítelo periódicamente para disfrutar de sesiones de práctica guiada, consejos de pronunciación y conocimientos culturales."
+  },
+  "settings": {
+    "title": "Ajustes",
+    "subtitle": "Configura tus preferencias",
+    "languageSettings": "Configuración de idioma",
+    "gameSettings": "Configuración del juego"
   },
   "badges": {
     "firstFlow": {

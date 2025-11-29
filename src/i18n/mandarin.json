@@ -44,6 +44,12 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "最近学习的字母"
+    },
+    "progress": {
+      "level": "等级 {{level}}"
+    },
     "languagePicker": {
       "label": "练习语言",
       "helper": "随时切换以使用另一个脚本进行训练。"
@@ -160,6 +166,12 @@
     "title": "学习",
     "intro": "深入学习精心策划的课程来掌握每个字母。新的学习模块即将在这里出现！",
     "body": "在那之前，继续探索河流并定期回来查看指导练习课程、发音技巧和文化见解。"
+  },
+  "settings": {
+    "title": "设置",
+    "subtitle": "配置您的偏好",
+    "languageSettings": "语言设置",
+    "gameSettings": "游戏设置"
   },
   "badges": {
     "firstFlow": {
