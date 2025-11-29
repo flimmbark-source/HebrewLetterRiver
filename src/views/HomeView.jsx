@@ -339,7 +339,7 @@ export default function HomeView() {
                   onClick={() => canClaimReward && handleDailyClaim(task.id)}
                   disabled={!canClaimReward || claimingTaskId === task.id}
                 >
-                  {task.rewardClaimed ? 'Done' : canClaimReward ? 'Claim' : 'Locked'}
+                  {task.rewardClaimed ? 'Claimed' : canClaimReward ? 'Claim' : 'In Progress'}
                 </button>
               </div>
             );
