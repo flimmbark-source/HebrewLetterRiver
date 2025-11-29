@@ -168,10 +168,10 @@ function Shell() {
   );
 
   const tabClass = ({ isActive }) =>
-    `flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-xs font-bold transition-all sm:text-sm ${
+    `flex flex-1 flex-col items-center gap-1 px-3 py-2.5 text-[11px] font-bold uppercase tracking-wide transition-all ${
       isActive
-        ? 'bg-gradient-to-b from-cyan-600/30 via-cyan-500/25 to-cyan-900/40 text-cyan-200 border-b-4 border-cyan-700 shadow-[0_8px_16px_rgba(0,0,0,0.3)] shadow-cyan-500/20'
-        : 'bg-gradient-to-b from-slate-700/50 via-slate-800/50 to-slate-900/60 text-slate-300 border-b-4 border-slate-800 shadow-[0_4px_8px_rgba(0,0,0,0.2)] hover:text-white hover:from-slate-600/60 hover:via-slate-700/60 hover:to-slate-800/70 active:translate-y-1 active:border-b-2 active:shadow-[0_2px_4px_rgba(0,0,0,0.2)]'
+        ? 'text-[#22D3EE] drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]'
+        : 'text-[#64748B] hover:text-[#9CA3AF]'
     }`;
 
   return (
@@ -191,30 +191,32 @@ function Shell() {
         </Routes>
       </main>
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t-4 border-slate-800 bg-gradient-to-t from-slate-900 to-slate-800 px-4 pt-3 shadow-2xl"
-        style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}
+        className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4"
+        style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
       >
-        <div className="mx-auto flex w-full max-w-3xl justify-between gap-2">
-          <NavLink to="/home" className={tabClass}>
-            <HomeIcon className="h-5 w-5" />
-            <span>{t('app.nav.home')}</span>
-          </NavLink>
-          <button
-            type="button"
-            onClick={handlePlay}
-            className="flex flex-1 flex-col items-center gap-1 rounded-2xl border-b-4 border-emerald-800 bg-gradient-to-b from-emerald-600/40 via-emerald-500/30 to-emerald-900/50 px-4 py-2 text-xs font-bold text-emerald-200 shadow-[0_8px_16px_rgba(0,0,0,0.3)] shadow-emerald-500/20 transition-all hover:from-emerald-500/50 hover:via-emerald-400/40 hover:to-emerald-800/60 hover:text-emerald-100 active:translate-y-1 active:border-b-2 active:shadow-[0_4px_8px_rgba(0,0,0,0.2)] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-emerald-400 sm:text-sm"
-          >
-            <PlayIcon className="h-6 w-6" />
-            <span>{t('app.nav.play')}</span>
-          </button>
-          <NavLink to="/achievements" className={tabClass}>
-            <TrophyIcon className="h-5 w-5" />
-            <span>{t('app.nav.achievements')}</span>
-          </NavLink>
-          <NavLink to="/learn" className={tabClass}>
-            <BookIcon className="h-5 w-5" />
-            <span>{t('app.nav.learn')}</span>
-          </NavLink>
+        <div className="w-full max-w-3xl rounded-[28px] bg-[rgba(15,23,42,0.9)] px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-sm">
+          <div className="flex justify-between gap-2">
+            <NavLink to="/home" className={tabClass}>
+              <HomeIcon className="h-6 w-6" />
+              <span>{t('app.nav.home')}</span>
+            </NavLink>
+            <button
+              type="button"
+              onClick={handlePlay}
+              className="arcade-play-button flex flex-1 flex-col items-center gap-1 px-3 py-2.5 text-[11px] font-bold uppercase tracking-wide transition-all"
+            >
+              <PlayIcon className="h-6 w-6" />
+              <span>{t('app.nav.play')}</span>
+            </button>
+            <NavLink to="/achievements" className={tabClass}>
+              <TrophyIcon className="h-6 w-6" />
+              <span>{t('app.nav.achievements')}</span>
+            </NavLink>
+            <NavLink to="/learn" className={tabClass}>
+              <BookIcon className="h-6 w-6" />
+              <span>{t('app.nav.learn')}</span>
+            </NavLink>
+          </div>
         </div>
       </nav>
       <footer className="pb-6 text-center text-xs font-semibold text-slate-600 sm:text-sm">{t('app.footer.resetNotice')}</footer>
@@ -229,7 +231,7 @@ export default function App() {
         <ToastProvider>
           <ProgressProvider>
             <GameProvider>
-              <div className="min-h-screen bg-slate-950">
+              <div className="min-h-screen arcade-gradient-bg">
                 <Shell />
               </div>
             </GameProvider>

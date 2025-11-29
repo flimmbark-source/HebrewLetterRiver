@@ -39,25 +39,13 @@ function TaskCard({
   const formattedReward = rewardValue.toLocaleString();
   const canClaimReward = Boolean(task.rewardClaimable) && !task.rewardClaimed && typeof onClaimReward === 'function';
   const clickable = canClaimReward && !claimingReward;
-  const highlightClass = canClaimReward
-    ? 'border-amber-400/40 ring-1 ring-amber-300/60 shadow-amber-300/20'
-    : task.rewardClaimed
-    ? 'border-emerald-400/40'
-    : '';
   const questLabel = t('home.quest.label', { current: questNumber, total: totalQuests });
-  const statusPillClass = 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200';
   const currentProgress = Math.min(task.progress ?? 0, task.goal);
   const progressValue = `${currentProgress} / ${task.goal}`;
 
-  const statusLabel = task.rewardClaimed
-    ? t('home.quest.collected')
-    : task.completed
-    ? t('home.quest.complete')
-    : t('home.quest.inProgress');
-
   const cardClass = clickable
-    ? 'cursor-pointer hover:scale-[1.02] bg-gradient-to-b from-cyan-900/60 via-slate-900/80 to-slate-950 border-2 border-cyan-700/50 shadow-[0_12px_24px_rgba(0,0,0,0.4)] animate-pulse hover:shadow-[0_16px_32px_rgba(6,182,212,0.3)]'
-    : 'bg-gradient-to-b from-slate-800/80 via-slate-900/90 to-slate-950 border-2 border-slate-700/80 shadow-[0_12px_24px_rgba(0,0,0,0.4)]';
+    ? 'arcade-quest-card-claimable cursor-pointer'
+    : 'arcade-quest-card';
 
   const handleCardClick = () => {
     if (!clickable) return;
@@ -74,7 +62,7 @@ function TaskCard({
 
   return (
     <div
-      className={`quest-card rounded-[28px] p-6 transition-all sm:p-8 ${cardClass} ${clickable ? 'hover:shadow-[0_16px_32px_rgba(6,182,212,0.3)] active:translate-y-1 active:shadow-[0_8px_16px_rgba(0,0,0,0.4)]' : 'hover:shadow-[0_14px_28px_rgba(0,0,0,0.5)]'}`}
+      className={`rounded-[24px] p-5 transition-all sm:p-6 ${cardClass}`}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role={clickable ? 'button' : undefined}
@@ -82,21 +70,21 @@ function TaskCard({
       aria-label={clickable ? `Claim ${formattedReward} stars for quest` : undefined}
     >
       <div className="flex items-start justify-between gap-4">
-        <h3 className="text-base font-semibold text-white sm:text-lg">{task.description}</h3>
-        <span className="flex-shrink-0 rounded-full border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-200">
-          {questLabel}
-        </span>
+        <h3 className="text-base font-semibold text-[#F9FAFB] sm:text-lg">{task.description}</h3>
+        <div className="arcade-pill flex-shrink-0">
+          <span className="text-[11px] font-bold uppercase tracking-wider">{questLabel}</span>
+        </div>
       </div>
       <div className="mt-5 flex items-center justify-between">
-        <span className="text-base font-bold text-slate-200">{progressValue}</span>
+        <span className="text-base font-bold text-[#F9FAFB]">{progressValue}</span>
         {rewardValue > 0 && (
-          <span className={`text-base font-bold ${clickable ? 'text-amber-300 animate-pulse' : 'text-amber-200'}`}>
-            {clickable && '✨ '}+{formattedReward} ⭐{clickable && ' ✨'}
+          <span className={`text-base font-bold ${clickable ? 'text-[#FACC15] animate-pulse' : 'text-[#FACC15]/80'}`}>
+            +{formattedReward} ⭐
           </span>
         )}
       </div>
-      <div className="mt-3 h-4 rounded-full bg-slate-800/80 shadow-inner">
-        <div className="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-cyan-400 shadow-[0_2px_8px_rgba(251,191,36,0.5)] transition-all duration-300" style={{ width: `${percentage}%` }} />
+      <div className="arcade-progress-bar-container mt-3">
+        <div className="arcade-progress-bar-fill arcade-progress-bar-fill-quest" style={{ width: `${percentage}%` }} />
       </div>
     </div>
   );
@@ -167,24 +155,24 @@ export default function HomeView() {
       {/* Letter River Header */}
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('app.title')}</h1>
-          <p className="mt-1 text-sm font-semibold text-cyan-400 sm:text-base">{t('app.tagline')}</p>
+          <h1 className="arcade-title text-[clamp(28px,7vw,32px)] font-bold">{t('app.title')}</h1>
+          <p className="mt-1 text-sm font-semibold text-[#9CA3AF] sm:text-base">{t('app.tagline')}</p>
         </div>
         <div className="relative flex-shrink-0">
           <button
             onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
-            className="flex h-12 w-12 items-center justify-center rounded-full border-b-4 border-slate-600 bg-slate-700 text-slate-200 shadow-lg transition-all hover:bg-slate-600 hover:scale-105 active:translate-y-1 active:border-b-2"
+            className="arcade-icon-button flex h-12 w-12 items-center justify-center rounded-full transition-all"
             aria-label={t('app.languagePicker.label')}
           >
             <GlobeIcon className="h-6 w-6" />
           </button>
           {/* App Language Selector Popup */}
           {appLanguageSelectorExpanded && (
-            <div className="absolute right-0 top-0 w-80 rounded-3xl border-4 border-slate-700 bg-slate-800 p-5 shadow-2xl z-50">
+            <div className="arcade-card absolute right-0 top-0 w-80 z-50">
               {/* Close X Button */}
               <button
                 onClick={() => setAppLanguageSelectorExpanded(false)}
-                className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border-4 border-red-600 bg-red-500 text-white shadow-lg transition-all hover:bg-red-400 active:translate-y-1 active:shadow-md"
+                className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#F97373] text-white shadow-lg transition-all hover:bg-[#EF4444] active:translate-y-1 active:shadow-md"
                 aria-label="Close"
               >
                 <XIcon className="h-4 w-4" />
@@ -198,7 +186,7 @@ export default function HomeView() {
                 id="home-app-language-select"
                 value={appLanguageId}
                 onChange={(event) => selectAppLanguage(event.target.value)}
-                className="w-full rounded-2xl border-4 border-slate-600 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-inner focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/40"
+                className="w-full rounded-2xl border border-[rgba(255,255,255,0.06)] bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white shadow-inner focus:border-[#22D3EE] focus:outline-none focus:ring-2 focus:ring-[#22D3EE]/40"
               >
                 {languageOptions.map((option) => (
                   <option key={option.id} value={option.id}>
@@ -207,7 +195,7 @@ export default function HomeView() {
                 ))}
               </select>
 
-              <p className="mt-3 text-center text-xs text-slate-400">
+              <p className="mt-3 text-center text-xs text-[#9CA3AF]">
                 {t('app.languagePicker.helper')}
               </p>
 
@@ -220,7 +208,7 @@ export default function HomeView() {
                 id="home-practice-language-select"
                 value={languageId}
                 onChange={(event) => selectLanguage(event.target.value)}
-                className="w-full rounded-2xl border-4 border-slate-600 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-inner focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/40"
+                className="w-full rounded-2xl border border-[rgba(255,255,255,0.06)] bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white shadow-inner focus:border-[#22D3EE] focus:outline-none focus:ring-2 focus:ring-[#22D3EE]/40"
               >
                 {languageOptions.map((option) => (
                   <option key={option.id} value={option.id}>
@@ -229,7 +217,7 @@ export default function HomeView() {
                 ))}
               </select>
 
-              <p className="mt-3 text-center text-xs text-slate-400">
+              <p className="mt-3 text-center text-xs text-[#9CA3AF]">
                 {t('home.languagePicker.helper')}
               </p>
             </div>
@@ -237,38 +225,44 @@ export default function HomeView() {
         </div>
       </header>
 
-      <section className="rounded-[28px] border-2 border-slate-700/80 bg-gradient-to-b from-slate-800/80 via-slate-900/90 to-slate-950 p-6 shadow-[0_12px_24px_rgba(0,0,0,0.4)] sm:p-8">
+      <section className="arcade-card">
         <h2 className="text-lg font-bold uppercase tracking-wide text-white sm:text-xl">{t('home.progress.heading')}</h2>
         <div className="progress-cards-container mt-6">
-          <div className="progress-card rounded-[24px] border-2 border-amber-900/30 bg-gradient-to-b from-amber-950/40 via-slate-900/60 to-slate-950 p-5 shadow-[0_8px_16px_rgba(0,0,0,0.3)] sm:p-6">
-            <p className="progress-card-label text-xs font-bold uppercase tracking-wider text-amber-400/80">{t('home.progress.streak')}</p>
-            <p className="progress-card-value mt-3 text-4xl font-bold text-amber-300 sm:text-5xl">{t('home.progress.days', { count: streak.current })}</p>
-            <p className="progress-card-subtext mt-2 text-xs font-semibold text-slate-400">{t('home.progress.resetsAt', { time: nextResetTime })}</p>
+          <div className="arcade-progress-card rounded-[24px] p-5 sm:p-6">
+            <div className="arcade-pill mb-3 inline-block">
+              <span className="text-[11px] font-bold uppercase tracking-wider">{t('home.progress.streak')}</span>
+            </div>
+            <p className="progress-card-value mt-3 text-4xl font-bold text-[#FACC15] sm:text-5xl">{t('home.progress.days', { count: streak.current })}</p>
+            <p className="progress-card-subtext mt-2 text-xs font-semibold text-[#9CA3AF]">{t('home.progress.resetsAt', { time: nextResetTime })}</p>
           </div>
-          <div className="progress-card rounded-[24px] border-2 border-cyan-900/40 bg-gradient-to-b from-cyan-950/40 via-slate-900/60 to-slate-950 p-5 shadow-[0_8px_16px_rgba(0,0,0,0.3)] sm:p-6">
-            <p className="progress-card-label text-xs font-bold uppercase tracking-wider text-cyan-400/80">⭐ {t('home.progress.starLevel')}</p>
+          <div className="arcade-progress-card arcade-progress-card-featured rounded-[24px] p-5 sm:p-6">
+            <div className="arcade-pill mb-3 inline-block">
+              <span className="text-[11px] font-bold uppercase tracking-wider">⭐ {t('home.progress.starLevel')}</span>
+            </div>
             <div className="mt-3 flex items-baseline justify-between">
-              <p className="progress-card-value text-4xl font-bold text-cyan-300 sm:text-5xl">{t('home.progress.level', { level })}</p>
-              <p className="progress-card-subtext text-sm font-semibold text-slate-400">{t('home.progress.totalStars', { count: formatNumber(totalStarsEarned) })}</p>
+              <p className="progress-card-value text-4xl font-bold text-[#22D3EE] sm:text-5xl">{t('home.progress.level', { level })}</p>
+              <p className="progress-card-subtext text-sm font-semibold text-[#9CA3AF]">{t('home.progress.totalStars', { count: formatNumber(totalStarsEarned) })}</p>
             </div>
-            <div className="mt-4 h-4 rounded-full bg-slate-800/80 shadow-inner">
-              <div className="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-cyan-400 shadow-[0_2px_8px_rgba(251,191,36,0.5)] transition-all duration-300" style={{ width: `${starsProgress * 100}%` }} />
+            <div className="arcade-progress-bar-container mt-4">
+              <div className="arcade-progress-bar-fill arcade-progress-bar-fill-xp" style={{ width: `${starsProgress * 100}%` }} />
             </div>
-            <p className="mt-3 text-sm font-semibold text-slate-300">
+            <p className="mt-3 text-sm font-semibold text-[#F9FAFB]">
               {t('home.progress.toNextLevel', { current: formatNumber(levelProgress), total: formatNumber(starsPerLevel) })}
             </p>
           </div>
-          <div className="progress-card rounded-[24px] border-2 border-emerald-900/30 bg-gradient-to-b from-emerald-950/40 via-slate-900/60 to-slate-950 p-5 shadow-[0_8px_16px_rgba(0,0,0,0.3)] sm:p-6">
-            <p className="progress-card-label text-xs font-bold uppercase tracking-wider text-emerald-400/80">{t('home.progress.latestBadge')}</p>
+          <div className="arcade-progress-card rounded-[24px] p-5 sm:p-6">
+            <div className="arcade-pill mb-3 inline-block">
+              <span className="text-[11px] font-bold uppercase tracking-wider">{t('home.progress.latestBadge')}</span>
+            </div>
             {latestBadge ? (
               <div className="mt-3 space-y-2">
-                <p className="text-lg font-bold text-white sm:text-xl">{latestBadge.name}</p>
-                <p className="text-base font-semibold text-emerald-300">{latestBadge.label}</p>
-                <p className="progress-card-subtext text-xs font-semibold text-slate-400">{t('home.progress.tier', { tier: latestBadge.tier })} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
-                <p className="progress-card-subtext text-xs text-slate-400">{latestBadge.summary}</p>
+                <p className="text-lg font-bold text-[#F9FAFB] sm:text-xl">{latestBadge.name}</p>
+                <p className="text-base font-semibold text-[#FACC15]">{latestBadge.label}</p>
+                <p className="progress-card-subtext text-xs font-semibold text-[#9CA3AF]">{t('home.progress.tier', { tier: latestBadge.tier })} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
+                <p className="progress-card-subtext text-xs text-[#9CA3AF]">{latestBadge.summary}</p>
               </div>
             ) : (
-              <p className="mt-4 text-sm font-semibold text-slate-400">{t('home.progress.playToUnlock')}</p>
+              <p className="mt-4 text-sm font-semibold text-[#9CA3AF]">{t('home.progress.playToUnlock')}</p>
             )}
           </div>
         </div>

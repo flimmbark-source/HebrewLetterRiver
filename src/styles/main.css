@@ -1476,3 +1476,197 @@ body.high-contrast { background: #000; color: #fff; }
     transform: translate(var(--drift-distance, 40px), 0);
   }
 }
+
+/* === ARCADE THEME STYLES === */
+
+/* Global dark gradient background with vignette */
+.arcade-gradient-bg {
+  background:
+    radial-gradient(circle at center, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%),
+    linear-gradient(180deg, #020617 0%, #050816 100%);
+}
+
+/* App title with soft shadow and stroke */
+.arcade-title {
+  color: #F9FAFB;
+  text-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.6),
+    -1px -1px 0 rgba(0, 0, 0, 0.3),
+    1px -1px 0 rgba(0, 0, 0, 0.3),
+    -1px 1px 0 rgba(0, 0, 0, 0.3),
+    1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Icon button styling */
+.arcade-icon-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #9CA3AF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.arcade-icon-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #F9FAFB;
+  transform: scale(1.05);
+}
+
+.arcade-icon-button:active {
+  transform: scale(0.98);
+}
+
+/* Main card container styling */
+.arcade-card {
+  background: linear-gradient(180deg, #0B1120 0%, #0a0f1c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+}
+
+@media (min-width: 640px) {
+  .arcade-card {
+    padding: 24px;
+  }
+}
+
+/* Progress card styling */
+.arcade-progress-card {
+  background: linear-gradient(180deg, #0B1120 0%, #0a0f1c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.arcade-progress-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
+}
+
+/* Featured progress card with glow */
+.arcade-progress-card-featured {
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.7),
+    0 0 12px rgba(34, 211, 238, 0.15);
+}
+
+/* Quest card styling */
+.arcade-quest-card {
+  background: linear-gradient(180deg, #0B1120 0%, #0a0f1c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.arcade-quest-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
+}
+
+/* Claimable quest card with glow and pulse */
+.arcade-quest-card-claimable {
+  background: linear-gradient(180deg, rgba(34, 211, 238, 0.08) 0%, #0B1120 100%);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(34, 211, 238, 0.25);
+  animation: arcade-glow-pulse 2s ease-in-out infinite;
+}
+
+.arcade-quest-card-claimable:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 24px 56px rgba(0, 0, 0, 0.9),
+    0 0 28px rgba(34, 211, 238, 0.35);
+}
+
+.arcade-quest-card-claimable:active {
+  transform: translateY(-2px) scale(0.99);
+}
+
+@keyframes arcade-glow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 16px 40px rgba(0, 0, 0, 0.7),
+      0 0 20px rgba(34, 211, 238, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 16px 40px rgba(0, 0, 0, 0.7),
+      0 0 32px rgba(34, 211, 238, 0.4);
+  }
+}
+
+/* Label pill styling */
+.arcade-pill {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 4px 12px;
+  color: #9CA3AF;
+}
+
+/* Progress bar container */
+.arcade-progress-bar-container {
+  height: 12px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.9);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Progress bar fill base */
+.arcade-progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* XP bar fill with gold gradient and glow */
+.arcade-progress-bar-fill-xp {
+  background: linear-gradient(90deg, #FACC15 0%, #EAB308 100%);
+  box-shadow:
+    0 0 12px rgba(250, 204, 21, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Quest bar fill with gradient and glow */
+.arcade-progress-bar-fill-quest {
+  background: linear-gradient(90deg, #22C55E 0%, #16A34A 100%);
+  box-shadow:
+    0 0 12px rgba(34, 197, 94, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Play button with glossy gradient */
+.arcade-play-button {
+  background: linear-gradient(180deg, #22D3EE 0%, #0EA5E9 50%, #0369A1 100%);
+  color: #ECFEFF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    0 10px 20px rgba(15, 118, 110, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+  border-radius: 9999px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arcade-play-button:hover {
+  background: linear-gradient(180deg, #34D9F4 0%, #1EB5F5 50%, #0480B8 100%);
+  box-shadow:
+    0 12px 24px rgba(15, 118, 110, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.arcade-play-button:active {
+  background: linear-gradient(180deg, #18BDD9 0%, #0C9FD6 50%, #025885 100%);
+  box-shadow:
+    0 6px 12px rgba(15, 118, 110, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.4);
+  transform: translateY(0) scale(0.98);
+}
