@@ -163,129 +163,170 @@ export default function HomeView() {
   const totalQuests = daily?.tasks?.length ?? 0;
 
   return (
-    <div className="space-y-8 sm:space-y-10">
-      {/* Letter River Header */}
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('app.title')}</h1>
-          <p className="mt-1 text-sm font-semibold text-cyan-400 sm:text-base">{t('app.tagline')}</p>
+    <>
+      {/* Player Header */}
+      <header className="player-header">
+        <div className="player-meta">
+          <div className="avatar"></div>
+          <div className="player-text">
+            <div className="player-name">Player</div>
+            <div className="player-level">{t('home.progress.level', { level })}</div>
+            <div className="player-rank">{latestBadge?.label || 'Beginner'}</div>
+          </div>
         </div>
-        <div className="relative flex-shrink-0">
+        <div className="top-counters">
+          <div className="pill-counter">
+            <span className="icon">⭐</span>
+            <span className="value">{formatNumber(totalStarsEarned)}</span>
+          </div>
           <button
             onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
-            className="flex h-12 w-12 items-center justify-center rounded-full border-b-4 border-slate-600 bg-slate-700 text-slate-200 shadow-lg transition-all hover:bg-slate-600 hover:scale-105 active:translate-y-1 active:border-b-2"
+            className="tiny-pill"
             aria-label={t('app.languagePicker.label')}
           >
-            <GlobeIcon className="h-6 w-6" />
+            🌎
           </button>
-          {/* App Language Selector Popup */}
-          {appLanguageSelectorExpanded && (
-            <div className="absolute right-0 top-0 w-80 rounded-3xl border-4 border-slate-700 bg-slate-800 p-5 shadow-2xl z-50">
-              {/* Close X Button */}
-              <button
-                onClick={() => setAppLanguageSelectorExpanded(false)}
-                className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border-4 border-red-600 bg-red-500 text-white shadow-lg transition-all hover:bg-red-400 active:translate-y-1 active:shadow-md"
-                aria-label="Close"
-              >
-                <XIcon className="h-4 w-4" />
-              </button>
-
-              <h3 className="mb-3 text-center text-lg font-bold text-white">
-                {t('app.languagePicker.label')}
-              </h3>
-
-              <select
-                id="home-app-language-select"
-                value={appLanguageId}
-                onChange={(event) => selectAppLanguage(event.target.value)}
-                className="w-full rounded-2xl border-4 border-slate-600 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-inner focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/40"
-              >
-                {languageOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name}
-                  </option>
-                ))}
-              </select>
-
-              <p className="mt-3 text-center text-xs text-slate-400">
-                {t('app.languagePicker.helper')}
-              </p>
-
-              {/* Practice Language Selector */}
-              <h3 className="mb-3 mt-5 text-center text-lg font-bold text-white">
-                {t('home.languagePicker.label')}
-              </h3>
-
-              <select
-                id="home-practice-language-select"
-                value={languageId}
-                onChange={(event) => selectLanguage(event.target.value)}
-                className="w-full rounded-2xl border-4 border-slate-600 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-inner focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/40"
-              >
-                {languageOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name}
-                  </option>
-                ))}
-              </select>
-
-              <p className="mt-3 text-center text-xs text-slate-400">
-                {t('home.languagePicker.helper')}
-              </p>
-            </div>
-          )}
         </div>
       </header>
 
-      <section className="rounded-[28px] border-2 border-slate-700/80 bg-gradient-to-b from-slate-800/80 via-slate-900/90 to-slate-950 p-6 shadow-[0_12px_24px_rgba(0,0,0,0.4)] sm:p-8">
-        <h2 className="text-lg font-bold uppercase tracking-wide text-white sm:text-xl">{t('home.progress.heading')}</h2>
-        <div className="progress-cards-container mt-6">
-          <div className="progress-card rounded-[24px] border-2 border-amber-900/30 bg-gradient-to-b from-amber-950/40 via-slate-900/60 to-slate-950 p-5 shadow-[0_8px_16px_rgba(0,0,0,0.3)] sm:p-6">
-            <p className="progress-card-label text-xs font-bold uppercase tracking-wider text-amber-400/80">{t('home.progress.streak')}</p>
-            <p className="progress-card-value mt-3 text-4xl font-bold text-amber-300 sm:text-5xl">{t('home.progress.days', { count: streak.current })}</p>
-            <p className="progress-card-subtext mt-2 text-xs font-semibold text-slate-400">{t('home.progress.resetsAt', { time: nextResetTime })}</p>
+      {/* App Language Selector Popup */}
+      {appLanguageSelectorExpanded && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 backdrop-blur">
+          <div className="w-full max-w-lg rounded-3xl border-4 border-arcade-wood-dark bg-gradient-to-br from-arcade-panel-light to-arcade-panel-medium p-6 shadow-arcade-frame">
+            <button
+              onClick={() => setAppLanguageSelectorExpanded(false)}
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-arcade-accent-red text-white shadow-arcade-sm"
+              aria-label="Close"
+            >
+              <XIcon className="h-4 w-4" />
+            </button>
+
+            <h3 className="mb-3 text-center font-heading text-lg font-bold text-arcade-text-main">
+              {t('app.languagePicker.label')}
+            </h3>
+
+            <select
+              id="home-app-language-select"
+              value={appLanguageId}
+              onChange={(event) => selectAppLanguage(event.target.value)}
+              className="w-full rounded-2xl border-2 border-arcade-panel-border bg-arcade-panel-light px-4 py-2.5 text-sm font-semibold text-arcade-text-main shadow-inner"
+            >
+              {languageOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+
+            <h3 className="mb-3 mt-5 text-center font-heading text-lg font-bold text-arcade-text-main">
+              {t('home.languagePicker.label')}
+            </h3>
+
+            <select
+              id="home-practice-language-select"
+              value={languageId}
+              onChange={(event) => selectLanguage(event.target.value)}
+              className="w-full rounded-2xl border-2 border-arcade-panel-border bg-arcade-panel-light px-4 py-2.5 text-sm font-semibold text-arcade-text-main shadow-inner"
+            >
+              {languageOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
           </div>
-          <div className="progress-card rounded-[24px] border-2 border-cyan-900/40 bg-gradient-to-b from-cyan-950/40 via-slate-900/60 to-slate-950 p-5 shadow-[0_8px_16px_rgba(0,0,0,0.3)] sm:p-6">
-            <p className="progress-card-label text-xs font-bold uppercase tracking-wider text-cyan-400/80">⭐ {t('home.progress.starLevel')}</p>
-            <div className="mt-3 flex items-baseline justify-between">
-              <p className="progress-card-value text-4xl font-bold text-cyan-300 sm:text-5xl">{t('home.progress.level', { level })}</p>
-              <p className="progress-card-subtext text-sm font-semibold text-slate-400">{t('home.progress.totalStars', { count: formatNumber(totalStarsEarned) })}</p>
+        </div>
+      )}
+
+      {/* Hero Card */}
+      <section className="hero-card">
+        <h1 className="hero-title">{t('app.title')}</h1>
+        <p className="hero-body">
+          <span>{t('app.tagline')}</span>
+        </p>
+        <button className="hero-cta" onClick={() => openGame({ autostart: false })}>Play</button>
+      </section>
+
+      {/* Progress Section */}
+      <section className="section">
+        <div className="section-header">
+          <div className="section-title">
+            <div className="wood-header">{t('home.progress.heading')}</div>
+          </div>
+          <div className="section-link">View details</div>
+        </div>
+        <div className="progress-row">
+          <div className="progress-card-small">
+            <div className="progress-icon red">🔥</div>
+            <div className="progress-label">{t('home.progress.streak')}</div>
+            <div className="progress-value">{t('home.progress.days', { count: streak.current })}</div>
+            <div className="progress-sub">{t('home.progress.resetsAt', { time: nextResetTime })}</div>
+          </div>
+          <div className="progress-card-small">
+            <div className="progress-icon gold">★</div>
+            <div className="progress-label">{t('home.progress.starLevel')}</div>
+            <div className="progress-value">{t('home.progress.level', { level })}</div>
+            <div className="progress-bar-shell">
+              <div className="progress-bar-fill" style={{ width: `${starsProgress * 100}%` }}></div>
             </div>
-            <div className="mt-4 h-4 rounded-full bg-slate-800/80 shadow-inner">
-              <div className="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-cyan-400 shadow-[0_2px_8px_rgba(251,191,36,0.5)] transition-all duration-300" style={{ width: `${starsProgress * 100}%` }} />
-            </div>
-            <p className="mt-3 text-sm font-semibold text-slate-300">
+            <div className="progress-sub">
               {t('home.progress.toNextLevel', { current: formatNumber(levelProgress), total: formatNumber(starsPerLevel) })}
-            </p>
+            </div>
           </div>
-          <div className="progress-card rounded-[24px] border-2 border-emerald-900/30 bg-gradient-to-b from-emerald-950/40 via-slate-900/60 to-slate-950 p-5 shadow-[0_8px_16px_rgba(0,0,0,0.3)] sm:p-6">
-            <p className="progress-card-label text-xs font-bold uppercase tracking-wider text-emerald-400/80">{t('home.progress.latestBadge')}</p>
-            {latestBadge ? (
-              <div className="mt-3 space-y-2">
-                <p className="text-lg font-bold text-white sm:text-xl">{latestBadge.name}</p>
-                <p className="text-base font-semibold text-emerald-300">{latestBadge.label}</p>
-                <p className="progress-card-subtext text-xs font-semibold text-slate-400">{t('home.progress.tier', { tier: latestBadge.tier })} · {new Date(latestBadge.earnedAt).toLocaleDateString()}</p>
-                <p className="progress-card-subtext text-xs text-slate-400">{latestBadge.summary}</p>
-              </div>
-            ) : (
-              <p className="mt-4 text-sm font-semibold text-slate-400">{t('home.progress.playToUnlock')}</p>
-            )}
+          <div className="progress-card-small">
+            <div className="progress-icon cyan">🏅</div>
+            <div className="progress-label">{t('home.progress.latestBadge')}</div>
+            <div className="progress-value">{latestBadge?.name || 'None yet'}</div>
+            <div className="progress-sub">{latestBadge ? latestBadge.label : t('home.progress.playToUnlock')}</div>
           </div>
         </div>
       </section>
-      <section className="quest-cards-container">
-        {daily?.tasks?.map((task, index) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            questNumber={index + 1}
-            totalQuests={totalQuests}
-            claimingReward={claimingTaskId === task.id}
-            onClaimReward={() => handleDailyClaim(task.id)}
-          />
-        ))}
-      </section>
 
-    </div>
+      {/* Daily Quests Section */}
+      {daily?.tasks && daily.tasks.length > 0 && (
+        <section className="section">
+          <div className="section-header">
+            <div className="section-title">
+              <div className="wood-header">Daily quests</div>
+            </div>
+            <div className="section-link">Resets at {nextResetTime}</div>
+          </div>
+          {daily.tasks.map((task, index) => {
+            const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
+            const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
+            const canClaimReward = Boolean(task.rewardClaimable) && !task.rewardClaimed;
+            const currentProgress = Math.min(task.progress ?? 0, task.goal);
+
+            return (
+              <div key={task.id} className="quest-card-arcade">
+                <div className="quest-left">
+                  <div className="quest-top-row">
+                    <div className="quest-title-arcade">{task.description}</div>
+                    {rewardValue > 0 && (
+                      <div className="quest-reward-inline">
+                        +{rewardValue} <span className="star-inline">★</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="quest-progress-meta">
+                    {currentProgress} / {task.goal}
+                  </div>
+                  <div className="quest-progress-bar">
+                    <div className="quest-progress-fill" style={{ width: `${percentage}%` }}></div>
+                  </div>
+                </div>
+                <button
+                  className={`quest-cta ${canClaimReward ? 'active' : ''}`}
+                  onClick={() => canClaimReward && handleDailyClaim(task.id)}
+                  disabled={!canClaimReward || claimingTaskId === task.id}
+                >
+                  {task.rewardClaimed ? 'Done' : canClaimReward ? 'Claim' : 'Locked'}
+                </button>
+              </div>
+            );
+          })}
+        </section>
+      )}
+    </>
   );
 }
