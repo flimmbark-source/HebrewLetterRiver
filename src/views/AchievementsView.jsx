@@ -2,7 +2,17 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { on } from '../lib/eventBus.js';
+
+function XIcon({ className = '' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
 
 function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
   const totalTiers = badge.tiers.length;
@@ -85,14 +95,14 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
   };
 
   const cardClass = canClaim
-    ? 'cursor-pointer hover:scale-[1.02] bg-gradient-to-br from-cyan-900/40 to-slate-900/60 border-cyan-600/50 shadow-cyan-500/20 animate-pulse hover:border-cyan-500/60'
-    : 'cursor-default bg-slate-900/60 border-slate-800 hover:border-cyan-500/40';
+    ? 'cursor-pointer hover:scale-[1.02] border-arcade-accent-gold/50 shadow-arcade-button animate-pulse hover:border-arcade-accent-gold/70'
+    : 'cursor-default border-arcade-panel-border hover:border-arcade-accent-orange/40';
 
-  const highlightClass = celebratingTier !== null ? 'ring-2 ring-amber-400/70 shadow-amber-400/40 animate-pulse' : '';
+  const highlightClass = celebratingTier !== null ? 'ring-2 ring-arcade-accent-gold/70 shadow-arcade-button animate-pulse' : '';
 
   return (
     <div
-      className={`rounded-3xl border p-5 shadow-inner transition sm:p-6 ${cardClass} ${highlightClass}`}
+      className={`progress-card-small p-5 transition sm:p-6 ${cardClass} ${highlightClass}`}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role={canClaim ? 'button' : undefined}
@@ -100,22 +110,22 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
       aria-label={canClaim ? `Claim ${firstUnclaimed.stars} stars for ${tierProgressLabel}` : undefined}
     >
       <div className="flex items-start justify-between gap-4">
-        <h3 className="text-base font-semibold text-white sm:text-lg">{badgeSummary}</h3>
-        <span className="flex-shrink-0 rounded-full border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-200">
-          {isClaiming ? translate('achievements.claiming') : tierProgressLabel}
+        <h3 className="text-base font-semibold text-arcade-text-main sm:text-lg">{badgeSummary}</h3>
+        <span className="pill-counter">
+          <span className="value">{isClaiming ? translate('achievements.claiming') : tierProgressLabel}</span>
         </span>
       </div>
       <div className="mt-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-slate-300">{currentDisplay}</span>
+          <span className="text-sm text-arcade-text-soft">{currentDisplay}</span>
           {activeTier?.stars > 0 && (
-            <span className={`text-sm font-semibold ${canClaim ? 'text-amber-300 animate-pulse' : 'text-amber-200'}`}>
+            <span className={`text-sm font-semibold ${canClaim ? 'text-arcade-accent-gold animate-pulse' : 'text-arcade-text-soft'}`}>
               {canClaim && '✨ '}+{activeTier.stars} ⭐{canClaim && ' ✨'}
             </span>
           )}
         </div>
-        <div className="mt-2 h-2 rounded-full bg-slate-800">
-          <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400 transition-all duration-300" style={{ width: `${percent}%` }} />
+        <div className="progress-bar-shell mt-2">
+          <div className="progress-bar-fill transition-all duration-300" style={{ width: `${percent}%` }} />
         </div>
       </div>
     </div>
@@ -125,7 +135,30 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
 export default function AchievementsView() {
   const { player, badges, daily, claimBadgeReward, claimDailyReward, starLevelSize } = useProgress();
   const { t } = useLocalization();
+  const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
+  const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
   const gameName = t('app.title');
+
+  const latestBadge = useMemo(() => {
+    if (!player.latestBadge) return null;
+    const badge = badgesCatalog.find((item) => item.id === player.latestBadge.id);
+    const tierSpec = badge?.tiers?.find((item) => item.tier === player.latestBadge.tier);
+
+    const nameKey = player.latestBadge.nameKey ?? badge?.nameKey;
+    const labelKey = player.latestBadge.labelKey ?? tierSpec?.labelKey;
+    const summaryKey = player.latestBadge.summaryKey ?? badge?.summaryKey;
+
+    const name = nameKey ? t(nameKey) : player.latestBadge.name ?? badge?.name ?? player.latestBadge.id;
+    const label = labelKey ? t(labelKey) : player.latestBadge.label ?? tierSpec?.label ?? '';
+    const summary = summaryKey ? t(summaryKey, { gameName }) : player.latestBadge.summary ?? badge?.summary ?? '';
+
+    return {
+      ...player.latestBadge,
+      name,
+      label,
+      summary
+    };
+  }, [player.latestBadge, t, gameName]);
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
   const playerStars = Math.max(0, Math.floor(player?.stars ?? 0));
@@ -219,44 +252,106 @@ export default function AchievementsView() {
   const levelName = t(`achievements.levelNames.${Math.min(level, 10)}`, { defaultValue: t('achievements.levelNames.10') });
 
   return (
-    <div className="space-y-8 sm:space-y-10">
-      <header className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-between">
-        {/* Left: Title */}
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('achievements.title')}</h1>
-
-        {/* Center: Level with name */}
-        <div className="flex flex-col items-center text-center">
-          <p className="text-2xl font-bold text-white">{t('home.progress.level', { level })}</p>
-          <p className="mt-1 text-sm font-semibold text-cyan-400">{levelName}</p>
-        </div>
-
-        {/* Right: Progress bar */}
-        <div className="w-full text-center sm:w-auto sm:min-w-[240px] sm:text-right">
-          <p className="text-xs uppercase tracking-wider text-slate-400">{t('achievements.profile.starsToNextLevel')}</p>
-          <div className="mt-2 h-2 rounded-full bg-slate-800">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400"
-              style={{ width: `${levelPercent}%` }}
-            />
+    <>
+      {/* Player Header */}
+      <header className="player-header">
+        <div className="player-meta">
+          <div className="avatar"></div>
+          <div className="player-text">
+            <div className="player-name">Player</div>
+            <div className="player-level-row">
+              <div className="player-level">{t('home.progress.level', { level })}</div>
+              <div className="player-level-progress">
+                <div className="player-level-progress-fill" style={{ width: `${levelPercent}%` }}></div>
+              </div>
+            </div>
+            <div className="player-rank">{latestBadge?.label || 'Patient Paddler'}</div>
           </div>
-          <p className="mt-2 text-sm font-semibold text-slate-300">
-            {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐
-          </p>
+        </div>
+        <div className="top-counters">
+          <div className="pill-counter">
+            <span className="icon">⭐</span>
+            <span className="value">{formatNumber(totalStarsEarned)}</span>
+          </div>
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
+              className="tiny-pill"
+              aria-label={t('app.languagePicker.label')}
+            >
+              🌎
+            </button>
+
+            {/* App Language Selector Popup */}
+            {appLanguageSelectorExpanded && (
+              <div className="language-selector-popup">
+                <button
+                  onClick={() => setAppLanguageSelectorExpanded(false)}
+                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-arcade-accent-red text-white shadow-arcade-sm z-10"
+                  aria-label="Close"
+                >
+                  <XIcon className="h-3 w-3" />
+                </button>
+
+                <h3 className="mb-3 text-center font-heading text-sm font-bold text-arcade-text-main">
+                  {t('app.languagePicker.label')}
+                </h3>
+
+                <select
+                  id="achievements-app-language-select"
+                  value={appLanguageId}
+                  onChange={(event) => selectAppLanguage(event.target.value)}
+                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
+                >
+                  {languageOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+
+                <h3 className="mb-2 mt-4 text-center font-heading text-sm font-bold text-arcade-text-main">
+                  {t('home.languagePicker.label')}
+                </h3>
+
+                <select
+                  id="achievements-practice-language-select"
+                  value={languageId}
+                  onChange={(event) => selectLanguage(event.target.value)}
+                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
+                >
+                  {languageOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
-      <section className="grid gap-5 sm:gap-6 lg:grid-cols-2">
-        {badgesCatalog.map((badge) => (
-          <BadgeCard
-            key={badge.id}
-            badge={badge}
-            progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
-            translate={t}
-            gameName={gameName}
-            onClaim={handleBadgeClaim}
-          />
-        ))}
+      <section className="section" style={{ marginTop: '20px',  }}>
+        <div className="section-header">
+          <div className="section-title">
+            <div className="wood-header">Achievements</div>
+          </div>
+        </div>
+        <section className="section" style={{ marginTop: '10px',  }}></section>
+        <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
+          {badgesCatalog.map((badge) => (
+            <BadgeCard
+              key={badge.id}
+              badge={badge}
+              progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
+              translate={t}
+              gameName={gameName}
+              onClaim={handleBadgeClaim}
+            />
+          ))}
+        </div>
       </section>
-    </div>
+    </>
   );
 }

@@ -1,8 +1,549 @@
+/* === ARCADE CARTOON UI STYLES === */
+
 html, body { width: 100%; overflow-x: hidden; }
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   touch-action: manipulation;
 }
+
+* { box-sizing: border-box; }
+
+/* App shell container - responsive */
+.app-shell {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  border-radius: 0;
+  background: linear-gradient(180deg, #fffaf0 0%, #ffe9c9 45%, #ffe2b8 100%);
+  padding: 12px 12px 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-x: hidden;
+  box-shadow: inset 0 3px 0 rgba(255,255,255,0.8);
+}
+
+/* Desktop styling */
+@media (min-width: 768px) {
+  .app-shell {
+    max-width: 768px;
+    margin: 0 auto;
+    border-radius: 26px;
+    min-height: auto;
+    padding: 16px 20px 90px;
+    gap: 14px;
+  }
+}
+
+/* Wooden header bar */
+.wood-header {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px 5px;
+  margin-bottom: 4px;
+  background: linear-gradient(180deg, #f2b15b 0%, #c97932 45%, #aa622d 100%);
+  color: #fff7e5;
+  font-family: "Baloo 2", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 14px;
+  box-shadow: 0 3px 0 rgba(133, 63, 21, 1), 0 6px 10px rgba(133, 63, 21, 0.7);
+}
+
+.wood-header::before,
+.wood-header::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff 0, #ffd27b 40%, #c27b2a 100%);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.6);
+}
+
+.wood-header::before { left: -6px; }
+.wood-header::after { right: -6px; }
+
+/* Player header */
+.player-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 4px 0;
+}
+
+.player-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: url('https://thumbnail.imgbin.com/2/14/2/3d-funny-avatar-red-cartoon-character-with-big-eyes-TZr7QHvu_t.jpg') center/cover;
+  box-shadow: 0 5px 10px rgba(149, 70, 18, 0.8);
+  border: 2px solid #fff3c8;
+}
+
+.player-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.player-name {
+  font-family: "Baloo 2", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a2208;
+}
+
+.player-level-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.player-level {
+  font-size: 13px;
+  color: #6c3b14;
+  white-space: nowrap;
+}
+
+.player-level-progress {
+  flex: 1;
+  height: 4px;
+  min-width: 30px;
+  border-radius: 999px;
+  background: #f0cda0;
+  overflow: hidden;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.8);
+}
+
+.player-level-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffce4a 0%, #ff9247 50%, #ff5a4f 100%);
+  box-shadow: 0 0 4px rgba(255, 146, 71, 0.65);
+  transition: width 0.3s ease;
+}
+
+.player-rank {
+  font-size: 11px;
+  color: #b07737;
+}
+
+/* Top counters */
+.top-counters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: radial-gradient(circle at 20% 0, #fff6e0 0, #ffe2b8 40%, #f0ae60 100%);
+  border: 2px solid rgba(214, 140, 64, 0.9);
+  box-shadow: 0 3px 0 rgba(176, 104, 38, 1), 0 6px 10px rgba(176, 104, 38, 0.7);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pill-counter span.value {
+  color: #4a2208;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pill-counter span.icon { font-size: 13px; }
+
+.tiny-pill {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 20% 0, #fff 0, #ffe6c7 40%, #f0b35f 100%);
+  border: 2px solid rgba(214, 140, 64, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #6c3b14;
+  box-shadow: 0 3px 0 rgba(176, 104, 38, 1), 0 6px 10px rgba(176, 104, 38, 0.7);
+  cursor: pointer;
+}
+
+/* Language selector popup */
+.language-selector-popup {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 220px;
+  background: linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%);
+  border-radius: 18px;
+  padding: 20px 12px 12px;
+  border: 2px solid rgba(235, 179, 105, 0.95);
+  box-shadow: 0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6);
+  z-index: 1000;
+}
+
+/* Hero card */
+.hero-card {
+  margin-top: 4px;
+  background:
+    radial-gradient(circle at 10% 0, #fff9eb 0, transparent 40%),
+    linear-gradient(180deg, #fff3d9 0%, #ffe5bd 55%, #ffd29e 100%);
+  border-radius: 24px;
+  padding: 10px 12px 14px;
+  box-shadow: 0 8px 14px rgba(199, 124, 52, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.8);
+  color: #4a2208;
+  position: relative;
+  border: 2px solid #e49b5a;
+}
+
+.hero-title {
+  font-family: "Baloo 2", system-ui, sans-serif;
+  font-size: 18px;
+  margin: 0 0 4px;
+  color: #4a2208;
+}
+
+.hero-body {
+  font-size: 18px;
+  margin: 0;
+  color: #f46a2b;
+}
+
+.hero-body span { letter-spacing: 0.08em; }
+
+.hero-cta {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 0;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: "Nunito", system-ui, sans-serif;
+  color: #4a1a06;
+  background: radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%);
+  box-shadow: 0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7);
+  cursor: pointer;
+}
+
+.hero-cta:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #c85a24, 0 5px 12px rgba(200, 90, 36, 0.7);
+}
+
+/* Section headers */
+.section {
+  margin-top: 10px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px 4px;
+}
+
+.section-title {
+  display: inline-flex;
+  align-items: center;
+}
+
+.section-title span {
+  display: inline-block;
+}
+
+.section-title .wood-header { margin-bottom: 0; }
+
+.section-link {
+  font-size: 11px;
+  color: #b07737;
+}
+
+/* Progress row grid */
+.progress-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 8px;
+}
+
+/* Progress cards - arcade style */
+.progress-card-small {
+  background: linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%);
+  border-radius: 20px;
+  padding: 8px 10px 9px;
+  border: 2px solid rgba(235, 179, 105, 0.95);
+  box-shadow: 0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.progress-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  margin-bottom: 2px;
+  box-shadow: 0 2px 0 rgba(176, 104, 38, 0.9);
+}
+
+.progress-icon.red {
+  background: radial-gradient(circle at 20% 0, #ffe5dd 0, #ff9a7a 45%, #e14d3a 100%);
+  color: #7f1d1d;
+}
+
+.progress-icon.gold {
+  background: radial-gradient(circle at 20% 0, #fff7cf 0, #ffd96d 45%, #e79b26 100%);
+  color: #7b3f00;
+}
+
+.progress-icon.cyan {
+  background: radial-gradient(circle at 20% 0, #dffff7 0, #7be2ff 45%, #1f9dbf 100%);
+  color: #074352;
+}
+
+.progress-label {
+  font-size: 11px;
+  color: #b07737;
+}
+
+.progress-value {
+  font-family: "Baloo 2", system-ui, sans-serif;
+  font-size: 16px;
+  color: #4a2208;
+}
+
+.progress-sub {
+  font-size: 10px;
+  color: #b07737;
+}
+
+.progress-bar-shell {
+  margin-top: 2px;
+  height: 6px;
+  border-radius: 999px;
+  background: #f0cda0;
+  overflow: hidden;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.8);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffce4a 0%, #ff9247 50%, #ff5a4f 100%);
+  box-shadow: 0 0 6px rgba(255, 146, 71, 0.65);
+  transition: width 0.3s ease;
+}
+
+/* Quest card */
+.quest-card {
+  background: linear-gradient(180deg, #fff5dd 0%, #ffe8c4 55%, #ffd7a6 100%);
+  border-radius: 22px;
+  padding: 8px 10px 8px 12px;
+  border: 2px solid rgba(235, 179, 105, 0.95);
+  box-shadow: 0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.quest-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.quest-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.quest-title {
+  font-size: 13px;
+  color: #4a2208;
+  font-weight: 700;
+}
+
+.quest-reward-inline {
+  font-size: 11px;
+  color: #6c3b14;
+}
+
+.quest-reward-inline .star-inline {
+  color: #ffce4a;
+  margin-left: 2px;
+}
+
+.quest-progress-meta {
+  font-size: 11px;
+  color: #6c3b14;
+}
+
+.quest-progress-bar {
+  margin-top: 1px;
+  height: 6px;
+  border-radius: 999px;
+  background: #f0cda0;
+  overflow: hidden;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.8);
+}
+
+.quest-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7be2ff 0%, #ffce4a 60%, #ffb347 100%);
+  box-shadow: 0 0 6px rgba(123, 226, 255, 0.7);
+  transition: width 0.3s ease;
+}
+
+.quest-cta {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #c9a474;
+  background: radial-gradient(circle at 20% 0, #fff7e2 0, #f3d5a8 45%, #e5b879 100%);
+  box-shadow: 0 3px 0 rgba(196, 144, 79, 1), 0 6px 10px rgba(196, 144, 79, 0.7);
+  cursor: default;
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+.quest-cta.active {
+  opacity: 1;
+  cursor: pointer;
+  color: #4a1a06;
+  background: radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%);
+  box-shadow: 0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7);
+}
+
+.quest-cta.active:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #c85a24, 0 5px 12px rgba(200, 90, 36, 0.7);
+}
+
+.quest-cta:disabled {
+  color: #c9a474;
+  opacity: 0.7;
+}
+
+/* Bottom navigation - arcade style */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #fffaf0 0%, #ffe9c9 45%, #ffe2b8 100%);
+  padding: 8px 12px 10px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0,1fr));
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 -2px 10px rgba(169, 77, 21, 0.3);
+  z-index: 100;
+}
+
+/* Desktop styling */
+@media (min-width: 768px) {
+  .bottom-nav {
+    max-width: 768px;
+    margin: 0 auto;
+    border-radius: 26px 26px 0 0;
+  }
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  color: #b07737;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background: rgba(255, 146, 71, 0.1);
+}
+
+.nav-icon-shell {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 20% 0, #fffaf0 0, #ffe0b5 45%, #f4b267 100%);
+  border: 2px solid rgba(214, 140, 64, 0.9);
+  box-shadow: 0 3px 0 rgba(199, 124, 52, 1), 0 6px 10px rgba(199, 124, 52, 0.7);
+}
+
+.nav-icon-shell span { font-size: 15px; }
+
+.nav-item.active .nav-icon-shell {
+  background: radial-gradient(circle at 20% 0, #fff7e2 0, #ffd36b 40%, #ff9247 100%);
+  box-shadow: 0 4px 0 #e27b31, 0 7px 12px rgba(226, 123, 49, 0.8);
+}
+
+.nav-item.active span.label {
+  color: #4a2208;
+  font-weight: 700;
+}
+
+.play-diamond-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-diamond {
+  width: 44px;
+  height: 44px;
+  transform: rotate(45deg);
+  border-radius: 18px;
+  background: radial-gradient(circle at 20% 0, #fff7e2 0, #ffd874 40%, #ff9247 100%);
+  border: 2px solid rgba(214, 140, 64, 0.9);
+  box-shadow: 0 5px 0 #d86a2a, 0 10px 14px rgba(216, 106, 42, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-diamond span {
+  transform: rotate(-45deg);
+  font-size: 18px;
+  color: #7a330a;
+}
+
+/* === END ARCADE CARTOON UI STYLES === */
 
 /* === PROGRESS CARDS === */
 .progress-cards-container {
@@ -826,10 +1367,6 @@ body {
 }
 
 /* Apply improved contrast throughout */
-.quest-title {
-  color: var(--text-primary);
-}
-
 .quest-progress-text,
 .mode-card-description {
   color: var(--text-secondary);

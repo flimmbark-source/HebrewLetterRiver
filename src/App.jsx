@@ -4,6 +4,7 @@ import HomeView from './views/HomeView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import LearnView from './views/LearnView.jsx';
 import WordRiverView from './views/WordRiverView.jsx';
+import SettingsView from './views/SettingsView.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import { ProgressProvider } from './context/ProgressContext.jsx';
 import { GameProvider, useGame } from './context/GameContext.jsx';
@@ -115,36 +116,94 @@ function LanguageOnboardingModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 backdrop-blur">
-      <div className="w-full max-w-lg rounded-3xl border-4 border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 p-6 text-center shadow-2xl sm:p-8">
-        <h2 className="text-2xl font-bold text-white sm:text-3xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6" style={{
+      background: 'radial-gradient(circle at 15% 0%, #ffe7b6 0, transparent 45%), radial-gradient(circle at 85% 0%, #ffd3b6 0, transparent 45%), radial-gradient(circle at 50% 100%, #ffc38a 0, transparent 55%), linear-gradient(160deg, #f8c792 0%, #f6a66c 40%, #f28e52 100%)'
+    }}>
+      <div className="w-full max-w-lg rounded-3xl p-6 text-center shadow-2xl sm:p-8" style={{
+        background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%)',
+        border: '3px solid rgba(235, 179, 105, 0.95)',
+        boxShadow: '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)'
+      }}>
+        <h2 className="text-2xl font-bold sm:text-3xl" style={{
+          fontFamily: '"Baloo 2", system-ui, sans-serif',
+          color: '#4a2208'
+        }}>
           {translateOnboarding('app.languagePicker.onboardingTitle')}
         </h2>
-        <p className="mt-3 text-sm text-slate-300 sm:text-base">
+        <p className="mt-3 text-sm sm:text-base" style={{ color: '#6c3b14' }}>
           {translateOnboarding('app.languagePicker.onboardingSubtitle')}
         </p>
         <div className="mt-6 space-y-5 text-left">
-          <LanguageSelect
-            selectId="onboarding-app-language"
-            value={pendingAppId}
-            onChange={handleAppLanguageChange}
-            label={translateOnboarding('app.languagePicker.label')}
-            helperText={translateOnboarding('app.languagePicker.helper')}
-            options={languageOptions}
-          />
-          <LanguageSelect
-            selectId="onboarding-language"
-            value={pendingPracticeId}
-            onChange={handleChange}
-            label={translateOnboarding('app.practicePicker.label')}
-            helperText={translateOnboarding('app.practicePicker.helper')}
-            options={languageOptions}
-          />
+          <div className="flex flex-col gap-2">
+            <label htmlFor="onboarding-app-language" className="text-xs font-bold uppercase tracking-wider" style={{ color: '#b07737' }}>
+              {translateOnboarding('app.languagePicker.label')}
+            </label>
+            <select
+              id="onboarding-app-language"
+              value={pendingAppId}
+              onChange={(event) => handleAppLanguageChange(event.target.value)}
+              className="w-full rounded-xl border-2 px-3 py-2 text-sm font-semibold shadow-inner sm:text-base"
+              style={{
+                borderColor: 'rgba(235, 179, 105, 0.95)',
+                background: '#fff5dd',
+                color: '#4a2208'
+              }}
+            >
+              {languageOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs font-semibold" style={{ color: '#b07737' }}>
+              {translateOnboarding('app.languagePicker.helper')}
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="onboarding-language" className="text-xs font-bold uppercase tracking-wider" style={{ color: '#b07737' }}>
+              {translateOnboarding('app.practicePicker.label')}
+            </label>
+            <select
+              id="onboarding-language"
+              value={pendingPracticeId}
+              onChange={(event) => handleChange(event.target.value)}
+              className="w-full rounded-xl border-2 px-3 py-2 text-sm font-semibold shadow-inner sm:text-base"
+              style={{
+                borderColor: 'rgba(235, 179, 105, 0.95)',
+                background: '#fff5dd',
+                color: '#4a2208'
+              }}
+            >
+              {languageOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs font-semibold" style={{ color: '#b07737' }}>
+              {translateOnboarding('app.practicePicker.helper')}
+            </p>
+          </div>
         </div>
         <button
           type="button"
           onClick={handleContinue}
-          className="mt-6 w-full rounded-2xl border-b-4 border-cyan-700 bg-cyan-600 px-5 py-3 text-base font-bold text-white shadow-lg transition-all hover:bg-cyan-500 active:translate-y-1 active:border-b-2 sm:w-auto sm:px-8"
+          className="mt-6 w-full rounded-full px-5 py-3 text-base font-bold shadow-lg transition-all active:translate-y-1 sm:w-auto sm:px-8"
+          style={{
+            border: 0,
+            fontFamily: '"Nunito", system-ui, sans-serif',
+            color: '#4a1a06',
+            background: 'radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%)',
+            boxShadow: '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)'
+          }}
+          onMouseDown={(e) => {
+            e.currentTarget.style.transform = 'translateY(2px)';
+            e.currentTarget.style.boxShadow = '0 2px 0 #c85a24, 0 5px 12px rgba(200, 90, 36, 0.7)';
+          }}
+          onMouseUp={(e) => {
+            e.currentTarget.style.transform = '';
+            e.currentTarget.style.boxShadow = '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)';
+          }}
         >
           {translateOnboarding('app.languagePicker.confirm')}
         </button>
@@ -154,7 +213,7 @@ function LanguageOnboardingModal() {
 }
 
 function Shell() {
-  const { openGame } = useGame();
+  const { openGame, isVisible: isGameVisible } = useGame();
   const { t, interfaceLanguagePack } = useLocalization();
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
@@ -167,57 +226,57 @@ function Shell() {
     [openGame]
   );
 
-  const tabClass = ({ isActive }) =>
-    `flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-xs font-bold transition-all sm:text-sm ${
-      isActive
-        ? 'bg-gradient-to-b from-cyan-600/30 via-cyan-500/25 to-cyan-900/40 text-cyan-200 border-b-4 border-cyan-700 shadow-[0_8px_16px_rgba(0,0,0,0.3)] shadow-cyan-500/20'
-        : 'bg-gradient-to-b from-slate-700/50 via-slate-800/50 to-slate-900/60 text-slate-300 border-b-4 border-slate-800 shadow-[0_4px_8px_rgba(0,0,0,0.2)] hover:text-white hover:from-slate-600/60 hover:via-slate-700/60 hover:to-slate-800/70 active:translate-y-1 active:border-b-2 active:shadow-[0_2px_4px_rgba(0,0,0,0.2)]'
-    }`;
-
   return (
-    <div
-      className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-28 pt-8 sm:px-6 sm:pt-10"
-      style={{ paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}
-      dir={direction}
-    >
+    <div className="app-shell" dir={direction}>
       <LanguageOnboardingModal />
-      <main className="mt-8 flex-1 pb-6 sm:mt-10">
+      <main className="flex-1">
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomeView />} />
           <Route path="/achievements" element={<AchievementsView />} />
           <Route path="/learn" element={<LearnView />} />
           <Route path="/word-river" element={<WordRiverView />} />
+          <Route path="/settings" element={<SettingsView />} />
         </Routes>
       </main>
-      <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t-4 border-slate-800 bg-gradient-to-t from-slate-900 to-slate-800 px-4 pt-3 shadow-2xl"
-        style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}
-      >
-        <div className="mx-auto flex w-full max-w-3xl justify-between gap-2">
-          <NavLink to="/home" className={tabClass}>
-            <HomeIcon className="h-5 w-5" />
-            <span>{t('app.nav.home')}</span>
-          </NavLink>
-          <button
-            type="button"
-            onClick={handlePlay}
-            className="flex flex-1 flex-col items-center gap-1 rounded-2xl border-b-4 border-emerald-800 bg-gradient-to-b from-emerald-600/40 via-emerald-500/30 to-emerald-900/50 px-4 py-2 text-xs font-bold text-emerald-200 shadow-[0_8px_16px_rgba(0,0,0,0.3)] shadow-emerald-500/20 transition-all hover:from-emerald-500/50 hover:via-emerald-400/40 hover:to-emerald-800/60 hover:text-emerald-100 active:translate-y-1 active:border-b-2 active:shadow-[0_4px_8px_rgba(0,0,0,0.2)] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-emerald-400 sm:text-sm"
-          >
-            <PlayIcon className="h-6 w-6" />
-            <span>{t('app.nav.play')}</span>
-          </button>
-          <NavLink to="/achievements" className={tabClass}>
-            <TrophyIcon className="h-5 w-5" />
-            <span>{t('app.nav.achievements')}</span>
-          </NavLink>
-          <NavLink to="/learn" className={tabClass}>
-            <BookIcon className="h-5 w-5" />
-            <span>{t('app.nav.learn')}</span>
-          </NavLink>
-        </div>
-      </nav>
-      <footer className="pb-6 text-center text-xs font-semibold text-slate-600 sm:text-sm">{t('app.footer.resetNotice')}</footer>
+      {!isGameVisible && <nav className="bottom-nav">
+        <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-icon-shell">
+            <span>🏠</span>
+          </div>
+          <span className="label">{t('app.nav.home')}</span>
+        </NavLink>
+        <NavLink to="/learn" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-icon-shell">
+            <span>📚</span>
+          </div>
+          <span className="label">{t('app.nav.learn')}</span>
+        </NavLink>
+        <button
+          type="button"
+          onClick={handlePlay}
+          className="nav-item active"
+        >
+          <div className="play-diamond-shell">
+            <div className="play-diamond">
+              <span>▶</span>
+            </div>
+          </div>
+          <span className="label">{t('app.nav.play')}</span>
+        </button>
+        <NavLink to="/achievements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-icon-shell">
+            <span>🏆</span>
+          </div>
+          <span className="label">{t('app.nav.achievements')}</span>
+        </NavLink>
+        <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-icon-shell">
+            <span>⚙️</span>
+          </div>
+          <span className="label">{t('app.nav.settings')}</span>
+        </NavLink>
+      </nav>}
     </div>
   );
 }
@@ -229,9 +288,7 @@ export default function App() {
         <ToastProvider>
           <ProgressProvider>
             <GameProvider>
-              <div className="min-h-screen bg-slate-950">
-                <Shell />
-              </div>
+              <Shell />
             </GameProvider>
           </ProgressProvider>
         </ToastProvider>

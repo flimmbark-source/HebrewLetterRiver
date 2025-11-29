@@ -46,7 +46,20 @@
 
 html,
 body {
-  @apply bg-slate-950 text-white min-h-screen font-sans;
+  @apply min-h-screen font-sans;
+  color: #6c3b14;
+  font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.arcade-bg {
+  background:
+    radial-gradient(circle at 15% 0%, #ffe7b6 0, transparent 45%),
+    radial-gradient(circle at 85% 0%, #ffd3b6 0, transparent 45%),
+    radial-gradient(circle at 50% 100%, #ffc38a 0, transparent 55%),
+    linear-gradient(160deg, #f8c792 0%, #f6a66c 40%, #f28e52 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hebrew-font {

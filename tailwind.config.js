@@ -5,73 +5,52 @@ export default {
     extend: {
       fontFamily: {
         hebrew: ['"Heebo"', 'sans-serif'],
-        sans: ['"Inter"', 'system-ui', 'sans-serif']
+        sans: ['"Nunito"', 'system-ui', 'sans-serif'],
+        heading: ['"Baloo 2"', 'system-ui', 'sans-serif']
       },
       colors: {
-        river: {
-          background: '#0f172a',
-          panel: '#111827',
-          accent: '#22d3ee',
-          accentDark: '#0ea5e9'
-        },
-        // Playful color palette inspired by the reference image
-        playful: {
-          cream: '#FFF5E1',
-          beige: '#F5E6D3',
-          orange: {
-            50: '#FFF7ED',
-            100: '#FFEDD5',
-            200: '#FED7AA',
-            300: '#FDBA74',
-            400: '#FB923C',
-            500: '#F97316',
-            600: '#EA580C',
-            700: '#C2410C',
-            800: '#9A3412',
-            900: '#7C2D12'
-          },
-          yellow: {
-            50: '#FEFCE8',
-            100: '#FEF9C3',
-            200: '#FEF08A',
-            300: '#FDE047',
-            400: '#FACC15',
-            500: '#EAB308',
-            600: '#CA8A04',
-            700: '#A16207',
-            800: '#854D0E',
-            900: '#713F12'
-          },
-          brown: {
-            50: '#F5F3F0',
-            100: '#E8E4DE',
-            200: '#D4C9BD',
-            300: '#BAAA95',
-            400: '#9E8770',
-            500: '#8B7355',
-            600: '#6F5A44',
-            700: '#584637',
-            800: '#3D2F24',
-            900: '#2A1F17'
-          },
-          red: {
-            400: '#F87171',
-            500: '#EF4444',
-            600: '#DC2626'
-          }
+        arcade: {
+          // Background gradients
+          'bg-outer-1': '#f8c792',
+          'bg-outer-2': '#f6a66c',
+          'bg-shell': '#ffe9c9',
+
+          // Panel colors
+          'panel-light': '#fff5dd',
+          'panel-medium': '#ffe2b8',
+          'panel-border': '#e49b5a',
+
+          // Wood colors
+          'wood-dark': '#aa622d',
+          'wood-mid': '#c97932',
+          'wood-light': '#f2b15b',
+
+          // Accent colors
+          'accent-orange': '#ff9247',
+          'accent-orange-deep': '#f46a2b',
+          'accent-red': '#ff5a4f',
+          'accent-green': '#5acb5a',
+          'accent-gold': '#ffce4a',
+
+          // Text colors
+          'text-main': '#4a2208',
+          'text-soft': '#6c3b14',
+          'text-muted': '#b07737'
         }
       },
       boxShadow: {
-        'playful-sm': '0 2px 0 0 rgba(0, 0, 0, 0.3)',
-        'playful': '0 4px 0 0 rgba(0, 0, 0, 0.3)',
-        'playful-lg': '0 6px 0 0 rgba(0, 0, 0, 0.3)',
-        'playful-xl': '0 8px 0 0 rgba(0, 0, 0, 0.3)',
-        'inner-playful': 'inset 0 2px 4px rgba(0, 0, 0, 0.2)'
+        'arcade-sm': '0 3px 0 rgba(133, 63, 21, 1), 0 6px 10px rgba(133, 63, 21, 0.7)',
+        'arcade': '0 4px 0 rgba(176, 104, 38, 1), 0 8px 12px rgba(176, 104, 38, 0.7)',
+        'arcade-lg': '0 5px 0 #d86a2a, 0 10px 14px rgba(216, 106, 42, 0.85)',
+        'arcade-pill': '0 3px 0 rgba(176, 104, 38, 1), 0 6px 10px rgba(176, 104, 38, 0.7)',
+        'arcade-card': '0 8px 14px rgba(199, 124, 52, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.8)',
+        'arcade-button': '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)',
+        'arcade-frame': '0 18px 36px rgba(169, 77, 21, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.6)'
       },
       borderRadius: {
-        'playful': '20px',
-        'playful-lg': '28px',
-        'playful-xl': '36px'
+        'arcade': '20px',
+        'arcade-lg': '24px',
+        'arcade-xl': '30px'
       }
     }
   },
