@@ -209,6 +209,7 @@ export default function HomeView() {
       </header>
 
       {/* Hero Card */}
+      <section className="section" style={{ marginTop: '20px',  }}></section>
       <section className="hero-card" style={{ position: 'relative' }}>
         <h1 className="hero-title">Recently Learned Letters</h1>
         <div className="hero-body" style={{ display: 'flex', gap: '12px', fontSize: '24px', flexWrap: 'wrap' }}>
@@ -263,12 +264,14 @@ export default function HomeView() {
 
       {/* Progress Section */}
       <section className="section">
+        <section className="section" style={{ marginTop: '20px',  }}></section>
         <div className="section-header">
           <div className="section-title">
             <div className="wood-header">{t('home.progress.heading')}</div>
           </div>
           <div className="section-link">View details</div>
         </div>
+        <section className="section" style={{ marginTop: '5px',  }}></section>
         <div className="progress-row">
           <div className="progress-card-small">
             <div className="progress-icon red">🔥</div>
@@ -297,6 +300,7 @@ export default function HomeView() {
       </section>
 
       {/* Daily Quests Section */}
+      <section className="section" style={{ marginTop: '20px',  }}></section>
       {daily?.tasks && daily.tasks.length > 0 && (
         <section className="section">
           <div className="section-header">
@@ -305,6 +309,7 @@ export default function HomeView() {
             </div>
             <div className="section-link">Resets at {nextResetTime}</div>
           </div>
+          <section className="section" style={{ marginTop: '5px',  }}></section>
           {daily.tasks.map((task, index) => {
             const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
             const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;

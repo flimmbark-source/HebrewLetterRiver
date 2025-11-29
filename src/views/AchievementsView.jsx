@@ -332,12 +332,13 @@ export default function AchievementsView() {
         </div>
       </header>
 
-      <section className="section" style={{ marginTop: '20px' }}>
+      <section className="section" style={{ marginTop: '20px',  }}>
         <div className="section-header">
           <div className="section-title">
             <div className="wood-header">Achievements</div>
           </div>
         </div>
+        <section className="section" style={{ marginTop: '10px',  }}></section>
         <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
           {badgesCatalog.map((badge) => (
             <BadgeCard
