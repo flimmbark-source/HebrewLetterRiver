@@ -56,7 +56,17 @@
     },
     "cta": {
       "start": "新しい実行を開始する",
-      "practice": "練習用フォーカスレター"
+      "practice": "練習用フォーカスレター",
+      "play": "プレイ"
+    },
+    "quest": {
+      "claim": "請求",
+      "claimed": "請求済み",
+      "locked": "進行中"
+    },
+    "dailyQuests": {
+      "title": "デイリークエスト",
+      "resetsAt": "{{time}}にリセット"
     }
   },
   "game": {
@@ -160,7 +170,8 @@
     "next": "次へ: {{label}}",
     "complete": "すべての階層が完了しました",
     "earnStars": "このティアのロックを解除すると、+{{stars}} ⭐を獲得できます。",
-    "maxed": "バッジを完全にマスター — 輝きをお楽しみください!"
+    "maxed": "バッジを完全にマスター — 輝きをお楽しみください!",
+    "claimStarsAria": "{{label}}のために{{stars}}スターを請求"
   },
   "learn": {
     "title": "学ぶ",
@@ -260,5 +271,13 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "common": {
+    "close": "閉じる",
+    "viewDetails": "詳細を見る",
+    "player": "プレイヤー",
+    "patientPaddler": "忍耐強いパドラー",
+    "noneYet": "まだなし",
+    "play": "プレイ"
   }
 }

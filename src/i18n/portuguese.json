@@ -56,7 +56,17 @@
     },
     "cta": {
       "start": "Comece uma nova corrida",
-      "practice": "Carta de foco prático"
+      "practice": "Carta de foco prático",
+      "play": "Jogar"
+    },
+    "quest": {
+      "claim": "Reivindicar",
+      "claimed": "Reivindicado",
+      "locked": "Em Progresso"
+    },
+    "dailyQuests": {
+      "title": "Missões diárias",
+      "resetsAt": "Reinicia em {{time}}"
     }
   },
   "game": {
@@ -160,7 +170,8 @@
     "next": "Próximo: {{label}}",
     "complete": "Todas as camadas concluídas",
     "earnStars": "Ganhe +{{stars}} ⭐ ao desbloquear este nível.",
-    "maxed": "Distintivo totalmente dominado – aproveite o brilho!"
+    "maxed": "Distintivo totalmente dominado – aproveite o brilho!",
+    "claimStarsAria": "Reivindicar {{stars}} estrelas para {{label}}"
   },
   "learn": {
     "title": "Aprender",
@@ -260,5 +271,13 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "common": {
+    "close": "Fechar",
+    "viewDetails": "Ver detalhes",
+    "player": "Jogador",
+    "patientPaddler": "Remador Paciente",
+    "noneYet": "Nenhum ainda",
+    "play": "Jogar"
   }
 }

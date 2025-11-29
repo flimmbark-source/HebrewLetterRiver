@@ -56,7 +56,17 @@
     },
     "cta": {
       "start": "开始新的跑步",
-      "practice": "实践焦点信"
+      "practice": "实践焦点信",
+      "play": "玩"
+    },
+    "quest": {
+      "claim": "领取",
+      "claimed": "已领取",
+      "locked": "进行中"
+    },
+    "dailyQuests": {
+      "title": "每日任务",
+      "resetsAt": "在{{time}}重置"
     }
   },
   "game": {
@@ -160,7 +170,8 @@
     "next": "下一页：{{label}}",
     "complete": "所有层级均已完成",
     "earnStars": "解锁此级别后，可赚取 +{{stars}} ⭐。",
-    "maxed": "完全掌握徽章——享受光芒！"
+    "maxed": "完全掌握徽章——享受光芒！",
+    "claimStarsAria": "领取{{label}}的{{stars}}颗星"
   },
   "learn": {
     "title": "学习",
@@ -260,5 +271,13 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "common": {
+    "close": "关闭",
+    "viewDetails": "查看详情",
+    "player": "玩家",
+    "patientPaddler": "耐心的桨手",
+    "noneYet": "还没有",
+    "play": "玩"
   }
 }

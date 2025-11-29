@@ -3,6 +3,14 @@
     "id": "english",
     "name": "English"
   },
+  "common": {
+    "close": "Close",
+    "viewDetails": "View details",
+    "player": "Player",
+    "patientPaddler": "Patient Paddler",
+    "noneYet": "None yet",
+    "play": "Play"
+  },
   "app": {
     "title": "World Letter River",
     "tagline": "Flow, learn, and celebrate every catch.",
@@ -53,7 +61,8 @@
     },
     "cta": {
       "start": "Start a New Run",
-      "practice": "Practice Focus Letter"
+      "practice": "Practice Focus Letter",
+      "play": "Play"
     },
     "progress": {
       "heading": "Progress today",
@@ -74,7 +83,14 @@
       "inProgress": "In progress…",
       "collected": "Reward collected",
       "collectedShort": "✓ Collected",
-      "claiming": "Claiming…"
+      "claiming": "Claiming…",
+      "claim": "Claim",
+      "claimed": "Claimed",
+      "locked": "In Progress"
+    },
+    "dailyQuests": {
+      "title": "Daily quests",
+      "resetsAt": "Resets at {{time}}"
     }
   },
   "wordRiver": {
@@ -201,6 +217,7 @@
     "earnStars": "Earn +{{stars}} ⭐ when you unlock this tier.",
     "maxed": "Badge fully mastered — enjoy the glow!",
     "claiming": "Claiming…",
+    "claimStarsAria": "Claim {{stars}} stars for {{label}}",
     "moreTiers": "+{{count}} more tier",
     "moreTiersPlural": "+{{count}} more tiers",
     "profile": {

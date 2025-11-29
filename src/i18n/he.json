@@ -56,7 +56,17 @@
     },
     "cta": {
       "start": "התחילו ריצה חדשה",
-      "practice": "תרגלו את אות המיקוד"
+      "practice": "תרגלו את אות המיקוד",
+      "play": "שחק"
+    },
+    "quest": {
+      "claim": "תבע",
+      "claimed": "נתבע",
+      "locked": "בתהליך"
+    },
+    "dailyQuests": {
+      "title": "משימות יומיות",
+      "resetsAt": "מתאפס ב-{{time}}"
     }
   },
   "game": {
@@ -160,7 +170,8 @@
     "next": "הבא: {{label}}",
     "complete": "כל הדרגות הושלמו",
     "earnStars": "קבלו +{{stars}} ⭐ כאשר תפתחו את הדרגה הזו.",
-    "maxed": "התג שולט לחלוטין — תיהנו מהזוהר!"
+    "maxed": "התג שולט לחלוטין — תיהנו מהזוהר!",
+    "claimStarsAria": "תבע {{stars}} כוכבים עבור {{label}}"
   },
   "learn": {
     "title": "לימוד",
@@ -260,5 +271,13 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "common": {
+    "close": "סגור",
+    "viewDetails": "צפה בפרטים",
+    "player": "שחקן",
+    "patientPaddler": "חותר סבלני",
+    "noneYet": "עדיין אף אחד",
+    "play": "שחק"
   }
 }

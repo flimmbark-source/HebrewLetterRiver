@@ -53,7 +53,17 @@
     },
     "cta": {
       "start": "Iniciar una nueva ejecución",
-      "practice": "Carta de enfoque de práctica"
+      "practice": "Carta de enfoque de práctica",
+      "play": "Jugar"
+    },
+    "quest": {
+      "claim": "Reclamar",
+      "claimed": "Reclamado",
+      "locked": "En Progreso"
+    },
+    "dailyQuests": {
+      "title": "Misiones diarias",
+      "resetsAt": "Se reinicia a las {{time}}"
     }
   },
   "wordRiver": {
@@ -178,7 +188,8 @@
     "next": "Siguiente: {{label}}",
     "complete": "Todos los niveles completos",
     "earnStars": "Gana +{{stars}} ⭐ cuando desbloqueas este nivel.",
-    "maxed": "Insignia completamente dominada: ¡disfruta del brillo!"
+    "maxed": "Insignia completamente dominada: ¡disfruta del brillo!",
+    "claimStarsAria": "Reclamar {{stars}} estrellas para {{label}}"
   },
   "learn": {
     "title": "Aprender",
@@ -257,5 +268,13 @@
       "fast-flow": "Fast Flow speed active",
       "no-intros": "No Introductions enabled"
     }
+  },
+  "common": {
+    "close": "Cerrar",
+    "viewDetails": "Ver detalles",
+    "player": "Jugador",
+    "patientPaddler": "Remero Paciente",
+    "noneYet": "Ninguno todavía",
+    "play": "Jugar"
   }
 }

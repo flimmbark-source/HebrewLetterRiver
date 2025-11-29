@@ -56,7 +56,17 @@
     },
     "cta": {
       "start": "ابدأ جولة جديدة",
-      "practice": "ممارسة رسالة التركيز"
+      "practice": "ممارسة رسالة التركيز",
+      "play": "يلعب"
+    },
+    "quest": {
+      "claim": "يدعي",
+      "claimed": "مطالب",
+      "locked": "قيد التقدم"
+    },
+    "dailyQuests": {
+      "title": "المهام اليومية",
+      "resetsAt": "إعادة التعيين في {{time}}"
     }
   },
   "game": {
@@ -160,7 +170,8 @@
     "next": "التالي: {{label}}",
     "complete": "جميع المستويات كاملة",
     "earnStars": "اربح +{{stars}} ⭐ عندما تفتح هذا المستوى.",
-    "maxed": "شارة متقنة بالكامل - استمتع بالتوهج!"
+    "maxed": "شارة متقنة بالكامل - استمتع بالتوهج!",
+    "claimStarsAria": "اطلب {{stars}} نجوم لـ {{label}}"
   },
   "learn": {
     "title": "يتعلم",
@@ -260,5 +271,13 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "common": {
+    "close": "يغلق",
+    "viewDetails": "عرض التفاصيل",
+    "player": "لاعب",
+    "patientPaddler": "المجدف الصبور",
+    "noneYet": "لا شيء حتى الآن",
+    "play": "يلعب"
   }
 }

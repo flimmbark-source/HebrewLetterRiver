@@ -56,7 +56,17 @@
     },
     "cta": {
       "start": "Commencer une nouvelle course",
-      "practice": "Lettre de mise au point pratique"
+      "practice": "Lettre de mise au point pratique",
+      "play": "Jouer"
+    },
+    "quest": {
+      "claim": "Réclamer",
+      "claimed": "Réclamé",
+      "locked": "En Cours"
+    },
+    "dailyQuests": {
+      "title": "Quêtes quotidiennes",
+      "resetsAt": "Réinitialise à {{time}}"
     }
   },
   "game": {
@@ -160,7 +170,8 @@
     "next": "Suivant : {{label}}",
     "complete": "Tous les niveaux sont terminés",
     "earnStars": "Gagnez +{{stars}} ⭐ lorsque vous débloquez ce niveau.",
-    "maxed": "Badge entièrement maîtrisé — profitez de l'éclat !"
+    "maxed": "Badge entièrement maîtrisé — profitez de l'éclat !",
+    "claimStarsAria": "Réclamer {{stars}} étoiles pour {{label}}"
   },
   "learn": {
     "title": "Apprendre",
@@ -260,5 +271,13 @@
     "subtitle": "Configurez vos préférences",
     "languageSettings": "Paramètres de langue",
     "gameSettings": "Paramètres du jeu"
+  },
+  "common": {
+    "close": "Fermer",
+    "viewDetails": "Voir les détails",
+    "player": "Joueur",
+    "patientPaddler": "Pagayeur Patient",
+    "noneYet": "Aucun encore",
+    "play": "Jouer"
   }
 }
