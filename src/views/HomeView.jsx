@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
@@ -6,6 +6,7 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
 import { classNames } from '../lib/classNames.js';
+import { loadLanguage } from '../lib/languageLoader.js';
 
 function GlobeIcon({ className = '' }) {
   return (
@@ -33,6 +34,7 @@ export default function HomeView() {
   const { t } = useLocalization();
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
+  const [hoveredLetter, setHoveredLetter] = useState(null);
 
   const latestBadge = useMemo(() => {
     if (!player.latestBadge) return null;
@@ -62,6 +64,45 @@ export default function HomeView() {
   const starsProgress = starsPerLevel > 0 ? Math.min(levelProgress / starsPerLevel, 1) : 0;
   const formatNumber = useCallback((value) => Math.max(0, Math.floor(value ?? 0)).toLocaleString(), []);
   const [claimingTaskId, setClaimingTaskId] = useState(null);
+
+  // Get recently encountered letters
+  const recentLetters = useMemo(() => {
+    try {
+      const languagePack = loadLanguage(languageId);
+      const letters = player.letters || {};
+      const itemsById = languagePack.itemsById || {};
+
+      // Get letters with activity, sorted by total interactions
+      const activeLetters = Object.entries(letters)
+        .filter(([id, stats]) => (stats.correct || 0) + (stats.incorrect || 0) > 0)
+        .map(([id, stats]) => ({
+          id,
+          symbol: itemsById[id]?.symbol || id,
+          name: itemsById[id]?.name || id,
+          sound: itemsById[id]?.sound || '',
+          total: (stats.correct || 0) + (stats.incorrect || 0)
+        }))
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 5);
+
+      return activeLetters.length > 0 ? activeLetters : [
+        { symbol: 'ק', name: 'Qof', sound: 'k' },
+        { symbol: 'ר', name: 'Resh', sound: 'r' },
+        { symbol: 'ט', name: 'Tet', sound: 't' },
+        { symbol: 'ו', name: 'Vav', sound: 'v' },
+        { symbol: 'ב', name: 'Bet', sound: 'b' }
+      ];
+    } catch (e) {
+      // Fallback to default letters
+      return [
+        { symbol: 'ק', name: 'Qof', sound: 'k' },
+        { symbol: 'ר', name: 'Resh', sound: 'r' },
+        { symbol: 'ט', name: 'Tet', sound: 't' },
+        { symbol: 'ו', name: 'Vav', sound: 'v' },
+        { symbol: 'ב', name: 'Bet', sound: 'b' }
+      ];
+    }
+  }, [player.letters, languageId]);
 
   const handleDailyClaim = useCallback(
     (taskId) => {
@@ -168,11 +209,55 @@ export default function HomeView() {
       </header>
 
       {/* Hero Card */}
-      <section className="hero-card">
+      <section className="hero-card" style={{ position: 'relative' }}>
         <h1 className="hero-title">Recently Learned Letters</h1>
-        <p className="hero-body">
-          <span>ק, ר, ט, ו, ב</span>
-        </p>
+        <div className="hero-body" style={{ display: 'flex', gap: '12px', fontSize: '24px', flexWrap: 'wrap' }}>
+          {recentLetters.map((letter, index) => (
+            <span
+              key={index}
+              style={{
+                cursor: 'pointer',
+                position: 'relative',
+                fontFamily: 'Heebo, sans-serif',
+                transition: 'transform 0.2s ease'
+              }}
+              onMouseEnter={() => setHoveredLetter(index)}
+              onMouseLeave={() => setHoveredLetter(null)}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.15)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              {letter.symbol}
+              {hoveredLetter === index && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    bottom: '100%',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    marginBottom: '8px',
+                    padding: '6px 12px',
+                    background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%)',
+                    border: '2px solid rgba(235, 179, 105, 0.95)',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6)',
+                    whiteSpace: 'nowrap',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#4a2208',
+                    zIndex: 10,
+                    fontFamily: 'Nunito, sans-serif'
+                  }}
+                >
+                  {letter.name} ({letter.sound})
+                </span>
+              )}
+            </span>
+          ))}
+        </div>
         <button className="hero-cta" onClick={() => openGame({ autostart: false })}>Play</button>
       </section>
 

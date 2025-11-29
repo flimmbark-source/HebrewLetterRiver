@@ -116,36 +116,94 @@ function LanguageOnboardingModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 backdrop-blur">
-      <div className="w-full max-w-lg rounded-3xl border-4 border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 p-6 text-center shadow-2xl sm:p-8">
-        <h2 className="text-2xl font-bold text-white sm:text-3xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6" style={{
+      background: 'radial-gradient(circle at 15% 0%, #ffe7b6 0, transparent 45%), radial-gradient(circle at 85% 0%, #ffd3b6 0, transparent 45%), radial-gradient(circle at 50% 100%, #ffc38a 0, transparent 55%), linear-gradient(160deg, #f8c792 0%, #f6a66c 40%, #f28e52 100%)'
+    }}>
+      <div className="w-full max-w-lg rounded-3xl p-6 text-center shadow-2xl sm:p-8" style={{
+        background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%)',
+        border: '3px solid rgba(235, 179, 105, 0.95)',
+        boxShadow: '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)'
+      }}>
+        <h2 className="text-2xl font-bold sm:text-3xl" style={{
+          fontFamily: '"Baloo 2", system-ui, sans-serif',
+          color: '#4a2208'
+        }}>
           {translateOnboarding('app.languagePicker.onboardingTitle')}
         </h2>
-        <p className="mt-3 text-sm text-slate-300 sm:text-base">
+        <p className="mt-3 text-sm sm:text-base" style={{ color: '#6c3b14' }}>
           {translateOnboarding('app.languagePicker.onboardingSubtitle')}
         </p>
         <div className="mt-6 space-y-5 text-left">
-          <LanguageSelect
-            selectId="onboarding-app-language"
-            value={pendingAppId}
-            onChange={handleAppLanguageChange}
-            label={translateOnboarding('app.languagePicker.label')}
-            helperText={translateOnboarding('app.languagePicker.helper')}
-            options={languageOptions}
-          />
-          <LanguageSelect
-            selectId="onboarding-language"
-            value={pendingPracticeId}
-            onChange={handleChange}
-            label={translateOnboarding('app.practicePicker.label')}
-            helperText={translateOnboarding('app.practicePicker.helper')}
-            options={languageOptions}
-          />
+          <div className="flex flex-col gap-2">
+            <label htmlFor="onboarding-app-language" className="text-xs font-bold uppercase tracking-wider" style={{ color: '#b07737' }}>
+              {translateOnboarding('app.languagePicker.label')}
+            </label>
+            <select
+              id="onboarding-app-language"
+              value={pendingAppId}
+              onChange={(event) => handleAppLanguageChange(event.target.value)}
+              className="w-full rounded-xl border-2 px-3 py-2 text-sm font-semibold shadow-inner sm:text-base"
+              style={{
+                borderColor: 'rgba(235, 179, 105, 0.95)',
+                background: '#fff5dd',
+                color: '#4a2208'
+              }}
+            >
+              {languageOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs font-semibold" style={{ color: '#b07737' }}>
+              {translateOnboarding('app.languagePicker.helper')}
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="onboarding-language" className="text-xs font-bold uppercase tracking-wider" style={{ color: '#b07737' }}>
+              {translateOnboarding('app.practicePicker.label')}
+            </label>
+            <select
+              id="onboarding-language"
+              value={pendingPracticeId}
+              onChange={(event) => handleChange(event.target.value)}
+              className="w-full rounded-xl border-2 px-3 py-2 text-sm font-semibold shadow-inner sm:text-base"
+              style={{
+                borderColor: 'rgba(235, 179, 105, 0.95)',
+                background: '#fff5dd',
+                color: '#4a2208'
+              }}
+            >
+              {languageOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs font-semibold" style={{ color: '#b07737' }}>
+              {translateOnboarding('app.practicePicker.helper')}
+            </p>
+          </div>
         </div>
         <button
           type="button"
           onClick={handleContinue}
-          className="mt-6 w-full rounded-2xl border-b-4 border-cyan-700 bg-cyan-600 px-5 py-3 text-base font-bold text-white shadow-lg transition-all hover:bg-cyan-500 active:translate-y-1 active:border-b-2 sm:w-auto sm:px-8"
+          className="mt-6 w-full rounded-full px-5 py-3 text-base font-bold shadow-lg transition-all active:translate-y-1 sm:w-auto sm:px-8"
+          style={{
+            border: 0,
+            fontFamily: '"Nunito", system-ui, sans-serif',
+            color: '#4a1a06',
+            background: 'radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%)',
+            boxShadow: '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)'
+          }}
+          onMouseDown={(e) => {
+            e.currentTarget.style.transform = 'translateY(2px)';
+            e.currentTarget.style.boxShadow = '0 2px 0 #c85a24, 0 5px 12px rgba(200, 90, 36, 0.7)';
+          }}
+          onMouseUp={(e) => {
+            e.currentTarget.style.transform = '';
+            e.currentTarget.style.boxShadow = '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)';
+          }}
         >
           {translateOnboarding('app.languagePicker.confirm')}
         </button>

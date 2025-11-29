@@ -485,6 +485,13 @@ body {
   font-size: 10px;
   color: #b07737;
   cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background: rgba(255, 146, 71, 0.1);
 }
 
 .nav-icon-shell {
