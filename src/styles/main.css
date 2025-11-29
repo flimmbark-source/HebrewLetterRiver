@@ -131,11 +131,14 @@ body {
   background: radial-gradient(circle at 20% 0, #fff6e0 0, #ffe2b8 40%, #f0ae60 100%);
   border: 2px solid rgba(214, 140, 64, 0.9);
   box-shadow: 0 3px 0 rgba(176, 104, 38, 1), 0 6px 10px rgba(176, 104, 38, 0.7);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .pill-counter span.value {
   color: #4a2208;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .pill-counter span.icon { font-size: 13px; }
@@ -159,7 +162,7 @@ body {
 .language-selector-popup {
   position: absolute;
   top: 0;
-  left: 0;
+  right: 0;
   width: 220px;
   background: linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%);
   border-radius: 18px;

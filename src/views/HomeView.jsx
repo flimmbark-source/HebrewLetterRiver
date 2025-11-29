@@ -26,82 +26,6 @@ function XIcon({ className = '' }) {
   );
 }
 
-function TaskCard({
-  task,
-  questNumber = 1,
-  totalQuests = 1,
-  claimingReward = false,
-  onClaimReward
-}) {
-  const { t } = useLocalization();
-  const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
-  const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
-  const formattedReward = rewardValue.toLocaleString();
-  const canClaimReward = Boolean(task.rewardClaimable) && !task.rewardClaimed && typeof onClaimReward === 'function';
-  const clickable = canClaimReward && !claimingReward;
-  const highlightClass = canClaimReward
-    ? 'border-amber-400/40 ring-1 ring-amber-300/60 shadow-amber-300/20'
-    : task.rewardClaimed
-    ? 'border-emerald-400/40'
-    : '';
-  const questLabel = t('home.quest.label', { current: questNumber, total: totalQuests });
-  const statusPillClass = 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200';
-  const currentProgress = Math.min(task.progress ?? 0, task.goal);
-  const progressValue = `${currentProgress} / ${task.goal}`;
-
-  const statusLabel = task.rewardClaimed
-    ? t('home.quest.collected')
-    : task.completed
-    ? t('home.quest.complete')
-    : t('home.quest.inProgress');
-
-  const cardClass = clickable
-    ? 'cursor-pointer hover:scale-[1.02] bg-gradient-to-b from-cyan-900/60 via-slate-900/80 to-slate-950 border-2 border-cyan-700/50 shadow-[0_12px_24px_rgba(0,0,0,0.4)] animate-pulse hover:shadow-[0_16px_32px_rgba(6,182,212,0.3)]'
-    : 'bg-gradient-to-b from-slate-800/80 via-slate-900/90 to-slate-950 border-2 border-slate-700/80 shadow-[0_12px_24px_rgba(0,0,0,0.4)]';
-
-  const handleCardClick = () => {
-    if (!clickable) return;
-    onClaimReward();
-  };
-
-  const handleCardKeyDown = (event) => {
-    if (!clickable) return;
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      onClaimReward();
-    }
-  };
-
-  return (
-    <div
-      className={`quest-card rounded-[28px] p-6 transition-all sm:p-8 ${cardClass} ${clickable ? 'hover:shadow-[0_16px_32px_rgba(6,182,212,0.3)] active:translate-y-1 active:shadow-[0_8px_16px_rgba(0,0,0,0.4)]' : 'hover:shadow-[0_14px_28px_rgba(0,0,0,0.5)]'}`}
-      onClick={handleCardClick}
-      onKeyDown={handleCardKeyDown}
-      role={clickable ? 'button' : undefined}
-      tabIndex={clickable ? 0 : undefined}
-      aria-label={clickable ? `Claim ${formattedReward} stars for quest` : undefined}
-    >
-      <div className="flex items-start justify-between gap-4">
-        <h3 className="text-base font-semibold text-white sm:text-lg">{task.description}</h3>
-        <span className="flex-shrink-0 rounded-full border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-200">
-          {questLabel}
-        </span>
-      </div>
-      <div className="mt-5 flex items-center justify-between">
-        <span className="text-base font-bold text-slate-200">{progressValue}</span>
-        {rewardValue > 0 && (
-          <span className={`text-base font-bold ${clickable ? 'text-amber-300 animate-pulse' : 'text-amber-200'}`}>
-            {clickable && '✨ '}+{formattedReward} ⭐{clickable && ' ✨'}
-          </span>
-        )}
-      </div>
-      <div className="mt-3 h-4 rounded-full bg-slate-800/80 shadow-inner">
-        <div className="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-cyan-400 shadow-[0_2px_8px_rgba(251,191,36,0.5)] transition-all duration-300" style={{ width: `${percentage}%` }} />
-      </div>
-    </div>
-  );
-}
-
 export default function HomeView() {
   const { player, streak, daily, starLevelSize, claimDailyReward } = useProgress();
 
@@ -240,9 +164,9 @@ export default function HomeView() {
 
       {/* Hero Card */}
       <section className="hero-card">
-        <h1 className="hero-title">{t('app.title')}</h1>
+        <h1 className="hero-title">Recently Learned Letters</h1>
         <p className="hero-body">
-          <span>{t('app.tagline')}</span>
+          <span>ק, ר, ט, ו, ב</span>
         </p>
         <button className="hero-cta" onClick={() => openGame({ autostart: false })}>Play</button>
       </section>

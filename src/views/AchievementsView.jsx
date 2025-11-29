@@ -2,7 +2,17 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { on } from '../lib/eventBus.js';
+
+function XIcon({ className = '' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
 
 function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
   const totalTiers = badge.tiers.length;
@@ -125,7 +135,30 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
 export default function AchievementsView() {
   const { player, badges, daily, claimBadgeReward, claimDailyReward, starLevelSize } = useProgress();
   const { t } = useLocalization();
+  const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
+  const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
   const gameName = t('app.title');
+
+  const latestBadge = useMemo(() => {
+    if (!player.latestBadge) return null;
+    const badge = badgesCatalog.find((item) => item.id === player.latestBadge.id);
+    const tierSpec = badge?.tiers?.find((item) => item.tier === player.latestBadge.tier);
+
+    const nameKey = player.latestBadge.nameKey ?? badge?.nameKey;
+    const labelKey = player.latestBadge.labelKey ?? tierSpec?.labelKey;
+    const summaryKey = player.latestBadge.summaryKey ?? badge?.summaryKey;
+
+    const name = nameKey ? t(nameKey) : player.latestBadge.name ?? badge?.name ?? player.latestBadge.id;
+    const label = labelKey ? t(labelKey) : player.latestBadge.label ?? tierSpec?.label ?? '';
+    const summary = summaryKey ? t(summaryKey, { gameName }) : player.latestBadge.summary ?? badge?.summary ?? '';
+
+    return {
+      ...player.latestBadge,
+      name,
+      label,
+      summary
+    };
+  }, [player.latestBadge, t, gameName]);
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
   const playerStars = Math.max(0, Math.floor(player?.stars ?? 0));
@@ -220,24 +253,76 @@ export default function AchievementsView() {
 
   return (
     <>
-      <header className="hero-card">
-        <h1 className="hero-title">{t('achievements.title')}</h1>
-        <div className="flex flex-col gap-3 mt-2">
-          <div className="flex items-center justify-between">
-            <p className="text-lg font-bold text-arcade-text-main font-heading">{t('home.progress.level', { level })}</p>
-            <p className="text-sm font-semibold text-arcade-text-soft">{levelName}</p>
+      {/* Player Header */}
+      <header className="player-header">
+        <div className="player-meta">
+          <div className="avatar"></div>
+          <div className="player-text">
+            <div className="player-name">Player</div>
+            <div className="player-level">{t('home.progress.level', { level })}</div>
+            <div className="player-rank">{latestBadge?.label || 'Patient Paddler'}</div>
           </div>
-          <div className="progress-bar-shell">
-            <div
-              className="progress-bar-fill"
-              style={{ width: `${levelPercent}%` }}
-            />
+        </div>
+        <div className="top-counters">
+          <div className="pill-counter">
+            <span className="icon">⭐</span>
+            <span className="value">{formatNumber(totalStarsEarned)}</span>
           </div>
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-arcade-text-muted">{t('achievements.profile.starsToNextLevel')}</p>
-            <p className="text-sm font-semibold text-arcade-text-soft">
-              {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐
-            </p>
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
+              className="tiny-pill"
+              aria-label={t('app.languagePicker.label')}
+            >
+              🌎
+            </button>
+
+            {/* App Language Selector Popup */}
+            {appLanguageSelectorExpanded && (
+              <div className="language-selector-popup">
+                <button
+                  onClick={() => setAppLanguageSelectorExpanded(false)}
+                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-arcade-accent-red text-white shadow-arcade-sm z-10"
+                  aria-label="Close"
+                >
+                  <XIcon className="h-3 w-3" />
+                </button>
+
+                <h3 className="mb-3 text-center font-heading text-sm font-bold text-arcade-text-main">
+                  {t('app.languagePicker.label')}
+                </h3>
+
+                <select
+                  id="achievements-app-language-select"
+                  value={appLanguageId}
+                  onChange={(event) => selectAppLanguage(event.target.value)}
+                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
+                >
+                  {languageOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+
+                <h3 className="mb-2 mt-4 text-center font-heading text-sm font-bold text-arcade-text-main">
+                  {t('home.languagePicker.label')}
+                </h3>
+
+                <select
+                  id="achievements-practice-language-select"
+                  value={languageId}
+                  onChange={(event) => selectLanguage(event.target.value)}
+                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
+                >
+                  {languageOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </div>
       </header>

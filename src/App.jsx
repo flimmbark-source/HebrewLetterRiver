@@ -4,6 +4,7 @@ import HomeView from './views/HomeView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import LearnView from './views/LearnView.jsx';
 import WordRiverView from './views/WordRiverView.jsx';
+import SettingsView from './views/SettingsView.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import { ProgressProvider } from './context/ProgressContext.jsx';
 import { GameProvider, useGame } from './context/GameContext.jsx';
@@ -177,6 +178,7 @@ function Shell() {
           <Route path="/achievements" element={<AchievementsView />} />
           <Route path="/learn" element={<LearnView />} />
           <Route path="/word-river" element={<WordRiverView />} />
+          <Route path="/settings" element={<SettingsView />} />
         </Routes>
       </main>
       <nav className="bottom-nav">
@@ -210,7 +212,7 @@ function Shell() {
           </div>
           <span className="label">{t('app.nav.achievements')}</span>
         </NavLink>
-        <NavLink to="/word-river" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+        <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <div className="nav-icon-shell">
             <span>⚙️</span>
           </div>
