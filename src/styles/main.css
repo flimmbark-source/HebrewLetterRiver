@@ -1360,10 +1360,6 @@ body {
 }
 
 /* Apply improved contrast throughout */
-.quest-title {
-  color: var(--text-primary);
-}
-
 .quest-progress-text,
 .mode-card-description {
   color: var(--text-secondary);

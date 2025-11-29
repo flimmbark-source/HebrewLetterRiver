@@ -332,7 +332,7 @@ export default function AchievementsView() {
         </div>
       </header>
 
-      <section className="section">
+      <section className="section" style={{ marginTop: '20px' }}>
         <div className="section-header">
           <div className="section-title">
             <div className="wood-header">Achievements</div>
