@@ -10,7 +10,8 @@
       "home": "Lar",
       "play": "Jogar",
       "achievements": "Conquistas",
-      "learn": "Aprender"
+      "learn": "Aprender",
+      "settings": "Configurações"
     },
     "languagePicker": {
       "label": "Idioma do aplicativo",

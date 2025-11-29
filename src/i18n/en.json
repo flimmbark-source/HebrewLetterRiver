@@ -10,7 +10,8 @@
       "home": "Home",
       "play": "Play",
       "achievements": "Achievements",
-      "learn": "Learn"
+      "learn": "Learn",
+      "settings": "Settings"
     },
     "languagePicker": {
       "label": "App Language",

@@ -104,9 +104,34 @@ body {
   color: #4a2208;
 }
 
+.player-level-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .player-level {
   font-size: 13px;
   color: #6c3b14;
+  white-space: nowrap;
+}
+
+.player-level-progress {
+  flex: 1;
+  height: 4px;
+  min-width: 30px;
+  border-radius: 999px;
+  background: #f0cda0;
+  overflow: hidden;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.8);
+}
+
+.player-level-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffce4a 0%, #ff9247 50%, #ff5a4f 100%);
+  box-shadow: 0 0 4px rgba(255, 146, 71, 0.65);
+  transition: width 0.3s ease;
 }
 
 .player-rank {
@@ -422,6 +447,11 @@ body {
   box-shadow: 0 2px 0 #c85a24, 0 5px 12px rgba(200, 90, 36, 0.7);
 }
 
+.quest-cta:disabled {
+  color: #c9a474;
+  opacity: 0.7;
+}
+
 /* Bottom navigation - arcade style */
 .bottom-nav {
   position: fixed;
@@ -465,6 +495,7 @@ body {
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at 20% 0, #fffaf0 0, #ffe0b5 45%, #f4b267 100%);
+  border: 2px solid rgba(214, 140, 64, 0.9);
   box-shadow: 0 3px 0 rgba(199, 124, 52, 1), 0 6px 10px rgba(199, 124, 52, 0.7);
 }
 
@@ -492,6 +523,7 @@ body {
   transform: rotate(45deg);
   border-radius: 18px;
   background: radial-gradient(circle at 20% 0, #fff7e2 0, #ffd874 40%, #ff9247 100%);
+  border: 2px solid rgba(214, 140, 64, 0.9);
   box-shadow: 0 5px 0 #d86a2a, 0 10px 14px rgba(216, 106, 42, 0.85);
   display: flex;
   align-items: center;

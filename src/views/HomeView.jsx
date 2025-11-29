@@ -94,7 +94,12 @@ export default function HomeView() {
           <div className="avatar"></div>
           <div className="player-text">
             <div className="player-name">Player</div>
-            <div className="player-level">{t('home.progress.level', { level })}</div>
+            <div className="player-level-row">
+              <div className="player-level">{t('home.progress.level', { level })}</div>
+              <div className="player-level-progress">
+                <div className="player-level-progress-fill" style={{ width: `${starsProgress * 100}%` }}></div>
+              </div>
+            </div>
             <div className="player-rank">{latestBadge?.label || 'Patient Paddler'}</div>
           </div>
         </div>

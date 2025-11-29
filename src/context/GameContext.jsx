@@ -60,7 +60,7 @@ export function GameProvider({ children }) {
     setIsVisible(false);
   }, []);
 
-  const contextValue = useMemo(() => ({ openGame, closeGame }), [openGame, closeGame]);
+  const contextValue = useMemo(() => ({ openGame, closeGame, isVisible }), [openGame, closeGame, isVisible]);
 
   return (
     <GameContext.Provider value={contextValue}>

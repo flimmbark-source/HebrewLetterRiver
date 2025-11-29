@@ -155,7 +155,7 @@ function LanguageOnboardingModal() {
 }
 
 function Shell() {
-  const { openGame } = useGame();
+  const { openGame, isVisible: isGameVisible } = useGame();
   const { t, interfaceLanguagePack } = useLocalization();
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
@@ -181,7 +181,7 @@ function Shell() {
           <Route path="/settings" element={<SettingsView />} />
         </Routes>
       </main>
-      <nav className="bottom-nav">
+      {!isGameVisible && <nav className="bottom-nav">
         <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <div className="nav-icon-shell">
             <span>🏠</span>
@@ -216,9 +216,9 @@ function Shell() {
           <div className="nav-icon-shell">
             <span>⚙️</span>
           </div>
-          <span className="label">Settings</span>
+          <span className="label">{t('app.nav.settings')}</span>
         </NavLink>
-      </nav>
+      </nav>}
     </div>
   );
 }
