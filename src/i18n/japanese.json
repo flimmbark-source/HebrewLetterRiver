@@ -48,7 +48,17 @@
       "title": "最近学んだ文字"
     },
     "progress": {
-      "level": "レベル {{level}}"
+      "level": "レベル {{level}}",
+      "heading": "今日の進捗",
+      "streak": "ストリーク",
+      "days": "{{count}} 日",
+      "resetsAt": "00:00 アジア/エルサレムにリセット ({{time}})",
+      "starLevel": "スターレベル",
+      "totalStars": "{{count}} ⭐ 合計",
+      "toNextLevel": "{{current}} / {{total}} ⭐ 次のレベルまで",
+      "latestBadge": "最新のバッジ",
+      "tier": "ティア {{tier}}",
+      "playToUnlock": "セッションをプレイして実績のロック解除を開始します。"
     },
     "languagePicker": {
       "label": "言語を練習する",
@@ -224,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "毎日のバッジ",
+      "claimStars": "スターを請求する",
+      "rewardsCollected": "報酬が収集されました",
+      "completeQuests": "クエストを完了してスターを獲得",
+      "starsReady": "完了したクエスト全体で +{{stars}} ⭐ の準備ができています。",
+      "finishQuests": "クエストを完了してスター報酬をアンロックします。"
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "ウォームアップ",
+        "description": "2つのクイックランをプレイして流れを刺激します。"
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "フォーカス",
+        "description": "{{letter}}を含む5つの完璧な一致をキャッチします。"
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "スパイス",
+        "description": "{{constraint}}がアクティブな状態でラウンドに勝ちます。"
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "エキスパートモード実行",
+      "fast-flow": "ファストフロー速度アクティブ",
+      "no-intros": "イントロなしが有効"
     }
   },
   "wordRiver": {

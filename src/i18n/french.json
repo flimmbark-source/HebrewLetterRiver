@@ -48,7 +48,17 @@
       "title": "Lettres récemment apprises"
     },
     "progress": {
-      "level": "Niveau {{level}}"
+      "level": "Niveau {{level}}",
+      "heading": "Progrès aujourd'hui",
+      "streak": "Série",
+      "days": "{{count}} jours",
+      "resetsAt": "Réinitialise à 00:00 Asie/Jérusalem ({{time}})",
+      "starLevel": "Niveau d'étoiles",
+      "totalStars": "{{count}} ⭐ total",
+      "toNextLevel": "{{current}} / {{total}} ⭐ pour le niveau suivant",
+      "latestBadge": "Dernier badge",
+      "tier": "Niveau {{tier}}",
+      "playToUnlock": "Jouez une session pour commencer à débloquer des succès."
     },
     "languagePicker": {
       "label": "Langue de pratique",
@@ -218,31 +228,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "Badge quotidien",
+      "claimStars": "Réclamez vos étoiles",
+      "rewardsCollected": "Récompenses collectées",
+      "completeQuests": "Complétez des quêtes pour gagner des étoiles",
+      "starsReady": "Vous avez +{{stars}} ⭐ prêts sur les quêtes terminées.",
+      "finishQuests": "Terminez les quêtes pour débloquer leurs récompenses en étoiles."
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "Échauffement",
+        "description": "Jouez deux courses rapides pour agiter le courant."
       },
       "focus": {
         "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "description": "Attrapez cinq correspondances parfaites avec {{letter}}."
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "Piment",
+        "description": "Gagnez un tour avec le {{constraint}} actif."
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "Mode Expert actif",
+      "fast-flow": "Vitesse Flux Rapide active",
+      "no-intros": "Aucune introduction activée"
     }
   },
   "wordRiver": {

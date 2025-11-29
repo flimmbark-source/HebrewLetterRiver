@@ -48,7 +48,17 @@
       "title": "Letras Recentemente Aprendidas"
     },
     "progress": {
-      "level": "Nível {{level}}"
+      "level": "Nível {{level}}",
+      "heading": "Progresso hoje",
+      "streak": "Sequência",
+      "days": "{{count}} dias",
+      "resetsAt": "Reinicia às 00:00 Ásia/Jerusalém ({{time}})",
+      "starLevel": "Nível de estrelas",
+      "totalStars": "{{count}} ⭐ total",
+      "toNextLevel": "{{current}} / {{total}} ⭐ para o próximo nível",
+      "latestBadge": "Último distintivo",
+      "tier": "Camada {{tier}}",
+      "playToUnlock": "Jogue uma sessão para começar a desbloquear conquistas."
     },
     "languagePicker": {
       "label": "Pratique a linguagem",
@@ -224,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "Distintivo diário",
+      "claimStars": "Reivindique suas estrelas",
+      "rewardsCollected": "Recompensas coletadas",
+      "completeQuests": "Complete missões para ganhar estrelas",
+      "starsReady": "Você tem +{{stars}} ⭐ prontas em missões concluídas.",
+      "finishQuests": "Termine as missões para desbloquear suas recompensas em estrelas."
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "Aquecimento",
+        "description": "Jogue duas corridas rápidas para agitar a corrente."
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "Foco",
+        "description": "Capture cinco correspondências perfeitas com {{letter}}."
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "Tempero",
+        "description": "Ganhe uma rodada com o {{constraint}} ativo."
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "Corrida do Modo Especialista",
+      "fast-flow": "Velocidade de Fluxo Rápido ativa",
+      "no-intros": "Sem Apresentações ativado"
     }
   },
   "wordRiver": {

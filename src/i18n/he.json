@@ -48,7 +48,17 @@
       "title": "אותיות שנלמדו לאחרונה"
     },
     "progress": {
-      "level": "רמה {{level}}"
+      "level": "רמה {{level}}",
+      "heading": "התקדמות היום",
+      "streak": "רצף",
+      "days": "{{count}} ימים",
+      "resetsAt": "מתאפס ב-00:00 אסיה/ירושלים ({{time}})",
+      "starLevel": "רמת כוכבים",
+      "totalStars": "{{count}} ⭐ סה\"כ",
+      "toNextLevel": "{{current}} / {{total}} ⭐ לרמה הבאה",
+      "latestBadge": "תג אחרון",
+      "tier": "דרג {{tier}}",
+      "playToUnlock": "שחק מושב כדי להתחיל לפתוח הישגים."
     },
     "languagePicker": {
       "label": "שפת תרגול",
@@ -224,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "תג יומי",
+      "claimStars": "תבע את הכוכבים שלך",
+      "rewardsCollected": "פרסים נאספו",
+      "completeQuests": "השלם משימות כדי לזכות בכוכבים",
+      "starsReady": "יש לך +{{stars}} ⭐ מוכנים במשימות שהושלמו.",
+      "finishQuests": "סיים משימות כדי לפתוח את פרסי הכוכבים שלהן."
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "חימום",
+        "description": "שחק שני ריצות מהירות כדי לערבב את הזרם."
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "מיקוד",
+        "description": "תפוס חמישה התאמות מושלמות עם {{letter}}."
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "תבלין",
+        "description": "נצח סיבוב עם {{constraint}} פעיל."
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "ריצת מצב מומחה",
+      "fast-flow": "מהירות זרימה מהירה פעילה",
+      "no-intros": "אין הקדמות מופעלות"
     }
   },
   "wordRiver": {

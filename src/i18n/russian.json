@@ -48,7 +48,17 @@
       "title": "Недавно изученные буквы"
     },
     "progress": {
-      "level": "Уровень {{level}}"
+      "level": "Уровень {{level}}",
+      "heading": "Прогресс сегодня",
+      "streak": "Серия",
+      "days": "{{count}} дней",
+      "resetsAt": "Сброс в 00:00 Азия/Иерусалим ({{time}})",
+      "starLevel": "Уровень звезд",
+      "totalStars": "{{count}} ⭐ всего",
+      "toNextLevel": "{{current}} / {{total}} ⭐ до следующего уровня",
+      "latestBadge": "Последний значок",
+      "tier": "Уровень {{tier}}",
+      "playToUnlock": "Сыграйте в сеанс, чтобы начать разблокировать достижения."
     },
     "languagePicker": {
       "label": "Практика языка",
@@ -224,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "Ежедневный значок",
+      "claimStars": "Заберите свои звезды",
+      "rewardsCollected": "Награды собраны",
+      "completeQuests": "Выполняйте задания, чтобы заработать звезды",
+      "starsReady": "У вас есть +{{stars}} ⭐ готовых по завершенным заданиям.",
+      "finishQuests": "Завершите задания, чтобы разблокировать их звездные награды."
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "Разминка",
+        "description": "Сыграйте два быстрых забега, чтобы взбудоражить течение."
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "Фокус",
+        "description": "Поймайте пять идеальных совпадений с {{letter}}."
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "Специи",
+        "description": "Выиграйте раунд с активным {{constraint}}."
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "Режим эксперта активен",
+      "fast-flow": "Быстрый поток активен",
+      "no-intros": "Без вступлений включено"
     }
   },
   "wordRiver": {

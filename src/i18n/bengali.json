@@ -48,7 +48,17 @@
       "title": "সম্প্রতি শেখা অক্ষর"
     },
     "progress": {
-      "level": "স্তর {{level}}"
+      "level": "স্তর {{level}}",
+      "heading": "আজকের অগ্রগতি",
+      "streak": "ধারা",
+      "days": "{{count}} দিন",
+      "resetsAt": "00:00 এশিয়া/জেরুজালেমে রিসেট হয় ({{time}})",
+      "starLevel": "তারকা স্তর",
+      "totalStars": "{{count}} ⭐ মোট",
+      "toNextLevel": "{{current}} / {{total}} ⭐ পরবর্তী স্তরে",
+      "latestBadge": "সর্বশেষ ব্যাজ",
+      "tier": "স্তর {{tier}}",
+      "playToUnlock": "অর্জন আনলক শুরু করতে একটি সেশন খেলুন।"
     },
     "languagePicker": {
       "label": "ভাষা অনুশীলন করুন",
@@ -224,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "দৈনিক ব্যাজ",
+      "claimStars": "আপনার তারা দাবি করুন",
+      "rewardsCollected": "পুরস্কার সংগৃহীত",
+      "completeQuests": "তারা অর্জন করতে কোয়েস্ট সম্পূর্ণ করুন",
+      "starsReady": "আপনার কাছে +{{stars}} ⭐ সম্পূর্ণ কোয়েস্ট জুড়ে প্রস্তুত।",
+      "finishQuests": "তাদের তারকা পুরস্কার আনলক করতে কোয়েস্ট শেষ করুন।"
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "ওয়ার্ম-আপ",
+        "description": "বর্তমান আলোড়িত করতে দুটি দ্রুত দৌড় খেলুন।"
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "ফোকাস",
+        "description": "{{letter}} সমন্বিত পাঁচটি নিখুঁত ম্যাচ ধরুন।"
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "মসলা",
+        "description": "{{constraint}} সক্রিয় থাকা একটি রাউন্ড জিতুন।"
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "বিশেষজ্ঞ মোড চালান",
+      "fast-flow": "দ্রুত প্রবাহ গতি সক্রিয়",
+      "no-intros": "কোনো ভূমিকা সক্ষম নেই"
     }
   },
   "wordRiver": {

@@ -48,7 +48,17 @@
       "title": "हाल ही में सीखे गए अक्षर"
     },
     "progress": {
-      "level": "स्तर {{level}}"
+      "level": "स्तर {{level}}",
+      "heading": "आज की प्रगति",
+      "streak": "स्ट्रीक",
+      "days": "{{count}} दिन",
+      "resetsAt": "00:00 एशिया/जेरूसलम पर रीसेट ({{time}})",
+      "starLevel": "स्टार स्तर",
+      "totalStars": "{{count}} ⭐ कुल",
+      "toNextLevel": "{{current}} / {{total}} ⭐ अगले स्तर के लिए",
+      "latestBadge": "नवीनतम बैज",
+      "tier": "टियर {{tier}}",
+      "playToUnlock": "उपलब्धियों को अनलॉक करना शुरू करने के लिए एक सत्र खेलें।"
     },
     "languagePicker": {
       "label": "भाषा का अभ्यास करें",
@@ -224,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "दैनिक बैज",
+      "claimStars": "अपने सितारों का दावा करें",
+      "rewardsCollected": "पुरस्कार एकत्रित",
+      "completeQuests": "सितारे अर्जित करने के लिए क्वेस्ट पूरा करें",
+      "starsReady": "आपके पास पूर्ण क्वेस्ट में +{{stars}} ⭐ तैयार हैं।",
+      "finishQuests": "उनके स्टार पुरस्कारों को अनलॉक करने के लिए क्वेस्ट समाप्त करें।"
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "वार्म-अप",
+        "description": "धारा को हिलाने के लिए दो त्वरित रन खेलें।"
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "फोकस",
+        "description": "{{letter}} की विशेषता वाले पांच सही मिलान पकड़ें।"
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "मसाला",
+        "description": "{{constraint}} सक्रिय के साथ एक राउंड जीतें।"
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "विशेषज्ञ मोड चलाएं",
+      "fast-flow": "तेज प्रवाह गति सक्रिय",
+      "no-intros": "कोई परिचय सक्षम नहीं"
     }
   },
   "wordRiver": {
