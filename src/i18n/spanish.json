@@ -64,6 +64,18 @@
     "dailyQuests": {
       "title": "Misiones diarias",
       "resetsAt": "Se reinicia a las {{time}}"
+    },
+    "progress": {
+      "heading": "Progreso de hoy",
+      "streak": "Racha",
+      "days": "{{count}} días",
+      "resetsAt": "Se reinicia a las 00:00 Asía/Jerusalén ({{time}})",
+      "starLevel": "Nivel de estrellas",
+      "totalStars": "{{count}} ⭐ total",
+      "toNextLevel": "{{current}} / {{total}} ⭐ para el próximo nivel",
+      "latestBadge": "Última insignia",
+      "tier": "Nivel {{tier}}",
+      "playToUnlock": "Juega una sesión para comenzar a desbloquear logros."
     }
   },
   "wordRiver": {
