@@ -44,13 +44,39 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "最近学んだ文字"
+    },
+    "progress": {
+      "level": "レベル {{level}}",
+      "heading": "今日の進捗",
+      "streak": "ストリーク",
+      "days": "{{count}} 日",
+      "resetsAt": "00:00 アジア/エルサレムにリセット ({{time}})",
+      "starLevel": "スターレベル",
+      "totalStars": "{{count}} ⭐ 合計",
+      "toNextLevel": "{{current}} / {{total}} ⭐ 次のレベルまで",
+      "latestBadge": "最新のバッジ",
+      "tier": "ティア {{tier}}",
+      "playToUnlock": "セッションをプレイして実績のロック解除を開始します。"
+    },
     "languagePicker": {
       "label": "言語を練習する",
       "helper": "いつでも切り替えて、別のスクリプトでトレーニングできます。"
     },
     "cta": {
       "start": "新しい実行を開始する",
-      "practice": "練習用フォーカスレター"
+      "practice": "練習用フォーカスレター",
+      "play": "プレイ"
+    },
+    "quest": {
+      "claim": "請求",
+      "claimed": "請求済み",
+      "locked": "進行中"
+    },
+    "dailyQuests": {
+      "title": "デイリークエスト",
+      "resetsAt": "{{time}}にリセット"
     }
   },
   "game": {
@@ -154,12 +180,19 @@
     "next": "次へ: {{label}}",
     "complete": "すべての階層が完了しました",
     "earnStars": "このティアのロックを解除すると、+{{stars}} ⭐を獲得できます。",
-    "maxed": "バッジを完全にマスター — 輝きをお楽しみください!"
+    "maxed": "バッジを完全にマスター — 輝きをお楽しみください!",
+    "claimStarsAria": "{{label}}のために{{stars}}スターを請求"
   },
   "learn": {
     "title": "学ぶ",
     "intro": "厳選されたレッスンに飛び込んで、それぞれの文字をマスターしましょう。新しい学習モジュールが間もなくここに登場します!",
     "body": "それまでは川の探索を続け、ガイド付きの練習セッション、発音のヒント、文化的な洞察を定期的にチェックしてください。"
+  },
+  "settings": {
+    "title": "設定",
+    "subtitle": "設定を構成する",
+    "languageSettings": "言語設定",
+    "gameSettings": "ゲーム設定"
   },
   "badges": {
     "firstFlow": {
@@ -201,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "毎日のバッジ",
+      "claimStars": "スターを請求する",
+      "rewardsCollected": "報酬が収集されました",
+      "completeQuests": "クエストを完了してスターを獲得",
+      "starsReady": "完了したクエスト全体で +{{stars}} ⭐ の準備ができています。",
+      "finishQuests": "クエストを完了してスター報酬をアンロックします。"
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "ウォームアップ",
+        "description": "2つのクイックランをプレイして流れを刺激します。"
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "フォーカス",
+        "description": "{{letter}}を含む5つの完璧な一致をキャッチします。"
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "スパイス",
+        "description": "{{constraint}}がアクティブな状態でラウンドに勝ちます。"
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "エキスパートモード実行",
+      "fast-flow": "ファストフロー速度アクティブ",
+      "no-intros": "イントロなしが有効"
     }
   },
   "wordRiver": {
@@ -248,5 +281,13 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "common": {
+    "close": "閉じる",
+    "viewDetails": "詳細を見る",
+    "player": "プレイヤー",
+    "patientPaddler": "忍耐強いパドラー",
+    "noneYet": "まだなし",
+    "play": "プレイ"
   }
 }

@@ -44,13 +44,39 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "最近学习的字母"
+    },
+    "progress": {
+      "level": "等级 {{level}}",
+      "heading": "今日进度",
+      "streak": "连胜",
+      "days": "{{count}} 天",
+      "resetsAt": "在00:00亚洲/耶路撒冷重置 ({{time}})",
+      "starLevel": "星级",
+      "totalStars": "{{count}} ⭐ 总计",
+      "toNextLevel": "{{current}} / {{total}} ⭐ 到下一级",
+      "latestBadge": "最新徽章",
+      "tier": "等级 {{tier}}",
+      "playToUnlock": "玩一个会话以开始解锁成就。"
+    },
     "languagePicker": {
       "label": "练习语言",
       "helper": "随时切换以使用另一个脚本进行训练。"
     },
     "cta": {
       "start": "开始新的跑步",
-      "practice": "实践焦点信"
+      "practice": "实践焦点信",
+      "play": "玩"
+    },
+    "quest": {
+      "claim": "领取",
+      "claimed": "已领取",
+      "locked": "进行中"
+    },
+    "dailyQuests": {
+      "title": "每日任务",
+      "resetsAt": "在{{time}}重置"
     }
   },
   "game": {
@@ -154,12 +180,19 @@
     "next": "下一页：{{label}}",
     "complete": "所有层级均已完成",
     "earnStars": "解锁此级别后，可赚取 +{{stars}} ⭐。",
-    "maxed": "完全掌握徽章——享受光芒！"
+    "maxed": "完全掌握徽章——享受光芒！",
+    "claimStarsAria": "领取{{label}}的{{stars}}颗星"
   },
   "learn": {
     "title": "学习",
     "intro": "深入学习精心策划的课程来掌握每个字母。新的学习模块即将在这里出现！",
     "body": "在那之前，继续探索河流并定期回来查看指导练习课程、发音技巧和文化见解。"
+  },
+  "settings": {
+    "title": "设置",
+    "subtitle": "配置您的偏好",
+    "languageSettings": "语言设置",
+    "gameSettings": "游戏设置"
   },
   "badges": {
     "firstFlow": {
@@ -201,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "每日徽章",
+      "claimStars": "领取你的星星",
+      "rewardsCollected": "奖励已收集",
+      "completeQuests": "完成任务以赚取星星",
+      "starsReady": "您在已完成的任务中有 +{{stars}} ⭐ 准备就绪。",
+      "finishQuests": "完成任务以解锁他们的星星奖励。"
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "热身",
+        "description": "玩两次快速奔跑以搅动电流。"
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "专注",
+        "description": "捕获五个完美匹配的 {{letter}}。"
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "香料",
+        "description": "在 {{constraint}} 激活的情况下赢得一轮。"
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "专家模式运行",
+      "fast-flow": "快速流动速度激活",
+      "no-intros": "未启用介绍"
     }
   },
   "wordRiver": {
@@ -248,5 +281,13 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "common": {
+    "close": "关闭",
+    "viewDetails": "查看详情",
+    "player": "玩家",
+    "patientPaddler": "耐心的桨手",
+    "noneYet": "还没有",
+    "play": "玩"
   }
 }

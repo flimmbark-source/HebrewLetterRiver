@@ -61,11 +61,18 @@ export default function SettingsView() {
 
   return (
     <>
+      <header className="hero-card">
+        <h1 className="hero-title">{t('settings.title')}</h1>
+        <p className="hero-body">
+          <span>{t('settings.subtitle')}</span>
+        </p>
+      </header>
+
       {/* Language Settings */}
       <section className="section">
         <div className="section-header">
           <div className="section-title">
-            <div className="wood-header">Language Settings</div>
+            <div className="wood-header">{t('settings.languageSettings')}</div>
           </div>
         </div>
 
@@ -116,7 +123,7 @@ export default function SettingsView() {
       <section className="section">
         <div className="section-header">
           <div className="section-title">
-            <div className="wood-header">Game Settings</div>
+            <div className="wood-header">{t('settings.gameSettings')}</div>
           </div>
         </div>
 

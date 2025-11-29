@@ -44,13 +44,39 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "हाल ही में सीखे गए अक्षर"
+    },
+    "progress": {
+      "level": "स्तर {{level}}",
+      "heading": "आज की प्रगति",
+      "streak": "स्ट्रीक",
+      "days": "{{count}} दिन",
+      "resetsAt": "00:00 एशिया/जेरूसलम पर रीसेट ({{time}})",
+      "starLevel": "स्टार स्तर",
+      "totalStars": "{{count}} ⭐ कुल",
+      "toNextLevel": "{{current}} / {{total}} ⭐ अगले स्तर के लिए",
+      "latestBadge": "नवीनतम बैज",
+      "tier": "टियर {{tier}}",
+      "playToUnlock": "उपलब्धियों को अनलॉक करना शुरू करने के लिए एक सत्र खेलें।"
+    },
     "languagePicker": {
       "label": "भाषा का अभ्यास करें",
       "helper": "किसी अन्य स्क्रिप्ट में प्रशिक्षित करने के लिए किसी भी समय स्विच करें।"
     },
     "cta": {
       "start": "एक नया रन प्रारंभ करें",
-      "practice": "फोकस लेटर का अभ्यास करें"
+      "practice": "फोकस लेटर का अभ्यास करें",
+      "play": "खेलें"
+    },
+    "quest": {
+      "claim": "दावा करें",
+      "claimed": "दावा किया",
+      "locked": "प्रगति में"
+    },
+    "dailyQuests": {
+      "title": "दैनिक क्वेस्ट",
+      "resetsAt": "{{time}} पर रीसेट होता है"
     }
   },
   "game": {
@@ -154,12 +180,19 @@
     "next": "अगला: {{label}}",
     "complete": "सभी स्तर पूर्ण",
     "earnStars": "जब आप इस स्तर को अनलॉक करेंगे तो +{{stars}} ⭐ अर्जित करें।",
-    "maxed": "बैज पूरी तरह से महारत हासिल है - चमक का आनंद लें!"
+    "maxed": "बैज पूरी तरह से महारत हासिल है - चमक का आनंद लें!",
+    "claimStarsAria": "{{label}} के लिए {{stars}} सितारे का दावा करें"
   },
   "learn": {
     "title": "सीखना",
     "intro": "प्रत्येक अक्षर पर महारत हासिल करने के लिए क्यूरेटेड पाठों में गोता लगाएँ। नए शिक्षण मॉड्यूल जल्द ही यहां दिखाई देंगे!",
     "body": "तब तक, नदी की खोज जारी रखें और निर्देशित अभ्यास सत्र, उच्चारण युक्तियाँ और सांस्कृतिक अंतर्दृष्टि के लिए नियमित रूप से जाँच करें।"
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "subtitle": "अपनी प्राथमिकताएं कॉन्फ़िगर करें",
+    "languageSettings": "भाषा सेटिंग्स",
+    "gameSettings": "गेम सेटिंग्स"
   },
   "badges": {
     "firstFlow": {
@@ -201,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "दैनिक बैज",
+      "claimStars": "अपने सितारों का दावा करें",
+      "rewardsCollected": "पुरस्कार एकत्रित",
+      "completeQuests": "सितारे अर्जित करने के लिए क्वेस्ट पूरा करें",
+      "starsReady": "आपके पास पूर्ण क्वेस्ट में +{{stars}} ⭐ तैयार हैं।",
+      "finishQuests": "उनके स्टार पुरस्कारों को अनलॉक करने के लिए क्वेस्ट समाप्त करें।"
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "वार्म-अप",
+        "description": "धारा को हिलाने के लिए दो त्वरित रन खेलें।"
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "फोकस",
+        "description": "{{letter}} की विशेषता वाले पांच सही मिलान पकड़ें।"
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "मसाला",
+        "description": "{{constraint}} सक्रिय के साथ एक राउंड जीतें।"
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "विशेषज्ञ मोड चलाएं",
+      "fast-flow": "तेज प्रवाह गति सक्रिय",
+      "no-intros": "कोई परिचय सक्षम नहीं"
     }
   },
   "wordRiver": {
@@ -248,5 +281,13 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "common": {
+    "close": "बंद करना",
+    "viewDetails": "विवरण देखें",
+    "player": "खिलाड़ी",
+    "patientPaddler": "धैर्यवान पैडलर",
+    "noneYet": "अभी तक कोई नहीं",
+    "play": "खेलें"
   }
 }

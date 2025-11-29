@@ -44,13 +44,38 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "Letras aprendidas recientemente"
+    },
     "languagePicker": {
       "label": "Practica el idioma",
       "helper": "Cambie en cualquier momento para entrenar en otro guión."
     },
     "cta": {
       "start": "Iniciar una nueva ejecución",
-      "practice": "Carta de enfoque de práctica"
+      "practice": "Carta de enfoque de práctica",
+      "play": "Jugar"
+    },
+    "quest": {
+      "claim": "Reclamar",
+      "claimed": "Reclamado",
+      "locked": "En Progreso"
+    },
+    "dailyQuests": {
+      "title": "Misiones diarias",
+      "resetsAt": "Se reinicia a las {{time}}"
+    },
+    "progress": {
+      "heading": "Progreso de hoy",
+      "streak": "Racha",
+      "days": "{{count}} días",
+      "resetsAt": "Se reinicia a las 00:00 Asía/Jerusalén ({{time}})",
+      "starLevel": "Nivel de estrellas",
+      "totalStars": "{{count}} ⭐ total",
+      "toNextLevel": "{{current}} / {{total}} ⭐ para el próximo nivel",
+      "latestBadge": "Última insignia",
+      "tier": "Nivel {{tier}}",
+      "playToUnlock": "Juega una sesión para comenzar a desbloquear logros."
     }
   },
   "wordRiver": {
@@ -175,12 +200,19 @@
     "next": "Siguiente: {{label}}",
     "complete": "Todos los niveles completos",
     "earnStars": "Gana +{{stars}} ⭐ cuando desbloqueas este nivel.",
-    "maxed": "Insignia completamente dominada: ¡disfruta del brillo!"
+    "maxed": "Insignia completamente dominada: ¡disfruta del brillo!",
+    "claimStarsAria": "Reclamar {{stars}} estrellas para {{label}}"
   },
   "learn": {
     "title": "Aprender",
     "intro": "Sumérgete en lecciones seleccionadas para dominar cada letra. ¡Pronto aparecerán aquí nuevos módulos de aprendizaje!",
     "body": "Hasta entonces, siga explorando el río y visítelo periódicamente para disfrutar de sesiones de práctica guiada, consejos de pronunciación y conocimientos culturales."
+  },
+  "settings": {
+    "title": "Ajustes",
+    "subtitle": "Configura tus preferencias",
+    "languageSettings": "Configuración de idioma",
+    "gameSettings": "Configuración del juego"
   },
   "badges": {
     "firstFlow": {
@@ -248,5 +280,13 @@
       "fast-flow": "Fast Flow speed active",
       "no-intros": "No Introductions enabled"
     }
+  },
+  "common": {
+    "close": "Cerrar",
+    "viewDetails": "Ver detalles",
+    "player": "Jugador",
+    "patientPaddler": "Remero Paciente",
+    "noneYet": "Ninguno todavía",
+    "play": "Jugar"
   }
 }

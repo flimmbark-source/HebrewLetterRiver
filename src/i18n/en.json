@@ -3,6 +3,14 @@
     "id": "english",
     "name": "English"
   },
+  "common": {
+    "close": "Close",
+    "viewDetails": "View details",
+    "player": "Player",
+    "patientPaddler": "Patient Paddler",
+    "noneYet": "None yet",
+    "play": "Play"
+  },
   "app": {
     "title": "World Letter River",
     "tagline": "Flow, learn, and celebrate every catch.",
@@ -44,13 +52,17 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "Recently Learned Letters"
+    },
     "languagePicker": {
       "label": "Practice Language",
       "helper": "Switch anytime to train in another script."
     },
     "cta": {
       "start": "Start a New Run",
-      "practice": "Practice Focus Letter"
+      "practice": "Practice Focus Letter",
+      "play": "Play"
     },
     "progress": {
       "heading": "Progress today",
@@ -71,7 +83,14 @@
       "inProgress": "In progress…",
       "collected": "Reward collected",
       "collectedShort": "✓ Collected",
-      "claiming": "Claiming…"
+      "claiming": "Claiming…",
+      "claim": "Claim",
+      "claimed": "Claimed",
+      "locked": "In Progress"
+    },
+    "dailyQuests": {
+      "title": "Daily quests",
+      "resetsAt": "Resets at {{time}}"
     }
   },
   "wordRiver": {
@@ -198,6 +217,7 @@
     "earnStars": "Earn +{{stars}} ⭐ when you unlock this tier.",
     "maxed": "Badge fully mastered — enjoy the glow!",
     "claiming": "Claiming…",
+    "claimStarsAria": "Claim {{stars}} stars for {{label}}",
     "moreTiers": "+{{count}} more tier",
     "moreTiersPlural": "+{{count}} more tiers",
     "profile": {
@@ -227,6 +247,12 @@
     "title": "Learn",
     "intro": "Dive into curated lessons to master each letter. Fresh learning modules will appear here soon!",
     "body": "Until then, keep exploring the river and check back regularly for guided practice sessions, pronunciation tips, and cultural insights."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Configure your preferences",
+    "languageSettings": "Language Settings",
+    "gameSettings": "Game Settings"
   },
   "badges": {
     "firstFlow": {

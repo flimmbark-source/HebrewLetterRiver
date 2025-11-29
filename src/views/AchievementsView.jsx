@@ -107,7 +107,7 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
       onKeyDown={handleCardKeyDown}
       role={canClaim ? 'button' : undefined}
       tabIndex={canClaim ? 0 : undefined}
-      aria-label={canClaim ? `Claim ${firstUnclaimed.stars} stars for ${tierProgressLabel}` : undefined}
+      aria-label={canClaim ? translate('achievements.claimStarsAria', { stars: firstUnclaimed.stars, label: tierProgressLabel }) : undefined}
     >
       <div className="flex items-start justify-between gap-4">
         <h3 className="text-base font-semibold text-arcade-text-main sm:text-lg">{badgeSummary}</h3>
@@ -258,14 +258,14 @@ export default function AchievementsView() {
         <div className="player-meta">
           <div className="avatar"></div>
           <div className="player-text">
-            <div className="player-name">Player</div>
+            <div className="player-name">{t('common.player')}</div>
             <div className="player-level-row">
               <div className="player-level">{t('home.progress.level', { level })}</div>
               <div className="player-level-progress">
                 <div className="player-level-progress-fill" style={{ width: `${levelPercent}%` }}></div>
               </div>
             </div>
-            <div className="player-rank">{latestBadge?.label || 'Patient Paddler'}</div>
+            <div className="player-rank">{latestBadge?.label || t('common.patientPaddler')}</div>
           </div>
         </div>
         <div className="top-counters">
@@ -288,7 +288,7 @@ export default function AchievementsView() {
                 <button
                   onClick={() => setAppLanguageSelectorExpanded(false)}
                   className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-arcade-accent-red text-white shadow-arcade-sm z-10"
-                  aria-label="Close"
+                  aria-label={t('common.close')}
                 >
                   <XIcon className="h-3 w-3" />
                 </button>
@@ -335,7 +335,7 @@ export default function AchievementsView() {
       <section className="section" style={{ marginTop: '20px',  }}>
         <div className="section-header">
           <div className="section-title">
-            <div className="wood-header">Achievements</div>
+            <div className="wood-header">{t('achievements.title')}</div>
           </div>
         </div>
         <section className="section" style={{ marginTop: '10px',  }}></section>

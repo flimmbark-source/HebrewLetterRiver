@@ -44,13 +44,39 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "الحروف المتعلمة مؤخراً"
+    },
+    "progress": {
+      "level": "المستوى {{level}}",
+      "heading": "التقدم اليوم",
+      "streak": "سلسلة",
+      "days": "{{count}} أيام",
+      "resetsAt": "يعاد التعيين في الساعة 00:00 آسيا/القدس ({{time}})",
+      "starLevel": "مستوى النجوم",
+      "totalStars": "{{count}} ⭐ المجموع",
+      "toNextLevel": "{{current}} / {{total}} ⭐ للمستوى التالي",
+      "latestBadge": "أحدث شارة",
+      "tier": "المستوى {{tier}}",
+      "playToUnlock": "العب جلسة لبدء فتح الإنجازات."
+    },
     "languagePicker": {
       "label": "ممارسة اللغة",
       "helper": "قم بالتبديل في أي وقت للتدريب على برنامج نصي آخر."
     },
     "cta": {
       "start": "ابدأ جولة جديدة",
-      "practice": "ممارسة رسالة التركيز"
+      "practice": "ممارسة رسالة التركيز",
+      "play": "يلعب"
+    },
+    "quest": {
+      "claim": "يدعي",
+      "claimed": "مطالب",
+      "locked": "قيد التقدم"
+    },
+    "dailyQuests": {
+      "title": "المهام اليومية",
+      "resetsAt": "إعادة التعيين في {{time}}"
     }
   },
   "game": {
@@ -154,12 +180,19 @@
     "next": "التالي: {{label}}",
     "complete": "جميع المستويات كاملة",
     "earnStars": "اربح +{{stars}} ⭐ عندما تفتح هذا المستوى.",
-    "maxed": "شارة متقنة بالكامل - استمتع بالتوهج!"
+    "maxed": "شارة متقنة بالكامل - استمتع بالتوهج!",
+    "claimStarsAria": "اطلب {{stars}} نجوم لـ {{label}}"
   },
   "learn": {
     "title": "يتعلم",
     "intro": "انغمس في الدروس المنسقة لإتقان كل حرف. ستظهر وحدات تعليمية جديدة هنا قريبًا!",
     "body": "وحتى ذلك الحين، استمر في استكشاف النهر وراجع بانتظام جلسات التدريب الموجهة ونصائح النطق والرؤى الثقافية."
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "subtitle": "قم بتكوين تفضيلاتك",
+    "languageSettings": "إعدادات اللغة",
+    "gameSettings": "إعدادات اللعبة"
   },
   "badges": {
     "firstFlow": {
@@ -201,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "شارة يومية",
+      "claimStars": "اطلب نجومك",
+      "rewardsCollected": "تم جمع المكافآت",
+      "completeQuests": "أكمل المهام لكسب النجوم",
+      "starsReady": "لديك +{{stars}} ⭐ جاهزة عبر المهام المكتملة.",
+      "finishQuests": "أنهِ المهام لفتح مكافآت النجوم الخاصة بها."
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "الاحماء",
+        "description": "العب جولتين سريعتين لتحريك التيار."
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "التركيز",
+        "description": "التقط خمس مطابقات مثالية تضم {{letter}}."
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "التوابل",
+        "description": "اربح جولة مع {{constraint}} نشط."
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "تشغيل وضع الخبير",
+      "fast-flow": "سرعة التدفق السريع نشطة",
+      "no-intros": "لا توجد مقدمات ممكّنة"
     }
   },
   "wordRiver": {
@@ -248,5 +281,13 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "common": {
+    "close": "يغلق",
+    "viewDetails": "عرض التفاصيل",
+    "player": "لاعب",
+    "patientPaddler": "المجدف الصبور",
+    "noneYet": "لا شيء حتى الآن",
+    "play": "يلعب"
   }
 }

@@ -134,14 +134,14 @@ export default function HomeView() {
         <div className="player-meta">
           <div className="avatar"></div>
           <div className="player-text">
-            <div className="player-name">Player</div>
+            <div className="player-name">{t('common.player')}</div>
             <div className="player-level-row">
               <div className="player-level">{t('home.progress.level', { level })}</div>
               <div className="player-level-progress">
                 <div className="player-level-progress-fill" style={{ width: `${starsProgress * 100}%` }}></div>
               </div>
             </div>
-            <div className="player-rank">{latestBadge?.label || 'Patient Paddler'}</div>
+            <div className="player-rank">{latestBadge?.label || t('common.patientPaddler')}</div>
           </div>
         </div>
         <div className="top-counters">
@@ -164,7 +164,7 @@ export default function HomeView() {
                 <button
                   onClick={() => setAppLanguageSelectorExpanded(false)}
                   className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-arcade-accent-red text-white shadow-arcade-sm z-10"
-                  aria-label="Close"
+                  aria-label={t('common.close')}
                 >
                   <XIcon className="h-3 w-3" />
                 </button>
@@ -211,7 +211,7 @@ export default function HomeView() {
       {/* Hero Card */}
       <section className="section" style={{ marginTop: '20px',  }}></section>
       <section className="hero-card" style={{ position: 'relative' }}>
-        <h1 className="hero-title">Recently Learned Letters</h1>
+        <h1 className="hero-title">{t('home.recentLetters.title')}</h1>
         <div className="hero-body" style={{ display: 'flex', gap: '12px', fontSize: '24px', flexWrap: 'wrap' }}>
           {recentLetters.map((letter, index) => (
             <span
@@ -259,7 +259,7 @@ export default function HomeView() {
             </span>
           ))}
         </div>
-        <button className="hero-cta" onClick={() => openGame({ autostart: false })}>Play</button>
+        <button className="hero-cta" onClick={() => openGame({ autostart: false })}>{t('home.cta.play')}</button>
       </section>
 
       {/* Progress Section */}
@@ -269,7 +269,7 @@ export default function HomeView() {
           <div className="section-title">
             <div className="wood-header">{t('home.progress.heading')}</div>
           </div>
-          <div className="section-link">View details</div>
+          <div className="section-link">{t('common.viewDetails')}</div>
         </div>
         <section className="section" style={{ marginTop: '5px',  }}></section>
         <div className="progress-row">
@@ -293,7 +293,7 @@ export default function HomeView() {
           <div className="progress-card-small">
             <div className="progress-icon cyan">🏅</div>
             <div className="progress-label">{t('home.progress.latestBadge')}</div>
-            <div className="progress-value">{latestBadge?.name || 'None yet'}</div>
+            <div className="progress-value">{latestBadge?.name || t('common.noneYet')}</div>
             <div className="progress-sub">{latestBadge ? latestBadge.label : t('home.progress.playToUnlock')}</div>
           </div>
         </div>
@@ -305,9 +305,9 @@ export default function HomeView() {
         <section className="section">
           <div className="section-header">
             <div className="section-title">
-              <div className="wood-header">Daily quests</div>
+              <div className="wood-header">{t('home.dailyQuests.title')}</div>
             </div>
-            <div className="section-link">Resets at {nextResetTime}</div>
+            <div className="section-link">{t('home.dailyQuests.resetsAt', { time: nextResetTime })}</div>
           </div>
           <section className="section" style={{ marginTop: '5px',  }}></section>
           {daily.tasks.map((task, index) => {
@@ -339,7 +339,7 @@ export default function HomeView() {
                   onClick={() => canClaimReward && handleDailyClaim(task.id)}
                   disabled={!canClaimReward || claimingTaskId === task.id}
                 >
-                  {task.rewardClaimed ? 'Claimed' : canClaimReward ? 'Claim' : 'In Progress'}
+                  {task.rewardClaimed ? t('home.quest.claimed') : canClaimReward ? t('home.quest.claim') : t('home.quest.locked')}
                 </button>
               </div>
             );

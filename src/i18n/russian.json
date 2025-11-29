@@ -44,13 +44,39 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "Недавно изученные буквы"
+    },
+    "progress": {
+      "level": "Уровень {{level}}",
+      "heading": "Прогресс сегодня",
+      "streak": "Серия",
+      "days": "{{count}} дней",
+      "resetsAt": "Сброс в 00:00 Азия/Иерусалим ({{time}})",
+      "starLevel": "Уровень звезд",
+      "totalStars": "{{count}} ⭐ всего",
+      "toNextLevel": "{{current}} / {{total}} ⭐ до следующего уровня",
+      "latestBadge": "Последний значок",
+      "tier": "Уровень {{tier}}",
+      "playToUnlock": "Сыграйте в сеанс, чтобы начать разблокировать достижения."
+    },
     "languagePicker": {
       "label": "Практика языка",
       "helper": "В любой момент переключитесь на обучение по другому сценарию."
     },
     "cta": {
       "start": "Начать новый прогон",
-      "practice": "Письмо о практике"
+      "practice": "Письмо о практике",
+      "play": "Играть"
+    },
+    "quest": {
+      "claim": "Требовать",
+      "claimed": "Заявлено",
+      "locked": "В Процессе"
+    },
+    "dailyQuests": {
+      "title": "Ежедневные задания",
+      "resetsAt": "Сброс в {{time}}"
     }
   },
   "game": {
@@ -154,12 +180,19 @@
     "next": "Далее: {{label}}",
     "complete": "Все уровни завершены",
     "earnStars": "Заработайте +{{stars}} ⭐, когда разблокируете этот уровень.",
-    "maxed": "Значок полностью освоен — наслаждайтесь сиянием!"
+    "maxed": "Значок полностью освоен — наслаждайтесь сиянием!",
+    "claimStarsAria": "Получить {{stars}} звезд для {{label}}"
   },
   "learn": {
     "title": "Учиться",
     "intro": "Погрузитесь в тщательно подобранные уроки, чтобы освоить каждую букву. Скоро здесь появятся свежие обучающие модули!",
     "body": "А до тех пор продолжайте исследовать реку и регулярно посещайте ее, чтобы получить практические занятия под руководством гида, советы по произношению и информацию о культуре."
+  },
+  "settings": {
+    "title": "Настройки",
+    "subtitle": "Настройте свои предпочтения",
+    "languageSettings": "Настройки языка",
+    "gameSettings": "Настройки игры"
   },
   "badges": {
     "firstFlow": {
@@ -201,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "Ежедневный значок",
+      "claimStars": "Заберите свои звезды",
+      "rewardsCollected": "Награды собраны",
+      "completeQuests": "Выполняйте задания, чтобы заработать звезды",
+      "starsReady": "У вас есть +{{stars}} ⭐ готовых по завершенным заданиям.",
+      "finishQuests": "Завершите задания, чтобы разблокировать их звездные награды."
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "Разминка",
+        "description": "Сыграйте два быстрых забега, чтобы взбудоражить течение."
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "Фокус",
+        "description": "Поймайте пять идеальных совпадений с {{letter}}."
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "Специи",
+        "description": "Выиграйте раунд с активным {{constraint}}."
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "Режим эксперта активен",
+      "fast-flow": "Быстрый поток активен",
+      "no-intros": "Без вступлений включено"
     }
   },
   "wordRiver": {
@@ -248,5 +281,13 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "common": {
+    "close": "Закрыть",
+    "viewDetails": "Посмотреть детали",
+    "player": "Игрок",
+    "patientPaddler": "Терпеливый Гребец",
+    "noneYet": "Пока нет",
+    "play": "Играть"
   }
 }

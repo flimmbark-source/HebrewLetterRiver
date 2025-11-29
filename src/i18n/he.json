@@ -44,13 +44,39 @@
         }
       }
     },
+    "recentLetters": {
+      "title": "אותיות שנלמדו לאחרונה"
+    },
+    "progress": {
+      "level": "רמה {{level}}",
+      "heading": "התקדמות היום",
+      "streak": "רצף",
+      "days": "{{count}} ימים",
+      "resetsAt": "מתאפס ב-00:00 אסיה/ירושלים ({{time}})",
+      "starLevel": "רמת כוכבים",
+      "totalStars": "{{count}} ⭐ סה\"כ",
+      "toNextLevel": "{{current}} / {{total}} ⭐ לרמה הבאה",
+      "latestBadge": "תג אחרון",
+      "tier": "דרג {{tier}}",
+      "playToUnlock": "שחק מושב כדי להתחיל לפתוח הישגים."
+    },
     "languagePicker": {
       "label": "שפת תרגול",
       "helper": "החליפו בכל רגע כדי להתאמן בכתב אחר."
     },
     "cta": {
       "start": "התחילו ריצה חדשה",
-      "practice": "תרגלו את אות המיקוד"
+      "practice": "תרגלו את אות המיקוד",
+      "play": "שחק"
+    },
+    "quest": {
+      "claim": "תבע",
+      "claimed": "נתבע",
+      "locked": "בתהליך"
+    },
+    "dailyQuests": {
+      "title": "משימות יומיות",
+      "resetsAt": "מתאפס ב-{{time}}"
     }
   },
   "game": {
@@ -154,12 +180,19 @@
     "next": "הבא: {{label}}",
     "complete": "כל הדרגות הושלמו",
     "earnStars": "קבלו +{{stars}} ⭐ כאשר תפתחו את הדרגה הזו.",
-    "maxed": "התג שולט לחלוטין — תיהנו מהזוהר!"
+    "maxed": "התג שולט לחלוטין — תיהנו מהזוהר!",
+    "claimStarsAria": "תבע {{stars}} כוכבים עבור {{label}}"
   },
   "learn": {
     "title": "לימוד",
     "intro": "צללו לשיעורים שנבחרו בקפידה כדי לשלוט בכל אות. בקרוב יופיעו כאן יחידות למידה חדשות!",
     "body": "עד אז, המשיכו לחקור את הנהר וחזרו לכאן באופן קבוע לתרגולים מודרכים, טיפים להגייה ותובנות תרבותיות."
+  },
+  "settings": {
+    "title": "הגדרות",
+    "subtitle": "הגדרו את העדפותיכם",
+    "languageSettings": "הגדרות שפה",
+    "gameSettings": "הגדרות משחק"
   },
   "badges": {
     "firstFlow": {
@@ -201,31 +234,31 @@
   },
   "daily": {
     "badge": {
-      "title": "Daily badge",
-      "claimStars": "Claim your stars",
-      "rewardsCollected": "Rewards collected",
-      "completeQuests": "Complete quests to earn stars",
-      "starsReady": "You have +{{stars}} ⭐ ready across completed quests.",
-      "finishQuests": "Finish quests to unlock their star rewards."
+      "title": "תג יומי",
+      "claimStars": "תבע את הכוכבים שלך",
+      "rewardsCollected": "פרסים נאספו",
+      "completeQuests": "השלם משימות כדי לזכות בכוכבים",
+      "starsReady": "יש לך +{{stars}} ⭐ מוכנים במשימות שהושלמו.",
+      "finishQuests": "סיים משימות כדי לפתוח את פרסי הכוכבים שלהן."
     },
     "tasks": {
       "warmup": {
-        "title": "Warm-Up",
-        "description": "Play two quick runs to stir the current."
+        "title": "חימום",
+        "description": "שחק שני ריצות מהירות כדי לערבב את הזרם."
       },
       "focus": {
-        "title": "Focus",
-        "description": "Catch five perfect matches featuring {{letter}}."
+        "title": "מיקוד",
+        "description": "תפוס חמישה התאמות מושלמות עם {{letter}}."
       },
       "spice": {
-        "title": "Spice",
-        "description": "Win a round with the {{constraint}} active."
+        "title": "תבלין",
+        "description": "נצח סיבוב עם {{constraint}} פעיל."
       }
     },
     "constraints": {
-      "expert-mode": "Expert Mode run",
-      "fast-flow": "Fast Flow speed active",
-      "no-intros": "No Introductions enabled"
+      "expert-mode": "ריצת מצב מומחה",
+      "fast-flow": "מהירות זרימה מהירה פעילה",
+      "no-intros": "אין הקדמות מופעלות"
     }
   },
   "wordRiver": {
@@ -248,5 +281,13 @@
     "targets": {
       "fallback": "Meaning"
     }
+  },
+  "common": {
+    "close": "סגור",
+    "viewDetails": "צפה בפרטים",
+    "player": "שחקן",
+    "patientPaddler": "חותר סבלני",
+    "noneYet": "עדיין אף אחד",
+    "play": "שחק"
   }
 }
