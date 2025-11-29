@@ -85,14 +85,14 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
   };
 
   const cardClass = canClaim
-    ? 'cursor-pointer hover:scale-[1.02] bg-gradient-to-br from-cyan-900/40 to-slate-900/60 border-cyan-600/50 shadow-cyan-500/20 animate-pulse hover:border-cyan-500/60'
-    : 'cursor-default bg-slate-900/60 border-slate-800 hover:border-cyan-500/40';
+    ? 'cursor-pointer hover:scale-[1.02] border-arcade-accent-gold/50 shadow-arcade-button animate-pulse hover:border-arcade-accent-gold/70'
+    : 'cursor-default border-arcade-panel-border hover:border-arcade-accent-orange/40';
 
-  const highlightClass = celebratingTier !== null ? 'ring-2 ring-amber-400/70 shadow-amber-400/40 animate-pulse' : '';
+  const highlightClass = celebratingTier !== null ? 'ring-2 ring-arcade-accent-gold/70 shadow-arcade-button animate-pulse' : '';
 
   return (
     <div
-      className={`rounded-3xl border p-5 shadow-inner transition sm:p-6 ${cardClass} ${highlightClass}`}
+      className={`progress-card-small p-5 transition sm:p-6 ${cardClass} ${highlightClass}`}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role={canClaim ? 'button' : undefined}
@@ -100,22 +100,22 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
       aria-label={canClaim ? `Claim ${firstUnclaimed.stars} stars for ${tierProgressLabel}` : undefined}
     >
       <div className="flex items-start justify-between gap-4">
-        <h3 className="text-base font-semibold text-white sm:text-lg">{badgeSummary}</h3>
-        <span className="flex-shrink-0 rounded-full border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-200">
-          {isClaiming ? translate('achievements.claiming') : tierProgressLabel}
+        <h3 className="text-base font-semibold text-arcade-text-main sm:text-lg">{badgeSummary}</h3>
+        <span className="pill-counter">
+          <span className="value">{isClaiming ? translate('achievements.claiming') : tierProgressLabel}</span>
         </span>
       </div>
       <div className="mt-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-slate-300">{currentDisplay}</span>
+          <span className="text-sm text-arcade-text-soft">{currentDisplay}</span>
           {activeTier?.stars > 0 && (
-            <span className={`text-sm font-semibold ${canClaim ? 'text-amber-300 animate-pulse' : 'text-amber-200'}`}>
+            <span className={`text-sm font-semibold ${canClaim ? 'text-arcade-accent-gold animate-pulse' : 'text-arcade-text-soft'}`}>
               {canClaim && '✨ '}+{activeTier.stars} ⭐{canClaim && ' ✨'}
             </span>
           )}
         </div>
-        <div className="mt-2 h-2 rounded-full bg-slate-800">
-          <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400 transition-all duration-300" style={{ width: `${percent}%` }} />
+        <div className="progress-bar-shell mt-2">
+          <div className="progress-bar-fill transition-all duration-300" style={{ width: `${percent}%` }} />
         </div>
       </div>
     </div>
@@ -219,44 +219,48 @@ export default function AchievementsView() {
   const levelName = t(`achievements.levelNames.${Math.min(level, 10)}`, { defaultValue: t('achievements.levelNames.10') });
 
   return (
-    <div className="space-y-8 sm:space-y-10">
-      <header className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-between">
-        {/* Left: Title */}
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">{t('achievements.title')}</h1>
-
-        {/* Center: Level with name */}
-        <div className="flex flex-col items-center text-center">
-          <p className="text-2xl font-bold text-white">{t('home.progress.level', { level })}</p>
-          <p className="mt-1 text-sm font-semibold text-cyan-400">{levelName}</p>
-        </div>
-
-        {/* Right: Progress bar */}
-        <div className="w-full text-center sm:w-auto sm:min-w-[240px] sm:text-right">
-          <p className="text-xs uppercase tracking-wider text-slate-400">{t('achievements.profile.starsToNextLevel')}</p>
-          <div className="mt-2 h-2 rounded-full bg-slate-800">
+    <>
+      <header className="hero-card">
+        <h1 className="hero-title">{t('achievements.title')}</h1>
+        <div className="flex flex-col gap-3 mt-2">
+          <div className="flex items-center justify-between">
+            <p className="text-lg font-bold text-arcade-text-main font-heading">{t('home.progress.level', { level })}</p>
+            <p className="text-sm font-semibold text-arcade-text-soft">{levelName}</p>
+          </div>
+          <div className="progress-bar-shell">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400"
+              className="progress-bar-fill"
               style={{ width: `${levelPercent}%` }}
             />
           </div>
-          <p className="mt-2 text-sm font-semibold text-slate-300">
-            {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-arcade-text-muted">{t('achievements.profile.starsToNextLevel')}</p>
+            <p className="text-sm font-semibold text-arcade-text-soft">
+              {formatNumber(levelProgress)} / {formatNumber(starsPerLevel)} ⭐
+            </p>
+          </div>
         </div>
       </header>
 
-      <section className="grid gap-5 sm:gap-6 lg:grid-cols-2">
-        {badgesCatalog.map((badge) => (
-          <BadgeCard
-            key={badge.id}
-            badge={badge}
-            progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
-            translate={t}
-            gameName={gameName}
-            onClaim={handleBadgeClaim}
-          />
-        ))}
+      <section className="section">
+        <div className="section-header">
+          <div className="section-title">
+            <div className="wood-header">Achievements</div>
+          </div>
+        </div>
+        <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
+          {badgesCatalog.map((badge) => (
+            <BadgeCard
+              key={badge.id}
+              badge={badge}
+              progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
+              translate={t}
+              gameName={gameName}
+              onClaim={handleBadgeClaim}
+            />
+          ))}
+        </div>
       </section>
-    </div>
+    </>
   );
 }

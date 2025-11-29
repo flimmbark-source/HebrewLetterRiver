@@ -171,7 +171,7 @@ export default function HomeView() {
           <div className="player-text">
             <div className="player-name">Player</div>
             <div className="player-level">{t('home.progress.level', { level })}</div>
-            <div className="player-rank">{latestBadge?.label || 'Beginner'}</div>
+            <div className="player-rank">{latestBadge?.label || 'Patient Paddler'}</div>
           </div>
         </div>
         <div className="top-counters">
@@ -179,64 +179,64 @@ export default function HomeView() {
             <span className="icon">⭐</span>
             <span className="value">{formatNumber(totalStarsEarned)}</span>
           </div>
-          <button
-            onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
-            className="tiny-pill"
-            aria-label={t('app.languagePicker.label')}
-          >
-            🌎
-          </button>
-        </div>
-      </header>
-
-      {/* App Language Selector Popup */}
-      {appLanguageSelectorExpanded && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 backdrop-blur">
-          <div className="w-full max-w-lg rounded-3xl border-4 border-arcade-wood-dark bg-gradient-to-br from-arcade-panel-light to-arcade-panel-medium p-6 shadow-arcade-frame">
+          <div style={{ position: 'relative' }}>
             <button
-              onClick={() => setAppLanguageSelectorExpanded(false)}
-              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-arcade-accent-red text-white shadow-arcade-sm"
-              aria-label="Close"
+              onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
+              className="tiny-pill"
+              aria-label={t('app.languagePicker.label')}
             >
-              <XIcon className="h-4 w-4" />
+              🌎
             </button>
 
-            <h3 className="mb-3 text-center font-heading text-lg font-bold text-arcade-text-main">
-              {t('app.languagePicker.label')}
-            </h3>
+            {/* App Language Selector Popup */}
+            {appLanguageSelectorExpanded && (
+              <div className="language-selector-popup">
+                <button
+                  onClick={() => setAppLanguageSelectorExpanded(false)}
+                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-arcade-accent-red text-white shadow-arcade-sm z-10"
+                  aria-label="Close"
+                >
+                  <XIcon className="h-3 w-3" />
+                </button>
 
-            <select
-              id="home-app-language-select"
-              value={appLanguageId}
-              onChange={(event) => selectAppLanguage(event.target.value)}
-              className="w-full rounded-2xl border-2 border-arcade-panel-border bg-arcade-panel-light px-4 py-2.5 text-sm font-semibold text-arcade-text-main shadow-inner"
-            >
-              {languageOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.name}
-                </option>
-              ))}
-            </select>
+                <h3 className="mb-3 text-center font-heading text-sm font-bold text-arcade-text-main">
+                  {t('app.languagePicker.label')}
+                </h3>
 
-            <h3 className="mb-3 mt-5 text-center font-heading text-lg font-bold text-arcade-text-main">
-              {t('home.languagePicker.label')}
-            </h3>
+                <select
+                  id="home-app-language-select"
+                  value={appLanguageId}
+                  onChange={(event) => selectAppLanguage(event.target.value)}
+                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
+                >
+                  {languageOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
 
-            <select
-              id="home-practice-language-select"
-              value={languageId}
-              onChange={(event) => selectLanguage(event.target.value)}
-              className="w-full rounded-2xl border-2 border-arcade-panel-border bg-arcade-panel-light px-4 py-2.5 text-sm font-semibold text-arcade-text-main shadow-inner"
-            >
-              {languageOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.name}
-                </option>
-              ))}
-            </select>
+                <h3 className="mb-2 mt-4 text-center font-heading text-sm font-bold text-arcade-text-main">
+                  {t('home.languagePicker.label')}
+                </h3>
+
+                <select
+                  id="home-practice-language-select"
+                  value={languageId}
+                  onChange={(event) => selectLanguage(event.target.value)}
+                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
+                >
+                  {languageOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </header>
 
       {/* Hero Card */}
       <section className="hero-card">
