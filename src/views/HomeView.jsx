@@ -298,10 +298,10 @@ export default function HomeView() {
             const currentProgress = Math.min(task.progress ?? 0, task.goal);
 
             return (
-              <div key={task.id} className="quest-card-arcade">
+              <div key={task.id} className="quest-card">
                 <div className="quest-left">
                   <div className="quest-top-row">
-                    <div className="quest-title-arcade">{task.description}</div>
+                    <div className="quest-title">{task.description}</div>
                     {rewardValue > 0 && (
                       <div className="quest-reward-inline">
                         +{rewardValue} <span className="star-inline">★</span>

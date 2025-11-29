@@ -168,57 +168,55 @@ function Shell() {
   );
 
   return (
-    <div className="phone-frame" dir={direction}>
-      <div className="app-shell">
-        <LanguageOnboardingModal />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/home" element={<HomeView />} />
-            <Route path="/achievements" element={<AchievementsView />} />
-            <Route path="/learn" element={<LearnView />} />
-            <Route path="/word-river" element={<WordRiverView />} />
-          </Routes>
-        </main>
-        <nav className="bottom-nav">
-          <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <div className="nav-icon-shell">
-              <span>🏠</span>
+    <div className="app-shell" dir={direction}>
+      <LanguageOnboardingModal />
+      <main className="flex-1">
+        <Routes>
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={<HomeView />} />
+          <Route path="/achievements" element={<AchievementsView />} />
+          <Route path="/learn" element={<LearnView />} />
+          <Route path="/word-river" element={<WordRiverView />} />
+        </Routes>
+      </main>
+      <nav className="bottom-nav">
+        <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-icon-shell">
+            <span>🏠</span>
+          </div>
+          <span className="label">{t('app.nav.home')}</span>
+        </NavLink>
+        <NavLink to="/learn" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-icon-shell">
+            <span>📚</span>
+          </div>
+          <span className="label">{t('app.nav.learn')}</span>
+        </NavLink>
+        <button
+          type="button"
+          onClick={handlePlay}
+          className="nav-item active"
+        >
+          <div className="play-diamond-shell">
+            <div className="play-diamond">
+              <span>▶</span>
             </div>
-            <span className="label">{t('app.nav.home')}</span>
-          </NavLink>
-          <NavLink to="/learn" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <div className="nav-icon-shell">
-              <span>📚</span>
-            </div>
-            <span className="label">{t('app.nav.learn')}</span>
-          </NavLink>
-          <button
-            type="button"
-            onClick={handlePlay}
-            className="nav-item active"
-          >
-            <div className="play-diamond-shell">
-              <div className="play-diamond">
-                <span>▶</span>
-              </div>
-            </div>
-            <span className="label">{t('app.nav.play')}</span>
-          </button>
-          <NavLink to="/achievements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <div className="nav-icon-shell">
-              <span>🏆</span>
-            </div>
-            <span className="label">{t('app.nav.achievements')}</span>
-          </NavLink>
-          <NavLink to="/word-river" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <div className="nav-icon-shell">
-              <span>⚙️</span>
-            </div>
-            <span className="label">Settings</span>
-          </NavLink>
-        </nav>
-      </div>
+          </div>
+          <span className="label">{t('app.nav.play')}</span>
+        </button>
+        <NavLink to="/achievements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-icon-shell">
+            <span>🏆</span>
+          </div>
+          <span className="label">{t('app.nav.achievements')}</span>
+        </NavLink>
+        <NavLink to="/word-river" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-icon-shell">
+            <span>⚙️</span>
+          </div>
+          <span className="label">Settings</span>
+        </NavLink>
+      </nav>
     </div>
   );
 }

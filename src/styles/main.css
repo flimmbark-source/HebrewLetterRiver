@@ -8,26 +8,31 @@ body {
 
 * { box-sizing: border-box; }
 
-/* Phone frame wrapper */
-.phone-frame {
-  width: 320px;
-  max-width: 100%;
-  border-radius: 30px;
-  padding: 16px 10px;
-  background: radial-gradient(circle at top, #ffe3b5 0%, #f7b372 55%, #e98445 100%);
-  box-shadow: 0 18px 36px rgba(169, 77, 21, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.6);
-}
-
-/* App shell container */
+/* App shell container - responsive */
 .app-shell {
-  border-radius: 26px;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  border-radius: 0;
   background: linear-gradient(180deg, #fffaf0 0%, #ffe9c9 45%, #ffe2b8 100%);
   padding: 12px 12px 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow: hidden;
+  overflow-x: hidden;
   box-shadow: inset 0 3px 0 rgba(255,255,255,0.8);
+}
+
+/* Desktop styling */
+@media (min-width: 768px) {
+  .app-shell {
+    max-width: 768px;
+    margin: 0 auto;
+    border-radius: 26px;
+    min-height: auto;
+    padding: 16px 20px 14px;
+    gap: 14px;
+  }
 }
 
 /* Wooden header bar */
@@ -306,8 +311,8 @@ body {
   transition: width 0.3s ease;
 }
 
-/* Quest card - arcade style */
-.quest-card-arcade {
+/* Quest card */
+.quest-card {
   background: linear-gradient(180deg, #fff5dd 0%, #ffe8c4 55%, #ffd7a6 100%);
   border-radius: 22px;
   padding: 8px 10px 8px 12px;
@@ -317,6 +322,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  margin-bottom: 10px;
 }
 
 .quest-left {
@@ -333,7 +339,7 @@ body {
   gap: 8px;
 }
 
-.quest-title-arcade {
+.quest-title {
   font-size: 13px;
   color: #4a2208;
   font-weight: 700;
