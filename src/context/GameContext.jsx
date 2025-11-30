@@ -115,28 +115,26 @@ function GameCanvas({ fontClass }) {
         <div className="relative flex flex-col">
           <div
             id="top-bar"
-            className="text-sm shadow-lg sm:text-base"
+            className="relative text-sm shadow-lg sm:text-base"
             style={{ background: 'rgba(255, 229, 201, 0.9)' }}
           >
-            <div className="flex flex-1 flex-col items-start justify-center gap-1 text-left">
-              <span
-                id="back-to-menu-button"
-                className="text-xs font-semibold uppercase tracking-wide"
-                style={{ color: '#b07737' }}
-              >
-                {t('game.controls.exitToMenu')}
-              </span>
-              <div className="inline-flex items-baseline gap-2">
+            <span
+              id="back-to-menu-button"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-wide sm:left-6"
+              style={{ color: '#b07737' }}
+            >
+              {t('game.controls.exitToMenu')}
+            </span>
+            <div className="flex w-full items-center justify-center gap-4 sm:gap-6">
+              <div className="inline-flex items-center gap-2 text-center">
                 <span className="font-semibold" style={{ color: '#6c3b14' }}>{t('game.labels.level')}</span>
                 <span id="level" className="text-2xl font-bold" style={{ color: '#ff9247' }}>
                   1
                 </span>
               </div>
-            </div>
-            <div className="flex shrink-0 items-center gap-4 sm:gap-6">
-              <div className="text-left">
+              <div className="flex items-center gap-2 text-center">
                 <span className="font-semibold" style={{ color: '#6c3b14' }}>{t('game.labels.score')}</span>
-                <span id="score" className="ml-2 text-2xl font-bold" style={{ color: '#ffce4a' }}>
+                <span id="score" className="text-2xl font-bold" style={{ color: '#ffce4a' }}>
                   0
                 </span>
               </div>
