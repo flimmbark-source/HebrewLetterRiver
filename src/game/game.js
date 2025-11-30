@@ -340,6 +340,34 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     dropZones = Array.from(document.querySelectorAll('.catcher-box'));
   }
 
+  function measureBucketTextWidth() {
+    if (!choicesContainer || typeof window === 'undefined') {
+      return BUCKET_MIN_WIDTH_FALLBACK;
+    }
+    const buckets = choicesContainer.querySelectorAll('.catcher-box');
+    if (!buckets.length) return BUCKET_MIN_WIDTH_FALLBACK;
+    const measurementElement = ensureBucketMeasurementElement();
+    if (!measurementElement) return BUCKET_MIN_WIDTH_FALLBACK;
+
+    let maxWidth = 0;
+    buckets.forEach((bucket) => {
+      measurementElement.className = bucket.className;
+      measurementElement.textContent = bucket.textContent ?? '';
+      measurementElement.style.padding = '0';
+      measurementElement.style.border = '0';
+      const rect = measurementElement.getBoundingClientRect();
+      measurementElement.style.padding = '';
+      measurementElement.style.border = '';
+      if (rect.width > maxWidth) maxWidth = rect.width;
+    });
+
+    if (!Number.isFinite(maxWidth) || maxWidth <= 0) {
+      return BUCKET_MIN_WIDTH_FALLBACK;
+    }
+
+    return Math.ceil(maxWidth);
+  }
+
   function clearPendingBucketLayout() {
     if (pendingBucketLayoutHandle === null) return;
     if (pendingBucketLayoutIsAnimationFrame) {
@@ -392,24 +420,40 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       return;
     }
     if (typeof window === 'undefined') return;
+    const buckets = choicesContainer.querySelectorAll('.catcher-box');
+    if (!buckets.length) return;
     const containerWidth = choicesContainer.clientWidth;
     if (containerWidth <= 0) return;
     const minBucketWidth = getBucketMinWidth();
+    const minBucketTextWidth = measureBucketTextWidth();
+    const bucketStyle = window.getComputedStyle?.(buckets[0]);
+    const horizontalPadding =
+      (parseFloat(bucketStyle?.paddingLeft) || 0) + (parseFloat(bucketStyle?.paddingRight) || 0);
+    const minReadableWidth = Math.max(
+      BUCKET_MIN_WIDTH_FALLBACK,
+      minBucketTextWidth + horizontalPadding
+    );
     const computed = window.getComputedStyle?.(choicesContainer);
     const gapValueRaw = computed?.columnGap || computed?.gap || `${LAYOUT_GAP_FALLBACK}px`;
     const gapValue = parseFloat(gapValueRaw) || LAYOUT_GAP_FALLBACK;
     const totalGap = gapValue * Math.max(count - 1, 0);
     const availableWidth = containerWidth - totalGap;
+    const targetWidth = availableWidth / count;
     if (availableWidth / count >= minBucketWidth) {
       choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(${minBucketWidth}px, 1fr))`;
+      return;
+    }
+    if (targetWidth >= minReadableWidth) {
+      const minWidth = Math.max(minReadableWidth, targetWidth);
+      choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(${minWidth}px, 1fr))`;
       return;
     }
     const numerator = containerWidth + gapValue;
     const maxColumns = Math.max(
       1,
-      Math.min(count, Math.floor(numerator / (minBucketWidth + gapValue)))
+      Math.min(count, Math.floor(numerator / (minReadableWidth + gapValue)))
     );
-    choicesContainer.style.gridTemplateColumns = `repeat(${maxColumns}, minmax(${minBucketWidth}px, 1fr))`;
+    choicesContainer.style.gridTemplateColumns = `repeat(${maxColumns}, minmax(${minReadableWidth}px, 1fr))`;
   }
 
   if (playArea) {
