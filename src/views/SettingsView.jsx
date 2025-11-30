@@ -61,13 +61,6 @@ export default function SettingsView() {
 
   return (
     <>
-      <header className="hero-card">
-        <h1 className="hero-title">{t('settings.title')}</h1>
-        <p className="hero-body">
-          <span>{t('settings.subtitle')}</span>
-        </p>
-      </header>
-
       {/* Language Settings */}
       <section className="section">
         <div className="section-header">

@@ -41,6 +41,7 @@ export default {
       boxShadow: {
         'arcade-sm': '0 3px 0 rgba(133, 63, 21, 1), 0 6px 10px rgba(133, 63, 21, 0.7)',
         'arcade': '0 4px 0 rgba(176, 104, 38, 1), 0 8px 12px rgba(176, 104, 38, 0.7)',
+        'arcade-md': '0 4px 0 rgba(214, 140, 64, 1), 0 8px 16px rgba(255, 146, 71, 0.6)',
         'arcade-lg': '0 5px 0 #d86a2a, 0 10px 14px rgba(216, 106, 42, 0.85)',
         'arcade-pill': '0 3px 0 rgba(176, 104, 38, 1), 0 6px 10px rgba(176, 104, 38, 0.7)',
         'arcade-card': '0 8px 14px rgba(199, 124, 52, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.8)',
