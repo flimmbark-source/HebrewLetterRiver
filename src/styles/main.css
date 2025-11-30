@@ -738,16 +738,10 @@ body {
 /* === SOUND BUCKETS === */
 .sound-buckets-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Mobile: 2 columns */
+  grid-template-columns: repeat(auto-fit, minmax(160px, max-content));
   gap: var(--space-1); /* 8px between buckets */
   padding: var(--space-2); /* 16px from edges */
-}
-
-/* Desktop: 4 columns */
-@media (min-width: 768px) {
-  .sound-buckets-container {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  justify-content: start; /* Allow buckets to shrink to their content width */
 }
 
 .sound-bucket {
