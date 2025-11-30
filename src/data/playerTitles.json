@@ -1,0 +1,57 @@
+[
+  {
+    "levels": [1, 2, 3, 4, 5],
+    "baseWord": "Paddler",
+    "adjectives": [
+      "Patient",
+      "Ponderous",
+      "Perceptive",
+      "Persistent",
+      "Powerful"
+    ]
+  },
+  {
+    "levels": [6, 7, 8, 9, 10],
+    "baseWord": "Surfer",
+    "adjectives": [
+      "Safe",
+      "Swift",
+      "Scholarly",
+      "Stellar",
+      "Supreme"
+    ]
+  },
+  {
+    "levels": [11, 12, 13, 14, 15],
+    "baseWord": "Navigator",
+    "adjectives": [
+      "Nimble",
+      "Noble",
+      "Noted",
+      "Notable",
+      "Natural"
+    ]
+  },
+  {
+    "levels": [16, 17, 18, 19, 20],
+    "baseWord": "Voyager",
+    "adjectives": [
+      "Valiant",
+      "Vibrant",
+      "Vigilant",
+      "Victorious",
+      "Visionary"
+    ]
+  },
+  {
+    "levels": [21, 22, 23, 24, 25],
+    "baseWord": "Mariner",
+    "adjectives": [
+      "Mighty",
+      "Masterful",
+      "Majestic",
+      "Miraculous",
+      "Mythical"
+    ]
+  }
+]

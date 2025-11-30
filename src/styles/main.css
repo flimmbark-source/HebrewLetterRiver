@@ -189,12 +189,59 @@ body {
   top: 0;
   right: 0;
   width: 220px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
   background: linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%);
   border-radius: 18px;
   padding: 20px 12px 12px;
   border: 2px solid rgba(235, 179, 105, 0.95);
   box-shadow: 0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6);
   z-index: 1000;
+}
+
+/* Prevent popup from going off screen on mobile */
+@media (max-width: 480px) {
+  .language-selector-popup {
+    position: fixed;
+    right: 12px;
+    left: auto;
+    top: 60px;
+    width: calc(100vw - 24px);
+    max-width: 300px;
+  }
+}
+
+/* Letter tooltip */
+.letter-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%);
+  border: 2px solid rgba(235, 179, 105, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6);
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a2208;
+  z-index: 10;
+  font-family: 'Nunito', sans-serif;
+  pointer-events: none;
+}
+
+/* Prevent tooltips from going off screen edges */
+@media (max-width: 480px) {
+  .letter-tooltip {
+    left: auto;
+    right: 0;
+    transform: none;
+    max-width: 180px;
+    white-space: normal;
+  }
 }
 
 /* Hero card */

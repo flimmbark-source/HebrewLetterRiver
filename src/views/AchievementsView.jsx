@@ -4,6 +4,7 @@ import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { on } from '../lib/eventBus.js';
+import { getPlayerTitle } from '../utils/playerTitles.js';
 
 function XIcon({ className = '' }) {
   return (
@@ -265,7 +266,7 @@ export default function AchievementsView() {
                 <div className="player-level-progress-fill" style={{ width: `${levelPercent}%` }}></div>
               </div>
             </div>
-            <div className="player-rank">{latestBadge?.label || t('common.patientPaddler')}</div>
+            <div className="player-rank">{getPlayerTitle(level)}</div>
           </div>
         </div>
         <div className="top-counters">

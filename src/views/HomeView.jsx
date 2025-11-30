@@ -6,6 +6,7 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
 import { classNames } from '../lib/classNames.js';
+import { getPlayerTitle } from '../utils/playerTitles.js';
 import { loadLanguage } from '../lib/languageLoader.js';
 
 function GlobeIcon({ className = '' }) {
@@ -141,7 +142,7 @@ export default function HomeView() {
                 <div className="player-level-progress-fill" style={{ width: `${starsProgress * 100}%` }}></div>
               </div>
             </div>
-            <div className="player-rank">{latestBadge?.label || t('common.patientPaddler')}</div>
+            <div className="player-rank">{getPlayerTitle(level)}</div>
           </div>
         </div>
         <div className="top-counters">
@@ -233,26 +234,7 @@ export default function HomeView() {
             >
               {letter.symbol}
               {hoveredLetter === index && (
-                <span
-                  style={{
-                    position: 'absolute',
-                    bottom: '100%',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    marginBottom: '8px',
-                    padding: '6px 12px',
-                    background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%)',
-                    border: '2px solid rgba(235, 179, 105, 0.95)',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6)',
-                    whiteSpace: 'nowrap',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#4a2208',
-                    zIndex: 10,
-                    fontFamily: 'Nunito, sans-serif'
-                  }}
-                >
+                <span className="letter-tooltip">
                   {letter.name} ({letter.sound})
                 </span>
               )}
@@ -294,7 +276,7 @@ export default function HomeView() {
             <div className="progress-icon cyan">🏅</div>
             <div className="progress-label">{t('home.progress.latestBadge')}</div>
             <div className="progress-value">{latestBadge?.name || t('common.noneYet')}</div>
-            <div className="progress-sub">{latestBadge ? latestBadge.label : t('home.progress.playToUnlock')}</div>
+            <div className="progress-sub">{latestBadge ? latestBadge.summary : t('home.progress.playToUnlock')}</div>
           </div>
         </div>
       </section>
