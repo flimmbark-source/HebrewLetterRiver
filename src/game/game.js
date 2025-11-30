@@ -342,12 +342,12 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   function measureBucketTextWidth() {
     if (!choicesContainer || typeof window === 'undefined') {
-      return BUCKET_MIN_WIDTH_FALLBACK;
+      return 0;
     }
     const buckets = choicesContainer.querySelectorAll('.catcher-box');
-    if (!buckets.length) return BUCKET_MIN_WIDTH_FALLBACK;
+    if (!buckets.length) return 0;
     const measurementElement = ensureBucketMeasurementElement();
-    if (!measurementElement) return BUCKET_MIN_WIDTH_FALLBACK;
+    if (!measurementElement) return 0;
 
     let maxWidth = 0;
     buckets.forEach((bucket) => {
@@ -362,7 +362,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     });
 
     if (!Number.isFinite(maxWidth) || maxWidth <= 0) {
-      return BUCKET_MIN_WIDTH_FALLBACK;
+      return 0;
     }
 
     return Math.ceil(maxWidth);
@@ -429,10 +429,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     const bucketStyle = window.getComputedStyle?.(buckets[0]);
     const horizontalPadding =
       (parseFloat(bucketStyle?.paddingLeft) || 0) + (parseFloat(bucketStyle?.paddingRight) || 0);
-    const minReadableWidth = Math.max(
-      BUCKET_MIN_WIDTH_FALLBACK,
-      minBucketTextWidth + horizontalPadding
-    );
+    const measuredReadableWidth = minBucketTextWidth + horizontalPadding;
+    const minReadableWidth = measuredReadableWidth > 0
+      ? Math.ceil(measuredReadableWidth)
+      : BUCKET_MIN_WIDTH_FALLBACK;
     const computed = window.getComputedStyle?.(choicesContainer);
     const gapValueRaw = computed?.columnGap || computed?.gap || `${LAYOUT_GAP_FALLBACK}px`;
     const gapValue = parseFloat(gapValueRaw) || LAYOUT_GAP_FALLBACK;
