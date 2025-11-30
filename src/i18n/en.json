@@ -130,7 +130,7 @@
     },
     "setup": {
       "title": "World Letter River",
-      "subtitleFallback": "Drag the moving item to the correct box!",
+      "subtitleFallback": "Drag the letters to the correct boxes!",
       "prompt": "Choose what you want to practice:",
       "installDescription": "Install App",
       "defaultNoun": "item",
