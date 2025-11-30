@@ -177,7 +177,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
       const card = document.createElement('div');
       card.className =
-        'mode-card flex h-full flex-col border-slate-600 bg-slate-800/70 transition hover:border-cyan-400/80';
+        'mode-card flex h-full flex-col border-arcade-panel-border bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium transition hover:border-arcade-accent-orange';
 
       const title = document.createElement('span');
       title.className = `mode-card-title text-white ${fontClass}`;
@@ -186,7 +186,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
       if (mode.description) {
         const description = document.createElement('p');
-        description.className = 'mode-card-description text-slate-400';
+        description.className = 'mode-card-description text-arcade-text-soft';
         description.textContent = mode.description;
         card.appendChild(description);
       }
@@ -826,7 +826,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
     const seenInSession = Object.keys(sessionStats);
     if (seenInSession.length === 0) {
-      summaryContainer.innerHTML = `<p class="text-slate-400">${t('game.summary.empty')}</p>`;
+      summaryContainer.innerHTML = `<p class="text-arcade-text-soft">${t('game.summary.empty')}</p>`;
       return;
     }
 
@@ -837,7 +837,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       const itemData = resolveItemById(key);
       if (!itemData) return;
       const span = document.createElement('span');
-      span.className = `${fontClass} text-3xl p-2 bg-slate-700 rounded-md cursor-pointer`;
+      span.className = `${fontClass} text-3xl p-2 bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium border-2 border-arcade-panel-border rounded-md cursor-pointer shadow-arcade-sm`;
       span.textContent = itemData.symbol ?? '';
 
       span.addEventListener('mouseenter', (event) => {
@@ -858,7 +858,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     });
 
     const encounteredTitle = document.createElement('h3');
-    encounteredTitle.className = 'text-xl font-bold text-cyan-400 mb-2';
+    encounteredTitle.className = 'text-xl font-bold text-arcade-accent-orange mb-2';
     encounteredTitle.textContent = t('game.summary.heading');
     summaryContainer.appendChild(encounteredTitle);
     summaryContainer.appendChild(encounteredContainer);
@@ -877,11 +877,11 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       if (weakestLinkItem) {
         const weakestLinkContainer = document.createElement('div');
         weakestLinkContainer.innerHTML = `
-            <h3 class="text-xl font-bold text-cyan-400 mb-2">${t('game.summary.weakestLink')}</h3>
-            <p class="mb-3 text-sm text-slate-400">${t('game.summary.weakestLinkDescription')}</p>
+            <h3 class="text-xl font-bold text-arcade-accent-orange mb-2">${t('game.summary.weakestLink')}</h3>
+            <p class="mb-3 text-sm text-arcade-text-soft">${t('game.summary.weakestLinkDescription')}</p>
             <div class="flex items-center justify-center gap-4">
               <span class="${fontClass} text-5xl">${weakestLinkItem.symbol ?? ''}</span>
-              <button id="practice-weakest-btn" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold py-2 px-4 rounded-lg">${t('game.summary.practice')}</button>
+              <button id="practice-weakest-btn" class="bg-gradient-to-b from-arcade-accent-gold to-arcade-accent-orange hover:shadow-arcade-md text-arcade-text-main font-bold py-2 px-4 rounded-lg shadow-arcade-sm border-2 border-arcade-accent-orange">${t('game.summary.practice')}</button>
             </div>`;
         summaryContainer.appendChild(weakestLinkContainer);
         document.getElementById('practice-weakest-btn').addEventListener('click', () => {
@@ -1066,7 +1066,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     itemEl.textContent = itemData.symbol;
     const reducedMotion = reducedMotionToggle.checked;
     const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
-    itemEl.className = `falling-letter font-bold ${fontClass} text-cyan-300 ${animationName}`;
+    itemEl.className = `falling-letter font-bold ${fontClass} text-arcade-text-main ${animationName}`;
     itemEl.style.top = `${Math.random() * 70}%`;
     // Invert slider value: 34 - value (so left=slow, right=fast)
     const sliderValue = parseInt(gameSpeedSlider.value, 10);
@@ -1200,7 +1200,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       const labelText = displayLabel || displaySymbol;
       box.textContent = labelText;
       box.dataset.itemId = choice.id;
-      box.className = 'catcher-box bg-slate-700 text-white font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-slate-600';
+      box.className = 'catcher-box bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium text-arcade-text-main font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-arcade-panel-border shadow-arcade-sm';
       const ariaLabel = getCharacterAriaLabel(choice);
       if (ariaLabel) box.setAttribute('aria-label', ariaLabel);
       box.addEventListener('dragover', (e) => {
@@ -1237,7 +1237,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     const bonusCatcher = document.createElement('div');
     bonusCatcher.textContent = t('game.bonus.catchHere');
     bonusCatcher.dataset.itemId = 'bonus-gem';
-    bonusCatcher.className = 'catcher-box bg-yellow-500 text-slate-900 font-bold py-6 px-2 rounded-lg text-lg transition-all border-2 border-yellow-400 col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5';
+    bonusCatcher.className = 'catcher-box bg-gradient-to-b from-arcade-accent-gold to-arcade-accent-orange text-arcade-text-main font-bold py-6 px-2 rounded-lg text-lg transition-all border-2 border-arcade-accent-orange shadow-arcade-md col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5';
     bonusCatcher.setAttribute('aria-label', t('game.bonus.catchHere'));
     bonusCatcher.addEventListener('dragover', (e) => {
       e.preventDefault();

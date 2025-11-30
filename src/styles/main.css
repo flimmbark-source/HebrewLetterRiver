@@ -1524,11 +1524,11 @@ body {
 }
 .falling-letter.dragging {
   transform: scale(1.2);
-  box-shadow: 0 0 20px rgba(103, 232, 249, 0.5);
+  box-shadow: 0 6px 0 rgba(228, 155, 90, 1), 0 12px 24px rgba(255, 146, 71, 0.6);
 }
 .falling-gem.dragging {
   transform: scale(1.2);
-  box-shadow: 0 0 20px rgba(254, 240, 138, 0.7);
+  box-shadow: 0 6px 0 rgba(228, 155, 90, 1), 0 12px 24px rgba(255, 206, 74, 0.7);
 }
 #drag-ghost {
   position: fixed;
@@ -1607,7 +1607,8 @@ body {
 .simple-flow { animation-name: simple-flow; }
 .catcher-box.drag-over {
   transform: scale(1.05);
-  border-color: #67e8f9;
+  border-color: #ff9247;
+  box-shadow: 0 4px 0 rgba(228, 155, 90, 1), 0 8px 16px rgba(255, 146, 71, 0.6);
 }
 .feedback-correct { animation: pop-correct 0.4s ease-out; }
 .feedback-incorrect { animation: flash-red 0.4s ease-out; }
@@ -1627,8 +1628,9 @@ body {
 }
 @keyframes pop-correct {
   50% {
-    background: #10b981;
+    background: #5acb5a;
     transform: scale(1.1);
+    box-shadow: 0 4px 0 rgba(68, 153, 68, 1), 0 8px 16px rgba(90, 203, 90, 0.6);
   }
   100% {
     transform: scale(1);
@@ -1641,7 +1643,8 @@ body {
 }
 @keyframes flash-red {
   50% {
-    background: #ef4444;
+    background: #ff5a4f;
+    box-shadow: 0 4px 0 rgba(200, 70, 60, 1), 0 8px 16px rgba(255, 90, 79, 0.6);
   }
 }
 @keyframes shake {
@@ -1669,11 +1672,13 @@ body {
   }
   20% {
     transform: scale(1.5);
-    color: #fef08a;
+    color: #ffce4a;
+    text-shadow: 0 3px 6px rgba(255, 206, 74, 0.6);
   }
   80% {
     transform: scale(1.2);
-    color: #fef08a;
+    color: #ffce4a;
+    text-shadow: 0 3px 6px rgba(255, 206, 74, 0.6);
   }
   100% {
     transform: scale(1);
@@ -1706,15 +1711,15 @@ body {
   }
 }
 .setup-label:hover .mode-card {
-  border-color: #22d3ee;
+  border-color: #ff9247;
 }
 .setup-label input:checked ~ .mode-card {
   border-width: 3px;
-  border-color: rgb(94, 234, 212);
+  border-color: rgba(255, 206, 74, 0.9);
   padding: calc(var(--space-2) - 1px);
 }
 .setup-label input:checked ~ .mode-card > span {
-  color: #67e8f9;
+  color: #ff9247;
 }
 body.high-contrast { background: #000; color: #fff; }
 .high-contrast #play-area,
