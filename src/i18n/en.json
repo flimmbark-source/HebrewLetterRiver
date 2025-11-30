@@ -121,7 +121,7 @@
     },
     "controls": {
       "leave": "Leave Game",
-      "exitToMenu": "Exit to Menu",
+      "exitToMenu": "⬅",
       "start": "Start Game",
       "playAgain": "Play Again",
       "install": "Install App",

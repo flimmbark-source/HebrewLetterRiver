@@ -219,7 +219,7 @@ function GameCanvas({ fontClass }) {
                   style={{ color: '#4a2208' }}
                 >
                   <span className="text-lg" aria-hidden="true">
-                    ←
+                    
                   </span>
                   <span>{t('game.controls.exitToMenu')}</span>
                 </div>
