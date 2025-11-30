@@ -738,16 +738,9 @@ body {
 /* === SOUND BUCKETS === */
 .sound-buckets-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Mobile: 2 columns */
+  grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
   gap: var(--space-1); /* 8px between buckets */
   padding: var(--space-2); /* 16px from edges */
-}
-
-/* Desktop: 4 columns */
-@media (min-width: 768px) {
-  .sound-buckets-container {
-    grid-template-columns: repeat(4, 1fr);
-  }
 }
 
 .sound-bucket {
@@ -1427,7 +1420,7 @@ body {
 /* === GAME TOP BAR === */
 #top-bar {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: var(--space-2); /* 16px all around */
   gap: var(--space-2); /* 16px between sections */

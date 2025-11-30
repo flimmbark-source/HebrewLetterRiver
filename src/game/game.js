@@ -285,9 +285,6 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     bucketMeasurementElement.style.pointerEvents = 'none';
     bucketMeasurementElement.style.left = '-9999px';
     bucketMeasurementElement.style.top = '0';
-    bucketMeasurementElement.style.width = 'max-content';
-    bucketMeasurementElement.style.maxWidth = 'max-content';
-    bucketMeasurementElement.style.whiteSpace = 'nowrap';
     bucketMeasurementElement.style.boxSizing = 'border-box';
     document.body.appendChild(bucketMeasurementElement);
     return bucketMeasurementElement;
@@ -308,9 +305,22 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     if (!buckets.length) return BUCKET_MIN_WIDTH_FALLBACK;
     const measurementElement = ensureBucketMeasurementElement();
     if (!measurementElement) return BUCKET_MIN_WIDTH_FALLBACK;
+    const containerWidth = choicesContainer.clientWidth;
+    if (Number.isFinite(containerWidth) && containerWidth > 0) {
+      measurementElement.style.width = `${containerWidth}px`;
+      measurementElement.style.maxWidth = `${containerWidth}px`;
+    } else {
+      measurementElement.style.width = '';
+      measurementElement.style.maxWidth = '';
+    }
+    measurementElement.style.whiteSpace = 'normal';
     let maxWidth = 0;
     buckets.forEach((bucket) => {
       measurementElement.className = bucket.className;
+      const bucketStyle = window.getComputedStyle?.(bucket);
+      measurementElement.style.padding = bucketStyle?.padding ?? '';
+      measurementElement.style.border = bucketStyle?.border ?? '';
+      measurementElement.style.boxSizing = bucketStyle?.boxSizing ?? 'border-box';
       measurementElement.innerHTML = bucket.innerHTML;
       const ariaLabel = bucket.getAttribute('aria-label');
       if (ariaLabel) measurementElement.setAttribute('aria-label', ariaLabel);
@@ -338,6 +348,37 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   function refreshDropZones() {
     dropZones = Array.from(document.querySelectorAll('.catcher-box'));
+  }
+
+  function measureBucketTextWidth() {
+    if (!choicesContainer || typeof window === 'undefined') {
+      return 0;
+    }
+    const buckets = choicesContainer.querySelectorAll('.catcher-box');
+    if (!buckets.length) return 0;
+    const measurementElement = ensureBucketMeasurementElement();
+    if (!measurementElement) return 0;
+
+    measurementElement.style.width = 'max-content';
+    measurementElement.style.maxWidth = '';
+    measurementElement.style.whiteSpace = 'nowrap';
+    let maxWidth = 0;
+    buckets.forEach((bucket) => {
+      measurementElement.className = bucket.className;
+      measurementElement.textContent = bucket.textContent ?? '';
+      measurementElement.style.padding = '0';
+      measurementElement.style.border = '0';
+      const rect = measurementElement.getBoundingClientRect();
+      measurementElement.style.padding = '';
+      measurementElement.style.border = '';
+      if (rect.width > maxWidth) maxWidth = rect.width;
+    });
+
+    if (!Number.isFinite(maxWidth) || maxWidth <= 0) {
+      return 0;
+    }
+
+    return Math.ceil(maxWidth);
   }
 
   function clearPendingBucketLayout() {
@@ -392,24 +433,40 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       return;
     }
     if (typeof window === 'undefined') return;
+    const buckets = choicesContainer.querySelectorAll('.catcher-box');
+    if (!buckets.length) return;
     const containerWidth = choicesContainer.clientWidth;
     if (containerWidth <= 0) return;
     const minBucketWidth = getBucketMinWidth();
+    const minBucketTextWidth = measureBucketTextWidth();
+    const bucketStyle = window.getComputedStyle?.(buckets[0]);
+    const horizontalPadding =
+      (parseFloat(bucketStyle?.paddingLeft) || 0) + (parseFloat(bucketStyle?.paddingRight) || 0);
+    const measuredReadableWidth = minBucketTextWidth + horizontalPadding;
+    const minReadableWidth = measuredReadableWidth > 0
+      ? Math.ceil(measuredReadableWidth)
+      : BUCKET_MIN_WIDTH_FALLBACK;
     const computed = window.getComputedStyle?.(choicesContainer);
     const gapValueRaw = computed?.columnGap || computed?.gap || `${LAYOUT_GAP_FALLBACK}px`;
     const gapValue = parseFloat(gapValueRaw) || LAYOUT_GAP_FALLBACK;
     const totalGap = gapValue * Math.max(count - 1, 0);
     const availableWidth = containerWidth - totalGap;
+    const targetWidth = availableWidth / count;
     if (availableWidth / count >= minBucketWidth) {
       choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(${minBucketWidth}px, 1fr))`;
+      return;
+    }
+    if (targetWidth >= minReadableWidth) {
+      const minWidth = Math.max(minReadableWidth, targetWidth);
+      choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(${minWidth}px, 1fr))`;
       return;
     }
     const numerator = containerWidth + gapValue;
     const maxColumns = Math.max(
       1,
-      Math.min(count, Math.floor(numerator / (minBucketWidth + gapValue)))
+      Math.min(count, Math.floor(numerator / (minReadableWidth + gapValue)))
     );
-    choicesContainer.style.gridTemplateColumns = `repeat(${maxColumns}, minmax(${minBucketWidth}px, 1fr))`;
+    choicesContainer.style.gridTemplateColumns = `repeat(${maxColumns}, minmax(${minReadableWidth}px, 1fr))`;
   }
 
   if (playArea) {
