@@ -285,9 +285,6 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     bucketMeasurementElement.style.pointerEvents = 'none';
     bucketMeasurementElement.style.left = '-9999px';
     bucketMeasurementElement.style.top = '0';
-    bucketMeasurementElement.style.width = 'max-content';
-    bucketMeasurementElement.style.maxWidth = 'max-content';
-    bucketMeasurementElement.style.whiteSpace = 'nowrap';
     bucketMeasurementElement.style.boxSizing = 'border-box';
     document.body.appendChild(bucketMeasurementElement);
     return bucketMeasurementElement;
@@ -308,9 +305,22 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     if (!buckets.length) return BUCKET_MIN_WIDTH_FALLBACK;
     const measurementElement = ensureBucketMeasurementElement();
     if (!measurementElement) return BUCKET_MIN_WIDTH_FALLBACK;
+    const containerWidth = choicesContainer.clientWidth;
+    if (Number.isFinite(containerWidth) && containerWidth > 0) {
+      measurementElement.style.width = `${containerWidth}px`;
+      measurementElement.style.maxWidth = `${containerWidth}px`;
+    } else {
+      measurementElement.style.width = '';
+      measurementElement.style.maxWidth = '';
+    }
+    measurementElement.style.whiteSpace = 'normal';
     let maxWidth = 0;
     buckets.forEach((bucket) => {
       measurementElement.className = bucket.className;
+      const bucketStyle = window.getComputedStyle?.(bucket);
+      measurementElement.style.padding = bucketStyle?.padding ?? '';
+      measurementElement.style.border = bucketStyle?.border ?? '';
+      measurementElement.style.boxSizing = bucketStyle?.boxSizing ?? 'border-box';
       measurementElement.innerHTML = bucket.innerHTML;
       const ariaLabel = bucket.getAttribute('aria-label');
       if (ariaLabel) measurementElement.setAttribute('aria-label', ariaLabel);
@@ -349,6 +359,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     const measurementElement = ensureBucketMeasurementElement();
     if (!measurementElement) return 0;
 
+    measurementElement.style.width = 'max-content';
+    measurementElement.style.maxWidth = '';
+    measurementElement.style.whiteSpace = 'nowrap';
     let maxWidth = 0;
     buckets.forEach((bucket) => {
       measurementElement.className = bucket.className;
