@@ -118,23 +118,14 @@ function GameCanvas({ fontClass }) {
             className="text-sm shadow-lg sm:text-base"
             style={{ background: 'rgba(255, 229, 201, 0.9)' }}
           >
-            <button
-              id="back-to-menu-button"
-              type="button"
-              className="flex shrink-0 items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:px-4 sm:text-sm"
-              style={{
-                border: '2px solid rgba(235, 179, 105, 0.95)',
-                background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%)',
-                color: '#4a2208',
-                boxShadow: '0 3px 0 rgba(214, 140, 64, 1), 0 6px 10px rgba(214, 140, 64, 0.4)'
-              }}
-            >
-              <span className="text-lg" aria-hidden="true">
-                ←
+            <div className="flex flex-1 flex-col items-start justify-center gap-1 text-left">
+              <span
+                id="back-to-menu-button"
+                className="text-xs font-semibold uppercase tracking-wide"
+                style={{ color: '#b07737' }}
+              >
+                {t('game.controls.exitToMenu')}
               </span>
-              <span>{t('game.controls.exitToMenu')}</span>
-            </button>
-            <div className="flex-1 text-center">
               <div className="inline-flex items-baseline gap-2">
                 <span className="font-semibold" style={{ color: '#6c3b14' }}>{t('game.labels.level')}</span>
                 <span id="level" className="text-2xl font-bold" style={{ color: '#ff9247' }}>
@@ -224,22 +215,16 @@ function GameCanvas({ fontClass }) {
               </div>
 
               <div id="game-over-view" className="relative hidden pt-12 text-center">
-                <button
+                <div
                   id="game-over-exit-button"
-                  type="button"
-                  className="absolute left-0 top-0 flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:text-sm"
-                  style={{
-                    border: '2px solid rgba(235, 179, 105, 0.95)',
-                    background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%)',
-                    color: '#4a2208',
-                    boxShadow: '0 3px 0 rgba(214, 140, 64, 1), 0 6px 10px rgba(214, 140, 64, 0.4)'
-                  }}
+                  className="absolute left-0 top-0 flex items-center gap-2 px-4 py-2 text-xs font-semibold sm:text-sm"
+                  style={{ color: '#4a2208' }}
                 >
                   <span className="text-lg" aria-hidden="true">
                     ←
                   </span>
                   <span>{t('game.controls.exitToMenu')}</span>
-                </button>
+                </div>
                 <h2 id="game-over-heading" className={`mb-4 text-4xl font-bold ${fontClass}`} style={{ color: '#ff9247' }}>
                   {t('game.summary.gameOver')}
                 </h2>
