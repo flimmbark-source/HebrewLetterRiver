@@ -212,6 +212,12 @@ body {
   }
 }
 
+/* RTL text for Hebrew/Arabic letters - keeps UI LTR */
+.hebrew-text {
+  direction: rtl;
+  display: inline-block;
+}
+
 /* Letter tooltip */
 .letter-tooltip {
   position: absolute;

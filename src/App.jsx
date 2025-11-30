@@ -227,7 +227,7 @@ function Shell() {
   );
 
   return (
-    <div className="app-shell" dir={direction}>
+    <div className="app-shell">
       <LanguageOnboardingModal />
       <main className="flex-1">
         <Routes>

@@ -217,6 +217,7 @@ export default function HomeView() {
           {recentLetters.map((letter, index) => (
             <span
               key={index}
+              className="hebrew-text"
               style={{
                 cursor: 'pointer',
                 position: 'relative',
