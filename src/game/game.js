@@ -94,7 +94,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const introductionsConfig = activeLanguage.introductions ?? {};
   const defaultSubtitle = translateWithFallback(
     'game.setup.subtitleFallback',
-    introductionsConfig.subtitleTemplate ?? 'Drag the moving item to the correct box!'
+    introductionsConfig.subtitleTemplate ?? 'Drag the letters to the correct boxes!'
   );
   const subtitleTemplate = translateWithFallback(
     `game.introductions.${activeLanguage.id}.subtitle`,
