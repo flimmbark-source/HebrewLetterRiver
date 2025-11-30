@@ -188,7 +188,7 @@ function GameCanvas({ fontClass }) {
               className="relative w-full max-w-3xl shadow-2xl"
               style={{
                 border: '2px solid rgba(235, 179, 105, 0.95)',
-                background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%)',
+                background: 'linear-gradient(180deg, #dfcba5ff 0%, #e0bf95ff 55%, #d3b894ff 100%)',
                 boxShadow: '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)'
               }}
             >

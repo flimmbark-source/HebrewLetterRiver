@@ -180,7 +180,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         'mode-card flex h-full flex-col border-arcade-panel-border bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium transition hover:border-arcade-accent-orange';
 
       const title = document.createElement('span');
-      title.className = `mode-card-title text-white ${fontClass}`;
+      title.className = `mode-card-title text-cyan ${fontClass}`;
       title.textContent = mode.label;
       card.appendChild(title);
 
