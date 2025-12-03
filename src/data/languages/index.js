@@ -9,6 +9,7 @@ import bengaliPack from './bengali.js';
 import portuguesePack from './portuguese.js';
 import russianPack from './russian.js';
 import japanesePack from './japanese.js';
+import amharicPack from './amharic.js';
 
 export const languagePacks = {
   [hebrewPack.id]: hebrewPack,
@@ -21,7 +22,8 @@ export const languagePacks = {
   [bengaliPack.id]: bengaliPack,
   [portuguesePack.id]: portuguesePack,
   [russianPack.id]: russianPack,
-  [japanesePack.id]: japanesePack
+  [japanesePack.id]: japanesePack,
+  [amharicPack.id]: amharicPack
 };
 
 export const defaultLanguageId = hebrewPack.id;
