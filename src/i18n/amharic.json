@@ -1,0 +1,324 @@
+{
+  "language": {
+    "id": "amharic",
+    "name": "አማርኛ"
+  },
+  "common": {
+    "close": "ዝጋ",
+    "viewDetails": "ዝርዝሮችን ይመልከቱ",
+    "player": "ተጫዋች",
+    "patientPaddler": "ታጋሽ ጀልባተኛ",
+    "noneYet": "እስካሁን የለም",
+    "play": "ተጫወት"
+  },
+  "app": {
+    "title": "የዓለም ፊደል ወንዝ",
+    "tagline": "ፍሰት፣ ተማር እና እያንዳንዱን ያዝ ክብር።",
+    "nav": {
+      "home": "ዋና ገጽ",
+      "play": "ተጫወት",
+      "achievements": "ስኬቶች",
+      "learn": "ተማር",
+      "settings": "ቅንብሮች"
+    },
+    "languagePicker": {
+      "label": "የመተግበሪያ ቋንቋ",
+      "helper": "የበይነገጽ ቋንቋ ያዘጋጁ።",
+      "onboardingTitle": "ቋንቋዎችዎን ይምረጡ",
+      "onboardingSubtitle": "የበይነገጽ ቋንቋ እና መለማመድ የሚፈልጉትን ፊደል ይምረጡ።",
+      "confirm": "መማር ጀምር"
+    },
+    "practicePicker": {
+      "label": "የመለማመጃ ቋንቋ",
+      "helper": "ማሰስ የሚፈልጉትን የቋንቋ ፓኬት ይምረጡ።"
+    },
+    "footer": {
+      "resetNotice": "በየቀኑ በሰዓት 00:00 አሲያ/ኢየሩሳሌም ዳግም ማስጀመሪያ ይከሰታል።"
+    }
+  },
+  "home": {
+    "hero": {
+      "heading": "የወንዝ ጀብዱዎን ይምረጡ።",
+      "description": "በነጠላ ፊደላት ይጀምሩ ወይም ወደ ሙሉ ቃላት ይግቡ።",
+      "modeSelectTitle": "ሁነታ ይምረጡ",
+      "modes": {
+        "letters": {
+          "title": "የፊደል ወንዝ",
+          "description": "የሚንሳፈፉ ፊደሎችን ያዙ እና ወደ ትክክለኛው ባልዲ ይጣሉ።"
+        },
+        "words": {
+          "title": "የቃላት ወንዝ",
+          "description": "ሙሉ ቃላትን ይሰብስቡ እና ከትርጉማቸው ጋር ያዛምዱ።"
+        }
+      }
+    },
+    "recentLetters": {
+      "title": "በቅርብ የተማሩ ፊደላት"
+    },
+    "languagePicker": {
+      "label": "የመለማመጃ ቋንቋ",
+      "helper": "በማንኛውም ጊዜ ለሌላ ስክሪፕት ለመለማመድ ይቀይሩ።"
+    },
+    "cta": {
+      "start": "አዲስ ሩጫ ጀምር",
+      "practice": "የትኩረት ፊደል ተለማመድ",
+      "play": "ተጫወት"
+    },
+    "progress": {
+      "heading": "ዛሬ እድገት",
+      "streak": "ተከታታይ",
+      "days": "{{count}} ቀናት",
+      "resetsAt": "በሰዓት 00:00 አሲያ/ኢየሩሳሌም ዳግም ይጀምራል ({{time}})",
+      "starLevel": "የኮከብ ደረጃ",
+      "level": "ደረጃ {{level}}",
+      "totalStars": "{{count}} ⭐ ጠቅላላ",
+      "toNextLevel": "{{current}} / {{total}} ⭐ ለቀጣይ ደረጃ",
+      "latestBadge": "የቅርብ ዓመታት አርማ",
+      "tier": "ደረጃ {{tier}}",
+      "playToUnlock": "ስኬቶችን መክፈት ለመጀመር ክፍለ ጊዜ ይጫወቱ።"
+    },
+    "quest": {
+      "label": "ፍለጋ {{current}} ከ {{total}}",
+      "complete": "ፍለጋ ተጠናቀቀ",
+      "inProgress": "በሂደት ላይ...",
+      "collected": "ሽልማት ተሰብስቧል",
+      "collectedShort": "✓ ተሰብስቧል",
+      "claiming": "በማስገባት ላይ...",
+      "claim": "አስገባ",
+      "claimed": "ተገብቷል",
+      "locked": "በሂደት ላይ"
+    },
+    "dailyQuests": {
+      "title": "ዕለታዊ ፍለጋዎች",
+      "resetsAt": "በ {{time}} ዳግም ይጀምራል"
+    }
+  },
+  "wordRiver": {
+    "title": "የቃላት ወንዝ",
+    "subtitle": "እያንዳንዱን ቃል ይገንቡ እና ከትርጉሙ ጋር ያገናኙ።",
+    "phases": {
+      "letters": "ደረጃ 1 · ቃሉን ይገንቡ",
+      "match": "ደረጃ 2 · ትርጉሙን ያዛምዱ"
+    },
+    "instructions": {
+      "letters": "ቃሉን በመለማመጃ ቋንቋዎ ለመገንባት የሚንሳፈፉ ፊደሎችን ወደ እያንዳንዱ ባልዲ ይጎትቱ።",
+      "match": "የተጠናቀቁትን ቃላት ከሚዛመደው ኢሞጂ ወይም ትርጉም ጋር ይጎትቱ።"
+    },
+    "notifications": {
+      "roundComplete": "ዙር ተጠናቀቀ! አዳዲስ ቃላት በመንገድ ላይ ናቸው።"
+    },
+    "actions": {
+      "back": "ወደ ዋና ገጽ ተመለስ"
+    },
+    "targets": {
+      "fallback": "ትርጉም"
+    }
+  },
+  "game": {
+    "labels": {
+      "level": "ደረጃ",
+      "score": "ነጥብ"
+    },
+    "controls": {
+      "leave": "ጨዋታን ተው",
+      "exitToMenu": "⬅",
+      "start": "ጨዋታ ጀምር",
+      "playAgain": "እንደገና ተጫወት",
+      "install": "መተግበሪያ ጫን",
+      "accessibility": "የተደራሽነት አማራጮች",
+      "close": "ዝጋ"
+    },
+    "setup": {
+      "title": "የዓለም ፊደል ወንዝ",
+      "subtitleFallback": "ፊደሎቹን ወደ ትክክለኛው ሳጥኖች ይጎትቱ!",
+      "prompt": "መለማመድ የሚፈልጉትን ይምረጡ:",
+      "installDescription": "መተግበሪያ ጫን",
+      "defaultNoun": "ንጥል",
+      "defaultModeLabel": "ዋና መለማመጃ",
+      "defaultModeDescription": "ዋናውን የቁምፊዎች ስብስብ ይለማመዱ።"
+    },
+    "modes": {
+      "letters": {
+        "label": "ፊደሎች ብቻ",
+        "description": "የመሠረታዊ ቁምፊዎች ስብስብ ይለማመዱ።",
+        "noun": "ፊደል"
+      },
+      "vowels1": {
+        "label": "'አ' እና 'ኦ' አናባቢዎች",
+        "description": "የአናባቢ ምልክቶችን ይለማመዱ።",
+        "noun": "ንጥል"
+      },
+      "vowels2": {
+        "label": "'ኤ' እና 'ኢ' አናባቢዎች",
+        "description": "የአናባቢ ምልክቶችን ይለማመዱ።",
+        "noun": "ንጥል"
+      },
+      "expert": {
+        "label": "የባለሙያ ሁነታ",
+        "description": "ለተጨማሪ ፈተና ፊደሎችን እና አናባቢዎችን ይቀላቅሉ።",
+        "noun": "ንጥል"
+      },
+      "hiragana": {
+        "label": "ሂራጋና",
+        "description": "መሠረታዊ ሂራጋና ቁምፊዎችን ይለማመዱ።",
+        "noun": "ቁምፊ"
+      },
+      "characters": {
+        "label": "ቁምፊዎች",
+        "description": "አስፈላጊ ቁምፊዎችን ይለማመዱ።",
+        "noun": "ቁምፊ"
+      }
+    },
+    "accessibility": {
+      "showIntroductions": "መግቢያዎችን አሳይ",
+      "highContrast": "ከፍተኛ ንጽጽር ሁነታ",
+      "randomLetters": "በዘፈቀደ ፊደሎች",
+      "reducedMotion": "የተቀነሰ እንቅስቃሴ",
+      "speed": "የጨዋታ ፍጥነት",
+      "speedFast": "ፈጣን",
+      "speedNormal": "መደበኛ",
+      "speedSlow": "ዝግታ",
+      "gear": "የተደራሽነት ቅንብሮች"
+    },
+    "bonus": {
+      "title": "የቦነስ ዙር!",
+      "instruction": "ዕንቁዎቹን ያዙ!",
+      "catchHere": "እዚህ ያዙ!",
+      "timeLeft": "የቀረው ጊዜ: {{seconds}}",
+      "gemAria": "የቦነስ እንቁ"
+    },
+    "summary": {
+      "heading": "የተገናኙ ንጥሎች",
+      "empty": "ለዚህ ዙር ለማሳየት ምንም ስታቲስቲክስ የለም።",
+      "gameOver": "ጨዋታው ተጠናቀቀ",
+      "finalScore": "የመጨረሻ ነጥብ: {{score}}",
+      "weakestLink": "ደካማው አገናኝ",
+      "weakestLinkDescription": "በሚቀጥለው ጊዜ በዚህ ንጥል ላይ ያተኩሩ።",
+      "characterLabel": "ቁምፊ {{symbol}}",
+      "characterLabelWithPronunciation": "ቁምፊ {{symbol}} {{pronunciation}} ተብሎ ይነበባል",
+      "soundLabel": "ድምጽ: {{sound}}",
+      "learningRecap": "የመማሪያ ማጠቃለያ",
+      "practice": "ይህን ተለማመድ"
+    },
+    "status": {
+      "bonusRound": "የቦነስ ዙር!",
+      "bonusInstruction": "ዕንቁዎቹን ያዙ!",
+      "lives": "ህይወቶች",
+      "levelUp": "ደረጃ ከፍ ማድረግ!"
+    }
+  },
+  "achievements": {
+    "title": "ስኬቶች",
+    "description": "ኮከቦችን ለመሰብሰብ በእያንዳንዱ ደረጃ ይሂዱ።",
+    "tier": "ደረጃ",
+    "tierProgress": "ደረጃ {{current}} / {{total}}",
+    "next": "ቀጣይ: {{label}}",
+    "complete": "ሁሉም ደረጃዎች ተጠናቀቁ",
+    "earnStars": "ይህንን ደረጃ ሲከፍቱ +{{stars}} ⭐ ያግኙ።",
+    "maxed": "ባጅ ሙሉ በሙሉ ተማረ - በብርሃኑ ይደሰቱ!",
+    "claiming": "በማስገባት ላይ...",
+    "claimStarsAria": "ለ {{label}} {{stars}} ኮከቦች አስገባ",
+    "moreTiers": "+{{count}} ተጨማሪ ደረጃ",
+    "moreTiersPlural": "+{{count}} ተጨማሪ ደረጃዎች",
+    "profile": {
+      "title": "የተጫዋች መገለጫ",
+      "description": "የኮከብ እድገትዎን ይከታተሉ እና በወንዝ ደረጃዎች ለመውጣት ሽልማቶችን ይጠይቁ።",
+      "starsToNextLevel": "ወደ ቀጣይ ደረጃ ኮከቦች",
+      "totalStarsEarned": "ጠቅላላ የተገኙ ኮከቦች",
+      "currentStarBalance": "አሁን ያለው የኮከብ ቀሪ ሂሳብ",
+      "starsReadyToClaim": "ለመጠየቅ የዝገጁ ኮከቦች",
+      "dailyBadgeReady": "ዕለታዊ ባጅ ዝግጁ",
+      "claimStarsToLevel": "+{{stars}} ⭐ ወደ ደረጃዎ ለመጨመር ይጠይቁ።"
+    },
+    "levelNames": {
+      "1": "ታጋሽ ጀልባተኛ",
+      "2": "ለስላሳ ሞገድ",
+      "3": "የተረጋጋ ፍሰት",
+      "4": "እየጨመረ የመጣ ፈጣን",
+      "5": "የወንዝ ሯጭ",
+      "6": "የሞገድ ጋላቢ",
+      "7": "የፏፏቴ አደን",
+      "8": "የጎርፍ መምህር",
+      "9": "የፏፏቴ ተዋጊ",
+      "10": "የወንዝ ጌታ"
+    }
+  },
+  "learn": {
+    "title": "ተማር",
+    "intro": "እያንዳንዱን ፊደል ለመማር በተዘጋጁ ትምህርቶች ውስጥ ይግቡ። አዳዲስ የመማሪያ ሞጁሎች በቅርቡ እዚህ ይታያሉ!",
+    "body": "እስከዚያ ድረስ፣ ወንዙን ማሰስ ይቀጥሉ እና የተመሩ የመለማመጃ ክፍለ ጊዜዎችን፣ የአጠራር ምክሮችን እና የባህል ግንዛቤዎችን በየጊዜው ይፈትሹ።"
+  },
+  "settings": {
+    "title": "ቅንብሮች",
+    "subtitle": "ምርጫዎችዎን ያዋቅሩ",
+    "languageSettings": "የቋንቋ ቅንብሮች",
+    "gameSettings": "የጨዋታ ቅንብሮች"
+  },
+  "badges": {
+    "firstFlow": {
+      "name": "የመጀመሪያ ፍሰት",
+      "summary": "የ{{gameName}} ሙሉ ሩጫ ይጫወቱ።",
+      "tiers": {
+        "1": "የነሐስ ሞገድ",
+        "2": "የብር መጨመር",
+        "3": "የወርቅ ጎርፍ"
+      }
+    },
+    "steadyStreak": {
+      "name": "የተከታታይ ጠባቂ",
+      "summary": "በተከታታይ ቀናት ይግቡ እና ይጫወቱ።",
+      "tiers": {
+        "1": "የሳምንት መጨረሻ ሞገድ",
+        "2": "የጨረቃ ብርሃን ሩጫ",
+        "3": "ዘላለማዊ ወንዝ"
+      }
+    },
+    "letterMaster": {
+      "name": "የፊደል ጌታ",
+      "summary": "ሳያመልጥዎ ንጥሎችን ያዙ።",
+      "tiers": {
+        "1": "ትኩረት ያለው መርጨት",
+        "2": "ትክክለኛ ፍሰት",
+        "3": "ፍጹም ሞገድ"
+      }
+    },
+    "gemChaser": {
+      "name": "የዕንቁ አደን",
+      "summary": "የቦነስ ዙሮችን ያሸንፉ እና የወንዝ ዕንቁዎችን ይሰብስቡ።",
+      "tiers": {
+        "1": "የሚያብረቀርቅ ፍሰት",
+        "2": "የሚያብረቀርቅ ፈጣን",
+        "3": "የሚያበራ ፏፏቴ"
+      }
+    }
+  },
+  "daily": {
+    "badge": {
+      "title": "ዕለታዊ ባጅ",
+      "claimStars": "ኮከቦችዎን ይጠይቁ",
+      "rewardsCollected": "ሽልማቶች ተሰብስበዋል",
+      "completeQuests": "ኮከቦችን ለማግኘት ፍለጋዎችን ያጠናቅቁ",
+      "starsReady": "በተጠናቀቁ ፍለጋዎች ላይ +{{stars}} ⭐ ዝግጁ አለዎት።",
+      "finishQuests": "የኮከብ ሽልማቶቻቸውን ለመክፈት ፍለጋዎችን ያጠናቅቁ።"
+    },
+    "tasks": {
+      "warmup": {
+        "title": "ማሞቂያ",
+        "description": "ሞገዱን ለማነቃቃት ሁለት ፈጣን ሩጫዎችን ይጫወቱ።"
+      },
+      "focus": {
+        "title": "ትኩረት",
+        "description": "{{letter}} የያዙ አምስት ፍጹም ተዛማጆችን ያዙ።"
+      },
+      "spice": {
+        "title": "ቅመም",
+        "description": "{{constraint}} በሚንቀሳቀስበት ጊዜ ዙር ያሸንፉ።"
+      }
+    },
+    "constraints": {
+      "expert-mode": "የባለሙያ ሁነታ ሩጫ",
+      "fast-flow": "ፈጣን ፍሰት ፍጥነት ንቁ",
+      "no-intros": "ምንም መግቢያዎች አልነቁም"
+    }
+  }
+}

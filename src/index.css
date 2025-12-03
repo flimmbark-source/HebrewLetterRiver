@@ -97,3 +97,7 @@ body {
 .language-font-japanese {
   font-family: 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
 }
+
+.language-font-ethiopic {
+  font-family: 'Noto Sans Ethiopic', 'Abyssinica SIL', 'Nyala', sans-serif;
+}
