@@ -132,6 +132,81 @@
         "label": "Personnages",
         "description": "Pratiquez les caractères essentiels.",
         "noun": "personnage"
+      },
+      "accents": {
+        "label": "Accents et Tildes",
+        "description": "Apprenez les accents et les caractères spéciaux.",
+        "noun": "accent"
+      },
+      "pronunciation": {
+        "label": "Prononciation",
+        "description": "Pratiquez les modèles sonores spéciaux.",
+        "noun": "son"
+      },
+      "letterforms": {
+        "label": "Formes de Lettres",
+        "description": "Apprenez les formes isolées, initiales, médianes et finales.",
+        "noun": "forme"
+      },
+      "harakat": {
+        "label": "Harakat (Diacritiques)",
+        "description": "Pratiquez les marques de voyelles et les diacritiques.",
+        "noun": "marque"
+      },
+      "katakana": {
+        "label": "Katakana",
+        "description": "Pratiquez les caractères katakana.",
+        "noun": "personnage"
+      },
+      "romaji": {
+        "label": "Romaji",
+        "description": "Pratiquez la romanisation du japonais.",
+        "noun": "personnage"
+      },
+      "pinyin": {
+        "label": "Pinyin",
+        "description": "Pratiquez le système de prononciation chinois.",
+        "noun": "syllabe"
+      },
+      "radicals": {
+        "label": "Radicaux",
+        "description": "Apprenez les blocs de construction des caractères.",
+        "noun": "radical"
+      },
+      "matras": {
+        "label": "Matras (Marques de Voyelles)",
+        "description": "Pratiquez les marques de voyelles en devanagari.",
+        "noun": "marque"
+      },
+      "conjuncts": {
+        "label": "Conjoints",
+        "description": "Apprenez les formes consonantiques combinées.",
+        "noun": "conjoint"
+      },
+      "vowelmarks": {
+        "label": "Marques de Voyelles",
+        "description": "Pratiquez les diacritiques de voyelles.",
+        "noun": "marque"
+      },
+      "nasals": {
+        "label": "Nasales",
+        "description": "Pratiquez les sons et les marques nasales.",
+        "noun": "son"
+      },
+      "liaison": {
+        "label": "Liaison",
+        "description": "Pratiquez les prononciations liées.",
+        "noun": "modèle"
+      },
+      "cursive": {
+        "label": "Cursive",
+        "description": "Pratiquez les formes d'écriture cursive.",
+        "noun": "lettre"
+      },
+      "phonetics": {
+        "label": "Phonétique",
+        "description": "Pratiquez les modèles sonores et la prononciation.",
+        "noun": "son"
       }
     },
     "accessibility": {

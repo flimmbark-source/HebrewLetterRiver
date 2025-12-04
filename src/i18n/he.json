@@ -132,6 +132,81 @@
         "label": "תווים",
         "description": "תרגלו תווים חיוניים.",
         "noun": "תו"
+      },
+      "accents": {
+        "label": "הטעמות וסימנים",
+        "description": "למדו סימני הטעמה ותווים מיוחדים.",
+        "noun": "הטעמה"
+      },
+      "pronunciation": {
+        "label": "הגייה",
+        "description": "תרגלו דפוסי צליל מיוחדים.",
+        "noun": "צליל"
+      },
+      "letterforms": {
+        "label": "צורות אותיות",
+        "description": "למדו צורות מבודדות, התחלתיות, אמצעיות וסופיות.",
+        "noun": "צורה"
+      },
+      "harakat": {
+        "label": "הרכת (סימנים דיאקריטיים)",
+        "description": "תרגלו סימני תנועות וסימנים דיאקריטיים.",
+        "noun": "סימן"
+      },
+      "katakana": {
+        "label": "קטקאנה",
+        "description": "תרגלו תווי קטקאנה.",
+        "noun": "תו"
+      },
+      "romaji": {
+        "label": "רומאג'י",
+        "description": "תרגלו רומניזציה של יפנית.",
+        "noun": "תו"
+      },
+      "pinyin": {
+        "label": "פיניין",
+        "description": "תרגלו מערכת הגייה סינית.",
+        "noun": "הברה"
+      },
+      "radicals": {
+        "label": "שורשים",
+        "description": "למדו אבני בניין של תווים.",
+        "noun": "שורש"
+      },
+      "matras": {
+        "label": "מטרס (סימני תנועות)",
+        "description": "תרגלו סימני תנועות בדוונגרי.",
+        "noun": "סימן"
+      },
+      "conjuncts": {
+        "label": "צירופים",
+        "description": "למדו צורות עיצורים משולבים.",
+        "noun": "צירוף"
+      },
+      "vowelmarks": {
+        "label": "סימני תנועות",
+        "description": "תרגלו סימנים דיאקריטיים של תנועות.",
+        "noun": "סימן"
+      },
+      "nasals": {
+        "label": "עיצורי אף",
+        "description": "תרגלו צלילי אף וסימנים.",
+        "noun": "צליל"
+      },
+      "liaison": {
+        "label": "קישור",
+        "description": "תרגלו הגיות מקושרות.",
+        "noun": "דפוס"
+      },
+      "cursive": {
+        "label": "כתב רהוט",
+        "description": "תרגלו צורות כתיבה רהוטה.",
+        "noun": "אות"
+      },
+      "phonetics": {
+        "label": "פונטיקה",
+        "description": "תרגלו דפוסי צליל והגייה.",
+        "noun": "צליל"
       }
     },
     "accessibility": {

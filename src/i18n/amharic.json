@@ -167,6 +167,81 @@
         "label": "ቁምፊዎች",
         "description": "አስፈላጊ ቁምፊዎችን ይለማመዱ።",
         "noun": "ቁምፊ"
+      },
+      "accents": {
+        "label": "ዘዬዎች እና ምልክቶች",
+        "description": "የዘዬ ምልክቶችን እና ልዩ ቁምፊዎችን ይማሩ።",
+        "noun": "ዘዬ"
+      },
+      "pronunciation": {
+        "label": "አጠራር",
+        "description": "ልዩ የድምፅ ቅጦችን ይለማመዱ।",
+        "noun": "ድምፅ"
+      },
+      "letterforms": {
+        "label": "የፊደል ቅርጾች",
+        "description": "የተለየ፣ የመጀመሪያ፣ መካከለኛ እና የመጨረሻ ቅርጾችን ይማሩ።",
+        "noun": "ቅርጽ"
+      },
+      "harakat": {
+        "label": "ሐረካት (ዲያክሪቲክስ)",
+        "description": "የአናባቢ ምልክቶችን እና ዲያክሪቲክስን ይለማመዱ።",
+        "noun": "ምልክት"
+      },
+      "katakana": {
+        "label": "ካታካና",
+        "description": "ካታካና ቁምፊዎችን ይለማመዱ።",
+        "noun": "ቁምፊ"
+      },
+      "romaji": {
+        "label": "ሮማጂ",
+        "description": "የጃፓንኛ ሮማናይዜሽንን ይለማመዱ።",
+        "noun": "ቁምፊ"
+      },
+      "pinyin": {
+        "label": "ፒንዪን",
+        "description": "የቻይና አጠራር ስርዓትን ይለማመዱ።",
+        "noun": "ክፍለ ቃል"
+      },
+      "radicals": {
+        "label": "ሬዲካሎች",
+        "description": "የቁምፊ ግንባታ ብሎኮችን ይማሩ።",
+        "noun": "ሬዲካል"
+      },
+      "matras": {
+        "label": "ማትራስ (የአናባቢ ምልክቶች)",
+        "description": "በዴቫናጋሪ ውስጥ የአናባቢ ምልክቶችን ይለማመዱ።",
+        "noun": "ምልክት"
+      },
+      "conjuncts": {
+        "label": "ጥምር",
+        "description": "የተዋሃዱ የሰዋሰው ቅርጾችን ይማሩ።",
+        "noun": "ጥምር"
+      },
+      "vowelmarks": {
+        "label": "የአናባቢ ምልክቶች",
+        "description": "የአናባቢ ዲያክሪቲክስን ይለማመዱ።",
+        "noun": "ምልክት"
+      },
+      "nasals": {
+        "label": "ናሳል",
+        "description": "የናሳል ድምፆችን እና ምልክቶችን ይለማመዱ።",
+        "noun": "ድምፅ"
+      },
+      "liaison": {
+        "label": "ግንኙነት",
+        "description": "የተገናኙ አጠራሮችን ይለማመዱ።",
+        "noun": "ቅጥ"
+      },
+      "cursive": {
+        "label": "ኩርሲቭ",
+        "description": "የኩርሲቭ ጽሑፍ ቅርጾችን ይለማመዱ።",
+        "noun": "ፊደል"
+      },
+      "phonetics": {
+        "label": "የድምፅ ጥናት",
+        "description": "የድምፅ ቅጦችን እና አጠራርን ይለማመዱ።",
+        "noun": "ድምፅ"
       }
     },
     "accessibility": {
