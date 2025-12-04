@@ -773,6 +773,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
     startButton.textContent = t('game.controls.start');
     isRestartMode = false;
+    renderPracticeModes();
     setupView.classList.remove('hidden');
     gameOverView.classList.add('hidden');
     accessibilityView.classList.add('hidden');
