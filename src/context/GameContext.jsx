@@ -24,7 +24,7 @@ export function GameProvider({ children }) {
     const api = gameApiRef.current;
     api.resetToSetupScreen?.();
     gameApiRef.current = null;
-  }, [languagePack.id]);
+  }, [languagePack.id, interfaceLanguagePack.id]);
 
   useEffect(() => {
     if (!isVisible) return;
