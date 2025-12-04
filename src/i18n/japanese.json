@@ -132,6 +132,81 @@
         "label": "キャラクター",
         "description": "重要な文字を練習します。",
         "noun": "キャラクター"
+      },
+      "accents": {
+        "label": "アクセントと記号",
+        "description": "アクセント記号と特殊文字を学びます。",
+        "noun": "アクセント"
+      },
+      "pronunciation": {
+        "label": "発音",
+        "description": "特別な音のパターンを練習します。",
+        "noun": "音"
+      },
+      "letterforms": {
+        "label": "文字形式",
+        "description": "独立形、語頭形、語中形、語末形を学びます。",
+        "noun": "形式"
+      },
+      "harakat": {
+        "label": "ハラカート（発音記号）",
+        "description": "母音記号と発音記号を練習します。",
+        "noun": "記号"
+      },
+      "katakana": {
+        "label": "カタカナ",
+        "description": "カタカナ文字を練習します。",
+        "noun": "文字"
+      },
+      "romaji": {
+        "label": "ローマ字",
+        "description": "日本語のローマ字表記を練習します。",
+        "noun": "文字"
+      },
+      "pinyin": {
+        "label": "拼音",
+        "description": "中国語の発音システムを練習します。",
+        "noun": "音節"
+      },
+      "radicals": {
+        "label": "部首",
+        "description": "文字の構成要素を学びます。",
+        "noun": "部首"
+      },
+      "matras": {
+        "label": "マートラー（母音記号）",
+        "description": "デーヴァナーガリーの母音記号を練習します。",
+        "noun": "記号"
+      },
+      "conjuncts": {
+        "label": "結合文字",
+        "description": "組み合わせ子音形式を学びます。",
+        "noun": "結合文字"
+      },
+      "vowelmarks": {
+        "label": "母音記号",
+        "description": "母音発音記号を練習します。",
+        "noun": "記号"
+      },
+      "nasals": {
+        "label": "鼻音",
+        "description": "鼻音と記号を練習します。",
+        "noun": "音"
+      },
+      "liaison": {
+        "label": "リエゾン",
+        "description": "連結発音を練習します。",
+        "noun": "パターン"
+      },
+      "cursive": {
+        "label": "筆記体",
+        "description": "筆記体の書き方を練習します。",
+        "noun": "文字"
+      },
+      "phonetics": {
+        "label": "音声学",
+        "description": "音のパターンと発音を練習します。",
+        "noun": "音"
       }
     },
     "accessibility": {

@@ -132,6 +132,81 @@
         "label": "Personagens",
         "description": "Pratique caracteres essenciais.",
         "noun": "personagem"
+      },
+      "accents": {
+        "label": "Acentos e Tils",
+        "description": "Aprenda marcas de acentuação e caracteres especiais.",
+        "noun": "acento"
+      },
+      "pronunciation": {
+        "label": "Pronúncia",
+        "description": "Pratique padrões sonoros especiais.",
+        "noun": "som"
+      },
+      "letterforms": {
+        "label": "Formas de Letras",
+        "description": "Aprenda formas isoladas, iniciais, mediais e finais.",
+        "noun": "forma"
+      },
+      "harakat": {
+        "label": "Harakat (Diacríticos)",
+        "description": "Pratique marcas vocálicas e diacríticos.",
+        "noun": "marca"
+      },
+      "katakana": {
+        "label": "Katakana",
+        "description": "Pratique caracteres katakana.",
+        "noun": "personagem"
+      },
+      "romaji": {
+        "label": "Romaji",
+        "description": "Pratique a romanização do japonês.",
+        "noun": "personagem"
+      },
+      "pinyin": {
+        "label": "Pinyin",
+        "description": "Pratique o sistema de pronúncia chinês.",
+        "noun": "sílaba"
+      },
+      "radicals": {
+        "label": "Radicais",
+        "description": "Aprenda os blocos de construção de caracteres.",
+        "noun": "radical"
+      },
+      "matras": {
+        "label": "Matras (Marcas Vocálicas)",
+        "description": "Pratique marcas vocálicas em devanagari.",
+        "noun": "marca"
+      },
+      "conjuncts": {
+        "label": "Conjuntos",
+        "description": "Aprenda formas consonantais combinadas.",
+        "noun": "conjunto"
+      },
+      "vowelmarks": {
+        "label": "Marcas Vocálicas",
+        "description": "Pratique diacríticos vocálicos.",
+        "noun": "marca"
+      },
+      "nasals": {
+        "label": "Nasais",
+        "description": "Pratique sons e marcas nasais.",
+        "noun": "som"
+      },
+      "liaison": {
+        "label": "Ligação",
+        "description": "Pratique pronúncias conectadas.",
+        "noun": "padrão"
+      },
+      "cursive": {
+        "label": "Cursiva",
+        "description": "Pratique formas de escrita cursiva.",
+        "noun": "letra"
+      },
+      "phonetics": {
+        "label": "Fonética",
+        "description": "Pratique padrões sonoros e pronúncia.",
+        "noun": "som"
       }
     },
     "accessibility": {

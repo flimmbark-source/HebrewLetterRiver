@@ -152,6 +152,81 @@
         "label": "Personajes",
         "description": "Practica los personajes esenciales.",
         "noun": "personaje"
+      },
+      "accents": {
+        "label": "Acentos y tildes",
+        "description": "Aprende las marcas de acentuación y caracteres especiales.",
+        "noun": "acento"
+      },
+      "pronunciation": {
+        "label": "Pronunciación",
+        "description": "Practica patrones de sonido especiales.",
+        "noun": "sonido"
+      },
+      "letterforms": {
+        "label": "Formas de letras",
+        "description": "Aprende formas aisladas, iniciales, medias y finales.",
+        "noun": "forma"
+      },
+      "harakat": {
+        "label": "Harakat (Diacríticos)",
+        "description": "Practica marcas vocales y signos diacríticos.",
+        "noun": "marca"
+      },
+      "katakana": {
+        "label": "Katakana",
+        "description": "Practica los caracteres katakana.",
+        "noun": "personaje"
+      },
+      "romaji": {
+        "label": "Romaji",
+        "description": "Practica la romanización del japonés.",
+        "noun": "personaje"
+      },
+      "pinyin": {
+        "label": "Pinyin",
+        "description": "Practica el sistema de pronunciación chino.",
+        "noun": "sílaba"
+      },
+      "radicals": {
+        "label": "Radicales",
+        "description": "Aprende los bloques de construcción de caracteres.",
+        "noun": "radical"
+      },
+      "matras": {
+        "label": "Matras (Marcas vocales)",
+        "description": "Practica las marcas vocales en devanagari.",
+        "noun": "marca"
+      },
+      "conjuncts": {
+        "label": "Conjunciones",
+        "description": "Aprende formas de consonantes combinadas.",
+        "noun": "conjunción"
+      },
+      "vowelmarks": {
+        "label": "Marcas vocales",
+        "description": "Practica signos diacríticos vocales.",
+        "noun": "marca"
+      },
+      "nasals": {
+        "label": "Nasales",
+        "description": "Practica sonidos nasales y marcas.",
+        "noun": "sonido"
+      },
+      "liaison": {
+        "label": "Enlace",
+        "description": "Practica pronunciaciones conectadas.",
+        "noun": "patrón"
+      },
+      "cursive": {
+        "label": "Cursiva",
+        "description": "Practica formas de escritura cursiva.",
+        "noun": "letra"
+      },
+      "phonetics": {
+        "label": "Fonética",
+        "description": "Practica patrones de sonido y pronunciación.",
+        "noun": "sonido"
       }
     },
     "accessibility": {

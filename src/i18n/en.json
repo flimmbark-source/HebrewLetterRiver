@@ -167,6 +167,81 @@
         "label": "Characters",
         "description": "Practice essential characters.",
         "noun": "character"
+      },
+      "accents": {
+        "label": "Accents & Tildes",
+        "description": "Learn accent marks and special characters.",
+        "noun": "accent"
+      },
+      "pronunciation": {
+        "label": "Pronunciation",
+        "description": "Practice special sound patterns.",
+        "noun": "sound"
+      },
+      "letterforms": {
+        "label": "Letter Forms",
+        "description": "Learn isolated, initial, medial, and final forms.",
+        "noun": "form"
+      },
+      "harakat": {
+        "label": "Harakat (Diacritics)",
+        "description": "Practice vowel marks and diacritics.",
+        "noun": "mark"
+      },
+      "katakana": {
+        "label": "Katakana",
+        "description": "Practice katakana characters.",
+        "noun": "character"
+      },
+      "romaji": {
+        "label": "Romaji",
+        "description": "Practice romanization of Japanese.",
+        "noun": "character"
+      },
+      "pinyin": {
+        "label": "Pinyin",
+        "description": "Practice Chinese pronunciation system.",
+        "noun": "syllable"
+      },
+      "radicals": {
+        "label": "Radicals",
+        "description": "Learn character building blocks.",
+        "noun": "radical"
+      },
+      "matras": {
+        "label": "Matras (Vowel Marks)",
+        "description": "Practice vowel marks in Devanagari.",
+        "noun": "mark"
+      },
+      "conjuncts": {
+        "label": "Conjuncts",
+        "description": "Learn combined consonant forms.",
+        "noun": "conjunct"
+      },
+      "vowelmarks": {
+        "label": "Vowel Marks",
+        "description": "Practice vowel diacritics.",
+        "noun": "mark"
+      },
+      "nasals": {
+        "label": "Nasals",
+        "description": "Practice nasal sounds and marks.",
+        "noun": "sound"
+      },
+      "liaison": {
+        "label": "Liaison",
+        "description": "Practice connected pronunciations.",
+        "noun": "pattern"
+      },
+      "cursive": {
+        "label": "Cursive",
+        "description": "Practice cursive writing forms.",
+        "noun": "letter"
+      },
+      "phonetics": {
+        "label": "Phonetics",
+        "description": "Practice sound patterns and pronunciation.",
+        "noun": "sound"
       }
     },
     "accessibility": {

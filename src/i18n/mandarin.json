@@ -132,6 +132,81 @@
         "label": "人物",
         "description": "练习基本人物。",
         "noun": "字"
+      },
+      "accents": {
+        "label": "重音和符号",
+        "description": "学习重音符号和特殊字符。",
+        "noun": "重音"
+      },
+      "pronunciation": {
+        "label": "发音",
+        "description": "练习特殊的声音模式。",
+        "noun": "声音"
+      },
+      "letterforms": {
+        "label": "字母形式",
+        "description": "学习独立、起始、中间和结尾形式。",
+        "noun": "形式"
+      },
+      "harakat": {
+        "label": "哈拉卡特（变音符号）",
+        "description": "练习元音符号和变音符号。",
+        "noun": "符号"
+      },
+      "katakana": {
+        "label": "片假名",
+        "description": "练习片假名字符。",
+        "noun": "字"
+      },
+      "romaji": {
+        "label": "罗马字",
+        "description": "练习日语罗马化。",
+        "noun": "字"
+      },
+      "pinyin": {
+        "label": "拼音",
+        "description": "练习中文发音系统。",
+        "noun": "音节"
+      },
+      "radicals": {
+        "label": "部首",
+        "description": "学习字符构建块。",
+        "noun": "部首"
+      },
+      "matras": {
+        "label": "马特拉（元音符号）",
+        "description": "练习天城文中的元音符号。",
+        "noun": "符号"
+      },
+      "conjuncts": {
+        "label": "联合体",
+        "description": "学习组合辅音形式。",
+        "noun": "联合体"
+      },
+      "vowelmarks": {
+        "label": "元音符号",
+        "description": "练习元音变音符号。",
+        "noun": "符号"
+      },
+      "nasals": {
+        "label": "鼻音",
+        "description": "练习鼻音和标记。",
+        "noun": "声音"
+      },
+      "liaison": {
+        "label": "连读",
+        "description": "练习连接发音。",
+        "noun": "模式"
+      },
+      "cursive": {
+        "label": "草书",
+        "description": "练习草书书写形式。",
+        "noun": "字母"
+      },
+      "phonetics": {
+        "label": "语音学",
+        "description": "练习声音模式和发音。",
+        "noun": "声音"
       }
     },
     "accessibility": {
