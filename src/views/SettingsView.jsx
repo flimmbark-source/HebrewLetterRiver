@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { getFormattedLanguageName } from '../lib/languageUtils.js';
 
 export default function SettingsView() {
   const { t } = useLocalization();
@@ -81,7 +82,7 @@ export default function SettingsView() {
           >
             {languageOptions.map((option) => (
               <option key={option.id} value={option.id}>
-                {option.name}
+                {getFormattedLanguageName(option, t)}
               </option>
             ))}
           </select>
@@ -102,7 +103,7 @@ export default function SettingsView() {
           >
             {languageOptions.map((option) => (
               <option key={option.id} value={option.id}>
-                {option.name}
+                {getFormattedLanguageName(option, t)}
               </option>
             ))}
           </select>

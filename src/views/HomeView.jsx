@@ -5,6 +5,7 @@ import { useGame } from '../context/GameContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
+import { getFormattedLanguageName } from '../lib/languageUtils.js';
 import { classNames } from '../lib/classNames.js';
 import { getPlayerTitle } from '../utils/playerTitles.js';
 import { loadLanguage } from '../lib/languageLoader.js';
@@ -182,7 +183,7 @@ export default function HomeView() {
                 >
                   {languageOptions.map((option) => (
                     <option key={option.id} value={option.id}>
-                      {option.name}
+                      {getFormattedLanguageName(option, t)}
                     </option>
                   ))}
                 </select>
@@ -199,7 +200,7 @@ export default function HomeView() {
                 >
                   {languageOptions.map((option) => (
                     <option key={option.id} value={option.id}>
-                      {option.name}
+                      {getFormattedLanguageName(option, t)}
                     </option>
                   ))}
                 </select>
