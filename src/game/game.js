@@ -1133,6 +1133,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
     itemEl.className = `falling-letter font-bold ${fontClass} text-arcade-text-main ${animationName}`;
     itemEl.style.top = `${Math.random() * 70}%`;
+    itemEl.style.left = '0'; // Explicit left positioning to prevent RTL dir from affecting spawn position
     // Invert slider value: 34 - value (so left=slow, right=fast)
     const sliderValue = parseInt(gameSpeedSlider.value, 10);
     const invertedSpeed = 34 - sliderValue;
@@ -1359,6 +1360,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
     itemEl.className = `falling-gem text-4xl sm:text-5xl ${animationName}`;
     itemEl.style.top = `${Math.random() * 70}%`;
+    itemEl.style.left = '0'; // Explicit left positioning to prevent RTL dir from affecting spawn position
     const bonusSpeed = Math.max(5, parseInt(gameSpeedSlider.value, 10) - 5);
     itemEl.style.animationDuration = `${bonusSpeed}s`;
     itemEl.draggable = true;

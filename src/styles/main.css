@@ -1508,7 +1508,6 @@ body {
   animation-timing-function: linear;
   animation-fill-mode: forwards;
   transition: transform 0.2s ease-out;
-  direction: ltr; /* Ensure LTR coordinate system for animations regardless of parent dir */
 }
 .falling-letter.dragging {
   transform: scale(1.2);
