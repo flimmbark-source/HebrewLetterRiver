@@ -10,6 +10,7 @@ import { ProgressProvider } from './context/ProgressContext.jsx';
 import { GameProvider, useGame } from './context/GameContext.jsx';
 import { LocalizationProvider, useLocalization } from './context/LocalizationContext.jsx';
 import { LanguageProvider, useLanguage } from './context/LanguageContext.jsx';
+import { getFormattedLanguageName } from './lib/languageUtils.js';
 
 function HomeIcon(props) {
   return (
@@ -151,7 +152,7 @@ function LanguageOnboardingModal() {
             >
               {languageOptions.map((option) => (
                 <option key={option.id} value={option.id}>
-                  {option.name}
+                  {getFormattedLanguageName(option, translateOnboarding)}
                 </option>
               ))}
             </select>
@@ -176,7 +177,7 @@ function LanguageOnboardingModal() {
             >
               {languageOptions.map((option) => (
                 <option key={option.id} value={option.id}>
-                  {option.name}
+                  {getFormattedLanguageName(option, translateOnboarding)}
                 </option>
               ))}
             </select>
