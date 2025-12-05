@@ -25,7 +25,7 @@
       "label": "App Language",
       "helper": "Set the interface language.",
       "onboardingTitle": "Choose Your Languages",
-      "onboardingSubtitle": "Pick the interface language and the alphabet you want to practice.",
+      "onboardingSubtitle": "This app was developed to allow you to practice the alphabets of other langauges in your own native tongue.",
       "confirm": "Start learning"
     },
     "practicePicker": {
