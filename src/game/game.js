@@ -110,6 +110,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   );
   const metadata = activeLanguage.metadata ?? {};
   const fontClass = metadata.fontClass ?? 'language-font-hebrew';
+  const textDirection = metadata.textDirection ?? 'ltr';
+  const isRTL = textDirection === 'rtl';
   const accessibilityHints = metadata.accessibility ?? {};
   const letterDescriptionTemplate = accessibilityHints.letterDescriptionTemplate ?? null;
 
@@ -1034,6 +1036,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
       hasIntroducedForItemInLevel = roundItems.some((item) => item && !seenItems.has(item.id));
 
+      // Filter out any invalid items to prevent spawning without buckets
+      roundItems = roundItems.filter((item) => item && item.id);
+
       currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [] };
       generateChoices(roundItems, itemPool);
       processItemsForRound(roundItems, currentRound.id);
@@ -1070,6 +1075,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       roundItems.push(learningOrder.shift());
     }
 
+    // Filter out any invalid items to prevent spawning without buckets
+    roundItems = roundItems.filter((item) => item && item.id);
+
     currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [] };
     generateChoices(roundItems, itemPool);
     processItemsForRound(roundItems, currentRound.id);
@@ -1082,6 +1090,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   function processItemsForRound(items, roundId) {
     let totalDelay = 0;
     items.forEach((itemData) => {
+      if (!itemData || !itemData.id) return;
       if (currentRound.id !== roundId) return;
       const isNewItem = !seenItems.has(itemData.id);
       let delayForNext = 500;
@@ -1123,7 +1132,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     itemEl.isDropped = false;
     itemEl.textContent = itemData.symbol;
     const reducedMotion = reducedMotionToggle.checked;
-    const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
+    const rtlSuffix = isRTL ? '-rtl' : '';
+    const animationName = reducedMotion ? `simple-flow${rtlSuffix}` : [`river-flow-1${rtlSuffix}`, `river-flow-2${rtlSuffix}`][Math.floor(Math.random() * 2)];
     itemEl.className = `falling-letter font-bold ${fontClass} text-arcade-text-main ${animationName}`;
     itemEl.style.top = `${Math.random() * 70}%`;
     // Invert slider value: 34 - value (so left=slow, right=fast)
