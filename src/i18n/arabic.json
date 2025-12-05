@@ -72,7 +72,13 @@
     "quest": {
       "claim": "يدعي",
       "claimed": "مطالب",
-      "locked": "قيد التقدم"
+      "locked": "قيد التقدم",
+      "label": "المهمة {{current}} من {{total}}",
+      "complete": "المهمة مكتملة",
+      "inProgress": "قيد التقدم...",
+      "collected": "تم جمع المكافأة",
+      "collectedShort": "✓ تم الجمع",
+      "claiming": "يطالب..."
     },
     "dailyQuests": {
       "title": "المهام اليومية",
@@ -256,7 +262,32 @@
     "complete": "جميع المستويات كاملة",
     "earnStars": "اربح +{{stars}} ⭐ عندما تفتح هذا المستوى.",
     "maxed": "شارة متقنة بالكامل - استمتع بالتوهج!",
-    "claimStarsAria": "اطلب {{stars}} نجوم لـ {{label}}"
+    "claimStarsAria": "اطلب {{stars}} نجوم لـ {{label}}",
+    "claiming": "يطالب...",
+    "moreTiers": "+{{count}} مستوى آخر",
+    "moreTiersPlural": "+{{count}} مستويات أخرى",
+    "profile": {
+      "title": "ملف اللاعب",
+      "description": "تتبع تقدم النجوم الخاص بك واطلب المكافآت للارتقاء في رتب النهر.",
+      "starsToNextLevel": "نجوم للمستوى التالي",
+      "totalStarsEarned": "إجمالي النجوم المكتسبة",
+      "currentStarBalance": "رصيد النجوم الحالي",
+      "starsReadyToClaim": "نجوم جاهزة للمطالبة",
+      "dailyBadgeReady": "الشارة اليومية جاهزة",
+      "claimStarsToLevel": "اطلب +{{stars}} ⭐ لإضافتها إلى مستواك."
+    },
+    "levelNames": {
+      "1": "المجدف الصبور",
+      "2": "تيار لطيف",
+      "3": "تيار ثابت",
+      "4": "منحدرات متصاعدة",
+      "5": "عداء النهر",
+      "6": "راكب الأمواج",
+      "7": "مطارد الشلال",
+      "8": "مروض التيار",
+      "9": "محارب الشلال",
+      "10": "سيد النهر"
+    }
   },
   "learn": {
     "title": "يتعلم",
@@ -364,5 +395,19 @@
     "patientPaddler": "المجدف الصبور",
     "noneYet": "لا شيء حتى الآن",
     "play": "يلعب"
+  },
+  "languageNames": {
+    "hebrew": "العبرية",
+    "english": "الإنجليزية",
+    "mandarin": "الصينية الماندرينية",
+    "hindi": "الهندية",
+    "spanish": "الإسبانية",
+    "french": "الفرنسية",
+    "arabic": "العربية",
+    "bengali": "البنغالية",
+    "portuguese": "البرتغالية",
+    "russian": "الروسية",
+    "japanese": "اليابانية",
+    "amharic": "الأمهرية"
   }
 }

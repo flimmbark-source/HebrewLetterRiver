@@ -3,6 +3,20 @@
     "id": "mandarin",
     "name": "普通话 中文"
   },
+  "languageNames": {
+    "hebrew": "希伯来语",
+    "english": "英语",
+    "mandarin": "普通话 中文",
+    "hindi": "印地语",
+    "spanish": "西班牙语",
+    "french": "法语",
+    "arabic": "阿拉伯语",
+    "bengali": "孟加拉语",
+    "portuguese": "葡萄牙语",
+    "russian": "俄语",
+    "japanese": "日语",
+    "amharic": "阿姆哈拉语"
+  },
   "app": {
     "title": "希伯来语字母河",
     "tagline": "流动、学习并庆祝每一次捕获。",
@@ -70,6 +84,12 @@
       "play": "玩"
     },
     "quest": {
+      "label": "任务 {{current}} / {{total}}",
+      "complete": "任务完成",
+      "inProgress": "进行中...",
+      "collected": "奖励已收集",
+      "collectedShort": "✓ 已收集",
+      "claiming": "领取中...",
       "claim": "领取",
       "claimed": "已领取",
       "locked": "进行中"
@@ -256,7 +276,32 @@
     "complete": "所有层级均已完成",
     "earnStars": "解锁此级别后，可赚取 +{{stars}} ⭐。",
     "maxed": "完全掌握徽章——享受光芒！",
-    "claimStarsAria": "领取{{label}}的{{stars}}颗星"
+    "claimStarsAria": "领取{{label}}的{{stars}}颗星",
+    "claiming": "领取中...",
+    "moreTiers": "+{{count}} 个级别",
+    "moreTiersPlural": "+{{count}} 个级别",
+    "profile": {
+      "title": "玩家资料",
+      "description": "追踪您的星星进度并领取奖励以在河流等级中提升。",
+      "starsToNextLevel": "升级所需星星",
+      "totalStarsEarned": "总共获得的星星",
+      "currentStarBalance": "当前星星余额",
+      "starsReadyToClaim": "准备领取的星星",
+      "dailyBadgeReady": "每日徽章已准备",
+      "claimStarsToLevel": "领取 +{{stars}} ⭐ 将它们添加到您的等级。"
+    },
+    "levelNames": {
+      "1": "耐心的桨手",
+      "2": "温和水流",
+      "3": "稳定溪流",
+      "4": "上升急流",
+      "5": "河流奔跑者",
+      "6": "波浪骑手",
+      "7": "瀑布追逐者",
+      "8": "洪流驯服者",
+      "9": "瀑布战士",
+      "10": "河流大师"
+    }
   },
   "learn": {
     "title": "学习",

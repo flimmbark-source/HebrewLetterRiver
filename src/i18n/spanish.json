@@ -3,6 +3,20 @@
     "id": "spanish",
     "name": "Español"
   },
+  "languageNames": {
+    "hebrew": "Hebreo",
+    "english": "Inglés",
+    "mandarin": "Chino mandarín",
+    "hindi": "Hindi",
+    "spanish": "Español",
+    "french": "Francés",
+    "arabic": "Árabe",
+    "bengali": "Bengalí",
+    "portuguese": "Portugués",
+    "russian": "Ruso",
+    "japanese": "Japonés",
+    "amharic": "Amhárico"
+  },
   "app": {
     "title": "Río de letras hebreas",
     "tagline": "Fluye, aprende y celebra cada captura.",
@@ -57,6 +71,12 @@
       "play": "Jugar"
     },
     "quest": {
+      "label": "Misión {{current}} de {{total}}",
+      "complete": "Misión completada",
+      "inProgress": "En progreso...",
+      "collected": "Recompensa recolectada",
+      "collectedShort": "✓ Recolectado",
+      "claiming": "Reclamando...",
       "claim": "Reclamar",
       "claimed": "Reclamado",
       "locked": "En Progreso"
@@ -276,7 +296,32 @@
     "complete": "Todos los niveles completos",
     "earnStars": "Gana +{{stars}} ⭐ cuando desbloqueas este nivel.",
     "maxed": "Insignia completamente dominada: ¡disfruta del brillo!",
-    "claimStarsAria": "Reclamar {{stars}} estrellas para {{label}}"
+    "claiming": "Reclamando...",
+    "claimStarsAria": "Reclamar {{stars}} estrellas para {{label}}",
+    "moreTiers": "+{{count}} nivel más",
+    "moreTiersPlural": "+{{count}} niveles más",
+    "profile": {
+      "title": "Perfil del jugador",
+      "description": "Rastrea tu progreso de estrellas y reclama recompensas para subir en los rangos del Río.",
+      "starsToNextLevel": "Estrellas para el próximo nivel",
+      "totalStarsEarned": "Total de estrellas ganadas",
+      "currentStarBalance": "Saldo actual de estrellas",
+      "starsReadyToClaim": "Estrellas listas para reclamar",
+      "dailyBadgeReady": "Insignia diaria lista",
+      "claimStarsToLevel": "Reclama +{{stars}} ⭐ para agregarlas a tu nivel."
+    },
+    "levelNames": {
+      "1": "Remero Paciente",
+      "2": "Corriente Suave",
+      "3": "Arroyo Constante",
+      "4": "Rápidos Crecientes",
+      "5": "Corredor de Río",
+      "6": "Jinete de Olas",
+      "7": "Cazador de Cascadas",
+      "8": "Domador de Torrentes",
+      "9": "Guerrero de Cascadas",
+      "10": "Maestro del Río"
+    }
   },
   "learn": {
     "title": "Aprender",

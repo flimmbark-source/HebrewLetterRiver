@@ -43,7 +43,7 @@ const bengaliIntroductions = {
 
 const bengaliPack = {
   id: 'bengali',
-  name: 'Bengali',
+  name: 'বাংলা',
   metadata: {
     dictionaryId: 'bengali',
     fontClass: 'language-font-bengali',

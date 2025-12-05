@@ -43,7 +43,7 @@ const arabicIntroductions = {
 
 const arabicPack = {
   id: 'arabic',
-  name: 'Standard Arabic',
+  name: 'اللغة العربية الفصحى',
   metadata: {
     dictionaryId: 'arabic',
     fontClass: 'language-font-arabic',

@@ -3,6 +3,20 @@
     "id": "hebrew",
     "name": "עברית"
   },
+  "languageNames": {
+    "hebrew": "עברית",
+    "english": "אנגלית",
+    "mandarin": "סינית מנדרינית",
+    "hindi": "הינדי",
+    "spanish": "ספרדית",
+    "french": "צרפתית",
+    "arabic": "ערבית",
+    "bengali": "בנגלית",
+    "portuguese": "פורטוגזית",
+    "russian": "רוסית",
+    "japanese": "יפנית",
+    "amharic": "אמהרית"
+  },
   "app": {
     "title": "נהר האותיות העבריות",
     "tagline": "זרמו, למדו וחגגו כל תפיסה.",
@@ -70,6 +84,12 @@
       "play": "שחק"
     },
     "quest": {
+      "label": "משימה {{current}} מתוך {{total}}",
+      "complete": "המשימה הושלמה",
+      "inProgress": "בתהליך...",
+      "collected": "הפרס נאסף",
+      "collectedShort": "✓ נאסף",
+      "claiming": "אוסף...",
       "claim": "תבע",
       "claimed": "נתבע",
       "locked": "בתהליך"
@@ -256,7 +276,32 @@
     "complete": "כל הדרגות הושלמו",
     "earnStars": "קבלו +{{stars}} ⭐ כאשר תפתחו את הדרגה הזו.",
     "maxed": "התג שולט לחלוטין — תיהנו מהזוהר!",
-    "claimStarsAria": "תבע {{stars}} כוכבים עבור {{label}}"
+    "claiming": "תובע...",
+    "claimStarsAria": "תבע {{stars}} כוכבים עבור {{label}}",
+    "moreTiers": "+{{count}} דרגה נוספת",
+    "moreTiersPlural": "+{{count}} דרגות נוספות",
+    "profile": {
+      "title": "פרופיל שחקן",
+      "description": "עקבו אחר התקדמות הכוכבים שלכם ותבעו פרסים כדי לעלות בדרגות הנהר.",
+      "starsToNextLevel": "כוכבים לרמה הבאה",
+      "totalStarsEarned": "סה\"כ כוכבים שהושגו",
+      "currentStarBalance": "יתרת כוכבים נוכחית",
+      "starsReadyToClaim": "כוכבים מוכנים לתביעה",
+      "dailyBadgeReady": "תג יומי מוכן",
+      "claimStarsToLevel": "תבעו +{{stars}} ⭐ כדי להוסיף אותם לרמה שלכם."
+    },
+    "levelNames": {
+      "1": "חותר סבלני",
+      "2": "זרם עדין",
+      "3": "נחל יציב",
+      "4": "מפלי עליה",
+      "5": "רץ נהר",
+      "6": "רוכב גלים",
+      "7": "רודף מפלים",
+      "8": "מאלף סילון",
+      "9": "לוחם מפלי מים",
+      "10": "אמן הנהר"
+    }
   },
   "learn": {
     "title": "לימוד",

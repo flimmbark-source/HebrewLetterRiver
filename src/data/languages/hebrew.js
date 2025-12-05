@@ -103,7 +103,7 @@ export const hebrewIntroductions = {
 
 const hebrewPack = {
   id: 'hebrew',
-  name: 'Hebrew',
+  name: 'עברית',
   metadata: {
     dictionaryId: 'hebrew',
     fontClass: 'language-font-hebrew',

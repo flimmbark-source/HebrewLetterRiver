@@ -43,7 +43,7 @@ const japaneseIntroductions = {
 
 const japanesePack = {
   id: 'japanese',
-  name: 'Japanese',
+  name: '日本語',
   metadata: {
     dictionaryId: 'japanese',
     fontClass: 'language-font-japanese',

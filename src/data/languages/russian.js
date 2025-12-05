@@ -43,7 +43,7 @@ const russianIntroductions = {
 
 const russianPack = {
   id: 'russian',
-  name: 'Russian',
+  name: 'Русский',
   metadata: {
     dictionaryId: 'russian',
     fontClass: 'language-font-cyrillic',

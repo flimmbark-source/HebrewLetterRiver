@@ -3,6 +3,20 @@
     "id": "english",
     "name": "English"
   },
+  "languageNames": {
+    "hebrew": "Hebrew",
+    "english": "English",
+    "mandarin": "Mandarin Chinese",
+    "hindi": "Hindi",
+    "spanish": "Spanish",
+    "french": "French",
+    "arabic": "Arabic",
+    "bengali": "Bengali",
+    "portuguese": "Portuguese",
+    "russian": "Russian",
+    "japanese": "Japanese",
+    "amharic": "Amharic"
+  },
   "common": {
     "close": "Close",
     "viewDetails": "View details",

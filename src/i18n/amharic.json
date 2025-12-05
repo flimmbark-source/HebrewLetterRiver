@@ -395,5 +395,19 @@
       "fast-flow": "ፈጣን ፍሰት ፍጥነት ንቁ",
       "no-intros": "ምንም መግቢያዎች አልነቁም"
     }
+  },
+  "languageNames": {
+    "hebrew": "እብራይስጥ",
+    "english": "እንግሊዝኛ",
+    "mandarin": "ማንዳሪን ቻይንኛ",
+    "hindi": "ሂንዲ",
+    "spanish": "ስፓኒሽ",
+    "french": "ፈረንሳይኛ",
+    "arabic": "ዓረብኛ",
+    "bengali": "ቤንጋሊ",
+    "portuguese": "ፖርቹጋልኛ",
+    "russian": "ሩሲያኛ",
+    "japanese": "ጃፓንኛ",
+    "amharic": "አማርኛ"
   }
 }
