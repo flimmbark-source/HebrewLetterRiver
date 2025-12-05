@@ -43,7 +43,7 @@ const portugueseIntroductions = {
 
 const portuguesePack = {
   id: 'portuguese',
-  name: 'Portuguese',
+  name: 'Português',
   metadata: {
     dictionaryId: 'portuguese',
     fontClass: 'language-font-latin',

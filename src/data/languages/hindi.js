@@ -43,7 +43,7 @@ const hindiIntroductions = {
 
 const hindiPack = {
   id: 'hindi',
-  name: 'Hindi',
+  name: 'हिंदी',
   metadata: {
     dictionaryId: 'hindi',
     fontClass: 'language-font-devanagari',

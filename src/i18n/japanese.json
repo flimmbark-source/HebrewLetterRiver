@@ -72,7 +72,13 @@
     "quest": {
       "claim": "請求",
       "claimed": "請求済み",
-      "locked": "進行中"
+      "locked": "進行中",
+      "label": "クエスト {{current}} / {{total}}",
+      "complete": "クエスト完了",
+      "inProgress": "進行中...",
+      "collected": "報酬を受け取りました",
+      "collectedShort": "✓ 受取済み",
+      "claiming": "請求中..."
     },
     "dailyQuests": {
       "title": "デイリークエスト",
@@ -256,7 +262,32 @@
     "complete": "すべての階層が完了しました",
     "earnStars": "このティアのロックを解除すると、+{{stars}} ⭐を獲得できます。",
     "maxed": "バッジを完全にマスター — 輝きをお楽しみください!",
-    "claimStarsAria": "{{label}}のために{{stars}}スターを請求"
+    "claimStarsAria": "{{label}}のために{{stars}}スターを請求",
+    "claiming": "請求中...",
+    "moreTiers": "+{{count}} 追加ティア",
+    "moreTiersPlural": "+{{count}} 追加ティア",
+    "profile": {
+      "title": "プレイヤープロフィール",
+      "description": "スターの進捗を追跡し、報酬を受け取ってリバーランクを上げましょう。",
+      "starsToNextLevel": "次のレベルまでのスター",
+      "totalStarsEarned": "獲得した総スター数",
+      "currentStarBalance": "現在のスターバランス",
+      "starsReadyToClaim": "請求可能なスター",
+      "dailyBadgeReady": "デイリーバッジ準備完了",
+      "claimStarsToLevel": "+{{stars}} ⭐ を請求してレベルに追加しましょう。"
+    },
+    "levelNames": {
+      "1": "忍耐強いパドラー",
+      "2": "穏やかな流れ",
+      "3": "安定した流れ",
+      "4": "上昇する急流",
+      "5": "リバーランナー",
+      "6": "ウェーブライダー",
+      "7": "カスケードチェイサー",
+      "8": "トレントテイマー",
+      "9": "滝の戦士",
+      "10": "リバーマスター"
+    }
   },
   "learn": {
     "title": "学ぶ",
@@ -364,5 +395,19 @@
     "patientPaddler": "忍耐強いパドラー",
     "noneYet": "まだなし",
     "play": "プレイ"
+  },
+  "languageNames": {
+    "hebrew": "ヘブライ語",
+    "english": "英語",
+    "mandarin": "中国語（標準語）",
+    "hindi": "ヒンディー語",
+    "spanish": "スペイン語",
+    "french": "フランス語",
+    "arabic": "アラビア語",
+    "bengali": "ベンガル語",
+    "portuguese": "ポルトガル語",
+    "russian": "ロシア語",
+    "japanese": "日本語",
+    "amharic": "アムハラ語"
   }
 }

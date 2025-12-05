@@ -43,7 +43,7 @@ const mandarinIntroductions = {
 
 const mandarinPack = {
   id: 'mandarin',
-  name: 'Mandarin Chinese',
+  name: '普通话 中文',
   metadata: {
     dictionaryId: 'mandarin',
     fontClass: 'language-font-han',

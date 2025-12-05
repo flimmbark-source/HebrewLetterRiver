@@ -43,7 +43,7 @@ const spanishIntroductions = {
 
 const spanishPack = {
   id: 'spanish',
-  name: 'Spanish',
+  name: 'Español',
   metadata: {
     dictionaryId: 'spanish',
     fontClass: 'language-font-latin',

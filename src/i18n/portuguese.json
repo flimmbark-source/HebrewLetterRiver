@@ -72,7 +72,13 @@
     "quest": {
       "claim": "Reivindicar",
       "claimed": "Reivindicado",
-      "locked": "Em Progresso"
+      "locked": "Em Progresso",
+      "label": "Missão {{current}} de {{total}}",
+      "complete": "Missão completa",
+      "inProgress": "Em andamento...",
+      "collected": "Recompensa coletada",
+      "collectedShort": "✓ Coletado",
+      "claiming": "Reivindicando..."
     },
     "dailyQuests": {
       "title": "Missões diárias",
@@ -256,7 +262,32 @@
     "complete": "Todas as camadas concluídas",
     "earnStars": "Ganhe +{{stars}} ⭐ ao desbloquear este nível.",
     "maxed": "Distintivo totalmente dominado – aproveite o brilho!",
-    "claimStarsAria": "Reivindicar {{stars}} estrelas para {{label}}"
+    "claimStarsAria": "Reivindicar {{stars}} estrelas para {{label}}",
+    "claiming": "Reivindicando...",
+    "moreTiers": "+{{count}} nível a mais",
+    "moreTiersPlural": "+{{count}} níveis a mais",
+    "profile": {
+      "title": "Perfil do Jogador",
+      "description": "Acompanhe seu progresso de estrelas e reivindique recompensas para subir nos rankings do Rio.",
+      "starsToNextLevel": "Estrelas para o próximo nível",
+      "totalStarsEarned": "Total de estrelas ganhas",
+      "currentStarBalance": "Saldo atual de estrelas",
+      "starsReadyToClaim": "Estrelas prontas para reivindicar",
+      "dailyBadgeReady": "Distintivo diário pronto",
+      "claimStarsToLevel": "Reivindique +{{stars}} ⭐ para adicioná-las ao seu nível."
+    },
+    "levelNames": {
+      "1": "Remador Paciente",
+      "2": "Corrente Suave",
+      "3": "Fluxo Constante",
+      "4": "Corredeiras Crescentes",
+      "5": "Corredor do Rio",
+      "6": "Cavaleiro de Ondas",
+      "7": "Caçador de Cascatas",
+      "8": "Domador de Torrentes",
+      "9": "Guerreiro da Cachoeira",
+      "10": "Mestre do Rio"
+    }
   },
   "learn": {
     "title": "Aprender",
@@ -364,5 +395,19 @@
     "patientPaddler": "Remador Paciente",
     "noneYet": "Nenhum ainda",
     "play": "Jogar"
+  },
+  "languageNames": {
+    "hebrew": "Hebraico",
+    "english": "Inglês",
+    "mandarin": "Chinês Mandarim",
+    "hindi": "Hindi",
+    "spanish": "Espanhol",
+    "french": "Francês",
+    "arabic": "Árabe",
+    "bengali": "Bengali",
+    "portuguese": "Português",
+    "russian": "Russo",
+    "japanese": "Japonês",
+    "amharic": "Amárico"
   }
 }

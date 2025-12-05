@@ -54,7 +54,7 @@ const amharicIntroductions = {
 
 const amharicPack = {
   id: 'amharic',
-  name: 'Amharic',
+  name: 'አማርኛ',
   metadata: {
     dictionaryId: 'amharic',
     fontClass: 'language-font-ethiopic',
