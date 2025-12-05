@@ -110,8 +110,6 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   );
   const metadata = activeLanguage.metadata ?? {};
   const fontClass = metadata.fontClass ?? 'language-font-hebrew';
-  const textDirection = metadata.textDirection ?? 'ltr';
-  const isRTL = textDirection === 'rtl';
   const accessibilityHints = metadata.accessibility ?? {};
   const letterDescriptionTemplate = accessibilityHints.letterDescriptionTemplate ?? null;
 
@@ -1132,8 +1130,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     itemEl.isDropped = false;
     itemEl.textContent = itemData.symbol;
     const reducedMotion = reducedMotionToggle.checked;
-    const rtlSuffix = isRTL ? '-rtl' : '';
-    const animationName = reducedMotion ? `simple-flow${rtlSuffix}` : [`river-flow-1${rtlSuffix}`, `river-flow-2${rtlSuffix}`][Math.floor(Math.random() * 2)];
+    const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
     itemEl.className = `falling-letter font-bold ${fontClass} text-arcade-text-main ${animationName}`;
     itemEl.style.top = `${Math.random() * 70}%`;
     // Invert slider value: 34 - value (so left=slow, right=fast)
