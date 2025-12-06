@@ -761,7 +761,7 @@ body {
   gap: 8px;
   padding: 12px 8px;
   border-radius: 16px;
-  background: linear-gradient(180deg, #fffaf5 0%, #fff5e8 100%);
+  background: linear-gradient(180deg, #f7ddc3 0%, #f0d9ba 100%);
   border: 2px solid #e5b883;
   box-shadow:
     0 2px 0 #d4a574,
@@ -957,7 +957,7 @@ body {
 .mode-column__headline {
   text-align: center;
   padding: 0 6px 2px;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   font-weight: 700;
 }
@@ -965,7 +965,7 @@ body {
 .mode-panel {
   padding: 10px 10px 12px;
   border-radius: 16px;
-  background: linear-gradient(180deg, #fffaf5 0%, #fff5e8 100%);
+  background: linear-gradient(180deg, #f7ddc3 0%, #f0d9ba 100%);
   border: 2px solid #e5b883;
   box-shadow:
     0 2px 0 #d4a574,

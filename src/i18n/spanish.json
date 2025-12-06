@@ -126,7 +126,7 @@
     },
     "controls": {
       "leave": "Salir del juego",
-      "exitToMenu": "Salir al menú",
+      "exitToMenu": "⬅",
       "start": "Iniciar juego",
       "playAgain": "Jugar de nuevo",
       "install": "Instalar aplicación",

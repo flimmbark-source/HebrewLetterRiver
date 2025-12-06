@@ -92,7 +92,7 @@
     },
     "controls": {
       "leave": "ترك اللعبة",
-      "exitToMenu": "الخروج إلى القائمة",
+      "exitToMenu": "⬅",
       "start": "ابدأ اللعبة",
       "playAgain": "العب مرة أخرى",
       "install": "تثبيت التطبيق",

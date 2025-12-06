@@ -106,7 +106,7 @@
     },
     "controls": {
       "leave": "离开游戏",
-      "exitToMenu": "返回菜单",
+      "exitToMenu": "⬅",
       "start": "开始游戏",
       "playAgain": "再玩一次",
       "install": "安装应用程序",

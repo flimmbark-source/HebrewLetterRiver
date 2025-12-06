@@ -106,7 +106,7 @@
     },
     "controls": {
       "leave": "יציאה מהמשחק",
-      "exitToMenu": "יציאה לתפריט",
+      "exitToMenu": "⬅",
       "start": "התחל משחק",
       "playAgain": "שחק שוב",
       "install": "התקן אפליקציה",

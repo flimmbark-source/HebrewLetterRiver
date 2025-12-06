@@ -198,20 +198,20 @@ function GameCanvas({ fontClass }) {
                     className="text-xs font-semibold transition sm:text-sm"
                     style={{ color: '#6c3b14' }}
                   >
-                    ← {t('game.controls.exitToMenu')}
+                    {t('game.controls.exitToMenu')}
                   </button>
                   <div className="text-center flex-1">
                     <h1 className={`modal-title text-xl sm:text-2xl font-bold ${fontClass}`} style={{ color: '#ff9247' }}>{t('game.setup.title')}</h1>
-                  </div>
-                  <div className="w-12"></div>
-                </div>
+
 
                 <div className="text-center py-1">
                   <p id="modal-subtitle" className="text-xs font-semibold sm:text-sm" style={{ color: '#6c3b14' }}>
                     {t('game.setup.subtitleFallback')}
                   </p>
                 </div>
-
+                  </div>
+                  <div className="w-12"></div>
+                </div>
                 <div className="setup-body px-4">
                   <aside className="goal-column" aria-label="Goal settings">
                     <div className="goal-column__label text-xs font-bold uppercase tracking-wider" style={{ color: '#6c3b14' }}>
