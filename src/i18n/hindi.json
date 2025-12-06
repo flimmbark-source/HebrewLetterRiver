@@ -93,6 +93,7 @@
     "controls": {
       "leave": "खेल छोड़ो",
       "exitToMenu": "⬅",
+      "backToMenu": "मेनू पर वापस जाएं",
       "start": "खेल शुरू",
       "playAgain": "फिर से चालू करें",
       "install": "एप्लिकेशन इंस्टॉल करो",

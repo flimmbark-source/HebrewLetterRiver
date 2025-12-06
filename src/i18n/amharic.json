@@ -122,6 +122,7 @@
     "controls": {
       "leave": "ጨዋታን ተው",
       "exitToMenu": "⬅",
+      "backToMenu": "ወደ ምናሌ ተመለስ",
       "start": "ጨዋታ ጀምር",
       "playAgain": "እንደገና ተጫወት",
       "install": "መተግበሪያ ጫን",

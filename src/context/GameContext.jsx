@@ -219,7 +219,7 @@ function GameCanvas({ fontClass }) {
                     </div>
 
                     <div className="goal-badge" aria-live="polite">
-                      <div className="goal-badge__value" id="goalValue">10</div>
+                      <div className="goal-badge__value" id="goalValue">Medium</div>
                     </div>
 
                     <div className="goal-column__controls" aria-label="Adjust goal">
@@ -337,7 +337,7 @@ function GameCanvas({ fontClass }) {
                         boxShadow: '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)'
                       }}
                     >
-                      {t('game.controls.exitToMenu')}
+                      {t('game.controls.backToMenu')}
                     </button>
                   </div>
                 </div>
