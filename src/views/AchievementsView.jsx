@@ -5,6 +5,7 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { on } from '../lib/eventBus.js';
 import { getPlayerTitle } from '../utils/playerTitles.js';
+import { getFormattedLanguageName } from '../lib/languageUtils.js';
 
 function XIcon({ className = '' }) {
   return (
@@ -306,7 +307,7 @@ export default function AchievementsView() {
                 >
                   {languageOptions.map((option) => (
                     <option key={option.id} value={option.id}>
-                      {option.name}
+                      {getFormattedLanguageName(option, t)}
                     </option>
                   ))}
                 </select>
@@ -323,7 +324,7 @@ export default function AchievementsView() {
                 >
                   {languageOptions.map((option) => (
                     <option key={option.id} value={option.id}>
-                      {option.name}
+                      {getFormattedLanguageName(option, t)}
                     </option>
                   ))}
                 </select>
