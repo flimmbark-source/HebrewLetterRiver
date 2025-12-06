@@ -190,8 +190,8 @@ function GameCanvas({ fontClass }) {
                 ⚙️
               </button>
 
-              <div id="setup-view" className="space-y-3 pt-4 sm:pt-6 sm:space-y-4">
-                <div className="flex items-center px-4">
+              <div id="setup-view" className="flex flex-col h-full">
+                <div className="flex items-center justify-between px-4 py-3 border-b-2" style={{ borderColor: 'rgba(235, 179, 105, 0.3)' }}>
                   <button
                     id="setup-exit-button"
                     type="button"
@@ -200,11 +200,14 @@ function GameCanvas({ fontClass }) {
                   >
                     ← {t('game.controls.exitToMenu')}
                   </button>
+                  <div className="text-center flex-1">
+                    <h1 className={`modal-title text-2xl sm:text-3xl font-bold ${fontClass}`} style={{ color: '#ff9247' }}>{t('game.setup.title')}</h1>
+                  </div>
+                  <div className="w-16"></div>
                 </div>
 
-                <div className="space-y-1 text-center">
-                  <h1 className={`modal-title ${fontClass}`} style={{ color: '#ff9247' }}>{t('game.setup.title')}</h1>
-                  <p id="modal-subtitle" className="modal-subtitle" style={{ color: '#6c3b14' }}>
+                <div className="text-center py-2">
+                  <p id="modal-subtitle" className="text-sm font-semibold" style={{ color: '#6c3b14' }}>
                     {t('game.setup.subtitleFallback')}
                   </p>
                 </div>
