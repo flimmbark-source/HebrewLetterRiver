@@ -73,6 +73,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const goalValueEl = document.getElementById('goalValue');
   const goalIncreaseBtn = document.getElementById('goalIncrease');
   const goalDecreaseBtn = document.getElementById('goalDecrease');
+  const goalProgressFillEl = document.getElementById('goalProgressFill');
   const winView = document.getElementById('win-view');
   const continuePlayingButton = document.getElementById('continue-playing-button');
   const winExitButton = document.getElementById('win-exit-button');
@@ -211,14 +212,23 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     }
   }
 
+  function updateGoalProgressBar() {
+    if (goalProgressFillEl && goalValue > 0) {
+      const percent = (waveCorrectCount / goalValue) * 100;
+      goalProgressFillEl.style.height = `${Math.min(100, Math.max(0, percent))}%`;
+    }
+  }
+
   function increaseGoal() {
     goalValue = Math.min(GOAL_MAX, goalValue + GOAL_STEP);
     updateGoalDisplay();
+    updateGoalProgressBar();
   }
 
   function decreaseGoal() {
     goalValue = Math.max(GOAL_MIN, goalValue - GOAL_STEP);
     updateGoalDisplay();
+    updateGoalProgressBar();
   }
 
   function showWinScreen() {
@@ -234,6 +244,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   function continueAfterWin() {
     waveCorrectCount = 0;
+    updateGoalProgressBar();
     winView.classList.add('hidden');
     modal.classList.add('hidden');
     gameActive = true;
@@ -687,6 +698,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         sessionStats[droppedItemId].correct++;
         // Track wave progress for win condition
         waveCorrectCount++;
+        updateGoalProgressBar();
         if (waveCorrectCount >= goalValue) {
           totalWins++;
           trackTimeout(() => {
@@ -704,6 +716,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         sessionStats[droppedItemId].incorrect++;
         // Reset wave progress on incorrect answer
         waveCorrectCount = 0;
+        updateGoalProgressBar();
       }
 
       // Find the correct bucket to show its sound/label
@@ -837,6 +850,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     updateLives();
     updateLevelDisplay();
     updateGoalDisplay();
+    updateGoalProgressBar();
 
     startButton.textContent = t('game.controls.start');
     isRestartMode = false;

@@ -221,6 +221,25 @@ function GameCanvas({ fontClass }) {
 
                     <div className="goal-column__controls" aria-label="Adjust goal">
                       <button className="goal-icon-button" type="button" id="goalIncrease" aria-label="Increase goal">+</button>
+
+                      <div className="goal-progress-bar" aria-label="Goal progress">
+                        <div className="goal-progress-bar__inner">
+                          <div className="goal-progress-bar__fill" id="goalProgressFill"></div>
+                          <div className="goal-progress-bar__ticks">
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                          </div>
+                        </div>
+                      </div>
+
                       <button className="goal-icon-button" type="button" id="goalDecrease" aria-label="Decrease goal">–</button>
                     </div>
                   </aside>
