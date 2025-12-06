@@ -249,6 +249,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let activeBucketCount = 0;
   const BUCKET_MIN_WIDTH_FALLBACK = 96;
   const LAYOUT_GAP_FALLBACK = 12;
+  const BUCKET_BASE_HEIGHT = 80; // Base height when containers are full size
+  const BUCKET_MIN_HEIGHT = 44; // Minimum height for touch accessibility
   let pendingBucketLayoutHandle = null;
   let pendingBucketLayoutIsAnimationFrame = false;
   let isApplyingBucketLayout = false;
@@ -452,13 +454,26 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     const totalGap = gapValue * Math.max(count - 1, 0);
     const availableWidth = containerWidth - totalGap;
     const targetWidth = availableWidth / count;
+
+    // Helper function to calculate and apply height based on width ratio
+    const applyDynamicHeight = (currentWidth) => {
+      const widthRatio = currentWidth / minBucketWidth;
+      const dynamicHeight = BUCKET_BASE_HEIGHT * widthRatio;
+      const finalHeight = Math.max(dynamicHeight, BUCKET_MIN_HEIGHT);
+      buckets.forEach(bucket => {
+        bucket.style.minHeight = `${finalHeight}px`;
+      });
+    };
+
     if (availableWidth / count >= minBucketWidth) {
       choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(${minBucketWidth}px, 1fr))`;
+      applyDynamicHeight(minBucketWidth);
       return;
     }
     if (targetWidth >= minReadableWidth) {
       const minWidth = Math.max(minReadableWidth, targetWidth);
       choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(${minWidth}px, 1fr))`;
+      applyDynamicHeight(minWidth);
       return;
     }
     const numerator = containerWidth + gapValue;
@@ -467,6 +482,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       Math.min(count, Math.floor(numerator / (minReadableWidth + gapValue)))
     );
     choicesContainer.style.gridTemplateColumns = `repeat(${maxColumns}, minmax(${minReadableWidth}px, 1fr))`;
+    applyDynamicHeight(minReadableWidth);
   }
 
   if (playArea) {
