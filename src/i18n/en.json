@@ -146,6 +146,7 @@
       "title": "World Letter River",
       "subtitleFallback": "Drag the letters to the correct boxes!",
       "prompt": "Choose what you want to practice:",
+      "goal": "Goal",
       "installDescription": "Install App",
       "defaultNoun": "item",
       "defaultModeLabel": "Core Practice",
@@ -288,6 +289,13 @@
       "soundLabel": "Sound: {{sound}}",
       "learningRecap": "Learning Recap",
       "practice": "Practice This"
+    },
+    "win": {
+      "title": "You Win!",
+      "message": "You reached your goal!",
+      "correctAnswers": "correct answers in a row!",
+      "totalWins": "Total wins",
+      "continue": "Continue Playing"
     },
     "status": {
       "bonusRound": "Bonus Round!",
