@@ -336,6 +336,114 @@
         "2": "শিমারিং র‍্যাপিড",
         "3": "রেডিয়েন্ট ক্যাসকেড"
       }
+    },
+    "dedicatedScholar": {
+      "name": "Dedicated Scholar",
+      "summary": "Catch a total number of items across all sessions.",
+      "tiers": {
+        "1": "Studious Starter",
+        "2": "Devoted Reader",
+        "3": "Master Scholar"
+      }
+    },
+    "accuracyAce": {
+      "name": "Accuracy Ace",
+      "summary": "Complete sessions with 90% or higher accuracy.",
+      "tiers": {
+        "1": "Sharp Eye",
+        "2": "Keen Focus",
+        "3": "Flawless Precision"
+      }
+    },
+    "speedDemon": {
+      "name": "Speed Demon",
+      "summary": "Complete sessions with fast flow speed enabled.",
+      "tiers": {
+        "1": "Quick Current",
+        "2": "Rapid Runner",
+        "3": "Lightning Flow"
+      }
+    },
+    "explorer": {
+      "name": "Explorer",
+      "summary": "Try different game modes and challenges.",
+      "tiers": {
+        "1": "Curious Wanderer",
+        "2": "Brave Voyager",
+        "3": "Intrepid Pioneer"
+      }
+    },
+    "perfectionist": {
+      "name": "Perfectionist",
+      "summary": "Complete sessions without any mistakes.",
+      "tiers": {
+        "1": "Careful Catcher",
+        "2": "Precision Master",
+        "3": "Absolute Perfection"
+      }
+    },
+    "earlyBird": {
+      "name": "Early Bird",
+      "summary": "Play sessions in the morning hours (5am-11am).",
+      "tiers": {
+        "1": "Dawn Paddler",
+        "2": "Sunrise Swimmer",
+        "3": "Morning Master"
+      }
+    },
+    "nightOwl": {
+      "name": "Night Owl",
+      "summary": "Play sessions in the evening hours (8pm-2am).",
+      "tiers": {
+        "1": "Twilight Traveler",
+        "2": "Moonlight Navigator",
+        "3": "Midnight Champion"
+      }
+    },
+    "comebackKid": {
+      "name": "Comeback Kid",
+      "summary": "Return to play after breaking your streak.",
+      "tiers": {
+        "1": "Fresh Start",
+        "2": "Resilient Spirit",
+        "3": "Unwavering Return"
+      }
+    },
+    "marathonRunner": {
+      "name": "Marathon Runner",
+      "summary": "Play extended sessions with 30+ catches.",
+      "tiers": {
+        "1": "Endurance Paddler",
+        "2": "Distance Swimmer",
+        "3": "Ultra Runner"
+      }
+    },
+    "weekendWarrior": {
+      "name": "Weekend Warrior",
+      "summary": "Play sessions on weekends (Saturday or Sunday).",
+      "tiers": {
+        "1": "Saturday Starter",
+        "2": "Weekend Regular",
+        "3": "Weekend Legend"
+      }
+    },
+    "varietySeeker": {
+      "name": "Variety Seeker",
+      "summary": "Practice many different unique letters.",
+      "tiers": {
+        "1": "Diverse Learner",
+        "2": "Broad Explorer",
+        "3": "Complete Master"
+      }
+    },
+    "rapidLearner": {
+      "name": "Rapid Learner",
+      "summary": "Improve accuracy on previously weak letters.",
+      "tiers": {
+        "1": "Quick Study",
+        "2": "Fast Improver",
+        "3": "Lightning Learner"
+      }
     }
   },
   "daily": {
@@ -359,6 +467,34 @@
       "spice": {
         "title": "মসলা",
         "description": "{{constraint}} সক্রিয় থাকা একটি রাউন্ড জিতুন।"
+      },
+      "accuracyChallenge": {
+        "title": "Accuracy Challenge",
+        "description": "Complete a session with 90% or better accuracy."
+      },
+      "gemCollector": {
+        "title": "Gem Collector",
+        "description": "Win two bonus rounds today."
+      },
+      "varietyPack": {
+        "title": "Variety Pack",
+        "description": "Catch at least eight different unique letters."
+      },
+      "powerSession": {
+        "title": "Power Session",
+        "description": "Catch 25 or more items in a single session."
+      },
+      "perfectRun": {
+        "title": "Perfect Run",
+        "description": "Complete one session without any mistakes."
+      },
+      "speedPractice": {
+        "title": "Speed Practice",
+        "description": "Complete a session with fast flow speed enabled."
+      },
+      "tripleThread": {
+        "title": "Triple Threat",
+        "description": "Play three full sessions today."
       }
     },
     "constraints": {
