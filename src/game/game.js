@@ -206,9 +206,31 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     updateModalSubtitle();
   }
 
+  function getDifficultyInfo(value) {
+    const difficulties = [
+      { name: 'Very Easy', color: '#7bd74f', values: [5, 10, 15] },
+      { name: 'Easy', color: '#90ee90', values: [20, 25] },
+      { name: 'Medium', color: '#ffd96d', values: [30, 35, 40, 45] },
+      { name: 'Hard', color: '#ff9247', values: [50, 55, 60, 65] },
+      { name: 'Expert', color: '#ff7043', values: [70, 75, 80, 85] },
+      { name: 'Master', color: '#e53935', values: [90, 95, 100] }
+    ];
+
+    for (const difficulty of difficulties) {
+      if (difficulty.values.includes(value)) {
+        return difficulty;
+      }
+    }
+
+    // Default fallback
+    return { name: 'Medium', color: '#ffd96d', values: [30] };
+  }
+
   function updateGoalDisplay() {
     if (goalValueEl) {
-      goalValueEl.textContent = goalValue;
+      const difficultyInfo = getDifficultyInfo(goalValue);
+      goalValueEl.textContent = difficultyInfo.name;
+      goalValueEl.style.color = difficultyInfo.color;
     }
     updateGoalSettingBar();
   }
@@ -255,6 +277,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   function exitFromWin() {
     resetToSetupScreen();
+    onReturnToMenu?.();
   }
 
   if ('serviceWorker' in navigator) {
@@ -776,7 +799,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let hasIntroducedForItemInLevel;
   let bonusCaughtInSession = 0;
   let randomLettersEnabled = randomLettersToggle?.checked ?? false;
-  let goalValue = 10;
+  let goalValue = 30;
   let waveCorrectCount = 0;
   let totalWins = 0;
   const initialLives = 3;

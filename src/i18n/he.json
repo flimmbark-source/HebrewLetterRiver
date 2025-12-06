@@ -107,6 +107,7 @@
     "controls": {
       "leave": "יציאה מהמשחק",
       "exitToMenu": "⬅",
+      "backToMenu": "חזרה לתפריט",
       "start": "התחל משחק",
       "playAgain": "שחק שוב",
       "install": "התקן אפליקציה",

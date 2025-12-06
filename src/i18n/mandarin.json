@@ -107,6 +107,7 @@
     "controls": {
       "leave": "离开游戏",
       "exitToMenu": "⬅",
+      "backToMenu": "返回菜单",
       "start": "开始游戏",
       "playAgain": "再玩一次",
       "install": "安装应用程序",

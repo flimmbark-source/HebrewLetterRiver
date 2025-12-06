@@ -93,6 +93,7 @@
     "controls": {
       "leave": "Sair do jogo",
       "exitToMenu": "⬅",
+      "backToMenu": "Voltar ao menu",
       "start": "Iniciar jogo",
       "playAgain": "Jogue novamente",
       "install": "Instalar aplicativo",

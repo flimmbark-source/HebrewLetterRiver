@@ -107,6 +107,7 @@
     "controls": {
       "leave": "Quitter le jeu",
       "exitToMenu": "⬅",
+      "backToMenu": "Retour au menu",
       "start": "Commencer le jeu",
       "playAgain": "Rejouer",
       "install": "Installer l'application",
