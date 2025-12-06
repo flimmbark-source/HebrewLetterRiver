@@ -738,18 +738,18 @@ body {
 /* === NEW MODE SELECT LAYOUT === */
 .setup-body {
   display: grid;
-  grid-template-columns: 130px 1fr;
-  column-gap: 20px;
+  grid-template-columns: 105px 1fr;
+  column-gap: 12px;
   align-items: stretch;
-  padding: 16px;
+  padding: 10px;
   flex: 1;
 }
 
 @media (max-width: 640px) {
   .setup-body {
-    grid-template-columns: 110px 1fr;
-    column-gap: 14px;
-    padding: 12px;
+    grid-template-columns: 95px 1fr;
+    column-gap: 10px;
+    padding: 8px;
   }
 }
 
@@ -758,38 +758,38 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 20px 14px;
-  border-radius: 20px;
+  gap: 8px;
+  padding: 12px 8px;
+  border-radius: 16px;
   background: linear-gradient(180deg, #fffaf5 0%, #fff5e8 100%);
   border: 2px solid #e5b883;
   box-shadow:
     0 2px 0 #d4a574,
     0 8px 16px rgba(180, 120, 70, 0.15);
-  min-width: 130px;
+  min-width: 105px;
   height: 100%;
 }
 
 @media (max-width: 640px) {
   .goal-column {
-    min-width: 110px;
-    padding: 16px 10px;
-    gap: 12px;
+    min-width: 95px;
+    padding: 10px 6px;
+    gap: 6px;
   }
 }
 
 .goal-column__label {
   text-align: center;
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0.1em;
   font-weight: 700;
 }
 
 .goal-badge {
   position: relative;
-  width: 80px;
-  height: 80px;
-  border-radius: 18px;
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #fffbf5 0%, #ffd998 100%);
   border: 2px solid #d4a574;
   box-shadow:
@@ -803,14 +803,14 @@ body {
 
 @media (max-width: 640px) {
   .goal-badge {
-    width: 70px;
-    height: 70px;
+    width: 55px;
+    height: 55px;
   }
 }
 
 .goal-badge__value {
   font-family: "Baloo 2", system-ui, sans-serif;
-  font-size: 36px;
+  font-size: 28px;
   font-weight: 700;
   color: #4a2208;
   line-height: 1;
@@ -819,22 +819,22 @@ body {
 
 @media (max-width: 640px) {
   .goal-badge__value {
-    font-size: 32px;
+    font-size: 26px;
   }
 }
 
 .goal-column__controls {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   align-items: center;
   width: 100%;
 }
 
 .goal-icon-button {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   border: 2px solid #d4a574;
   background: linear-gradient(135deg, #fffbf5 0%, #ffc78a 100%);
   box-shadow:
@@ -846,7 +846,7 @@ body {
   justify-content: center;
   cursor: pointer;
   font-family: "Baloo 2", system-ui, sans-serif;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: #4a2208;
   transition: all 0.12s ease-out;
@@ -855,9 +855,9 @@ body {
 
 @media (max-width: 640px) {
   .goal-icon-button {
-    width: 40px;
-    height: 40px;
-    font-size: 22px;
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
   }
 }
 
@@ -880,9 +880,9 @@ body {
 
 /* GOAL PROGRESS BAR */
 .goal-progress-bar {
-  width: 70px;
-  border-radius: 14px;
-  padding: 6px 5px;
+  width: 56px;
+  border-radius: 12px;
+  padding: 5px 4px;
   background: linear-gradient(180deg, #fffbf5 0%, #fff5e8 100%);
   border: 2px solid #e5b883;
   box-shadow:
@@ -896,15 +896,15 @@ body {
 
 @media (max-width: 640px) {
   .goal-progress-bar {
-    width: 62px;
+    width: 52px;
   }
 }
 
 .goal-progress-bar__inner {
   position: relative;
   width: 100%;
-  height: 200px;
-  border-radius: 10px;
+  height: 140px;
+  border-radius: 8px;
   overflow: hidden;
   background: linear-gradient(180deg, #f5e8d8 0%, #f0ddc8 100%);
   box-shadow: inset 0 2px 6px rgba(180, 120, 70, 0.15);
@@ -912,7 +912,7 @@ body {
 
 @media (max-width: 640px) {
   .goal-progress-bar__inner {
-    height: 180px;
+    height: 130px;
   }
 }
 
@@ -956,15 +956,15 @@ body {
 
 .mode-column__headline {
   text-align: center;
-  padding: 0 8px 4px;
-  font-size: 10px;
+  padding: 0 6px 2px;
+  font-size: 9px;
   letter-spacing: 0.1em;
   font-weight: 700;
 }
 
 .mode-panel {
-  padding: 16px 14px 18px;
-  border-radius: 20px;
+  padding: 10px 10px 12px;
+  border-radius: 16px;
   background: linear-gradient(180deg, #fffaf5 0%, #fff5e8 100%);
   border: 2px solid #e5b883;
   box-shadow:
@@ -972,29 +972,29 @@ body {
     0 8px 16px rgba(180, 120, 70, 0.15);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   flex: 1;
 }
 
 @media (max-width: 640px) {
   .mode-panel {
-    padding: 12px 10px 14px;
-    gap: 8px;
+    padding: 8px 8px 10px;
+    gap: 5px;
   }
 }
 
 .mode-buttons-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   flex: 1;
 }
 
 .mode-button {
   position: relative;
   width: 100%;
-  padding: 14px 20px;
-  border-radius: 16px;
+  padding: 10px 14px;
+  border-radius: 14px;
   border: 2px solid #e5b883;
   background: linear-gradient(135deg, #fffbf5 0%, #ffd998 100%);
   box-shadow:
@@ -1006,7 +1006,7 @@ body {
   align-items: center;
   justify-content: center;
   font-family: "Baloo 2", system-ui, sans-serif;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 700;
   color: #4a2208;
   transition: all 0.12s ease-out;
@@ -1016,8 +1016,8 @@ body {
 
 @media (max-width: 640px) {
   .mode-button {
-    padding: 12px 16px;
-    font-size: 16px;
+    padding: 9px 12px;
+    font-size: 14px;
   }
 }
 
@@ -1068,7 +1068,7 @@ body {
 .mode-panel__footer {
   display: flex;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .primary-cta {
@@ -1076,10 +1076,10 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 14px 52px;
+  padding: 10px 36px;
   border-radius: 999px;
   font-family: "Baloo 2", system-ui, sans-serif;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   cursor: pointer;
   text-transform: uppercase;
@@ -1090,8 +1090,8 @@ body {
 
 @media (max-width: 640px) {
   .primary-cta {
-    padding: 12px 44px;
-    font-size: 22px;
+    padding: 9px 32px;
+    font-size: 18px;
   }
 }
 
