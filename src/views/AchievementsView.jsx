@@ -135,7 +135,7 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
 }
 
 export default function AchievementsView() {
-  const { player, badges, daily, claimBadgeReward, claimDailyReward, starLevelSize } = useProgress();
+  const { player, badges, activeBadges, daily, claimBadgeReward, claimDailyReward, starLevelSize } = useProgress();
   const { t } = useLocalization();
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
@@ -342,16 +342,18 @@ export default function AchievementsView() {
         </div>
         <section className="section" style={{ marginTop: '10px',  }}></section>
         <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
-          {badgesCatalog.map((badge) => (
-            <BadgeCard
-              key={badge.id}
-              badge={badge}
-              progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
-              translate={t}
-              gameName={gameName}
-              onClaim={handleBadgeClaim}
-            />
-          ))}
+          {badgesCatalog
+            .filter((badge) => activeBadges.includes(badge.id))
+            .map((badge) => (
+              <BadgeCard
+                key={badge.id}
+                badge={badge}
+                progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
+                translate={t}
+                gameName={gameName}
+                onClaim={handleBadgeClaim}
+              />
+            ))}
         </div>
       </section>
     </>

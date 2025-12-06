@@ -64,6 +64,16 @@ const defaultBadges = badgesCatalog.reduce((acc, badge) => {
   return acc;
 }, {});
 
+const MAX_ACTIVE_BADGES = 6;
+
+function selectRandomBadges(excludeIds = []) {
+  const available = badgesCatalog.filter(badge => !excludeIds.includes(badge.id));
+  const shuffled = [...available].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, MAX_ACTIVE_BADGES).map(b => b.id);
+}
+
+const defaultActiveBadges = selectRandomBadges();
+
 const defaultStreak = {
   current: 0,
   best: 0,
@@ -232,8 +242,12 @@ function createLanguageAssets(languagePack, localization = {}) {
   function generateDaily(dateKey, focusLetterInfo, constraint) {
     const focusLetter = focusLetterInfo ?? fallbackLetterInfo;
     const selectedConstraint = constraint ?? pickConstraint();
-    const rewardDistribution = distributeRewardStars(DAILY_REWARD_STARS, dailyTemplates.length);
-    const tasks = dailyTemplates.map((template, index) => {
+
+    const shuffled = [...dailyTemplates].sort(() => Math.random() - 0.5);
+    const selectedTemplates = shuffled.slice(0, 3);
+
+    const rewardDistribution = distributeRewardStars(DAILY_REWARD_STARS, selectedTemplates.length);
+    const tasks = selectedTemplates.map((template, index) => {
       const baseTranslation = {
         titleKey: template.titleKey ?? null,
         descriptionKey: template.descriptionKey ?? null
@@ -452,6 +466,14 @@ export function ProgressProvider({ children }) {
     [storagePrefix, assets]
   );
 
+  const hydrateActiveBadges = useCallback(() => {
+    const stored = loadState(`${storagePrefix}.activeBadges`, null);
+    if (stored && Array.isArray(stored) && stored.length > 0) {
+      return stored;
+    }
+    return [...defaultActiveBadges];
+  }, [storagePrefix]);
+
   const [player, setPlayer] = useState(() => {
     const loaded = hydratePlayer();
     initialPlayerRef.current = loaded;
@@ -460,7 +482,9 @@ export function ProgressProvider({ children }) {
   const [badges, setBadges] = useState(() => hydrateBadges());
   const [streak, setStreak] = useState(() => hydrateStreak());
   const [daily, setDaily] = useState(() => hydrateDaily(initialPlayerRef.current));
+  const [activeBadges, setActiveBadges] = useState(() => hydrateActiveBadges());
   const [lastSession, setLastSession] = useState(null);
+  const sessionStatsRef = useRef({ uniqueLetters: new Set(), totalCatches: 0, mistakes: 0, modesPlayed: new Set() });
 
   useEffect(() => {
     hydratedPrefixRef.current = storagePrefix;
@@ -477,16 +501,18 @@ export function ProgressProvider({ children }) {
     const nextBadges = hydrateBadges();
     const nextStreak = hydrateStreak();
     const nextDaily = hydrateDaily(nextPlayer);
+    const nextActiveBadges = hydrateActiveBadges();
     initialPlayerRef.current = nextPlayer;
     setPlayer(nextPlayer);
     setBadges(nextBadges);
     setStreak(nextStreak);
     setDaily(nextDaily);
+    setActiveBadges(nextActiveBadges);
     setLastSession(null);
     if (hydratedPrefixRef.current === storagePrefix) {
       setIsHydrationComplete(true);
     }
-  }, [hydratePlayer, hydrateBadges, hydrateStreak, hydrateDaily, storagePrefix]);
+  }, [hydratePlayer, hydrateBadges, hydrateStreak, hydrateDaily, hydrateActiveBadges, storagePrefix]);
 
   useEffect(() => {
     if (!isHydrationComplete) return;
@@ -507,6 +533,11 @@ export function ProgressProvider({ children }) {
     if (!isHydrationComplete) return;
     saveState(`${storagePrefix}.daily`, daily);
   }, [daily, storagePrefix, isHydrationComplete]);
+
+  useEffect(() => {
+    if (!isHydrationComplete) return;
+    saveState(`${storagePrefix}.activeBadges`, activeBadges);
+  }, [activeBadges, storagePrefix, isHydrationComplete]);
 
   useEffect(() => {
     const key = getJerusalemDateKey();
@@ -593,10 +624,28 @@ export function ProgressProvider({ children }) {
     if (shouldAdvanceBadge) trackBadgeProgress('steady-streak', 1);
   }
 
+  const replaceCompletedBadge = useCallback((completedBadgeId) => {
+    setActiveBadges((prev) => {
+      const available = badgesCatalog
+        .map(b => b.id)
+        .filter(id => !prev.includes(id));
+
+      if (available.length === 0) {
+        return prev;
+      }
+
+      const randomIndex = Math.floor(Math.random() * available.length);
+      const newBadgeId = available[randomIndex];
+
+      return prev.map(id => id === completedBadgeId ? newBadgeId : id);
+    });
+  }, []);
+
   function trackBadgeProgress(badgeId, delta = 1) {
     const badgeSpec = badgeSpecById[badgeId];
     if (!badgeSpec) return;
     const earnedTiers = [];
+    let completedAllTiers = false;
     setBadges((prev) => {
       const current = prev[badgeId] ?? { tier: 0, progress: 0, unclaimed: [] };
       let tier = Number.isFinite(current.tier) ? current.tier : 0;
@@ -617,6 +666,10 @@ export function ProgressProvider({ children }) {
           };
           unclaimed.push(reward);
           earnedTiers.push(reward);
+
+          if (tier === badgeSpec.tiers.length) {
+            completedAllTiers = true;
+          }
         } else {
           break;
         }
@@ -635,8 +688,10 @@ export function ProgressProvider({ children }) {
       addToast({
         tone: 'info',
         title: `${badgeName} · ${tierLabel}`,
-        description: `Tier ${latestReward.tier} ready to claim! +${latestReward.stars} ⭐`,
-        icon: '⭐'
+        description: completedAllTiers
+          ? `All tiers complete! +${latestReward.stars} ⭐ A new achievement is now available.`
+          : `Tier ${latestReward.tier} ready to claim! +${latestReward.stars} ⭐`,
+        icon: completedAllTiers ? '🏆' : '⭐'
       });
     }
   }
@@ -703,6 +758,7 @@ export function ProgressProvider({ children }) {
       const badgeSpec = badgeSpecById[badgeId];
       if (!badgeSpec) return { success: false };
       let reward = null;
+      let isMaxTier = false;
       setBadges((prev) => {
         const state = prev[badgeId];
         if (!state) return prev;
@@ -713,6 +769,7 @@ export function ProgressProvider({ children }) {
             : 0;
         if (index < 0 || index >= unclaimed.length) return prev;
         reward = unclaimed.splice(index, 1)[0];
+        isMaxTier = reward.tier === badgeSpec.tiers.length && state.tier === badgeSpec.tiers.length;
         return {
           ...prev,
           [badgeId]: {
@@ -722,6 +779,11 @@ export function ProgressProvider({ children }) {
         };
       });
       if (!reward) return { success: false };
+
+      if (isMaxTier) {
+        replaceCompletedBadge(badgeId);
+      }
+
       const tierSpec = badgeSpec.tiers.find((item) => item.tier === reward.tier) ?? reward;
       const badgeName = badgeSpec.nameKey ? t(badgeSpec.nameKey) : badgeSpec.name ?? badgeId;
       const tierLabel = tierSpec.labelKey ? t(tierSpec.labelKey) : tierSpec.label ?? `Tier ${reward.tier}`;
@@ -744,13 +806,15 @@ export function ProgressProvider({ children }) {
       addToast({
         tone: 'success',
         title: `${badgeName} · ${tierLabel}`,
-        description: `Claimed +${reward.stars} ⭐`,
-        icon: '🏅'
+        description: isMaxTier
+          ? `Mastered! +${reward.stars} ⭐ New achievement unlocked!`
+          : `Claimed +${reward.stars} ⭐`,
+        icon: isMaxTier ? '🏆' : '🏅'
       });
       celebrate({ particleCount: 140, spread: 75, originY: 0.55 });
       return { success: true, reward };
     },
-    [addToast, applyStarsToPlayer, t]
+    [addToast, applyStarsToPlayer, t, replaceCompletedBadge]
   );
 
   const claimDailyReward = useCallback(
@@ -826,39 +890,169 @@ export function ProgressProvider({ children }) {
   useEffect(() => {
     const offSessionStart = on('game:session-start', (payload) => {
       setLastSession({ start: new Date().toISOString(), settings: payload?.settings ?? {}, mode: payload?.mode });
+      sessionStatsRef.current = { uniqueLetters: new Set(), totalCatches: 0, mistakes: 0, modesPlayed: new Set() };
+      if (payload?.mode) {
+        sessionStatsRef.current.modesPlayed.add(payload.mode);
+      }
     });
     const offSessionComplete = on('game:session-complete', (payload) => {
       const dateKey = getJerusalemDateKey();
+      const stats = payload?.stats ?? {};
+      const correct = stats.correct ?? 0;
+      const incorrect = stats.incorrect ?? 0;
+      const total = correct + incorrect;
+      const accuracy = total > 0 ? correct / total : 0;
+      const speed = payload?.settings?.speed ?? 0;
+      const isFastFlow = speed >= 18;
+      const isPerfect = incorrect === 0 && total > 0;
+      const isMarathon = sessionStatsRef.current.totalCatches >= 30;
+      const uniqueLetterCount = sessionStatsRef.current.uniqueLetters.size;
+
+      const now = new Date();
+      const hour = now.getHours();
+      const isEarlyBird = hour >= 5 && hour < 11;
+      const isNightOwl = hour >= 20 || hour < 2;
+      const dayOfWeek = now.getDay();
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
       updateStreakForSession(dateKey);
-      setPlayer((prev) => ({
-        ...prev,
-        totals: {
-          ...prev.totals,
-          sessions: prev.totals.sessions + 1,
-          bonusCatches: prev.totals.bonusCatches + (payload?.bonusCaught ?? 0)
+
+      setPlayer((prev) => {
+        const hadStreak = prev.totals?.sessions > 0 && (streak.lastPlayedDateKey === null || differenceInJerusalemDays(streak.lastPlayedDateKey, dateKey) > 1);
+        if (hadStreak && streak.current === 1 && streak.lastPlayedDateKey !== dateKey) {
+          trackBadgeProgress('comeback-kid', 1);
         }
-      }));
+
+        return {
+          ...prev,
+          totals: {
+            ...prev.totals,
+            sessions: prev.totals.sessions + 1,
+            bonusCatches: prev.totals.bonusCatches + (payload?.bonusCaught ?? 0)
+          }
+        };
+      });
+
       trackBadgeProgress('first-flow', 1);
-      markDailyProgress((task) => task.id === 'warmup');
+      trackBadgeProgress('dedicated-scholar', sessionStatsRef.current.totalCatches);
+
+      if (accuracy >= 0.9) {
+        trackBadgeProgress('accuracy-ace', 1);
+        markDailyProgress((task) => task.type === 'highAccuracy');
+      }
+
+      if (isFastFlow) {
+        trackBadgeProgress('speed-demon', 1);
+        markDailyProgress((task) => task.type === 'fastMode');
+      }
+
+      if (isPerfect) {
+        trackBadgeProgress('perfectionist', 1);
+        markDailyProgress((task) => task.type === 'flawlessSession');
+      }
+
+      if (isMarathon) {
+        trackBadgeProgress('marathon-runner', 1);
+      }
+
+      if (isEarlyBird) {
+        trackBadgeProgress('early-bird', 1);
+      }
+
+      if (isNightOwl) {
+        trackBadgeProgress('night-owl', 1);
+      }
+
+      if (isWeekend) {
+        trackBadgeProgress('weekend-warrior', 1);
+      }
+
+      if (sessionStatsRef.current.modesPlayed.size > 0) {
+        setPlayer((prev) => {
+          const prevModes = new Set(prev.modesPlayed ?? []);
+          sessionStatsRef.current.modesPlayed.forEach(mode => prevModes.add(mode));
+          const newModesCount = prevModes.size;
+          const oldModesCount = (prev.modesPlayed ?? []).length;
+
+          if (newModesCount > oldModesCount) {
+            trackBadgeProgress('explorer', newModesCount - oldModesCount);
+          }
+
+          return {
+            ...prev,
+            modesPlayed: Array.from(prevModes)
+          };
+        });
+      }
+
+      if (uniqueLetterCount > 0) {
+        setPlayer((prev) => {
+          const prevLetters = new Set(Object.keys(prev.letters ?? {}));
+          const newCount = Math.max(0, uniqueLetterCount - prevLetters.size);
+
+          if (newCount > 0) {
+            trackBadgeProgress('variety-seeker', Math.min(newCount, uniqueLetterCount));
+          }
+
+          return prev;
+        });
+      }
+
+      markDailyProgress((task) => task.id === 'warmup' || task.id === 'triple-threat');
+
       markDailyProgress((task) => {
         if (task.id !== 'spice') return false;
         const constraint = spiceConstraints.find((c) => c.id === task.meta?.constraintId);
         return constraint?.predicate(payload);
       });
+
+      markDailyProgress((task) => {
+        if (task.type === 'uniqueLetters') {
+          return sessionStatsRef.current.uniqueLetters.size >= task.goal;
+        }
+        return false;
+      });
+
+      markDailyProgress((task) => {
+        if (task.type === 'totalCatches') {
+          return sessionStatsRef.current.totalCatches >= task.goal;
+        }
+        return false;
+      });
     });
+
     const offLetter = on('game:letter-result', (payload) => {
       const itemId = payload?.itemId;
       if (!itemId) return;
+
+      sessionStatsRef.current.totalCatches += 1;
+      sessionStatsRef.current.uniqueLetters.add(itemId);
+
+      if (!payload.correct) {
+        sessionStatsRef.current.mistakes += 1;
+      }
+
       setPlayer((prev) => {
         const current = prev.letters[itemId] ?? { correct: 0, incorrect: 0 };
+        const newStats = {
+          correct: current.correct + (payload.correct ? 1 : 0),
+          incorrect: current.incorrect + (!payload.correct ? 1 : 0)
+        };
+
+        const oldTotal = current.correct + current.incorrect;
+        const oldAccuracy = oldTotal > 0 ? current.correct / oldTotal : 0;
+        const newTotal = newStats.correct + newStats.incorrect;
+        const newAccuracy = newTotal > 0 ? newStats.correct / newTotal : 0;
+
+        if (oldAccuracy < 0.5 && newAccuracy >= 0.5 && newTotal >= 5) {
+          trackBadgeProgress('rapid-learner', 1);
+        }
+
         return {
           ...prev,
           letters: {
             ...prev.letters,
-            [itemId]: {
-              correct: current.correct + (payload.correct ? 1 : 0),
-              incorrect: current.incorrect + (!payload.correct ? 1 : 0)
-            }
+            [itemId]: newStats
           },
           totals: {
             ...prev.totals,
@@ -866,6 +1060,7 @@ export function ProgressProvider({ children }) {
           }
         };
       });
+
       if (payload.correct) {
         trackBadgeProgress('letter-master', 1);
         markDailyProgress((task) => {
@@ -878,21 +1073,25 @@ export function ProgressProvider({ children }) {
         });
       }
     });
+
     const offBonus = on('game:bonus-catch', () => {
       trackBadgeProgress('gem-chaser', 1);
+      markDailyProgress((task) => task.type === 'bonusRounds');
     });
+
     return () => {
       offSessionStart();
       offSessionComplete();
       offLetter();
       offBonus();
     };
-  }, [streak.current, assets]);
+  }, [streak.current, streak.lastPlayedDateKey, assets]);
 
   const value = useMemo(
     () => ({
       player,
       badges,
+      activeBadges,
       streak,
       daily,
       setDaily,
@@ -902,7 +1101,7 @@ export function ProgressProvider({ children }) {
       claimBadgeReward,
       claimDailyReward
     }),
-    [assets, player, badges, streak, daily, lastSession, claimBadgeReward, claimDailyReward]
+    [assets, player, badges, activeBadges, streak, daily, lastSession, claimBadgeReward, claimDailyReward]
   );
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;
