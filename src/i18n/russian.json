@@ -92,7 +92,7 @@
     },
     "controls": {
       "leave": "Выйти из игры",
-      "exitToMenu": "Выйти в меню",
+      "exitToMenu": "⬅",
       "start": "Начать игру",
       "playAgain": "Играть снова",
       "install": "Установить приложение",

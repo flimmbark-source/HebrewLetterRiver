@@ -70,6 +70,15 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const setupExitButton = document.getElementById('setup-exit-button');
   const gameOverExitButton = document.getElementById('game-over-exit-button');
   const modeOptionsContainer = document.getElementById('mode-options');
+  const goalValueEl = document.getElementById('goalValue');
+  const goalIncreaseBtn = document.getElementById('goalIncrease');
+  const goalDecreaseBtn = document.getElementById('goalDecrease');
+  const goalProgressFillEl = document.getElementById('goalProgressFill');
+  const winView = document.getElementById('win-view');
+  const continuePlayingButton = document.getElementById('continue-playing-button');
+  const winExitButton = document.getElementById('win-exit-button');
+  const winGoalDisplay = document.getElementById('win-goal-display');
+  const totalWinsDisplay = document.getElementById('total-wins-display');
 
   if (!scoreEl || !levelEl) {
     throw new Error('Game elements failed to initialize.');
@@ -164,54 +173,88 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     modeOptionsContainer.innerHTML = '';
 
     practiceModes.forEach((mode, index) => {
-      const label = document.createElement('label');
-      label.className = 'setup-label cursor-pointer';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'mode-button';
+      button.dataset.mode = mode.id;
+      button.textContent = mode.label;
+      button.setAttribute('role', 'radio');
+      button.setAttribute('aria-checked', index === 0 ? 'true' : 'false');
 
-      const input = document.createElement('input');
-      input.type = 'radio';
-      input.name = 'gameMode';
-      input.value = mode.id;
-      input.className = 'hidden';
-      input.checked = index === 0;
-      input.defaultChecked = index === 0;
-
-      const card = document.createElement('div');
-      card.className =
-        'mode-card flex h-full flex-col border-arcade-panel-border bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium transition hover:border-arcade-accent-orange';
-
-      const title = document.createElement('span');
-      title.className = `mode-card-title text-cyan ${fontClass}`;
-      title.textContent = mode.label;
-      card.appendChild(title);
-
-      if (mode.description) {
-        const description = document.createElement('p');
-        description.className = 'mode-card-description text-arcade-text-soft';
-        description.textContent = mode.description;
-        card.appendChild(description);
+      if (index === 0) {
+        button.classList.add('selected');
+        gameMode = mode.id;
       }
 
-      label.appendChild(input);
-      label.appendChild(card);
-      modeOptionsContainer.appendChild(label);
+      button.addEventListener('click', () => {
+        // Remove selected class from all buttons
+        modeOptionsContainer.querySelectorAll('.mode-button').forEach((btn) => {
+          btn.classList.remove('selected');
+          btn.setAttribute('aria-checked', 'false');
+        });
 
-      input.addEventListener('change', () => {
-        gameMode = input.value;
+        // Add selected class to clicked button
+        button.classList.add('selected');
+        button.setAttribute('aria-checked', 'true');
+        gameMode = mode.id;
         updateModalSubtitle();
       });
+
+      modeOptionsContainer.appendChild(button);
     });
 
-    const selectedInput = modeOptionsContainer.querySelector('input[name="gameMode"]:checked');
-    if (selectedInput) {
-      gameMode = selectedInput.value;
-    } else {
-      const firstRadio = modeOptionsContainer.querySelector('input[name="gameMode"]');
-      if (firstRadio) {
-        firstRadio.checked = true;
-        gameMode = firstRadio.value;
-      }
-    }
     updateModalSubtitle();
+  }
+
+  function updateGoalDisplay() {
+    if (goalValueEl) {
+      goalValueEl.textContent = goalValue;
+    }
+    updateGoalSettingBar();
+  }
+
+  function updateGoalSettingBar() {
+    if (goalProgressFillEl) {
+      // Bar represents the goal setting itself
+      // Minimum (10) = 20% filled (2 segments)
+      // Maximum (99) = 100% filled (10 segments)
+      const range = GOAL_MAX - GOAL_MIN;
+      const currentOffset = goalValue - GOAL_MIN;
+      const percent = 20 + (currentOffset / range) * 80;
+      goalProgressFillEl.style.height = `${Math.min(100, Math.max(20, percent))}%`;
+    }
+  }
+
+  function increaseGoal() {
+    goalValue = Math.min(GOAL_MAX, goalValue + GOAL_STEP);
+    updateGoalDisplay();
+  }
+
+  function decreaseGoal() {
+    goalValue = Math.max(GOAL_MIN, goalValue - GOAL_STEP);
+    updateGoalDisplay();
+  }
+
+  function showWinScreen() {
+    gameActive = false;
+    modal.classList.remove('hidden');
+    setupView.classList.add('hidden');
+    gameOverView.classList.add('hidden');
+    winView.classList.remove('hidden');
+
+    if (winGoalDisplay) winGoalDisplay.textContent = goalValue;
+    if (totalWinsDisplay) totalWinsDisplay.textContent = totalWins;
+  }
+
+  function continueAfterWin() {
+    waveCorrectCount = 0;
+    winView.classList.add('hidden');
+    modal.classList.add('hidden');
+    gameActive = true;
+  }
+
+  function exitFromWin() {
+    resetToSetupScreen();
   }
 
   if ('serviceWorker' in navigator) {
@@ -654,14 +697,28 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     if (isCorrect) {
       updateScore(isBonusRound ? 25 : 10);
       targetBox.classList.add('feedback-correct');
-      if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].correct++;
+      if (!isBonusRound && droppedItemId) {
+        sessionStats[droppedItemId].correct++;
+        // Track wave progress for win condition
+        waveCorrectCount++;
+        if (waveCorrectCount >= goalValue) {
+          totalWins++;
+          trackTimeout(() => {
+            showWinScreen();
+          }, 500);
+        }
+      }
       // Hide the letter immediately after correct drop
       item.element.style.display = 'none';
     } else {
       lives--;
       updateLives(true);
       targetBox.classList.add('feedback-incorrect');
-      if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
+      if (!isBonusRound && droppedItemId) {
+        sessionStats[droppedItemId].incorrect++;
+        // Reset wave progress on incorrect answer
+        waveCorrectCount = 0;
+      }
 
       // Find the correct bucket to show its sound/label
       const correctBucket = choicesContainer.querySelector(`[data-item-id="${droppedItemId}"]`);
@@ -719,9 +776,15 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let hasIntroducedForItemInLevel;
   let bonusCaughtInSession = 0;
   let randomLettersEnabled = randomLettersToggle?.checked ?? false;
+  let goalValue = 10;
+  let waveCorrectCount = 0;
+  let totalWins = 0;
   const initialLives = 3;
   const learnPhaseDuration = 2500;
   const levelUpThreshold = 50;
+  const GOAL_MIN = 10;
+  const GOAL_MAX = 99;
+  const GOAL_STEP = 5;
 
   function clonePool(items = []) {
     return items.map((item) => ({ ...item }));
@@ -782,16 +845,19 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     hasIntroducedForItemInLevel = false;
     bonusCaughtInSession = 0;
     randomLettersEnabled = randomLettersToggle?.checked ?? false;
+    waveCorrectCount = 0;
 
     updateScore(0, true);
     updateLives();
     updateLevelDisplay();
+    updateGoalDisplay();
 
     startButton.textContent = t('game.controls.start');
     isRestartMode = false;
     renderPracticeModes();
     setupView.classList.remove('hidden');
     gameOverView.classList.add('hidden');
+    winView?.classList.add('hidden');
     accessibilityView.classList.add('hidden');
     setupExitButton?.classList.remove('hidden');
     modal.classList.remove('hidden');
@@ -814,9 +880,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     hasIntroducedForItemInLevel = false;
     bonusCaughtInSession = 0;
     randomLettersEnabled = randomLettersToggle?.checked ?? false;
+    waveCorrectCount = 0;
 
-    const selectedModeInput = document.querySelector('input[name="gameMode"]:checked');
-    gameMode = selectedModeInput?.value ?? gameMode ?? practiceModes[0]?.id ?? 'letters';
+    const selectedModeButton = document.querySelector('.mode-button.selected');
+    gameMode = selectedModeButton?.dataset.mode ?? gameMode ?? practiceModes[0]?.id ?? 'letters';
     introductionsEnabled = document.getElementById('toggle-introductions').checked;
 
     const gameItemPool = getModePool(gameMode);
@@ -1556,11 +1623,23 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   backToMenuButton?.addEventListener('click', handleReturnToMenu);
   setupExitButton?.addEventListener('click', handleReturnToMenu);
   gameOverExitButton?.addEventListener('click', handleReturnToMenu);
+  goalIncreaseBtn?.addEventListener('click', increaseGoal);
+  goalDecreaseBtn?.addEventListener('click', decreaseGoal);
+  continuePlayingButton?.addEventListener('click', continueAfterWin);
+  winExitButton?.addEventListener('click', exitFromWin);
 
   function setGameMode(value) {
-    const radio = document.querySelector(`input[name="gameMode"][value="${value}"]`);
-    if (radio) {
-      radio.checked = true;
+    const button = document.querySelector(`.mode-button[data-mode="${value}"]`);
+    if (button) {
+      // Remove selected class from all buttons
+      document.querySelectorAll('.mode-button').forEach((btn) => {
+        btn.classList.remove('selected');
+        btn.setAttribute('aria-checked', 'false');
+      });
+
+      // Add selected class to target button
+      button.classList.add('selected');
+      button.setAttribute('aria-checked', 'true');
       gameMode = value;
       updateModalSubtitle();
     }

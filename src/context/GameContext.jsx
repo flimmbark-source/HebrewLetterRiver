@@ -182,15 +182,6 @@ function GameCanvas({ fontClass }) {
               }}
             >
               <button
-                id="setup-exit-button"
-                type="button"
-                className="absolute left-4 top-4 text-sm font-semibold transition sm:text-base"
-                style={{ color: '#6c3b14' }}
-              >
-                {t('game.controls.exitToMenu')}
-              </button>
-
-              <button
                 id="accessibility-btn"
                 className="absolute right-4 top-4 text-2xl transition"
                 aria-label={t('game.accessibility.gear')}
@@ -199,17 +190,90 @@ function GameCanvas({ fontClass }) {
                 ⚙️
               </button>
 
-              <div id="setup-view" className="space-y-3 pt-12 sm:pt-14 sm:space-y-4">
-                <div className="space-y-1 text-center">
-                  <h1 className={`modal-title ${fontClass}`} style={{ color: '#ff9247' }}>{t('game.setup.title')}</h1>
-                  <p id="modal-subtitle" className="modal-subtitle" style={{ color: '#6c3b14' }}>
+              <div id="setup-view" className="flex flex-col h-full">
+                <div className="flex items-center justify-between px-3 py-2 border-b-2" style={{ borderColor: 'rgba(235, 179, 105, 0.3)' }}>
+                  <button
+                    id="setup-exit-button"
+                    type="button"
+                    className="text-xs font-semibold transition sm:text-sm"
+                    style={{ color: '#6c3b14' }}
+                  >
+                    {t('game.controls.exitToMenu')}
+                  </button>
+                  <div className="text-center flex-1">
+                    <h1 className={`modal-title text-xl sm:text-2xl font-bold ${fontClass}`} style={{ color: '#ff9247' }}>{t('game.setup.title')}</h1>
+
+
+                <div className="text-center py-1">
+                  <p id="modal-subtitle" className="text-xs font-semibold sm:text-sm" style={{ color: '#6c3b14' }}>
                     {t('game.setup.subtitleFallback')}
                   </p>
                 </div>
+                  </div>
+                  <div className="w-12"></div>
+                </div>
+                <div className="setup-body px-4">
+                  <aside className="goal-column" aria-label="Goal settings">
+                    <div className="goal-column__label text-xs font-bold uppercase tracking-wider" style={{ color: '#6c3b14' }}>
+                      {t('game.setup.goal', 'Goal')}
+                    </div>
 
-                <p className="text-center text-sm sm:text-base" style={{ color: '#4a2208' }}>{t('game.setup.prompt')}</p>
+                    <div className="goal-badge" aria-live="polite">
+                      <div className="goal-badge__value" id="goalValue">10</div>
+                    </div>
 
-                <div id="mode-options" className="mode-cards-container mx-auto max-w-2xl" />
+                    <div className="goal-column__controls" aria-label="Adjust goal">
+                      <button className="goal-icon-button" type="button" id="goalIncrease" aria-label="Increase goal">+</button>
+
+                      <div className="goal-progress-bar" aria-label="Goal progress">
+                        <div className="goal-progress-bar__inner">
+                          <div className="goal-progress-bar__fill" id="goalProgressFill"></div>
+                          <div className="goal-progress-bar__ticks">
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                            <span className="goal-progress-bar__tick"></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button className="goal-icon-button" type="button" id="goalDecrease" aria-label="Decrease goal">–</button>
+                    </div>
+                  </aside>
+
+                  <section className="mode-column">
+                    <h2 className="mode-column__headline text-xs font-bold uppercase tracking-wider" style={{ color: '#6c3b14' }}>
+                      {t('game.setup.prompt')}
+                    </h2>
+
+                    <div className="mode-panel">
+                      <div id="mode-options" className="mode-buttons-container" />
+
+                      <div className="mode-panel__footer">
+                        <button
+                          id="start-button"
+                          className="primary-cta"
+                          type="button"
+                          style={{
+                            border: '2px solid #5aa838',
+                            background: 'linear-gradient(135deg, #e8ffd8 0%, #7bd74f 100%)',
+                            color: '#ffffff',
+                            boxShadow: '0 6px 0 #5aa838, 0 8px 20px rgba(90, 168, 56, 0.3)',
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)'
+                          }}
+                        >
+                          {t('game.controls.start')}
+                        </button>
+                      </div>
+                    </div>
+                  </section>
+                </div>
               </div>
 
               <div id="game-over-view" className="relative hidden pt-12 text-center">
@@ -219,7 +283,7 @@ function GameCanvas({ fontClass }) {
                   style={{ color: '#4a2208' }}
                 >
                   <span className="text-lg" aria-hidden="true">
-                    
+
                   </span>
                   <span>{t('game.controls.exitToMenu')}</span>
                 </div>
@@ -232,19 +296,54 @@ function GameCanvas({ fontClass }) {
                 <div className="learning-summary-container my-6" />
               </div>
 
-              <div className="mt-2 flex flex-shrink-0 flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                <button
-                  id="start-button"
-                  className="w-full rounded-full px-6 py-3 text-base font-semibold transition sm:w-auto sm:text-lg"
-                  style={{
-                    border: 0,
-                    background: 'radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%)',
-                    color: '#4a1a06',
-                    boxShadow: '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)'
-                  }}
-                >
-                  {t('game.controls.start')}
-                </button>
+              <div id="win-view" className="relative hidden pt-8 text-center px-4">
+                <div className="space-y-6">
+                  <div className="text-6xl">🎉</div>
+                  <h2 className={`text-5xl font-bold ${fontClass}`} style={{ color: '#7bd74f' }}>
+                    {t('game.win.title', 'You Win!')}
+                  </h2>
+                  <p className="text-xl font-semibold" style={{ color: '#4a2208' }}>
+                    {t('game.win.message', 'You reached your goal!')}
+                  </p>
+                  <div className="space-y-2">
+                    <p className="text-lg" style={{ color: '#6c3b14' }}>
+                      <span className="font-bold" id="win-goal-display">10</span> {t('game.win.correctAnswers', 'correct answers in a row!')}
+                    </p>
+                    <p className="text-base" style={{ color: '#6c3b14' }}>
+                      {t('game.win.totalWins', 'Total wins')}: <span className="font-bold" id="total-wins-display">0</span>
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:justify-center mt-8">
+                    <button
+                      id="continue-playing-button"
+                      className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
+                      style={{
+                        border: '2px solid #5aa838',
+                        background: 'linear-gradient(135deg, #e8ffd8 0%, #7bd74f 100%)',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 0 #5aa838, 0 6px 12px rgba(90, 168, 56, 0.3)',
+                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)'
+                      }}
+                    >
+                      {t('game.win.continue', 'Continue Playing')}
+                    </button>
+                    <button
+                      id="win-exit-button"
+                      className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
+                      style={{
+                        border: 0,
+                        background: 'radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%)',
+                        color: '#4a1a06',
+                        boxShadow: '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)'
+                      }}
+                    >
+                      {t('game.controls.exitToMenu')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="setup-footer" className="mt-2 flex flex-shrink-0 flex-col items-center gap-3 pb-4 sm:flex-row sm:justify-center">
                 <button
                   id="install-btn"
                   className="hidden rounded-full px-5 py-3 text-sm font-semibold transition"
