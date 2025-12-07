@@ -218,7 +218,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     if (goalProgressFillEl) {
       // Bar represents the goal setting itself
       // Minimum (5) = 20% filled (2 segments)
-      // Maximum (50) = 100% filled (10 segments)
+      // Maximum (25) = 100% filled (10 segments)
       const range = GOAL_MAX - GOAL_MIN;
       const currentOffset = goalValue - GOAL_MIN;
       const percent = 20 + (currentOffset / range) * 80;
@@ -785,15 +785,15 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let hasIntroducedForItemInLevel;
   let bonusCaughtInSession = 0;
   let randomLettersEnabled = randomLettersToggle?.checked ?? false;
-  let goalValue = 15;
+  let goalValue = 10;
   let waveCorrectCount = 0;
   let totalWins = 0;
   const initialLives = 3;
   const learnPhaseDuration = 2500;
   const levelUpThreshold = 50;
   const GOAL_MIN = 5;
-  const GOAL_MAX = 50;
-  const GOAL_STEP = 5;
+  const GOAL_MAX = 25;
+  const GOAL_STEP = 1;
 
   function clonePool(items = []) {
     return items.map((item) => ({ ...item }));
