@@ -74,6 +74,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const goalIncreaseBtn = document.getElementById('goalIncrease');
   const goalDecreaseBtn = document.getElementById('goalDecrease');
   const goalProgressFillEl = document.getElementById('goalProgressFill');
+  const goalInfoIcon = document.getElementById('goalInfoIcon');
+  const goalTooltip = document.getElementById('goalTooltip');
   const winView = document.getElementById('win-view');
   const continuePlayingButton = document.getElementById('continue-playing-button');
   const winExitButton = document.getElementById('win-exit-button');
@@ -1638,6 +1640,25 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   goalDecreaseBtn?.addEventListener('click', decreaseGoal);
   continuePlayingButton?.addEventListener('click', continueAfterWin);
   winExitButton?.addEventListener('click', exitFromWin);
+
+  // Goal info icon tooltip handlers
+  goalInfoIcon?.addEventListener('mouseenter', () => {
+    goalTooltip?.classList.remove('hidden');
+  });
+  goalInfoIcon?.addEventListener('mouseleave', () => {
+    goalTooltip?.classList.add('hidden');
+  });
+  goalInfoIcon?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    goalTooltip?.classList.toggle('hidden');
+  });
+  // Close tooltip when clicking outside
+  document.addEventListener('click', (e) => {
+    if (goalTooltip && !goalTooltip.classList.contains('hidden') &&
+        !goalInfoIcon?.contains(e.target) && !goalTooltip?.contains(e.target)) {
+      goalTooltip.classList.add('hidden');
+    }
+  });
 
   function setGameMode(value) {
     const button = document.querySelector(`.mode-button[data-mode="${value}"]`);

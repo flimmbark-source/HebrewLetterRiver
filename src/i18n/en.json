@@ -148,6 +148,7 @@
       "subtitleFallback": "Drag the letters to the correct boxes!",
       "prompt": "Choose what you want to practice:",
       "goal": "Goal",
+      "goalTooltip": "The Goal number represents the amount of letters you need to collect correctly in a row within a single wave. Complete a wave with this number of letters to win!",
       "installDescription": "Install App",
       "defaultNoun": "item",
       "defaultModeLabel": "Core Practice",
@@ -279,7 +280,7 @@
       "gemAria": "Bonus gem"
     },
     "summary": {
-      "heading": "Items Encountered",
+      "heading": "Letters Encountered",
       "empty": "No stats to show for this round.",
       "gameOver": "Game Over",
       "finalScore": "Final Score: {{score}}",
