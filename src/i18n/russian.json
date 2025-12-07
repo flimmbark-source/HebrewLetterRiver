@@ -247,6 +247,15 @@
       "learningRecap": "Обзор обучения",
       "practice": "Практикуйте это"
     },
+    "win": {
+      "title": "Вы победили!",
+      "message": "Вы достигли цели!",
+      "correctAnswers": "правильных ответов подряд!",
+      "sessionCorrectPrefix": "Вы поймали",
+      "sessionCorrectSuffix": "буквы подряд в этой игре!",
+      "totalWins": "Всего побед",
+      "continue": "Продолжить игру"
+    },
     "status": {
       "bonusRound": "Бонусный раунд!",
       "bonusInstruction": "Лови драгоценные камни!",

@@ -247,6 +247,15 @@
       "learningRecap": "خلاصة التعلم",
       "practice": "ممارسة هذا"
     },
+    "win": {
+      "title": "لقد فزت!",
+      "message": "لقد وصلت إلى هدفك!",
+      "correctAnswers": "إجابات صحيحة متتالية!",
+      "sessionCorrectPrefix": "لقد أمسكت",
+      "sessionCorrectSuffix": "أحرفًا متتالية في هذه اللعبة!",
+      "totalWins": "إجمالي مرات الفوز",
+      "continue": "مواصلة اللعب"
+    },
     "status": {
       "bonusRound": "جولة المكافأة!",
       "bonusInstruction": "قبض على الأحجار الكريمة!",

@@ -247,6 +247,15 @@
       "learningRecap": "学習の要約",
       "practice": "これを練習してください"
     },
+    "win": {
+      "title": "勝利！",
+      "message": "目標を達成しました！",
+      "correctAnswers": "連続正解！",
+      "sessionCorrectPrefix": "このゲームで",
+      "sessionCorrectSuffix": "文字を連続でキャッチしました！",
+      "totalWins": "合計勝利数",
+      "continue": "プレイを続ける"
+    },
     "status": {
       "bonusRound": "ボーナスラウンド！",
       "bonusInstruction": "宝石を捕まえよう！",

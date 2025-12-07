@@ -247,6 +247,15 @@
       "learningRecap": "Recapitulação da aprendizagem",
       "practice": "Pratique isso"
     },
+    "win": {
+      "title": "Você ganhou!",
+      "message": "Você atingiu seu objetivo!",
+      "correctAnswers": "respostas corretas em sequência!",
+      "sessionCorrectPrefix": "Você pegou",
+      "sessionCorrectSuffix": "letras seguidas nesta partida!",
+      "totalWins": "Total de vitórias",
+      "continue": "Continuar jogando"
+    },
     "status": {
       "bonusRound": "Rodada de bônus!",
       "bonusInstruction": "Pegue as joias!",

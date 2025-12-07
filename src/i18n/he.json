@@ -261,6 +261,15 @@
       "learningRecap": "סיכום לימוד",
       "practice": "תרגלו זאת"
     },
+    "win": {
+      "title": "ניצחת!",
+      "message": "הגעת ליעד שלך!",
+      "correctAnswers": "תשובות נכונות ברצף!",
+      "sessionCorrectPrefix": "תפסת",
+      "sessionCorrectSuffix": "אותיות ברצף במשחק הזה!",
+      "totalWins": "ניצחונות בסך הכל",
+      "continue": "המשך לשחק"
+    },
     "status": {
       "bonusRound": "סיבוב בונוס!",
       "bonusInstruction": "תפסו את האבנים היקרות!",
