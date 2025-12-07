@@ -2026,6 +2026,17 @@ body {
   animation: stat-ghost-rise 0.9s ease-out;
 }
 
+.score-lives-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+#lives-container {
+  gap: 10px;
+}
+
 @keyframes stat-ghost-rise {
   0% {
     opacity: 0;
@@ -2073,9 +2084,12 @@ body {
     font-size: 16px;
   }
 
+  .score-lives-group {
+    gap: 8px;
+  }
+
   #lives-container {
-    width: 100%;
-    justify-content: center;
+    gap: 8px;
   }
 }
 

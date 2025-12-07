@@ -132,11 +132,14 @@ function GameCanvas({ fontClass }) {
                   1
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-center">
-                <span className="font-semibold" style={{ color: '#6c3b14' }}>{t('game.labels.score')}</span>
-                <span id="score" className="text-2xl font-bold" style={{ color: '#ffce4a' }}>
-                  0
-                </span>
+              <div className="score-lives-group flex items-center gap-3 text-center">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold" style={{ color: '#6c3b14' }}>{t('game.labels.score')}</span>
+                  <span id="score" className="text-2xl font-bold" style={{ color: '#ffce4a' }}>
+                    0
+                  </span>
+                </div>
+                <div id="lives-container" className="flex items-center gap-2" />
               </div>
               <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3" id="river-stat-container">
                 <div className="stat-badge" id="wave-stat" aria-live="polite">
@@ -156,7 +159,6 @@ function GameCanvas({ fontClass }) {
                   <span className="stat-badge__ghost" id="streak-stat-ghost" aria-hidden="true" />
                 </div>
               </div>
-              <div id="lives-container" className="flex items-center gap-2" />
             </div>
           </div>
         </div>
