@@ -74,6 +74,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const goalIncreaseBtn = document.getElementById('goalIncrease');
   const goalDecreaseBtn = document.getElementById('goalDecrease');
   const goalProgressFillEl = document.getElementById('goalProgressFill');
+  const goalInfoIcon = document.getElementById('goalInfoIcon');
+  const goalTooltip = document.getElementById('goalTooltip');
   const winView = document.getElementById('win-view');
   const continuePlayingButton = document.getElementById('continue-playing-button');
   const winExitButton = document.getElementById('win-exit-button');
@@ -206,31 +208,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     updateModalSubtitle();
   }
 
-  function getDifficultyInfo(value) {
-    const difficulties = [
-      { name: 'Very Easy', color: '#7bd74f', values: [5, 10, 15] },
-      { name: 'Easy', color: '#90ee90', values: [20, 25] },
-      { name: 'Medium', color: '#ffd96d', values: [30, 35, 40, 45] },
-      { name: 'Hard', color: '#ff9247', values: [50, 55, 60, 65] },
-      { name: 'Expert', color: '#ff7043', values: [70, 75, 80, 85] },
-      { name: 'Master', color: '#e53935', values: [90, 95, 100] }
-    ];
-
-    for (const difficulty of difficulties) {
-      if (difficulty.values.includes(value)) {
-        return difficulty;
-      }
-    }
-
-    // Default fallback
-    return { name: 'Medium', color: '#ffd96d', values: [30] };
-  }
-
   function updateGoalDisplay() {
     if (goalValueEl) {
-      const difficultyInfo = getDifficultyInfo(goalValue);
-      goalValueEl.textContent = difficultyInfo.name;
-      goalValueEl.style.color = difficultyInfo.color;
+      goalValueEl.textContent = goalValue;
+      goalValueEl.style.color = '#4a2208';
     }
     updateGoalSettingBar();
   }
@@ -238,8 +219,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   function updateGoalSettingBar() {
     if (goalProgressFillEl) {
       // Bar represents the goal setting itself
-      // Minimum (10) = 20% filled (2 segments)
-      // Maximum (99) = 100% filled (10 segments)
+      // Minimum (5) = 20% filled (2 segments)
+      // Maximum (25) = 100% filled (10 segments)
       const range = GOAL_MAX - GOAL_MIN;
       const currentOffset = goalValue - GOAL_MIN;
       const percent = 20 + (currentOffset / range) * 80;
@@ -273,6 +254,13 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     winView.classList.add('hidden');
     modal.classList.add('hidden');
     gameActive = true;
+    // Clear current round and start a new wave
+    if (currentRound && currentRound.timers) {
+      currentRound.timers.forEach((handle) => clearTrackedTimeout(handle));
+    }
+    activeItems.forEach((item) => item.element.remove());
+    activeItems.clear();
+    spawnNextRound();
   }
 
   function exitFromWin() {
@@ -799,15 +787,15 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let hasIntroducedForItemInLevel;
   let bonusCaughtInSession = 0;
   let randomLettersEnabled = randomLettersToggle?.checked ?? false;
-  let goalValue = 30;
+  let goalValue = 10;
   let waveCorrectCount = 0;
   let totalWins = 0;
   const initialLives = 3;
   const learnPhaseDuration = 2500;
   const levelUpThreshold = 50;
-  const GOAL_MIN = 10;
-  const GOAL_MAX = 99;
-  const GOAL_STEP = 5;
+  const GOAL_MIN = 5;
+  const GOAL_MAX = 25;
+  const GOAL_STEP = 1;
 
   function clonePool(items = []) {
     return items.map((item) => ({ ...item }));
@@ -1109,6 +1097,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   function spawnNextRound() {
     if (!gameActive) return;
+    // Reset wave counter at the start of each new wave/round
+    waveCorrectCount = 0;
     if (isBonusRound) {
       spawnBonusRound();
       return;
@@ -1650,6 +1640,25 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   goalDecreaseBtn?.addEventListener('click', decreaseGoal);
   continuePlayingButton?.addEventListener('click', continueAfterWin);
   winExitButton?.addEventListener('click', exitFromWin);
+
+  // Goal info icon tooltip handlers
+  goalInfoIcon?.addEventListener('mouseenter', () => {
+    goalTooltip?.classList.remove('hidden');
+  });
+  goalInfoIcon?.addEventListener('mouseleave', () => {
+    goalTooltip?.classList.add('hidden');
+  });
+  goalInfoIcon?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    goalTooltip?.classList.toggle('hidden');
+  });
+  // Close tooltip when clicking outside
+  document.addEventListener('click', (e) => {
+    if (goalTooltip && !goalTooltip.classList.contains('hidden') &&
+        !goalInfoIcon?.contains(e.target) && !goalTooltip?.contains(e.target)) {
+      goalTooltip.classList.add('hidden');
+    }
+  });
 
   function setGameMode(value) {
     const button = document.querySelector(`.mode-button[data-mode="${value}"]`);

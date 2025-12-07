@@ -1,6 +1,7 @@
 [
   {
     "id": "first-flow",
+    "section": "classic",
     "nameKey": "badges.firstFlow.name",
     "summaryKey": "badges.firstFlow.summary",
     "tiers": [
@@ -11,6 +12,7 @@
   },
   {
     "id": "steady-streak",
+    "section": "classic",
     "nameKey": "badges.steadyStreak.name",
     "summaryKey": "badges.steadyStreak.summary",
     "tiers": [
@@ -21,6 +23,7 @@
   },
   {
     "id": "letter-master",
+    "section": "classic",
     "nameKey": "badges.letterMaster.name",
     "summaryKey": "badges.letterMaster.summary",
     "tiers": [
@@ -30,17 +33,8 @@
     ]
   },
   {
-    "id": "gem-chaser",
-    "nameKey": "badges.gemChaser.name",
-    "summaryKey": "badges.gemChaser.summary",
-    "tiers": [
-      { "tier": 1, "labelKey": "badges.gemChaser.tiers.1", "goal": 5, "stars": 30 },
-      { "tier": 2, "labelKey": "badges.gemChaser.tiers.2", "goal": 15, "stars": 80 },
-      { "tier": 3, "labelKey": "badges.gemChaser.tiers.3", "goal": 40, "stars": 200 }
-    ]
-  },
-  {
     "id": "dedicated-scholar",
+    "section": "classic",
     "nameKey": "badges.dedicatedScholar.name",
     "summaryKey": "badges.dedicatedScholar.summary",
     "tiers": [
@@ -50,7 +44,30 @@
     ]
   },
   {
+    "id": "rapid-learner",
+    "section": "polyglot",
+    "nameKey": "badges.rapidLearner.name",
+    "summaryKey": "badges.rapidLearner.summary",
+    "tiers": [
+      { "tier": 1, "labelKey": "badges.rapidLearner.tiers.1", "goal": 3, "stars": 25 },
+      { "tier": 2, "labelKey": "badges.rapidLearner.tiers.2", "goal": 10, "stars": 65 },
+      { "tier": 3, "labelKey": "badges.rapidLearner.tiers.3", "goal": 25, "stars": 150 }
+    ]
+  },
+  {
+    "id": "gem-chaser",
+    "section": "special",
+    "nameKey": "badges.gemChaser.name",
+    "summaryKey": "badges.gemChaser.summary",
+    "tiers": [
+      { "tier": 1, "labelKey": "badges.gemChaser.tiers.1", "goal": 5, "stars": 30 },
+      { "tier": 2, "labelKey": "badges.gemChaser.tiers.2", "goal": 15, "stars": 80 },
+      { "tier": 3, "labelKey": "badges.gemChaser.tiers.3", "goal": 40, "stars": 200 }
+    ]
+  },
+  {
     "id": "accuracy-ace",
+    "section": "special",
     "nameKey": "badges.accuracyAce.name",
     "summaryKey": "badges.accuracyAce.summary",
     "tiers": [
@@ -61,6 +78,7 @@
   },
   {
     "id": "speed-demon",
+    "section": "special",
     "nameKey": "badges.speedDemon.name",
     "summaryKey": "badges.speedDemon.summary",
     "tiers": [
@@ -71,6 +89,7 @@
   },
   {
     "id": "explorer",
+    "section": "polyglot",
     "nameKey": "badges.explorer.name",
     "summaryKey": "badges.explorer.summary",
     "tiers": [
@@ -81,6 +100,7 @@
   },
   {
     "id": "perfectionist",
+    "section": "special",
     "nameKey": "badges.perfectionist.name",
     "summaryKey": "badges.perfectionist.summary",
     "tiers": [
@@ -90,7 +110,30 @@
     ]
   },
   {
+    "id": "marathon-runner",
+    "section": "special",
+    "nameKey": "badges.marathonRunner.name",
+    "summaryKey": "badges.marathonRunner.summary",
+    "tiers": [
+      { "tier": 1, "labelKey": "badges.marathonRunner.tiers.1", "goal": 3, "stars": 25 },
+      { "tier": 2, "labelKey": "badges.marathonRunner.tiers.2", "goal": 10, "stars": 60 },
+      { "tier": 3, "labelKey": "badges.marathonRunner.tiers.3", "goal": 25, "stars": 140 }
+    ]
+  },
+  {
+    "id": "variety-seeker",
+    "section": "polyglot",
+    "nameKey": "badges.varietySeeker.name",
+    "summaryKey": "badges.varietySeeker.summary",
+    "tiers": [
+      { "tier": 1, "labelKey": "badges.varietySeeker.tiers.1", "goal": 10, "stars": 20 },
+      { "tier": 2, "labelKey": "badges.varietySeeker.tiers.2", "goal": 25, "stars": 55 },
+      { "tier": 3, "labelKey": "badges.varietySeeker.tiers.3", "goal": 50, "stars": 130 }
+    ]
+  },
+  {
     "id": "early-bird",
+    "section": "dedication",
     "nameKey": "badges.earlyBird.name",
     "summaryKey": "badges.earlyBird.summary",
     "tiers": [
@@ -101,6 +144,7 @@
   },
   {
     "id": "night-owl",
+    "section": "dedication",
     "nameKey": "badges.nightOwl.name",
     "summaryKey": "badges.nightOwl.summary",
     "tiers": [
@@ -111,6 +155,7 @@
   },
   {
     "id": "comeback-kid",
+    "section": "dedication",
     "nameKey": "badges.comebackKid.name",
     "summaryKey": "badges.comebackKid.summary",
     "tiers": [
@@ -120,43 +165,14 @@
     ]
   },
   {
-    "id": "marathon-runner",
-    "nameKey": "badges.marathonRunner.name",
-    "summaryKey": "badges.marathonRunner.summary",
-    "tiers": [
-      { "tier": 1, "labelKey": "badges.marathonRunner.tiers.1", "goal": 3, "stars": 25 },
-      { "tier": 2, "labelKey": "badges.marathonRunner.tiers.2", "goal": 10, "stars": 60 },
-      { "tier": 3, "labelKey": "badges.marathonRunner.tiers.3", "goal": 25, "stars": 140 }
-    ]
-  },
-  {
     "id": "weekend-warrior",
+    "section": "dedication",
     "nameKey": "badges.weekendWarrior.name",
     "summaryKey": "badges.weekendWarrior.summary",
     "tiers": [
       { "tier": 1, "labelKey": "badges.weekendWarrior.tiers.1", "goal": 2, "stars": 15 },
       { "tier": 2, "labelKey": "badges.weekendWarrior.tiers.2", "goal": 6, "stars": 45 },
       { "tier": 3, "labelKey": "badges.weekendWarrior.tiers.3", "goal": 15, "stars": 110 }
-    ]
-  },
-  {
-    "id": "variety-seeker",
-    "nameKey": "badges.varietySeeker.name",
-    "summaryKey": "badges.varietySeeker.summary",
-    "tiers": [
-      { "tier": 1, "labelKey": "badges.varietySeeker.tiers.1", "goal": 5, "stars": 20 },
-      { "tier": 2, "labelKey": "badges.varietySeeker.tiers.2", "goal": 15, "stars": 55 },
-      { "tier": 3, "labelKey": "badges.varietySeeker.tiers.3", "goal": 30, "stars": 130 }
-    ]
-  },
-  {
-    "id": "rapid-learner",
-    "nameKey": "badges.rapidLearner.name",
-    "summaryKey": "badges.rapidLearner.summary",
-    "tiers": [
-      { "tier": 1, "labelKey": "badges.rapidLearner.tiers.1", "goal": 3, "stars": 25 },
-      { "tier": 2, "labelKey": "badges.rapidLearner.tiers.2", "goal": 10, "stars": 65 },
-      { "tier": 3, "labelKey": "badges.rapidLearner.tiers.3", "goal": 25, "stars": 150 }
     ]
   }
 ]

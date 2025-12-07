@@ -148,6 +148,7 @@
       "subtitleFallback": "Drag the letters to the correct boxes!",
       "prompt": "Choose what you want to practice:",
       "goal": "Goal",
+      "goalTooltip": "Collect this many letters within a single wave to win!",
       "installDescription": "Install App",
       "defaultNoun": "item",
       "defaultModeLabel": "Core Practice",
@@ -279,7 +280,7 @@
       "gemAria": "Bonus gem"
     },
     "summary": {
-      "heading": "Items Encountered",
+      "heading": "Letters Encountered",
       "empty": "No stats to show for this round.",
       "gameOver": "Game Over",
       "finalScore": "Final Score: {{score}}",
@@ -355,7 +356,7 @@
   "badges": {
     "firstFlow": {
       "name": "First Flow",
-      "summary": "Play a full run of {{gameName}}.",
+      "summary": "Complete {{goal}} games.",
       "tiers": {
         "1": "Bronze Current",
         "2": "Silver Surge",
@@ -364,7 +365,7 @@
     },
     "steadyStreak": {
       "name": "Streak Keeper",
-      "summary": "Log in and play on consecutive days.",
+      "summary": "Play {{goal}} days in a row.",
       "tiers": {
         "1": "Weekend Wave",
         "2": "Moonlit Run",
@@ -373,7 +374,7 @@
     },
     "letterMaster": {
       "name": "Letter Master",
-      "summary": "Catch items without missing.",
+      "summary": "Catch {{goal}} letters in a row without missing.",
       "tiers": {
         "1": "Focused Splash",
         "2": "Precision Flow",
@@ -382,7 +383,7 @@
     },
     "gemChaser": {
       "name": "Gem Chaser",
-      "summary": "Win bonus rounds and gather river gems.",
+      "summary": "Win {{goal}} bonus rounds.",
       "tiers": {
         "1": "Sparkling Stream",
         "2": "Shimmering Rapid",
@@ -391,7 +392,7 @@
     },
     "dedicatedScholar": {
       "name": "Dedicated Scholar",
-      "summary": "Catch a total number of items across all sessions.",
+      "summary": "Catch {{goal}} total letters.",
       "tiers": {
         "1": "Studious Starter",
         "2": "Devoted Reader",
@@ -400,7 +401,7 @@
     },
     "accuracyAce": {
       "name": "Accuracy Ace",
-      "summary": "Complete sessions with 90% or higher accuracy.",
+      "summary": "Complete {{goal}} games with 90%+ accuracy.",
       "tiers": {
         "1": "Sharp Eye",
         "2": "Keen Focus",
@@ -409,7 +410,7 @@
     },
     "speedDemon": {
       "name": "Speed Demon",
-      "summary": "Complete sessions with fast flow speed enabled.",
+      "summary": "Complete {{goal}} games with fast speed.",
       "tiers": {
         "1": "Quick Current",
         "2": "Rapid Runner",
@@ -418,7 +419,7 @@
     },
     "explorer": {
       "name": "Explorer",
-      "summary": "Try different game modes and challenges.",
+      "summary": "Try {{goal}} different game modes.",
       "tiers": {
         "1": "Curious Wanderer",
         "2": "Brave Voyager",
@@ -427,7 +428,7 @@
     },
     "perfectionist": {
       "name": "Perfectionist",
-      "summary": "Complete sessions without any mistakes.",
+      "summary": "Complete {{goal}} perfect games (no mistakes).",
       "tiers": {
         "1": "Careful Catcher",
         "2": "Precision Master",
@@ -436,7 +437,7 @@
     },
     "earlyBird": {
       "name": "Early Bird",
-      "summary": "Play sessions in the morning hours (5am-11am).",
+      "summary": "Play {{goal}} games in the morning (5am-11am).",
       "tiers": {
         "1": "Dawn Paddler",
         "2": "Sunrise Swimmer",
@@ -445,7 +446,7 @@
     },
     "nightOwl": {
       "name": "Night Owl",
-      "summary": "Play sessions in the evening hours (8pm-2am).",
+      "summary": "Play {{goal}} games at night (8pm-2am).",
       "tiers": {
         "1": "Twilight Traveler",
         "2": "Moonlight Navigator",
@@ -454,7 +455,7 @@
     },
     "comebackKid": {
       "name": "Comeback Kid",
-      "summary": "Return to play after breaking your streak.",
+      "summary": "Return {{goal}} times after breaking a streak.",
       "tiers": {
         "1": "Fresh Start",
         "2": "Resilient Spirit",
@@ -463,7 +464,7 @@
     },
     "marathonRunner": {
       "name": "Marathon Runner",
-      "summary": "Play extended sessions with 30+ catches.",
+      "summary": "Complete {{goal}} long games (30+ catches).",
       "tiers": {
         "1": "Endurance Paddler",
         "2": "Distance Swimmer",
@@ -472,7 +473,7 @@
     },
     "weekendWarrior": {
       "name": "Weekend Warrior",
-      "summary": "Play sessions on weekends (Saturday or Sunday).",
+      "summary": "Play {{goal}} games on weekends.",
       "tiers": {
         "1": "Saturday Starter",
         "2": "Weekend Regular",
@@ -481,7 +482,7 @@
     },
     "varietySeeker": {
       "name": "Variety Seeker",
-      "summary": "Practice many different unique letters.",
+      "summary": "Practice {{goal}} different letters.",
       "tiers": {
         "1": "Diverse Learner",
         "2": "Broad Explorer",
@@ -490,13 +491,19 @@
     },
     "rapidLearner": {
       "name": "Rapid Learner",
-      "summary": "Improve accuracy on previously weak letters.",
+      "summary": "Improve {{goal}} weak letters to 50%+ accuracy.",
       "tiers": {
         "1": "Quick Study",
         "2": "Fast Improver",
         "3": "Lightning Learner"
       }
     }
+  },
+  "achievementSections": {
+    "classic": "Classic",
+    "special": "Special",
+    "polyglot": "Polyglot",
+    "dedication": "Dedication"
   },
   "daily": {
     "badge": {

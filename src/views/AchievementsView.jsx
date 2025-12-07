@@ -34,7 +34,7 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
   const percent = isMaxed ? 100 : Math.min((currentProgressValue / nextGoal) * 100, 100);
   const tierLabel = translate(activeTier.labelKey);
   const badgeName = translate(badge.nameKey);
-  const badgeSummary = translate(badge.summaryKey, { gameName });
+  const badgeSummary = translate(badge.summaryKey, { gameName, goal: nextGoal });
   const tierProgressLabel = translate('achievements.tierProgress', {
     current: Math.min((hasUnclaimed ? unclaimed[0].tier : claimedTiers + 1) || 1, totalTiers),
     total: totalTiers
@@ -140,6 +140,7 @@ export default function AchievementsView() {
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
   const gameName = t('app.title');
+  const sectionBannerVariant = 'aurora';
 
   const latestBadge = useMemo(() => {
     if (!player.latestBadge) return null;
@@ -254,7 +255,7 @@ export default function AchievementsView() {
   const levelName = t(`achievements.levelNames.${Math.min(level, 10)}`, { defaultValue: t('achievements.levelNames.10') });
 
   return (
-    <>
+    <div className="achievements-view">
       {/* Player Header */}
       <header className="player-header">
         <div className="player-meta">
@@ -334,28 +335,50 @@ export default function AchievementsView() {
         </div>
       </header>
 
-      <section className="section" style={{ marginTop: '20px',  }}>
+      <section className="section" style={{ marginTop: '20px' }}>
         <div className="section-header">
-          <div className="section-title">
-            <div className="wood-header">{t('achievements.title')}</div>
-          </div>
+          <div className="wood-header">{t('achievements.title')}</div>
         </div>
-        <section className="section" style={{ marginTop: '10px',  }}></section>
-        <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
-          {badgesCatalog
-            .filter((badge) => activeBadges.includes(badge.id))
-            .map((badge) => (
-              <BadgeCard
-                key={badge.id}
-                badge={badge}
-                progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
-                translate={t}
-                gameName={gameName}
-                onClaim={handleBadgeClaim}
-              />
-            ))}
-        </div>
+        <section className="section" style={{ marginTop: '10px' }}></section>
+
+        {/* Group badges by section */}
+        {['classic', 'special', 'polyglot', 'dedication'].map((sectionId) => {
+          const sectionCatalog = badgesCatalog.filter((badge) => badge.section === sectionId);
+          const activeSectionBadges = sectionCatalog.filter((badge) => activeBadges.includes(badge.id));
+          const additionalBadges = sectionCatalog.filter((badge) => !activeBadges.includes(badge.id));
+          // Only show sections with at least 3 achievements
+          const displayBadges = [...activeSectionBadges, ...additionalBadges].slice(
+            0,
+            Math.max(3, activeSectionBadges.length)
+          );
+
+          if (displayBadges.length === 0) return null;
+
+          return (
+                        <div key={sectionId} className="achievement-section" style={{ marginBottom: '32px' }}>
+              <div className="section-header mb-3">
+                <div className="section-title">
+                  <div className={`section-banner section-banner--${sectionBannerVariant} text-sm`}>
+                    {t(`achievementSections.${sectionId}`, sectionId.charAt(0).toUpperCase() + sectionId.slice(1))}
+                  </div>
+                </div>
+              </div>
+              <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
+                {displayBadges.map((badge) => (
+                  <BadgeCard
+                    key={badge.id}
+                    badge={badge}
+                    progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
+                    translate={t}
+                    gameName={gameName}
+                    onClaim={handleBadgeClaim}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </section>
-    </>
+    </div>
   );
 }

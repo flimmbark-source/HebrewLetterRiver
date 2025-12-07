@@ -235,7 +235,7 @@
       "gemAria": "ボーナスジェム"
     },
     "summary": {
-      "heading": "遭遇したアイテム",
+      "heading": "遭遇した文字",
       "empty": "このラウンドに表示する統計はありません。",
       "gameOver": "ゲームオーバー",
       "finalScore": "最終スコア: {{score}}",
