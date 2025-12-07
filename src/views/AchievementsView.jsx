@@ -348,7 +348,7 @@ export default function AchievementsView() {
             .filter((badge) => badge.section === sectionId && activeBadges.includes(badge.id));
 
           // Only show sections with at least 3 achievements
-          if (sectionBadges.length < 3) return null;
+          if (sectionBadges.length === 0) return null;
 
           return (
             <div key={sectionId} style={{ marginBottom: '32px' }}>
