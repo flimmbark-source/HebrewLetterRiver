@@ -851,7 +851,7 @@ body {
 .goal-badge__tooltip {
   position: absolute;
   bottom: calc(100% + 8px);
-  left: 50%;
+  left: 100%;
   transform: translateX(-50%);
   background: #2d1b0d;
   color: #fff;
