@@ -261,6 +261,15 @@
       "learningRecap": "学习回顾",
       "practice": "练习这个"
     },
+    "win": {
+      "title": "你赢了！",
+      "message": "你达成了目标！",
+      "correctAnswers": "个连续正确答案！",
+      "sessionCorrectPrefix": "你在本局连续抓住了",
+      "sessionCorrectSuffix": "个字母！",
+      "totalWins": "总胜场",
+      "continue": "继续游戏"
+    },
     "status": {
       "bonusRound": "奖金回合！",
       "bonusInstruction": "抓住宝石！",

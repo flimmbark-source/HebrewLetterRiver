@@ -276,6 +276,15 @@
       "learningRecap": "የመማሪያ ማጠቃለያ",
       "practice": "ይህን ተለማመድ"
     },
+    "win": {
+      "title": "አሸንፈዋል!",
+      "message": "ዓላማዎን አግኝተዋል!",
+      "correctAnswers": "ትክክለኛ መልሶች በተከታታይ!",
+      "sessionCorrectPrefix": "በዚህ ጨዋታ በተከታታይ",
+      "sessionCorrectSuffix": "ቁምፊዎችን ያገኙ።",
+      "totalWins": "ጠቅላላ ሽግግር",
+      "continue": "ማጫወት ይቀጥሉ"
+    },
     "status": {
       "bonusRound": "የቦነስ ዙር!",
       "bonusInstruction": "ዕንቁዎቹን ያዙ!",

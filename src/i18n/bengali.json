@@ -247,6 +247,15 @@
       "learningRecap": "শেখার রিক্যাপ",
       "practice": "এই অনুশীলন"
     },
+    "win": {
+      "title": "আপনি জিতেছেন!",
+      "message": "আপনি আপনার লক্ষ্য পূরণ করেছেন!",
+      "correctAnswers": "টি সঠিক উত্তর ধারাবাহিক!",
+      "sessionCorrectPrefix": "আপনি এই খেলায় টানা",
+      "sessionCorrectSuffix": "টি অক্ষর ধরেছেন!",
+      "totalWins": "মোট জয়",
+      "continue": "খেলা চালিয়ে যান"
+    },
     "status": {
       "bonusRound": "বোনাস রাউন্ড!",
       "bonusInstruction": "রত্ন ধরা!",

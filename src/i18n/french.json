@@ -261,6 +261,15 @@
       "learningRecap": "Récapitulatif de l'apprentissage",
       "practice": "Pratiquez ceci"
     },
+    "win": {
+      "title": "Vous avez gagné !",
+      "message": "Vous avez atteint votre objectif !",
+      "correctAnswers": "réponses correctes d'affilée !",
+      "sessionCorrectPrefix": "Vous avez attrapé",
+      "sessionCorrectSuffix": "lettres d'affilée dans cette partie !",
+      "totalWins": "Victoires totales",
+      "continue": "Continuer à jouer"
+    },
     "status": {
       "bonusRound": "Tour bonus !",
       "bonusInstruction": "Attrapez les gemmes !",

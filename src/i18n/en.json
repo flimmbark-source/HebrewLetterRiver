@@ -296,6 +296,8 @@
       "title": "You Win!",
       "message": "You reached your goal!",
       "correctAnswers": "correct answers in a row!",
+      "sessionCorrectPrefix": "You caught",
+      "sessionCorrectSuffix": "letters in a row this game!",
       "totalWins": "Total wins",
       "continue": "Continue Playing"
     },

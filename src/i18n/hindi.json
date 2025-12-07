@@ -247,6 +247,15 @@
       "learningRecap": "सीखना पुनर्कथन",
       "practice": "इसका अभ्यास करें"
     },
+    "win": {
+      "title": "आप जीते!",
+      "message": "आपने अपना लक्ष्य प्राप्त कर लिया!",
+      "correctAnswers": "लगातार सही उत्तर!",
+      "sessionCorrectPrefix": "आपने पकड़ीं",
+      "sessionCorrectSuffix": "अक्षर लगातार इस खेल में!",
+      "totalWins": "कुल जीतें",
+      "continue": "खेल जारी रखें"
+    },
     "status": {
       "bonusRound": "बोनस राउंड!",
       "bonusInstruction": "रत्न पकड़ो!",
