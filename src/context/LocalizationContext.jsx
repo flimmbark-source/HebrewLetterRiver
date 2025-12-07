@@ -11,8 +11,15 @@ const LocalizationContext = createContext({
   languagePack: loadLanguage(),
   interfaceLanguagePack: loadLanguage(defaultAppLanguageId),
   dictionary: getDictionary(defaultAppLanguageId),
-  t: (key, replacements) =>
-    translateFromDictionary(getDictionary(defaultAppLanguageId), key, replacements)
+    t: (key, fallbackOrReplacements = {}, replacements = {}) => {
+    const hasFallback = typeof fallbackOrReplacements === 'string';
+    const fallback = hasFallback ? fallbackOrReplacements : undefined;
+    const params = hasFallback ? replacements : fallbackOrReplacements;
+
+    const translated = translateFromDictionary(getDictionary(defaultAppLanguageId), key, params);
+    if (!translated || translated === key) return fallback ?? key;
+    return translated;
+  }
 });
 
 export function LocalizationProvider({ children }) {
@@ -26,7 +33,15 @@ export function LocalizationProvider({ children }) {
       languagePack,
       interfaceLanguagePack,
       dictionary,
-      t: (key, replacements = {}) => translateFromDictionary(dictionary, key, replacements)
+            t: (key, fallbackOrReplacements = {}, replacements = {}) => {
+        const hasFallback = typeof fallbackOrReplacements === 'string';
+        const fallback = hasFallback ? fallbackOrReplacements : undefined;
+        const params = hasFallback ? replacements : fallbackOrReplacements;
+
+        const translated = translateFromDictionary(dictionary, key, params);
+        if (!translated || translated === key) return fallback ?? key;
+        return translated;
+      }
     }),
     [languagePack, interfaceLanguagePack, dictionary]
   );

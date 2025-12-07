@@ -81,6 +81,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const winExitButton = document.getElementById('win-exit-button');
   const winGoalDisplay = document.getElementById('win-goal-display');
   const totalWinsDisplay = document.getElementById('total-wins-display');
+  const sessionCorrectDisplay = document.getElementById('session-correct-display');
 
   if (!scoreEl || !levelEl) {
     throw new Error('Game elements failed to initialize.');
@@ -247,6 +248,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
     if (winGoalDisplay) winGoalDisplay.textContent = goalValue;
     if (totalWinsDisplay) totalWinsDisplay.textContent = totalWins;
+    if (sessionCorrectDisplay) sessionCorrectDisplay.textContent = waveCorrectCount;
   }
 
   function continueAfterWin() {
@@ -711,7 +713,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       if (!isBonusRound && droppedItemId) {
         sessionStats[droppedItemId].correct++;
         // Track wave progress for win condition
-        waveCorrectCount++;
+        waveCorrectCount++
         totalCatchStreak++;
         if (waveCorrectCount >= goalValue) {
           totalWins++;

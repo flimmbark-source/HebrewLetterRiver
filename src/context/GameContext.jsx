@@ -320,7 +320,7 @@ function GameCanvas({ fontClass }) {
                   </p>
                   <div className="space-y-2">
                     <p className="text-lg" style={{ color: '#6c3b14' }}>
-                      <span className="font-bold" id="win-goal-display">{'totalCatchStreak'}</span> {t('game.win.correctAnswers', 'letters in a row!')}
+                      <span className="font-bold" id="session-correct-display">0</span> {t('game.win.sessionCorrect', 'letters caught this game!')}
                     </p>
                     <p className="text-base" style={{ color: '#6c3b14' }}>
                       {t('game.win.totalWins', 'Total wins')}: <span className="font-bold" id="total-wins-display">0</span>
