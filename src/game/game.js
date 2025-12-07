@@ -248,7 +248,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
     if (winGoalDisplay) winGoalDisplay.textContent = goalValue;
     if (totalWinsDisplay) totalWinsDisplay.textContent = totalWins;
-    if (sessionCorrectDisplay) sessionCorrectDisplay.textContent = waveCorrectCount;
+    if (sessionCorrectDisplay) sessionCorrectDisplay.textContent = totalCatchStreak;
   }
 
   function continueAfterWin() {
@@ -713,8 +713,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       if (!isBonusRound && droppedItemId) {
         sessionStats[droppedItemId].correct++;
         // Track wave progress for win condition
-        waveCorrectCount++
-        totalCatchStreak++;
+        waveCorrectCount++;
+        currentCatchStreak++;
+        totalCatchStreak = Math.max(totalCatchStreak, currentCatchStreak);
         if (waveCorrectCount >= goalValue) {
           totalWins++;
           trackTimeout(() => {
@@ -732,7 +733,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         sessionStats[droppedItemId].incorrect++;
         // Reset wave progress on incorrect answer
         waveCorrectCount = 0;
-        totalCatchStreak = 0
+        currentCatchStreak = 0;
       }
 
       // Find the correct bucket to show its sound/label
@@ -793,7 +794,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let randomLettersEnabled = randomLettersToggle?.checked ?? false;
   let goalValue = 10;
   let waveCorrectCount = 0;
-  let totalCatchStreak = 0
+  let totalCatchStreak = 0;
+  let currentCatchStreak = 0;
   let totalWins = 0;
   const initialLives = 3;
   const learnPhaseDuration = 2500;
@@ -862,6 +864,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     bonusCaughtInSession = 0;
     randomLettersEnabled = randomLettersToggle?.checked ?? false;
     waveCorrectCount = 0;
+    totalCatchStreak = 0;
+    currentCatchStreak = 0;
 
     updateScore(0, true);
     updateLives();
@@ -885,6 +889,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     lives = initialLives;
     level = 1;
     totalCatchStreak = 0;
+    currentCatchStreak = 0;
     scoreForNextLevel = levelUpThreshold;
     baseSpeedSetting = parseInt(document.getElementById('game-speed-slider').value, 10);
     fallDuration = baseSpeedSetting;
@@ -1309,6 +1314,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     currentRound.handledCount++;
 
     if (isMiss && !isBonusRound && key) {
+      waveCorrectCount = 0;
+      currentCatchStreak = 0;
       lives--;
       updateLives(true);
       emit('game:letter-result', {
@@ -1578,14 +1585,22 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     if (isCorrect) {
       updateScore(isBonusRound ? 25 : 10);
       targetBox.classList.add('feedback-correct');
-      if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].correct++;
+      if (!isBonusRound && droppedItemId) {
+        sessionStats[droppedItemId].correct++;
+        currentCatchStreak++;
+        totalCatchStreak = Math.max(totalCatchStreak, currentCatchStreak);
+      }
       // Hide the letter immediately after correct drop
       item.element.style.display = 'none';
     } else {
       lives--;
       updateLives(true);
       targetBox.classList.add('feedback-incorrect');
-      if (!isBonusRound && droppedItemId) sessionStats[droppedItemId].incorrect++;
+      if (!isBonusRound && droppedItemId) {
+        sessionStats[droppedItemId].incorrect++;
+        waveCorrectCount = 0;
+        currentCatchStreak = 0;
+      }
 
       // Find the correct bucket to show its sound/label
       const correctBucket = choicesContainer.querySelector(`[data-item-id="${droppedItemId}"]`);
