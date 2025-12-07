@@ -125,7 +125,7 @@ function GameCanvas({ fontClass }) {
             >
               {t('game.controls.exitToMenu')}
             </span>
-            <div className="flex w-full items-center justify-center gap-4 sm:gap-6">
+            <div className="top-bar-content flex w-full flex-wrap items-center justify-center gap-3 sm:gap-6">
               <div className="inline-flex items-center gap-2 text-center">
                 <span className="font-semibold" style={{ color: '#6c3b14' }}>{t('game.labels.level')}</span>
                 <span id="level" className="text-2xl font-bold" style={{ color: '#ff9247' }}>
@@ -138,7 +138,7 @@ function GameCanvas({ fontClass }) {
                   0
                 </span>
               </div>
-              <div className="flex items-center gap-2 sm:gap-3" id="river-stat-container">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3" id="river-stat-container">
                 <div className="stat-badge" id="wave-stat" aria-live="polite">
                   <span className="sr-only">{t('game.labels.bestWave', 'Best wave')}</span>
                   <span className="stat-badge__icon" aria-hidden="true">🌊</span>

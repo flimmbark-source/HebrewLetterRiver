@@ -1978,6 +1978,7 @@ body {
   align-items: center;
   padding: var(--space-2); /* 16px all around */
   gap: var(--space-2); /* 16px between sections */
+  flex-wrap: wrap;
 }
 
 .stat-badge {
@@ -2039,6 +2040,42 @@ body {
   100% {
     opacity: 0;
     transform: translate(-50%, -18px) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  #top-bar {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .top-bar-content {
+    gap: 10px;
+  }
+
+  #river-stat-container {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stat-badge {
+    padding: 4px 8px;
+    gap: 6px;
+  }
+
+  .stat-badge__icon {
+    width: 26px;
+    height: 26px;
+    font-size: 16px;
+  }
+
+  .stat-badge__value {
+    font-size: 16px;
+  }
+
+  #lives-container {
+    width: 100%;
+    justify-content: center;
   }
 }
 
