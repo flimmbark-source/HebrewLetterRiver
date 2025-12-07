@@ -138,6 +138,24 @@ function GameCanvas({ fontClass }) {
                   0
                 </span>
               </div>
+              <div className="flex items-center gap-2 sm:gap-3" id="river-stat-container">
+                <div className="stat-badge" id="wave-stat" aria-live="polite">
+                  <span className="sr-only">{t('game.labels.bestWave', 'Best wave')}</span>
+                  <span className="stat-badge__icon" aria-hidden="true">🌊</span>
+                  <span className="stat-badge__value" id="wave-stat-value">
+                    0
+                  </span>
+                  <span className="stat-badge__ghost" id="wave-stat-ghost" aria-hidden="true" />
+                </div>
+                <div className="stat-badge" id="streak-stat" aria-live="polite">
+                  <span className="sr-only">{t('game.labels.bestStreak', 'Best streak')}</span>
+                  <span className="stat-badge__icon" aria-hidden="true">🔥</span>
+                  <span className="stat-badge__value" id="streak-stat-value">
+                    0
+                  </span>
+                  <span className="stat-badge__ghost" id="streak-stat-ghost" aria-hidden="true" />
+                </div>
+              </div>
               <div id="lives-container" className="flex items-center gap-2" />
             </div>
           </div>

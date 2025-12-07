@@ -82,6 +82,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const winGoalDisplay = document.getElementById('win-goal-display');
   const totalWinsDisplay = document.getElementById('total-wins-display');
   const sessionCorrectDisplay = document.getElementById('session-correct-display');
+  const waveStatValue = document.getElementById('wave-stat-value');
+  const streakStatValue = document.getElementById('streak-stat-value');
+  const waveStatGhost = document.getElementById('wave-stat-ghost');
+  const streakStatGhost = document.getElementById('streak-stat-ghost');
 
   if (!scoreEl || !levelEl) {
     throw new Error('Game elements failed to initialize.');
@@ -715,7 +719,15 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         // Track wave progress for win condition
         waveCorrectCount++;
         currentCatchStreak++;
+        if (waveCorrectCount > bestWaveCatch) {
+          bestWaveCatch = waveCorrectCount;
+          updateWaveStat(true);
+        }
+        const improvedStreak = currentCatchStreak > totalCatchStreak;
         totalCatchStreak = Math.max(totalCatchStreak, currentCatchStreak);
+        if (improvedStreak) {
+          updateStreakStat(true);
+        }
         if (waveCorrectCount >= goalValue) {
           totalWins++;
           trackTimeout(() => {
@@ -796,6 +808,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let waveCorrectCount = 0;
   let totalCatchStreak = 0;
   let currentCatchStreak = 0;
+  let bestWaveCatch = 0;
   let totalWins = 0;
   const initialLives = 3;
   const learnPhaseDuration = 2500;
@@ -866,11 +879,14 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     waveCorrectCount = 0;
     totalCatchStreak = 0;
     currentCatchStreak = 0;
+    bestWaveCatch = 0;
 
     updateScore(0, true);
     updateLives();
     updateLevelDisplay();
     updateGoalDisplay();
+    updateWaveStat();
+    updateStreakStat();
 
     startButton.textContent = t('game.controls.start');
     isRestartMode = false;
@@ -888,8 +904,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     score = 0;
     lives = initialLives;
     level = 1;
+    waveCorrectCount = 0;
     totalCatchStreak = 0;
     currentCatchStreak = 0;
+    bestWaveCatch = 0;
     scoreForNextLevel = levelUpThreshold;
     baseSpeedSetting = parseInt(document.getElementById('game-speed-slider').value, 10);
     fallDuration = baseSpeedSetting;
@@ -919,6 +937,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     updateScore(0, true);
     updateLives();
     updateLevelDisplay();
+    updateWaveStat();
+    updateStreakStat();
     setupExitButton?.classList.add('hidden');
     modal.classList.add('hidden');
     accessibilityView?.classList.add('hidden');
@@ -1103,6 +1123,32 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     if (isLost) {
       gameContainer.classList.add('life-lost-shake');
       trackTimeout(() => gameContainer.classList.remove('life-lost-shake'), 500);
+    }
+  }
+
+  function triggerStatGhost(ghostEl, icon) {
+    if (!ghostEl) return;
+    ghostEl.textContent = `+1 ${icon}`;
+    ghostEl.classList.remove('stat-badge__ghost--visible');
+    // Force reflow so the animation restarts
+    void ghostEl.offsetWidth;
+    ghostEl.classList.add('stat-badge__ghost--visible');
+    trackTimeout(() => ghostEl.classList.remove('stat-badge__ghost--visible'), 900);
+  }
+
+  function updateWaveStat(triggerGhost = false) {
+    if (!waveStatValue) return;
+    waveStatValue.textContent = bestWaveCatch;
+    if (triggerGhost) {
+      triggerStatGhost(waveStatGhost, '🌊');
+    }
+  }
+
+  function updateStreakStat(triggerGhost = false) {
+    if (!streakStatValue) return;
+    streakStatValue.textContent = totalCatchStreak;
+    if (triggerGhost) {
+      triggerStatGhost(streakStatGhost, '🔥');
     }
   }
 
@@ -1587,8 +1633,23 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       targetBox.classList.add('feedback-correct');
       if (!isBonusRound && droppedItemId) {
         sessionStats[droppedItemId].correct++;
+        waveCorrectCount++;
         currentCatchStreak++;
+        if (waveCorrectCount > bestWaveCatch) {
+          bestWaveCatch = waveCorrectCount;
+          updateWaveStat(true);
+        }
+        const improvedStreak = currentCatchStreak > totalCatchStreak;
         totalCatchStreak = Math.max(totalCatchStreak, currentCatchStreak);
+        if (improvedStreak) {
+          updateStreakStat(true);
+        }
+        if (waveCorrectCount >= goalValue) {
+          totalWins++;
+          trackTimeout(() => {
+            showWinScreen();
+          }, 500);
+        }
       }
       // Hide the letter immediately after correct drop
       item.element.style.display = 'none';
