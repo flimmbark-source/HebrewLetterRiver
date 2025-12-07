@@ -249,7 +249,7 @@
       "gemAria": "Gemme bonus"
     },
     "summary": {
-      "heading": "Objets rencontrés",
+      "heading": "Lettres rencontrées",
       "empty": "Aucune statistique à afficher pour ce tour.",
       "gameOver": "Jeu terminé",
       "finalScore": "Note finale : {{score}}",

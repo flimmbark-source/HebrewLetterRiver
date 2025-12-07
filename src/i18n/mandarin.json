@@ -249,7 +249,7 @@
       "gemAria": "奖励宝石"
     },
     "summary": {
-      "heading": "遇到的物品",
+      "heading": "遇到的字母",
       "empty": "本轮没有可显示的统计数据。",
       "gameOver": "游戏结束",
       "finalScore": "最终得分：{{score}}",
