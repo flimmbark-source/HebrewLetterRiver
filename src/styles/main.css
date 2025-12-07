@@ -36,6 +36,58 @@ body {
 }
 
 /* Wooden header bar */
+
+.section-banner {
+  --banner-bg: linear-gradient(180deg, #f2b15b 0%, #c97932 45%, #aa622d 100%);
+  --banner-shadow: 0 3px 0 rgba(133, 63, 21, 1), 0 6px 10px rgba(133, 63, 21, 0.7);
+  --banner-pin: radial-gradient(circle at 30% 30%, #fff 0, #ffd27b 40%, #c27b2a 100%);
+  --banner-text: #fff7e5;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px 5px;
+  margin-bottom: 4px;
+  background: var(--banner-bg);
+  color: var(--banner-text);
+  font-family: "Baloo 2", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 14px;
+  box-shadow: var(--banner-shadow);
+}
+
+.section-banner::before,
+.section-banner::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--banner-pin);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.6);
+}
+
+.section-banner::before { left: -6px; }
+.section-banner::after { right: -6px; }
+
+.section-banner--wood {
+  --banner-bg: linear-gradient(180deg, #f2b15b 0%, #c97932 45%, #aa622d 100%);
+  --banner-shadow: 0 3px 0 rgba(133, 63, 21, 1), 0 6px 10px rgba(133, 63, 21, 0.7);
+  --banner-pin: radial-gradient(circle at 30% 30%, #fff 0, #ffd27b 40%, #c27b2a 100%);
+  --banner-text: #fff7e5;
+}
+
+.section-banner--aurora {
+  --banner-bg: linear-gradient(135deg, #6dd5fa 0%, #3a7bd5 45%, #283e75 100%);
+  --banner-shadow: 0 3px 0 rgba(26, 64, 122, 1), 0 6px 12px rgba(26, 64, 122, 0.65);
+  --banner-pin: radial-gradient(circle at 30% 30%, #e1f3ff 0, #8ad0ff 45%, #2b6fa3 100%);
+  --banner-text: #e6f3ff;
+}
+
 .wood-header {
   position: relative;
   display: inline-flex;
@@ -320,6 +372,23 @@ body {
 .section-link {
   font-size: 11px;
   color: #b07737;
+}
+
+/* Achievements banners */
+.achievements-view .section-header {
+  justify-content: center;
+}
+
+.achievements-view .section-title {
+  width: 100%;
+}
+
+.achievements-view .section-title .section-banner {
+  margin-bottom: 0;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
 }
 
 /* Progress row grid */

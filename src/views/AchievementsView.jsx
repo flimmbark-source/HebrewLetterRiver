@@ -140,6 +140,7 @@ export default function AchievementsView() {
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
   const gameName = t('app.title');
+  const sectionBannerVariant = 'aurora';
 
   const latestBadge = useMemo(() => {
     if (!player.latestBadge) return null;
@@ -254,7 +255,7 @@ export default function AchievementsView() {
   const levelName = t(`achievements.levelNames.${Math.min(level, 10)}`, { defaultValue: t('achievements.levelNames.10') });
 
   return (
-    <>
+    <div className="achievements-view">
       {/* Player Header */}
       <header className="player-header">
         <div className="player-meta">
@@ -336,27 +337,34 @@ export default function AchievementsView() {
 
       <section className="section" style={{ marginTop: '20px' }}>
         <div className="section-header">
-          <div className="section-title">
-            <div className="wood-header">{t('achievements.title')}</div>
-          </div>
+          <div className="wood-header">{t('achievements.title')}</div>
         </div>
         <section className="section" style={{ marginTop: '10px' }}></section>
 
         {/* Group badges by section */}
         {['classic', 'special', 'polyglot', 'dedication'].map((sectionId) => {
-          const sectionBadges = badgesCatalog
-            .filter((badge) => badge.section === sectionId && activeBadges.includes(badge.id));
-
+          const sectionCatalog = badgesCatalog.filter((badge) => badge.section === sectionId);
+          const activeSectionBadges = sectionCatalog.filter((badge) => activeBadges.includes(badge.id));
+          const additionalBadges = sectionCatalog.filter((badge) => !activeBadges.includes(badge.id));
           // Only show sections with at least 3 achievements
-          if (sectionBadges.length === 0) return null;
+          const displayBadges = [...activeSectionBadges, ...additionalBadges].slice(
+            0,
+            Math.max(3, activeSectionBadges.length)
+          );
+
+          if (displayBadges.length === 0) return null;
 
           return (
-            <div key={sectionId} style={{ marginBottom: '32px' }}>
-              <h3 className="text-xl font-bold mb-4" style={{ color: '#6c3b14' }}>
-                {t(`achievementSections.${sectionId}`, sectionId.charAt(0).toUpperCase() + sectionId.slice(1))}
-              </h3>
+                        <div key={sectionId} className="achievement-section" style={{ marginBottom: '32px' }}>
+              <div className="section-header mb-3">
+                <div className="section-title">
+                  <div className={`section-banner section-banner--${sectionBannerVariant} text-sm`}>
+                    {t(`achievementSections.${sectionId}`, sectionId.charAt(0).toUpperCase() + sectionId.slice(1))}
+                  </div>
+                </div>
+              </div>
               <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
-                {sectionBadges.map((badge) => (
+                {displayBadges.map((badge) => (
                   <BadgeCard
                     key={badge.id}
                     badge={badge}
@@ -371,6 +379,6 @@ export default function AchievementsView() {
           );
         })}
       </section>
-    </>
+    </div>
   );
 }
