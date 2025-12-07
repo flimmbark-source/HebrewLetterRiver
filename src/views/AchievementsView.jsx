@@ -334,27 +334,41 @@ export default function AchievementsView() {
         </div>
       </header>
 
-      <section className="section" style={{ marginTop: '20px',  }}>
+      <section className="section" style={{ marginTop: '20px' }}>
         <div className="section-header">
           <div className="section-title">
             <div className="wood-header">{t('achievements.title')}</div>
           </div>
         </div>
-        <section className="section" style={{ marginTop: '10px',  }}></section>
-        <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
-          {badgesCatalog
-            .filter((badge) => activeBadges.includes(badge.id))
-            .map((badge) => (
-              <BadgeCard
-                key={badge.id}
-                badge={badge}
-                progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
-                translate={t}
-                gameName={gameName}
-                onClaim={handleBadgeClaim}
-              />
-            ))}
-        </div>
+        <section className="section" style={{ marginTop: '10px' }}></section>
+
+        {/* Group badges by section */}
+        {['classic', 'special', 'polyglot', 'dedication'].map((sectionId) => {
+          const sectionBadges = badgesCatalog
+            .filter((badge) => badge.section === sectionId && activeBadges.includes(badge.id));
+
+          if (sectionBadges.length === 0) return null;
+
+          return (
+            <div key={sectionId} style={{ marginBottom: '32px' }}>
+              <h3 className="text-xl font-bold mb-4" style={{ color: '#6c3b14' }}>
+                {t(`achievementSections.${sectionId}`, sectionId.charAt(0).toUpperCase() + sectionId.slice(1))}
+              </h3>
+              <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
+                {sectionBadges.map((badge) => (
+                  <BadgeCard
+                    key={badge.id}
+                    badge={badge}
+                    progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
+                    translate={t}
+                    gameName={gameName}
+                    onClaim={handleBadgeClaim}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </section>
     </>
   );
