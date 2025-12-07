@@ -45,7 +45,7 @@
   },
   {
     "id": "rapid-learner",
-    "section": "classic",
+    "section": "polyglot",
     "nameKey": "badges.rapidLearner.name",
     "summaryKey": "badges.rapidLearner.summary",
     "tiers": [
@@ -89,7 +89,7 @@
   },
   {
     "id": "explorer",
-    "section": "special",
+    "section": "polyglot",
     "nameKey": "badges.explorer.name",
     "summaryKey": "badges.explorer.summary",
     "tiers": [
