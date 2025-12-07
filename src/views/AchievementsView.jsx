@@ -34,7 +34,7 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
   const percent = isMaxed ? 100 : Math.min((currentProgressValue / nextGoal) * 100, 100);
   const tierLabel = translate(activeTier.labelKey);
   const badgeName = translate(badge.nameKey);
-  const badgeSummary = translate(badge.summaryKey, { gameName });
+  const badgeSummary = translate(badge.summaryKey, { gameName, goal: nextGoal });
   const tierProgressLabel = translate('achievements.tierProgress', {
     current: Math.min((hasUnclaimed ? unclaimed[0].tier : claimedTiers + 1) || 1, totalTiers),
     total: totalTiers
@@ -347,7 +347,8 @@ export default function AchievementsView() {
           const sectionBadges = badgesCatalog
             .filter((badge) => badge.section === sectionId && activeBadges.includes(badge.id));
 
-          if (sectionBadges.length === 0) return null;
+          // Only show sections with at least 3 achievements
+          if (sectionBadges.length < 3) return null;
 
           return (
             <div key={sectionId} style={{ marginBottom: '32px' }}>
