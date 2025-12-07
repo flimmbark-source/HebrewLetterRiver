@@ -903,6 +903,8 @@ body {
   top: 4px;
   left: 4px;
   font-size: 14px;
+  width: 18px;
+  height: 18px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -917,10 +919,26 @@ body {
   opacity: 1;
 }
 
+.goal-badge__info-glyph {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  border: 1px solid #4a2208;
+  background: #fff6e4;
+  color: #4a2208;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1;
+  text-transform: lowercase;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
 .goal-badge__tooltip {
   position: absolute;
   bottom: calc(100% + 8px);
-  left: 100%;
+  left: 120%;
   transform: translateX(-50%);
   background: #2d1b0d;
   color: #fff;
@@ -939,7 +957,7 @@ body {
   content: '';
   position: absolute;
   top: 100%;
-  left: 50%;
+  left: 23%;
   transform: translateX(-50%);
   border: 6px solid transparent;
   border-top-color: #2d1b0d;
@@ -1303,6 +1321,16 @@ body {
   min-width: 44px;
 }
 
+/* Move the setup / back exit button further up and left in the modal
+   Override the utility classes so it sits near the modal corner. */
+#setup-exit-button {
+  position: absolute !important;
+  left: -10px !important;
+  top: 0px !important;
+  transform: none !important;
+  z-index: 1100;
+}
+
 /* === PHASE 5: PRODUCTION POLISH === */
 
 /* PRIMARY BUTTON - Complete 5-State System */
@@ -1488,7 +1516,7 @@ body {
 
 .modal-header {
   flex-shrink: 0;
-  margin-bottom: var(--space-3); /* 24px */
+  margin-bottom: var(--space-4); /* 24px */
 }
 
 .modal-footer {
@@ -1508,6 +1536,35 @@ body {
   font-weight: var(--font-normal); /* 400 */
   line-height: var(--line-height-normal); /* 1.5 */
   margin-bottom: 0; /* Removed to prevent overflow */
+}
+
+.setup-header {
+  position: - sticky;
+}
+
+.setup-header__back {
+  transition: color 0.2s ease;
+}
+
+@media (max-width: 640px) {
+  .setup-header {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-left: 1.5rem;
+    padding-right: 3.5rem;
+    justify-content: center;
+  }
+
+  .setup-header__back {
+    position: -webkit-sticky;
+    left: 0.25rem;
+    top: 0.5rem;
+  }
+
+  .setup-header__title {
+    padding-top: 0.25rem;
+    text-align: center;
+  }
 }
 
 /* Slide up animation for modals */

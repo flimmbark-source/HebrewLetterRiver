@@ -712,6 +712,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         sessionStats[droppedItemId].correct++;
         // Track wave progress for win condition
         waveCorrectCount++;
+        totalCatchStreak++;
         if (waveCorrectCount >= goalValue) {
           totalWins++;
           trackTimeout(() => {
@@ -729,6 +730,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         sessionStats[droppedItemId].incorrect++;
         // Reset wave progress on incorrect answer
         waveCorrectCount = 0;
+        totalCatchStreak = 0
       }
 
       // Find the correct bucket to show its sound/label
@@ -789,6 +791,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let randomLettersEnabled = randomLettersToggle?.checked ?? false;
   let goalValue = 10;
   let waveCorrectCount = 0;
+  let totalCatchStreak = 0
   let totalWins = 0;
   const initialLives = 3;
   const learnPhaseDuration = 2500;
@@ -879,6 +882,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     score = 0;
     lives = initialLives;
     level = 1;
+    totalCatchStreak = 0;
     scoreForNextLevel = levelUpThreshold;
     baseSpeedSetting = parseInt(document.getElementById('game-speed-slider').value, 10);
     fallDuration = baseSpeedSetting;
@@ -1641,22 +1645,34 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   continuePlayingButton?.addEventListener('click', continueAfterWin);
   winExitButton?.addEventListener('click', exitFromWin);
 
+  const setGoalTooltipVisibility = (isVisible) => {
+    goalTooltip?.classList.toggle('hidden', !isVisible);
+    goalInfoIcon?.setAttribute('aria-expanded', isVisible ? 'true' : 'false');
+  };
+
   // Goal info icon tooltip handlers
   goalInfoIcon?.addEventListener('mouseenter', () => {
-    goalTooltip?.classList.remove('hidden');
+    setGoalTooltipVisibility(true);
   });
   goalInfoIcon?.addEventListener('mouseleave', () => {
-    goalTooltip?.classList.add('hidden');
+        setGoalTooltipVisibility(false);
+  });
+  goalInfoIcon?.addEventListener('focus', () => {
+    setGoalTooltipVisibility(true);
+  });
+  goalInfoIcon?.addEventListener('blur', () => {
+    setGoalTooltipVisibility(false);
   });
   goalInfoIcon?.addEventListener('click', (e) => {
     e.stopPropagation();
-    goalTooltip?.classList.toggle('hidden');
+    const isVisible = goalTooltip ? goalTooltip.classList.contains('hidden') === false : false;
+    setGoalTooltipVisibility(!isVisible);
   });
   // Close tooltip when clicking outside
   document.addEventListener('click', (e) => {
     if (goalTooltip && !goalTooltip.classList.contains('hidden') &&
         !goalInfoIcon?.contains(e.target) && !goalTooltip?.contains(e.target)) {
-      goalTooltip.classList.add('hidden');
+      setGoalTooltipVisibility(false);
     }
   });
 

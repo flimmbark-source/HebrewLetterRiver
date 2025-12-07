@@ -191,26 +191,26 @@ function GameCanvas({ fontClass }) {
               </button>
 
               <div id="setup-view" className="flex flex-col h-full">
-                <div className="flex items-center justify-between px-3 py-2 border-b-2" style={{ borderColor: 'rgba(235, 179, 105, 0.3)' }}>
+                <div
+                  className="relative flex items-center justify-center px-3 py-2 border-b-2"
+                  style={{ borderColor: 'rgba(235, 179, 105, 0.3)' }}
+                >
                   <button
                     id="setup-exit-button"
                     type="button"
-                    className="text-xs font-semibold transition sm:text-sm"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold transition sm:text-sm"
                     style={{ color: '#6c3b14' }}
                   >
                     {t('game.controls.exitToMenu')}
                   </button>
-                  <div className="text-center flex-1">
-                    <h1 className={`modal-title text-xl sm:text-2xl font-bold ${fontClass}`} style={{ color: '#ff9247' }}>{t('game.setup.title')}</h1>
-
-
-                <div className="text-center py-1">
-                  <p id="modal-subtitle" className="text-xs font-semibold sm:text-sm" style={{ color: '#6c3b14' }}>
-                    {t('game.setup.subtitleFallback')}
-                  </p>
-                </div>
+                  <div className="flex flex-col items-center flex-1 text-center gap-1">
+                    <h1 className={`modal-title text-xl sm:text-2xl font-bold ${fontClass}`} style={{ color: '#ff9247' }}>
+                      {t('game.setup.title')}
+                    </h1>
+                    <p id="modal-subtitle" className="text-xs font-semibold sm:text-sm" style={{ color: '#6c3b14' }}>
+                      {t('game.setup.subtitleFallback')}
+                    </p>
                   </div>
-                  <div className="w-12"></div>
                 </div>
                 <div className="setup-body px-4">
                   <aside className="goal-column" aria-label="Goal settings">
@@ -223,9 +223,11 @@ function GameCanvas({ fontClass }) {
                         className="goal-badge__info-icon"
                         id="goalInfoIcon"
                         aria-label="Goal information"
+                        aria-controls="goalTooltip"
+                        aria-expanded="false"
                         type="button"
                       >
-                        🛈
+                        <span aria-hidden="true" className="goal-badge__info-glyph">i</span>
                       </button>
                       <div className="goal-badge__value" id="goalValue">Medium</div>
                       <div className="goal-badge__tooltip hidden" id="goalTooltip">
@@ -318,7 +320,7 @@ function GameCanvas({ fontClass }) {
                   </p>
                   <div className="space-y-2">
                     <p className="text-lg" style={{ color: '#6c3b14' }}>
-                      <span className="font-bold" id="win-goal-display">10</span> {t('game.win.correctAnswers', 'correct answers in a row!')}
+                      <span className="font-bold" id="win-goal-display">{'totalCatchStreak'}</span> {t('game.win.correctAnswers', 'letters in a row!')}
                     </p>
                     <p className="text-base" style={{ color: '#6c3b14' }}>
                       {t('game.win.totalWins', 'Total wins')}: <span className="font-bold" id="total-wins-display">0</span>
