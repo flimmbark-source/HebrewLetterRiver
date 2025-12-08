@@ -2147,6 +2147,19 @@ body {
   padding-inline-end: calc(max(var(--space-2) + env(safe-area-inset-right, 0px))+ var(--space-1)) ;
 }
 
+@media (max-width: 640px) {
+  #choices-container {
+    gap: var(--space-1); /* Tighter gap to fit more buckets per row */
+    padding: var(--space-1); /* Reduce edge padding on small screens */
+    padding-inline-start: calc(max(var(--space-1) + env(safe-area-inset-left, 0px)) + var(--space-1));
+    padding-inline-end: calc(max(var(--space-1) + env(safe-area-inset-right, 0px)) + var(--space-1));
+  }
+
+  .catcher-box {
+    padding: calc(var(--space-1) + 4px); /* Slightly slimmer buckets on mobile */
+  }
+}
+
 .falling-letter {
   /* iOS safe area support for notched devices */
   padding-bottom: calc(max(var(--space-2), env(safe-area-inset-bottom)) + var(--space-1));
