@@ -9,6 +9,12 @@ import WordRiverTutorial from '../game/wordRiver/WordRiverTutorial.jsx';
 import { loadState, saveState } from '../lib/storage.js';
 
 function loadTutorialPreference(tutorialSeen) {
+  // Always surface the tutorial at least once for new players, regardless of
+  // any stored accessibility toggle values.
+  if (tutorialSeen === false) {
+    return true;
+  }
+
   try {
     const saved = localStorage.getItem('gameSettings');
     if (!saved) return true;
@@ -17,9 +23,6 @@ function loadTutorialPreference(tutorialSeen) {
       return settings.showLetterRiverTutorial;
     }
     if (settings.showWordRiverTutorial !== undefined) {
-      if (settings.showWordRiverTutorial === false && tutorialSeen === false) {
-        return true;
-      }
       return settings.showWordRiverTutorial;
     }
     return true;
