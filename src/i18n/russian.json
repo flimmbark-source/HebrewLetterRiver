@@ -218,7 +218,7 @@
     },
     "accessibility": {
       "showIntroductions": "Показать знакомства",
-      "wordRiverTutorial": "Показывать обучение Word River",
+      "letterRiverTutorial": "Показывать обучение Letter River",
       "highContrast": "Режим высокой контрастности",
       "randomLetters": "Send random letters (Letter River)",
       "reducedMotion": "Уменьшенное движение",

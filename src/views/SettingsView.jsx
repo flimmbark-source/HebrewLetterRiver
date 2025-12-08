@@ -9,7 +9,7 @@ export default function SettingsView() {
 
   // Game accessibility settings - these mirror the game settings
   const [showIntroductions, setShowIntroductions] = useState(true);
-  const [showWordRiverTutorial, setShowWordRiverTutorial] = useState(true);
+  const [showLetterRiverTutorial, setShowLetterRiverTutorial] = useState(true);
   const [highContrast, setHighContrast] = useState(false);
   const [randomLetters, setRandomLetters] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -22,7 +22,11 @@ export default function SettingsView() {
       if (saved) {
         const settings = JSON.parse(saved);
         setShowIntroductions(settings.showIntroductions ?? true);
-        setShowWordRiverTutorial(settings.showWordRiverTutorial ?? true);
+        if (settings.showLetterRiverTutorial !== undefined) {
+          setShowLetterRiverTutorial(settings.showLetterRiverTutorial);
+        } else {
+          setShowLetterRiverTutorial(settings.showWordRiverTutorial ?? true);
+        }
         setHighContrast(settings.highContrast ?? false);
         setRandomLetters(settings.randomLetters ?? false);
         setReducedMotion(settings.reducedMotion ?? false);
@@ -38,7 +42,7 @@ export default function SettingsView() {
     try {
       const settings = {
         showIntroductions,
-        showWordRiverTutorial,
+        showLetterRiverTutorial,
         highContrast,
         randomLetters,
         reducedMotion,
@@ -55,7 +59,7 @@ export default function SettingsView() {
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
-  }, [showIntroductions, showWordRiverTutorial, highContrast, randomLetters, reducedMotion, gameSpeed]);
+  }, [showIntroductions, showLetterRiverTutorial, highContrast, randomLetters, reducedMotion, gameSpeed]);
 
   const getSpeedLabel = (speed) => {
     if (speed < 14) return t('game.accessibility.speedSlow');
@@ -138,12 +142,12 @@ export default function SettingsView() {
             </label>
 
             <label className="flex items-center justify-between">
-              <span className="text-sm text-arcade-text-main">{t('game.accessibility.wordRiverTutorial')}</span>
+              <span className="text-sm text-arcade-text-main">{t('game.accessibility.letterRiverTutorial')}</span>
               <input
-                id="settings-word-river-tutorial-toggle"
+                id="settings-letter-river-tutorial-toggle"
                 type="checkbox"
-                checked={showWordRiverTutorial}
-                onChange={(e) => setShowWordRiverTutorial(e.target.checked)}
+                checked={showLetterRiverTutorial}
+                onChange={(e) => setShowLetterRiverTutorial(e.target.checked)}
                 className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
               />
             </label>

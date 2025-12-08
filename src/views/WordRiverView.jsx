@@ -13,11 +13,25 @@ function loadTutorialPreference() {
     const saved = localStorage.getItem('gameSettings');
     if (!saved) return true;
     const settings = JSON.parse(saved);
-    return settings.showWordRiverTutorial ?? true;
+    if (settings.showLetterRiverTutorial !== undefined) {
+      return settings.showLetterRiverTutorial;
+    }
+    if (settings.showWordRiverTutorial !== undefined) {
+      return settings.showWordRiverTutorial;
+    }
+    return true;
   } catch (err) {
-    console.error('Failed to load Word River tutorial setting', err);
+    console.error('Failed to load Letter River tutorial setting', err);
     return true;
   }
+}
+
+function loadTutorialSeen() {
+  const letterRiverSeen = loadState('letterRiverTutorialSeen', null);
+  if (letterRiverSeen !== null && letterRiverSeen !== undefined) {
+    return letterRiverSeen;
+  }
+  return loadState('wordRiverTutorialSeen', false);
 }
 
 const SCENE_PHASE = 'sceneView';
@@ -36,8 +50,8 @@ export default function WordRiverView() {
   const [learnedObjectIds, setLearnedObjectIds] = useState([]);
   const [difficulty] = useState('easy');
   const [tutorialEnabled, setTutorialEnabled] = useState(() => loadTutorialPreference());
-  const [tutorialSeen, setTutorialSeen] = useState(() => loadState('wordRiverTutorialSeen', false));
-  const [showTutorial, setShowTutorial] = useState(() => loadTutorialPreference() && !loadState('wordRiverTutorialSeen', false));
+  const [tutorialSeen, setTutorialSeen] = useState(() => loadTutorialSeen());
+  const [showTutorial, setShowTutorial] = useState(() => loadTutorialPreference() && !loadTutorialSeen());
   const [tutorialStage, setTutorialStage] = useState('scene');
 
   const selectedObject = useMemo(() => {
@@ -75,7 +89,7 @@ export default function WordRiverView() {
 
   const handleDismissTutorial = useCallback(() => {
     setTutorialSeen(true);
-    saveState('wordRiverTutorialSeen', true);
+    saveState('letterRiverTutorialSeen', true);
   }, []);
 
   const handleFirstLetterShown = useCallback(() => {

@@ -263,7 +263,7 @@
     },
     "accessibility": {
       "showIntroductions": "Show Introductions",
-      "wordRiverTutorial": "Show Word River Tutorial",
+      "letterRiverTutorial": "Show Letter River Tutorial",
       "highContrast": "High Contrast Mode",
       "randomLetters": "Random Letters",
       "reducedMotion": "Reduced Motion",

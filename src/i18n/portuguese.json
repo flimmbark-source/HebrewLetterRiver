@@ -218,7 +218,7 @@
     },
     "accessibility": {
       "showIntroductions": "Mostrar apresentações",
-      "wordRiverTutorial": "Mostrar tutorial do Word River",
+      "letterRiverTutorial": "Mostrar tutorial do Letter River",
       "highContrast": "Modo de alto contraste",
       "randomLetters": "Send random letters (Letter River)",
       "reducedMotion": "Movimento Reduzido",

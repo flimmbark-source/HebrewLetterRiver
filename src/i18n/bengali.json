@@ -218,7 +218,7 @@
     },
     "accessibility": {
       "showIntroductions": "ভূমিকা দেখান",
-      "wordRiverTutorial": "ওয়ার্ড রিভার টিউটোরিয়াল দেখান",
+      "letterRiverTutorial": "লেটার রিভার টিউটোরিয়াল দেখান",
       "highContrast": "উচ্চ কনট্রাস্ট মোড",
       "randomLetters": "Send random letters (Letter River)",
       "reducedMotion": "গতি কমানো",
