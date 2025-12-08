@@ -2654,8 +2654,8 @@ body.high-contrast { background: #000; color: #fff; }
   gap: clamp(0.75rem, 2vw, 1.25rem);
 }
 .word-river-spelling-bucket {
-  width: clamp(140px, 32vw, 190px);
-  height: clamp(140px, 32vw, 190px);
+  width: clamp(90px, 32vw, 90px);
+  height: clamp(90px, 32vw, 90px);
   border-radius: 2rem;
   background: rgba(8, 47, 73, 0.6);
   border: 2px solid rgba(125, 211, 252, 0.45);
