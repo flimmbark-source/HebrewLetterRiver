@@ -8,7 +8,7 @@ import { classNames } from '../lib/classNames.js';
 import WordRiverTutorial from '../game/wordRiver/WordRiverTutorial.jsx';
 import { loadState, saveState } from '../lib/storage.js';
 
-function loadTutorialPreference() {
+function loadTutorialPreference(tutorialSeen) {
   try {
     const saved = localStorage.getItem('gameSettings');
     if (!saved) return true;
@@ -17,6 +17,9 @@ function loadTutorialPreference() {
       return settings.showLetterRiverTutorial;
     }
     if (settings.showWordRiverTutorial !== undefined) {
+      if (settings.showWordRiverTutorial === false && tutorialSeen === false) {
+        return true;
+      }
       return settings.showWordRiverTutorial;
     }
     return true;
@@ -52,9 +55,9 @@ export default function WordRiverView() {
   const [selectedObjectId, setSelectedObjectId] = useState(null);
   const [learnedObjectIds, setLearnedObjectIds] = useState([]);
   const [difficulty] = useState('easy');
-  const [tutorialEnabled, setTutorialEnabled] = useState(() => loadTutorialPreference());
   const [tutorialSeen, setTutorialSeen] = useState(() => loadTutorialSeen());
-  const [showTutorial, setShowTutorial] = useState(() => loadTutorialPreference() && !loadTutorialSeen());
+  const [tutorialEnabled, setTutorialEnabled] = useState(() => loadTutorialPreference(tutorialSeen));
+  const [showTutorial, setShowTutorial] = useState(() => tutorialEnabled && !tutorialSeen);
   const [tutorialStage, setTutorialStage] = useState('scene');
 
   const selectedObject = useMemo(() => {
@@ -117,7 +120,7 @@ export default function WordRiverView() {
   useEffect(() => {
     const handleStorage = (event) => {
       if (event.key === 'gameSettings') {
-        setTutorialEnabled(loadTutorialPreference());
+        setTutorialEnabled(loadTutorialPreference(tutorialSeen));
       }
     };
 
