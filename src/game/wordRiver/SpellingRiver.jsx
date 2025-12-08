@@ -262,7 +262,8 @@ export default function SpellingRiver({
   difficulty,
   fontClass,
   textDirection,
-  onCompleted
+  onCompleted,
+  onFirstLetterShown
 }) {
   const difficultyConfig = getDifficultyConfig(difficulty);
   const [slots, setSlots] = useState(() => buildSlots(object.l2Word, difficultyConfig.type, object.l2Phonetics));
@@ -273,8 +274,10 @@ export default function SpellingRiver({
   const cooldownRef = useRef(false);
   const { registerDropZone, getDropZones } = useDropZones();
   const completedRef = useRef(false);
+  const announcedLettersRef = useRef(false);
 
   useEffect(() => {
+    announcedLettersRef.current = false;
     const nextSlots = buildSlots(object.l2Word, difficultyConfig.type, object.l2Phonetics);
     setSlots(nextSlots);
     setLetters(generateRiverLetters(object.l2Word, nextSlots, difficulty));
@@ -285,6 +288,15 @@ export default function SpellingRiver({
     () => getWordPhonetics(object.l2Word, object.l2Phonetics).join(' '),
     [object.l2Phonetics, object.l2Word]
   );
+
+  useEffect(() => {
+    if (announcedLettersRef.current) return;
+    if (letters.length === 0) return;
+    announcedLettersRef.current = true;
+    if (onFirstLetterShown) {
+      onFirstLetterShown();
+    }
+  }, [letters, onFirstLetterShown]);
 
   useEffect(() => {
     const element = riverRef.current;
@@ -457,5 +469,10 @@ SpellingRiver.propTypes = {
   difficulty: PropTypes.oneOf(['easy', 'medium', 'hard']).isRequired,
   fontClass: PropTypes.string.isRequired,
   textDirection: PropTypes.string.isRequired,
-  onCompleted: PropTypes.func.isRequired
+  onCompleted: PropTypes.func.isRequired,
+  onFirstLetterShown: PropTypes.func
+};
+
+SpellingRiver.defaultProps = {
+  onFirstLetterShown: null
 };

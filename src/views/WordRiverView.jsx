@@ -1,10 +1,12 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WordRiverSceneView from '../game/wordRiver/WordRiverSceneView.jsx';
 import WordRiverFocusOverlay from '../game/wordRiver/WordRiverFocusOverlay.jsx';
 import { getDefaultWordRiverScene } from '../game/wordRiver/wordScenes.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { classNames } from '../lib/classNames.js';
+import WordRiverTutorial from '../game/wordRiver/WordRiverTutorial.jsx';
+import { loadState, saveState } from '../lib/storage.js';
 
 const SCENE_PHASE = 'sceneView';
 const MEANING_PHASE = 'focusMeaning';
@@ -21,6 +23,8 @@ export default function WordRiverView() {
   const [selectedObjectId, setSelectedObjectId] = useState(null);
   const [learnedObjectIds, setLearnedObjectIds] = useState([]);
   const [difficulty] = useState('easy');
+  const [showTutorial, setShowTutorial] = useState(() => !loadState('wordRiverTutorialSeen', false));
+  const [tutorialStage, setTutorialStage] = useState('scene');
 
   const selectedObject = useMemo(() => {
     if (!scene) return null;
@@ -54,6 +58,26 @@ export default function WordRiverView() {
     setPhase(SCENE_PHASE);
     setSelectedObjectId(null);
   }, [selectedObjectId]);
+
+  const handleDismissTutorial = useCallback(() => {
+    setShowTutorial(false);
+    saveState('wordRiverTutorialSeen', true);
+  }, []);
+
+  const handleFirstLetterShown = useCallback(() => {
+    setTutorialStage('drag');
+  }, []);
+
+  useEffect(() => {
+    if (!showTutorial) return;
+    if (phase === SCENE_PHASE) {
+      setTutorialStage('scene');
+      return;
+    }
+    if (phase === SPELLING_PHASE && tutorialStage === 'scene') {
+      setTutorialStage('spelling');
+    }
+  }, [phase, showTutorial, tutorialStage]);
 
   const isOverlayActive = phase !== SCENE_PHASE && selectedObject;
 
@@ -100,6 +124,13 @@ export default function WordRiverView() {
           onMeaningComplete={handleMeaningComplete}
           onSpellingComplete={handleSpellingComplete}
           onSuccessComplete={handleSuccessComplete}
+          onFirstLetterShown={showTutorial ? handleFirstLetterShown : null}
+        />
+        <WordRiverTutorial
+          visible={showTutorial}
+          stage={tutorialStage}
+          phase={phase}
+          onDismiss={handleDismissTutorial}
         />
       </div>
     </div>

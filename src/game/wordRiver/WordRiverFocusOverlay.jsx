@@ -84,7 +84,8 @@ export default function WordRiverFocusOverlay({
   textDirection,
   onMeaningComplete,
   onSpellingComplete,
-  onSuccessComplete
+  onSuccessComplete,
+  onFirstLetterShown
 }) {
   const overlayVisible = useMemo(() => phase !== 'sceneView' && Boolean(object), [phase, object]);
   if (!overlayVisible) return null;
@@ -101,6 +102,7 @@ export default function WordRiverFocusOverlay({
           fontClass={fontClass}
           textDirection={textDirection}
           onCompleted={onSpellingComplete}
+          onFirstLetterShown={onFirstLetterShown}
         />
       ) : null}
       {phase === 'success' ? (
@@ -129,9 +131,11 @@ WordRiverFocusOverlay.propTypes = {
   textDirection: PropTypes.string.isRequired,
   onMeaningComplete: PropTypes.func.isRequired,
   onSpellingComplete: PropTypes.func.isRequired,
-  onSuccessComplete: PropTypes.func.isRequired
+  onSuccessComplete: PropTypes.func.isRequired,
+  onFirstLetterShown: PropTypes.func
 };
 
 WordRiverFocusOverlay.defaultProps = {
-  object: null
+  object: null,
+  onFirstLetterShown: null
 };
