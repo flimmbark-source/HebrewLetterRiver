@@ -307,9 +307,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   let dropZones = [];
   let activeBucketCount = 0;
-  const BUCKET_MIN_WIDTH_FALLBACK = 96;
+  const BUCKET_MIN_WIDTH_FALLBACK = 80;
   const LAYOUT_GAP_FALLBACK = 12;
-  const BUCKET_BASE_HEIGHT = 80; // Base height when containers are full size
+  const BUCKET_BASE_HEIGHT = 50; // Base height when containers are full size
   const BUCKET_MIN_HEIGHT = 44; // Minimum height for touch accessibility
   let pendingBucketLayoutHandle = null;
   let pendingBucketLayoutIsAnimationFrame = false;

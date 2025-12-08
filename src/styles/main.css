@@ -1680,7 +1680,8 @@ body {
 
 /* Catcher box / Sound bucket states */
 .catcher-box {
-  max-width: 90px;
+  max-width: 70px;
+  max-height: 65px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2143,7 +2144,7 @@ body {
   gap: var(--space-2); /* 16px between buckets */
   padding: var(--space-2); /* 16px from edges */
   /* iOS safe area support for notched devices */
-  padding-bottom: max(var(--space-2), env(safe-area-inset-bottom));
+  padding-bottom: calc(max(var(--space-2), env(safe-area-inset-bottom)) + var(--space-1));
 }
 .falling-letter {
   font-size: clamp(45px, 14vw, 76px);
