@@ -1978,6 +1978,119 @@ body {
   align-items: center;
   padding: var(--space-2); /* 16px all around */
   gap: var(--space-2); /* 16px between sections */
+  flex-wrap: wrap;
+}
+
+.stat-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  border: 2px solid rgba(235, 179, 105, 0.95);
+  background: linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%);
+  box-shadow: 0 3px 0 rgba(214, 140, 64, 1), 0 6px 10px rgba(214, 140, 64, 0.4);
+}
+
+.stat-badge__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  background: radial-gradient(circle at 30% 30%, #fff7cf 0, #ffd96d 45%, #e79b26 100%);
+  box-shadow: inset 0 -2px 4px rgba(176, 104, 38, 0.35);
+}
+
+.stat-badge__value {
+  font-weight: 800;
+  color: #4a2208;
+  font-size: clamp(18px, 4.2vw, 22px);
+}
+
+.stat-badge__ghost {
+  position: absolute;
+  left: 50%;
+  top: -8px;
+  transform: translate(-50%, 8px);
+  font-weight: 800;
+  color: #4a2208;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stat-badge__ghost--visible {
+  animation: stat-ghost-rise 0.9s ease-out;
+}
+
+.score-lives-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+#lives-container {
+  gap: 10px;
+}
+
+@keyframes stat-ghost-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 8px) scale(0.95);
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -18px) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  #top-bar {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .top-bar-content {
+    gap: 10px;
+  }
+
+  #river-stat-container {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stat-badge {
+    padding: 4px 8px;
+    gap: 6px;
+  }
+
+  .stat-badge__icon {
+    width: 26px;
+    height: 26px;
+    font-size: 16px;
+  }
+
+  .stat-badge__value {
+    font-size: 16px;
+  }
+
+  .score-lives-group {
+    gap: 8px;
+  }
+
+  #lives-container {
+    gap: 8px;
+  }
 }
 
 @media (min-width: 640px) {

@@ -125,20 +125,40 @@ function GameCanvas({ fontClass }) {
             >
               {t('game.controls.exitToMenu')}
             </span>
-            <div className="flex w-full items-center justify-center gap-4 sm:gap-6">
+            <div className="top-bar-content flex w-full flex-wrap items-center justify-center gap-3 sm:gap-6">
               <div className="inline-flex items-center gap-2 text-center">
                 <span className="font-semibold" style={{ color: '#6c3b14' }}>{t('game.labels.level')}</span>
                 <span id="level" className="text-2xl font-bold" style={{ color: '#ff9247' }}>
                   1
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-center">
-                <span className="font-semibold" style={{ color: '#6c3b14' }}>{t('game.labels.score')}</span>
-                <span id="score" className="text-2xl font-bold" style={{ color: '#ffce4a' }}>
-                  0
-                </span>
+              <div className="score-lives-group flex items-center gap-3 text-center">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold" style={{ color: '#6c3b14' }}>{t('game.labels.score')}</span>
+                  <span id="score" className="text-2xl font-bold" style={{ color: '#ffce4a' }}>
+                    0
+                  </span>
+                </div>
+                <div id="lives-container" className="flex items-center gap-2" />
               </div>
-              <div id="lives-container" className="flex items-center gap-2" />
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3" id="river-stat-container">
+                <div className="stat-badge" id="wave-stat" aria-live="polite">
+                  <span className="sr-only">{t('game.labels.bestWave', 'Best wave')}</span>
+                  <span className="stat-badge__icon" aria-hidden="true">🌊</span>
+                  <span className="stat-badge__value" id="wave-stat-value">
+                    0
+                  </span>
+                  <span className="stat-badge__ghost" id="wave-stat-ghost" aria-hidden="true" />
+                </div>
+                <div className="stat-badge" id="streak-stat" aria-live="polite">
+                  <span className="sr-only">{t('game.labels.bestStreak', 'Best streak')}</span>
+                  <span className="stat-badge__icon" aria-hidden="true">🔥</span>
+                  <span className="stat-badge__value" id="streak-stat-value">
+                    0
+                  </span>
+                  <span className="stat-badge__ghost" id="streak-stat-ghost" aria-hidden="true" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -229,7 +249,10 @@ function GameCanvas({ fontClass }) {
                       >
                         <span aria-hidden="true" className="goal-badge__info-glyph">i</span>
                       </button>
-                      <div className="goal-badge__value" id="goalValue">Medium</div>
+                      <div className="goal-badge__value">
+                        <span id="goalValue">0</span>
+                        <span className="goal-badge__icon" aria-hidden="true">🌊</span>
+                      </div>
                       <div className="goal-badge__tooltip hidden" id="goalTooltip">
                         {t('game.setup.goalTooltip', 'The Goal number represents the amount of letters you need to collect correctly in a row within a single wave. Complete a wave with this number of letters to win!')}
                       </div>
