@@ -28,10 +28,13 @@ function loadTutorialPreference() {
 
 function loadTutorialSeen() {
   const letterRiverSeen = loadState('letterRiverTutorialSeen', null);
-  if (letterRiverSeen !== null && letterRiverSeen !== undefined) {
+  if (typeof letterRiverSeen === 'boolean') {
     return letterRiverSeen;
   }
-  return loadState('wordRiverTutorialSeen', false);
+
+  // Always surface the Letter River tutorial at least once, even if an older
+  // Word River flag exists from a previous build.
+  return false;
 }
 
 const SCENE_PHASE = 'sceneView';
