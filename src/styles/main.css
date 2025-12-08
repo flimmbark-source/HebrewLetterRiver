@@ -2145,6 +2145,7 @@ body {
   padding: var(--space-2); /* 16px from edges */
   /* iOS safe area support for notched devices */
   padding-bottom: calc(max(var(--space-2), env(safe-area-inset-bottom)) + var(--space-1));
+  padding-right: calc(max(var(--space-2), env(safe-area-inset-bottom)) + var(--space-1));
 }
 .falling-letter {
   font-size: clamp(45px, 14vw, 76px);
