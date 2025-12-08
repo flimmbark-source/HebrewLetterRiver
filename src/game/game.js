@@ -308,7 +308,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let dropZones = [];
   let activeBucketCount = 0;
   const BUCKET_MIN_WIDTH_FALLBACK = 80;
-  const LAYOUT_GAP_FALLBACK = 4;
+  const LAYOUT_GAP_FALLBACK = 8;
   const BUCKET_BASE_HEIGHT = 50; // Base height when containers are full size
   const BUCKET_MIN_HEIGHT = 44; // Minimum height for touch accessibility
   let pendingBucketLayoutHandle = null;
@@ -537,11 +537,27 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       return;
     }
     const numerator = containerWidth + gapValue;
-    const maxColumns = Math.max(
+    const maxReadableColumns = Math.max(
       1,
       Math.min(count, Math.floor(numerator / (minReadableWidth + gapValue)))
     );
-    choicesContainer.style.gridTemplateColumns = `repeat(${maxColumns}, minmax(${minReadableWidth}px, 1fr))`;
+    const maxCompactColumns = Math.max(
+      1,
+      Math.min(count, Math.floor(numerator / (minBucketWidth + gapValue)))
+    );
+
+    if (count >= 4 && maxCompactColumns >= 4 && maxReadableColumns < 4) {
+      const compactColumns = Math.min(count, Math.max(4, maxCompactColumns));
+      const compactWidth = Math.max(
+        minBucketWidth,
+        Math.min(minReadableWidth, Math.floor(availableWidth / compactColumns))
+      );
+      choicesContainer.style.gridTemplateColumns = `repeat(${compactColumns}, minmax(${compactWidth}px, 1fr))`;
+      applyDynamicHeight(compactWidth);
+      return;
+    }
+
+    choicesContainer.style.gridTemplateColumns = `repeat(${maxReadableColumns}, minmax(${minReadableWidth}px, 1fr))`;
     applyDynamicHeight(minReadableWidth);
   }
 
