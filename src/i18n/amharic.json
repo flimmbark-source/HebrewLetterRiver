@@ -247,6 +247,7 @@
     },
     "accessibility": {
       "showIntroductions": "መግቢያዎችን አሳይ",
+      "wordRiverTutorial": "የኦርድ ሪቨር አሰልጣኝን አሳይ",
       "highContrast": "ከፍተኛ ንጽጽር ሁነታ",
       "randomLetters": "በዘፈቀደ ፊደሎች",
       "reducedMotion": "የተቀነሰ እንቅስቃሴ",

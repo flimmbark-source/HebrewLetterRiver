@@ -8,6 +8,18 @@ import { classNames } from '../lib/classNames.js';
 import WordRiverTutorial from '../game/wordRiver/WordRiverTutorial.jsx';
 import { loadState, saveState } from '../lib/storage.js';
 
+function loadTutorialPreference() {
+  try {
+    const saved = localStorage.getItem('gameSettings');
+    if (!saved) return true;
+    const settings = JSON.parse(saved);
+    return settings.showWordRiverTutorial ?? true;
+  } catch (err) {
+    console.error('Failed to load Word River tutorial setting', err);
+    return true;
+  }
+}
+
 const SCENE_PHASE = 'sceneView';
 const MEANING_PHASE = 'focusMeaning';
 const SPELLING_PHASE = 'spelling';
@@ -23,7 +35,9 @@ export default function WordRiverView() {
   const [selectedObjectId, setSelectedObjectId] = useState(null);
   const [learnedObjectIds, setLearnedObjectIds] = useState([]);
   const [difficulty] = useState('easy');
-  const [showTutorial, setShowTutorial] = useState(() => !loadState('wordRiverTutorialSeen', false));
+  const [tutorialEnabled, setTutorialEnabled] = useState(() => loadTutorialPreference());
+  const [tutorialSeen, setTutorialSeen] = useState(() => loadState('wordRiverTutorialSeen', false));
+  const [showTutorial, setShowTutorial] = useState(() => loadTutorialPreference() && !loadState('wordRiverTutorialSeen', false));
   const [tutorialStage, setTutorialStage] = useState('scene');
 
   const selectedObject = useMemo(() => {
@@ -60,7 +74,7 @@ export default function WordRiverView() {
   }, [selectedObjectId]);
 
   const handleDismissTutorial = useCallback(() => {
-    setShowTutorial(false);
+    setTutorialSeen(true);
     saveState('wordRiverTutorialSeen', true);
   }, []);
 
@@ -78,6 +92,21 @@ export default function WordRiverView() {
       setTutorialStage('spelling');
     }
   }, [phase, showTutorial, tutorialStage]);
+
+  useEffect(() => {
+    setShowTutorial(tutorialEnabled && !tutorialSeen);
+  }, [tutorialEnabled, tutorialSeen]);
+
+  useEffect(() => {
+    const handleStorage = (event) => {
+      if (event.key === 'gameSettings') {
+        setTutorialEnabled(loadTutorialPreference());
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   const isOverlayActive = phase !== SCENE_PHASE && selectedObject;
 

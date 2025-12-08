@@ -232,6 +232,7 @@
     },
     "accessibility": {
       "showIntroductions": "展会介绍",
+      "wordRiverTutorial": "显示文字河教程",
       "highContrast": "高对比度模式",
       "randomLetters": "Send random letters (Letter River)",
       "reducedMotion": "减少运动",

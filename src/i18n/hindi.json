@@ -218,6 +218,7 @@
     },
     "accessibility": {
       "showIntroductions": "परिचय दिखाएँ",
+      "wordRiverTutorial": "वर्ड रिवर ट्यूटोरियल दिखाएँ",
       "highContrast": "उच्च कंट्रास्ट मोड",
       "randomLetters": "Send random letters (Letter River)",
       "reducedMotion": "कम गति",
