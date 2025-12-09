@@ -399,7 +399,7 @@ function GameCanvas({ fontClass }) {
 
         <div
           id="accessibility-view"
-          className="hidden absolute right-6 top-28 z-40 w-72 rounded-2xl p-4 text-left shadow-xl"
+          className="hidden absolute right-6 top-28 z-40 w-72 rounded-2xl p-4 text-left shadow-xl overflow-y-auto max-h-[80vh]"
           style={{
             border: '2px solid rgba(235, 179, 105, 0.95)',
             background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%)',
@@ -411,6 +411,22 @@ function GameCanvas({ fontClass }) {
           </button>
           <h3 className="mb-4 text-center text-lg font-semibold" style={{ color: '#ff9247' }}>{t('game.controls.accessibility')}</h3>
           <div className="space-y-4 text-sm" style={{ color: '#4a2208' }}>
+            <div className="border-b pb-3" style={{ borderColor: '#e49b5a' }}>
+              <label htmlFor="game-font-select" className="block text-sm mb-2" style={{ color: '#4a2208' }}>
+                {t('game.accessibility.font') || 'Font'}
+              </label>
+              <select
+                id="game-font-select"
+                className="w-full rounded-lg border px-2 py-1 text-xs"
+                style={{ borderColor: '#e49b5a', background: '#fff5dd', color: '#4a2208' }}
+              >
+                <option value="default">{t('game.accessibility.fontDefault') || 'Default'}</option>
+                <option value="opendyslexic">{t('game.accessibility.fontOpenDyslexic') || 'OpenDyslexic'}</option>
+                <option value="comic-sans">{t('game.accessibility.fontComicSans') || 'Comic Sans'}</option>
+                <option value="arial">{t('game.accessibility.fontArial') || 'Arial'}</option>
+                <option value="verdana">{t('game.accessibility.fontVerdana') || 'Verdana'}</option>
+              </select>
+            </div>
             <label className="flex items-center justify-between">
               <span>{t('game.accessibility.showIntroductions')}</span>
               <input id="toggle-introductions" type="checkbox" className="h-5 w-5 rounded" style={{ borderColor: '#e49b5a', background: '#fff5dd', accentColor: '#ff9247' }} defaultChecked />
@@ -426,6 +442,14 @@ function GameCanvas({ fontClass }) {
             <label className="flex items-center justify-between">
               <span>{t('game.accessibility.reducedMotion')}</span>
               <input id="reduced-motion-toggle" type="checkbox" className="h-5 w-5 rounded" style={{ borderColor: '#e49b5a', background: '#fff5dd', accentColor: '#ff9247' }} />
+            </label>
+            <label className="flex items-center justify-between">
+              <span>{t('game.accessibility.slowRiver') || 'Slow River Mode'}</span>
+              <input id="slow-river-toggle" type="checkbox" className="h-5 w-5 rounded" style={{ borderColor: '#e49b5a', background: '#fff5dd', accentColor: '#ff9247' }} />
+            </label>
+            <label className="flex items-center justify-between">
+              <span>{t('game.accessibility.clickMode') || 'Click Mode'}</span>
+              <input id="click-mode-toggle" type="checkbox" className="h-5 w-5 rounded" style={{ borderColor: '#e49b5a', background: '#fff5dd', accentColor: '#ff9247' }} />
             </label>
             <div>
               <label htmlFor="game-speed-slider" className="text-sm" style={{ color: '#4a2208' }}>

@@ -13,6 +13,13 @@ export default function SettingsView() {
   const [randomLetters, setRandomLetters] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [gameSpeed, setGameSpeed] = useState(17);
+  const [gameFont, setGameFont] = useState('default');
+  const [slowRiver, setSlowRiver] = useState(false);
+  const [clickMode, setClickMode] = useState(false);
+
+  // Info popup state
+  const [showInfoPopup, setShowInfoPopup] = useState(false);
+  const [infoPopupContent, setInfoPopupContent] = useState({ title: '', description: '' });
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -25,6 +32,9 @@ export default function SettingsView() {
         setRandomLetters(settings.randomLetters ?? false);
         setReducedMotion(settings.reducedMotion ?? false);
         setGameSpeed(settings.gameSpeed ?? 17);
+        setGameFont(settings.gameFont ?? 'default');
+        setSlowRiver(settings.slowRiver ?? false);
+        setClickMode(settings.clickMode ?? false);
       }
     } catch (e) {
       console.error('Failed to load game settings', e);
@@ -39,7 +49,10 @@ export default function SettingsView() {
         highContrast,
         randomLetters,
         reducedMotion,
-        gameSpeed
+        gameSpeed,
+        gameFont,
+        slowRiver,
+        clickMode
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
 
@@ -52,13 +65,64 @@ export default function SettingsView() {
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
-  }, [showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed]);
+  }, [showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, slowRiver, clickMode]);
 
   const getSpeedLabel = (speed) => {
     if (speed < 14) return t('game.accessibility.speedSlow');
     if (speed > 20) return t('game.accessibility.speedFast');
     return t('game.accessibility.speedNormal');
   };
+
+  // Setting descriptions for info popup
+  const settingInfo = {
+    showIntroductions: {
+      title: t('game.accessibility.showIntroductions'),
+      description: t('game.accessibility.showIntroductionsInfo') || 'Shows an introduction screen for each new letter before it appears in the game, helping you learn the letter before playing.'
+    },
+    highContrast: {
+      title: t('game.accessibility.highContrast'),
+      description: t('game.accessibility.highContrastInfo') || 'Increases the contrast between text and background colors to make letters easier to see and distinguish.'
+    },
+    randomLetters: {
+      title: t('game.accessibility.randomLetters'),
+      description: t('game.accessibility.randomLettersInfo') || 'Letters appear in random order instead of the standard alphabetical sequence, providing varied practice.'
+    },
+    reducedMotion: {
+      title: t('game.accessibility.reducedMotion'),
+      description: t('game.accessibility.reducedMotionInfo') || 'Simplifies animations by removing rotation and complex movement patterns, making letters move in straight lines for easier tracking.'
+    },
+    gameSpeed: {
+      title: t('game.accessibility.speed'),
+      description: t('game.accessibility.speedInfo') || 'Controls how quickly letters move across the screen. Slower speeds give you more time to recognize and drag letters.'
+    },
+    gameFont: {
+      title: t('game.accessibility.font') || 'Font',
+      description: t('game.accessibility.fontInfo') || 'Choose from different fonts including dyslexia-friendly options. Some fonts are specially designed to make letters easier to distinguish.'
+    },
+    slowRiver: {
+      title: t('game.accessibility.slowRiver') || 'Slow River Mode',
+      description: t('game.accessibility.slowRiverInfo') || 'Letters move to the center of the screen and stay there instead of flowing off the edge. This gives you unlimited time to identify and place each letter.'
+    },
+    clickMode: {
+      title: t('game.accessibility.clickMode') || 'Click Mode',
+      description: t('game.accessibility.clickModeInfo') || 'Click on a letter to select it, then click on a bucket to place it, instead of dragging. This makes the game easier to play if you have difficulty with dragging.'
+    }
+  };
+
+  const showInfo = (settingKey) => {
+    if (settingInfo[settingKey]) {
+      setInfoPopupContent(settingInfo[settingKey]);
+      setShowInfoPopup(true);
+    }
+  };
+
+  const fontOptions = [
+    { value: 'default', label: t('game.accessibility.fontDefault') || 'Default' },
+    { value: 'opendyslexic', label: t('game.accessibility.fontOpenDyslexic') || 'OpenDyslexic' },
+    { value: 'comic-sans', label: t('game.accessibility.fontComicSans') || 'Comic Sans' },
+    { value: 'arial', label: t('game.accessibility.fontArial') || 'Arial' },
+    { value: 'verdana', label: t('game.accessibility.fontVerdana') || 'Verdana' }
+  ];
 
   return (
     <>
@@ -121,10 +185,44 @@ export default function SettingsView() {
           </div>
         </div>
 
-        <div className="progress-card-small p-4">
-          <div className="space-y-4">
+        <div className="progress-card-small p-4 relative">
+          {/* Info icon */}
+          <div className="absolute right-3 top-3 text-arcade-text-muted text-xs">
+            ⓘ {t('game.accessibility.clickForInfo') || 'Click on a setting to learn more'}
+          </div>
+
+          <div className="space-y-4 mt-2">
+            {/* Font Dropdown */}
+            <div className="border-b border-arcade-panel-border pb-4">
+              <label htmlFor="settings-font-select" className="block text-sm text-arcade-text-main mb-2">
+                <span
+                  className="cursor-pointer hover:text-arcade-accent-orange"
+                  onClick={() => showInfo('gameFont')}
+                >
+                  {t('game.accessibility.font') || 'Font'}
+                </span>
+              </label>
+              <select
+                id="settings-font-select"
+                value={gameFont}
+                onChange={(e) => setGameFont(e.target.value)}
+                className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
+              >
+                {fontOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <label className="flex items-center justify-between">
-              <span className="text-sm text-arcade-text-main">{t('game.accessibility.showIntroductions')}</span>
+              <span
+                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
+                onClick={() => showInfo('showIntroductions')}
+              >
+                {t('game.accessibility.showIntroductions')}
+              </span>
               <input
                 id="settings-toggle-introductions"
                 type="checkbox"
@@ -135,7 +233,12 @@ export default function SettingsView() {
             </label>
 
             <label className="flex items-center justify-between">
-              <span className="text-sm text-arcade-text-main">{t('game.accessibility.highContrast')}</span>
+              <span
+                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
+                onClick={() => showInfo('highContrast')}
+              >
+                {t('game.accessibility.highContrast')}
+              </span>
               <input
                 id="settings-high-contrast-toggle"
                 type="checkbox"
@@ -146,7 +249,12 @@ export default function SettingsView() {
             </label>
 
             <label className="flex items-center justify-between">
-              <span className="text-sm text-arcade-text-main">{t('game.accessibility.randomLetters')}</span>
+              <span
+                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
+                onClick={() => showInfo('randomLetters')}
+              >
+                {t('game.accessibility.randomLetters')}
+              </span>
               <input
                 id="settings-random-letters-toggle"
                 type="checkbox"
@@ -157,7 +265,12 @@ export default function SettingsView() {
             </label>
 
             <label className="flex items-center justify-between">
-              <span className="text-sm text-arcade-text-main">{t('game.accessibility.reducedMotion')}</span>
+              <span
+                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
+                onClick={() => showInfo('reducedMotion')}
+              >
+                {t('game.accessibility.reducedMotion')}
+              </span>
               <input
                 id="settings-reduced-motion-toggle"
                 type="checkbox"
@@ -167,9 +280,46 @@ export default function SettingsView() {
               />
             </label>
 
+            <label className="flex items-center justify-between">
+              <span
+                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
+                onClick={() => showInfo('slowRiver')}
+              >
+                {t('game.accessibility.slowRiver') || 'Slow River Mode'}
+              </span>
+              <input
+                id="settings-slow-river-toggle"
+                type="checkbox"
+                checked={slowRiver}
+                onChange={(e) => setSlowRiver(e.target.checked)}
+                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
+              />
+            </label>
+
+            <label className="flex items-center justify-between">
+              <span
+                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
+                onClick={() => showInfo('clickMode')}
+              >
+                {t('game.accessibility.clickMode') || 'Click Mode'}
+              </span>
+              <input
+                id="settings-click-mode-toggle"
+                type="checkbox"
+                checked={clickMode}
+                onChange={(e) => setClickMode(e.target.checked)}
+                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
+              />
+            </label>
+
             <div>
               <label htmlFor="settings-game-speed-slider" className="block text-sm text-arcade-text-main mb-2">
-                {t('game.accessibility.speed')} (<span id="settings-speed-label">{getSpeedLabel(gameSpeed)}</span>)
+                <span
+                  className="cursor-pointer hover:text-arcade-accent-orange"
+                  onClick={() => showInfo('gameSpeed')}
+                >
+                  {t('game.accessibility.speed')} (<span id="settings-speed-label">{getSpeedLabel(gameSpeed)}</span>)
+                </span>
               </label>
               <input
                 id="settings-game-speed-slider"
@@ -184,6 +334,32 @@ export default function SettingsView() {
           </div>
         </div>
       </section>
+
+      {/* Info Popup Modal */}
+      {showInfoPopup && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+          onClick={() => setShowInfoPopup(false)}
+        >
+          <div
+            className="progress-card-small p-6 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-heading text-lg font-bold text-arcade-text-main mb-3">
+              {infoPopupContent.title}
+            </h3>
+            <p className="text-sm text-arcade-text-main mb-4">
+              {infoPopupContent.description}
+            </p>
+            <button
+              onClick={() => setShowInfoPopup(false)}
+              className="w-full rounded-xl bg-arcade-accent-orange px-4 py-2 text-sm font-semibold text-white hover:bg-opacity-90 transition"
+            >
+              {t('common.close') || 'Close'}
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
