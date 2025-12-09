@@ -20,6 +20,7 @@ export default function SettingsView() {
   // Info popup state
   const [showInfoPopup, setShowInfoPopup] = useState(false);
   const [infoPopupContent, setInfoPopupContent] = useState({ title: '', description: '' });
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -109,10 +110,15 @@ export default function SettingsView() {
     }
   };
 
-  const showInfo = (settingKey) => {
+  const showInfo = (settingKey, event) => {
     if (settingInfo[settingKey]) {
       setInfoPopupContent(settingInfo[settingKey]);
       setShowInfoPopup(true);
+      if (event) {
+        const x = event.clientX || event.touches?.[0]?.clientX || 0;
+        const y = event.clientY || event.touches?.[0]?.clientY || 0;
+        setPopupPosition({ x, y });
+      }
     }
   };
 
@@ -197,8 +203,8 @@ export default function SettingsView() {
               <label htmlFor="settings-font-select" className="block text-sm text-arcade-text-main mb-2">
                 <span
                   className="cursor-pointer hover:text-arcade-accent-orange"
-                  onClick={() => showInfo('gameFont')}
-                  onMouseEnter={() => showInfo('gameFont')}
+                  onClick={(e) => showInfo('gameFont', e)}
+                  onMouseEnter={(e) => showInfo('gameFont', e)}
                   onMouseLeave={() => setShowInfoPopup(false)}
                 >
                   Game Font
@@ -221,8 +227,8 @@ export default function SettingsView() {
             <label className="flex items-center justify-between">
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={() => showInfo('showIntroductions')}
-                onMouseEnter={() => showInfo('showIntroductions')}
+                onClick={(e) => showInfo('showIntroductions', e)}
+                onMouseEnter={(e) => showInfo('showIntroductions', e)}
                 onMouseLeave={() => setShowInfoPopup(false)}
               >
                 {t('game.accessibility.showIntroductions')}
@@ -239,8 +245,8 @@ export default function SettingsView() {
             <label className="flex items-center justify-between">
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={() => showInfo('highContrast')}
-                onMouseEnter={() => showInfo('highContrast')}
+                onClick={(e) => showInfo('highContrast', e)}
+                onMouseEnter={(e) => showInfo('highContrast', e)}
                 onMouseLeave={() => setShowInfoPopup(false)}
               >
                 {t('game.accessibility.highContrast')}
@@ -257,8 +263,8 @@ export default function SettingsView() {
             <label className="flex items-center justify-between">
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={() => showInfo('randomLetters')}
-                onMouseEnter={() => showInfo('randomLetters')}
+                onClick={(e) => showInfo('randomLetters', e)}
+                onMouseEnter={(e) => showInfo('randomLetters', e)}
                 onMouseLeave={() => setShowInfoPopup(false)}
               >
                 {t('game.accessibility.randomLetters')}
@@ -275,8 +281,8 @@ export default function SettingsView() {
             <label className="flex items-center justify-between">
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={() => showInfo('reducedMotion')}
-                onMouseEnter={() => showInfo('reducedMotion')}
+                onClick={(e) => showInfo('reducedMotion', e)}
+                onMouseEnter={(e) => showInfo('reducedMotion', e)}
                 onMouseLeave={() => setShowInfoPopup(false)}
               >
                 {t('game.accessibility.reducedMotion')}
@@ -293,8 +299,8 @@ export default function SettingsView() {
             <label className="flex items-center justify-between">
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={() => showInfo('slowRiver')}
-                onMouseEnter={() => showInfo('slowRiver')}
+                onClick={(e) => showInfo('slowRiver', e)}
+                onMouseEnter={(e) => showInfo('slowRiver', e)}
                 onMouseLeave={() => setShowInfoPopup(false)}
               >
                 Slow River Mode
@@ -311,8 +317,8 @@ export default function SettingsView() {
             <label className="flex items-center justify-between">
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={() => showInfo('clickMode')}
-                onMouseEnter={() => showInfo('clickMode')}
+                onClick={(e) => showInfo('clickMode', e)}
+                onMouseEnter={(e) => showInfo('clickMode', e)}
                 onMouseLeave={() => setShowInfoPopup(false)}
               >
                 Click Mode
@@ -330,8 +336,8 @@ export default function SettingsView() {
               <label htmlFor="settings-game-speed-slider" className="block text-sm text-arcade-text-main mb-2">
                 <span
                   className="cursor-pointer hover:text-arcade-accent-orange"
-                  onClick={() => showInfo('gameSpeed')}
-                  onMouseEnter={() => showInfo('gameSpeed')}
+                  onClick={(e) => showInfo('gameSpeed', e)}
+                  onMouseEnter={(e) => showInfo('gameSpeed', e)}
                   onMouseLeave={() => setShowInfoPopup(false)}
                 >
                   {t('game.accessibility.speed')} (<span id="settings-speed-label">{getSpeedLabel(gameSpeed)}</span>)
@@ -351,29 +357,31 @@ export default function SettingsView() {
         </div>
       </section>
 
-      {/* Info Popup Modal */}
+      {/* Info Popup Tooltip */}
       {showInfoPopup && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
-          onClick={() => setShowInfoPopup(false)}
+          className="fixed z-50 pointer-events-none"
+          style={{
+            left: `${popupPosition.x + 15}px`,
+            top: `${popupPosition.y + 15}px`,
+            maxWidth: '320px'
+          }}
         >
           <div
-            className="progress-card-small p-6 max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
+            className="progress-card-small p-4 shadow-lg pointer-events-auto"
+            style={{
+              border: '2px solid rgba(235, 179, 105, 0.95)',
+              boxShadow: '0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6)'
+            }}
             onMouseEnter={() => setShowInfoPopup(true)}
+            onMouseLeave={() => setShowInfoPopup(false)}
           >
-            <h3 className="font-heading text-lg font-bold text-arcade-text-main mb-3">
+            <h3 className="font-heading text-sm font-bold text-arcade-text-main mb-2">
               {infoPopupContent.title}
             </h3>
-            <p className="text-sm text-arcade-text-main mb-4">
+            <p className="text-xs text-arcade-text-main">
               {infoPopupContent.description}
             </p>
-            <button
-              onClick={() => setShowInfoPopup(false)}
-              className="w-full rounded-xl bg-arcade-accent-orange px-4 py-2 text-sm font-semibold text-white hover:bg-opacity-90 transition"
-            >
-              {t('common.close') || 'Close'}
-            </button>
           </div>
         </div>
       )}
