@@ -439,10 +439,10 @@ function GameCanvas({ fontClass }) {
 </label>
 
 <label className="flex items-center justify-between">
-  <span>{t('game.accessibility.showhighcontrast')}</span>
-  <input
-                id="high-contrast-toggle"
-                type="checkbox"
+<span>High Contrast</span>
+<input
+    id="high-contrast-toggle"
+    type="checkbox"
     className="h-5 w-5 rounded accessibility-checkbox"
     style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
     defaultChecked
@@ -452,7 +452,7 @@ function GameCanvas({ fontClass }) {
                         <label className="flex items-center justify-between">
   <span>{t('game.accessibility.randomLetters')}</span>
   <input
-                id="random-letters-toggle"
+    id="random-letters-toggle"
     type="checkbox"
     className="h-5 w-5 rounded accessibility-checkbox"
     style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
@@ -472,7 +472,7 @@ function GameCanvas({ fontClass }) {
 </label>            
 
 <label className="flex items-center justify-between">
-  <span>{t('game.accessibility.slowRiver')}</span>
+  <span>Slow River</span>
   <input
     id="slow-river-toggle"
     type="checkbox"
@@ -483,7 +483,7 @@ function GameCanvas({ fontClass }) {
 </label>
 
 <label className="flex items-center justify-between">
-  <span>{t('game.accessibility.clickMode')}</span>
+  <span>Click Mode</span>
   <input
     id="click-mode-toggle"
     type="checkbox"
