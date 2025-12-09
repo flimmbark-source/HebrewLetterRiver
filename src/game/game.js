@@ -643,33 +643,35 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     return null;
   }
 
-  function startClickMode(itemEl, payload) {
-    function onClick(e) {
-      e.preventDefault();
-      e.stopPropagation();
+function startClickMode(itemEl, payload) {
+  const glyphEl = itemEl.querySelector('.letter-symbol') || itemEl;
 
-      // If this letter is already selected, deselect it
-      if (selectedLetter && selectedLetter.element === itemEl) {
-        selectedLetter.element.classList.remove('click-selected');
-        selectedLetter.element.style.animationPlayState = 'running';
-        selectedLetter = null;
-        return;
-      }
+  function onClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
 
-      // Deselect previous letter if any
-      if (selectedLetter) {
-        selectedLetter.element.classList.remove('click-selected');
-        selectedLetter.element.style.animationPlayState = 'running';
-      }
-
-      // Select this letter
-      selectedLetter = { element: itemEl, payload };
-      itemEl.classList.add('click-selected');
-      itemEl.style.animationPlayState = 'paused';
+    // If this letter is already selected, deselect it
+    if (selectedLetter && selectedLetter.element === glyphEl) {
+      selectedLetter.element.classList.remove('click-selected');
+      selectedLetter.element.style.animationPlayState = 'running';
+      selectedLetter = null;
+      return;
     }
 
-    itemEl.addEventListener('click', onClick);
+    // Deselect previous letter if any
+    if (selectedLetter) {
+      selectedLetter.element.classList.remove('click-selected');
+      selectedLetter.element.style.animationPlayState = 'running';
+    }
+
+    // Select this letter (glyph only)
+    selectedLetter = { element: glyphEl, payload };
+    glyphEl.classList.add('click-selected');
+    itemEl.style.animationPlayState = 'paused';
   }
+
+  itemEl.addEventListener('click', onClick);
+}
 
   function setupClickModeBuckets() {
     const buckets = dropZones.filter((el) => el && el.classList && el.classList.contains('catcher-box'));
@@ -701,6 +703,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   function startPointerDrag(itemEl, payload) {
     function onDown(e) {
+      if (clickModeEnabled) {
+        return;
+      }
+
       if (e.button !== undefined && e.button !== 0) return;
       e.preventDefault();
       itemEl.setPointerCapture?.(e.pointerId);

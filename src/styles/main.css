@@ -1791,6 +1791,31 @@ body {
   50% { transform: scale(1.15); }
 }
 
+/* === CLICK MODE SELECTION STATE === */
+/* Keeps selection tight around the gem instead of a giant bar */
+.falling-letter.click-selected,
+.falling-gem.click-selected {
+  cursor: pointer;
+  /* remove any big solid border if there is one somewhere else */
+  border: none;
+
+  /* keep size tight and avoid stretching weirdly */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9999px;
+  padding: 2px 4px;
+
+  /* soft yellow halo instead of a hard bar */
+  box-shadow:
+    0 0 0 2px rgba(250, 204, 21, 0.9),
+    0 0 16px rgba(250, 204, 21, 0.6);
+  background: rgba(250, 204, 21, 0.08);
+
+  transform: scale(1.08);
+}
+
 /* === LOADING STATES === */
 
 /* Quest claim button with loading */
