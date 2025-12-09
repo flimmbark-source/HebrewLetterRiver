@@ -77,35 +77,35 @@ export default function SettingsView() {
   const settingInfo = {
     showIntroductions: {
       title: t('game.accessibility.showIntroductions'),
-      description: t('game.accessibility.showIntroductionsInfo') || 'Shows an introduction screen for each new letter before it appears in the game, helping you learn the letter before playing.'
+      description: 'Shows an introduction screen for each new letter before it appears in the game, helping you learn the letter before playing.'
     },
     highContrast: {
       title: t('game.accessibility.highContrast'),
-      description: t('game.accessibility.highContrastInfo') || 'Increases the contrast between text and background colors to make letters easier to see and distinguish.'
+      description: 'Increases the contrast between text and background colors to make letters easier to see and distinguish.'
     },
     randomLetters: {
       title: t('game.accessibility.randomLetters'),
-      description: t('game.accessibility.randomLettersInfo') || 'Letters appear in random order instead of the standard alphabetical sequence, providing varied practice.'
+      description: 'Letters appear in random order instead of the standard alphabetical sequence, providing varied practice.'
     },
     reducedMotion: {
       title: t('game.accessibility.reducedMotion'),
-      description: t('game.accessibility.reducedMotionInfo') || 'Simplifies animations by removing rotation and complex movement patterns, making letters move in straight lines for easier tracking.'
+      description: 'Simplifies animations by removing rotation and complex movement patterns, making letters move in straight lines for easier tracking.'
     },
     gameSpeed: {
       title: t('game.accessibility.speed'),
-      description: t('game.accessibility.speedInfo') || 'Controls how quickly letters move across the screen. Slower speeds give you more time to recognize and drag letters.'
+      description: 'Controls how quickly letters move across the screen. Slower speeds give you more time to recognize and drag letters.'
     },
     gameFont: {
-      title: t('game.accessibility.font') || 'Font',
-      description: t('game.accessibility.fontInfo') || 'Choose from different fonts including dyslexia-friendly options. Some fonts are specially designed to make letters easier to distinguish.'
+      title: 'Game Font',
+      description: 'Choose from different fonts including dyslexia-friendly options. Some fonts are specially designed to make letters easier to distinguish.'
     },
     slowRiver: {
-      title: t('game.accessibility.slowRiver') || 'Slow River Mode',
-      description: t('game.accessibility.slowRiverInfo') || 'Letters move to the center of the screen and stay there instead of flowing off the edge. This gives you unlimited time to identify and place each letter.'
+      title: 'Slow River Mode',
+      description: 'Letters move to the center of the screen and stay there instead of flowing off the edge. This gives you unlimited time to identify and place each letter.'
     },
     clickMode: {
-      title: t('game.accessibility.clickMode') || 'Click Mode',
-      description: t('game.accessibility.clickModeInfo') || 'Click on a letter to select it, then click on a bucket to place it, instead of dragging. This makes the game easier to play if you have difficulty with dragging.'
+      title: 'Click Mode',
+      description: 'Click on a letter to select it, then click on a bucket to place it, instead of dragging. This makes the game easier to play if you have difficulty with dragging.'
     }
   };
 
@@ -117,11 +117,11 @@ export default function SettingsView() {
   };
 
   const fontOptions = [
-    { value: 'default', label: t('game.accessibility.fontDefault') || 'Default' },
-    { value: 'opendyslexic', label: t('game.accessibility.fontOpenDyslexic') || 'OpenDyslexic' },
-    { value: 'comic-sans', label: t('game.accessibility.fontComicSans') || 'Comic Sans' },
-    { value: 'arial', label: t('game.accessibility.fontArial') || 'Arial' },
-    { value: 'verdana', label: t('game.accessibility.fontVerdana') || 'Verdana' }
+    { value: 'default', label: 'Default' },
+    { value: 'opendyslexic', label: 'OpenDyslexic' },
+    { value: 'comic-sans', label: 'Comic Sans' },
+    { value: 'arial', label: 'Arial' },
+    { value: 'verdana', label: 'Verdana' }
   ];
 
   return (
@@ -199,7 +199,7 @@ export default function SettingsView() {
                   className="cursor-pointer hover:text-arcade-accent-orange"
                   onClick={() => showInfo('gameFont')}
                 >
-                  {t('game.accessibility.font') || 'Font'}
+                  Game Font
                 </span>
               </label>
               <select
@@ -285,7 +285,7 @@ export default function SettingsView() {
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
                 onClick={() => showInfo('slowRiver')}
               >
-                {t('game.accessibility.slowRiver') || 'Slow River Mode'}
+                Slow River Mode
               </span>
               <input
                 id="settings-slow-river-toggle"
@@ -301,7 +301,7 @@ export default function SettingsView() {
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
                 onClick={() => showInfo('clickMode')}
               >
-                {t('game.accessibility.clickMode') || 'Click Mode'}
+                Click Mode
               </span>
               <input
                 id="settings-click-mode-toggle"

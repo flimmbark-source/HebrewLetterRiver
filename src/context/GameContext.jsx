@@ -413,18 +413,18 @@ function GameCanvas({ fontClass }) {
           <div className="space-y-4 text-sm" style={{ color: '#4a2208' }}>
             <div className="border-b pb-3" style={{ borderColor: '#e49b5a' }}>
               <label htmlFor="game-font-select" className="block text-sm mb-2" style={{ color: '#4a2208' }}>
-                {t('game.accessibility.font') || 'Font'}
+                Game Font
               </label>
               <select
                 id="game-font-select"
                 className="w-full rounded-lg border px-2 py-1 text-xs"
                 style={{ borderColor: '#e49b5a', background: '#fff5dd', color: '#4a2208' }}
               >
-                <option value="default">{t('game.accessibility.fontDefault') || 'Default'}</option>
-                <option value="opendyslexic">{t('game.accessibility.fontOpenDyslexic') || 'OpenDyslexic'}</option>
-                <option value="comic-sans">{t('game.accessibility.fontComicSans') || 'Comic Sans'}</option>
-                <option value="arial">{t('game.accessibility.fontArial') || 'Arial'}</option>
-                <option value="verdana">{t('game.accessibility.fontVerdana') || 'Verdana'}</option>
+                <option value="default">Default</option>
+                <option value="opendyslexic">OpenDyslexic</option>
+                <option value="comic-sans">Comic Sans</option>
+                <option value="arial">Arial</option>
+                <option value="verdana">Verdana</option>
               </select>
             </div>
             <label className="flex items-center justify-between">
@@ -444,11 +444,11 @@ function GameCanvas({ fontClass }) {
               <input id="reduced-motion-toggle" type="checkbox" className="h-5 w-5 rounded" style={{ borderColor: '#e49b5a', background: '#fff5dd', accentColor: '#ff9247' }} />
             </label>
             <label className="flex items-center justify-between">
-              <span>{t('game.accessibility.slowRiver') || 'Slow River Mode'}</span>
+              <span>Slow River Mode</span>
               <input id="slow-river-toggle" type="checkbox" className="h-5 w-5 rounded" style={{ borderColor: '#e49b5a', background: '#fff5dd', accentColor: '#ff9247' }} />
             </label>
             <label className="flex items-center justify-between">
-              <span>{t('game.accessibility.clickMode') || 'Click Mode'}</span>
+              <span>Click Mode</span>
               <input id="click-mode-toggle" type="checkbox" className="h-5 w-5 rounded" style={{ borderColor: '#e49b5a', background: '#fff5dd', accentColor: '#ff9247' }} />
             </label>
             <div>
