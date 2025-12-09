@@ -1698,6 +1698,8 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
       const saved = localStorage.getItem('gameSettings');
       if (saved) {
         const settings = JSON.parse(saved);
+        const introductionsToggle = document.getElementById('toggle-introductions');
+        if (introductionsToggle) introductionsToggle.checked = settings.showIntroductions ?? true;
         if (highContrastToggle) highContrastToggle.checked = settings.highContrast ?? false;
         if (randomLettersToggle) randomLettersToggle.checked = settings.randomLetters ?? false;
         if (reducedMotionToggle) reducedMotionToggle.checked = settings.reducedMotion ?? false;
@@ -1722,6 +1724,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     accessibilityView.style.top = `${btnRect.bottom - containerRect.top + 5}px`;
     accessibilityView.style.right = `${containerRect.right - btnRect.right}px`;
     accessibilityView.classList.toggle('hidden');
+    // Reload settings when opening the menu to ensure checkboxes reflect current state
+    if (!accessibilityView.classList.contains('hidden')) {
+      loadSettingsFromLocalStorage();
+    }
   });
   closeAccessibilityBtn?.addEventListener('click', () => accessibilityView.classList.add('hidden'));
   highContrastToggle?.addEventListener('change', (e) => {
