@@ -187,8 +187,8 @@ export default function SettingsView() {
 
         <div className="progress-card-small p-4 relative">
           {/* Info icon */}
-          <div className="absolute right-3 top-3 text-arcade-text-muted text-xs">
-            ⓘ {t('game.accessibility.clickForInfo') || 'Click on a setting to learn more'}
+          <div className="absolute right-3 top-3 text-arcade-text-muted text-xl">
+            ⓘ
           </div>
 
           <div className="space-y-4 mt-2">
@@ -198,6 +198,8 @@ export default function SettingsView() {
                 <span
                   className="cursor-pointer hover:text-arcade-accent-orange"
                   onClick={() => showInfo('gameFont')}
+                  onMouseEnter={() => showInfo('gameFont')}
+                  onMouseLeave={() => setShowInfoPopup(false)}
                 >
                   Game Font
                 </span>
@@ -220,6 +222,8 @@ export default function SettingsView() {
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
                 onClick={() => showInfo('showIntroductions')}
+                onMouseEnter={() => showInfo('showIntroductions')}
+                onMouseLeave={() => setShowInfoPopup(false)}
               >
                 {t('game.accessibility.showIntroductions')}
               </span>
@@ -236,6 +240,8 @@ export default function SettingsView() {
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
                 onClick={() => showInfo('highContrast')}
+                onMouseEnter={() => showInfo('highContrast')}
+                onMouseLeave={() => setShowInfoPopup(false)}
               >
                 {t('game.accessibility.highContrast')}
               </span>
@@ -252,6 +258,8 @@ export default function SettingsView() {
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
                 onClick={() => showInfo('randomLetters')}
+                onMouseEnter={() => showInfo('randomLetters')}
+                onMouseLeave={() => setShowInfoPopup(false)}
               >
                 {t('game.accessibility.randomLetters')}
               </span>
@@ -268,6 +276,8 @@ export default function SettingsView() {
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
                 onClick={() => showInfo('reducedMotion')}
+                onMouseEnter={() => showInfo('reducedMotion')}
+                onMouseLeave={() => setShowInfoPopup(false)}
               >
                 {t('game.accessibility.reducedMotion')}
               </span>
@@ -284,6 +294,8 @@ export default function SettingsView() {
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
                 onClick={() => showInfo('slowRiver')}
+                onMouseEnter={() => showInfo('slowRiver')}
+                onMouseLeave={() => setShowInfoPopup(false)}
               >
                 Slow River Mode
               </span>
@@ -300,6 +312,8 @@ export default function SettingsView() {
               <span
                 className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
                 onClick={() => showInfo('clickMode')}
+                onMouseEnter={() => showInfo('clickMode')}
+                onMouseLeave={() => setShowInfoPopup(false)}
               >
                 Click Mode
               </span>
@@ -317,6 +331,8 @@ export default function SettingsView() {
                 <span
                   className="cursor-pointer hover:text-arcade-accent-orange"
                   onClick={() => showInfo('gameSpeed')}
+                  onMouseEnter={() => showInfo('gameSpeed')}
+                  onMouseLeave={() => setShowInfoPopup(false)}
                 >
                   {t('game.accessibility.speed')} (<span id="settings-speed-label">{getSpeedLabel(gameSpeed)}</span>)
                 </span>
@@ -344,6 +360,7 @@ export default function SettingsView() {
           <div
             className="progress-card-small p-6 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
+            onMouseEnter={() => setShowInfoPopup(true)}
           >
             <h3 className="font-heading text-lg font-bold text-arcade-text-main mb-3">
               {infoPopupContent.title}
