@@ -3,7 +3,6 @@ import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import HomeView from './views/HomeView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import LearnView from './views/LearnView.jsx';
-import WordRiverView from './views/WordRiverView.jsx';
 import SettingsView from './views/SettingsView.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import { ProgressProvider } from './context/ProgressContext.jsx';
@@ -236,7 +235,6 @@ function Shell() {
           <Route path="/home" element={<HomeView />} />
           <Route path="/achievements" element={<AchievementsView />} />
           <Route path="/learn" element={<LearnView />} />
-          <Route path="/word-river" element={<WordRiverView />} />
           <Route path="/settings" element={<SettingsView />} />
         </Routes>
       </main>
