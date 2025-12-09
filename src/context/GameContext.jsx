@@ -367,9 +367,10 @@ function GameCanvas({ fontClass }) {
           >
             <button
               id="accessibility-btn"
-              className="absolute right-4 top-4 text-2xl transition"
+              type="button"
+              className="absolute right-4 top-4 text-2xl transition cursor-pointer hover:scale-110 active:scale-95 z-10"
               aria-label={t('game.accessibility.gear')}
-              style={{ color: '#b07737' }}
+              style={{ color: '#b07737', minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               ⚙️
             </button>

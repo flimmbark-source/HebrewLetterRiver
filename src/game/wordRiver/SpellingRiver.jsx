@@ -142,14 +142,17 @@ function useDropZones() {
   return { registerDropZone, getDropZones };
 }
 
-function FloatingLetter({ letter, fontClass, getDropZones, onLetterDrop }) {
+function FloatingLetter({ letter, fontClass, gameFont, getDropZones, onLetterDrop }) {
   const ref = useRef(null);
+
+  // Compute the game font class
+  const gameFontClass = gameFont !== 'default' ? `game-font-${gameFont}` : '';
 
   useRiverPointerDrag(ref, {
     enabled: true,
     payload: { letter, origin: { type: 'river', letterId: letter.id } },
     getDropZones,
-    ghostClassName: `${fontClass} text-5xl font-semibold text-cyan-200 drop-shadow-lg px-2 py-1`,
+    ghostClassName: `${fontClass} ${gameFontClass} text-5xl font-semibold text-cyan-200 drop-shadow-lg px-2 py-1`,
     getGhostContent: () => letter.label,
     onDrop: ({ zone, payload }) => onLetterDrop({ letter: payload.letter, zone, origin: payload.origin }),
     freezeWhileDragging: true
@@ -161,7 +164,8 @@ function FloatingLetter({ letter, fontClass, getDropZones, onLetterDrop }) {
       className={classNames(
         'word-river-floating-letter',
         'absolute select-none rounded-2xl px-3 py-2 text-4xl font-semibold text-cyan-200 shadow-lg backdrop-blur-sm',
-        fontClass
+        fontClass,
+        gameFontClass
       )}
       style={{
         top: `${letter.top}%`,
@@ -185,6 +189,7 @@ FloatingLetter.propTypes = {
     driftDuration: PropTypes.number.isRequired
   }).isRequired,
   fontClass: PropTypes.string.isRequired,
+  gameFont: PropTypes.string.isRequired,
   getDropZones: PropTypes.func.isRequired,
   onLetterDrop: PropTypes.func.isRequired
 };
@@ -192,12 +197,15 @@ FloatingLetter.propTypes = {
 function SpellingSlot({
   slot,
   fontClass,
+  gameFont,
   registerDropZone,
   getDropZones,
   onLetterDrop,
   textDirection
 }) {
   const ref = useRef(null);
+  const gameFontClass = gameFont !== 'default' ? `game-font-${gameFont}` : '';
+
   useEffect(() => {
     const element = ref.current;
     if (!element) return () => {};
@@ -214,7 +222,7 @@ function SpellingSlot({
       origin: { type: 'slot', slotId: slot.id, letterId: slot.sourceLetterId ?? null }
     },
     getDropZones,
-    ghostClassName: `${fontClass} text-5xl font-semibold text-cyan-200 drop-shadow-lg px-2 py-1`,
+    ghostClassName: `${fontClass} ${gameFontClass} text-5xl font-semibold text-cyan-200 drop-shadow-lg px-2 py-1`,
     getGhostContent: () => slot.filledLabel ?? slot.label ?? '',
     onDrop: ({ zone, payload }) => onLetterDrop({ letter: payload.letter, zone, origin: payload.origin }),
     freezeWhileDragging: true
@@ -227,6 +235,7 @@ function SpellingSlot({
         'word-river-spelling-slot',
         'flex h-14 w-14 items-center justify-center rounded-2xl border-2 text-3xl font-semibold transition-all',
         fontClass,
+        gameFontClass,
         {
           'word-river-spelling-slot-filled': Boolean(slot.filledChar),
           'word-river-spelling-slot-empty': !slot.filledChar,
@@ -251,6 +260,7 @@ SpellingSlot.propTypes = {
     locked: PropTypes.bool
   }).isRequired,
   fontClass: PropTypes.string.isRequired,
+  gameFont: PropTypes.string.isRequired,
   registerDropZone: PropTypes.func.isRequired,
   getDropZones: PropTypes.func.isRequired,
   onLetterDrop: PropTypes.func.isRequired,
@@ -261,6 +271,7 @@ export default function SpellingRiver({
   object,
   difficulty,
   fontClass,
+  gameFont,
   textDirection,
   onCompleted
 }) {
@@ -424,6 +435,7 @@ export default function SpellingRiver({
               key={slot.id}
               slot={slot}
               fontClass={fontClass}
+              gameFont={gameFont}
               registerDropZone={registerDropZone}
               getDropZones={getDropZones}
               onLetterDrop={handleLetterDrop}
@@ -438,6 +450,7 @@ export default function SpellingRiver({
             key={letter.id}
             letter={letter}
             fontClass={fontClass}
+            gameFont={gameFont}
             getDropZones={getDropZones}
             onLetterDrop={handleLetterDrop}
           />
@@ -456,6 +469,7 @@ SpellingRiver.propTypes = {
   }).isRequired,
   difficulty: PropTypes.oneOf(['easy', 'medium', 'hard']).isRequired,
   fontClass: PropTypes.string.isRequired,
+  gameFont: PropTypes.string.isRequired,
   textDirection: PropTypes.string.isRequired,
   onCompleted: PropTypes.func.isRequired
 };

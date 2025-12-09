@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WordRiverSceneView from '../game/wordRiver/WordRiverSceneView.jsx';
 import WordRiverFocusOverlay from '../game/wordRiver/WordRiverFocusOverlay.jsx';
@@ -21,6 +21,31 @@ export default function WordRiverView() {
   const [selectedObjectId, setSelectedObjectId] = useState(null);
   const [learnedObjectIds, setLearnedObjectIds] = useState([]);
   const [difficulty] = useState('easy');
+
+  // Read game font from localStorage
+  const [gameFont, setGameFont] = useState(() => {
+    try {
+      const settings = JSON.parse(localStorage.getItem('gameSettings') || '{}');
+      return settings.gameFont || 'default';
+    } catch {
+      return 'default';
+    }
+  });
+
+  // Listen for font changes from settings
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const settings = JSON.parse(localStorage.getItem('gameSettings') || '{}');
+        setGameFont(settings.gameFont || 'default');
+      } catch {
+        // Ignore parse errors
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const selectedObject = useMemo(() => {
     if (!scene) return null;
@@ -96,6 +121,7 @@ export default function WordRiverView() {
           object={selectedObject}
           difficulty={difficulty}
           fontClass={fontClass}
+          gameFont={gameFont}
           textDirection={textDirection}
           onMeaningComplete={handleMeaningComplete}
           onSpellingComplete={handleSpellingComplete}

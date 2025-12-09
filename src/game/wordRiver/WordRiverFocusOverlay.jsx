@@ -81,6 +81,7 @@ export default function WordRiverFocusOverlay({
   object,
   difficulty,
   fontClass,
+  gameFont,
   textDirection,
   onMeaningComplete,
   onSpellingComplete,
@@ -99,6 +100,7 @@ export default function WordRiverFocusOverlay({
           object={object}
           difficulty={difficulty}
           fontClass={fontClass}
+          gameFont={gameFont}
           textDirection={textDirection}
           onCompleted={onSpellingComplete}
         />
@@ -126,6 +128,7 @@ WordRiverFocusOverlay.propTypes = {
   }),
   difficulty: PropTypes.oneOf(['easy', 'medium', 'hard']).isRequired,
   fontClass: PropTypes.string.isRequired,
+  gameFont: PropTypes.string.isRequired,
   textDirection: PropTypes.string.isRequired,
   onMeaningComplete: PropTypes.func.isRequired,
   onSpellingComplete: PropTypes.func.isRequired,
