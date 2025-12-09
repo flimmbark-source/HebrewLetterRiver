@@ -718,7 +718,8 @@ function startClickMode(itemEl, payload) {
 
       const ghost = ensureDragGhost();
       ghost.textContent = itemEl.textContent;
-      ghost.className = itemEl.classList.contains('falling-gem') ? 'text-5xl' : `${fontClass} text-6xl`;
+      const fontStyleClass = selectedFont !== 'default' ? `game-font-${selectedFont}` : '';
+      ghost.className = itemEl.classList.contains('falling-gem') ? 'text-5xl' : `${fontClass} ${fontStyleClass} text-6xl`;
       ghost.style.opacity = '0.95';
 
       itemEl.style.visibility = 'hidden';
