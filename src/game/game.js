@@ -90,9 +90,8 @@ export function setupGame({ onReturnToMenu, onGameStart, languagePack, translate
   const waveStatGhost = document.getElementById('wave-stat-ghost');
   const streakStatGhost = document.getElementById('streak-stat-ghost');
 
-  if (!scoreEl || !levelEl) {
-    throw new Error('Game elements failed to initialize.');
-  }
+  // Note: Some game elements (scoreEl, levelEl, etc.) may not exist initially
+  // when in mode select, but will be available when the game starts
 
   const activeLanguage = languagePack ?? loadLanguage();
   const activeDictionary = dictionary ?? getDictionary(activeLanguage.id);
@@ -1172,10 +1171,12 @@ function startClickMode(itemEl, payload) {
   function updateScore(points = 0, reset = false) {
     if (reset) score = 0;
     else score += points;
-    scoreEl.textContent = score;
-    if (points > 0) {
-      scoreEl.classList.add('score-pop');
-      trackTimeout(() => scoreEl.classList.remove('score-pop'), 300);
+    if (scoreEl) {
+      scoreEl.textContent = score;
+      if (points > 0) {
+        scoreEl.classList.add('score-pop');
+        trackTimeout(() => scoreEl.classList.remove('score-pop'), 300);
+      }
     }
     if (score >= scoreForNextLevel && !isBonusRound) levelUp();
   }
@@ -1188,33 +1189,45 @@ function startClickMode(itemEl, payload) {
     isBonusRound = level % 5 === 0 && gameMode === 'letters';
     const levelUpText = isBonusRound ? t('game.status.bonusRound') : t('game.status.levelUp');
 
-    const levelLabel = levelEl.previousElementSibling;
-    levelLabel.classList.add('hidden');
-    levelEl.textContent = levelUpText;
-    levelEl.classList.add('flash-level-up', 'text-3xl');
-    levelEl.classList.remove('text-2xl');
-    trackTimeout(() => {
-      levelLabel.classList.remove('hidden');
-      levelEl.classList.remove('flash-level-up', 'text-3xl');
-      levelEl.classList.add('text-2xl');
-      updateLevelDisplay();
-    }, 1800);
+    if (levelEl) {
+      const levelLabel = levelEl.previousElementSibling;
+      if (levelLabel) {
+        levelLabel.classList.add('hidden');
+      }
+      levelEl.textContent = levelUpText;
+      levelEl.classList.add('flash-level-up', 'text-3xl');
+      levelEl.classList.remove('text-2xl');
+      trackTimeout(() => {
+        if (levelLabel) {
+          levelLabel.classList.remove('hidden');
+        }
+        if (levelEl) {
+          levelEl.classList.remove('flash-level-up', 'text-3xl');
+          levelEl.classList.add('text-2xl');
+        }
+        updateLevelDisplay();
+      }, 1800);
+    }
     emit('game:level-up', { level, mode: gameMode });
   }
 
   function updateLevelDisplay() {
-    levelEl.textContent = level;
+    if (levelEl) {
+      levelEl.textContent = level;
+    }
   }
 
   function updateLives(isLost = false) {
-    livesContainer.innerHTML = '';
-    for (let i = 0; i < initialLives; i++) {
-      const heart = document.createElement('span');
-      heart.textContent = '❤️';
-      heart.className = `transition-opacity duration-300 ${i < lives ? 'opacity-100' : 'opacity-20'}`;
-      livesContainer.appendChild(heart);
+    if (livesContainer) {
+      livesContainer.innerHTML = '';
+      for (let i = 0; i < initialLives; i++) {
+        const heart = document.createElement('span');
+        heart.textContent = '❤️';
+        heart.className = `transition-opacity duration-300 ${i < lives ? 'opacity-100' : 'opacity-20'}`;
+        livesContainer.appendChild(heart);
+      }
     }
-    if (isLost) {
+    if (isLost && gameContainer) {
       gameContainer.classList.add('life-lost-shake');
       trackTimeout(() => gameContainer.classList.remove('life-lost-shake'), 500);
     }
