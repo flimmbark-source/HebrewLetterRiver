@@ -428,60 +428,70 @@ function GameCanvas({ fontClass }) {
               </select>
             </div>
             <label className="flex items-center justify-between">
-              <span>{t('game.accessibility.showIntroductions')}</span>
-              <input
-                id="toggle-introductions"
-                type="checkbox"
-                className="h-5 w-5 rounded"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd', accentColor: '#ff9247' }}
-                defaultChecked
-              />
-            </label>
-            <label className="flex items-center justify-between">
-              <span>{t('game.accessibility.highContrast')}</span>
-              <input
+  <span>{t('game.accessibility.showIntroductions')}</span>
+  <input
+    id="toggle-introductions"
+    type="checkbox"
+    className="h-5 w-5 rounded accessibility-checkbox"
+    style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+    defaultChecked
+  />
+</label>
+
+<label className="flex items-center justify-between">
+  <span>{t('game.accessibility.showhighcontrast')}</span>
+  <input
                 id="high-contrast-toggle"
                 type="checkbox"
-                className="h-5 w-5 rounded"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd', accentColor: '#ff9247' }}
-              />
-            </label>
-            <label className="flex items-center justify-between">
-              <span>{t('game.accessibility.randomLetters')}</span>
-              <input
+    className="h-5 w-5 rounded accessibility-checkbox"
+    style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+    defaultChecked
+  />
+</label>
+            
+                        <label className="flex items-center justify-between">
+  <span>{t('game.accessibility.randomLetters')}</span>
+  <input
                 id="random-letters-toggle"
-                type="checkbox"
-                className="h-5 w-5 rounded"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd', accentColor: '#ff9247' }}
-              />
-            </label>
-            <label className="flex items-center justify-between">
-              <span>{t('game.accessibility.reducedMotion')}</span>
-              <input
-                id="reduced-motion-toggle"
-                type="checkbox"
-                className="h-5 w-5 rounded"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd', accentColor: '#ff9247' }}
-              />
-            </label>
-            <label className="flex items-center justify-between">
-              <span>Slow River Mode</span>
-              <input
-                id="slow-river-toggle"
-                type="checkbox"
-                className="h-5 w-5 rounded"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd', accentColor: '#ff9247' }}
-              />
-            </label>
-            <label className="flex items-center justify-between">
-              <span>Click Mode</span>
-              <input
-                id="click-mode-toggle"
-                type="checkbox"
-                className="h-5 w-5 rounded"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd', accentColor: '#ff9247' }}
-              />
-            </label>
+    type="checkbox"
+    className="h-5 w-5 rounded accessibility-checkbox"
+    style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+    defaultChecked
+  />
+</label>            
+
+<label className="flex items-center justify-between">
+  <span>{t('game.accessibility.reducedMotion')}</span>
+  <input
+    id="reduced-motion-toggle"
+    type="checkbox"
+    className="h-5 w-5 rounded accessibility-checkbox"
+    style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+    defaultChecked
+  />
+</label>            
+
+<label className="flex items-center justify-between">
+  <span>{t('game.accessibility.slowRiver')}</span>
+  <input
+    id="slow-river-toggle"
+    type="checkbox"
+    className="h-5 w-5 rounded accessibility-checkbox"
+    style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+    defaultChecked
+  />
+</label>
+
+<label className="flex items-center justify-between">
+  <span>{t('game.accessibility.clickMode')}</span>
+  <input
+    id="click-mode-toggle"
+    type="checkbox"
+    className="h-5 w-5 rounded accessibility-checkbox"
+    style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+    defaultChecked
+  />
+</label>
             <div>
               <label htmlFor="game-speed-slider" className="text-sm" style={{ color: '#4a2208' }}>
                 {t('game.accessibility.speed')} (<span id="speed-label">{t('game.accessibility.speedNormal')}</span>)
