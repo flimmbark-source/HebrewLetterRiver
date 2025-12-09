@@ -933,15 +933,23 @@ function startClickMode(itemEl, payload) {
 
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
-    choicesContainer.innerHTML = '';
+    if (choicesContainer) {
+      choicesContainer.innerHTML = '';
+    }
     activeBucketCount = 0;
     applyBucketLayout(0);
     invalidateBucketMinWidth();
     refreshDropZones();
     clearPendingBucketLayout();
-    learnOverlay.classList.remove('visible');
-    ghostEl.classList.remove('ghost-rise');
-    summaryTooltip.classList.add('hidden');
+    if (learnOverlay) {
+      learnOverlay.classList.remove('visible');
+    }
+    if (ghostEl) {
+      ghostEl.classList.remove('ghost-rise');
+    }
+    if (summaryTooltip) {
+      summaryTooltip.classList.add('hidden');
+    }
     if (dragGhost) {
       dragGhost.remove();
       dragGhost = null;
@@ -954,7 +962,7 @@ function startClickMode(itemEl, payload) {
     lives = initialLives;
     level = 1;
     scoreForNextLevel = levelUpThreshold;
-    baseSpeedSetting = parseInt(gameSpeedSlider.value, 10);
+    baseSpeedSetting = parseInt(gameSpeedSlider?.value ?? 17, 10);
     fallDuration = baseSpeedSetting;
     isBonusRound = false;
     seenItems = new Set();
@@ -976,15 +984,27 @@ function startClickMode(itemEl, payload) {
     updateWaveStat();
     updateStreakStat();
 
-    startButton.textContent = t('game.controls.start');
+    if (startButton) {
+      startButton.textContent = t('game.controls.start');
+    }
     isRestartMode = false;
     renderPracticeModes();
-    setupView.classList.remove('hidden');
-    gameOverView.classList.add('hidden');
-    winView?.classList.add('hidden');
-    accessibilityView.classList.add('hidden');
+    if (setupView) {
+      setupView.classList.remove('hidden');
+    }
+    if (gameOverView) {
+      gameOverView.classList.add('hidden');
+    }
+    if (winView) {
+      winView.classList.add('hidden');
+    }
+    if (accessibilityView) {
+      accessibilityView.classList.add('hidden');
+    }
     setupExitButton?.classList.remove('hidden');
-    modal.classList.remove('hidden');
+    if (modal) {
+      modal.classList.remove('hidden');
+    }
     refreshDropZones();
   }
 
