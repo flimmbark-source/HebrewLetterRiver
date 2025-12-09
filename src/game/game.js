@@ -247,10 +247,18 @@ export function setupGame({ onReturnToMenu, onGameStart, languagePack, translate
 
   function showWinScreen() {
     gameActive = false;
-    modal.classList.remove('hidden');
-    setupView.classList.add('hidden');
-    gameOverView.classList.add('hidden');
-    winView.classList.remove('hidden');
+    if (modal) {
+      modal.classList.remove('hidden');
+    }
+    if (setupView) {
+      setupView.classList.add('hidden');
+    }
+    if (gameOverView) {
+      gameOverView.classList.add('hidden');
+    }
+    if (winView) {
+      winView.classList.remove('hidden');
+    }
 
     if (winGoalDisplay) winGoalDisplay.textContent = goalValue;
     if (totalWinsDisplay) totalWinsDisplay.textContent = totalWins;
@@ -259,8 +267,12 @@ export function setupGame({ onReturnToMenu, onGameStart, languagePack, translate
 
   function continueAfterWin() {
     waveCorrectCount = 0;
-    winView.classList.add('hidden');
-    modal.classList.add('hidden');
+    if (winView) {
+      winView.classList.add('hidden');
+    }
+    if (modal) {
+      modal.classList.add('hidden');
+    }
     gameActive = true;
     // Clear current round and start a new wave
     if (currentRound && currentRound.timers) {
@@ -1053,9 +1065,13 @@ function startClickMode(itemEl, payload) {
     updateWaveStat();
     updateStreakStat();
     setupExitButton?.classList.add('hidden');
-    modal.classList.add('hidden');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
     accessibilityView?.classList.add('hidden');
-    learnOverlay.classList.remove('visible');
+    if (learnOverlay) {
+      learnOverlay.classList.remove('visible');
+    }
 
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
