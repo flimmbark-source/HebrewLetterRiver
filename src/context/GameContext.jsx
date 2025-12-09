@@ -16,6 +16,7 @@ const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
 export function GameProvider({ children }) {
   const [isVisible, setIsVisible] = useState(false);
   const [options, setOptions] = useState(null);
+  const [isInModeSelect, setIsInModeSelect] = useState(true);
   const containerRef = useRef(null);
   const gameApiRef = useRef(null);
   const [hasMounted, setHasMounted] = useState(false);
@@ -41,6 +42,10 @@ export function GameProvider({ children }) {
       gameApiRef.current = setupGame({
         onReturnToMenu: () => {
           setIsVisible(false);
+          setIsInModeSelect(true);
+        },
+        onGameStart: () => {
+          setIsInModeSelect(false);
         },
         languagePack,
         translate: t,
@@ -49,6 +54,7 @@ export function GameProvider({ children }) {
     }
     const api = gameApiRef.current;
     api.resetToSetupScreen();
+    setIsInModeSelect(true);
     if (options?.mode) api.setGameMode(options.mode);
     if (options?.forceLetter) api.forceStartByHebrew(options.forceLetter);
     if (options?.autostart) {
@@ -66,6 +72,7 @@ export function GameProvider({ children }) {
       gameApiRef.current.resetToSetupScreen();
     }
     setIsVisible(false);
+    setIsInModeSelect(true);
   }, []);
 
   const contextValue = useMemo(
@@ -106,7 +113,7 @@ export function GameProvider({ children }) {
                     onClick={(e) => e.stopPropagation()}
                     dir={direction}
                   >
-                    <GameCanvas key={languagePack.id} fontClass={fontClass} />
+                    <GameCanvas key={languagePack.id} fontClass={fontClass} isInModeSelect={isInModeSelect} />
                   </div>
                 </div>
               </div>
@@ -118,7 +125,7 @@ export function GameProvider({ children }) {
   );
 }
 
-function GameCanvas({ fontClass }) {
+function GameCanvas({ fontClass, isInModeSelect }) {
   const { t } = useLocalization();
 
   // Info popup state (mirrors SettingsView behaviour)
@@ -219,140 +226,144 @@ function GameCanvas({ fontClass }) {
           maxHeight: 'calc(100vh - 2rem)',
         }}
       >
-        <div className="relative flex flex-col">
-          <div
-            id="top-bar"
-            className="relative text-sm shadow-lg sm:text-base"
-            style={{ background: 'rgba(255, 229, 201, 0.9)' }}
-          >
-            <span
-              id="back-to-menu-button"
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-wide sm:left-6"
-              style={{ color: '#b07737' }}
-            >
-              {t('game.controls.exitToMenu')}
-            </span>
-            <div className="top-bar-content flex w-full flex-wrap items-center justify-center gap-3 sm:gap-6">
-              <div className="inline-flex items-center gap-2 text-center">
-                <span className="font-semibold" style={{ color: '#6c3b14' }}>
-                  {t('game.labels.level')}
-                </span>
-                <span
-                  id="level"
-                  className="text-2xl font-bold"
-                  style={{ color: '#ff9247' }}
-                >
-                  1
-                </span>
-              </div>
-              <div className="score-lives-group flex items-center gap-3 text-center">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold" style={{ color: '#6c3b14' }}>
-                    {t('game.labels.score')}
-                  </span>
-                  <span
-                    id="score"
-                    className="text-2xl font-bold"
-                    style={{ color: '#ffce4a' }}
-                  >
-                    0
-                  </span>
-                </div>
-                <div
-                  id="lives-container"
-                  className="flex items-center gap-2"
-                />
-              </div>
+        {!isInModeSelect && (
+          <>
+            <div className="relative flex flex-col">
               <div
-                className="flex flex-wrap items-center justify-center gap-2 sm:gap-3"
-                id="river-stat-container"
+                id="top-bar"
+                className="relative text-sm shadow-lg sm:text-base"
+                style={{ background: 'rgba(255, 229, 201, 0.9)' }}
               >
-                <div className="stat-badge" id="wave-stat" aria-live="polite">
-                  <span className="sr-only">
-                    {t('game.labels.bestWave', 'Best wave')}
-                  </span>
-                  <span className="stat-badge__icon" aria-hidden="true">
-                    🌊
-                  </span>
-                  <span className="stat-badge__value" id="wave-stat-value">
-                    0
-                  </span>
-                  <span
-                    className="stat-badge__ghost"
-                    id="wave-stat-ghost"
-                    aria-hidden="true"
-                  />
+                <span
+                  id="back-to-menu-button"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-wide sm:left-6"
+                  style={{ color: '#b07737' }}
+                >
+                  {t('game.controls.exitToMenu')}
+                </span>
+                <div className="top-bar-content flex w-full flex-wrap items-center justify-center gap-3 sm:gap-6">
+                  <div className="inline-flex items-center gap-2 text-center">
+                    <span className="font-semibold" style={{ color: '#6c3b14' }}>
+                      {t('game.labels.level')}
+                    </span>
+                    <span
+                      id="level"
+                      className="text-2xl font-bold"
+                      style={{ color: '#ff9247' }}
+                    >
+                      1
+                    </span>
+                  </div>
+                  <div className="score-lives-group flex items-center gap-3 text-center">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold" style={{ color: '#6c3b14' }}>
+                        {t('game.labels.score')}
+                      </span>
+                      <span
+                        id="score"
+                        className="text-2xl font-bold"
+                        style={{ color: '#ffce4a' }}
+                      >
+                        0
+                      </span>
+                    </div>
+                    <div
+                      id="lives-container"
+                      className="flex items-center gap-2"
+                    />
+                  </div>
+                  <div
+                    className="flex flex-wrap items-center justify-center gap-2 sm:gap-3"
+                    id="river-stat-container"
+                  >
+                    <div className="stat-badge" id="wave-stat" aria-live="polite">
+                      <span className="sr-only">
+                        {t('game.labels.bestWave', 'Best wave')}
+                      </span>
+                      <span className="stat-badge__icon" aria-hidden="true">
+                        🌊
+                      </span>
+                      <span className="stat-badge__value" id="wave-stat-value">
+                        0
+                      </span>
+                      <span
+                        className="stat-badge__ghost"
+                        id="wave-stat-ghost"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="stat-badge" id="streak-stat" aria-live="polite">
+                      <span className="sr-only">
+                        {t('game.labels.bestStreak', 'Best streak')}
+                      </span>
+                      <span className="stat-badge__icon" aria-hidden="true">
+                        🔥
+                      </span>
+                      <span className="stat-badge__value" id="streak-stat-value">
+                        0
+                      </span>
+                      <span
+                        className="stat-badge__ghost"
+                        id="streak-stat-ghost"
+                        aria-hidden="true"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="stat-badge" id="streak-stat" aria-live="polite">
-                  <span className="sr-only">
-                    {t('game.labels.bestStreak', 'Best streak')}
-                  </span>
-                  <span className="stat-badge__icon" aria-hidden="true">
-                    🔥
-                  </span>
-                  <span className="stat-badge__value" id="streak-stat-value">
-                    0
-                  </span>
-                  <span
-                    className="stat-badge__ghost"
-                    id="streak-stat-ghost"
-                    aria-hidden="true"
+              </div>
+            </div>
+
+            <div
+              id="play-area"
+              className="relative flex-1 overflow-hidden"
+              style={{
+                background:
+                  'linear-gradient(180deg, rgba(255, 218, 168, 0.3), rgba(255, 229, 201, 0.5))',
+              }}
+            >
+              <div
+                id="learn-overlay"
+                className="absolute left-1/2 top-4 z-20 flex -translate-x-1/2 items-center gap-4 rounded-2xl px-6 py-3 shadow-lg"
+                style={{
+                  border: '2px solid rgba(235, 179, 105, 0.95)',
+                  background:
+                    'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%)',
+                  boxShadow:
+                    '0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6)',
+                }}
+              >
+                <div
+                  id="learn-letter"
+                  className={`text-6xl font-bold ${fontClass}`}
+                  style={{ color: '#ff9247' }}
+                />
+                <div className="flex flex-col text-center">
+                  <div
+                    id="learn-name"
+                    className="text-2xl font-semibold"
+                    style={{ color: '#4a2208' }}
+                  />
+                  <div
+                    id="learn-sound"
+                    className="text-lg"
+                    style={{ color: '#6c3b14' }}
                   />
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div
-          id="play-area"
-          className="relative flex-1 overflow-hidden"
-          style={{
-            background:
-              'linear-gradient(180deg, rgba(255, 218, 168, 0.3), rgba(255, 229, 201, 0.5))',
-          }}
-        >
-          <div
-            id="learn-overlay"
-            className="absolute left-1/2 top-4 z-20 flex -translate-x-1/2 items-center gap-4 rounded-2xl px-6 py-3 shadow-lg"
-            style={{
-              border: '2px solid rgba(235, 179, 105, 0.95)',
-              background:
-                'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%)',
-              boxShadow:
-                '0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6)',
-            }}
-          >
             <div
-              id="learn-letter"
-              className={`text-6xl font-bold ${fontClass}`}
-              style={{ color: '#ff9247' }}
+              id="choices-container"
+              className="grid w-full flex-shrink-0 grid-cols-2 gap-3 px-4 pb-6 pt-4 sm:grid-cols-3 sm:px-6 md:grid-cols-4 lg:grid-cols-5"
+              style={{ background: 'linear-gradient(180deg, #fff9eb 0%, #ffe5bd 100%)' }}
             />
-            <div className="flex flex-col text-center">
-              <div
-                id="learn-name"
-                className="text-2xl font-semibold"
-                style={{ color: '#4a2208' }}
-              />
-              <div
-                id="learn-sound"
-                className="text-lg"
-                style={{ color: '#6c3b14' }}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div
-          id="choices-container"
-          className="grid w-full flex-shrink-0 grid-cols-2 gap-3 px-4 pb-6 pt-4 sm:grid-cols-3 sm:px-6 md:grid-cols-4 lg:grid-cols-5"
-          style={{ background: 'linear-gradient(180deg, #fff9eb 0%, #ffe5bd 100%)' }}
-        />
+          </>
+        )}
 
         <div
           id="modal"
           className="fixed inset-0 z-30 flex items-center justify-center overflow-y-auto p-4 sm:p-6"
-          style={{ background: 'rgba(74, 34, 8, 0.8)' }}
+          style={{ background: isInModeSelect ? 'transparent' : 'rgba(74, 34, 8, 0.8)' }}
         >
           <div
             id="modal-content"
@@ -365,6 +376,16 @@ function GameCanvas({ fontClass }) {
                 '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)',
             }}
           >
+            <button
+              id="setup-exit-button"
+              type="button"
+              className="absolute left-4 top-4 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
+              aria-label={t('game.controls.exitToMenu')}
+              style={{ color: '#6c3b14', minWidth: '44px', minHeight: '44px' }}
+            >
+              ×
+            </button>
+
             <button
               id="accessibility-btn"
               className="absolute right-4 top-4 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
@@ -379,14 +400,6 @@ function GameCanvas({ fontClass }) {
                 className="relative flex items-center justify-center px-3 py-2 border-b-2"
                 style={{ borderColor: 'rgba(235, 179, 105, 0.3)' }}
               >
-                <button
-                  id="setup-exit-button"
-                  type="button"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold transition sm:text-sm"
-                  style={{ color: '#6c3b14' }}
-                >
-                  {t('game.controls.exitToMenu')}
-                </button>
                 <div className="flex flex-col items-center flex-1 text-center gap-1">
                   <h1
                     className={`modal-title text-xl sm:text-2xl font-bold ${fontClass}`}

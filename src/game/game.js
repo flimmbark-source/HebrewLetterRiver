@@ -39,7 +39,7 @@ function clearAllTimers() {
   trackedIntervals.clear();
 }
 
-export function setupGame({ onReturnToMenu, languagePack, translate, dictionary } = {}) {
+export function setupGame({ onReturnToMenu, onGameStart, languagePack, translate, dictionary } = {}) {
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
   const livesContainer = document.getElementById('lives-container');
@@ -990,6 +990,7 @@ function startClickMode(itemEl, payload) {
   }
 
   function startGame() {
+    onGameStart?.();
     score = 0;
     lives = initialLives;
     level = 1;
