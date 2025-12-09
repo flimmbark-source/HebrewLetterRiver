@@ -51,10 +51,6 @@
         "letters": {
           "title": "Letter River",
           "description": "Catch drifting letters and drop them into the right buckets."
-        },
-        "words": {
-          "title": "Word River",
-          "description": "Assemble full words and match them to their meanings."
         }
       }
     },
@@ -519,27 +515,6 @@
       "expert-mode": "Mode Expert actif",
       "fast-flow": "Vitesse Flux Rapide active",
       "no-intros": "Aucune introduction activée"
-    }
-  },
-  "wordRiver": {
-    "title": "Word River",
-    "subtitle": "Build each word and connect it with its meaning.",
-    "phases": {
-      "letters": "Phase 1 · Build the word",
-      "match": "Phase 2 · Match the meaning"
-    },
-    "instructions": {
-      "letters": "Drag drifting letters into each bucket to build the word in your practice language.",
-      "match": "Drag the completed words to the emoji or meaning that matches."
-    },
-    "notifications": {
-      "roundComplete": "Round complete! New words are on the way."
-    },
-    "actions": {
-      "back": "Back to Home"
-    },
-    "targets": {
-      "fallback": "Meaning"
     }
   },
   "settings": {
