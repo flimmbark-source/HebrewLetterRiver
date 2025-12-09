@@ -110,17 +110,41 @@ export default function SettingsView() {
     }
   };
 
-  const showInfo = (settingKey, event) => {
-    if (settingInfo[settingKey]) {
-      setInfoPopupContent(settingInfo[settingKey]);
-      setShowInfoPopup(true);
-      if (event) {
-        const x = event.clientX || event.touches?.[0]?.clientX || 0;
-        const y = event.clientY || event.touches?.[0]?.clientY || 0;
-        setPopupPosition({ x, y });
-      }
+const showInfo = (settingKey, event) => {
+  if (settingInfo[settingKey]) {
+    setInfoPopupContent(settingInfo[settingKey]);
+    setShowInfoPopup(true);
+
+    if (event) {
+      const clientX = event.clientX || event.touches?.[0]?.clientX || 0;
+      const clientY = event.clientY || event.touches?.[0]?.clientY || 0;
+
+      const viewportWidth  = window.innerWidth  || document.documentElement.clientWidth  || 0;
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+
+      const horizontalPadding    = 16;   // px from left/right
+      const verticalOffset       = 15;   // px below cursor when possible
+      const bottomBuffer         = 24;   // px from bottom of screen
+      const estimatedPopupHeight = 200;  // rough max popup height
+      const maxPopupWidth        = 320;  // matches your maxWidth style
+
+      // X: sit a bit to the right of the cursor, but not off the screen
+      const rawX = clientX + 15;
+      const x = Math.min(
+        Math.max(rawX, horizontalPadding),
+        viewportWidth - maxPopupWidth - horizontalPadding
+      );
+
+      // Y: prefer below the cursor, but clamp so there's a bottom buffer
+      const rawY = clientY + verticalOffset;
+      const maxY = viewportHeight - estimatedPopupHeight - bottomBuffer;
+      const y = Math.min(rawY, maxY);
+
+      setPopupPosition({ x, y });
     }
-  };
+  }
+};
+
 
   const fontOptions = [
     { value: 'default', label: 'Default' },
