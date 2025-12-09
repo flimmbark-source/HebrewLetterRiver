@@ -65,6 +65,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   const reducedMotionToggle = document.getElementById('reduced-motion-toggle');
   const gameSpeedSlider = document.getElementById('game-speed-slider');
   const speedLabel = document.getElementById('speed-label');
+  const gameFontSelect = document.getElementById('game-font-select');
+  const slowRiverToggle = document.getElementById('slow-river-toggle');
+  const clickModeToggle = document.getElementById('click-mode-toggle');
   const installBtn = document.getElementById('install-btn');
   const backToMenuButton = document.getElementById('back-to-menu-button');
   const setupExitButton = document.getElementById('setup-exit-button');
@@ -410,6 +413,9 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
 
   function refreshDropZones() {
     dropZones = Array.from(document.querySelectorAll('.catcher-box'));
+    if (clickModeEnabled) {
+      setupClickModeBuckets();
+    }
   }
 
   function measureBucketTextWidth() {
@@ -637,8 +643,70 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     return null;
   }
 
+function startClickMode(itemEl, payload) {
+  const glyphEl = itemEl.querySelector('.letter-symbol') || itemEl;
+
+  function onClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // If this letter is already selected, deselect it
+    if (selectedLetter && selectedLetter.element === glyphEl) {
+      selectedLetter.element.classList.remove('click-selected');
+      selectedLetter.element.style.animationPlayState = 'running';
+      selectedLetter = null;
+      return;
+    }
+
+    // Deselect previous letter if any
+    if (selectedLetter) {
+      selectedLetter.element.classList.remove('click-selected');
+      selectedLetter.element.style.animationPlayState = 'running';
+    }
+
+    // Select this letter (glyph only)
+    selectedLetter = { element: glyphEl, payload };
+    glyphEl.classList.add('click-selected');
+    itemEl.style.animationPlayState = 'paused';
+  }
+
+  itemEl.addEventListener('click', onClick);
+}
+
+  function setupClickModeBuckets() {
+    const buckets = dropZones.filter((el) => el && el.classList && el.classList.contains('catcher-box'));
+    buckets.forEach((bucket) => {
+      // Remove existing click handlers
+      const oldHandler = bucket._clickHandler;
+      if (oldHandler) {
+        bucket.removeEventListener('click', oldHandler);
+      }
+
+      // Add new click handler
+      const clickHandler = (e) => {
+        if (!selectedLetter) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Drop the selected letter into this bucket
+        programmaticDrop(bucket, selectedLetter.payload);
+
+        // Deselect the letter
+        selectedLetter.element.classList.remove('click-selected');
+        selectedLetter = null;
+      };
+
+      bucket._clickHandler = clickHandler;
+      bucket.addEventListener('click', clickHandler);
+    });
+  }
+
   function startPointerDrag(itemEl, payload) {
     function onDown(e) {
+      if (clickModeEnabled) {
+        return;
+      }
+
       if (e.button !== undefined && e.button !== 0) return;
       e.preventDefault();
       itemEl.setPointerCapture?.(e.pointerId);
@@ -820,6 +888,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
   let hasIntroducedForItemInLevel;
   let bonusCaughtInSession = 0;
   let randomLettersEnabled = randomLettersToggle?.checked ?? false;
+  let slowRiverEnabled = false;
+  let clickModeEnabled = false;
+  let selectedFont = 'default';
+  let selectedLetter = null; // For click mode
   let goalValue = 10;
   let waveCorrectCount = 0;
   let totalCatchStreak = 0;
@@ -936,6 +1008,10 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     hasIntroducedForItemInLevel = false;
     bonusCaughtInSession = 0;
     randomLettersEnabled = randomLettersToggle?.checked ?? false;
+    slowRiverEnabled = slowRiverToggle?.checked ?? false;
+    clickModeEnabled = clickModeToggle?.checked ?? false;
+    selectedFont = gameFontSelect?.value ?? 'default';
+    selectedLetter = null;
     waveCorrectCount = 0;
 
     const selectedModeButton = document.querySelector('.mode-button.selected');
@@ -1298,14 +1374,32 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     itemEl.id = elementId;
     itemEl.isDropped = false;
     itemEl.textContent = itemData.symbol;
-    const reducedMotion = reducedMotionToggle.checked;
-    const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
-    itemEl.className = `falling-letter font-bold ${fontClass} text-arcade-text-main ${animationName}`;
-    itemEl.style.top = `${Math.random() * 70}%`;
+
+    // Determine animation based on settings
+    let animationName;
+    if (slowRiverEnabled) {
+      animationName = 'slow-river-flow';
+    } else {
+      const reducedMotion = reducedMotionToggle.checked;
+      animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
+    }
+
+    // Apply font class based on selected font
+    const fontStyleClass = selectedFont !== 'default' ? `game-font-${selectedFont}` : '';
+    itemEl.className = `falling-letter font-bold ${fontClass} ${fontStyleClass} text-arcade-text-main ${animationName}`;
+
+    // In Slow River mode, use less top position variation
+    if (slowRiverEnabled) {
+      itemEl.style.top = `${30 + Math.random() * 40}%`; // 30-70% range centered
+    } else {
+      itemEl.style.top = `${Math.random() * 70}%`;
+    }
     itemEl.style.left = '0'; // Explicit left positioning to prevent RTL dir from affecting spawn position
+
     // Invert slider value: 34 - value (so left=slow, right=fast)
+    // In Slow River mode, letters move to center and stay, so use slower animation
     const sliderValue = parseInt(gameSpeedSlider.value, 10);
-    const invertedSpeed = 34 - sliderValue;
+    const invertedSpeed = slowRiverEnabled ? Math.max(10, 34 - sliderValue) : 34 - sliderValue;
     itemEl.style.animationDuration = `${invertedSpeed}s`;
     itemEl.draggable = true;
     const pronunciation = itemData.pronunciation ?? itemData.sound ?? '';
@@ -1341,17 +1435,30 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
         itemEl.style.animationPlayState = 'running';
       }
     });
-    const missHandler = () => onItemHandled(elementId, roundId, true);
-    itemEl.addEventListener('animationend', missHandler);
+
+    // In Slow River mode, letters don't trigger miss on animationend since they stay on screen
+    const missHandler = slowRiverEnabled ? null : () => onItemHandled(elementId, roundId, true);
+    if (missHandler) {
+      itemEl.addEventListener('animationend', missHandler);
+    }
+
     activeItems.set(elementId, { data: itemData, element: itemEl, missHandler });
     playArea.appendChild(itemEl);
-    startPointerDrag(itemEl, {
+
+    const payload = {
       sound: itemData.sound,
       id: elementId,
       roundId,
       itemId: itemData.id,
       symbol: itemData.symbol
-    });
+    };
+
+    // Use click mode or drag mode based on settings
+    if (clickModeEnabled) {
+      startClickMode(itemEl, payload);
+    } else {
+      startPointerDrag(itemEl, payload);
+    }
   }
 
   function onItemHandled(itemId, roundId, isMiss) {
@@ -1572,17 +1679,87 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     });
   }
 
+  // Helper to sync settings to localStorage
+  function syncSettingsToLocalStorage() {
+    try {
+      const settings = {
+        showIntroductions: document.getElementById('toggle-introductions')?.checked ?? true,
+        highContrast: highContrastToggle?.checked ?? false,
+        randomLetters: randomLettersToggle?.checked ?? false,
+        reducedMotion: reducedMotionToggle?.checked ?? false,
+        gameSpeed: parseInt(gameSpeedSlider?.value ?? 17, 10),
+        gameFont: gameFontSelect?.value ?? 'default',
+        slowRiver: slowRiverToggle?.checked ?? false,
+        clickMode: clickModeToggle?.checked ?? false
+      };
+      localStorage.setItem('gameSettings', JSON.stringify(settings));
+    } catch (e) {
+      console.error('Failed to save game settings', e);
+    }
+  }
+
+  // Load settings from localStorage on game init
+  function loadSettingsFromLocalStorage() {
+    try {
+      const saved = localStorage.getItem('gameSettings');
+      if (saved) {
+        const settings = JSON.parse(saved);
+        const introductionsToggle = document.getElementById('toggle-introductions');
+        if (introductionsToggle) introductionsToggle.checked = settings.showIntroductions ?? true;
+        if (highContrastToggle) highContrastToggle.checked = settings.highContrast ?? false;
+        if (randomLettersToggle) randomLettersToggle.checked = settings.randomLetters ?? false;
+        if (reducedMotionToggle) reducedMotionToggle.checked = settings.reducedMotion ?? false;
+        if (gameSpeedSlider) gameSpeedSlider.value = settings.gameSpeed ?? 17;
+        if (gameFontSelect) gameFontSelect.value = settings.gameFont ?? 'default';
+        if (slowRiverToggle) slowRiverToggle.checked = settings.slowRiver ?? false;
+        if (clickModeToggle) clickModeToggle.checked = settings.clickMode ?? false;
+        if (settings.highContrast) {
+          document.body.classList.add('high-contrast');
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load game settings', e);
+    }
+  }
+
+  loadSettingsFromLocalStorage();
+
   accessibilityBtn?.addEventListener('click', () => {
     const btnRect = accessibilityBtn.getBoundingClientRect();
     const containerRect = gameContainer.getBoundingClientRect();
     accessibilityView.style.top = `${btnRect.bottom - containerRect.top + 5}px`;
     accessibilityView.style.right = `${containerRect.right - btnRect.right}px`;
     accessibilityView.classList.toggle('hidden');
+    // Reload settings when opening the menu to ensure checkboxes reflect current state
+    if (!accessibilityView.classList.contains('hidden')) {
+      loadSettingsFromLocalStorage();
+    }
   });
   closeAccessibilityBtn?.addEventListener('click', () => accessibilityView.classList.add('hidden'));
-  highContrastToggle?.addEventListener('change', (e) => document.body.classList.toggle('high-contrast', e.target.checked));
+  highContrastToggle?.addEventListener('change', (e) => {
+    document.body.classList.toggle('high-contrast', e.target.checked);
+    syncSettingsToLocalStorage();
+  });
   randomLettersToggle?.addEventListener('change', (e) => {
     randomLettersEnabled = e.target.checked;
+    syncSettingsToLocalStorage();
+  });
+  slowRiverToggle?.addEventListener('change', (e) => {
+    slowRiverEnabled = e.target.checked;
+    syncSettingsToLocalStorage();
+  });
+  clickModeToggle?.addEventListener('change', (e) => {
+    clickModeEnabled = e.target.checked;
+    // Refresh drop zones to update click handlers
+    refreshDropZones();
+    syncSettingsToLocalStorage();
+  });
+  gameFontSelect?.addEventListener('change', (e) => {
+    selectedFont = e.target.value;
+    syncSettingsToLocalStorage();
+  });
+  reducedMotionToggle?.addEventListener('change', () => {
+    syncSettingsToLocalStorage();
   });
 
   const speedSlowLabel = t('game.accessibility.speedSlow');
@@ -1595,6 +1772,13 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     if (v < 14) speedLabel.textContent = speedSlowLabel;
     else if (v > 20) speedLabel.textContent = speedFastLabel;
     else speedLabel.textContent = speedNormalLabel;
+    syncSettingsToLocalStorage();
+  });
+
+  // Also sync the introductions toggle
+  const introductionsToggle = document.getElementById('toggle-introductions');
+  introductionsToggle?.addEventListener('change', () => {
+    syncSettingsToLocalStorage();
   });
 
   function updateModalSubtitle() {
