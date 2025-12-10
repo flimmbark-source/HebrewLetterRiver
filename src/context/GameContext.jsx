@@ -367,7 +367,7 @@ function GameCanvas({ fontClass }) {
           >
             <button
               id="accessibility-btn"
-              className="absolute left-4 top-4 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
+              className="absolute left-2 top-1 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
               aria-label={t('game.accessibility.gear')}
               style={{ color: '#b07737', minWidth: '44px', minHeight: '44px' }}
             >
@@ -375,7 +375,7 @@ function GameCanvas({ fontClass }) {
             </button>
 <button
   id="setup-exit-button"
-  className="absolute right-4 top-4 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
+  className="absolute right-2 top-1 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
   aria-label={t('game.controls.exitToMenu')}
   style={{ color: '#6c3b14', minWidth: '44px', minHeight: '44px' }}
 >
