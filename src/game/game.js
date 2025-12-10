@@ -987,11 +987,12 @@ function startClickMode(itemEl, payload) {
     setupExitButton?.classList.remove('hidden');
     modal.classList.remove('hidden');
 
-    // Hide game play area elements so only the mode select modal is visible
+    // Hide game container background and children so only the mode select modal is visible
+    gameContainer.style.background = 'transparent';
     const topBar = document.getElementById('top-bar');
-    if (topBar) topBar.classList.add('hidden');
-    if (playArea) playArea.classList.add('hidden');
-    if (choicesContainer) choicesContainer.classList.add('hidden');
+    if (topBar) topBar.style.display = 'none';
+    if (playArea) playArea.style.display = 'none';
+    if (choicesContainer) choicesContainer.style.display = 'none';
 
     refreshDropZones();
   }
@@ -1040,11 +1041,12 @@ function startClickMode(itemEl, payload) {
     updateWaveStat();
     updateStreakStat();
 
-    // Show game play area elements now that the game is starting
+    // Show game container and play area elements now that the game is starting
+    gameContainer.style.background = 'linear-gradient(180deg, #fff9eb 0%, #ffe5bd 100%)';
     const topBar = document.getElementById('top-bar');
-    if (topBar) topBar.classList.remove('hidden');
-    if (playArea) playArea.classList.remove('hidden');
-    if (choicesContainer) choicesContainer.classList.remove('hidden');
+    if (topBar) topBar.style.display = '';
+    if (playArea) playArea.style.display = '';
+    if (choicesContainer) choicesContainer.style.display = '';
 
     setupExitButton?.classList.add('hidden');
     modal.classList.add('hidden');
