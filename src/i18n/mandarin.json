@@ -18,7 +18,7 @@
     "amharic": "阿姆哈拉语"
   },
   "app": {
-    "title": "希伯来语字母河",
+    "title": "字母河",
     "tagline": "流动、学习并庆祝每一次捕获。",
     "nav": {
       "home": "家",
@@ -111,7 +111,7 @@
       "close": "关闭"
     },
     "setup": {
-      "title": "希伯来语字母河",
+      "title": "字母河",
       "subtitleFallback": "把移动的{{noun}}拖到正确的方框！",
       "prompt": "选择你想要练习的内容：",
       "installDescription": "安装应用程序",

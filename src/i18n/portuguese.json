@@ -4,7 +4,7 @@
     "name": "Português"
   },
   "app": {
-    "title": "Rio Letra Hebraica",
+    "title": "Rio de Letras",
     "tagline": "Flua, aprenda e comemore cada captura.",
     "nav": {
       "home": "Lar",
@@ -97,7 +97,7 @@
       "close": "Fechar"
     },
     "setup": {
-      "title": "Rio Letra Hebraica",
+      "title": "Rio de Letras",
       "subtitleFallback": "Arraste a {{noun}} em movimento para o espaço correto.",
       "prompt": "Escolha o que você quer praticar:",
       "installDescription": "Instalar aplicativo",

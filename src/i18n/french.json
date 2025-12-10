@@ -18,7 +18,7 @@
     "amharic": "Amharique"
   },
   "app": {
-    "title": "Lettre hébraïque rivière",
+    "title": "Rivière de lettres",
     "tagline": "Coulez, apprenez et célébrez chaque prise.",
     "nav": {
       "home": "Maison",
@@ -111,7 +111,7 @@
       "close": "Fermer"
     },
     "setup": {
-      "title": "Lettre hébraïque rivière",
+      "title": "Rivière de lettres",
       "subtitleFallback": "Faites glisser la {{noun}} en mouvement vers la bonne case.",
       "prompt": "Choisissez ce que vous souhaitez pratiquer :",
       "installDescription": "Installer l'application",

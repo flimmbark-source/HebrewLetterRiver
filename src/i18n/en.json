@@ -26,7 +26,7 @@
     "play": "Play"
   },
   "app": {
-    "title": "World Letter River",
+    "title": "Letter River",
     "tagline": "Flow, learn, and celebrate every catch.",
     "nav": {
       "home": "Home",
@@ -119,7 +119,7 @@
       "close": "Close"
     },
     "setup": {
-      "title": "World Letter River",
+      "title": "Letter River",
       "subtitleFallback": "Drag the letters to the correct boxes!",
       "prompt": "Choose what you want to practice:",
       "goal": "Goal",
