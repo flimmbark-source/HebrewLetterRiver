@@ -729,8 +729,8 @@ function GameCanvas({ fontClass }) {
               <input
                 id="toggle-introductions"
                 type="checkbox"
-                className="h-5 w-5 rounded accessibility-checkbox"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+                className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
+                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
                 defaultChecked
               />
             </label>
@@ -747,8 +747,8 @@ function GameCanvas({ fontClass }) {
               <input
                 id="high-contrast-toggle"
                 type="checkbox"
-                className="h-5 w-5 rounded accessibility-checkbox"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+                className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
+                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
             </label>
 
@@ -764,8 +764,8 @@ function GameCanvas({ fontClass }) {
               <input
                 id="random-letters-toggle"
                 type="checkbox"
-                className="h-5 w-5 rounded accessibility-checkbox"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+                className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
+                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
             </label>
 
@@ -781,8 +781,8 @@ function GameCanvas({ fontClass }) {
               <input
                 id="reduced-motion-toggle"
                 type="checkbox"
-                className="h-5 w-5 rounded accessibility-checkbox"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+                className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
+                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
             </label>
 
@@ -798,8 +798,8 @@ function GameCanvas({ fontClass }) {
               <input
                 id="slow-river-toggle"
                 type="checkbox"
-                className="h-5 w-5 rounded accessibility-checkbox"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+                className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
+                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
             </label>
 
@@ -815,8 +815,8 @@ function GameCanvas({ fontClass }) {
               <input
                 id="click-mode-toggle"
                 type="checkbox"
-                className="h-5 w-5 rounded accessibility-checkbox"
-                style={{ borderColor: '#e49b5a', backgroundColor: '#fff5dd' }}
+                className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
+                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
             </label>
 
