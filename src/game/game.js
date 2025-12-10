@@ -986,6 +986,32 @@ function startClickMode(itemEl, payload) {
     accessibilityView.classList.add('hidden');
     setupExitButton?.classList.remove('hidden');
     modal.classList.remove('hidden');
+
+    // Hide modal internal backdrop so mode select appears directly over current page
+    modal.style.background = 'transparent';
+
+    // Hide game container background and children so only the mode select modal is visible
+    gameContainer.style.background = 'transparent';
+    const topBar = document.getElementById('top-bar');
+    if (topBar) topBar.style.display = 'none';
+    if (playArea) playArea.style.display = 'none';
+    if (choicesContainer) choicesContainer.style.display = 'none';
+
+    // Hide the GameContext wrapper's background (the beige container)
+    const gameView = document.getElementById('game-view');
+    if (gameView?.parentElement) {
+      gameView.parentElement.style.background = 'transparent';
+      gameView.parentElement.style.border = 'none';
+      gameView.parentElement.style.boxShadow = 'none';
+
+      // Hide the dark backdrop overlay so modal appears directly over current page
+      const scrollContainer = gameView.parentElement.parentElement?.parentElement;
+      const backdrop = scrollContainer?.previousElementSibling;
+      if (backdrop?.classList.contains('backdrop-blur')) {
+        backdrop.style.display = 'none';
+      }
+    }
+
     refreshDropZones();
   }
 
@@ -1032,6 +1058,32 @@ function startClickMode(itemEl, payload) {
     updateLevelDisplay();
     updateWaveStat();
     updateStreakStat();
+
+    // Show game container and play area elements now that the game is starting
+    gameContainer.style.background = 'linear-gradient(180deg, #fff9eb 0%, #ffe5bd 100%)';
+    const topBar = document.getElementById('top-bar');
+    if (topBar) topBar.style.display = '';
+    if (playArea) playArea.style.display = '';
+    if (choicesContainer) choicesContainer.style.display = '';
+
+    // Restore modal internal backdrop for game-over/win screens
+    modal.style.background = 'rgba(74, 34, 8, 0.8)';
+
+    // Restore the GameContext wrapper's background (the beige container)
+    const gameView = document.getElementById('game-view');
+    if (gameView?.parentElement) {
+      gameView.parentElement.style.background = 'linear-gradient(180deg, #fffaf0 0%, #ffe9c9 45%, #ffe2b8 100%)';
+      gameView.parentElement.style.border = '2px solid #e49b5a';
+      gameView.parentElement.style.boxShadow = '';
+
+      // Restore the dark backdrop overlay
+      const scrollContainer = gameView.parentElement.parentElement?.parentElement;
+      const backdrop = scrollContainer?.previousElementSibling;
+      if (backdrop?.classList.contains('backdrop-blur')) {
+        backdrop.style.display = '';
+      }
+    }
+
     setupExitButton?.classList.add('hidden');
     modal.classList.add('hidden');
     accessibilityView?.classList.add('hidden');
