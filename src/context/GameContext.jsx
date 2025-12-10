@@ -213,7 +213,7 @@ function GameCanvas({ fontClass }) {
     <div id="game-view" className="flex h-full w-full flex-col overflow-hidden">
       <div
         id="game-container"
-        className="relative flex h-full min-h-[calc(100vh-4rem)] flex-col sm:min-h-[600px]"
+        className="relative flex h-full min-h-[calc(95vh-4rem)] flex-col sm:min-h-[575px]"
         style={{
           background: 'linear-gradient(180deg, #fff9eb 0%, #ffe5bd 100%)',
           maxHeight: 'calc(100vh - 2rem)',
@@ -345,7 +345,7 @@ function GameCanvas({ fontClass }) {
 
         <div
           id="choices-container"
-          className="grid w-full flex-shrink-0 grid-cols-2 gap-3 px-4 pb-6 pt-4 sm:grid-cols-3 sm:px-6 md:grid-cols-4 lg:grid-cols-5"
+          className="grid w-full flex-shrink-0 grid-cols-2 gap-3 px-4 pb-10 pt-2 sm:grid-cols-3 sm:px-6 md:grid-cols-4 lg:grid-cols-5"
           style={{ background: 'linear-gradient(180deg, #fff9eb 0%, #ffe5bd 100%)' }}
         />
 
