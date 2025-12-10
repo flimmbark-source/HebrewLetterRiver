@@ -15,6 +15,7 @@ const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
 
 export function GameProvider({ children }) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isGameRunning, setIsGameRunning] = useState(false);
   const [options, setOptions] = useState(null);
   const containerRef = useRef(null);
   const gameApiRef = useRef(null);
@@ -41,6 +42,13 @@ export function GameProvider({ children }) {
       gameApiRef.current = setupGame({
         onReturnToMenu: () => {
           setIsVisible(false);
+          setIsGameRunning(false);
+        },
+        onGameStart: () => {
+          setIsGameRunning(true);
+        },
+        onGameReset: () => {
+          setIsGameRunning(false);
         },
         languagePack,
         translate: t,
@@ -66,11 +74,12 @@ export function GameProvider({ children }) {
       gameApiRef.current.resetToSetupScreen();
     }
     setIsVisible(false);
+    setIsGameRunning(false);
   }, []);
 
   const contextValue = useMemo(
-    () => ({ openGame, closeGame, isVisible }),
-    [openGame, closeGame, isVisible],
+    () => ({ openGame, closeGame, isVisible, isGameRunning }),
+    [openGame, closeGame, isVisible, isGameRunning],
   );
 
   return (

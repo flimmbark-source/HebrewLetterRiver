@@ -39,7 +39,7 @@ function clearAllTimers() {
   trackedIntervals.clear();
 }
 
-export function setupGame({ onReturnToMenu, languagePack, translate, dictionary } = {}) {
+export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary } = {}) {
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
   const livesContainer = document.getElementById('lives-container');
@@ -1015,6 +1015,8 @@ function startClickMode(itemEl, payload) {
     }
 
     refreshDropZones();
+
+    if (onGameReset) onGameReset();
   }
 
   function startGame() {
@@ -1093,6 +1095,8 @@ function startClickMode(itemEl, payload) {
 
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
+
+    if (onGameStart) onGameStart();
 
     spawnNextRound();
     emit('game:session-start', {
