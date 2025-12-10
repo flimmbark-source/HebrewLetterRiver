@@ -351,7 +351,7 @@ function GameCanvas({ fontClass }) {
 
         <div
           id="modal"
-          className="fixed inset-0 z-30 flex items-center justify-center overflow-y-auto p-4 sm:p-6"
+          className="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto pt-10 p-4 sm:p-6"
           style={{ background: 'rgba(74, 34, 8, 0.8)' }}
         >
           <div
