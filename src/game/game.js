@@ -787,22 +787,17 @@ function startClickMode(itemEl, payload) {
     const item = activeItems.get(droppedId);
 
     item.element.isDropped = true;
-    if (!isBonusRound && droppedItemId && !sessionStats[droppedItemId]) {
+    if (droppedItemId && !sessionStats[droppedItemId]) {
       sessionStats[droppedItemId] = { correct: 0, incorrect: 0 };
     }
 
-    const isCorrect = isBonusRound || targetItemId === droppedItemId;
-    if (isBonusRound) {
-      bonusCaughtInSession += 1;
-      emit('game:bonus-catch', { count: bonusCaughtInSession, score, languageId: activeLanguage.id });
-    }
+    const isCorrect = targetItemId === droppedItemId;
 
     if (isCorrect) {
-      updateScore(isBonusRound ? 25 : 10);
+      updateScore(10);
       targetBox.classList.add('feedback-correct');
-      if (!isBonusRound && droppedItemId) {
+      if (droppedItemId) {
         sessionStats[droppedItemId].correct++;
-        // Track wave progress for win condition
         waveCorrectCount++;
         currentCatchStreak++;
         if (waveCorrectCount > bestWaveCatch) {
@@ -814,12 +809,6 @@ function startClickMode(itemEl, payload) {
         if (improvedStreak) {
           updateStreakStat(true);
         }
-        if (waveCorrectCount >= goalValue) {
-          totalWins++;
-          trackTimeout(() => {
-            showWinScreen();
-          }, 500);
-        }
       }
       // Hide the letter immediately after correct drop
       item.element.style.display = 'none';
@@ -827,9 +816,8 @@ function startClickMode(itemEl, payload) {
       lives--;
       updateLives(true);
       targetBox.classList.add('feedback-incorrect');
-      if (!isBonusRound && droppedItemId) {
+      if (droppedItemId) {
         sessionStats[droppedItemId].incorrect++;
-        // Reset wave progress on incorrect answer
         waveCorrectCount = 0;
         currentCatchStreak = 0;
       }
@@ -852,17 +840,15 @@ function startClickMode(itemEl, payload) {
       item.element.style.display = 'none';
     }
 
-    if (!isBonusRound) {
-      emit('game:letter-result', {
-        itemId: droppedItemId,
-        symbol: droppedSymbol,
-        sound: item.data.sound,
-        correct: isCorrect,
-        mode: gameMode,
-        roundId,
-        languageId: activeLanguage.id
-      });
-    }
+    emit('game:letter-result', {
+      itemId: droppedItemId,
+      symbol: droppedSymbol,
+      sound: item.data.sound,
+      correct: isCorrect,
+      mode: gameMode,
+      roundId,
+      languageId: activeLanguage.id
+    });
 
     item.element.removeEventListener('animationend', item.missHandler);
     trackTimeout(() => {
@@ -878,7 +864,6 @@ function startClickMode(itemEl, payload) {
   let gameActive;
   let fallDuration;
   let baseSpeedSetting;
-  let isBonusRound;
   let introductionsEnabled;
   let activeItems = new Map();
   let seenItems;
@@ -888,7 +873,6 @@ function startClickMode(itemEl, payload) {
   let sessionStats;
   let forcedStartItem = null;
   let hasIntroducedForItemInLevel;
-  let bonusCaughtInSession = 0;
   let randomLettersEnabled = randomLettersToggle?.checked ?? false;
   let slowRiverEnabled = false;
   let clickModeEnabled = false;
@@ -958,13 +942,11 @@ function startClickMode(itemEl, payload) {
     scoreForNextLevel = levelUpThreshold;
     baseSpeedSetting = parseInt(gameSpeedSlider.value, 10);
     fallDuration = baseSpeedSetting;
-    isBonusRound = false;
     seenItems = new Set();
     learningOrder = [];
     lastItemSound = null;
     sessionStats = {};
     hasIntroducedForItemInLevel = false;
-    bonusCaughtInSession = 0;
     randomLettersEnabled = randomLettersToggle?.checked ?? false;
     waveCorrectCount = 0;
     totalCatchStreak = 0;
@@ -1031,13 +1013,11 @@ function startClickMode(itemEl, payload) {
     baseSpeedSetting = parseInt(document.getElementById('game-speed-slider').value, 10);
     fallDuration = baseSpeedSetting;
     gameActive = true;
-    isBonusRound = false;
     seenItems = new Set();
     lastItemSound = null;
     currentRound = null;
     sessionStats = {};
     hasIntroducedForItemInLevel = false;
-    bonusCaughtInSession = 0;
     randomLettersEnabled = randomLettersToggle?.checked ?? false;
     slowRiverEnabled = slowRiverToggle?.checked ?? false;
     clickModeEnabled = clickModeToggle?.checked ?? false;
@@ -1123,7 +1103,6 @@ function startClickMode(itemEl, payload) {
       mode: gameMode,
       score,
       stats: sessionStats,
-      bonusCaught: bonusCaughtInSession,
       settings: {
         mode: gameMode,
         speed: baseSpeedSetting,
@@ -1235,7 +1214,7 @@ function startClickMode(itemEl, payload) {
       scoreEl.classList.add('score-pop');
       trackTimeout(() => scoreEl.classList.remove('score-pop'), 300);
     }
-    if (score >= scoreForNextLevel && !isBonusRound) levelUp();
+    if (score >= scoreForNextLevel) levelUp();
   }
 
   function levelUp() {
@@ -1243,8 +1222,19 @@ function startClickMode(itemEl, payload) {
     hasIntroducedForItemInLevel = false;
     scoreForNextLevel += levelUpThreshold;
     if (fallDuration > 7) fallDuration -= 1;
-    isBonusRound = level % 5 === 0 && gameMode === 'letters';
-    const levelUpText = isBonusRound ? t('game.status.bonusRound') : t('game.status.levelUp');
+
+    // Check if player has reached the goal level
+const winThreshold = goalValue + 1;
+
+if (level >= winThreshold) {
+  totalWins++;
+  trackTimeout(() => {
+    showWinScreen();
+  }, 500);
+  return;
+}
+
+    const levelUpText = t('game.status.levelUp');
 
     const levelLabel = levelEl.previousElementSibling;
     levelLabel.classList.add('hidden');
@@ -1308,10 +1298,6 @@ function startClickMode(itemEl, payload) {
     if (!gameActive) return;
     // Reset wave counter at the start of each new wave/round
     waveCorrectCount = 0;
-    if (isBonusRound) {
-      spawnBonusRound();
-      return;
-    }
 
     let roundItems = [];
 
@@ -1524,26 +1510,20 @@ function startClickMode(itemEl, payload) {
 
   function onItemHandled(itemId, roundId, isMiss) {
     if (!activeItems.has(itemId)) return;
-    if (roundId === 'bonus') {
-      const item = activeItems.get(itemId);
-      item.element.remove();
-      activeItems.delete(itemId);
-      return;
-    }
     if (!currentRound || currentRound.id !== roundId) return;
 
     const item = activeItems.get(itemId);
     const itemData = item?.data ?? {};
     const key = itemData.id;
-    if (!isBonusRound && key && !sessionStats[key]) sessionStats[key] = { correct: 0, incorrect: 0 };
-    if (!isBonusRound && key && isMiss) sessionStats[key].incorrect++;
+    if (key && !sessionStats[key]) sessionStats[key] = { correct: 0, incorrect: 0 };
+    if (key && isMiss) sessionStats[key].incorrect++;
     if (key) seenItems.add(key);
 
     item.element.remove();
     activeItems.delete(itemId);
     currentRound.handledCount++;
 
-    if (isMiss && !isBonusRound && key) {
+    if (isMiss && key) {
       waveCorrectCount = 0;
       currentCatchStreak = 0;
       lives--;
@@ -1564,7 +1544,6 @@ function startClickMode(itemEl, payload) {
       return;
     }
     if (currentRound.handledCount === currentRound.items.length) {
-      if (isBonusRound) isBonusRound = false;
       spawnNextRound();
     }
   }
@@ -1623,132 +1602,6 @@ function startClickMode(itemEl, payload) {
     refreshDropZones();
   }
 
-  function spawnBonusRound() {
-    if (!gameActive) return;
-    activeItems.forEach((item) => item.element.remove());
-    activeItems.clear();
-    choicesContainer.innerHTML = '';
-    activeBucketCount = 0;
-    applyBucketLayout(0);
-    clearPendingBucketLayout();
-    invalidateBucketMinWidth();
-
-    learnLetterEl.textContent = '💎';
-    learnName.textContent = t('game.bonus.title');
-    learnSound.textContent = t('game.bonus.instruction');
-    learnOverlay.classList.add('visible');
-    refreshDropZones();
-
-    const bonusCatcher = document.createElement('div');
-    bonusCatcher.textContent = t('game.bonus.catchHere');
-    bonusCatcher.dataset.itemId = 'bonus-gem';
-    bonusCatcher.className = 'catcher-box bg-gradient-to-b from-arcade-accent-gold to-arcade-accent-orange text-arcade-text-main font-bold py-6 px-2 rounded-lg text-lg transition-all border-2 border-arcade-accent-orange shadow-arcade-md col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5';
-    bonusCatcher.setAttribute('aria-label', t('game.bonus.catchHere'));
-    bonusCatcher.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      bonusCatcher.classList.add('drag-over');
-    });
-    bonusCatcher.addEventListener('dragleave', () => bonusCatcher.classList.remove('drag-over'));
-    bonusCatcher.addEventListener('drop', handleDrop);
-    choicesContainer.appendChild(bonusCatcher);
-    activeBucketCount = 1;
-    invalidateBucketMinWidth();
-    applyBucketLayout();
-    clearPendingBucketLayout();
-    refreshDropZones();
-
-    let timeLeft = 10;
-    const bonusDuration = 10000;
-    const bonusTimerInterval = trackInterval(() => {
-      timeLeft--;
-      learnSound.textContent = t('game.bonus.timeLeft', { seconds: Math.max(timeLeft, 0) });
-      if (timeLeft <= 0) clearTrackedInterval(bonusTimerInterval);
-    }, 1000);
-
-    const gemSpawner = trackInterval(() => {
-      if (!gameActive) {
-        clearTrackedInterval(gemSpawner);
-        return;
-      }
-      startGemDrop();
-    }, 400);
-
-    const bonusTimeout = trackTimeout(() => {
-      clearTrackedInterval(gemSpawner);
-      clearTrackedInterval(bonusTimerInterval);
-      const cleanupTimeout = trackTimeout(() => {
-        if (!gameActive) return;
-        learnOverlay.classList.remove('visible');
-        isBonusRound = false;
-        document.querySelectorAll('.falling-gem').forEach((gem) => gem.remove());
-        spawnNextRound();
-      }, 2000);
-      if (currentRound) currentRound.timers.push(cleanupTimeout);
-    }, bonusDuration);
-    if (currentRound) currentRound.timers.push(bonusTimeout);
-  }
-
-  function startGemDrop() {
-    if (!gameActive) return;
-    const elementId = `gem-${Date.now()}-${Math.random()}`;
-    const itemEl = document.createElement('div');
-    itemEl.id = elementId;
-    itemEl.isDropped = false;
-    itemEl.textContent = '💎';
-    const reducedMotion = reducedMotionToggle.checked;
-    const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
-    const interactionClass = clickModeEnabled ? 'click-mode-item' : 'drag-mode-item';
-    itemEl.className = `falling-gem text-4xl sm:text-5xl ${animationName} ${interactionClass}`;
-    itemEl.style.top = `${Math.random() * 70}%`;
-    itemEl.style.left = '0'; // Explicit left positioning to prevent RTL dir from affecting spawn position
-    const bonusSpeed = Math.max(5, parseInt(gameSpeedSlider.value, 10) - 5);
-    itemEl.style.animationDuration = `${bonusSpeed}s`;
-    itemEl.draggable = true;
-    itemEl.setAttribute('aria-label', t('game.bonus.gemAria'));
-    itemEl.addEventListener('dragstart', (e) => {
-      const dragData = JSON.stringify({
-        sound: 'bonus-gem',
-        id: elementId,
-        roundId: 'bonus',
-        itemId: 'bonus-gem',
-        symbol: '💎'
-      });
-      e.dataTransfer.setData('application/json', dragData);
-      itemEl.style.animationPlayState = 'paused';
-      itemEl.classList.add('dragging');
-      trackTimeout(() => {
-        itemEl.style.visibility = 'hidden';
-      }, 0);
-    });
-
-    itemEl.addEventListener('dragend', () => {
-      itemEl.classList.remove('dragging');
-      if (!itemEl.isDropped) {
-        itemEl.style.visibility = 'visible';
-        itemEl.style.animationPlayState = 'running';
-      }
-    });
-    const missHandler = () => onItemHandled(elementId, 'bonus', true);
-    itemEl.addEventListener('animationend', missHandler);
-    activeItems.set(elementId, { data: { sound: 'bonus-gem', id: 'bonus-gem', symbol: '💎' }, element: itemEl, missHandler });
-    playArea.appendChild(itemEl);
-
-    const payload = {
-      sound: 'bonus-gem',
-      id: elementId,
-      roundId: 'bonus',
-      itemId: 'bonus-gem',
-      symbol: '💎'
-    };
-
-    // Use click mode or drag mode based on settings
-    if (clickModeEnabled) {
-      startClickMode(itemEl, payload);
-    } else {
-      startPointerDrag(itemEl, payload);
-    }
-  }
-
   // Helper to sync settings to localStorage
   function syncSettingsToLocalStorage() {
     try {
@@ -1763,6 +1616,8 @@ function startClickMode(itemEl, payload) {
         clickMode: clickModeToggle?.checked ?? false
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event('gameSettingsChanged'));
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
@@ -1783,8 +1638,23 @@ function startClickMode(itemEl, payload) {
         if (gameFontSelect) gameFontSelect.value = settings.gameFont ?? 'default';
         if (slowRiverToggle) slowRiverToggle.checked = settings.slowRiver ?? false;
         if (clickModeToggle) clickModeToggle.checked = settings.clickMode ?? false;
+
+        // Update internal variables
+        randomLettersEnabled = settings.randomLetters ?? false;
+        slowRiverEnabled = settings.slowRiver ?? false;
+        clickModeEnabled = settings.clickMode ?? false;
+        selectedFont = settings.gameFont ?? 'default';
+
+        // Apply high contrast
         if (settings.highContrast) {
           document.body.classList.add('high-contrast');
+        } else {
+          document.body.classList.remove('high-contrast');
+        }
+
+        // Refresh drop zones to update click mode handlers
+        if (dropZones && dropZones.length > 0) {
+          refreshDropZones();
         }
       }
     } catch (e) {
@@ -1793,6 +1663,18 @@ function startClickMode(itemEl, payload) {
   }
 
   loadSettingsFromLocalStorage();
+
+  // Listen for changes to settings from other sources (like SettingsView)
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'gameSettings' && e.newValue) {
+      loadSettingsFromLocalStorage();
+    }
+  });
+
+  // Also listen for custom event (for same-window updates)
+  window.addEventListener('gameSettingsChanged', () => {
+    loadSettingsFromLocalStorage();
+  });
 
 accessibilityBtn?.addEventListener('click', () => {
   const isOpening = accessibilityView.classList.contains('hidden');
@@ -1919,20 +1801,16 @@ accessibilityBtn?.addEventListener('click', () => {
     const item = activeItems.get(droppedId);
 
     item.element.isDropped = true;
-    if (!isBonusRound && droppedItemId && !sessionStats[droppedItemId]) {
+    if (droppedItemId && !sessionStats[droppedItemId]) {
       sessionStats[droppedItemId] = { correct: 0, incorrect: 0 };
     }
 
-    const isCorrect = isBonusRound || targetItemId === droppedItemId;
-    if (isBonusRound) {
-      bonusCaughtInSession += 1;
-      emit('game:bonus-catch', { count: bonusCaughtInSession, score, languageId: activeLanguage.id });
-    }
+    const isCorrect = targetItemId === droppedItemId;
 
     if (isCorrect) {
-      updateScore(isBonusRound ? 25 : 10);
+      updateScore(10);
       targetBox.classList.add('feedback-correct');
-      if (!isBonusRound && droppedItemId) {
+      if (droppedItemId) {
         sessionStats[droppedItemId].correct++;
         waveCorrectCount++;
         currentCatchStreak++;
@@ -1945,12 +1823,6 @@ accessibilityBtn?.addEventListener('click', () => {
         if (improvedStreak) {
           updateStreakStat(true);
         }
-        if (waveCorrectCount >= goalValue) {
-          totalWins++;
-          trackTimeout(() => {
-            showWinScreen();
-          }, 500);
-        }
       }
       // Hide the letter immediately after correct drop
       item.element.style.display = 'none';
@@ -1958,7 +1830,7 @@ accessibilityBtn?.addEventListener('click', () => {
       lives--;
       updateLives(true);
       targetBox.classList.add('feedback-incorrect');
-      if (!isBonusRound && droppedItemId) {
+      if (droppedItemId) {
         sessionStats[droppedItemId].incorrect++;
         waveCorrectCount = 0;
         currentCatchStreak = 0;
@@ -1983,17 +1855,15 @@ accessibilityBtn?.addEventListener('click', () => {
       item.element.style.display = 'none';
     }
 
-    if (!isBonusRound) {
-      emit('game:letter-result', {
-        itemId: droppedItemId,
-        symbol: droppedSymbol,
-        sound: item.data.sound,
-        correct: isCorrect,
-        mode: gameMode,
-        roundId,
-        languageId: activeLanguage.id
-      });
-    }
+    emit('game:letter-result', {
+      itemId: droppedItemId,
+      symbol: droppedSymbol,
+      sound: item.data.sound,
+      correct: isCorrect,
+      mode: gameMode,
+      roundId,
+      languageId: activeLanguage.id
+    });
 
     item.element.removeEventListener('animationend', item.missHandler);
     trackTimeout(() => {

@@ -123,7 +123,7 @@
       "subtitleFallback": "Drag the letters to the correct boxes!",
       "prompt": "Choose what you want to practice:",
       "goal": "Goal",
-      "goalTooltip": "Collect this many letters within a single wave to win!",
+      "goalTooltip": "Beat this level to win the game!",
       "installDescription": "Install App",
       "defaultNoun": "item",
       "defaultModeLabel": "Core Practice",

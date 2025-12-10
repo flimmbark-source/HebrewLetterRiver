@@ -24,22 +24,33 @@ export default function SettingsView() {
 
   // Load settings from localStorage on mount
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('gameSettings');
-      if (saved) {
-        const settings = JSON.parse(saved);
-        setShowIntroductions(settings.showIntroductions ?? true);
-        setHighContrast(settings.highContrast ?? false);
-        setRandomLetters(settings.randomLetters ?? false);
-        setReducedMotion(settings.reducedMotion ?? false);
-        setGameSpeed(settings.gameSpeed ?? 17);
-        setGameFont(settings.gameFont ?? 'default');
-        setSlowRiver(settings.slowRiver ?? false);
-        setClickMode(settings.clickMode ?? false);
+    const loadSettings = () => {
+      try {
+        const saved = localStorage.getItem('gameSettings');
+        if (saved) {
+          const settings = JSON.parse(saved);
+          setShowIntroductions(settings.showIntroductions ?? true);
+          setHighContrast(settings.highContrast ?? false);
+          setRandomLetters(settings.randomLetters ?? false);
+          setReducedMotion(settings.reducedMotion ?? false);
+          setGameSpeed(settings.gameSpeed ?? 17);
+          setGameFont(settings.gameFont ?? 'default');
+          setSlowRiver(settings.slowRiver ?? false);
+          setClickMode(settings.clickMode ?? false);
+        }
+      } catch (e) {
+        console.error('Failed to load game settings', e);
       }
-    } catch (e) {
-      console.error('Failed to load game settings', e);
-    }
+    };
+
+    loadSettings();
+
+    // Listen for settings changes from other sources (like game.js)
+    window.addEventListener('gameSettingsChanged', loadSettings);
+
+    return () => {
+      window.removeEventListener('gameSettingsChanged', loadSettings);
+    };
   }, []);
 
   // Save settings to localStorage whenever they change
@@ -56,6 +67,9 @@ export default function SettingsView() {
         clickMode
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
+
+      // Dispatch event to notify other components (like game.js)
+      window.dispatchEvent(new Event('gameSettingsChanged'));
 
       // Apply high contrast to body
       if (highContrast) {
