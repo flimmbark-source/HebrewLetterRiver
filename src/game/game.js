@@ -1000,6 +1000,13 @@ function startClickMode(itemEl, payload) {
       gameView.parentElement.style.background = 'transparent';
       gameView.parentElement.style.border = 'none';
       gameView.parentElement.style.boxShadow = 'none';
+
+      // Hide the dark backdrop overlay so modal appears directly over current page
+      const scrollContainer = gameView.parentElement.parentElement?.parentElement;
+      const backdrop = scrollContainer?.previousElementSibling;
+      if (backdrop?.classList.contains('backdrop-blur')) {
+        backdrop.style.display = 'none';
+      }
     }
 
     refreshDropZones();
@@ -1062,6 +1069,13 @@ function startClickMode(itemEl, payload) {
       gameView.parentElement.style.background = 'linear-gradient(180deg, #fffaf0 0%, #ffe9c9 45%, #ffe2b8 100%)';
       gameView.parentElement.style.border = '2px solid #e49b5a';
       gameView.parentElement.style.boxShadow = '';
+
+      // Restore the dark backdrop overlay
+      const scrollContainer = gameView.parentElement.parentElement?.parentElement;
+      const backdrop = scrollContainer?.previousElementSibling;
+      if (backdrop?.classList.contains('backdrop-blur')) {
+        backdrop.style.display = '';
+      }
     }
 
     setupExitButton?.classList.add('hidden');
