@@ -252,6 +252,7 @@ export function setupGame({ onReturnToMenu, languagePack, translate, dictionary 
     setupView.classList.add('hidden');
     gameOverView.classList.add('hidden');
     winView.classList.remove('hidden');
+    accessibilityBtn?.classList.add('hidden');
 
     if (winGoalDisplay) winGoalDisplay.textContent = goalValue;
     if (totalWinsDisplay) totalWinsDisplay.textContent = totalWins;
@@ -985,6 +986,7 @@ function startClickMode(itemEl, payload) {
     winView?.classList.add('hidden');
     accessibilityView.classList.add('hidden');
     setupExitButton?.classList.remove('hidden');
+    accessibilityBtn?.classList.remove('hidden');
     modal.classList.remove('hidden');
 
     // Hide modal internal backdrop so mode select appears directly over current page
@@ -1133,6 +1135,7 @@ function startClickMode(itemEl, payload) {
     startButton.textContent = t('game.controls.playAgain');
     isRestartMode = true;
     setupExitButton?.classList.add('hidden');
+    accessibilityBtn?.classList.add('hidden');
     modal.classList.remove('hidden');
   }
 
