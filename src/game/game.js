@@ -987,6 +987,9 @@ function startClickMode(itemEl, payload) {
     setupExitButton?.classList.remove('hidden');
     modal.classList.remove('hidden');
 
+    // Hide modal internal backdrop so mode select appears directly over current page
+    modal.style.background = 'transparent';
+
     // Hide game container background and children so only the mode select modal is visible
     gameContainer.style.background = 'transparent';
     const topBar = document.getElementById('top-bar');
@@ -1062,6 +1065,9 @@ function startClickMode(itemEl, payload) {
     if (topBar) topBar.style.display = '';
     if (playArea) playArea.style.display = '';
     if (choicesContainer) choicesContainer.style.display = '';
+
+    // Restore modal internal backdrop for game-over/win screens
+    modal.style.background = 'rgba(74, 34, 8, 0.8)';
 
     // Restore the GameContext wrapper's background (the beige container)
     const gameView = document.getElementById('game-view');
