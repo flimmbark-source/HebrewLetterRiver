@@ -52,8 +52,7 @@ const defaultPlayer = {
   totalStarsEarned: 0,
   totals: {
     sessions: 0,
-    perfectCatches: 0,
-    bonusCatches: 0
+    perfectCatches: 0
   },
   letters: {},
   latestBadge: null
@@ -927,8 +926,7 @@ export function ProgressProvider({ children }) {
           ...prev,
           totals: {
             ...prev.totals,
-            sessions: prev.totals.sessions + 1,
-            bonusCatches: prev.totals.bonusCatches + (payload?.bonusCaught ?? 0)
+            sessions: prev.totals.sessions + 1
           }
         };
       });
@@ -1074,16 +1072,10 @@ export function ProgressProvider({ children }) {
       }
     });
 
-    const offBonus = on('game:bonus-catch', () => {
-      trackBadgeProgress('gem-chaser', 1);
-      markDailyProgress((task) => task.type === 'bonusRounds');
-    });
-
     return () => {
       offSessionStart();
       offSessionComplete();
       offLetter();
-      offBonus();
     };
   }, [streak.current, streak.lastPlayedDateKey, assets]);
 
