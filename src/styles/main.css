@@ -2246,10 +2246,22 @@ body {
   position: absolute;
   cursor: grab;
   user-select: none;
-  touch-action: none;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
   transition: transform 0.2s ease-out;
+}
+
+/* Drag mode items need touch-action: none for full pointer control */
+.falling-letter.drag-mode-item,
+.falling-gem.drag-mode-item {
+  touch-action: none;
+}
+
+/* Click mode items need touch-action: manipulation to allow click events on mobile */
+.falling-letter.click-mode-item,
+.falling-gem.click-mode-item {
+  touch-action: manipulation;
+  cursor: pointer;
 }
 .falling-letter.dragging {
   transform: scale(1.2);
