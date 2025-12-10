@@ -994,6 +994,14 @@ function startClickMode(itemEl, payload) {
     if (playArea) playArea.style.display = 'none';
     if (choicesContainer) choicesContainer.style.display = 'none';
 
+    // Hide the GameContext wrapper's background (the beige container)
+    const gameView = document.getElementById('game-view');
+    if (gameView?.parentElement) {
+      gameView.parentElement.style.background = 'transparent';
+      gameView.parentElement.style.border = 'none';
+      gameView.parentElement.style.boxShadow = 'none';
+    }
+
     refreshDropZones();
   }
 
@@ -1047,6 +1055,14 @@ function startClickMode(itemEl, payload) {
     if (topBar) topBar.style.display = '';
     if (playArea) playArea.style.display = '';
     if (choicesContainer) choicesContainer.style.display = '';
+
+    // Restore the GameContext wrapper's background (the beige container)
+    const gameView = document.getElementById('game-view');
+    if (gameView?.parentElement) {
+      gameView.parentElement.style.background = 'linear-gradient(180deg, #fffaf0 0%, #ffe9c9 45%, #ffe2b8 100%)';
+      gameView.parentElement.style.border = '2px solid #e49b5a';
+      gameView.parentElement.style.boxShadow = '';
+    }
 
     setupExitButton?.classList.add('hidden');
     modal.classList.add('hidden');
