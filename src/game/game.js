@@ -1439,7 +1439,8 @@ function startClickMode(itemEl, payload) {
 
     // Apply font class based on selected font
     const fontStyleClass = selectedFont !== 'default' ? `game-font-${selectedFont}` : '';
-    itemEl.className = `falling-letter font-bold ${fontClass} ${fontStyleClass} text-arcade-text-main ${animationName}`;
+    const interactionClass = clickModeEnabled ? 'click-mode-item' : 'drag-mode-item';
+    itemEl.className = `falling-letter font-bold ${fontClass} ${fontStyleClass} text-arcade-text-main ${animationName} ${interactionClass}`;
 
     // In Slow River mode, use less top position variation
     if (slowRiverEnabled) {
@@ -1689,7 +1690,8 @@ function startClickMode(itemEl, payload) {
     itemEl.textContent = '💎';
     const reducedMotion = reducedMotionToggle.checked;
     const animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
-    itemEl.className = `falling-gem text-4xl sm:text-5xl ${animationName}`;
+    const interactionClass = clickModeEnabled ? 'click-mode-item' : 'drag-mode-item';
+    itemEl.className = `falling-gem text-4xl sm:text-5xl ${animationName} ${interactionClass}`;
     itemEl.style.top = `${Math.random() * 70}%`;
     itemEl.style.left = '0'; // Explicit left positioning to prevent RTL dir from affecting spawn position
     const bonusSpeed = Math.max(5, parseInt(gameSpeedSlider.value, 10) - 5);
@@ -1723,13 +1725,21 @@ function startClickMode(itemEl, payload) {
     itemEl.addEventListener('animationend', missHandler);
     activeItems.set(elementId, { data: { sound: 'bonus-gem', id: 'bonus-gem', symbol: '💎' }, element: itemEl, missHandler });
     playArea.appendChild(itemEl);
-    startPointerDrag(itemEl, {
+
+    const payload = {
       sound: 'bonus-gem',
       id: elementId,
       roundId: 'bonus',
       itemId: 'bonus-gem',
       symbol: '💎'
-    });
+    };
+
+    // Use click mode or drag mode based on settings
+    if (clickModeEnabled) {
+      startClickMode(itemEl, payload);
+    } else {
+      startPointerDrag(itemEl, payload);
+    }
   }
 
   // Helper to sync settings to localStorage
