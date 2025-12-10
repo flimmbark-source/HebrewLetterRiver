@@ -554,6 +554,7 @@ export function ProgressProvider({ children }) {
   const applyStarsToPlayer = useCallback(
     (stars, options = {}) => {
       if (!Number.isFinite(stars) || stars <= 0) {
+        console.warn('applyStarsToPlayer: Invalid stars value', { stars, options });
         return { success: false, levelUp: false };
       }
       const { latestBadge = null, source = null, metadata = null } = options ?? {};
@@ -577,6 +578,15 @@ export function ProgressProvider({ children }) {
         if (latestBadge) {
           nextPlayer.latestBadge = latestBadge;
         }
+        console.log('applyStarsToPlayer: Stars awarded', {
+          starsAwarded: stars,
+          previousTotal: prev.stars,
+          newTotal: nextPlayer.stars,
+          totalStarsEarned: nextPlayer.totalStarsEarned,
+          level: nextPlayer.level,
+          source,
+          metadata
+        });
         return nextPlayer;
       });
       if (levelUp) {
@@ -787,7 +797,21 @@ export function ProgressProvider({ children }) {
       const badgeName = badgeSpec.nameKey ? t(badgeSpec.nameKey) : badgeSpec.name ?? badgeId;
       const tierLabel = tierSpec.labelKey ? t(tierSpec.labelKey) : tierSpec.label ?? `Tier ${reward.tier}`;
       const summary = badgeSpec.summaryKey ? t(badgeSpec.summaryKey) : badgeSpec.summary ?? '';
-      applyStarsToPlayer(reward.stars, {
+
+      // Ensure we have a valid stars value - fallback to tierSpec if reward.stars is missing
+      const starsToAward = Number.isFinite(reward.stars) && reward.stars > 0
+        ? reward.stars
+        : (Number.isFinite(tierSpec.stars) ? tierSpec.stars : 0);
+
+      console.log('claimBadgeReward: Claiming badge', {
+        badgeId,
+        tier: reward.tier,
+        rewardStars: reward.stars,
+        tierSpecStars: tierSpec.stars,
+        starsToAward
+      });
+
+      applyStarsToPlayer(starsToAward, {
         latestBadge: {
           id: badgeId,
           tier: reward.tier,
@@ -806,8 +830,8 @@ export function ProgressProvider({ children }) {
         tone: 'success',
         title: `${badgeName} · ${tierLabel}`,
         description: isMaxTier
-          ? `Mastered! +${reward.stars} ⭐ New achievement unlocked!`
-          : `Claimed +${reward.stars} ⭐`,
+          ? `Mastered! +${starsToAward} ⭐ New achievement unlocked!`
+          : `Claimed +${starsToAward} ⭐`,
         icon: isMaxTier ? '🏆' : '🏅'
       });
       celebrate({ particleCount: 140, spread: 75, originY: 0.55 });
