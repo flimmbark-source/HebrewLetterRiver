@@ -1240,6 +1240,16 @@ function startClickMode(itemEl, payload) {
     scoreForNextLevel += levelUpThreshold;
     if (fallDuration > 7) fallDuration -= 1;
     isBonusRound = level % 5 === 0 && gameMode === 'letters';
+
+    // Check if player has reached the goal level
+    if (level >= goalValue) {
+      totalWins++;
+      trackTimeout(() => {
+        showWinScreen();
+      }, 500);
+      return;
+    }
+
     const levelUpText = isBonusRound ? t('game.status.bonusRound') : t('game.status.levelUp');
 
     const levelLabel = levelEl.previousElementSibling;
@@ -1940,12 +1950,6 @@ accessibilityBtn?.addEventListener('click', () => {
         totalCatchStreak = Math.max(totalCatchStreak, currentCatchStreak);
         if (improvedStreak) {
           updateStreakStat(true);
-        }
-        if (waveCorrectCount >= goalValue) {
-          totalWins++;
-          trackTimeout(() => {
-            showWinScreen();
-          }, 500);
         }
       }
       // Hide the letter immediately after correct drop

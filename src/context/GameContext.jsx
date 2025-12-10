@@ -432,7 +432,7 @@ function GameCanvas({ fontClass }) {
                         className="goal-badge__icon"
                         aria-hidden="true"
                       >
-                        🌊
+                        🎯
                       </span>
                     </div>
                     <div
@@ -441,7 +441,7 @@ function GameCanvas({ fontClass }) {
                     >
                       {t(
                         'game.setup.goalTooltip',
-                        'The Goal number represents the amount of letters you need to collect correctly in a row within a single wave. Complete a wave with this number of letters to win!',
+                        'The Goal number represents the level you need to reach to win the game. Collect letters and earn points to level up!',
                       )}
                     </div>
                   </div>
