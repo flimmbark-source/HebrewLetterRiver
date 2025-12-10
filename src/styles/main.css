@@ -1355,13 +1355,6 @@ body {
 
 /* Move the setup / back exit button further up and left in the modal
    Override the utility classes so it sits near the modal corner. */
-#setup-exit-button {
-  position: absolute !important;
-  left: -10px !important;
-  top: 0px !important;
-  transform: none !important;
-  z-index: 1100;
-}
 
 /* === PHASE 5: PRODUCTION POLISH === */
 
