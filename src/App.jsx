@@ -238,7 +238,7 @@ function Shell() {
           <Route path="/settings" element={<SettingsView />} />
         </Routes>
       </main>
-      {!isGameVisible && <nav className="bottom-nav">
+      <nav className="bottom-nav">
         <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <div className="nav-icon-shell">
             <span>🏠</span>
@@ -275,7 +275,7 @@ function Shell() {
           </div>
           <span className="label">{t('app.nav.settings')}</span>
         </NavLink>
-      </nav>}
+      </nav>
     </div>
   );
 }
