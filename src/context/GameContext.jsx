@@ -367,26 +367,25 @@ function GameCanvas({ fontClass }) {
           >
             <button
               id="accessibility-btn"
-              className="absolute right-4 top-4 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
+              className="absolute left-4 top-4 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
               aria-label={t('game.accessibility.gear')}
               style={{ color: '#b07737', minWidth: '44px', minHeight: '44px' }}
             >
               ⚙️
             </button>
-
+<button
+  id="setup-exit-button"
+  className="absolute right-4 top-4 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
+  aria-label={t('game.controls.exitToMenu')}
+  style={{ color: '#6c3b14', minWidth: '44px', minHeight: '44px' }}
+>
+  ✕
+</button>
             <div id="setup-view" className="flex flex-col h-full">
               <div
                 className="relative flex items-center justify-center px-3 py-2 border-b-2"
                 style={{ borderColor: 'rgba(235, 179, 105, 0.3)' }}
               >
-                <button
-                  id="setup-exit-button"
-                  type="button"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold transition sm:text-sm"
-                  style={{ color: '#6c3b14' }}
-                >
-                  {t('game.controls.exitToMenu')}
-                </button>
                 <div className="flex flex-col items-center flex-1 text-center gap-1">
                   <h1
                     className={`modal-title text-xl sm:text-2xl font-bold ${fontClass}`}

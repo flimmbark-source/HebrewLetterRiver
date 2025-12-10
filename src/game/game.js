@@ -1777,17 +1777,48 @@ function startClickMode(itemEl, payload) {
 
   loadSettingsFromLocalStorage();
 
-  accessibilityBtn?.addEventListener('click', () => {
-    const btnRect = accessibilityBtn.getBoundingClientRect();
-    const containerRect = gameContainer.getBoundingClientRect();
-    accessibilityView.style.top = `${btnRect.bottom - containerRect.top + 5}px`;
-    accessibilityView.style.right = `${containerRect.right - btnRect.right}px`;
-    accessibilityView.classList.toggle('hidden');
-    // Reload settings when opening the menu to ensure checkboxes reflect current state
-    if (!accessibilityView.classList.contains('hidden')) {
-      loadSettingsFromLocalStorage();
-    }
-  });
+accessibilityBtn?.addEventListener('click', () => {
+  const isOpening = accessibilityView.classList.contains('hidden');
+
+  // Toggle visibility first
+  accessibilityView.classList.toggle('hidden');
+
+  // If we just closed it, nothing else to do
+  if (!isOpening) return;
+
+  const btnRect = accessibilityBtn.getBoundingClientRect();
+  const containerRect = gameContainer.getBoundingClientRect();
+  const BUFFER = 8; // how far from edges you want it
+
+  // --- 1. Initial position under the button (in container coords)
+  let top = btnRect.bottom - containerRect.top + 5;
+  let left = btnRect.left - containerRect.left;
+
+  accessibilityView.style.position = 'absolute';
+  accessibilityView.style.top = `${top}px`;
+  accessibilityView.style.left = `${left}px`;
+
+  // Make sure it's visible so we can measure it (hidden class is already removed)
+  const popupRect = accessibilityView.getBoundingClientRect();
+  const popupWidth = popupRect.width;
+  const popupHeight = popupRect.height;
+
+  // --- 2. Clamp inside container
+  const maxLeft = containerRect.width - popupWidth - BUFFER;
+  const maxTop = containerRect.height - popupHeight - BUFFER;
+
+  // keep it within [BUFFER, maxLeft] horizontally
+  left = Math.min(Math.max(left, BUFFER), Math.max(maxLeft, BUFFER));
+  // keep it within [BUFFER, maxTop] vertically
+  top = Math.min(Math.max(top, BUFFER), Math.max(maxTop, BUFFER));
+
+  accessibilityView.style.left = `${left}px`;
+  accessibilityView.style.top = `${top}px`;
+
+  // Reload settings when opening the menu to ensure checkboxes reflect current state
+  loadSettingsFromLocalStorage();
+});
+
   closeAccessibilityBtn?.addEventListener('click', () => accessibilityView.classList.add('hidden'));
   highContrastToggle?.addEventListener('change', (e) => {
     document.body.classList.toggle('high-contrast', e.target.checked);
