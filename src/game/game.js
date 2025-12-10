@@ -1610,6 +1610,8 @@ function startClickMode(itemEl, payload) {
         clickMode: clickModeToggle?.checked ?? false
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event('gameSettingsChanged'));
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
@@ -1630,8 +1632,23 @@ function startClickMode(itemEl, payload) {
         if (gameFontSelect) gameFontSelect.value = settings.gameFont ?? 'default';
         if (slowRiverToggle) slowRiverToggle.checked = settings.slowRiver ?? false;
         if (clickModeToggle) clickModeToggle.checked = settings.clickMode ?? false;
+
+        // Update internal variables
+        randomLettersEnabled = settings.randomLetters ?? false;
+        slowRiverEnabled = settings.slowRiver ?? false;
+        clickModeEnabled = settings.clickMode ?? false;
+        selectedFont = settings.gameFont ?? 'default';
+
+        // Apply high contrast
         if (settings.highContrast) {
           document.body.classList.add('high-contrast');
+        } else {
+          document.body.classList.remove('high-contrast');
+        }
+
+        // Refresh drop zones to update click mode handlers
+        if (dropZones && dropZones.length > 0) {
+          refreshDropZones();
         }
       }
     } catch (e) {
@@ -1640,6 +1657,18 @@ function startClickMode(itemEl, payload) {
   }
 
   loadSettingsFromLocalStorage();
+
+  // Listen for changes to settings from other sources (like SettingsView)
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'gameSettings' && e.newValue) {
+      loadSettingsFromLocalStorage();
+    }
+  });
+
+  // Also listen for custom event (for same-window updates)
+  window.addEventListener('gameSettingsChanged', () => {
+    loadSettingsFromLocalStorage();
+  });
 
 accessibilityBtn?.addEventListener('click', () => {
   const isOpening = accessibilityView.classList.contains('hidden');
