@@ -319,6 +319,7 @@ function GameCanvas({ fontClass }) {
           style={{
             background:
               'linear-gradient(180deg, rgba(255, 218, 168, 0.3), rgba(255, 229, 201, 0.5))',
+            maxHeight: 'calc(100vh - 12rem)',
           }}
         >
           <div
