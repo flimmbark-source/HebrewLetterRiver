@@ -986,6 +986,13 @@ function startClickMode(itemEl, payload) {
     accessibilityView.classList.add('hidden');
     setupExitButton?.classList.remove('hidden');
     modal.classList.remove('hidden');
+
+    // Hide game play area elements so only the mode select modal is visible
+    const topBar = document.getElementById('top-bar');
+    if (topBar) topBar.classList.add('hidden');
+    if (playArea) playArea.classList.add('hidden');
+    if (choicesContainer) choicesContainer.classList.add('hidden');
+
     refreshDropZones();
   }
 
@@ -1032,6 +1039,13 @@ function startClickMode(itemEl, payload) {
     updateLevelDisplay();
     updateWaveStat();
     updateStreakStat();
+
+    // Show game play area elements now that the game is starting
+    const topBar = document.getElementById('top-bar');
+    if (topBar) topBar.classList.remove('hidden');
+    if (playArea) playArea.classList.remove('hidden');
+    if (choicesContainer) choicesContainer.classList.remove('hidden');
+
     setupExitButton?.classList.add('hidden');
     modal.classList.add('hidden');
     accessibilityView?.classList.add('hidden');
