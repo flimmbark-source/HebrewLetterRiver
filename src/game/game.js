@@ -814,12 +814,6 @@ function startClickMode(itemEl, payload) {
         if (improvedStreak) {
           updateStreakStat(true);
         }
-        if (waveCorrectCount >= goalValue) {
-          totalWins++;
-          trackTimeout(() => {
-            showWinScreen();
-          }, 500);
-        }
       }
       // Hide the letter immediately after correct drop
       item.element.style.display = 'none';
@@ -1242,13 +1236,15 @@ function startClickMode(itemEl, payload) {
     isBonusRound = level % 5 === 0 && gameMode === 'letters';
 
     // Check if player has reached the goal level
-    if (level >= goalValue) {
-      totalWins++;
-      trackTimeout(() => {
-        showWinScreen();
-      }, 500);
-      return;
-    }
+const winThreshold = goalValue + 1;
+
+if (level >= winThreshold) {
+  totalWins++;
+  trackTimeout(() => {
+    showWinScreen();
+  }, 500);
+  return;
+}
 
     const levelUpText = isBonusRound ? t('game.status.bonusRound') : t('game.status.levelUp');
 
