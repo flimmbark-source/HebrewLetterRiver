@@ -2369,7 +2369,6 @@ body {
   outline-offset: 4px;
   box-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
   z-index: 10;
-  position: relative;
 }
 .catcher-box.drag-over {
   transform: scale(1.05);
