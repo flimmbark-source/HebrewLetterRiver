@@ -879,6 +879,7 @@ function startClickMode(itemEl, payload) {
   let selectedFont = 'default';
   let selectedLetter = null; // For click mode
   let goalValue = 10;
+  let hasReachedGoal = false; // Track if goal level was reached
   let waveCorrectCount = 0;
   let totalCatchStreak = 0;
   let currentCatchStreak = 0;
@@ -948,6 +949,7 @@ function startClickMode(itemEl, payload) {
     sessionStats = {};
     hasIntroducedForItemInLevel = false;
     randomLettersEnabled = randomLettersToggle?.checked ?? false;
+    hasReachedGoal = false;
     waveCorrectCount = 0;
     totalCatchStreak = 0;
     currentCatchStreak = 0;
@@ -1019,6 +1021,7 @@ function startClickMode(itemEl, payload) {
     sessionStats = {};
     hasIntroducedForItemInLevel = false;
     randomLettersEnabled = randomLettersToggle?.checked ?? false;
+    hasReachedGoal = false;
     slowRiverEnabled = slowRiverToggle?.checked ?? false;
     clickModeEnabled = clickModeToggle?.checked ?? false;
     selectedFont = gameFontSelect?.value ?? 'default';
@@ -1224,15 +1227,14 @@ function startClickMode(itemEl, payload) {
     if (fallDuration > 7) fallDuration -= 1;
 
     // Check if player has reached the goal level
-const winThreshold = goalValue + 1;
+    const winThreshold = goalValue + 1;
 
-if (level >= winThreshold) {
-  totalWins++;
-  trackTimeout(() => {
-    showWinScreen();
-  }, 500);
-  return;
-}
+    if (level >= winThreshold) {
+      totalWins++;
+      hasReachedGoal = true;
+      // Don't show win screen yet - wait for all letters to be cleared
+      // Win screen will be triggered in onItemHandled when activeItems.size === 0
+    }
 
     const levelUpText = t('game.status.levelUp');
 
@@ -1296,6 +1298,8 @@ if (level >= winThreshold) {
 
   function spawnNextRound() {
     if (!gameActive) return;
+    // Don't spawn new rounds if goal has been reached
+    if (hasReachedGoal) return;
     // Reset wave counter at the start of each new wave/round
     waveCorrectCount = 0;
 
@@ -1522,6 +1526,14 @@ if (level >= winThreshold) {
     item.element.remove();
     activeItems.delete(itemId);
     currentRound.handledCount++;
+
+    // Check if we should show win screen (goal reached and all letters cleared)
+    if (hasReachedGoal && activeItems.size === 0) {
+      trackTimeout(() => {
+        showWinScreen();
+      }, 500);
+      return;
+    }
 
     if (isMiss && key) {
       waveCorrectCount = 0;
