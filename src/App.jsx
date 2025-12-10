@@ -238,44 +238,46 @@ function Shell() {
           <Route path="/settings" element={<SettingsView />} />
         </Routes>
       </main>
-      <nav className="bottom-nav">
-        <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-          <div className="nav-icon-shell">
-            <span>🏠</span>
-          </div>
-          <span className="label">{t('app.nav.home')}</span>
-        </NavLink>
-        <NavLink to="/learn" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-          <div className="nav-icon-shell">
-            <span>📚</span>
-          </div>
-          <span className="label">{t('app.nav.learn')}</span>
-        </NavLink>
-        <button
-          type="button"
-          onClick={handlePlay}
-          className="nav-item active"
-        >
-          <div className="play-diamond-shell">
-            <div className="play-diamond">
-              <span>▶</span>
+      {!isGameVisible && (
+        <nav className="bottom-nav">
+          <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+            <div className="nav-icon-shell">
+              <span>🏠</span>
             </div>
-          </div>
-          <span className="label">{t('app.nav.play')}</span>
-        </button>
-        <NavLink to="/achievements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-          <div className="nav-icon-shell">
-            <span>🏆</span>
-          </div>
-          <span className="label">{t('app.nav.achievements')}</span>
-        </NavLink>
-        <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-          <div className="nav-icon-shell">
-            <span>⚙️</span>
-          </div>
-          <span className="label">{t('app.nav.settings')}</span>
-        </NavLink>
-      </nav>
+            <span className="label">{t('app.nav.home')}</span>
+          </NavLink>
+          <NavLink to="/learn" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+            <div className="nav-icon-shell">
+              <span>📚</span>
+            </div>
+            <span className="label">{t('app.nav.learn')}</span>
+          </NavLink>
+          <button
+            type="button"
+            onClick={handlePlay}
+            className="nav-item active"
+          >
+            <div className="play-diamond-shell">
+              <div className="play-diamond">
+                <span>▶</span>
+              </div>
+            </div>
+            <span className="label">{t('app.nav.play')}</span>
+          </button>
+          <NavLink to="/achievements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+            <div className="nav-icon-shell">
+              <span>🏆</span>
+            </div>
+            <span className="label">{t('app.nav.achievements')}</span>
+          </NavLink>
+          <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+            <div className="nav-icon-shell">
+              <span>⚙️</span>
+            </div>
+            <span className="label">{t('app.nav.settings')}</span>
+          </NavLink>
+        </nav>
+      )}
     </div>
   );
 }
