@@ -18,7 +18,7 @@
     "amharic": "Amhárico"
   },
   "app": {
-    "title": "Río de letras hebreas",
+    "title": "Río de letras",
     "tagline": "Fluye, aprende y celebra cada captura.",
     "nav": {
       "home": "Hogar",
@@ -110,7 +110,7 @@
       "close": "Cerca"
     },
     "setup": {
-      "title": "Río de letras hebreas",
+      "title": "Río de letras",
       "subtitleFallback": "Arrastra la {{noun}} en movimiento a la casilla correcta.",
       "prompt": "Elige lo que quieres practicar:",
       "installDescription": "Instalar aplicación",

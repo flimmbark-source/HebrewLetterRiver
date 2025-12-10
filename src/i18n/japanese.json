@@ -4,7 +4,7 @@
     "name": "日本語"
   },
   "app": {
-    "title": "ヘブライ文字の川",
+    "title": "文字の川",
     "tagline": "流れ、学び、獲物をすべて祝いましょう。",
     "nav": {
       "home": "家",
@@ -97,7 +97,7 @@
       "close": "近い"
     },
     "setup": {
-      "title": "ヘブライ文字の川",
+      "title": "文字の川",
       "subtitleFallback": "動く{{noun}}を正しい枠にドラッグしましょう。",
       "prompt": "練習したい内容を選択してください:",
       "installDescription": "アプリをインストールする",

@@ -1439,13 +1439,14 @@ function startClickMode(itemEl, payload) {
     const interactionClass = clickModeEnabled ? 'click-mode-item' : 'drag-mode-item';
     itemEl.className = `falling-letter font-bold ${fontClass} ${fontStyleClass} text-arcade-text-main ${animationName} ${interactionClass}`;
 
-    // In Slow River mode, use less top position variation
+    // In Slow River mode, use less top position variation and randomize horizontal placement
     if (slowRiverEnabled) {
       itemEl.style.top = `${30 + Math.random() * 40}%`; // 30-70% range centered
+      itemEl.style.left = `${10 + Math.random() * 80}%`; // 10-90% range with edge buffer
     } else {
       itemEl.style.top = `${Math.random() * 70}%`;
+      itemEl.style.left = '0'; // Explicit left positioning to prevent RTL dir from affecting spawn position
     }
-    itemEl.style.left = '0'; // Explicit left positioning to prevent RTL dir from affecting spawn position
 
     // Invert slider value: 34 - value (so left=slow, right=fast)
     // In Slow River mode, letters move to center and stay, so use slower animation
