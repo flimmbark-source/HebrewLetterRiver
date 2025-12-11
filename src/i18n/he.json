@@ -117,7 +117,8 @@
       "installDescription": "התקן אפליקציה",
       "defaultNoun": "פריט",
       "defaultModeLabel": "תרגול בסיסי",
-      "defaultModeDescription": "תרגלו את מערך התווים המרכזי."
+      "defaultModeDescription": "תרגלו את מערך התווים המרכזי.",
+      "selectAtLeastOne": "אנא בחרו לפחות אפשרות אחת לפני התחלת המשחק."
     },
     "modes": {
       "consonants-basic": {

@@ -127,7 +127,8 @@
       "installDescription": "Install App",
       "defaultNoun": "item",
       "defaultModeLabel": "Core Practice",
-      "defaultModeDescription": "Practice the main set of characters."
+      "defaultModeDescription": "Practice the main set of characters.",
+      "selectAtLeastOne": "Please select at least 1 option before starting the game."
     },
     "modes": {
       "consonants-basic": {

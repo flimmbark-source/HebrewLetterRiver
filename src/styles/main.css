@@ -1274,6 +1274,44 @@ body {
   }
 }
 
+.start-validation-popup {
+  position: absolute;
+  bottom: 105%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(220, 38, 38, 0.95);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin-bottom: 8px;
+  animation: validation-bounce 0.3s ease-out;
+}
+
+@keyframes validation-bounce {
+  0% {
+    transform: translateX(-50%) translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .start-validation-popup {
+    white-space: normal;
+    max-width: 250px;
+    text-align: center;
+  }
+}
+
 .mode-panel__footer {
   display: flex;
   justify-content: center;

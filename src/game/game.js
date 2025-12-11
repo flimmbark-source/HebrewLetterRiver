@@ -214,14 +214,11 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
       infoPopup.style.display = 'none';
 
       button.addEventListener('click', () => {
-        // Toggle selection
+        // Toggle selection - allow deselecting all buttons
         if (selectedModeIds.has(mode.id)) {
-          // Don't allow deselecting if it's the only one selected
-          if (selectedModeIds.size > 1) {
-            selectedModeIds.delete(mode.id);
-            button.classList.remove('selected');
-            button.setAttribute('aria-checked', 'false');
-          }
+          selectedModeIds.delete(mode.id);
+          button.classList.remove('selected');
+          button.setAttribute('aria-checked', 'false');
         } else {
           selectedModeIds.add(mode.id);
           button.classList.add('selected');
@@ -1868,6 +1865,26 @@ accessibilityBtn?.addEventListener('click', () => {
 
   renderPracticeModes();
 
+  // Create validation popup for start button
+  let validationPopup = null;
+  if (startButton) {
+    validationPopup = document.createElement('div');
+    validationPopup.className = 'start-validation-popup';
+    validationPopup.textContent = t('game.setup.selectAtLeastOne') || 'Please select at least 1 option before starting the game.';
+    validationPopup.style.display = 'none';
+    startButton.parentElement.style.position = 'relative';
+    startButton.parentElement.appendChild(validationPopup);
+  }
+
+  function showValidationPopup() {
+    if (validationPopup) {
+      validationPopup.style.display = 'block';
+      setTimeout(() => {
+        validationPopup.style.display = 'none';
+      }, 3000);
+    }
+  }
+
   startButton?.addEventListener('click', () => {
     if (isRestartMode) {
       gameOverView.classList.add('hidden');
@@ -1878,6 +1895,11 @@ accessibilityBtn?.addEventListener('click', () => {
       setupExitButton?.classList.remove('hidden');
       updateModalSubtitle();
     } else {
+      // Validate that at least one mode is selected
+      if (selectedModeIds.size === 0) {
+        showValidationPopup();
+        return;
+      }
       startGame();
     }
   });
