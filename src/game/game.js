@@ -178,39 +178,85 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     return acc;
   }, {});
 
+  // Track selected mode IDs (multi-select)
+  let selectedModeIds = new Set();
+
   function renderPracticeModes() {
     if (!modeOptionsContainer) return;
     modeOptionsContainer.innerHTML = '';
 
-    practiceModes.forEach((mode, index) => {
+    // Default select the first mode if none selected
+    if (selectedModeIds.size === 0 && practiceModes.length > 0) {
+      selectedModeIds.add(practiceModes[0].id);
+    }
+
+    practiceModes.forEach((mode) => {
+      const buttonWrapper = document.createElement('div');
+      buttonWrapper.className = 'mode-button-wrapper';
+      buttonWrapper.style.position = 'relative';
+
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'mode-button';
       button.dataset.mode = mode.id;
       button.textContent = mode.label;
-      button.setAttribute('role', 'radio');
-      button.setAttribute('aria-checked', index === 0 ? 'true' : 'false');
+      button.setAttribute('role', 'checkbox');
+      button.setAttribute('aria-checked', selectedModeIds.has(mode.id) ? 'true' : 'false');
 
-      if (index === 0) {
+      if (selectedModeIds.has(mode.id)) {
         button.classList.add('selected');
-        gameMode = mode.id;
       }
 
-      button.addEventListener('click', () => {
-        // Remove selected class from all buttons
-        modeOptionsContainer.querySelectorAll('.mode-button').forEach((btn) => {
-          btn.classList.remove('selected');
-          btn.setAttribute('aria-checked', 'false');
-        });
+      // Create info popup (initially hidden)
+      const infoPopup = document.createElement('div');
+      infoPopup.className = 'mode-info-popup';
+      infoPopup.textContent = mode.description || '';
+      infoPopup.style.display = 'none';
 
-        // Add selected class to clicked button
-        button.classList.add('selected');
-        button.setAttribute('aria-checked', 'true');
-        gameMode = mode.id;
+      button.addEventListener('click', () => {
+        // Toggle selection
+        if (selectedModeIds.has(mode.id)) {
+          // Don't allow deselecting if it's the only one selected
+          if (selectedModeIds.size > 1) {
+            selectedModeIds.delete(mode.id);
+            button.classList.remove('selected');
+            button.setAttribute('aria-checked', 'false');
+          }
+        } else {
+          selectedModeIds.add(mode.id);
+          button.classList.add('selected');
+          button.setAttribute('aria-checked', 'true');
+        }
         updateModalSubtitle();
       });
 
-      modeOptionsContainer.appendChild(button);
+      // Show popup on hover (desktop)
+      button.addEventListener('mouseenter', () => {
+        infoPopup.style.display = 'block';
+      });
+
+      button.addEventListener('mouseleave', () => {
+        infoPopup.style.display = 'none';
+      });
+
+      // Show popup on touch/press (mobile)
+      let touchTimeout;
+      button.addEventListener('touchstart', (e) => {
+        touchTimeout = setTimeout(() => {
+          infoPopup.style.display = 'block';
+        }, 300);
+      });
+
+      button.addEventListener('touchend', () => {
+        clearTimeout(touchTimeout);
+        setTimeout(() => {
+          infoPopup.style.display = 'none';
+        }, 2000);
+      });
+
+      buttonWrapper.appendChild(button);
+      buttonWrapper.appendChild(infoPopup);
+      modeOptionsContainer.appendChild(buttonWrapper);
     });
 
     updateModalSubtitle();
@@ -902,6 +948,32 @@ function startClickMode(itemEl, payload) {
     return clonePool(baseItems);
   }
 
+  function getCombinedModePool(modeIds) {
+    const combined = [];
+    const seen = new Set();
+    const hasFontShuffle = Array.from(modeIds).some((modeId) => {
+      const mode = practiceModes.find((m) => m.id === modeId);
+      return mode?.type === 'font-shuffle';
+    });
+
+    modeIds.forEach((modeId) => {
+      const pool = getModePool(modeId);
+      pool.forEach((item) => {
+        if (!seen.has(item.id)) {
+          seen.add(item.id);
+          // Apply font shuffle to all items if any mode has font-shuffle enabled
+          const itemCopy = { ...item };
+          if (hasFontShuffle) {
+            itemCopy.fontShuffle = true;
+          }
+          combined.push(itemCopy);
+        }
+      });
+    });
+
+    return combined;
+  }
+
   function resolveItemById(itemId) {
     return itemsById[itemId] ?? null;
   }
@@ -1028,11 +1100,12 @@ function startClickMode(itemEl, payload) {
     selectedLetter = null;
     waveCorrectCount = 0;
 
-    const selectedModeButton = document.querySelector('.mode-button.selected');
-    gameMode = selectedModeButton?.dataset.mode ?? gameMode ?? practiceModes[0]?.id ?? 'letters';
+    // Get combined pool from all selected modes
     introductionsEnabled = document.getElementById('toggle-introductions').checked;
 
-    const gameItemPool = getModePool(gameMode);
+    const gameItemPool = getCombinedModePool(selectedModeIds);
+    // Store first selected mode as gameMode for compatibility
+    gameMode = Array.from(selectedModeIds)[0] ?? practiceModes[0]?.id ?? 'letters';
 
     learningOrder = gameItemPool.filter((item) => !seenItems.has(item.id));
     for (let i = learningOrder.length - 1; i > 0; i--) {
@@ -1434,8 +1507,14 @@ function startClickMode(itemEl, payload) {
       animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
     }
 
-    // Apply font class based on selected font
-    const fontStyleClass = selectedFont !== 'default' ? `game-font-${selectedFont}` : '';
+    // Apply font class based on selected font or random if font shuffle enabled
+    let fontStyleClass = selectedFont !== 'default' ? `game-font-${selectedFont}` : '';
+    if (itemData.fontShuffle) {
+      // Randomly choose a font for this letter
+      const availableFonts = ['frank-ruhl', 'noto-serif', 'taamey-frank', 'ezra-sil', 'keter-yg'];
+      const randomFont = availableFonts[Math.floor(Math.random() * availableFonts.length)];
+      fontStyleClass = `game-font-${randomFont}`;
+    }
     const interactionClass = clickModeEnabled ? 'click-mode-item' : 'drag-mode-item';
     itemEl.className = `falling-letter font-bold ${fontClass} ${fontStyleClass} text-arcade-text-main ${animationName} ${interactionClass}`;
 
@@ -1594,7 +1673,9 @@ function startClickMode(itemEl, payload) {
       const box = document.createElement('div');
       const displaySymbol = getDisplaySymbol(choice);
       const displayLabel = getDisplayLabel(choice);
-      const labelText = displayLabel || displaySymbol;
+      // Add brackets around final forms
+      const isFinalForm = choice.isFinalForm || choice.id.startsWith('final-');
+      const labelText = isFinalForm ? `[${displayLabel || displaySymbol}]` : (displayLabel || displaySymbol);
       box.textContent = labelText;
       box.dataset.itemId = choice.id;
       box.className = 'catcher-box bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium text-arcade-text-main font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-arcade-panel-border shadow-arcade-sm';

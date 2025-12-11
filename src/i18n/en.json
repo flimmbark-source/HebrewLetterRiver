@@ -130,6 +130,26 @@
       "defaultModeDescription": "Practice the main set of characters."
     },
     "modes": {
+      "consonants-basic": {
+        "label": "Consonants",
+        "description": "Practice א–ת without niqqud or final forms.",
+        "noun": "letter"
+      },
+      "niqqud": {
+        "label": "Vowels (Niqqud)",
+        "description": "Practice vowel marks on a carrier letter.",
+        "noun": "vowel"
+      },
+      "final-forms": {
+        "label": "Final Forms",
+        "description": "Practice final letter forms: ך, ם, ן, ף, ץ",
+        "noun": "letter"
+      },
+      "font-shuffle": {
+        "label": "Font Shuffle",
+        "description": "Letters appear in random fonts each time.",
+        "noun": "letter"
+      },
       "letters": {
         "label": "Letters Only",
         "description": "Master the Hebrew alphabet.",

@@ -1241,6 +1241,39 @@ body {
     0 4px 10px rgba(94, 234, 212, 0.3);
 }
 
+.mode-button-wrapper {
+  position: relative;
+}
+
+.mode-info-popup {
+  position: absolute;
+  top: 50%;
+  left: 105%;
+  transform: translateY(-50%);
+  background: rgba(74, 34, 8, 0.95);
+  color: #fff9eb;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  max-width: 250px;
+  white-space: normal;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .mode-info-popup {
+    left: 50%;
+    top: auto;
+    bottom: 105%;
+    transform: translateX(-50%);
+  }
+}
+
 .mode-panel__footer {
   display: flex;
   justify-content: center;

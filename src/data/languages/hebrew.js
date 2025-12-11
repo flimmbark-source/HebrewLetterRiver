@@ -67,31 +67,54 @@ export const hebrewSyllableBases = [
   { id: 'tav-base', symbol: 'ת', name: 'Tav', baseSound: 'T' }
 ];
 
+// Basic consonants (excluding final forms) for the consonants-basic mode
+export const hebrewBasicConsonants = hebrewConsonants.filter(
+  (item) => !item.id.startsWith('final-')
+);
+
+// Final forms only for the final-forms mode
+export const hebrewFinalForms = hebrewConsonants.filter(
+  (item) => item.id.startsWith('final-')
+);
+
+// Niqqud with a carrier letter (using ב as the carrier)
+export const hebrewNiqqudWithCarrier = hebrewVowelMarkers.map((marker) => ({
+  id: `carrier-${marker.id}`,
+  symbol: `ב${marker.mark}`,
+  sound: marker.soundSuffix,
+  name: marker.name,
+  type: 'vowel',
+  markerId: marker.id
+}));
+
 export const hebrewPracticeModes = [
-  { id: 'letters', label: 'Letters Only', description: 'Master the 22 core letters.', type: 'consonants', noun: 'letter' },
   {
-    id: 'vowels1',
-    label: "'A' & 'O' Vowels",
-    description: 'Practice Patach and Holam.',
-    type: 'vowel-group',
-    groupId: 'vowels1',
-    noun: 'item'
+    id: 'consonants-basic',
+    label: 'Consonants',
+    description: 'Practice א–ת without niqqud or final forms.',
+    type: 'consonants-basic',
+    noun: 'letter'
   },
   {
-    id: 'vowels2',
-    label: "'E' & 'I' Vowels",
-    description: 'Practice Segol and Hirik.',
-    type: 'vowel-group',
-    groupId: 'vowels2',
-    noun: 'item'
+    id: 'niqqud',
+    label: 'Vowels (Niqqud)',
+    description: 'Practice vowel marks on a carrier letter.',
+    type: 'niqqud',
+    noun: 'vowel'
   },
   {
-    id: 'expert',
-    label: 'Expert Mode',
-    description: 'Mix of letters & vowels.',
-    type: 'combined',
-    include: ['letters', 'vowels1', 'vowels2'],
-    noun: 'item'
+    id: 'final-forms',
+    label: 'Final Forms',
+    description: 'Practice final letter forms: ך, ם, ן, ף, ץ',
+    type: 'final-forms',
+    noun: 'letter'
+  },
+  {
+    id: 'font-shuffle',
+    label: 'Font Shuffle',
+    description: 'Letters appear in random fonts each time.',
+    type: 'font-shuffle',
+    noun: 'letter'
   }
 ];
 
@@ -113,6 +136,9 @@ const hebrewPack = {
     }
   },
   consonants: hebrewConsonants,
+  basicConsonants: hebrewBasicConsonants,
+  finalForms: hebrewFinalForms,
+  niqqudWithCarrier: hebrewNiqqudWithCarrier,
   vowels: {
     markers: hebrewVowelMarkers,
     groups: hebrewVowelGroups,
