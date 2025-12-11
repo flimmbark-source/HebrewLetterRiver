@@ -12,19 +12,19 @@ export const hebrewConsonants = [
   { id: 'yud', symbol: 'י', sound: 'Y', name: 'Yud' },
   { id: 'kaf-dagesh', symbol: 'כּ', sound: 'K', name: 'Kaf' },
   { id: 'chaf', symbol: 'כ', sound: 'Ch', name: 'Chaf' },
-  { id: 'final-chaf', symbol: 'ך', sound: '[Ch]', name: 'Final Chaf' },
+  { id: 'final-chaf', symbol: 'ך', sound: 'Ch', name: 'Final Chaf' },
   { id: 'lamed', symbol: 'ל', sound: 'L', name: 'Lamed' },
   { id: 'mem', symbol: 'מ', sound: 'M', name: 'Mem' },
-  { id: 'final-mem', symbol: 'ם', sound: '[M]', name: 'Final Mem' },
+  { id: 'final-mem', symbol: 'ם', sound: 'M', name: 'Final Mem' },
   { id: 'nun', symbol: 'נ', sound: 'N', name: 'Nun' },
-  { id: 'final-nun', symbol: 'ן', sound: '[N]', name: 'Final Nun' },
+  { id: 'final-nun', symbol: 'ן', sound: 'N', name: 'Final Nun' },
   { id: 'samech', symbol: 'ס', sound: 'S', name: 'Samech' },
   { id: 'ayin', symbol: 'ע', sound: '(Ah)', name: 'Ayin' },
   { id: 'pei-dagesh', symbol: 'פּ', sound: 'P', name: 'Pei' },
   { id: 'fei', symbol: 'פ', sound: 'F', name: 'Fei' },
-  { id: 'final-fei', symbol: 'ף', sound: '[F]', name: 'Final Fei' },
+  { id: 'final-fei', symbol: 'ף', sound: 'F', name: 'Final Fei' },
   { id: 'tzadi', symbol: 'צ', sound: 'Tz', name: 'Tzadi' },
-  { id: 'final-tzadi', symbol: 'ץ', sound: '[Tz]', name: 'Final Tzadi' },
+  { id: 'final-tzadi', symbol: 'ץ', sound: 'Tz', name: 'Final Tzadi' },
   { id: 'kuf', symbol: 'ק', sound: 'K', name: 'Kuf' },
   { id: 'resh', symbol: 'ר', sound: 'R', name: 'Resh' },
   { id: 'shin', symbol: 'שׁ', sound: 'Sh', name: 'Shin' },
@@ -67,31 +67,56 @@ export const hebrewSyllableBases = [
   { id: 'tav-base', symbol: 'ת', name: 'Tav', baseSound: 'T' }
 ];
 
+// Basic consonants (excluding final forms) for the consonants-basic mode
+export const hebrewBasicConsonants = hebrewConsonants.filter(
+  (item) => !item.id.startsWith('final-')
+);
+
+// Final forms only for the final-forms mode
+export const hebrewFinalForms = hebrewConsonants.filter(
+  (item) => item.id.startsWith('final-')
+);
+
+function randomFrom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Niqqud with a random carrier letter (using hebrewSyllableBases as the pool)
+export const hebrewNiqqudWithCarrier = hebrewVowelMarkers.map((marker) => {
+  const base = randomFrom(hebrewSyllableBases); // pick a random base consonant
+
+  return {
+    id: `carrier-${base.id}-${marker.id}`,
+    symbol: `${base.symbol}${marker.mark}`,         // e.g. ג + ַ
+    sound: `${base.baseSound}${marker.soundSuffix}`,// e.g. G + a → "Ga"
+    name: `${base.name} + ${marker.name}`,          // e.g. "Gimel + Patach"
+    type: 'vowel',
+    markerId: marker.id,
+    baseId: base.id
+  };
+});
+
 export const hebrewPracticeModes = [
-  { id: 'letters', label: 'Letters Only', description: 'Master the 22 core letters.', type: 'consonants', noun: 'letter' },
   {
-    id: 'vowels1',
-    label: "'A' & 'O' Vowels",
-    description: 'Practice Patach and Holam.',
-    type: 'vowel-group',
-    groupId: 'vowels1',
-    noun: 'item'
+    id: 'consonants-basic',
+    label: 'Consonants',
+    description: 'Practice א–ת without niqqud or final forms.',
+    type: 'consonants-basic',
+    noun: 'letter'
   },
   {
-    id: 'vowels2',
-    label: "'E' & 'I' Vowels",
-    description: 'Practice Segol and Hirik.',
-    type: 'vowel-group',
-    groupId: 'vowels2',
-    noun: 'item'
+    id: 'niqqud',
+    label: 'Vowels (Niqqud)',
+    description: 'Practice vowel marks on a carrier letter.',
+    type: 'niqqud',
+    noun: 'vowel'
   },
   {
-    id: 'expert',
-    label: 'Expert Mode',
-    description: 'Mix of letters & vowels.',
-    type: 'combined',
-    include: ['letters', 'vowels1', 'vowels2'],
-    noun: 'item'
+    id: 'final-forms',
+    label: 'Final Forms',
+    description: 'Practice final letter forms: ך, ם, ן, ף, ץ',
+    type: 'final-forms',
+    noun: 'letter'
   }
 ];
 
@@ -113,6 +138,9 @@ const hebrewPack = {
     }
   },
   consonants: hebrewConsonants,
+  basicConsonants: hebrewBasicConsonants,
+  finalForms: hebrewFinalForms,
+  niqqudWithCarrier: hebrewNiqqudWithCarrier,
   vowels: {
     markers: hebrewVowelMarkers,
     groups: hebrewVowelGroups,

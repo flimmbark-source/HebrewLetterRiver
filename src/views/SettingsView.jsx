@@ -14,6 +14,7 @@ export default function SettingsView() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [gameSpeed, setGameSpeed] = useState(17);
   const [gameFont, setGameFont] = useState('default');
+  const [fontShuffle, setFontShuffle] = useState(false);
   const [slowRiver, setSlowRiver] = useState(false);
   const [clickMode, setClickMode] = useState(false);
 
@@ -35,6 +36,7 @@ export default function SettingsView() {
           setReducedMotion(settings.reducedMotion ?? false);
           setGameSpeed(settings.gameSpeed ?? 17);
           setGameFont(settings.gameFont ?? 'default');
+          setFontShuffle(settings.fontShuffle ?? false);
           setSlowRiver(settings.slowRiver ?? false);
           setClickMode(settings.clickMode ?? false);
         }
@@ -63,6 +65,7 @@ export default function SettingsView() {
         reducedMotion,
         gameSpeed,
         gameFont,
+        fontShuffle,
         slowRiver,
         clickMode
       };
@@ -80,7 +83,7 @@ export default function SettingsView() {
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
-  }, [showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, slowRiver, clickMode]);
+  }, [showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, fontShuffle, slowRiver, clickMode]);
 
   const getSpeedLabel = (speed) => {
     if (speed < 14) return t('game.accessibility.speedSlow');
@@ -113,6 +116,10 @@ export default function SettingsView() {
     gameFont: {
       title: 'Game Font',
       description: 'Choose from different fonts including dyslexia-friendly options. Some fonts are specially designed to make letters easier to distinguish.'
+    },
+    fontShuffle: {
+      title: 'Font Shuffle',
+      description: 'Each letter appears in a different random font from the previous one. This helps you recognize letters in various typefaces.'
     },
     slowRiver: {
       title: 'Slow River Mode',
@@ -261,6 +268,24 @@ const showInfo = (settingKey, event) => {
                 ))}
               </select>
             </div>
+
+            <label className="flex items-center justify-between border-b border-arcade-panel-border pb-4">
+              <span
+                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
+                onClick={(e) => showInfo('fontShuffle', e)}
+                onMouseEnter={(e) => showInfo('fontShuffle', e)}
+                onMouseLeave={() => setShowInfoPopup(false)}
+              >
+                Font Shuffle
+              </span>
+              <input
+                id="settings-font-shuffle-toggle"
+                type="checkbox"
+                checked={fontShuffle}
+                onChange={(e) => setFontShuffle(e.target.checked)}
+                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
+              />
+            </label>
 
             <label className="flex items-center justify-between">
               <span

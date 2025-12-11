@@ -65,9 +65,18 @@ export function GameProvider({ children }) {
   }, [isVisible, options, languagePack, t, dictionary]);
 
   const openGame = useCallback((openOptions = {}) => {
+    // If game is already visible, close it (acts as a toggle)
+    if (isVisible) {
+      if (gameApiRef.current) {
+        gameApiRef.current.resetToSetupScreen();
+      }
+      setIsVisible(false);
+      setIsGameRunning(false);
+      return;
+    }
     setOptions(openOptions);
     setIsVisible(true);
-  }, []);
+  }, [isVisible]);
 
   const closeGame = useCallback(() => {
     if (gameApiRef.current) {
@@ -99,8 +108,8 @@ export function GameProvider({ children }) {
                 style={{ background: 'rgba(74, 34, 8, 0.85)' }}
                 onClick={closeGame}
               />
-              <div className="absolute inset-0 overflow-y-auto overscroll-contain">
-                <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
+              <div className="absolute inset-0 overflow-y-auto overscroll-contain" onClick={closeGame}>
+                <div className="flex min-h-full items-center justify-center p-4 sm:p-6" onClick={closeGame}>
                   <div
                     ref={containerRef}
                     className={`relative h-full w-full max-w-5xl overflow-hidden rounded-2xl shadow-2xl transition-transform sm:rounded-3xl ${
@@ -382,14 +391,6 @@ function GameCanvas({ fontClass }) {
               style={{ color: '#b07737', minWidth: '44px', minHeight: '44px', zIndex: 10 }}            >
               ⚙️
             </button>
-<button
-  id="setup-exit-button"
-  className="absolute right-2 top-1 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
-  aria-label={t('game.controls.exitToMenu')}
-    style={{ color: '#6c3b14', minWidth: '44px', minHeight: '44px', zIndex: 10 }}
->
-  ✕
-</button>
             <div id="setup-view" className="flex flex-col h-full">
               <div
                 className="relative flex items-center justify-center px-3 py-2 border-b-2"
@@ -696,20 +697,31 @@ function GameCanvas({ fontClass }) {
               className="border-b pb-3"
               style={{ borderColor: '#e49b5a' }}
             >
-              <label
-                htmlFor="game-font-select"
-                className="block text-sm mb-2"
-                style={{ color: '#4a2208' }}
-              >
-                <span
-                  className="cursor-pointer hover:text-amber-700"
-                  onClick={(e) => showInfo('gameFont', e)}
-                  onMouseEnter={(e) => showInfo('gameFont', e)}
-                  onMouseLeave={() => setShowInfoPopup(false)}
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  htmlFor="game-font-select"
+                  className="text-sm"
+                  style={{ color: '#4a2208' }}
                 >
-                  Game Font
-                </span>
-              </label>
+                  <span
+                    className="cursor-pointer hover:text-amber-700"
+                    onClick={(e) => showInfo('gameFont', e)}
+                    onMouseEnter={(e) => showInfo('gameFont', e)}
+                    onMouseLeave={() => setShowInfoPopup(false)}
+                  >
+                    Game Font
+                  </span>
+                </label>
+                <label className="flex items-center gap-2 text-xs" style={{ color: '#4a2208' }}>
+                  <span>Shuffle</span>
+                  <input
+                    id="font-shuffle-toggle"
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-2 text-orange-600 focus:ring-orange-500"
+                    style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+                  />
+                </label>
+              </div>
               <select
                 id="game-font-select"
                 className="w-full rounded-lg border px-2 py-1 text-xs"

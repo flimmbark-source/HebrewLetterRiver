@@ -66,6 +66,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   const gameSpeedSlider = document.getElementById('game-speed-slider');
   const speedLabel = document.getElementById('speed-label');
   const gameFontSelect = document.getElementById('game-font-select');
+  const fontShuffleToggle = document.getElementById('font-shuffle-toggle');
   const slowRiverToggle = document.getElementById('slow-river-toggle');
   const clickModeToggle = document.getElementById('click-mode-toggle');
   const installBtn = document.getElementById('install-btn');
@@ -178,39 +179,82 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     return acc;
   }, {});
 
+  // Track selected mode IDs (multi-select)
+  let selectedModeIds = new Set();
+
   function renderPracticeModes() {
     if (!modeOptionsContainer) return;
     modeOptionsContainer.innerHTML = '';
 
-    practiceModes.forEach((mode, index) => {
+    // Default select the first mode if none selected
+    if (selectedModeIds.size === 0 && practiceModes.length > 0) {
+      selectedModeIds.add(practiceModes[0].id);
+    }
+
+    practiceModes.forEach((mode) => {
+      const buttonWrapper = document.createElement('div');
+      buttonWrapper.className = 'mode-button-wrapper';
+      buttonWrapper.style.position = 'relative';
+
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'mode-button';
       button.dataset.mode = mode.id;
       button.textContent = mode.label;
-      button.setAttribute('role', 'radio');
-      button.setAttribute('aria-checked', index === 0 ? 'true' : 'false');
+      button.setAttribute('role', 'checkbox');
+      button.setAttribute('aria-checked', selectedModeIds.has(mode.id) ? 'true' : 'false');
 
-      if (index === 0) {
+      if (selectedModeIds.has(mode.id)) {
         button.classList.add('selected');
-        gameMode = mode.id;
       }
 
-      button.addEventListener('click', () => {
-        // Remove selected class from all buttons
-        modeOptionsContainer.querySelectorAll('.mode-button').forEach((btn) => {
-          btn.classList.remove('selected');
-          btn.setAttribute('aria-checked', 'false');
-        });
+      // Create info popup (initially hidden)
+      const infoPopup = document.createElement('div');
+      infoPopup.className = 'mode-info-popup';
+      infoPopup.textContent = mode.description || '';
+      infoPopup.style.display = 'none';
 
-        // Add selected class to clicked button
-        button.classList.add('selected');
-        button.setAttribute('aria-checked', 'true');
-        gameMode = mode.id;
+      button.addEventListener('click', () => {
+        // Toggle selection - allow deselecting all buttons
+        if (selectedModeIds.has(mode.id)) {
+          selectedModeIds.delete(mode.id);
+          button.classList.remove('selected');
+          button.setAttribute('aria-checked', 'false');
+        } else {
+          selectedModeIds.add(mode.id);
+          button.classList.add('selected');
+          button.setAttribute('aria-checked', 'true');
+        }
         updateModalSubtitle();
       });
 
-      modeOptionsContainer.appendChild(button);
+      // Show popup on hover (desktop)
+      button.addEventListener('mouseenter', () => {
+        infoPopup.style.display = 'block';
+      });
+
+      button.addEventListener('mouseleave', () => {
+        infoPopup.style.display = 'none';
+      });
+
+      // Show popup on touch/press (mobile)
+      let touchTimeout;
+      button.addEventListener('touchstart', (e) => {
+        touchTimeout = setTimeout(() => {
+          infoPopup.style.display = 'block';
+        }, 300);
+      });
+
+      button.addEventListener('touchend', () => {
+        clearTimeout(touchTimeout);
+        setTimeout(() => {
+          infoPopup.style.display = 'none';
+        }, 2000);
+      });
+
+      buttonWrapper.appendChild(button);
+      buttonWrapper.appendChild(infoPopup);
+      modeOptionsContainer.appendChild(buttonWrapper);
     });
 
     updateModalSubtitle();
@@ -877,6 +921,8 @@ function startClickMode(itemEl, payload) {
   let slowRiverEnabled = false;
   let clickModeEnabled = false;
   let selectedFont = 'default';
+  let fontShuffleEnabled = false;
+  let lastUsedFont = null; // Track last used font to prevent consecutive repeats
   let selectedLetter = null; // For click mode
   let goalValue = 10;
   let hasReachedGoal = false; // Track if goal level was reached
@@ -900,6 +946,66 @@ function startClickMode(itemEl, payload) {
     if (modeItems[modeId]?.length) return clonePool(modeItems[modeId]);
     if (modeItems.letters?.length) return clonePool(modeItems.letters);
     return clonePool(baseItems);
+  }
+
+  function getCombinedModePool(modeIds) {
+    const combined = [];
+    const seen = new Set();
+
+    modeIds.forEach((modeId) => {
+      const pool = getModePool(modeId);
+      pool.forEach((item) => {
+        if (!seen.has(item.id)) {
+          seen.add(item.id);
+          const itemCopy = { ...item };
+          // Track which mode this item belongs to for even distribution
+          itemCopy.sourceMode = modeId;
+          combined.push(itemCopy);
+        }
+      });
+    });
+
+    return combined;
+  }
+
+  // Get items with even distribution across selected modes
+  function getEvenlyDistributedItems(itemPool, count, seenItems) {
+    if (selectedModeIds.size === 0) return [];
+
+    // Group items by source mode
+    const itemsByMode = {};
+    selectedModeIds.forEach((modeId) => {
+      itemsByMode[modeId] = itemPool.filter((item) => item.sourceMode === modeId);
+    });
+
+    const result = [];
+    const modesArray = Array.from(selectedModeIds);
+    let modeIndex = 0;
+    let attempts = 0;
+    const maxAttempts = count * modesArray.length * 3; // Prevent infinite loop
+
+    while (result.length < count && attempts < maxAttempts) {
+      attempts++;
+      const currentMode = modesArray[modeIndex];
+      const modePool = itemsByMode[currentMode];
+
+      if (modePool && modePool.length > 0) {
+        // Try to find an item from this mode that hasn't been used yet
+        const availableItems = modePool.filter((item) =>
+          !result.some((r) => r.id === item.id)
+        );
+
+        if (availableItems.length > 0) {
+          const randomIndex = Math.floor(Math.random() * availableItems.length);
+          result.push(availableItems[randomIndex]);
+        }
+      }
+
+      // Move to next mode
+      modeIndex = (modeIndex + 1) % modesArray.length;
+    }
+
+    return result;
   }
 
   function resolveItemById(itemId) {
@@ -990,11 +1096,12 @@ function startClickMode(itemEl, payload) {
       gameView.parentElement.style.border = 'none';
       gameView.parentElement.style.boxShadow = 'none';
 
-      // Hide the dark backdrop overlay so modal appears directly over current page
+      // Keep the backdrop visible but make it more subtle - allows clicking outside to close
       const scrollContainer = gameView.parentElement.parentElement?.parentElement;
       const backdrop = scrollContainer?.previousElementSibling;
       if (backdrop?.classList.contains('backdrop-blur')) {
-        backdrop.style.display = 'none';
+        backdrop.style.background = 'rgba(74, 34, 8, 0.5)';
+        backdrop.style.backdropFilter = 'blur(2px)';
       }
     }
 
@@ -1025,14 +1132,17 @@ function startClickMode(itemEl, payload) {
     slowRiverEnabled = slowRiverToggle?.checked ?? false;
     clickModeEnabled = clickModeToggle?.checked ?? false;
     selectedFont = gameFontSelect?.value ?? 'default';
+    fontShuffleEnabled = fontShuffleToggle?.checked ?? false;
+    lastUsedFont = null; // Reset last used font for new game
     selectedLetter = null;
     waveCorrectCount = 0;
 
-    const selectedModeButton = document.querySelector('.mode-button.selected');
-    gameMode = selectedModeButton?.dataset.mode ?? gameMode ?? practiceModes[0]?.id ?? 'letters';
+    // Get combined pool from all selected modes
     introductionsEnabled = document.getElementById('toggle-introductions').checked;
 
-    const gameItemPool = getModePool(gameMode);
+    const gameItemPool = getCombinedModePool(selectedModeIds);
+    // Store first selected mode as gameMode for compatibility
+    gameMode = Array.from(selectedModeIds)[0] ?? practiceModes[0]?.id ?? 'letters';
 
     learningOrder = gameItemPool.filter((item) => !seenItems.has(item.id));
     for (let i = learningOrder.length - 1; i > 0; i--) {
@@ -1068,6 +1178,8 @@ function startClickMode(itemEl, payload) {
       const backdrop = scrollContainer?.previousElementSibling;
       if (backdrop?.classList.contains('backdrop-blur')) {
         backdrop.style.display = '';
+        backdrop.style.background = '';
+        backdrop.style.backdropFilter = '';
       }
     }
 
@@ -1309,22 +1421,30 @@ function startClickMode(itemEl, payload) {
 
     if (isRandomLettersModeActive()) {
       const totalItemsInRound = Math.max(1, level);
-      const availablePool = [...itemPool];
 
       if (forcedStartItem && level === 1) {
         roundItems.push(forcedStartItem);
         forcedStartItem = null;
       }
 
-      for (let i = roundItems.length; i < totalItemsInRound; i++) {
-        if (!availablePool.length) {
-          if (!itemPool.length) break;
-          availablePool.push(...itemPool);
+      // Use even distribution if multiple modes are selected
+      if (selectedModeIds.size > 1) {
+        const itemsNeeded = totalItemsInRound - roundItems.length;
+        const distributedItems = getEvenlyDistributedItems(itemPool, itemsNeeded, seenItems);
+        roundItems.push(...distributedItems);
+      } else {
+        // Single mode: use original random selection
+        const availablePool = [...itemPool];
+        for (let i = roundItems.length; i < totalItemsInRound; i++) {
+          if (!availablePool.length) {
+            if (!itemPool.length) break;
+            availablePool.push(...itemPool);
+          }
+          const randomIndex = Math.floor(Math.random() * availablePool.length);
+          const [selectedItem] = availablePool.splice(randomIndex, 1);
+          if (!selectedItem) break;
+          roundItems.push(selectedItem);
         }
-        const randomIndex = Math.floor(Math.random() * availablePool.length);
-        const [selectedItem] = availablePool.splice(randomIndex, 1);
-        if (!selectedItem) break;
-        roundItems.push(selectedItem);
       }
 
       hasIntroducedForItemInLevel = roundItems.some((item) => item && !seenItems.has(item.id));
@@ -1356,10 +1476,24 @@ function startClickMode(itemEl, payload) {
       hasIntroducedForItemInLevel = true;
     }
 
-    while (roundItems.length < totalItemsInRound && seenSoFar.length > 0) {
-      const chosenIndex = Math.floor(Math.random() * seenSoFar.length);
-      const reviewItem = seenSoFar.splice(chosenIndex, 1)[0];
-      if (!roundItems.some((item) => item.id === reviewItem.id)) roundItems.push(reviewItem);
+    // Fill remaining slots with review items
+    if (roundItems.length < totalItemsInRound) {
+      const itemsNeeded = totalItemsInRound - roundItems.length;
+
+      // Use even distribution if multiple modes are selected
+      if (selectedModeIds.size > 1 && seenSoFar.length > 0) {
+        const distributedItems = getEvenlyDistributedItems(seenSoFar, itemsNeeded, new Set());
+        roundItems.push(...distributedItems.filter((item) =>
+          !roundItems.some((r) => r.id === item.id)
+        ));
+      } else {
+        // Single mode: use original random selection
+        while (roundItems.length < totalItemsInRound && seenSoFar.length > 0) {
+          const chosenIndex = Math.floor(Math.random() * seenSoFar.length);
+          const reviewItem = seenSoFar.splice(chosenIndex, 1)[0];
+          if (!roundItems.some((item) => item.id === reviewItem.id)) roundItems.push(reviewItem);
+        }
+      }
     }
 
     if (roundItems.length === 0 && seenSoFar.length > 0) {
@@ -1434,8 +1568,24 @@ function startClickMode(itemEl, payload) {
       animationName = reducedMotion ? 'simple-flow' : ['river-flow-1', 'river-flow-2'][Math.floor(Math.random() * 2)];
     }
 
-    // Apply font class based on selected font
-    const fontStyleClass = selectedFont !== 'default' ? `game-font-${selectedFont}` : '';
+    // Apply font class based on selected font or random if font shuffle enabled
+    let fontStyleClass = selectedFont !== 'default' ? `game-font-${selectedFont}` : '';
+    if (fontShuffleEnabled) {
+      // Randomly choose a font for this letter, ensuring it's different from the last one
+      const availableFonts = ['frank-ruhl', 'noto-serif', 'taamey-frank', 'ezra-sil', 'keter-yg'];
+      let randomFont;
+
+      // If we have a last used font, filter it out to ensure variety
+      if (lastUsedFont) {
+        const filteredFonts = availableFonts.filter((f) => f !== lastUsedFont);
+        randomFont = filteredFonts[Math.floor(Math.random() * filteredFonts.length)];
+      } else {
+        randomFont = availableFonts[Math.floor(Math.random() * availableFonts.length)];
+      }
+
+      lastUsedFont = randomFont;
+      fontStyleClass = `game-font-${randomFont}`;
+    }
     const interactionClass = clickModeEnabled ? 'click-mode-item' : 'drag-mode-item';
     itemEl.className = `falling-letter font-bold ${fontClass} ${fontStyleClass} text-arcade-text-main ${animationName} ${interactionClass}`;
 
@@ -1594,7 +1744,15 @@ function startClickMode(itemEl, payload) {
       const box = document.createElement('div');
       const displaySymbol = getDisplaySymbol(choice);
       const displayLabel = getDisplayLabel(choice);
-      const labelText = displayLabel || displaySymbol;
+      // Add brackets around final forms
+      const isFinalForm = choice.isFinalForm || choice.id.startsWith('final-');
+      // For vowel items, use the romanized sound (e.g., "Ba", "Bo", "Be", "Bi")
+      const isVowel = choice.type === 'vowel';
+      const labelText = isFinalForm
+        ? `[${displayLabel || displaySymbol}]`
+        : isVowel
+          ? displayLabel
+          : (displayLabel || displaySymbol);
       box.textContent = labelText;
       box.dataset.itemId = choice.id;
       box.className = 'catcher-box bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium text-arcade-text-main font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-arcade-panel-border shadow-arcade-sm';
@@ -1625,6 +1783,7 @@ function startClickMode(itemEl, payload) {
         reducedMotion: reducedMotionToggle?.checked ?? false,
         gameSpeed: parseInt(gameSpeedSlider?.value ?? 17, 10),
         gameFont: gameFontSelect?.value ?? 'default',
+        fontShuffle: fontShuffleToggle?.checked ?? false,
         slowRiver: slowRiverToggle?.checked ?? false,
         clickMode: clickModeToggle?.checked ?? false
       };
@@ -1649,12 +1808,14 @@ function startClickMode(itemEl, payload) {
         if (reducedMotionToggle) reducedMotionToggle.checked = settings.reducedMotion ?? false;
         if (gameSpeedSlider) gameSpeedSlider.value = settings.gameSpeed ?? 17;
         if (gameFontSelect) gameFontSelect.value = settings.gameFont ?? 'default';
+        if (fontShuffleToggle) fontShuffleToggle.checked = settings.fontShuffle ?? false;
         if (slowRiverToggle) slowRiverToggle.checked = settings.slowRiver ?? false;
         if (clickModeToggle) clickModeToggle.checked = settings.clickMode ?? false;
 
         // Update internal variables
         randomLettersEnabled = settings.randomLetters ?? false;
         slowRiverEnabled = settings.slowRiver ?? false;
+        fontShuffleEnabled = settings.fontShuffle ?? false;
         clickModeEnabled = settings.clickMode ?? false;
         selectedFont = settings.gameFont ?? 'default';
 
@@ -1754,6 +1915,11 @@ accessibilityBtn?.addEventListener('click', () => {
     selectedFont = e.target.value;
     syncSettingsToLocalStorage();
   });
+  fontShuffleToggle?.addEventListener('change', (e) => {
+    fontShuffleEnabled = e.target.checked;
+    lastUsedFont = null; // Reset last used font when toggling
+    syncSettingsToLocalStorage();
+  });
   reducedMotionToggle?.addEventListener('change', () => {
     syncSettingsToLocalStorage();
   });
@@ -1787,6 +1953,26 @@ accessibilityBtn?.addEventListener('click', () => {
 
   renderPracticeModes();
 
+  // Create validation popup for start button
+  let validationPopup = null;
+  if (startButton) {
+    validationPopup = document.createElement('div');
+    validationPopup.className = 'start-validation-popup';
+    validationPopup.textContent = t('game.setup.selectAtLeastOne') || 'Please select at least 1 option before starting the game.';
+    validationPopup.style.display = 'none';
+    startButton.parentElement.style.position = 'relative';
+    startButton.parentElement.appendChild(validationPopup);
+  }
+
+  function showValidationPopup() {
+    if (validationPopup) {
+      validationPopup.style.display = 'block';
+      setTimeout(() => {
+        validationPopup.style.display = 'none';
+      }, 3000);
+    }
+  }
+
   startButton?.addEventListener('click', () => {
     if (isRestartMode) {
       gameOverView.classList.add('hidden');
@@ -1797,6 +1983,11 @@ accessibilityBtn?.addEventListener('click', () => {
       setupExitButton?.classList.remove('hidden');
       updateModalSubtitle();
     } else {
+      // Validate that at least one mode is selected
+      if (selectedModeIds.size === 0) {
+        showValidationPopup();
+        return;
+      }
       startGame();
     }
   });

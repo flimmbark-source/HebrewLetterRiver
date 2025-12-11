@@ -40,6 +40,27 @@ body {
   font-family: Verdana, Geneva, sans-serif !important;
 }
 
+/* Hebrew Font Shuffle Classes */
+.game-font-frank-ruhl {
+  font-family: 'Frank Ruhl Libre', serif !important;
+}
+
+.game-font-noto-serif {
+  font-family: 'Noto Serif Hebrew', serif !important;
+}
+
+.game-font-taamey-frank {
+  font-family: 'Tinos', serif !important;
+}
+
+.game-font-ezra-sil {
+  font-family: 'David Libre', serif !important;
+}
+
+.game-font-keter-yg {
+  font-family: 'Heebo', sans-serif !important;
+}
+
 /* App shell container - responsive */
 .app-shell {
   width: 100%;
@@ -1239,6 +1260,77 @@ body {
     0 1px 0 #3fb8b5,
     inset 0 1px 2px rgba(255, 255, 255, 0.5),
     0 4px 10px rgba(94, 234, 212, 0.3);
+}
+
+.mode-button-wrapper {
+  position: relative;
+}
+
+.mode-info-popup {
+  position: absolute;
+  top: 50%;
+  left: 105%;
+  transform: translateY(-50%);
+  background: rgba(74, 34, 8, 0.95);
+  color: #fff9eb;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  max-width: 250px;
+  white-space: normal;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .mode-info-popup {
+    left: 50%;
+    top: auto;
+    bottom: 105%;
+    transform: translateX(-50%);
+  }
+}
+
+.start-validation-popup {
+  position: absolute;
+  bottom: 105%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(220, 38, 38, 0.95);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin-bottom: 8px;
+  animation: validation-bounce 0.3s ease-out;
+}
+
+@keyframes validation-bounce {
+  0% {
+    transform: translateX(-50%) translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .start-validation-popup {
+    white-space: normal;
+    max-width: 250px;
+    text-align: center;
+  }
 }
 
 .mode-panel__footer {

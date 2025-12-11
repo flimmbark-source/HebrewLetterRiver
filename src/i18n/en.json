@@ -121,15 +121,31 @@
     "setup": {
       "title": "Letter River",
       "subtitleFallback": "Drag the letters to the correct boxes!",
-      "prompt": "Choose what you want to practice:",
+      "prompt": "Choose what to practice:",
       "goal": "Goal",
       "goalTooltip": "Beat this level to win the game!",
       "installDescription": "Install App",
       "defaultNoun": "item",
       "defaultModeLabel": "Core Practice",
-      "defaultModeDescription": "Practice the main set of characters."
+      "defaultModeDescription": "Practice the main set of characters.",
+      "selectAtLeastOne": "Please select at least 1 option before starting the game."
     },
     "modes": {
+      "consonants-basic": {
+        "label": "Consonants",
+        "description": "Practice א–ת without niqqud or final forms.",
+        "noun": "letter"
+      },
+      "niqqud": {
+        "label": "Vowels (Niqqud)",
+        "description": "Practice vowel marks on a carrier letter.",
+        "noun": "vowel"
+      },
+      "final-forms": {
+        "label": "Final Forms",
+        "description": "Practice final letter forms: ך, ם, ן, ף, ץ",
+        "noun": "letter"
+      },
       "letters": {
         "label": "Letters Only",
         "description": "Master the Hebrew alphabet.",

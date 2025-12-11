@@ -117,9 +117,25 @@
       "installDescription": "התקן אפליקציה",
       "defaultNoun": "פריט",
       "defaultModeLabel": "תרגול בסיסי",
-      "defaultModeDescription": "תרגלו את מערך התווים המרכזי."
+      "defaultModeDescription": "תרגלו את מערך התווים המרכזי.",
+      "selectAtLeastOne": "אנא בחרו לפחות אפשרות אחת לפני התחלת המשחק."
     },
     "modes": {
+      "consonants-basic": {
+        "label": "עיצורים",
+        "description": "תרגלו א–ת ללא ניקוד או אותיות סופיות.",
+        "noun": "אות"
+      },
+      "niqqud": {
+        "label": "תנועות (ניקוד)",
+        "description": "תרגלו סימני תנועות על אות נושאת.",
+        "noun": "תנועה"
+      },
+      "final-forms": {
+        "label": "אותיות סופיות",
+        "description": "תרגלו צורות אותיות סופיות: ך, ם, ן, ף, ץ",
+        "noun": "אות"
+      },
       "letters": {
         "label": "אותיות בלבד",
         "description": "תרגלו את קבוצת האותיות המרכזית.",
