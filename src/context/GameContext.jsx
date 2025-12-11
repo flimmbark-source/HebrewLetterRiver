@@ -108,8 +108,8 @@ export function GameProvider({ children }) {
                 style={{ background: 'rgba(74, 34, 8, 0.85)' }}
                 onClick={closeGame}
               />
-              <div className="absolute inset-0 overflow-y-auto overscroll-contain">
-                <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
+              <div className="absolute inset-0 overflow-y-auto overscroll-contain" onClick={closeGame}>
+                <div className="flex min-h-full items-center justify-center p-4 sm:p-6" onClick={closeGame}>
                   <div
                     ref={containerRef}
                     className={`relative h-full w-full max-w-5xl overflow-hidden rounded-2xl shadow-2xl transition-transform sm:rounded-3xl ${
