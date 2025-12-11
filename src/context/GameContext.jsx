@@ -138,6 +138,7 @@ export function GameProvider({ children }) {
 
 function GameCanvas({ fontClass }) {
   const { t } = useLocalization();
+  const { closeGame } = useContext(GameContext);
 
   // Info popup state (mirrors SettingsView behaviour)
   const [showInfoPopup, setShowInfoPopup] = useState(false);
@@ -369,21 +370,29 @@ function GameCanvas({ fontClass }) {
         />
 
         <div
-          id="modal"
-          className="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto pt-10 p-4 sm:p-6"
-          style={{ background: 'rgba(74, 34, 8, 0.8)' }}
-        >
-          <div
-            id="modal-content"
-            className="relative w-full max-w-3xl shadow-2xl"
-            style={{
-              border: '2px solid rgba(235, 179, 105, 0.95)',
-              background:
-                'linear-gradient(180deg, #dfcba5ff 0%, #e0bf95ff 55%, #d3b894ff 100%)',
-              boxShadow:
-                '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)',
-            }}
-          >
+  id="modal"
+  className="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto pt-10 p-4 sm:p-6"
+  style={{ background: 'rgba(74, 34, 8, 0.8)' }}
+  onClick={(e) => {
+    // Only trigger when clicking the dark overlay, not the inner content
+    if (e.target === e.currentTarget) {
+      closeGame?.(); // closes the game overlay (and thus the modal)
+    }
+  }}
+>
+  <div
+    id="modal-content"
+    className="relative w-full max-w-3xl shadow-2xl"
+    style={{
+      border: '2px solid rgba(235, 179, 105, 0.95)',
+      background:
+        'linear-gradient(180deg, #dfcba5ff 0%, #e0bf95ff 55%, #d3b894ff 100%)',
+      boxShadow:
+        '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)',
+    }}
+    onClick={(e) => e.stopPropagation()}
+  >
+
             <button
               id="accessibility-btn"
               className="absolute left-2 top-1 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
