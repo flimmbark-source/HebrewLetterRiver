@@ -118,6 +118,12 @@
       "accessibility": "Accessibility Options",
       "close": "Close"
     },
+    "pause": {
+      "title": "Paused",
+      "message": "",
+      "resume": "Resume",
+      "mainMenu": "Main Menu"
+    },
     "setup": {
       "title": "Letter River",
       "subtitleFallback": "Drag the letters to the correct boxes!",

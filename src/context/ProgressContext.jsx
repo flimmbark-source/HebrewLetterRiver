@@ -313,12 +313,6 @@ function createLanguageAssets(languagePack, localization = {}) {
 
 const spiceConstraints = [
   {
-    id: 'expert-mode',
-    labelKey: 'daily.constraints.expert-mode',
-    fallbackLabel: 'Expert Mode run',
-    predicate: (session) => session?.settings?.mode === 'expert'
-  },
-  {
     id: 'fast-flow',
     labelKey: 'daily.constraints.fast-flow',
     fallbackLabel: 'Fast Flow speed active',
@@ -329,6 +323,30 @@ const spiceConstraints = [
     labelKey: 'daily.constraints.no-intros',
     fallbackLabel: 'No Introductions enabled',
     predicate: (session) => session?.settings?.introductions === false
+  },
+  {
+    id: 'click-mode',
+    labelKey: 'daily.constraints.click-mode',
+    fallbackLabel: 'Click Mode active',
+    predicate: (session) => session?.settings?.clickMode === true
+  },
+  {
+    id: 'slow-river',
+    labelKey: 'daily.constraints.slow-river',
+    fallbackLabel: 'Slow River mode active',
+    predicate: (session) => session?.settings?.slowRiver === true
+  },
+  {
+    id: 'random-letters',
+    labelKey: 'daily.constraints.random-letters',
+    fallbackLabel: 'Random Letters enabled',
+    predicate: (session) => session?.settings?.randomLetters === true
+  },
+  {
+    id: 'font-shuffle',
+    labelKey: 'daily.constraints.font-shuffle',
+    fallbackLabel: 'Font Shuffle active',
+    predicate: (session) => session?.settings?.fontShuffle === true
   }
 ];
 

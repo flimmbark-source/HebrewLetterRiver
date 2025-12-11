@@ -70,7 +70,10 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   const slowRiverToggle = document.getElementById('slow-river-toggle');
   const clickModeToggle = document.getElementById('click-mode-toggle');
   const installBtn = document.getElementById('install-btn');
-  const backToMenuButton = document.getElementById('back-to-menu-button');
+  const pauseButton = document.getElementById('pause-button');
+  const pauseModal = document.getElementById('pause-modal');
+  const resumeButton = document.getElementById('resume-button');
+  const pauseExitButton = document.getElementById('pause-exit-button');
   const setupExitButton = document.getElementById('setup-exit-button');
   const gameOverExitButton = document.getElementById('game-over-exit-button');
   const modeOptionsContainer = document.getElementById('mode-options');
@@ -1200,7 +1203,10 @@ function startClickMode(itemEl, payload) {
         mode: gameMode,
         speed: baseSpeedSetting,
         introductions: introductionsEnabled,
-        randomLetters: isRandomLettersModeActive()
+        randomLetters: isRandomLettersModeActive(),
+        clickMode: clickModeEnabled,
+        slowRiver: slowRiverEnabled,
+        fontShuffle: fontShuffleEnabled
       },
       languageId: activeLanguage.id
     });
@@ -1222,7 +1228,10 @@ function startClickMode(itemEl, payload) {
         mode: gameMode,
         speed: baseSpeedSetting,
         introductions: introductionsEnabled,
-        randomLetters: isRandomLettersModeActive()
+        randomLetters: isRandomLettersModeActive(),
+        clickMode: clickModeEnabled,
+        slowRiver: slowRiverEnabled,
+        fontShuffle: fontShuffleEnabled
       },
       languageId: activeLanguage.id
     });
@@ -1409,15 +1418,15 @@ function startClickMode(itemEl, payload) {
   }
 
   function spawnNextRound() {
-    if (!gameActive) return;
+    if (!gameActive || isPaused) return;
     // Don't spawn new rounds if goal has been reached
     if (hasReachedGoal) return;
     // Reset wave counter at the start of each new wave/round
     waveCorrectCount = 0;
 
     let roundItems = [];
-
     const itemPool = getModePool(gameMode);
+    const isFirstWaveOfLevel = !hasIntroducedForItemInLevel;
 
     if (isRandomLettersModeActive()) {
       const totalItemsInRound = Math.max(1, level);
@@ -1452,107 +1461,118 @@ function startClickMode(itemEl, payload) {
       // Filter out any invalid items to prevent spawning without buckets
       roundItems = roundItems.filter((item) => item && item.id);
 
-      currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [] };
+      currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [], isFirstWave: isFirstWaveOfLevel };
       generateChoices(roundItems, itemPool);
-      processItemsForRound(roundItems, currentRound.id);
+      processItemsForRound(roundItems, currentRound.id, isFirstWaveOfLevel);
       return;
     }
 
     let seenSoFar = itemPool.filter((item) => seenItems.has(item.id));
     const totalItemsInRound = level;
-    const shouldIntroduceNew = !hasIntroducedForItemInLevel && learningOrder.length > 0;
 
-    if (forcedStartItem && level === 1) {
-      roundItems.push(forcedStartItem);
-      forcedStartItem = null;
-      hasIntroducedForItemInLevel = true;
-    } else if (shouldIntroduceNew) {
-      if (level === 1) {
-        if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
-        if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
+    // First wave of level: send ONLY new letters
+    if (isFirstWaveOfLevel && learningOrder.length > 0) {
+      if (forcedStartItem && level === 1) {
+        roundItems.push(forcedStartItem);
+        forcedStartItem = null;
       } else {
-        roundItems.push(learningOrder.shift());
-      }
-      hasIntroducedForItemInLevel = true;
-    }
-
-    // Fill remaining slots with review items
-    if (roundItems.length < totalItemsInRound) {
-      const itemsNeeded = totalItemsInRound - roundItems.length;
-
-      // Use even distribution if multiple modes are selected
-      if (selectedModeIds.size > 1 && seenSoFar.length > 0) {
-        const distributedItems = getEvenlyDistributedItems(seenSoFar, itemsNeeded, new Set());
-        roundItems.push(...distributedItems.filter((item) =>
-          !roundItems.some((r) => r.id === item.id)
-        ));
-      } else {
-        // Single mode: use original random selection
-        while (roundItems.length < totalItemsInRound && seenSoFar.length > 0) {
-          const chosenIndex = Math.floor(Math.random() * seenSoFar.length);
-          const reviewItem = seenSoFar.splice(chosenIndex, 1)[0];
-          if (!roundItems.some((item) => item.id === reviewItem.id)) roundItems.push(reviewItem);
+        // Introduce new letters for the first wave
+        if (level === 1) {
+          if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
+          if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
+        } else {
+          if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
         }
       }
+      hasIntroducedForItemInLevel = true;
+    } else {
+      // Subsequent waves: send ALL letters for this level (including those just introduced)
+      // Fill with all available items up to level count
+      const availableItems = itemPool.filter((item) => seenItems.has(item.id));
+
+      if (selectedModeIds.size > 1 && availableItems.length > 0) {
+        roundItems = getEvenlyDistributedItems(availableItems, totalItemsInRound, new Set());
+      } else {
+        // Shuffle and take up to totalItemsInRound items
+        const shuffled = [...availableItems].sort(() => Math.random() - 0.5);
+        roundItems = shuffled.slice(0, totalItemsInRound);
+      }
     }
 
+    // Fallback if no items
     if (roundItems.length === 0 && seenSoFar.length > 0) {
       roundItems.push(seenSoFar[Math.floor(Math.random() * seenSoFar.length)]);
     } else if (roundItems.length === 0 && learningOrder.length > 0) {
       roundItems.push(learningOrder.shift());
+      hasIntroducedForItemInLevel = true;
     }
 
     // Filter out any invalid items to prevent spawning without buckets
     roundItems = roundItems.filter((item) => item && item.id);
 
-    currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [] };
+    currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [], isFirstWave: isFirstWaveOfLevel };
     generateChoices(roundItems, itemPool);
-    processItemsForRound(roundItems, currentRound.id);
+    processItemsForRound(roundItems, currentRound.id, isFirstWaveOfLevel);
   }
 
   function isRandomLettersModeActive() {
     return randomLettersEnabled && gameMode === 'letters';
   }
 
-  function processItemsForRound(items, roundId) {
-    let totalDelay = 0;
-    items.forEach((itemData) => {
-      if (!itemData || !itemData.id) return;
-      if (currentRound.id !== roundId) return;
-      const isNewItem = !seenItems.has(itemData.id);
-      let delayForNext = 500;
+  function processItemsForRound(items, roundId, isFirstWave) {
+    // First wave of level: spawn items one at a time with delays (for introductions)
+    // Subsequent waves: spawn ALL items at once (no delays)
+    if (isFirstWave) {
+      // First wave: spawn one at a time with delays
+      let totalDelay = 0;
+      items.forEach((itemData) => {
+        if (!itemData || !itemData.id) return;
+        if (currentRound.id !== roundId) return;
+        const isNewItem = !seenItems.has(itemData.id);
+        let delayForNext = 500;
 
-      if (isNewItem && introductionsEnabled) {
-        const showTime = totalDelay;
-        const t1 = trackTimeout(() => {
-          if (!gameActive || currentRound.id !== roundId) return;
-          learnLetterEl.textContent = itemData.symbol;
-          const transliteration = itemData.transliteration ?? itemData.name ?? '';
-          const pronunciation = getDisplayLabel(itemData);
-          learnName.textContent = transliteration;
-          learnSound.textContent = pronunciation ? t('game.summary.soundLabel', { sound: pronunciation }) : '';
-          learnOverlay.classList.add('visible');
+        if (isNewItem && introductionsEnabled) {
+          const showTime = totalDelay;
+          const t1 = trackTimeout(() => {
+            if (!gameActive || isPaused || currentRound.id !== roundId) return;
+            learnLetterEl.textContent = itemData.symbol;
+            const transliteration = itemData.transliteration ?? itemData.name ?? '';
+            const pronunciation = getDisplayLabel(itemData);
+            learnName.textContent = transliteration;
+            learnSound.textContent = pronunciation ? t('game.summary.soundLabel', { sound: pronunciation }) : '';
+            learnOverlay.classList.add('visible');
+            startItemDrop(itemData, roundId);
+          }, showTime);
+          currentRound.timers.push(t1);
+
+          const t2 = trackTimeout(() => {
+            learnOverlay.classList.remove('visible');
+          }, showTime + learnPhaseDuration);
+          currentRound.timers.push(t2);
+          delayForNext = learnPhaseDuration + 500;
+        } else {
+          const t3 = trackTimeout(() => {
+            if (gameActive && !isPaused && currentRound.id === roundId) startItemDrop(itemData, roundId);
+          }, totalDelay);
+          currentRound.timers.push(t3);
+        }
+        totalDelay += delayForNext;
+      });
+    } else {
+      // Subsequent waves: spawn all items at once with no delays
+      items.forEach((itemData) => {
+        if (!itemData || !itemData.id) return;
+        if (currentRound.id !== roundId) return;
+        // Spawn immediately with no delay
+        if (gameActive && !isPaused && currentRound.id === roundId) {
           startItemDrop(itemData, roundId);
-        }, showTime);
-        currentRound.timers.push(t1);
-
-        const t2 = trackTimeout(() => {
-          learnOverlay.classList.remove('visible');
-        }, showTime + learnPhaseDuration);
-        currentRound.timers.push(t2);
-        delayForNext = learnPhaseDuration + 500;
-      } else {
-        const t3 = trackTimeout(() => {
-          if (gameActive && currentRound.id === roundId) startItemDrop(itemData, roundId);
-        }, totalDelay);
-        currentRound.timers.push(t3);
-      }
-      totalDelay += delayForNext;
-    });
+        }
+      });
+    }
   }
 
   function startItemDrop(itemData, roundId) {
-    if (!gameActive) return;
+    if (!gameActive || isPaused) return;
     const elementId = `item-${Date.now()}-${Math.random()}`;
     const itemEl = document.createElement('div');
     itemEl.id = elementId;
@@ -2090,7 +2110,78 @@ accessibilityBtn?.addEventListener('click', () => {
     onReturnToMenu?.();
   };
 
-  backToMenuButton?.addEventListener('click', handleReturnToMenu);
+  let isPaused = false;
+
+  const pauseGame = () => {
+    if (!gameActive || isPaused) return;
+    isPaused = true;
+
+    // Pause all active item animations
+    activeItems.forEach((item) => {
+      if (item.element && item.element.style) {
+        item.element.style.animationPlayState = 'paused';
+      }
+    });
+
+    // Clear all pending timers to prevent new items from spawning
+    if (currentRound && currentRound.timers) {
+      currentRound.timers.forEach((handle) => clearTrackedTimeout(handle));
+      currentRound.timers = [];
+    }
+
+    // Show pause modal
+    pauseModal.classList.remove('hidden');
+  };
+
+  const resumeGame = () => {
+    if (!isPaused) return;
+    isPaused = false;
+
+    // Resume all active item animations
+    activeItems.forEach((item) => {
+      if (item.element && item.element.style) {
+        item.element.style.animationPlayState = 'running';
+      }
+    });
+
+    // Restart the round to spawn any remaining items
+    if (currentRound && currentRound.items) {
+      // Calculate which items haven't been spawned yet
+      const spawnedItemIds = new Set();
+      activeItems.forEach((item) => {
+        spawnedItemIds.add(item.id);
+      });
+
+      const itemsToSpawn = currentRound.items.filter((item) => {
+        // Check if this item hasn't been spawned yet
+        // We need to check against both the item data and spawned items
+        return !Array.from(activeItems.values()).some(
+          (activeItem) => activeItem.data && activeItem.data.id === item.id && activeItem.roundId === currentRound.id
+        );
+      });
+
+      // If there are items that haven't spawned yet, spawn them
+      if (itemsToSpawn.length > 0) {
+        const isFirstWave = currentRound.isFirstWave || false;
+        processItemsForRound(itemsToSpawn, currentRound.id, isFirstWave);
+      }
+    }
+
+    // Hide pause modal
+    pauseModal.classList.add('hidden');
+  };
+
+  const exitFromPause = () => {
+    isPaused = false;
+    // Hide pause modal first
+    pauseModal.classList.add('hidden');
+    // End the game, which will show the game over screen with final score
+    exitFromWin();
+  };
+
+  pauseButton?.addEventListener('click', pauseGame);
+  resumeButton?.addEventListener('click', resumeGame);
+  pauseExitButton?.addEventListener('click', exitFromPause);
   setupExitButton?.addEventListener('click', handleReturnToMenu);
   gameOverExitButton?.addEventListener('click', handleReturnToMenu);
   goalIncreaseBtn?.addEventListener('click', increaseGoal);

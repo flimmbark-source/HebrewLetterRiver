@@ -244,13 +244,20 @@ function GameCanvas({ fontClass }) {
             className="relative text-sm shadow-lg sm:text-base"
             style={{ background: 'rgba(255, 229, 201, 0.9)' }}
           >
-            <span
-              id="back-to-menu-button"
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-wide sm:left-6"
-              style={{ color: '#b07737' }}
+            <button
+              id="pause-button"
+              className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-md px-2 py-1 text-xl font-bold transition hover:opacity-80"
+              style={{
+                color: '#b07737',
+                minWidth: 'auto',
+                minHeight: 'auto',
+                background: 'rgba(235, 179, 105, 0.1)',
+                border: '2px solid rgba(235, 179, 105, 0.4)'
+              }}
+              aria-label="Pause game"
             >
-              {t('game.controls.exitToMenu')}
-            </span>
+              ⏸️
+            </button>
             <div className="top-bar-content flex w-full flex-wrap items-center justify-center gap-3 sm:gap-6">
               <div className="inline-flex items-center gap-2 text-center">
                 <span className="font-semibold" style={{ color: '#6c3b14' }}>
@@ -552,14 +559,6 @@ function GameCanvas({ fontClass }) {
               id="game-over-view"
               className="relative hidden pt-12 text-center"
             >
-              <div
-                id="game-over-exit-button"
-                className="absolute left-0 top-0 flex items-center gap-2 px-4 py-2 text-xs font-semibold sm:text-sm"
-                style={{ color: '#4a2208' }}
-              >
-                <span className="text-lg" aria-hidden="true"></span>
-                <span>{t('game.controls.exitToMenu')}</span>
-              </div>
               <h2
                 id="game-over-heading"
                 className={`mb-4 text-4xl font-bold ${fontClass}`}
@@ -575,6 +574,24 @@ function GameCanvas({ fontClass }) {
                 {t('game.summary.finalScore', { score: 0 })}
               </p>
               <div className="learning-summary-container my-6" />
+              <div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-center mt-8">
+                  <button
+                    id="win-exit-button"
+                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
+                    style={{
+                      border: 0,
+                      background:
+                        'radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%)',
+                      color: '#4a1a06',
+                      boxShadow:
+                        '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)',
+                    }}
+                  >
+                    {t('game.controls.backToMenu')}
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div
@@ -929,6 +946,74 @@ function GameCanvas({ fontClass }) {
           className="pointer-events-none absolute text-4xl font-bold opacity-0"
           style={{ color: '#5acb5a' }}
         />
+
+        {/* Pause Modal - Separate from main modal, no click-outside-to-close */}
+        <div
+          id="pause-modal"
+          className="fixed inset-0 z-40 hidden flex items-center justify-center p-4"
+          style={{ background: 'rgba(74, 34, 8, 0.95)' }}
+        >
+          <div
+            className="relative w-full max-w-md rounded-3xl shadow-2xl"
+            style={{
+              border: '2px solid rgba(235, 179, 105, 0.95)',
+              background:
+                'linear-gradient(180deg, #dfcba5ff 0%, #e0bf95ff 55%, #d3b894ff 100%)',
+              boxShadow:
+                '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)',
+            }}
+          >
+            <div className="relative pt-8 pb-8 text-center px-6">
+              <div className="space-y-6">
+                <div className="text-6xl">⏸️</div>
+                <h2
+                  className={`text-4xl font-bold ${fontClass}`}
+                  style={{ color: '#ff9247' }}
+                >
+                  {t('game.pause.title', 'Paused')}
+                </h2>
+                <p
+                  className="text-lg font-semibold"
+                  style={{ color: '#6c3b14' }}
+                >
+                  {t('game.pause.message', '')}
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:justify-center mt-8">
+                  <button
+                    id="resume-button"
+                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
+                    style={{
+                      border: '2px solid #5aa838',
+                      background:
+                        'linear-gradient(135deg, #e8ffd8 0%, #7bd74f 100%)',
+                      color: '#ffffff',
+                      boxShadow:
+                        '0 6px 0 #5aa838, 0 8px 20px rgba(90, 168, 56, 0.3)',
+                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
+                    }}
+                  >
+                    {t('game.pause.resume', 'Resume')}
+                  </button>
+                  <button
+                    id="pause-exit-button"
+                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
+                    style={{
+                      border: '2px solid #d97706',
+                      background:
+                        'linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%)',
+                      color: '#ffffff',
+                      boxShadow:
+                        '0 6px 0 #d97706, 0 8px 20px rgba(217, 119, 6, 0.3)',
+                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
+                    }}
+                  >
+                    {t('game.pause.mainMenu', 'Main Menu')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
