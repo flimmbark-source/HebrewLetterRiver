@@ -246,12 +246,12 @@ function GameCanvas({ fontClass }) {
           >
             <button
               id="pause-button"
-              className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-md px-3 py-2 text-2xl font-bold transition hover:opacity-80"
+              className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-md px-2 py-1 text-xl font-bold transition hover:opacity-80"
               style={{
                 color: '#b07737',
-                minWidth: '44px',
-                minHeight: '44px',
-                background: 'rgba(235, 179, 105, 0.2)',
+                minWidth: 'auto',
+                minHeight: 'auto',
+                background: 'rgba(235, 179, 105, 0.1)',
                 border: '2px solid rgba(235, 179, 105, 0.4)'
               }}
               aria-label="Pause game"
@@ -559,14 +559,6 @@ function GameCanvas({ fontClass }) {
               id="game-over-view"
               className="relative hidden pt-12 text-center"
             >
-              <div
-                id="game-over-exit-button"
-                className="absolute left-0 top-0 flex items-center gap-2 px-4 py-2 text-xs font-semibold sm:text-sm"
-                style={{ color: '#4a2208' }}
-              >
-                <span className="text-lg" aria-hidden="true"></span>
-                <span>{t('game.controls.exitToMenu')}</span>
-              </div>
               <h2
                 id="game-over-heading"
                 className={`mb-4 text-4xl font-bold ${fontClass}`}
@@ -582,6 +574,24 @@ function GameCanvas({ fontClass }) {
                 {t('game.summary.finalScore', { score: 0 })}
               </p>
               <div className="learning-summary-container my-6" />
+              <div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-center mt-8">
+                  <button
+                    id="win-exit-button"
+                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
+                    style={{
+                      border: 0,
+                      background:
+                        'radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%)',
+                      color: '#4a1a06',
+                      boxShadow:
+                        '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)',
+                    }}
+                  >
+                    {t('game.controls.backToMenu')}
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div
@@ -966,7 +976,7 @@ function GameCanvas({ fontClass }) {
                   className="text-lg font-semibold"
                   style={{ color: '#6c3b14' }}
                 >
-                  {t('game.pause.message', 'Take a break!')}
+                  {t('game.pause.message', '')}
                 </p>
                 <div className="flex flex-col gap-3 sm:flex-row sm:justify-center mt-8">
                   <button

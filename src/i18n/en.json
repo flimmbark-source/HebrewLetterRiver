@@ -120,7 +120,7 @@
     },
     "pause": {
       "title": "Paused",
-      "message": "Take a break!",
+      "message": "",
       "resume": "Resume",
       "mainMenu": "Main Menu"
     },

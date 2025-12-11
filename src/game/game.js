@@ -2176,7 +2176,7 @@ accessibilityBtn?.addEventListener('click', () => {
     // Hide pause modal first
     pauseModal.classList.add('hidden');
     // End the game, which will show the game over screen with final score
-    endGame();
+    exitFromWin();
   };
 
   pauseButton?.addEventListener('click', pauseGame);
