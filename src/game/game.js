@@ -2173,9 +2173,10 @@ accessibilityBtn?.addEventListener('click', () => {
 
   const exitFromPause = () => {
     isPaused = false;
+    // Hide pause modal first
+    pauseModal.classList.add('hidden');
+    // End the game, which will show the game over screen with final score
     endGame();
-    resetToSetupScreen();
-    onReturnToMenu?.();
   };
 
   pauseButton?.addEventListener('click', pauseGame);
