@@ -71,7 +71,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   const clickModeToggle = document.getElementById('click-mode-toggle');
   const installBtn = document.getElementById('install-btn');
   const pauseButton = document.getElementById('pause-button');
-  const pauseView = document.getElementById('pause-view');
+  const pauseModal = document.getElementById('pause-modal');
   const resumeButton = document.getElementById('resume-button');
   const pauseExitButton = document.getElementById('pause-exit-button');
   const setupExitButton = document.getElementById('setup-exit-button');
@@ -2129,10 +2129,8 @@ accessibilityBtn?.addEventListener('click', () => {
       currentRound.timers = [];
     }
 
-    // Show pause menu
-    setupView.classList.add('hidden');
-    pauseView.classList.remove('hidden');
-    modal.classList.remove('hidden');
+    // Show pause modal
+    pauseModal.classList.remove('hidden');
   };
 
   const resumeGame = () => {
@@ -2169,9 +2167,8 @@ accessibilityBtn?.addEventListener('click', () => {
       }
     }
 
-    // Hide pause menu
-    pauseView.classList.add('hidden');
-    modal.classList.add('hidden');
+    // Hide pause modal
+    pauseModal.classList.add('hidden');
   };
 
   const exitFromPause = () => {

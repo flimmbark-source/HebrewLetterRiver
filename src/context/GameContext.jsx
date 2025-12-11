@@ -661,59 +661,6 @@ function GameCanvas({ fontClass }) {
             </div>
 
             <div
-              id="pause-view"
-              className="relative hidden pt-8 text-center px-4"
-            >
-              <div className="space-y-6">
-                <div className="text-6xl">⏸️</div>
-                <h2
-                  className={`text-4xl font-bold ${fontClass}`}
-                  style={{ color: '#ff9247' }}
-                >
-                  {t('game.pause.title', 'Paused')}
-                </h2>
-                <p
-                  className="text-lg font-semibold"
-                  style={{ color: '#6c3b14' }}
-                >
-                  {t('game.pause.message', 'Take a break!')}
-                </p>
-                <div className="flex flex-col gap-3 sm:flex-row sm:justify-center mt-8">
-                  <button
-                    id="resume-button"
-                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
-                    style={{
-                      border: '2px solid #5aa838',
-                      background:
-                        'linear-gradient(135deg, #e8ffd8 0%, #7bd74f 100%)',
-                      color: '#ffffff',
-                      boxShadow:
-                        '0 6px 0 #5aa838, 0 8px 20px rgba(90, 168, 56, 0.3)',
-                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
-                    }}
-                  >
-                    {t('game.pause.resume', 'Resume')}
-                  </button>
-                  <button
-                    id="pause-exit-button"
-                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
-                    style={{
-                      border: '2px solid #d97706',
-                      background:
-                        'linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%)',
-                      color: '#ffffff',
-                      boxShadow:
-                        '0 6px 0 #d97706, 0 8px 20px rgba(217, 119, 6, 0.3)',
-                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
-                    }}
-                  >
-                    {t('game.pause.mainMenu', 'Main Menu')}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div
               id="setup-footer"
               className="mt-2 flex flex-shrink-0 flex-col items-center gap-3 pb-4 sm:flex-row sm:justify-center"
             >
@@ -989,6 +936,74 @@ function GameCanvas({ fontClass }) {
           className="pointer-events-none absolute text-4xl font-bold opacity-0"
           style={{ color: '#5acb5a' }}
         />
+
+        {/* Pause Modal - Separate from main modal, no click-outside-to-close */}
+        <div
+          id="pause-modal"
+          className="fixed inset-0 z-40 hidden flex items-center justify-center p-4"
+          style={{ background: 'rgba(74, 34, 8, 0.95)' }}
+        >
+          <div
+            className="relative w-full max-w-md rounded-3xl shadow-2xl"
+            style={{
+              border: '2px solid rgba(235, 179, 105, 0.95)',
+              background:
+                'linear-gradient(180deg, #dfcba5ff 0%, #e0bf95ff 55%, #d3b894ff 100%)',
+              boxShadow:
+                '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)',
+            }}
+          >
+            <div className="relative pt-8 pb-8 text-center px-6">
+              <div className="space-y-6">
+                <div className="text-6xl">⏸️</div>
+                <h2
+                  className={`text-4xl font-bold ${fontClass}`}
+                  style={{ color: '#ff9247' }}
+                >
+                  {t('game.pause.title', 'Paused')}
+                </h2>
+                <p
+                  className="text-lg font-semibold"
+                  style={{ color: '#6c3b14' }}
+                >
+                  {t('game.pause.message', 'Take a break!')}
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:justify-center mt-8">
+                  <button
+                    id="resume-button"
+                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
+                    style={{
+                      border: '2px solid #5aa838',
+                      background:
+                        'linear-gradient(135deg, #e8ffd8 0%, #7bd74f 100%)',
+                      color: '#ffffff',
+                      boxShadow:
+                        '0 6px 0 #5aa838, 0 8px 20px rgba(90, 168, 56, 0.3)',
+                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
+                    }}
+                  >
+                    {t('game.pause.resume', 'Resume')}
+                  </button>
+                  <button
+                    id="pause-exit-button"
+                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
+                    style={{
+                      border: '2px solid #d97706',
+                      background:
+                        'linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%)',
+                      color: '#ffffff',
+                      boxShadow:
+                        '0 6px 0 #d97706, 0 8px 20px rgba(217, 119, 6, 0.3)',
+                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
+                    }}
+                  >
+                    {t('game.pause.mainMenu', 'Main Menu')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
