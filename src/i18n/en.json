@@ -146,11 +146,6 @@
         "description": "Practice final letter forms: ך, ם, ן, ף, ץ",
         "noun": "letter"
       },
-      "font-shuffle": {
-        "label": "Font Shuffle",
-        "description": "Letters appear in random fonts each time.",
-        "noun": "letter"
-      },
       "letters": {
         "label": "Letters Only",
         "description": "Master the Hebrew alphabet.",

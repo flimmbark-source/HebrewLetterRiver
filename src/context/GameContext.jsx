@@ -696,20 +696,31 @@ function GameCanvas({ fontClass }) {
               className="border-b pb-3"
               style={{ borderColor: '#e49b5a' }}
             >
-              <label
-                htmlFor="game-font-select"
-                className="block text-sm mb-2"
-                style={{ color: '#4a2208' }}
-              >
-                <span
-                  className="cursor-pointer hover:text-amber-700"
-                  onClick={(e) => showInfo('gameFont', e)}
-                  onMouseEnter={(e) => showInfo('gameFont', e)}
-                  onMouseLeave={() => setShowInfoPopup(false)}
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  htmlFor="game-font-select"
+                  className="text-sm"
+                  style={{ color: '#4a2208' }}
                 >
-                  Game Font
-                </span>
-              </label>
+                  <span
+                    className="cursor-pointer hover:text-amber-700"
+                    onClick={(e) => showInfo('gameFont', e)}
+                    onMouseEnter={(e) => showInfo('gameFont', e)}
+                    onMouseLeave={() => setShowInfoPopup(false)}
+                  >
+                    Game Font
+                  </span>
+                </label>
+                <label className="flex items-center gap-2 text-xs" style={{ color: '#4a2208' }}>
+                  <span>Shuffle</span>
+                  <input
+                    id="font-shuffle-toggle"
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-2 text-orange-600 focus:ring-orange-500"
+                    style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+                  />
+                </label>
+              </div>
               <select
                 id="game-font-select"
                 className="w-full rounded-lg border px-2 py-1 text-xs"

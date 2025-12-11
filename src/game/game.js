@@ -66,6 +66,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   const gameSpeedSlider = document.getElementById('game-speed-slider');
   const speedLabel = document.getElementById('speed-label');
   const gameFontSelect = document.getElementById('game-font-select');
+  const fontShuffleToggle = document.getElementById('font-shuffle-toggle');
   const slowRiverToggle = document.getElementById('slow-river-toggle');
   const clickModeToggle = document.getElementById('click-mode-toggle');
   const installBtn = document.getElementById('install-btn');
@@ -920,6 +921,8 @@ function startClickMode(itemEl, payload) {
   let slowRiverEnabled = false;
   let clickModeEnabled = false;
   let selectedFont = 'default';
+  let fontShuffleEnabled = false;
+  let lastUsedFont = null; // Track last used font to prevent consecutive repeats
   let selectedLetter = null; // For click mode
   let goalValue = 10;
   let hasReachedGoal = false; // Track if goal level was reached
@@ -948,21 +951,13 @@ function startClickMode(itemEl, payload) {
   function getCombinedModePool(modeIds) {
     const combined = [];
     const seen = new Set();
-    const hasFontShuffle = Array.from(modeIds).some((modeId) => {
-      const mode = practiceModes.find((m) => m.id === modeId);
-      return mode?.type === 'font-shuffle';
-    });
 
     modeIds.forEach((modeId) => {
       const pool = getModePool(modeId);
       pool.forEach((item) => {
         if (!seen.has(item.id)) {
           seen.add(item.id);
-          // Apply font shuffle to all items if any mode has font-shuffle enabled
           const itemCopy = { ...item };
-          if (hasFontShuffle) {
-            itemCopy.fontShuffle = true;
-          }
           // Track which mode this item belongs to for even distribution
           itemCopy.sourceMode = modeId;
           combined.push(itemCopy);
@@ -1136,6 +1131,8 @@ function startClickMode(itemEl, payload) {
     slowRiverEnabled = slowRiverToggle?.checked ?? false;
     clickModeEnabled = clickModeToggle?.checked ?? false;
     selectedFont = gameFontSelect?.value ?? 'default';
+    fontShuffleEnabled = fontShuffleToggle?.checked ?? false;
+    lastUsedFont = null; // Reset last used font for new game
     selectedLetter = null;
     waveCorrectCount = 0;
 
@@ -1570,10 +1567,20 @@ function startClickMode(itemEl, payload) {
 
     // Apply font class based on selected font or random if font shuffle enabled
     let fontStyleClass = selectedFont !== 'default' ? `game-font-${selectedFont}` : '';
-    if (itemData.fontShuffle) {
-      // Randomly choose a font for this letter
+    if (fontShuffleEnabled) {
+      // Randomly choose a font for this letter, ensuring it's different from the last one
       const availableFonts = ['frank-ruhl', 'noto-serif', 'taamey-frank', 'ezra-sil', 'keter-yg'];
-      const randomFont = availableFonts[Math.floor(Math.random() * availableFonts.length)];
+      let randomFont;
+
+      // If we have a last used font, filter it out to ensure variety
+      if (lastUsedFont) {
+        const filteredFonts = availableFonts.filter((f) => f !== lastUsedFont);
+        randomFont = filteredFonts[Math.floor(Math.random() * filteredFonts.length)];
+      } else {
+        randomFont = availableFonts[Math.floor(Math.random() * availableFonts.length)];
+      }
+
+      lastUsedFont = randomFont;
       fontStyleClass = `game-font-${randomFont}`;
     }
     const interactionClass = clickModeEnabled ? 'click-mode-item' : 'drag-mode-item';
@@ -1773,6 +1780,7 @@ function startClickMode(itemEl, payload) {
         reducedMotion: reducedMotionToggle?.checked ?? false,
         gameSpeed: parseInt(gameSpeedSlider?.value ?? 17, 10),
         gameFont: gameFontSelect?.value ?? 'default',
+        fontShuffle: fontShuffleToggle?.checked ?? false,
         slowRiver: slowRiverToggle?.checked ?? false,
         clickMode: clickModeToggle?.checked ?? false
       };
@@ -1797,12 +1805,14 @@ function startClickMode(itemEl, payload) {
         if (reducedMotionToggle) reducedMotionToggle.checked = settings.reducedMotion ?? false;
         if (gameSpeedSlider) gameSpeedSlider.value = settings.gameSpeed ?? 17;
         if (gameFontSelect) gameFontSelect.value = settings.gameFont ?? 'default';
+        if (fontShuffleToggle) fontShuffleToggle.checked = settings.fontShuffle ?? false;
         if (slowRiverToggle) slowRiverToggle.checked = settings.slowRiver ?? false;
         if (clickModeToggle) clickModeToggle.checked = settings.clickMode ?? false;
 
         // Update internal variables
         randomLettersEnabled = settings.randomLetters ?? false;
         slowRiverEnabled = settings.slowRiver ?? false;
+        fontShuffleEnabled = settings.fontShuffle ?? false;
         clickModeEnabled = settings.clickMode ?? false;
         selectedFont = settings.gameFont ?? 'default';
 
@@ -1900,6 +1910,11 @@ accessibilityBtn?.addEventListener('click', () => {
   });
   gameFontSelect?.addEventListener('change', (e) => {
     selectedFont = e.target.value;
+    syncSettingsToLocalStorage();
+  });
+  fontShuffleToggle?.addEventListener('change', (e) => {
+    fontShuffleEnabled = e.target.checked;
+    lastUsedFont = null; // Reset last used font when toggling
     syncSettingsToLocalStorage();
   });
   reducedMotionToggle?.addEventListener('change', () => {

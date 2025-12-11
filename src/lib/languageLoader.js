@@ -18,10 +18,6 @@ function buildModeItems(baseItems, vowelGroups, practiceModes, pack) {
     } else if (mode.type === 'niqqud') {
       const niqqudItems = pack.niqqudWithCarrier ?? [];
       modeItems[mode.id] = niqqudItems.map((item) => ({ ...item }));
-    } else if (mode.type === 'font-shuffle') {
-      // Font shuffle uses the same items as basic consonants but with a flag
-      const basicConsonants = pack.basicConsonants ?? baseItems.filter((item) => !item.id.startsWith('final-'));
-      modeItems[mode.id] = basicConsonants.map((item) => ({ ...item, type: 'consonant', fontShuffle: true }));
     } else if (mode.type === 'vowel-group') {
       const groupItems = vowelGroups[mode.groupId] ?? [];
       modeItems[mode.id] = groupItems.map((item) => ({ ...item }));

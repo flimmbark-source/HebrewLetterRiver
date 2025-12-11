@@ -108,13 +108,6 @@ export const hebrewPracticeModes = [
     description: 'Practice final letter forms: ך, ם, ן, ף, ץ',
     type: 'final-forms',
     noun: 'letter'
-  },
-  {
-    id: 'font-shuffle',
-    label: 'Font Shuffle',
-    description: 'Letters appear in random fonts each time.',
-    type: 'font-shuffle',
-    noun: 'letter'
   }
 ];
 
