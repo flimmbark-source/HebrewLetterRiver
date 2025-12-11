@@ -121,7 +121,7 @@
     "setup": {
       "title": "Letter River",
       "subtitleFallback": "Drag the letters to the correct boxes!",
-      "prompt": "Choose what you want to practice:",
+      "prompt": "Choose what to practice:",
       "goal": "Goal",
       "goalTooltip": "Beat this level to win the game!",
       "installDescription": "Install App",
