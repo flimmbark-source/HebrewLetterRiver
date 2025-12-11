@@ -1418,7 +1418,7 @@ function startClickMode(itemEl, payload) {
   }
 
   function spawnNextRound() {
-    if (!gameActive) return;
+    if (!gameActive || isPaused) return;
     // Don't spawn new rounds if goal has been reached
     if (hasReachedGoal) return;
     // Reset wave counter at the start of each new wave/round
@@ -1534,7 +1534,7 @@ function startClickMode(itemEl, payload) {
         if (isNewItem && introductionsEnabled) {
           const showTime = totalDelay;
           const t1 = trackTimeout(() => {
-            if (!gameActive || currentRound.id !== roundId) return;
+            if (!gameActive || isPaused || currentRound.id !== roundId) return;
             learnLetterEl.textContent = itemData.symbol;
             const transliteration = itemData.transliteration ?? itemData.name ?? '';
             const pronunciation = getDisplayLabel(itemData);
@@ -1552,7 +1552,7 @@ function startClickMode(itemEl, payload) {
           delayForNext = learnPhaseDuration + 500;
         } else {
           const t3 = trackTimeout(() => {
-            if (gameActive && currentRound.id === roundId) startItemDrop(itemData, roundId);
+            if (gameActive && !isPaused && currentRound.id === roundId) startItemDrop(itemData, roundId);
           }, totalDelay);
           currentRound.timers.push(t3);
         }
@@ -1564,7 +1564,7 @@ function startClickMode(itemEl, payload) {
         if (!itemData || !itemData.id) return;
         if (currentRound.id !== roundId) return;
         // Spawn immediately with no delay
-        if (gameActive && currentRound.id === roundId) {
+        if (gameActive && !isPaused && currentRound.id === roundId) {
           startItemDrop(itemData, roundId);
         }
       });
@@ -1572,7 +1572,7 @@ function startClickMode(itemEl, payload) {
   }
 
   function startItemDrop(itemData, roundId) {
-    if (!gameActive) return;
+    if (!gameActive || isPaused) return;
     const elementId = `item-${Date.now()}-${Math.random()}`;
     const itemEl = document.createElement('div');
     itemEl.id = elementId;
@@ -2119,13 +2119,15 @@ accessibilityBtn?.addEventListener('click', () => {
     // Pause all active item animations
     activeItems.forEach((item) => {
       if (item.element && item.element.style) {
-        const computedStyle = window.getComputedStyle(item.element);
-        const transform = computedStyle.transform;
-        item.element.style.animation = 'none';
-        item.element.style.transform = transform;
-        item.pausedTransform = transform;
+        item.element.style.animationPlayState = 'paused';
       }
     });
+
+    // Clear all pending timers to prevent new items from spawning
+    if (currentRound && currentRound.timers) {
+      currentRound.timers.forEach((handle) => clearTrackedTimeout(handle));
+      currentRound.timers = [];
+    }
 
     // Show pause menu
     setupView.classList.add('hidden');
@@ -2139,11 +2141,33 @@ accessibilityBtn?.addEventListener('click', () => {
 
     // Resume all active item animations
     activeItems.forEach((item) => {
-      if (item.element && item.pausedTransform) {
-        item.element.style.animation = '';
-        delete item.pausedTransform;
+      if (item.element && item.element.style) {
+        item.element.style.animationPlayState = 'running';
       }
     });
+
+    // Restart the round to spawn any remaining items
+    if (currentRound && currentRound.items) {
+      // Calculate which items haven't been spawned yet
+      const spawnedItemIds = new Set();
+      activeItems.forEach((item) => {
+        spawnedItemIds.add(item.id);
+      });
+
+      const itemsToSpawn = currentRound.items.filter((item) => {
+        // Check if this item hasn't been spawned yet
+        // We need to check against both the item data and spawned items
+        return !Array.from(activeItems.values()).some(
+          (activeItem) => activeItem.data && activeItem.data.id === item.id && activeItem.roundId === currentRound.id
+        );
+      });
+
+      // If there are items that haven't spawned yet, spawn them
+      if (itemsToSpawn.length > 0) {
+        const isFirstWave = currentRound.isFirstWave || false;
+        processItemsForRound(itemsToSpawn, currentRound.id, isFirstWave);
+      }
+    }
 
     // Hide pause menu
     pauseView.classList.add('hidden');
