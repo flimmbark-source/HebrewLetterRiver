@@ -65,9 +65,18 @@ export function GameProvider({ children }) {
   }, [isVisible, options, languagePack, t, dictionary]);
 
   const openGame = useCallback((openOptions = {}) => {
+    // If game is already visible, close it (acts as a toggle)
+    if (isVisible) {
+      if (gameApiRef.current) {
+        gameApiRef.current.resetToSetupScreen();
+      }
+      setIsVisible(false);
+      setIsGameRunning(false);
+      return;
+    }
     setOptions(openOptions);
     setIsVisible(true);
-  }, []);
+  }, [isVisible]);
 
   const closeGame = useCallback(() => {
     if (gameApiRef.current) {
