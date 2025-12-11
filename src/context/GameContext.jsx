@@ -391,14 +391,6 @@ function GameCanvas({ fontClass }) {
               style={{ color: '#b07737', minWidth: '44px', minHeight: '44px', zIndex: 10 }}            >
               ⚙️
             </button>
-<button
-  id="setup-exit-button"
-  className="absolute right-2 top-1 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
-  aria-label={t('game.controls.exitToMenu')}
-    style={{ color: '#6c3b14', minWidth: '44px', minHeight: '44px', zIndex: 10 }}
->
-  ✕
-</button>
             <div id="setup-view" className="flex flex-col h-full">
               <div
                 className="relative flex items-center justify-center px-3 py-2 border-b-2"
