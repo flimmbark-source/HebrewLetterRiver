@@ -963,12 +963,54 @@ function startClickMode(itemEl, payload) {
           if (hasFontShuffle) {
             itemCopy.fontShuffle = true;
           }
+          // Track which mode this item belongs to for even distribution
+          itemCopy.sourceMode = modeId;
           combined.push(itemCopy);
         }
       });
     });
 
     return combined;
+  }
+
+  // Get items with even distribution across selected modes
+  function getEvenlyDistributedItems(itemPool, count, seenItems) {
+    if (selectedModeIds.size === 0) return [];
+
+    // Group items by source mode
+    const itemsByMode = {};
+    selectedModeIds.forEach((modeId) => {
+      itemsByMode[modeId] = itemPool.filter((item) => item.sourceMode === modeId);
+    });
+
+    const result = [];
+    const modesArray = Array.from(selectedModeIds);
+    let modeIndex = 0;
+    let attempts = 0;
+    const maxAttempts = count * modesArray.length * 3; // Prevent infinite loop
+
+    while (result.length < count && attempts < maxAttempts) {
+      attempts++;
+      const currentMode = modesArray[modeIndex];
+      const modePool = itemsByMode[currentMode];
+
+      if (modePool && modePool.length > 0) {
+        // Try to find an item from this mode that hasn't been used yet
+        const availableItems = modePool.filter((item) =>
+          !result.some((r) => r.id === item.id)
+        );
+
+        if (availableItems.length > 0) {
+          const randomIndex = Math.floor(Math.random() * availableItems.length);
+          result.push(availableItems[randomIndex]);
+        }
+      }
+
+      // Move to next mode
+      modeIndex = (modeIndex + 1) % modesArray.length;
+    }
+
+    return result;
   }
 
   function resolveItemById(itemId) {
@@ -1379,22 +1421,30 @@ function startClickMode(itemEl, payload) {
 
     if (isRandomLettersModeActive()) {
       const totalItemsInRound = Math.max(1, level);
-      const availablePool = [...itemPool];
 
       if (forcedStartItem && level === 1) {
         roundItems.push(forcedStartItem);
         forcedStartItem = null;
       }
 
-      for (let i = roundItems.length; i < totalItemsInRound; i++) {
-        if (!availablePool.length) {
-          if (!itemPool.length) break;
-          availablePool.push(...itemPool);
+      // Use even distribution if multiple modes are selected
+      if (selectedModeIds.size > 1) {
+        const itemsNeeded = totalItemsInRound - roundItems.length;
+        const distributedItems = getEvenlyDistributedItems(itemPool, itemsNeeded, seenItems);
+        roundItems.push(...distributedItems);
+      } else {
+        // Single mode: use original random selection
+        const availablePool = [...itemPool];
+        for (let i = roundItems.length; i < totalItemsInRound; i++) {
+          if (!availablePool.length) {
+            if (!itemPool.length) break;
+            availablePool.push(...itemPool);
+          }
+          const randomIndex = Math.floor(Math.random() * availablePool.length);
+          const [selectedItem] = availablePool.splice(randomIndex, 1);
+          if (!selectedItem) break;
+          roundItems.push(selectedItem);
         }
-        const randomIndex = Math.floor(Math.random() * availablePool.length);
-        const [selectedItem] = availablePool.splice(randomIndex, 1);
-        if (!selectedItem) break;
-        roundItems.push(selectedItem);
       }
 
       hasIntroducedForItemInLevel = roundItems.some((item) => item && !seenItems.has(item.id));
@@ -1426,10 +1476,24 @@ function startClickMode(itemEl, payload) {
       hasIntroducedForItemInLevel = true;
     }
 
-    while (roundItems.length < totalItemsInRound && seenSoFar.length > 0) {
-      const chosenIndex = Math.floor(Math.random() * seenSoFar.length);
-      const reviewItem = seenSoFar.splice(chosenIndex, 1)[0];
-      if (!roundItems.some((item) => item.id === reviewItem.id)) roundItems.push(reviewItem);
+    // Fill remaining slots with review items
+    if (roundItems.length < totalItemsInRound) {
+      const itemsNeeded = totalItemsInRound - roundItems.length;
+
+      // Use even distribution if multiple modes are selected
+      if (selectedModeIds.size > 1 && seenSoFar.length > 0) {
+        const distributedItems = getEvenlyDistributedItems(seenSoFar, itemsNeeded, new Set());
+        roundItems.push(...distributedItems.filter((item) =>
+          !roundItems.some((r) => r.id === item.id)
+        ));
+      } else {
+        // Single mode: use original random selection
+        while (roundItems.length < totalItemsInRound && seenSoFar.length > 0) {
+          const chosenIndex = Math.floor(Math.random() * seenSoFar.length);
+          const reviewItem = seenSoFar.splice(chosenIndex, 1)[0];
+          if (!roundItems.some((item) => item.id === reviewItem.id)) roundItems.push(reviewItem);
+        }
+      }
     }
 
     if (roundItems.length === 0 && seenSoFar.length > 0) {
@@ -1672,7 +1736,13 @@ function startClickMode(itemEl, payload) {
       const displayLabel = getDisplayLabel(choice);
       // Add brackets around final forms
       const isFinalForm = choice.isFinalForm || choice.id.startsWith('final-');
-      const labelText = isFinalForm ? `[${displayLabel || displaySymbol}]` : (displayLabel || displaySymbol);
+      // For vowel items, use the symbol (carrier + vowel) instead of just the sound
+      const isVowel = choice.type === 'vowel';
+      const labelText = isFinalForm
+        ? `[${displayLabel || displaySymbol}]`
+        : isVowel
+          ? displaySymbol
+          : (displayLabel || displaySymbol);
       box.textContent = labelText;
       box.dataset.itemId = choice.id;
       box.className = 'catcher-box bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium text-arcade-text-main font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-arcade-panel-border shadow-arcade-sm';
