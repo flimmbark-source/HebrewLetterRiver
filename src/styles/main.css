@@ -40,6 +40,27 @@ body {
   font-family: Verdana, Geneva, sans-serif !important;
 }
 
+/* Hebrew Font Shuffle Classes */
+.game-font-frank-ruhl {
+  font-family: 'Frank Ruhl Libre', serif !important;
+}
+
+.game-font-noto-serif {
+  font-family: 'Noto Serif Hebrew', serif !important;
+}
+
+.game-font-taamey-frank {
+  font-family: 'Tinos', serif !important;
+}
+
+.game-font-ezra-sil {
+  font-family: 'David Libre', serif !important;
+}
+
+.game-font-keter-yg {
+  font-family: 'Heebo', sans-serif !important;
+}
+
 /* App shell container - responsive */
 .app-shell {
   width: 100%;
