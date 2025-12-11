@@ -81,7 +81,7 @@ export const hebrewFinalForms = hebrewConsonants.filter(
 export const hebrewNiqqudWithCarrier = hebrewVowelMarkers.map((marker) => ({
   id: `carrier-${marker.id}`,
   symbol: `ב${marker.mark}`,
-  sound: marker.soundSuffix,
+  sound: `B${marker.soundSuffix}`,
   name: marker.name,
   type: 'vowel',
   markerId: marker.id

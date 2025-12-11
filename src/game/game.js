@@ -1746,12 +1746,12 @@ function startClickMode(itemEl, payload) {
       const displayLabel = getDisplayLabel(choice);
       // Add brackets around final forms
       const isFinalForm = choice.isFinalForm || choice.id.startsWith('final-');
-      // For vowel items, use the symbol (carrier + vowel) instead of just the sound
+      // For vowel items, use the romanized sound (e.g., "Ba", "Bo", "Be", "Bi")
       const isVowel = choice.type === 'vowel';
       const labelText = isFinalForm
         ? `[${displayLabel || displaySymbol}]`
         : isVowel
-          ? displaySymbol
+          ? displayLabel
           : (displayLabel || displaySymbol);
       box.textContent = labelText;
       box.dataset.itemId = choice.id;
