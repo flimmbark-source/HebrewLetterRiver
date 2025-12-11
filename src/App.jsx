@@ -213,7 +213,7 @@ function LanguageOnboardingModal() {
 }
 
 function Shell() {
-  const { openGame, isVisible: isGameVisible, isGameRunning } = useGame();
+  const { openGame, closeGame, isVisible: isGameVisible, isGameRunning } = useGame();
   const { t, interfaceLanguagePack } = useLocalization();
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
@@ -225,6 +225,13 @@ function Shell() {
     },
     [openGame]
   );
+
+  const handleNavClick = React.useCallback(() => {
+    // Close the game modal if it's open
+    if (isGameVisible) {
+      closeGame?.();
+    }
+  }, [isGameVisible, closeGame]);
 
   return (
     <div className="app-shell">
@@ -240,13 +247,13 @@ function Shell() {
       </main>
       {!(isGameVisible && isGameRunning) && (
         <nav className="bottom-nav">
-          <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
               <span>🏠</span>
             </div>
             <span className="label">{t('app.nav.home')}</span>
           </NavLink>
-          <NavLink to="/learn" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <NavLink to="/learn" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
               <span>📚</span>
             </div>
@@ -264,13 +271,13 @@ function Shell() {
             </div>
             <span className="label">{t('app.nav.play')}</span>
           </button>
-          <NavLink to="/achievements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <NavLink to="/achievements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
               <span>🏆</span>
             </div>
             <span className="label">{t('app.nav.achievements')}</span>
           </NavLink>
-          <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
               <span>⚙️</span>
             </div>
