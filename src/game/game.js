@@ -1096,11 +1096,12 @@ function startClickMode(itemEl, payload) {
       gameView.parentElement.style.border = 'none';
       gameView.parentElement.style.boxShadow = 'none';
 
-      // Hide the dark backdrop overlay so modal appears directly over current page
+      // Keep the backdrop visible but make it more subtle - allows clicking outside to close
       const scrollContainer = gameView.parentElement.parentElement?.parentElement;
       const backdrop = scrollContainer?.previousElementSibling;
       if (backdrop?.classList.contains('backdrop-blur')) {
-        backdrop.style.display = 'none';
+        backdrop.style.background = 'rgba(74, 34, 8, 0.5)';
+        backdrop.style.backdropFilter = 'blur(2px)';
       }
     }
 
@@ -1177,6 +1178,8 @@ function startClickMode(itemEl, payload) {
       const backdrop = scrollContainer?.previousElementSibling;
       if (backdrop?.classList.contains('backdrop-blur')) {
         backdrop.style.display = '';
+        backdrop.style.background = '';
+        backdrop.style.backdropFilter = '';
       }
     }
 
