@@ -70,7 +70,10 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   const slowRiverToggle = document.getElementById('slow-river-toggle');
   const clickModeToggle = document.getElementById('click-mode-toggle');
   const installBtn = document.getElementById('install-btn');
-  const backToMenuButton = document.getElementById('back-to-menu-button');
+  const pauseButton = document.getElementById('pause-button');
+  const pauseView = document.getElementById('pause-view');
+  const resumeButton = document.getElementById('resume-button');
+  const pauseExitButton = document.getElementById('pause-exit-button');
   const setupExitButton = document.getElementById('setup-exit-button');
   const gameOverExitButton = document.getElementById('game-over-exit-button');
   const modeOptionsContainer = document.getElementById('mode-options');
@@ -2107,7 +2110,56 @@ accessibilityBtn?.addEventListener('click', () => {
     onReturnToMenu?.();
   };
 
-  backToMenuButton?.addEventListener('click', handleReturnToMenu);
+  let isPaused = false;
+
+  const pauseGame = () => {
+    if (!gameActive || isPaused) return;
+    isPaused = true;
+
+    // Pause all active item animations
+    activeItems.forEach((item) => {
+      if (item.element && item.element.style) {
+        const computedStyle = window.getComputedStyle(item.element);
+        const transform = computedStyle.transform;
+        item.element.style.animation = 'none';
+        item.element.style.transform = transform;
+        item.pausedTransform = transform;
+      }
+    });
+
+    // Show pause menu
+    setupView.classList.add('hidden');
+    pauseView.classList.remove('hidden');
+    modal.classList.remove('hidden');
+  };
+
+  const resumeGame = () => {
+    if (!isPaused) return;
+    isPaused = false;
+
+    // Resume all active item animations
+    activeItems.forEach((item) => {
+      if (item.element && item.pausedTransform) {
+        item.element.style.animation = '';
+        delete item.pausedTransform;
+      }
+    });
+
+    // Hide pause menu
+    pauseView.classList.add('hidden');
+    modal.classList.add('hidden');
+  };
+
+  const exitFromPause = () => {
+    isPaused = false;
+    endGame();
+    resetToSetupScreen();
+    onReturnToMenu?.();
+  };
+
+  pauseButton?.addEventListener('click', pauseGame);
+  resumeButton?.addEventListener('click', resumeGame);
+  pauseExitButton?.addEventListener('click', exitFromPause);
   setupExitButton?.addEventListener('click', handleReturnToMenu);
   gameOverExitButton?.addEventListener('click', handleReturnToMenu);
   goalIncreaseBtn?.addEventListener('click', increaseGoal);

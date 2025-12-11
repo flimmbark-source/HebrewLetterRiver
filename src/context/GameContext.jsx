@@ -244,13 +244,20 @@ function GameCanvas({ fontClass }) {
             className="relative text-sm shadow-lg sm:text-base"
             style={{ background: 'rgba(255, 229, 201, 0.9)' }}
           >
-            <span
-              id="back-to-menu-button"
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-wide sm:left-6"
-              style={{ color: '#b07737' }}
+            <button
+              id="pause-button"
+              className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-md px-3 py-2 text-2xl font-bold transition hover:opacity-80"
+              style={{
+                color: '#b07737',
+                minWidth: '44px',
+                minHeight: '44px',
+                background: 'rgba(235, 179, 105, 0.2)',
+                border: '2px solid rgba(235, 179, 105, 0.4)'
+              }}
+              aria-label="Pause game"
             >
-              {t('game.controls.exitToMenu')}
-            </span>
+              ⏸️
+            </button>
             <div className="top-bar-content flex w-full flex-wrap items-center justify-center gap-3 sm:gap-6">
               <div className="inline-flex items-center gap-2 text-center">
                 <span className="font-semibold" style={{ color: '#6c3b14' }}>
@@ -648,6 +655,59 @@ function GameCanvas({ fontClass }) {
                     }}
                   >
                     {t('game.controls.backToMenu')}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              id="pause-view"
+              className="relative hidden pt-8 text-center px-4"
+            >
+              <div className="space-y-6">
+                <div className="text-6xl">⏸️</div>
+                <h2
+                  className={`text-4xl font-bold ${fontClass}`}
+                  style={{ color: '#ff9247' }}
+                >
+                  {t('game.pause.title', 'Paused')}
+                </h2>
+                <p
+                  className="text-lg font-semibold"
+                  style={{ color: '#6c3b14' }}
+                >
+                  {t('game.pause.message', 'Take a break!')}
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:justify-center mt-8">
+                  <button
+                    id="resume-button"
+                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
+                    style={{
+                      border: '2px solid #5aa838',
+                      background:
+                        'linear-gradient(135deg, #e8ffd8 0%, #7bd74f 100%)',
+                      color: '#ffffff',
+                      boxShadow:
+                        '0 6px 0 #5aa838, 0 8px 20px rgba(90, 168, 56, 0.3)',
+                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
+                    }}
+                  >
+                    {t('game.pause.resume', 'Resume')}
+                  </button>
+                  <button
+                    id="pause-exit-button"
+                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
+                    style={{
+                      border: '2px solid #d97706',
+                      background:
+                        'linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%)',
+                      color: '#ffffff',
+                      boxShadow:
+                        '0 6px 0 #d97706, 0 8px 20px rgba(217, 119, 6, 0.3)',
+                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
+                    }}
+                  >
+                    {t('game.pause.mainMenu', 'Main Menu')}
                   </button>
                 </div>
               </div>
