@@ -313,7 +313,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     gameActive = true;
     // Clear current round and start a new wave
     if (currentRound && currentRound.timers) {
-      currentRound.timers.forEach((handle) => clearTrackedTimeout(handle));
+      currentRound.timers.forEach((timer) => clearTrackedTimeout(timer.handle || timer));
     }
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
@@ -1023,7 +1023,7 @@ function startClickMode(itemEl, payload) {
   function resetToSetupScreen() {
     gameActive = false;
     if (currentRound && currentRound.timers) {
-      currentRound.timers.forEach((handle) => clearTrackedTimeout(handle));
+      currentRound.timers.forEach((timer) => clearTrackedTimeout(timer.handle || timer));
     }
     currentRound = null;
     clearAllTimers();
@@ -1215,7 +1215,7 @@ function startClickMode(itemEl, payload) {
 
   function endGame() {
     gameActive = false;
-    if (currentRound && currentRound.timers) currentRound.timers.forEach((handle) => clearTrackedTimeout(handle));
+    if (currentRound && currentRound.timers) currentRound.timers.forEach((timer) => clearTrackedTimeout(timer.handle || timer));
     currentRound = null;
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
@@ -1534,7 +1534,7 @@ function startClickMode(itemEl, payload) {
 
         if (isNewItem && introductionsEnabled) {
           const showTime = totalDelay;
-          const t1 = trackTimeout(() => {
+          const callback1 = () => {
             if (!gameActive || isPaused || currentRound.id !== roundId) return;
             learnLetterEl.textContent = itemData.symbol;
             const transliteration = itemData.transliteration ?? itemData.name ?? '';
@@ -1543,19 +1543,37 @@ function startClickMode(itemEl, payload) {
             learnSound.textContent = pronunciation ? t('game.summary.soundLabel', { sound: pronunciation }) : '';
             learnOverlay.classList.add('visible');
             startItemDrop(itemData, roundId);
-          }, showTime);
-          currentRound.timers.push(t1);
+          };
+          const t1 = trackTimeout(callback1, showTime);
+          currentRound.timers.push({
+            handle: t1,
+            startTime: Date.now(),
+            delay: showTime,
+            callback: callback1
+          });
 
-          const t2 = trackTimeout(() => {
+          const callback2 = () => {
             learnOverlay.classList.remove('visible');
-          }, showTime + learnPhaseDuration);
-          currentRound.timers.push(t2);
+          };
+          const t2 = trackTimeout(callback2, showTime + learnPhaseDuration);
+          currentRound.timers.push({
+            handle: t2,
+            startTime: Date.now(),
+            delay: showTime + learnPhaseDuration,
+            callback: callback2
+          });
           delayForNext = learnPhaseDuration + 500;
         } else {
-          const t3 = trackTimeout(() => {
+          const callback3 = () => {
             if (gameActive && !isPaused && currentRound.id === roundId) startItemDrop(itemData, roundId);
-          }, totalDelay);
-          currentRound.timers.push(t3);
+          };
+          const t3 = trackTimeout(callback3, totalDelay);
+          currentRound.timers.push({
+            handle: t3,
+            startTime: Date.now(),
+            delay: totalDelay,
+            callback: callback3
+          });
         }
         totalDelay += delayForNext;
       });
@@ -2124,10 +2142,12 @@ accessibilityBtn?.addEventListener('click', () => {
   };
 
   let isPaused = false;
+  let pauseTime = 0; // When the game was paused
 
   const pauseGame = () => {
     if (!gameActive || isPaused) return;
     isPaused = true;
+    pauseTime = Date.now();
 
     // Pause all active item animations
     activeItems.forEach((item) => {
@@ -2136,9 +2156,17 @@ accessibilityBtn?.addEventListener('click', () => {
       }
     });
 
-    // Clear all pending timers to prevent new items from spawning
+    // Pause timers by calculating remaining time for each
     if (currentRound && currentRound.timers) {
-      currentRound.timers.forEach((handle) => clearTrackedTimeout(handle));
+      currentRound.pausedTimers = currentRound.timers.map((timer) => {
+        const elapsed = pauseTime - timer.startTime;
+        const remaining = Math.max(0, timer.delay - elapsed);
+        clearTrackedTimeout(timer.handle);
+        return {
+          callback: timer.callback,
+          remaining: remaining
+        };
+      });
       currentRound.timers = [];
     }
 
@@ -2156,6 +2184,20 @@ accessibilityBtn?.addEventListener('click', () => {
         item.element.style.animationPlayState = 'running';
       }
     });
+
+    // Resume timers with their remaining time
+    if (currentRound && currentRound.pausedTimers) {
+      currentRound.pausedTimers.forEach((pausedTimer) => {
+        const handle = trackTimeout(pausedTimer.callback, pausedTimer.remaining);
+        currentRound.timers.push({
+          handle: handle,
+          startTime: Date.now(),
+          delay: pausedTimer.remaining,
+          callback: pausedTimer.callback
+        });
+      });
+      currentRound.pausedTimers = [];
+    }
 
     // Hide pause modal
     pauseModal.classList.add('hidden');
