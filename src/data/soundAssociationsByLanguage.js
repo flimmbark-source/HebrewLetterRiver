@@ -19,7 +19,7 @@ export const soundAssociationsByLanguage = {
   '(A)': {
     en: { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
     es: { emoji: '🐝', word: 'Abeja', alt: 'Abeja amarilla' },
-    fr: { emoji: '🍎', word: 'Ananas', alt: 'Ananas' },  // Fixed: Ananas starts with A
+    fr: { emoji: '🍍', word: 'Ananas', alt: 'Ananas' },  // Fixed: Pineapple emoji! Ananas starts with A
     pt: { emoji: '🐝', word: 'Abelha', alt: 'Abelha amarela' },
     he: { emoji: '🔴', word: 'אדום', alt: 'עיגול אדום' },
     ru: { emoji: '🍊', word: 'Апельсин', alt: 'Оранжевый апельсин' },
@@ -28,7 +28,7 @@ export const soundAssociationsByLanguage = {
   '(Ah)': {
     en: { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
     es: { emoji: '🐝', word: 'Abeja', alt: 'Abeja amarilla' },
-    fr: { emoji: '🍎', word: 'Ananas', alt: 'Ananas' },  // Fixed: Ananas starts with A
+    fr: { emoji: '🍍', word: 'Ananas', alt: 'Ananas' },  // Fixed: Pineapple emoji! Ananas starts with A
     pt: { emoji: '🐝', word: 'Abelha', alt: 'Abelha amarela' },
     he: { emoji: '🔴', word: 'אדום', alt: 'עיגול אדום' },
     ru: { emoji: '🍊', word: 'Апельсин', alt: 'Оранжевый апельсин' },
