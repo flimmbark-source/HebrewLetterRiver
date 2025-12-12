@@ -17,6 +17,11 @@ body {
   touch-action: manipulation;
 }
 
+/* Prevent scroll when play area is open */
+body.no-scroll {
+  overflow: hidden !important;
+}
+
 * { box-sizing: border-box; }
 
 /* Accessibility Font Classes */

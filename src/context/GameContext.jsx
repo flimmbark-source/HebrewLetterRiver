@@ -28,6 +28,26 @@ export function GameProvider({ children }) {
     setHasMounted(true);
   }, []);
 
+  // Disable body scroll when play area is open
+  useEffect(() => {
+    if (isVisible) {
+      // Prevent scrolling on body
+      document.body.style.overflow = 'hidden';
+      // Also add class for additional CSS support
+      document.body.classList.add('no-scroll');
+    } else {
+      // Re-enable scrolling
+      document.body.style.overflow = '';
+      document.body.classList.remove('no-scroll');
+    }
+
+    // Cleanup function to restore scroll on unmount
+    return () => {
+      document.body.style.overflow = '';
+      document.body.classList.remove('no-scroll');
+    };
+  }, [isVisible]);
+
   useEffect(() => {
     if (!gameApiRef.current) return;
     const api = gameApiRef.current;
