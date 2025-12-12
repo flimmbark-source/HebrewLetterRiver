@@ -1,6 +1,7 @@
 import { emit } from '../lib/eventBus.js';
 import { loadLanguage } from '../lib/languageLoader.js';
 import { getDictionary, translate as translateWithDictionary, formatTemplate } from '../i18n/index.js';
+import { getAssociation } from '../data/soundAssociations.js';
 
 const trackedTimeouts = new Set();
 const trackedIntervals = new Set();
@@ -69,6 +70,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   const fontShuffleToggle = document.getElementById('font-shuffle-toggle');
   const slowRiverToggle = document.getElementById('slow-river-toggle');
   const clickModeToggle = document.getElementById('click-mode-toggle');
+  const associationModeToggle = document.getElementById('association-mode-toggle');
   const installBtn = document.getElementById('install-btn');
   const pauseButton = document.getElementById('pause-button');
   const pauseModal = document.getElementById('pause-modal');
@@ -924,6 +926,7 @@ function startClickMode(itemEl, payload) {
   let randomLettersEnabled = randomLettersToggle?.checked ?? false;
   let slowRiverEnabled = false;
   let clickModeEnabled = false;
+  let associationModeEnabled = false;
   let selectedFont = 'default';
   let fontShuffleEnabled = false;
   let lastUsedFont = null; // Track last used font to prevent consecutive repeats
@@ -1852,7 +1855,22 @@ function startClickMode(itemEl, payload) {
         : isVowel
           ? displayLabel
           : (displayLabel || displaySymbol);
-      box.textContent = labelText;
+
+      // Check if association mode is enabled and we have an emoji for this sound
+      if (associationModeEnabled && displayLabel) {
+        const association = getAssociation(displayLabel);
+        if (association) {
+          // Display emoji with optional word label <span class="text-xs text-arcade-text-muted">${association.word}</span>
+          box.innerHTML = `<div class="flex flex-col items-center justify-center gap-1">
+            <span class="text-4xl" role="img" aria-label="${association.alt}">${association.emoji}</span>
+          </div>`;
+        } else {
+          // Fallback to text if no association found
+          box.textContent = labelText;
+        }
+      } else {
+        box.textContent = labelText;
+      }
       box.dataset.itemId = choice.id;
       // Store the sound for matching - allows multiple letters with same sound
       box.dataset.sound = displayLabel;
@@ -1886,7 +1904,8 @@ function startClickMode(itemEl, payload) {
         gameFont: gameFontSelect?.value ?? 'default',
         fontShuffle: fontShuffleToggle?.checked ?? false,
         slowRiver: slowRiverToggle?.checked ?? false,
-        clickMode: clickModeToggle?.checked ?? false
+        clickMode: clickModeToggle?.checked ?? false,
+        associationMode: associationModeToggle?.checked ?? false
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
       // Dispatch custom event to notify other components
@@ -1912,12 +1931,14 @@ function startClickMode(itemEl, payload) {
         if (fontShuffleToggle) fontShuffleToggle.checked = settings.fontShuffle ?? false;
         if (slowRiverToggle) slowRiverToggle.checked = settings.slowRiver ?? false;
         if (clickModeToggle) clickModeToggle.checked = settings.clickMode ?? false;
+        if (associationModeToggle) associationModeToggle.checked = settings.associationMode ?? false;
 
         // Update internal variables
         randomLettersEnabled = settings.randomLetters ?? false;
         slowRiverEnabled = settings.slowRiver ?? false;
         fontShuffleEnabled = settings.fontShuffle ?? false;
         clickModeEnabled = settings.clickMode ?? false;
+        associationModeEnabled = settings.associationMode ?? false;
         selectedFont = settings.gameFont ?? 'default';
 
         // Apply high contrast
@@ -2010,6 +2031,14 @@ accessibilityBtn?.addEventListener('click', () => {
     clickModeEnabled = e.target.checked;
     // Refresh drop zones to update click handlers
     refreshDropZones();
+    syncSettingsToLocalStorage();
+  });
+  associationModeToggle?.addEventListener('change', (e) => {
+    associationModeEnabled = e.target.checked;
+    // Regenerate choices to update bucket display
+    if (currentRound && currentRound.correctItems) {
+      generateChoices(currentRound.correctItems, itemPool);
+    }
     syncSettingsToLocalStorage();
   });
   gameFontSelect?.addEventListener('change', (e) => {

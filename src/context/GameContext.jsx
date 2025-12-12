@@ -10,6 +10,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { setupGame } from '../game/game.js';
 import { useLocalization } from './LocalizationContext.jsx';
+import { ErrorBoundary } from '../ErrorBoundary.jsx';
 
 const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
 
@@ -165,7 +166,6 @@ export function GameProvider({ children }) {
               <div
                 className="absolute inset-0 overflow-hidden"
                 onClick={closeGame}
-                onTouchMove={(e) => e.preventDefault()}
               >
                 <div className="flex min-h-full items-center justify-center p-4 sm:p-6" onClick={closeGame}>
                   <div
@@ -182,7 +182,13 @@ export function GameProvider({ children }) {
                     onClick={(e) => e.stopPropagation()}
                     dir={direction}
                   >
-                    <GameCanvas key={languagePack.id} fontClass={fontClass} />
+                  <ErrorBoundary>
+                    <GameCanvas
+                       key={languagePack.id}
+                        fontClass={fontClass}
+                       loadedSettings={loadedSettings}
+                    />
+                  </ErrorBoundary>
                   </div>
                 </div>
               </div>
@@ -194,7 +200,7 @@ export function GameProvider({ children }) {
   );
 }
 
-function GameCanvas({ fontClass }) {
+function GameCanvas({ fontClass, loadedSettings }) {
   const { t } = useLocalization();
   const { closeGame } = useContext(GameContext);
 
@@ -246,6 +252,11 @@ function GameCanvas({ fontClass }) {
       title: 'Click Mode',
       description:
         'Click on a letter to select it, then click on a bucket to place it, instead of dragging. This makes the game easier to play if you have difficulty with dragging.',
+    },
+    associationMode: {
+      title: 'Association Mode',
+      description:
+        'Buckets display images, drag to the image which starts with the letter sound.',
     },
   };
 
@@ -392,6 +403,7 @@ function GameCanvas({ fontClass }) {
           id="play-area"
           className="relative flex-1 overflow-hidden"
           style={{
+            touchAction: 'none',  // 👈 blocks scroll/pinch on this area
             background:
               'linear-gradient(180deg, rgba(255, 218, 168, 0.3), rgba(255, 229, 201, 0.5))',
             maxHeight: 'calc(100vh - 12rem)',
@@ -928,6 +940,24 @@ function GameCanvas({ fontClass }) {
                 id="click-mode-toggle"
                 type="checkbox"
                 defaultChecked={loadedSettings.clickMode}
+                className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
+                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+              />
+            </label>
+
+            <label className="flex items-center justify-between">
+              <span
+                className="cursor-pointer hover:text-amber-700"
+                onClick={(e) => showInfo('associationMode', e)}
+                onMouseEnter={(e) => showInfo('associationMode', e)}
+                onMouseLeave={() => setShowInfoPopup(false)}
+              >
+                Association Mode
+              </span>
+              <input
+                id="association-mode-toggle"
+                type="checkbox"
+                defaultChecked={loadedSettings.associationMode}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />

@@ -17,6 +17,7 @@ export default function SettingsView() {
   const [fontShuffle, setFontShuffle] = useState(false);
   const [slowRiver, setSlowRiver] = useState(false);
   const [clickMode, setClickMode] = useState(false);
+  const [associationMode, setAssociationMode] = useState(false);
 
   // Info popup state
   const [showInfoPopup, setShowInfoPopup] = useState(false);
@@ -39,6 +40,7 @@ export default function SettingsView() {
           setFontShuffle(settings.fontShuffle ?? false);
           setSlowRiver(settings.slowRiver ?? false);
           setClickMode(settings.clickMode ?? false);
+          setAssociationMode(settings.associationMode ?? false);
         }
       } catch (e) {
         console.error('Failed to load game settings', e);
@@ -67,7 +69,8 @@ export default function SettingsView() {
         gameFont,
         fontShuffle,
         slowRiver,
-        clickMode
+        clickMode,
+        associationMode
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
 
@@ -83,7 +86,7 @@ export default function SettingsView() {
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
-  }, [showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, fontShuffle, slowRiver, clickMode]);
+  }, [showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, fontShuffle, slowRiver, clickMode, associationMode]);
 
   const getSpeedLabel = (speed) => {
     if (speed < 14) return t('game.accessibility.speedSlow');
@@ -128,6 +131,10 @@ export default function SettingsView() {
     clickMode: {
       title: 'Click Mode',
       description: 'Click on a letter to select it, then click on a bucket to place it, instead of dragging. This makes the game easier to play if you have difficulty with dragging.'
+    },
+    associationMode: {
+      title: 'Association Mode',
+      description: 'Buckets display images, drag to the image which starts with the letter sound.'
     }
   };
 
@@ -391,6 +398,24 @@ const showInfo = (settingKey, event) => {
                 type="checkbox"
                 checked={clickMode}
                 onChange={(e) => setClickMode(e.target.checked)}
+                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
+              />
+            </label>
+
+            <label className="flex items-center justify-between">
+              <span
+                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
+                onClick={(e) => showInfo('associationMode', e)}
+                onMouseEnter={(e) => showInfo('associationMode', e)}
+                onMouseLeave={() => setShowInfoPopup(false)}
+              >
+                Association Mode
+              </span>
+              <input
+                id="settings-association-mode-toggle"
+                type="checkbox"
+                checked={associationMode}
+                onChange={(e) => setAssociationMode(e.target.checked)}
                 className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
               />
             </label>
