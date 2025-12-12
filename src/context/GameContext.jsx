@@ -108,6 +108,7 @@ export function GameProvider({ children }) {
         languagePack,
         translate: t,
         dictionary,
+        appLanguageId: interfaceLanguagePack.id,
       });
     }
     const api = gameApiRef.current;

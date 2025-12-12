@@ -40,7 +40,7 @@ function clearAllTimers() {
   trackedIntervals.clear();
 }
 
-export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary } = {}) {
+export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary, appLanguageId = 'en' } = {}) {
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
   const livesContainer = document.getElementById('lives-container');
@@ -1872,7 +1872,7 @@ function startClickMode(itemEl, payload) {
 
       // Check if association mode is enabled and we have an emoji for this sound
       if (associationModeEnabled && displayLabel) {
-        const association = getAssociation(displayLabel);
+        const association = getAssociation(displayLabel, appLanguageId);
         if (association) {
           // Display emoji with optional word label <span class="text-xs text-arcade-text-muted">${association.word}</span>
           box.innerHTML = `<div class="flex flex-col items-center justify-center gap-1">

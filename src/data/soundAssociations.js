@@ -11,6 +11,8 @@
  * - alt: Alternative description for screen readers
  */
 
+import { getTranslation } from './soundAssociationTranslations.js';
+
 export const soundAssociations = {
   // Vowels and semi-vowels
   '(A)': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
@@ -264,34 +266,58 @@ export const soundAssociations = {
 };
 
 /**
- * Get the association for a given sound
+ * Get the association for a given sound with localized word and alt text
  * @param {string} sound - The phonetic sound (e.g., "B", "Ch", "Ba")
- * @returns {object|null} The association object with emoji, word, and alt, or null if not found
+ * @param {string} appLanguageId - The app language ID (e.g., 'en', 'he', 'es') for translations
+ * @returns {object|null} The association object with emoji, word, and alt in the requested language, or null if not found
  */
-export function getAssociation(sound) {
+export function getAssociation(sound, appLanguageId = 'en') {
   if (!sound) return null;
+
+  // Helper to get localized association
+  const localizeAssociation = (baseAssociation) => {
+    if (!baseAssociation) return null;
+
+    // If we have a translation for this word, get localized version
+    if (baseAssociation.word) {
+      try {
+        const translation = getTranslation(baseAssociation.word, appLanguageId);
+        return {
+          emoji: baseAssociation.emoji,
+          word: translation.word,
+          alt: translation.alt
+        };
+      } catch (error) {
+        // Fallback to original association (English) if translation fails
+        return baseAssociation;
+      }
+    }
+
+    // Fallback to original association (English)
+    return baseAssociation;
+  };
 
   // Direct match
   if (soundAssociations[sound]) {
-    return soundAssociations[sound];
+    return localizeAssociation(soundAssociations[sound]);
   }
 
   // Try without parentheses (e.g., "(A)" -> "A")
   const withoutParens = sound.replace(/[()]/g, '');
   if (soundAssociations[withoutParens]) {
-    return soundAssociations[withoutParens];
+    return localizeAssociation(soundAssociations[withoutParens]);
   }
 
   // Try case variations
   const upperSound = sound.toUpperCase();
   if (soundAssociations[upperSound]) {
-    return soundAssociations[upperSound];
+    return localizeAssociation(soundAssociations[upperSound]);
   }
 
   const lowerSound = sound.toLowerCase();
   const capitalizedSound = lowerSound.charAt(0).toUpperCase() + lowerSound.slice(1);
   if (soundAssociations[capitalizedSound]) {
-    return soundAssociations[capitalizedSound];
+    return localizeAssociation(soundAssociations[capitalizedSound]);
   }
 
   return null;
