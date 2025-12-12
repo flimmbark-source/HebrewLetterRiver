@@ -827,10 +827,10 @@ function startClickMode(itemEl, payload) {
     const targetBox = e.currentTarget;
     targetBox.classList.remove('drag-over');
 
-    const { id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol } = payload;
+    const { id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol, sound: droppedSound } = payload;
     if (!gameActive || !activeItems.has(droppedId)) return;
 
-    const targetItemId = targetBox.dataset.itemId;
+    const targetSound = targetBox.dataset.sound;
     const item = activeItems.get(droppedId);
 
     item.element.isDropped = true;
@@ -838,7 +838,8 @@ function startClickMode(itemEl, payload) {
       sessionStats[droppedItemId] = { correct: 0, incorrect: 0 };
     }
 
-    const isCorrect = targetItemId === droppedItemId;
+    // Match by sound - allows multiple letters with same sound to share a bucket
+    const isCorrect = targetSound === droppedSound;
 
     if (isCorrect) {
       updateScore(10);
@@ -870,8 +871,8 @@ function startClickMode(itemEl, payload) {
       }
 
       // Find the correct bucket to show its sound/label
-      const correctBucket = choicesContainer.querySelector(`[data-item-id="${droppedItemId}"]`);
-      const correctLabel = correctBucket ? correctBucket.textContent : (getDisplayLabel(item.data) || getDisplaySymbol(item.data));
+      const correctBucket = choicesContainer.querySelector(`[data-sound="${droppedSound}"]`);
+      const correctLabel = correctBucket ? correctBucket.textContent : (droppedSound || getDisplayLabel(item.data) || getDisplaySymbol(item.data));
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
       ghostEl.textContent = correctLabel;
@@ -1740,16 +1741,25 @@ function startClickMode(itemEl, payload) {
     refreshDropZones();
     if (correctItems.length === 0) return;
 
-    const uniqueCorrect = new Map();
+    // Group items by sound - multiple letters with same sound share one bucket
+    const uniqueBySound = new Map();
     correctItems.forEach((item) => {
-      if (!item || uniqueCorrect.has(item.id)) return;
-      uniqueCorrect.set(item.id, item);
+      if (!item) return;
+      const sound = getDisplayLabel(item);
+      if (!sound) return; // Skip items without sound
+      if (!uniqueBySound.has(sound)) {
+        uniqueBySound.set(sound, item);
+      }
     });
-    const correctChoices = Array.from(uniqueCorrect.values());
-    const correctIds = new Set(correctChoices.map((i) => i.id));
+    const correctChoices = Array.from(uniqueBySound.values());
+    const correctSounds = new Set(correctChoices.map((i) => getDisplayLabel(i)));
     let finalChoices = [...correctChoices];
 
-    let distractorPool = itemPool.filter((i) => !correctIds.has(i.id));
+    // Filter distractors: exclude items with same sound as correct items
+    let distractorPool = itemPool.filter((i) => {
+      const sound = getDisplayLabel(i);
+      return sound && !correctSounds.has(sound);
+    });
     distractorPool.sort(() => 0.5 - Math.random());
 
     let i = 0;
@@ -1775,6 +1785,8 @@ function startClickMode(itemEl, payload) {
           : (displayLabel || displaySymbol);
       box.textContent = labelText;
       box.dataset.itemId = choice.id;
+      // Store the sound for matching - allows multiple letters with same sound
+      box.dataset.sound = displayLabel;
       box.className = 'catcher-box bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium text-arcade-text-main font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-arcade-panel-border shadow-arcade-sm';
       const ariaLabel = getCharacterAriaLabel(choice);
       if (ariaLabel) box.setAttribute('aria-label', ariaLabel);
@@ -2016,12 +2028,12 @@ accessibilityBtn?.addEventListener('click', () => {
     e.preventDefault();
     const targetBox = e.currentTarget;
     targetBox.classList.remove('drag-over');
-    const { id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol } = JSON.parse(
+    const { id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol, sound: droppedSound } = JSON.parse(
       e.dataTransfer.getData('application/json')
     );
     if (!gameActive || !activeItems.has(droppedId)) return;
 
-    const targetItemId = targetBox.dataset.itemId;
+    const targetSound = targetBox.dataset.sound;
     const item = activeItems.get(droppedId);
 
     item.element.isDropped = true;
@@ -2029,7 +2041,8 @@ accessibilityBtn?.addEventListener('click', () => {
       sessionStats[droppedItemId] = { correct: 0, incorrect: 0 };
     }
 
-    const isCorrect = targetItemId === droppedItemId;
+    // Match by sound - allows multiple letters with same sound to share a bucket
+    const isCorrect = targetSound === droppedSound;
 
     if (isCorrect) {
       updateScore(10);
@@ -2061,8 +2074,8 @@ accessibilityBtn?.addEventListener('click', () => {
       }
 
       // Find the correct bucket to show its sound/label
-      const correctBucket = choicesContainer.querySelector(`[data-item-id="${droppedItemId}"]`);
-      const correctLabel = correctBucket ? correctBucket.textContent : (getDisplayLabel(item.data) || getDisplaySymbol(item.data));
+      const correctBucket = choicesContainer.querySelector(`[data-sound="${droppedSound}"]`);
+      const correctLabel = correctBucket ? correctBucket.textContent : (droppedSound || getDisplayLabel(item.data) || getDisplaySymbol(item.data));
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
       ghostEl.textContent = correctLabel;
