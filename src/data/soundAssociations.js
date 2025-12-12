@@ -170,7 +170,97 @@ export const soundAssociations = {
   'Ze': { emoji: '0️⃣', word: 'Zero', alt: 'Number zero' },
   'Zi': { emoji: '🤐', word: 'Zip', alt: 'Zipper mouth' },
   'Zo': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
-  'Zu': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' }
+  'Zu': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
+
+  // ========================================
+  // LANGUAGE-SPECIFIC SOUND ALIASES
+  // ========================================
+
+  // English letter names
+  'ay': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
+  'bee': { emoji: '🐻', word: 'Bear', alt: 'Brown bear' },
+  'see': { emoji: '🍒', word: 'Cherry', alt: 'Red cherries' },
+  'dee': { emoji: '🦆', word: 'Duck', alt: 'Yellow duck' },
+  'eff': { emoji: '🐟', word: 'Fish', alt: 'Orange fish' },
+  'jee': { emoji: '🍇', word: 'Grapes', alt: 'Purple grapes' },
+  'aitch': { emoji: '🏠', word: 'House', alt: 'Small house' },
+  'eye': { emoji: '👁️', word: 'Eye', alt: 'Human eye' },
+  'jay': { emoji: '🤹', word: 'Juggler', alt: 'Person juggling' },
+
+  // Spanish sounds
+  'beh': { emoji: '🐻', word: 'Bear', alt: 'Brown bear' },
+  'seh': { emoji: '🍜', word: 'Soup', alt: 'Bowl of soup' },
+  'enyeh': { emoji: '🪺', word: 'Nest', alt: 'Bird nest' },
+  'eh-yeh': { emoji: '💛', word: 'Yellow', alt: 'Yellow heart' },
+  'ehr-eh': { emoji: '🚀', word: 'Rocket', alt: 'Red rocket' },
+
+  // French sounds
+  'uh': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
+  'ny': { emoji: '🪺', word: 'Nest', alt: 'Bird nest' },
+  'air': { emoji: '🚀', word: 'Rocket', alt: 'Red rocket' },
+  'ell': { emoji: '🦙', word: 'Llama', alt: 'Brown llama' },
+
+  // Russian sounds
+  'veh': { emoji: '🎻', word: 'Violin', alt: 'Brown violin' },
+  'geh': { emoji: '🍇', word: 'Grapes', alt: 'Purple grapes' },
+  'deh': { emoji: '🦆', word: 'Duck', alt: 'Yellow duck' },
+  'yeh': { emoji: '💛', word: 'Yellow', alt: 'Yellow heart' },
+  'zh': { emoji: '🤹', word: 'Juggler', alt: 'Person juggling' },
+  'zeh': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
+  'yot': { emoji: '🪀', word: 'Yo-yo', alt: 'Red yo-yo' },
+
+  // Portuguese sounds
+  'lye': { emoji: '🦙', word: 'Llama', alt: 'Brown llama' },
+  'heh': { emoji: '🏠', word: 'House', alt: 'Small house' },
+  'ess': { emoji: '🍜', word: 'Soup', alt: 'Bowl of soup' },
+
+  // Arabic syllables
+  'jeem': { emoji: '🤹', word: 'Juggler', alt: 'Person juggling' },
+  'dal': { emoji: '🦆', word: 'Duck', alt: 'Yellow duck' },
+  'dhal': { emoji: '🦆', word: 'Duck', alt: 'Yellow duck' },
+  'tha': { emoji: '🐯', word: 'Tiger', alt: 'Orange tiger' },
+
+  // Hindi syllables
+  'ā': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
+  'ī': { emoji: '🐦', word: 'Bird', alt: 'Blue bird' },
+  'kha': { emoji: '🪁', word: 'Kite', alt: 'Colorful kite' },
+  'gha': { emoji: '🍇', word: 'Grapes', alt: 'Purple grapes' },
+  'ca': { emoji: '🍒', word: 'Cherry', alt: 'Red cherries' },
+
+  // Bengali syllables
+  'ô': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
+  'ko': { emoji: '🐨', word: 'Koala', alt: 'Gray koala' },
+  'kho': { emoji: '🪁', word: 'Kite', alt: 'Colorful kite' },
+  'go': { emoji: '🐐', word: 'Goat', alt: 'White goat' },
+  'gho': { emoji: '🍇', word: 'Grapes', alt: 'Purple grapes' },
+  'co': { emoji: '🍒', word: 'Cherry', alt: 'Red cherries' },
+
+  // Japanese syllables (using existing syllable mappings)
+  'ke': { emoji: '🔑', word: 'Key', alt: 'Gold key' },
+  'ku': { emoji: '🧁', word: 'Cupcake', alt: 'Pink cupcake' },
+
+  // Amharic syllables
+  'le': { emoji: '🍋', word: 'Lemon', alt: 'Yellow lemon' },
+  'che': { emoji: '🧀', word: 'Cheese', alt: 'Cheese wedge' },
+  'nye': { emoji: '🌃', word: 'Night', alt: 'Night cityscape' },
+  'we': { emoji: '🌊', word: 'Wave', alt: 'Ocean wave' },
+  'je': { emoji: '🤹', word: 'Juggler', alt: 'Person juggling' },
+  'tse': { emoji: '👲🏼', word: 'Pizza', alt: 'Pizza slice' },
+  'fe': { emoji: '🐟', word: 'Fish', alt: 'Orange fish' },
+  'qe': { emoji: '👑', word: 'King', alt: 'Gold crown' },
+  'zhe': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
+
+  // Mandarin characters (using descriptive associations)
+  'nǐ': { emoji: '👤', word: 'You', alt: 'Person silhouette' },
+  'hǎo': { emoji: '👍', word: 'Good', alt: 'Thumbs up' },
+  'xué': { emoji: '📚', word: 'Study', alt: 'Books' },
+  'shēng': { emoji: '🌱', word: 'Life', alt: 'Seedling' },
+  'shuǐ': { emoji: '💧', word: 'Water', alt: 'Water droplet' },
+  'huǒ': { emoji: '🔥', word: 'Fire', alt: 'Flame' },
+  'shān': { emoji: '⛰️', word: 'Mountain', alt: 'Mountain' },
+  'tián': { emoji: '🌾', word: 'Field', alt: 'Rice field' },
+  'rì': { emoji: '☀️', word: 'Sun', alt: 'Bright sun' },
+  'yuè': { emoji: '🌙', word: 'Moon', alt: 'Crescent moon' }
 };
 
 /**
