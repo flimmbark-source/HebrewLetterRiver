@@ -927,6 +927,7 @@ function startClickMode(itemEl, payload) {
   let selectedFont = 'default';
   let fontShuffleEnabled = false;
   let lastUsedFont = null; // Track last used font to prevent consecutive repeats
+  let recentSpawnPositions = []; // Track recent spawn positions to prevent clumping
   let selectedLetter = null; // For click mode
   let goalValue = 10;
   let hasReachedGoal = false; // Track if goal level was reached
@@ -1056,6 +1057,7 @@ function startClickMode(itemEl, payload) {
     seenItems = new Set();
     learningOrder = [];
     lastItemSound = null;
+    recentSpawnPositions = []; // Clear spawn position tracking
     sessionStats = {};
     hasIntroducedForItemInLevel = false;
     randomLettersEnabled = randomLettersToggle?.checked ?? false;
@@ -1462,6 +1464,9 @@ function startClickMode(itemEl, payload) {
       // Filter out any invalid items to prevent spawning without buckets
       roundItems = roundItems.filter((item) => item && item.id);
 
+      // Clear spawn position tracking for new round
+      recentSpawnPositions = [];
+
       currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [], isFirstWave: isFirstWaveOfLevel };
       generateChoices(roundItems, itemPool);
       processItemsForRound(roundItems, currentRound.id, isFirstWaveOfLevel);
@@ -1510,6 +1515,9 @@ function startClickMode(itemEl, payload) {
 
     // Filter out any invalid items to prevent spawning without buckets
     roundItems = roundItems.filter((item) => item && item.id);
+
+    // Clear spawn position tracking for new round
+    recentSpawnPositions = [];
 
     currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [], isFirstWave: isFirstWaveOfLevel };
     generateChoices(roundItems, itemPool);
@@ -1590,6 +1598,47 @@ function startClickMode(itemEl, payload) {
     }
   }
 
+  /**
+   * Generate a well-distributed vertical spawn position with buffers and anti-clumping
+   * @param {boolean} isSlowRiver - Whether slow river mode is enabled
+   * @returns {number} - A position value between minBuffer and maxBuffer (percentage)
+   */
+  function getDistributedSpawnPosition(isSlowRiver) {
+    // Define buffers: 10% from top, 20% from bottom
+    const TOP_BUFFER = 10;
+    const BOTTOM_BUFFER = 20;
+    const MIN_SEPARATION = 8; // Minimum 8% separation between letters
+    const MAX_ATTEMPTS = 10; // Try up to 10 times to find a good position
+
+    // Different ranges for slow river vs normal mode
+    const minPos = isSlowRiver ? 30 : TOP_BUFFER;
+    const maxPos = isSlowRiver ? 70 : (100 - BOTTOM_BUFFER);
+    const range = maxPos - minPos;
+
+    let position;
+    let attempts = 0;
+    let isTooClose = true;
+
+    while (isTooClose && attempts < MAX_ATTEMPTS) {
+      position = minPos + Math.random() * range;
+
+      // Check if position is far enough from recent spawns
+      isTooClose = recentSpawnPositions.some(
+        (recentPos) => Math.abs(position - recentPos) < MIN_SEPARATION
+      );
+
+      attempts++;
+    }
+
+    // Add to recent positions and keep only last 5
+    recentSpawnPositions.push(position);
+    if (recentSpawnPositions.length > 5) {
+      recentSpawnPositions.shift();
+    }
+
+    return position;
+  }
+
   function startItemDrop(itemData, roundId) {
     if (!gameActive || isPaused) return;
     const elementId = `item-${Date.now()}-${Math.random()}`;
@@ -1628,12 +1677,14 @@ function startClickMode(itemEl, payload) {
     const interactionClass = clickModeEnabled ? 'click-mode-item' : 'drag-mode-item';
     itemEl.className = `falling-letter font-bold ${fontClass} ${fontStyleClass} text-arcade-text-main ${animationName} ${interactionClass}`;
 
-    // In Slow River mode, use less top position variation and randomize horizontal placement
+    // Use distributed positioning with buffers to prevent clumping
+    const topPosition = getDistributedSpawnPosition(slowRiverEnabled);
+    itemEl.style.top = `${topPosition}%`;
+
+    // In Slow River mode, randomize horizontal placement
     if (slowRiverEnabled) {
-      itemEl.style.top = `${30 + Math.random() * 40}%`; // 30-70% range centered
       itemEl.style.left = `${10 + Math.random() * 80}%`; // 10-90% range with edge buffer
     } else {
-      itemEl.style.top = `${Math.random() * 70}%`;
       itemEl.style.left = '0'; // Explicit left positioning to prevent RTL dir from affecting spawn position
     }
 

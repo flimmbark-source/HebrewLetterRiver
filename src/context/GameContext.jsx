@@ -24,6 +24,30 @@ export function GameProvider({ children }) {
   const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
 
+  // Load settings from localStorage to display correct initial state
+  const loadedSettings = useMemo(() => {
+    try {
+      const saved = localStorage.getItem('gameSettings');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error('Failed to load game settings:', error);
+    }
+    // Return defaults if no saved settings
+    return {
+      showIntroductions: true,
+      highContrast: false,
+      randomLetters: false,
+      reducedMotion: false,
+      gameSpeed: 17,
+      gameFont: 'default',
+      fontShuffle: false,
+      slowRiver: false,
+      clickMode: false,
+    };
+  }, []);
+
   useEffect(() => {
     setHasMounted(true);
   }, []);
@@ -31,21 +55,31 @@ export function GameProvider({ children }) {
   // Disable body scroll when play area is open
   useEffect(() => {
     if (isVisible) {
-      // Prevent scrolling on body
+      // Save current scroll position
+      const scrollY = window.scrollY;
+
+      // Prevent scrolling on body (position: fixed is required for iOS)
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
+
       // Also add class for additional CSS support
       document.body.classList.add('no-scroll');
-    } else {
-      // Re-enable scrolling
-      document.body.style.overflow = '';
-      document.body.classList.remove('no-scroll');
-    }
 
-    // Cleanup function to restore scroll on unmount
-    return () => {
-      document.body.style.overflow = '';
-      document.body.classList.remove('no-scroll');
-    };
+      // Return cleanup function that restores scroll
+      return () => {
+        const scrollY = document.body.style.top;
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        document.body.classList.remove('no-scroll');
+
+        // Restore scroll position
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      };
+    }
   }, [isVisible]);
 
   useEffect(() => {
@@ -128,7 +162,11 @@ export function GameProvider({ children }) {
                 style={{ background: 'rgba(74, 34, 8, 0.85)' }}
                 onClick={closeGame}
               />
-              <div className="absolute inset-0 overflow-y-auto overscroll-contain" onClick={closeGame}>
+              <div
+                className="absolute inset-0 overflow-hidden"
+                onClick={closeGame}
+                onTouchMove={(e) => e.preventDefault()}
+              >
                 <div className="flex min-h-full items-center justify-center p-4 sm:p-6" onClick={closeGame}>
                   <div
                     ref={containerRef}
@@ -763,6 +801,7 @@ function GameCanvas({ fontClass }) {
                   <input
                     id="font-shuffle-toggle"
                     type="checkbox"
+                    defaultChecked={loadedSettings.fontShuffle}
                     className="h-4 w-4 rounded border-2 text-orange-600 focus:ring-orange-500"
                     style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
                   />
@@ -770,6 +809,7 @@ function GameCanvas({ fontClass }) {
               </div>
               <select
                 id="game-font-select"
+                defaultValue={loadedSettings.gameFont}
                 className="w-full rounded-lg border px-2 py-1 text-xs"
                 style={{
                   borderColor: '#e49b5a',
@@ -797,9 +837,9 @@ function GameCanvas({ fontClass }) {
               <input
                 id="toggle-introductions"
                 type="checkbox"
+                defaultChecked={loadedSettings.showIntroductions}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
-                defaultChecked
               />
             </label>
 
@@ -815,6 +855,7 @@ function GameCanvas({ fontClass }) {
               <input
                 id="high-contrast-toggle"
                 type="checkbox"
+                defaultChecked={loadedSettings.highContrast}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
@@ -832,6 +873,7 @@ function GameCanvas({ fontClass }) {
               <input
                 id="random-letters-toggle"
                 type="checkbox"
+                defaultChecked={loadedSettings.randomLetters}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
@@ -849,6 +891,7 @@ function GameCanvas({ fontClass }) {
               <input
                 id="reduced-motion-toggle"
                 type="checkbox"
+                defaultChecked={loadedSettings.reducedMotion}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
@@ -866,6 +909,7 @@ function GameCanvas({ fontClass }) {
               <input
                 id="slow-river-toggle"
                 type="checkbox"
+                defaultChecked={loadedSettings.slowRiver}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
@@ -883,6 +927,7 @@ function GameCanvas({ fontClass }) {
               <input
                 id="click-mode-toggle"
                 type="checkbox"
+                defaultChecked={loadedSettings.clickMode}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
@@ -911,7 +956,7 @@ function GameCanvas({ fontClass }) {
                 type="range"
                 min="10"
                 max="24"
-                defaultValue="17"
+                defaultValue={loadedSettings.gameSpeed}
                 className="mt-2 w-full"
                 style={{ accentColor: '#ff9247' }}
               />
