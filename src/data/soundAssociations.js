@@ -66,7 +66,7 @@ export const soundAssociations = {
   'T': { emoji: '🐯', word: 'Tiger', alt: 'Orange tiger' },
 
   // Consonants - Tz
-  'Tz': { emoji: '🍕', word: 'Pizza', alt: 'Pizza slice' },
+  'Tz': { emoji: '👲🏼', word: 'Pizza', alt: 'Pizza slice' },
 
   // Consonants - V
   'V': { emoji: '🎻', word: 'Violin', alt: 'Brown violin' },
