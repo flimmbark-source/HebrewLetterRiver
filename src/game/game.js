@@ -313,7 +313,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     gameActive = true;
     // Clear current round and start a new wave
     if (currentRound && currentRound.timers) {
-      currentRound.timers.forEach((handle) => clearTrackedTimeout(handle));
+      currentRound.timers.forEach((timer) => clearTrackedTimeout(timer.handle || timer));
     }
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
@@ -827,10 +827,10 @@ function startClickMode(itemEl, payload) {
     const targetBox = e.currentTarget;
     targetBox.classList.remove('drag-over');
 
-    const { id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol } = payload;
+    const { id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol, sound: droppedSound } = payload;
     if (!gameActive || !activeItems.has(droppedId)) return;
 
-    const targetItemId = targetBox.dataset.itemId;
+    const targetSound = targetBox.dataset.sound;
     const item = activeItems.get(droppedId);
 
     item.element.isDropped = true;
@@ -838,7 +838,8 @@ function startClickMode(itemEl, payload) {
       sessionStats[droppedItemId] = { correct: 0, incorrect: 0 };
     }
 
-    const isCorrect = targetItemId === droppedItemId;
+    // Match by sound - allows multiple letters with same sound to share a bucket
+    const isCorrect = targetSound === droppedSound;
 
     if (isCorrect) {
       updateScore(10);
@@ -870,8 +871,8 @@ function startClickMode(itemEl, payload) {
       }
 
       // Find the correct bucket to show its sound/label
-      const correctBucket = choicesContainer.querySelector(`[data-item-id="${droppedItemId}"]`);
-      const correctLabel = correctBucket ? correctBucket.textContent : (getDisplayLabel(item.data) || getDisplaySymbol(item.data));
+      const correctBucket = choicesContainer.querySelector(`[data-sound="${droppedSound}"]`);
+      const correctLabel = correctBucket ? correctBucket.textContent : (droppedSound || getDisplayLabel(item.data) || getDisplaySymbol(item.data));
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
       ghostEl.textContent = correctLabel;
@@ -1022,7 +1023,7 @@ function startClickMode(itemEl, payload) {
   function resetToSetupScreen() {
     gameActive = false;
     if (currentRound && currentRound.timers) {
-      currentRound.timers.forEach((handle) => clearTrackedTimeout(handle));
+      currentRound.timers.forEach((timer) => clearTrackedTimeout(timer.handle || timer));
     }
     currentRound = null;
     clearAllTimers();
@@ -1214,7 +1215,7 @@ function startClickMode(itemEl, payload) {
 
   function endGame() {
     gameActive = false;
-    if (currentRound && currentRound.timers) currentRound.timers.forEach((handle) => clearTrackedTimeout(handle));
+    if (currentRound && currentRound.timers) currentRound.timers.forEach((timer) => clearTrackedTimeout(timer.handle || timer));
     currentRound = null;
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
@@ -1533,7 +1534,7 @@ function startClickMode(itemEl, payload) {
 
         if (isNewItem && introductionsEnabled) {
           const showTime = totalDelay;
-          const t1 = trackTimeout(() => {
+          const callback1 = () => {
             if (!gameActive || isPaused || currentRound.id !== roundId) return;
             learnLetterEl.textContent = itemData.symbol;
             const transliteration = itemData.transliteration ?? itemData.name ?? '';
@@ -1542,19 +1543,37 @@ function startClickMode(itemEl, payload) {
             learnSound.textContent = pronunciation ? t('game.summary.soundLabel', { sound: pronunciation }) : '';
             learnOverlay.classList.add('visible');
             startItemDrop(itemData, roundId);
-          }, showTime);
-          currentRound.timers.push(t1);
+          };
+          const t1 = trackTimeout(callback1, showTime);
+          currentRound.timers.push({
+            handle: t1,
+            startTime: Date.now(),
+            delay: showTime,
+            callback: callback1
+          });
 
-          const t2 = trackTimeout(() => {
+          const callback2 = () => {
             learnOverlay.classList.remove('visible');
-          }, showTime + learnPhaseDuration);
-          currentRound.timers.push(t2);
+          };
+          const t2 = trackTimeout(callback2, showTime + learnPhaseDuration);
+          currentRound.timers.push({
+            handle: t2,
+            startTime: Date.now(),
+            delay: showTime + learnPhaseDuration,
+            callback: callback2
+          });
           delayForNext = learnPhaseDuration + 500;
         } else {
-          const t3 = trackTimeout(() => {
+          const callback3 = () => {
             if (gameActive && !isPaused && currentRound.id === roundId) startItemDrop(itemData, roundId);
-          }, totalDelay);
-          currentRound.timers.push(t3);
+          };
+          const t3 = trackTimeout(callback3, totalDelay);
+          currentRound.timers.push({
+            handle: t3,
+            startTime: Date.now(),
+            delay: totalDelay,
+            callback: callback3
+          });
         }
         totalDelay += delayForNext;
       });
@@ -1740,16 +1759,25 @@ function startClickMode(itemEl, payload) {
     refreshDropZones();
     if (correctItems.length === 0) return;
 
-    const uniqueCorrect = new Map();
+    // Group items by sound - multiple letters with same sound share one bucket
+    const uniqueBySound = new Map();
     correctItems.forEach((item) => {
-      if (!item || uniqueCorrect.has(item.id)) return;
-      uniqueCorrect.set(item.id, item);
+      if (!item) return;
+      const sound = getDisplayLabel(item);
+      if (!sound) return; // Skip items without sound
+      if (!uniqueBySound.has(sound)) {
+        uniqueBySound.set(sound, item);
+      }
     });
-    const correctChoices = Array.from(uniqueCorrect.values());
-    const correctIds = new Set(correctChoices.map((i) => i.id));
+    const correctChoices = Array.from(uniqueBySound.values());
+    const correctSounds = new Set(correctChoices.map((i) => getDisplayLabel(i)));
     let finalChoices = [...correctChoices];
 
-    let distractorPool = itemPool.filter((i) => !correctIds.has(i.id));
+    // Filter distractors: exclude items with same sound as correct items
+    let distractorPool = itemPool.filter((i) => {
+      const sound = getDisplayLabel(i);
+      return sound && !correctSounds.has(sound);
+    });
     distractorPool.sort(() => 0.5 - Math.random());
 
     let i = 0;
@@ -1775,6 +1803,8 @@ function startClickMode(itemEl, payload) {
           : (displayLabel || displaySymbol);
       box.textContent = labelText;
       box.dataset.itemId = choice.id;
+      // Store the sound for matching - allows multiple letters with same sound
+      box.dataset.sound = displayLabel;
       box.className = 'catcher-box bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium text-arcade-text-main font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-arcade-panel-border shadow-arcade-sm';
       const ariaLabel = getCharacterAriaLabel(choice);
       if (ariaLabel) box.setAttribute('aria-label', ariaLabel);
@@ -2016,12 +2046,12 @@ accessibilityBtn?.addEventListener('click', () => {
     e.preventDefault();
     const targetBox = e.currentTarget;
     targetBox.classList.remove('drag-over');
-    const { id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol } = JSON.parse(
+    const { id: droppedId, roundId, itemId: droppedItemId, symbol: droppedSymbol, sound: droppedSound } = JSON.parse(
       e.dataTransfer.getData('application/json')
     );
     if (!gameActive || !activeItems.has(droppedId)) return;
 
-    const targetItemId = targetBox.dataset.itemId;
+    const targetSound = targetBox.dataset.sound;
     const item = activeItems.get(droppedId);
 
     item.element.isDropped = true;
@@ -2029,7 +2059,8 @@ accessibilityBtn?.addEventListener('click', () => {
       sessionStats[droppedItemId] = { correct: 0, incorrect: 0 };
     }
 
-    const isCorrect = targetItemId === droppedItemId;
+    // Match by sound - allows multiple letters with same sound to share a bucket
+    const isCorrect = targetSound === droppedSound;
 
     if (isCorrect) {
       updateScore(10);
@@ -2061,8 +2092,8 @@ accessibilityBtn?.addEventListener('click', () => {
       }
 
       // Find the correct bucket to show its sound/label
-      const correctBucket = choicesContainer.querySelector(`[data-item-id="${droppedItemId}"]`);
-      const correctLabel = correctBucket ? correctBucket.textContent : (getDisplayLabel(item.data) || getDisplaySymbol(item.data));
+      const correctBucket = choicesContainer.querySelector(`[data-sound="${droppedSound}"]`);
+      const correctLabel = correctBucket ? correctBucket.textContent : (droppedSound || getDisplayLabel(item.data) || getDisplaySymbol(item.data));
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();
       ghostEl.textContent = correctLabel;
@@ -2111,10 +2142,12 @@ accessibilityBtn?.addEventListener('click', () => {
   };
 
   let isPaused = false;
+  let pauseTime = 0; // When the game was paused
 
   const pauseGame = () => {
     if (!gameActive || isPaused) return;
     isPaused = true;
+    pauseTime = Date.now();
 
     // Pause all active item animations
     activeItems.forEach((item) => {
@@ -2123,9 +2156,17 @@ accessibilityBtn?.addEventListener('click', () => {
       }
     });
 
-    // Clear all pending timers to prevent new items from spawning
+    // Pause timers by calculating remaining time for each
     if (currentRound && currentRound.timers) {
-      currentRound.timers.forEach((handle) => clearTrackedTimeout(handle));
+      currentRound.pausedTimers = currentRound.timers.map((timer) => {
+        const elapsed = pauseTime - timer.startTime;
+        const remaining = Math.max(0, timer.delay - elapsed);
+        clearTrackedTimeout(timer.handle);
+        return {
+          callback: timer.callback,
+          remaining: remaining
+        };
+      });
       currentRound.timers = [];
     }
 
@@ -2144,27 +2185,18 @@ accessibilityBtn?.addEventListener('click', () => {
       }
     });
 
-    // Restart the round to spawn any remaining items
-    if (currentRound && currentRound.items) {
-      // Calculate which items haven't been spawned yet
-      const spawnedItemIds = new Set();
-      activeItems.forEach((item) => {
-        spawnedItemIds.add(item.id);
+    // Resume timers with their remaining time
+    if (currentRound && currentRound.pausedTimers) {
+      currentRound.pausedTimers.forEach((pausedTimer) => {
+        const handle = trackTimeout(pausedTimer.callback, pausedTimer.remaining);
+        currentRound.timers.push({
+          handle: handle,
+          startTime: Date.now(),
+          delay: pausedTimer.remaining,
+          callback: pausedTimer.callback
+        });
       });
-
-      const itemsToSpawn = currentRound.items.filter((item) => {
-        // Check if this item hasn't been spawned yet
-        // We need to check against both the item data and spawned items
-        return !Array.from(activeItems.values()).some(
-          (activeItem) => activeItem.data && activeItem.data.id === item.id && activeItem.roundId === currentRound.id
-        );
-      });
-
-      // If there are items that haven't spawned yet, spawn them
-      if (itemsToSpawn.length > 0) {
-        const isFirstWave = currentRound.isFirstWave || false;
-        processItemsForRound(itemsToSpawn, currentRound.id, isFirstWave);
-      }
+      currentRound.pausedTimers = [];
     }
 
     // Hide pause modal
