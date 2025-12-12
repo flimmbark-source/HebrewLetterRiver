@@ -2144,29 +2144,6 @@ accessibilityBtn?.addEventListener('click', () => {
       }
     });
 
-    // Restart the round to spawn any remaining items
-    if (currentRound && currentRound.items) {
-      // Calculate which items haven't been spawned yet
-      const spawnedItemIds = new Set();
-      activeItems.forEach((item) => {
-        spawnedItemIds.add(item.id);
-      });
-
-      const itemsToSpawn = currentRound.items.filter((item) => {
-        // Check if this item hasn't been spawned yet
-        // We need to check against both the item data and spawned items
-        return !Array.from(activeItems.values()).some(
-          (activeItem) => activeItem.data && activeItem.data.id === item.id && activeItem.roundId === currentRound.id
-        );
-      });
-
-      // If there are items that haven't spawned yet, spawn them
-      if (itemsToSpawn.length > 0) {
-        const isFirstWave = currentRound.isFirstWave || false;
-        processItemsForRound(itemsToSpawn, currentRound.id, isFirstWave);
-      }
-    }
-
     // Hide pause modal
     pauseModal.classList.add('hidden');
   };
