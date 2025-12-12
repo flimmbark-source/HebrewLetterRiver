@@ -247,6 +247,11 @@ function GameCanvas({ fontClass }) {
       description:
         'Click on a letter to select it, then click on a bucket to place it, instead of dragging. This makes the game easier to play if you have difficulty with dragging.',
     },
+    associationMode: {
+      title: 'Association Mode',
+      description:
+        'Instead of showing letter sounds in buckets, displays images or emojis that represent words starting with that sound. For example, a llama 🦙 for "L" or soup 🍜 for "S". This helps you learn letter-sound associations through visual mnemonics.',
+    },
   };
 
   const showInfo = (settingKey, event) => {
@@ -928,6 +933,24 @@ function GameCanvas({ fontClass }) {
                 id="click-mode-toggle"
                 type="checkbox"
                 defaultChecked={loadedSettings.clickMode}
+                className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
+                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+              />
+            </label>
+
+            <label className="flex items-center justify-between">
+              <span
+                className="cursor-pointer hover:text-amber-700"
+                onClick={(e) => showInfo('associationMode', e)}
+                onMouseEnter={(e) => showInfo('associationMode', e)}
+                onMouseLeave={() => setShowInfoPopup(false)}
+              >
+                Association Mode
+              </span>
+              <input
+                id="association-mode-toggle"
+                type="checkbox"
+                defaultChecked={loadedSettings.associationMode}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
