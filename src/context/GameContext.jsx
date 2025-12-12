@@ -24,6 +24,30 @@ export function GameProvider({ children }) {
   const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
 
+  // Load settings from localStorage to display correct initial state
+  const loadedSettings = useMemo(() => {
+    try {
+      const saved = localStorage.getItem('gameSettings');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error('Failed to load game settings:', error);
+    }
+    // Return defaults if no saved settings
+    return {
+      showIntroductions: true,
+      highContrast: false,
+      randomLetters: false,
+      reducedMotion: false,
+      gameSpeed: 17,
+      gameFont: 'default',
+      fontShuffle: false,
+      slowRiver: false,
+      clickMode: false,
+    };
+  }, []);
+
   useEffect(() => {
     setHasMounted(true);
   }, []);
@@ -763,6 +787,7 @@ function GameCanvas({ fontClass }) {
                   <input
                     id="font-shuffle-toggle"
                     type="checkbox"
+                    defaultChecked={loadedSettings.fontShuffle}
                     className="h-4 w-4 rounded border-2 text-orange-600 focus:ring-orange-500"
                     style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
                   />
@@ -770,6 +795,7 @@ function GameCanvas({ fontClass }) {
               </div>
               <select
                 id="game-font-select"
+                defaultValue={loadedSettings.gameFont}
                 className="w-full rounded-lg border px-2 py-1 text-xs"
                 style={{
                   borderColor: '#e49b5a',
@@ -797,9 +823,9 @@ function GameCanvas({ fontClass }) {
               <input
                 id="toggle-introductions"
                 type="checkbox"
+                defaultChecked={loadedSettings.showIntroductions}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
-                defaultChecked
               />
             </label>
 
@@ -815,6 +841,7 @@ function GameCanvas({ fontClass }) {
               <input
                 id="high-contrast-toggle"
                 type="checkbox"
+                defaultChecked={loadedSettings.highContrast}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
@@ -832,6 +859,7 @@ function GameCanvas({ fontClass }) {
               <input
                 id="random-letters-toggle"
                 type="checkbox"
+                defaultChecked={loadedSettings.randomLetters}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
@@ -849,6 +877,7 @@ function GameCanvas({ fontClass }) {
               <input
                 id="reduced-motion-toggle"
                 type="checkbox"
+                defaultChecked={loadedSettings.reducedMotion}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
@@ -866,6 +895,7 @@ function GameCanvas({ fontClass }) {
               <input
                 id="slow-river-toggle"
                 type="checkbox"
+                defaultChecked={loadedSettings.slowRiver}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
@@ -883,6 +913,7 @@ function GameCanvas({ fontClass }) {
               <input
                 id="click-mode-toggle"
                 type="checkbox"
+                defaultChecked={loadedSettings.clickMode}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
@@ -911,7 +942,7 @@ function GameCanvas({ fontClass }) {
                 type="range"
                 min="10"
                 max="24"
-                defaultValue="17"
+                defaultValue={loadedSettings.gameSpeed}
                 className="mt-2 w-full"
                 style={{ accentColor: '#ff9247' }}
               />
