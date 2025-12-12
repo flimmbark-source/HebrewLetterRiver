@@ -19,7 +19,7 @@ export const soundAssociationsByLanguage = {
   '(A)': {
     en: { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
     es: { emoji: '🐝', word: 'Abeja', alt: 'Abeja amarilla' },
-    fr: { emoji: '🍎', word: 'Pomme', alt: 'Pomme rouge' },
+    fr: { emoji: '🍎', word: 'Ananas', alt: 'Ananas' },  // Fixed: Ananas starts with A
     pt: { emoji: '🐝', word: 'Abelha', alt: 'Abelha amarela' },
     he: { emoji: '🔴', word: 'אדום', alt: 'עיגול אדום' },
     ru: { emoji: '🍊', word: 'Апельсин', alt: 'Оранжевый апельсин' },
@@ -28,7 +28,7 @@ export const soundAssociationsByLanguage = {
   '(Ah)': {
     en: { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
     es: { emoji: '🐝', word: 'Abeja', alt: 'Abeja amarilla' },
-    fr: { emoji: '🍎', word: 'Pomme', alt: 'Pomme rouge' },
+    fr: { emoji: '🍎', word: 'Ananas', alt: 'Ananas' },  // Fixed: Ananas starts with A
     pt: { emoji: '🐝', word: 'Abelha', alt: 'Abelha amarela' },
     he: { emoji: '🔴', word: 'אדום', alt: 'עיגול אדום' },
     ru: { emoji: '🍊', word: 'Апельсин', alt: 'Оранжевый апельсин' },
@@ -95,7 +95,7 @@ export const soundAssociationsByLanguage = {
   'H': {
     en: { emoji: '🏠', word: 'House', alt: 'Small house' },
     es: { emoji: '🍦', word: 'Helado', alt: 'Helado de vainilla' },
-    fr: { emoji: '🦔', word: 'Hérisson', alt: 'Hérisson brun' },
+    fr: { emoji: '🚁', word: 'Hélicoptère', alt: 'Hélicoptère' },  // Fixed: H is pronounced in Hélicoptère (borrowed word)
     pt: { emoji: '⏰', word: 'Hora', alt: 'Relógio' },
     he: { emoji: '⛰️', word: 'הר', alt: 'הר' },
     ru: { emoji: '🦛', word: 'Гиппопотам', alt: 'Гиппопотам' },
@@ -158,7 +158,7 @@ export const soundAssociationsByLanguage = {
   'R': {
     en: { emoji: '🚀', word: 'Rocket', alt: 'Red rocket' },
     es: { emoji: '🐀', word: 'Ratón', alt: 'Ratón gris' },
-    fr: { emoji: '🚀', word: 'Fusée', alt: 'Fusée rouge' },
+    fr: { emoji: '🐀', word: 'Rat', alt: 'Rat gris' },  // Fixed: Rat starts with R in French!
     pt: { emoji: '🐀', word: 'Rato', alt: 'Rato cinza' },
     he: { emoji: '🏃', word: 'רץ', alt: 'אדם רץ' },
     ru: { emoji: '🚀', word: 'Ракета', alt: 'Красная ракета' },
@@ -175,9 +175,9 @@ export const soundAssociationsByLanguage = {
 
   'Sh': {
     en: { emoji: '👞', word: 'Shoe', alt: 'Brown shoe' },
-    es: { emoji: '👞', word: 'Zapato', alt: 'Zapato marrón' },  // Using for Sh sound
-    fr: { emoji: '🐈', word: 'Chat', alt: 'Chat gris' },  // Ch sound similar
-    pt: { emoji: '🧃', word: 'Suco', alt: 'Suco de laranja' },
+    es: { emoji: '🤫', word: 'Shh', alt: 'Silencio' },  // Fixed: "Shh" is recognized for Sh sound
+    fr: { emoji: '🐈', word: 'Chat', alt: 'Chat gris' },  // Ch in French sounds like Sh
+    pt: { emoji: '🤫', word: 'Shh', alt: 'Silêncio' },  // Fixed: "Shh" for Sh sound
     he: { emoji: '🕐', word: 'שעה', alt: 'שעון' },
     ru: { emoji: '🎪', word: 'Шапито', alt: 'Цирковой шатёр' },
   },
@@ -220,9 +220,9 @@ export const soundAssociationsByLanguage = {
 
   'W': {
     en: { emoji: '🌊', word: 'Wave', alt: 'Ocean wave' },
-    es: { emoji: '🍉', word: 'Sandía', alt: 'Sandía' },  // Using closest
-    fr: { emoji: '🏃', word: 'Walking', alt: 'Marche' },
-    pt: { emoji: '🍉', word: 'Melancia', alt: 'Melancia' },
+    es: { emoji: '🚂', word: 'Vagón', alt: 'Vagón de tren' },  // Fixed: V/W sound in Spanish
+    fr: { emoji: '🚃', word: 'Wagon', alt: 'Wagon' },  // Fixed: Wagon starts with W
+    pt: { emoji: '🚂', word: 'Vagão', alt: 'Vagão de trem' },  // Fixed: V/W sound in Portuguese
     he: { emoji: '🩷', word: 'ורוד', alt: 'לב ורוד' },
     ru: { emoji: '🌊', word: 'Волна', alt: 'Океанская волна' },
   },
