@@ -52,7 +52,7 @@ export const soundAssociationsByLanguage = {
     es: { emoji: '🏠', word: 'Casa', alt: 'Casa pequeña' },
     fr: { emoji: '🐸', word: 'Crapaud', alt: 'Crapaud vert' },
     pt: { emoji: '🏠', word: 'Casa', alt: 'Casa pequena' },
-    he: { emoji: '🪁', word: 'כדור', alt: 'כדור צבעוני' },
+    he: { emoji: '⚽', word: 'כדור', alt: 'כדור צבעוני' },  // Fixed: Ball emoji for כדור (ball)
     ru: { emoji: '🧀', word: 'Сыр', alt: 'Кусок сыра' },
   },
 
@@ -105,14 +105,14 @@ export const soundAssociationsByLanguage = {
     en: { emoji: '🤹', word: 'Juggler', alt: 'Person juggling' },
     es: { emoji: '🦒', word: 'Jirafa', alt: 'Jirafa amarilla' },
     fr: { emoji: '🎲', word: 'Jeu', alt: 'Jeu de dés' },
-    pt: { emoji: '🌻', word: 'Jardim', alt: 'Jardim de flores' },
+    pt: { emoji: '🏞️', word: 'Jardim', alt: 'Jardim' },  // Fixed: Garden/park emoji for Jardim (garden)
     he: { emoji: '🌊', word: 'ים', alt: 'גלי ים' },
     ru: { emoji: '🍃', word: 'Жёлудь', alt: 'Жёлудь' },
   },
 
   'K': {
     en: { emoji: '🪁', word: 'Kite', alt: 'Colorful kite' },
-    es: { emoji: '🔑', word: 'Llave', alt: 'Llave dorada' },  // Using for K sound
+    es: { emoji: '🦘', word: 'Canguro', alt: 'Canguro' },  // Fixed: Canguro starts with C/K sound
     fr: { emoji: '🦘', word: 'Kangourou', alt: 'Kangourou' },
     pt: { emoji: '🔑', word: 'Chave', alt: 'Chave dourada' },  // K/Ch sound
     he: { emoji: '🐕', word: 'כלב', alt: 'כלב' },
@@ -291,7 +291,7 @@ export const soundAssociationsByLanguage = {
     fr: { emoji: '🪵', word: 'Bois', alt: 'Bûche' },
     pt: { emoji: '🧭', word: 'Bússola', alt: 'Bússola' },
     he: { emoji: '🔩', word: 'בורג', alt: 'בורג' },
-    ru: { emoji: '📘', word: 'Книга', alt: 'Синяя книга' },
+    ru: { emoji: '🥖', word: 'Булка', alt: 'Булка' },  // Fixed: Булка (bun/bread roll) starts with Б
   },
 
   // Add more syllables as needed - these demonstrate the pattern
