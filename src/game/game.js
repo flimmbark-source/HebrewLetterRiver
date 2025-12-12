@@ -1860,10 +1860,9 @@ function startClickMode(itemEl, payload) {
       if (associationModeEnabled && displayLabel) {
         const association = getAssociation(displayLabel);
         if (association) {
-          // Display emoji with optional word label
+          // Display emoji with optional word label <span class="text-xs text-arcade-text-muted">${association.word}</span>
           box.innerHTML = `<div class="flex flex-col items-center justify-center gap-1">
             <span class="text-4xl" role="img" aria-label="${association.alt}">${association.emoji}</span>
-            <span class="text-xs text-arcade-text-muted">${association.word}</span>
           </div>`;
         } else {
           // Fallback to text if no association found

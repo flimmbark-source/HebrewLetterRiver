@@ -10,6 +10,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { setupGame } from '../game/game.js';
 import { useLocalization } from './LocalizationContext.jsx';
+import { ErrorBoundary } from '../ErrorBoundary.jsx';
 
 const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
 
@@ -165,7 +166,6 @@ export function GameProvider({ children }) {
               <div
                 className="absolute inset-0 overflow-hidden"
                 onClick={closeGame}
-                onTouchMove={(e) => e.preventDefault()}
               >
                 <div className="flex min-h-full items-center justify-center p-4 sm:p-6" onClick={closeGame}>
                   <div
@@ -182,7 +182,13 @@ export function GameProvider({ children }) {
                     onClick={(e) => e.stopPropagation()}
                     dir={direction}
                   >
-                    <GameCanvas key={languagePack.id} fontClass={fontClass} />
+                  <ErrorBoundary>
+                    <GameCanvas
+                       key={languagePack.id}
+                        fontClass={fontClass}
+                       loadedSettings={loadedSettings}
+                    />
+                  </ErrorBoundary>
                   </div>
                 </div>
               </div>
@@ -194,7 +200,7 @@ export function GameProvider({ children }) {
   );
 }
 
-function GameCanvas({ fontClass }) {
+function GameCanvas({ fontClass, loadedSettings }) {
   const { t } = useLocalization();
   const { closeGame } = useContext(GameContext);
 
@@ -250,7 +256,7 @@ function GameCanvas({ fontClass }) {
     associationMode: {
       title: 'Association Mode',
       description:
-        'Instead of showing letter sounds in buckets, displays images or emojis that represent words starting with that sound. For example, a llama 🦙 for "L" or soup 🍜 for "S". This helps you learn letter-sound associations through visual mnemonics.',
+        'Buckets display images, drag to the image which starts with the letter sound.',
     },
   };
 
@@ -397,6 +403,7 @@ function GameCanvas({ fontClass }) {
           id="play-area"
           className="relative flex-1 overflow-hidden"
           style={{
+            touchAction: 'none',  // 👈 blocks scroll/pinch on this area
             background:
               'linear-gradient(180deg, rgba(255, 218, 168, 0.3), rgba(255, 229, 201, 0.5))',
             maxHeight: 'calc(100vh - 12rem)',

@@ -134,7 +134,7 @@ export default function SettingsView() {
     },
     associationMode: {
       title: 'Association Mode',
-      description: 'Instead of showing letter sounds in buckets, displays images or emojis that represent words starting with that sound. For example, a llama 🦙 for "L" or soup 🍜 for "S". This helps you learn letter-sound associations through visual mnemonics.'
+      description: 'Buckets display images, drag to the image which starts with the letter sound.'
     }
   };
 
