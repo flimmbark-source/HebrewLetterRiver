@@ -48,7 +48,7 @@ export const soundAssociations = {
   'M': { emoji: '🐭', word: 'Mouse', alt: 'Gray mouse' },
 
   // Consonants - N
-  'N': { emoji: '🪺', word: 'Nest', alt: 'Bird nest' },
+  'N': { emoji: '🪹', word: 'Nest', alt: 'Bird nest' },
 
   // Consonants - P
   'P': { emoji: '🍕', word: 'Pizza', alt: 'Pizza slice' },
@@ -116,24 +116,24 @@ export const soundAssociations = {
   'Le': { emoji: '🍋', word: 'Lemon', alt: 'Yellow lemon' },
   'Li': { emoji: '🦁', word: 'Lion', alt: 'Yellow lion' },
   'Lo': { emoji: '🔒', word: 'Lock', alt: 'Closed lock' },
-  'Lu': { emoji: '🌙', word: 'Luna', alt: 'Crescent moon' },
+  'Lu': { emoji: '🍀', word: 'luck', alt: 'Four Leaf Clover' },
 
   'Ma': { emoji: '🗺️', word: 'Map', alt: 'World map' },
   'Me': { emoji: '🍖', word: 'Meat', alt: 'Meat on bone' },
   'Mi': { emoji: '🥛', word: 'Milk', alt: 'Glass of milk' },
-  'Mo': { emoji: '🌙', word: 'Moon', alt: 'Crescent moon' },
+  'Mo': { emoji: '🌕', word: 'Moon', alt: 'Crescent moon' },
   'Mu': { emoji: '🎵', word: 'Music', alt: 'Musical note' },
 
   'Na': { emoji: '👃', word: 'Nose', alt: 'Human nose' },
-  'Ne': { emoji: '🪺', word: 'Nest', alt: 'Bird nest' },
-  'Ni': { emoji: '🌃', word: 'Night', alt: 'Night cityscape' },
+  'Ne': { emoji: '🪹', word: 'Nest', alt: 'Bird nest' },
+  'Ni': { emoji: '🌙', word: 'Night', alt: 'Night cityscape' },
   'No': { emoji: '🔔', word: 'Note', alt: 'Bell' },
   'Nu': { emoji: '🥜', word: 'Nut', alt: 'Peanuts' },
 
   'Pa': { emoji: '🐼', word: 'Panda', alt: 'Black and white panda' },
   'Pe': { emoji: '🐧', word: 'Penguin', alt: 'Black penguin' },
   'Pi': { emoji: '🍕', word: 'Pizza', alt: 'Pizza slice' },
-  'Po': { emoji: '🎯', word: 'Point', alt: 'Target bullseye' },
+  'Po': { emoji: '👉', word: 'Point', alt: 'Point Emoji' },
   'Pu': { emoji: '🐶', word: 'Puppy', alt: 'Cute dog' },
 
   'Ra': { emoji: '🐀', word: 'Rat', alt: 'Gray rat' },
@@ -143,13 +143,13 @@ export const soundAssociations = {
   'Ru': { emoji: '📏', word: 'Ruler', alt: 'Measuring ruler' },
 
   'Sa': { emoji: '🥗', word: 'Salad', alt: 'Green salad' },
-  'Se': { emoji: '🌊', word: 'Sea', alt: 'Ocean wave' },
-  'Si': { emoji: '🪑', word: 'Sit', alt: 'Chair' },
+  'Se': { emoji: '🐚', word: 'Seashell', alt: 'Spiral Shell' },
+  'Si': { emoji: '😷', word: 'Sick', alt: 'Sick' },
   'So': { emoji: '🍜', word: 'Soup', alt: 'Bowl of soup' },
   'Su': { emoji: '☀️', word: 'Sun', alt: 'Bright sun' },
 
   'Ta': { emoji: '🏷️', word: 'Tag', alt: 'Label tag' },
-  'Te': { emoji: '☕', word: 'Tea', alt: 'Cup of tea' },
+  'Te': { emoji: '🫖', word: 'Tea', alt: 'Cup of tea' },
   'Ti': { emoji: '🐯', word: 'Tiger', alt: 'Orange tiger' },
   'To': { emoji: '🍅', word: 'Tomato', alt: 'Red tomato' },
   'Tu': { emoji: '🌷', word: 'Tulip', alt: 'Red flower' },
@@ -161,10 +161,10 @@ export const soundAssociations = {
   'Vu': { emoji: '🌋', word: 'Volcano', alt: 'Erupting volcano' },
 
   'Ya': { emoji: '🧶', word: 'Yarn', alt: 'Ball of yarn' },
-  'Ye': { emoji: '💛', word: 'Yellow', alt: 'Yellow heart' },
+  'Ye': { emoji: '🟡', word: 'Yellow', alt: 'Yellow heart' },
   'Yi': { emoji: '🪀', word: 'Yo-yo', alt: 'Red yo-yo' },
   'Yo': { emoji: '🪀', word: 'Yo-yo', alt: 'Red yo-yo' },
-  'Yu': { emoji: '🥣', word: 'Yum', alt: 'Bowl with spoon' },
+  'Yu': { emoji: '😋', word: 'Yum', alt: 'Bowl with spoon' },
 
   'Za': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
   'Ze': { emoji: '0️⃣', word: 'Zero', alt: 'Number zero' },
@@ -190,13 +190,13 @@ export const soundAssociations = {
   // Spanish sounds
   'beh': { emoji: '🐻', word: 'Bear', alt: 'Brown bear' },
   'seh': { emoji: '🍜', word: 'Soup', alt: 'Bowl of soup' },
-  'enyeh': { emoji: '🪺', word: 'Nest', alt: 'Bird nest' },
-  'eh-yeh': { emoji: '💛', word: 'Yellow', alt: 'Yellow heart' },
+  'enyeh': { emoji: '🪹', word: 'Nest', alt: 'Bird nest' },
+  'eh-yeh': { emoji: '🟡', word: 'Yellow', alt: 'Yellow heart' },
   'ehr-eh': { emoji: '🚀', word: 'Rocket', alt: 'Red rocket' },
 
   // French sounds
   'uh': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
-  'ny': { emoji: '🪺', word: 'Nest', alt: 'Bird nest' },
+  'ny': { emoji: '🪹', word: 'Nest', alt: 'Bird nest' },
   'air': { emoji: '🚀', word: 'Rocket', alt: 'Red rocket' },
   'ell': { emoji: '🦙', word: 'Llama', alt: 'Brown llama' },
 
@@ -204,7 +204,7 @@ export const soundAssociations = {
   'veh': { emoji: '🎻', word: 'Violin', alt: 'Brown violin' },
   'geh': { emoji: '🍇', word: 'Grapes', alt: 'Purple grapes' },
   'deh': { emoji: '🦆', word: 'Duck', alt: 'Yellow duck' },
-  'yeh': { emoji: '💛', word: 'Yellow', alt: 'Yellow heart' },
+  'yeh': { emoji: '🟡', word: 'Yellow', alt: 'Yellow heart' },
   'zh': { emoji: '🤹', word: 'Juggler', alt: 'Person juggling' },
   'zeh': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
   'yot': { emoji: '🪀', word: 'Yo-yo', alt: 'Red yo-yo' },
@@ -260,7 +260,7 @@ export const soundAssociations = {
   'shān': { emoji: '⛰️', word: 'Mountain', alt: 'Mountain' },
   'tián': { emoji: '🌾', word: 'Field', alt: 'Rice field' },
   'rì': { emoji: '☀️', word: 'Sun', alt: 'Bright sun' },
-  'yuè': { emoji: '🌙', word: 'Moon', alt: 'Crescent moon' }
+  'yuè': { emoji: '🌕', word: 'Moon', alt: 'Crescent moon' }
 };
 
 /**
