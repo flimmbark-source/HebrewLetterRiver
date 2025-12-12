@@ -1590,16 +1590,29 @@ function startClickMode(itemEl, payload) {
       });
     } else {
       // Subsequent waves: spawn all items at once with no delays
-      items.forEach((itemData) => {
-        if (!itemData || !itemData.id) return;
-        if (currentRound.id !== roundId) return;
-        // Spawn immediately with no delay
-        if (gameActive && !isPaused && currentRound.id === roundId) {
-          startItemDrop(itemData, roundId);
-        }
+    const STAGGER_MS = 500;
+
+    items.forEach((itemData, index) => {
+    if (!itemData || !itemData.id) return;
+    if (currentRound.id !== roundId) return;
+
+    const delay = index * STAGGER_MS;
+
+    const cb = () => {
+      if (!gameActive || isPaused || currentRound.id !== roundId) return;
+      startItemDrop(itemData, roundId);
+    };
+
+    const h = trackTimeout(cb, delay);
+    currentRound.timers.push({
+      handle: h,
+      startTime: Date.now(),
+      delay,
+      callback: cb,
       });
+     });
     }
-  }
+  } 
 
   /**
    * Generate a well-distributed vertical spawn position with buffers and anti-clumping
@@ -1686,6 +1699,7 @@ function startClickMode(itemEl, payload) {
 
     // In Slow River mode, randomize horizontal placement
     if (slowRiverEnabled) {
+      itemEl.style.top = `${30 + Math.random() * 40}%`; // 30-70% range centered
       itemEl.style.left = `${10 + Math.random() * 80}%`; // 10-90% range with edge buffer
     } else {
       itemEl.style.left = '0'; // Explicit left positioning to prevent RTL dir from affecting spawn position

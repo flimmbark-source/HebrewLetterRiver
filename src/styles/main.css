@@ -2300,10 +2300,17 @@ body.no-scroll {
   min-height: 120px;
 }
 
+/* Desktop: add more breathing room on the left */
+@media (min-width: 1024px) {
+  #choices-container {
+    padding-left: 40px;   /* <- change this */
+    padding-right: 40px;  /* optional */
+  }
+}
+
 @media (max-width: 640px) {
   #choices-container {
     gap: var(--space-1); /* Tighter gap to fit more buckets per row */
-    padding: var(--space-1); /* Reduce edge padding on small screens */
     padding-inline-start: calc(max(var(--space-1) + env(safe-area-inset-left, 0px)) + var(--space-1));
     padding-inline-end: calc(max(var(--space-1) + env(safe-area-inset-right, 0px)) + var(--space-1));
   }
