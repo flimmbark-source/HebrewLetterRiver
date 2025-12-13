@@ -19,11 +19,110 @@ export const soundAssociations = soundAssociationsByLanguage;
  * Maps common variations to their canonical forms in the data
  */
 const SOUND_ALIASES = {
+  // Vowels with parentheses
   'A': '(A)',
+  'a': '(A)',
+  '(A)': '(A)',
+  '(a)': '(A)',
   'AH': '(Ah)',
   'Ah': '(Ah)',
-  '(A)': '(A)',
+  'ah': '(Ah)',
   '(Ah)': '(Ah)',
+  '(ah)': '(Ah)',
+
+  // Consonants
+  'B': 'B',
+  'b': 'B',
+
+  'C': 'C',
+  'c': 'C',
+
+  'Ch': 'Ch',
+  'ch': 'Ch',
+  'CH': 'Ch',
+
+  'D': 'D',
+  'd': 'D',
+
+  'F': 'F',
+  'f': 'F',
+
+  'G': 'G',
+  'g': 'G',
+
+  'H': 'H',
+  'h': 'H',
+
+  'J': 'J',
+  'j': 'J',
+
+  'K': 'K',
+  'k': 'K',
+
+  'L': 'L',
+  'l': 'L',
+
+  'M': 'M',
+  'm': 'M',
+
+  'N': 'N',
+  'n': 'N',
+
+  'P': 'P',
+  'p': 'P',
+
+  'R': 'R',
+  'r': 'R',
+
+  'S': 'S',
+  's': 'S',
+
+  'Sh': 'Sh',
+  'sh': 'Sh',
+  'SH': 'Sh',
+
+  'T': 'T',
+  't': 'T',
+
+  'Tz': 'Tz',
+  'tz': 'Tz',
+  'TZ': 'Tz',
+
+  'V': 'V',
+  'v': 'V',
+
+  'V/o/u': 'V/o/u',
+  'v/o/u': 'V/o/u',
+
+  'W': 'W',
+  'w': 'W',
+
+  'Y': 'Y',
+  'y': 'Y',
+
+  'Z': 'Z',
+  'z': 'Z',
+
+  // Syllables (vowel combinations)
+  'Ba': 'Ba',
+  'ba': 'Ba',
+  'BA': 'Ba',
+
+  'Be': 'Be',
+  'be': 'Be',
+  'BE': 'Be',
+
+  'Bi': 'Bi',
+  'bi': 'Bi',
+  'BI': 'Bi',
+
+  'Bo': 'Bo',
+  'bo': 'Bo',
+  'BO': 'Bo',
+
+  'Bu': 'Bu',
+  'bu': 'Bu',
+  'BU': 'Bu',
 };
 
 /**
