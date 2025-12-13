@@ -85,6 +85,9 @@ const SOUND_ALIASES = {
   'Ch': 'Ch',
   'ch': 'Ch',
   'CH': 'Ch',
+  'Kh': 'Ch',  // Alternative spelling for guttural Ch sound
+  'kh': 'Ch',
+  'KH': 'Ch',
 
   'D': 'D',
   'd': 'D',
@@ -132,6 +135,9 @@ const SOUND_ALIASES = {
   'Tz': 'Tz',
   'tz': 'Tz',
   'TZ': 'Tz',
+  'Ts': 'Tz',  // Alternative spelling
+  'ts': 'Tz',
+  'TS': 'Tz',
 
   'V': 'V',
   'v': 'V',
