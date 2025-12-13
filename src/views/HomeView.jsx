@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
@@ -37,6 +37,7 @@ export default function HomeView() {
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
   const [hoveredLetter, setHoveredLetter] = useState(null);
+  const languageSelectorRef = useRef(null);
 
   const latestBadge = useMemo(() => {
     if (!player.latestBadge) return null;
@@ -106,6 +107,22 @@ export default function HomeView() {
     }
   }, [player.letters, languageId]);
 
+  // Close language selector when clicking outside
+  useEffect(() => {
+    if (!appLanguageSelectorExpanded) return;
+
+    const handleClickOutside = (event) => {
+      if (languageSelectorRef.current && !languageSelectorRef.current.contains(event.target)) {
+        setAppLanguageSelectorExpanded(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [appLanguageSelectorExpanded]);
+
   const handleDailyClaim = useCallback(
     (taskId) => {
       if (!taskId || claimingTaskId) return;
@@ -151,7 +168,7 @@ export default function HomeView() {
             <span className="icon">⭐</span>
             <span className="value">{formatNumber(totalStarsEarned)}</span>
           </div>
-          <div style={{ position: 'relative' }}>
+          <div ref={languageSelectorRef} style={{ position: 'relative' }}>
             <button
               onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
               className="tiny-pill"
