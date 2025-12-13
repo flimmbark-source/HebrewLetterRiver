@@ -176,6 +176,21 @@ const SOUND_ALIASES = {
   'BU': 'Bu',
 };
 
+const LANGUAGE_ID_ALIASES = {
+  english: 'en',
+  spanish: 'es',
+  french: 'fr',
+  portuguese: 'pt',
+  hebrew: 'he',
+  russian: 'ru',
+  arabic: 'ar',
+  amharic: 'am',
+  bengali: 'bn',
+  mandarin: 'zh',
+  japanese: 'ja',
+  hindi: 'hi'
+};
+
 /**
  * Normalize sound key for consistent lookups
  * @param {string} sound - The sound to normalize
@@ -183,6 +198,12 @@ const SOUND_ALIASES = {
  */
 function normalizeSoundKey(sound) {
   return String(sound || '').trim();
+}
+
+function normalizeLanguageId(appLanguageId) {
+  if (!appLanguageId) return 'en';
+  const normalized = String(appLanguageId).trim().toLowerCase();
+  return LANGUAGE_ID_ALIASES[normalized] || normalized;
 }
 
 /**
@@ -195,26 +216,28 @@ export function getAssociation(sound, appLanguageId = 'en') {
   const raw = normalizeSoundKey(sound);
   if (!raw) return null;
 
+  const resolvedLanguageId = normalizeLanguageId(appLanguageId);
+
   // Try alias first
   const aliased = SOUND_ALIASES[raw] || SOUND_ALIASES[raw.toUpperCase()] || raw;
 
   // Try the aliased/normalized sound
-  let association = getAssociationForLanguage(aliased, appLanguageId);
+  let association = getAssociationForLanguage(aliased, resolvedLanguageId);
   if (association) return association;
 
   // Special handling for vowels: if caller passes "A" when we store "(A)"
   if (/^[AEIOU]h?$/i.test(raw)) {
-    association = getAssociationForLanguage(`(${raw})`, appLanguageId);
+    association = getAssociationForLanguage(`(${raw})`, resolvedLanguageId);
     if (association) return association;
   }
 
   // Try case variations (useful for "sh" -> "Sh")
   const lower = raw.toLowerCase();
   const capitalized = lower.charAt(0).toUpperCase() + lower.slice(1);
-  association = getAssociationForLanguage(capitalized, appLanguageId);
+  association = getAssociationForLanguage(capitalized, resolvedLanguageId);
   if (association) return association;
 
-  association = getAssociationForLanguage(raw.toUpperCase(), appLanguageId);
+  association = getAssociationForLanguage(raw.toUpperCase(), resolvedLanguageId);
   if (association) return association;
 
   return null;
