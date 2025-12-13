@@ -41,6 +41,7 @@ function clearAllTimers() {
 }
 
 export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary, appLanguageId = 'en' } = {}) {
+  console.log('🏗️ setupGame called - appLanguageId:', appLanguageId);
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
   const livesContainer = document.getElementById('lives-container');
@@ -923,6 +924,7 @@ function startClickMode(itemEl, payload) {
   let sessionStats;
   let forcedStartItem = null;
   let hasIntroducedForItemInLevel;
+  let spawnCallCounter = 0;
   let randomLettersEnabled = randomLettersToggle?.checked ?? false;
   let slowRiverEnabled = false;
   let clickModeEnabled = false;
@@ -1120,6 +1122,8 @@ function startClickMode(itemEl, payload) {
   }
 
   function startGame() {
+    console.log('🎮 startGame called');
+    spawnCallCounter = 0;
     score = 0;
     lives = initialLives;
     level = 1;
@@ -1424,6 +1428,9 @@ function startClickMode(itemEl, payload) {
   }
 
   function spawnNextRound() {
+    spawnCallCounter++;
+    console.log('🔍 spawnNextRound called - count:', spawnCallCounter, 'timestamp:', Date.now());
+
     if (!gameActive || isPaused) return;
     // Don't spawn new rounds if goal has been reached
     if (hasReachedGoal) return;
@@ -1434,7 +1441,7 @@ function startClickMode(itemEl, payload) {
     const itemPool = getModePool(gameMode);
     const isFirstWaveOfLevel = !hasIntroducedForItemInLevel;
 
-    console.log('🔍 spawnNextRound - level:', level, 'isFirstWaveOfLevel:', isFirstWaveOfLevel, 'randomLettersEnabled:', randomLettersEnabled);
+    console.log('  📊 level:', level, 'isFirstWaveOfLevel:', isFirstWaveOfLevel, 'randomLettersEnabled:', randomLettersEnabled);
 
     if (isRandomLettersModeActive()) {
       const totalItemsInRound = Math.max(1, level);
