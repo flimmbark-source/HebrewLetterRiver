@@ -24,6 +24,8 @@ export default function SettingsView() {
   const [infoPopupContent, setInfoPopupContent] = useState({ title: '', description: '' });
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
+  const [hasLoadedSettings, setHasLoadedSettings] = useState(false);
+
   // Load settings from localStorage on mount
   useEffect(() => {
     const loadSettings = () => {
@@ -42,6 +44,7 @@ export default function SettingsView() {
           setClickMode(settings.clickMode ?? false);
           setAssociationMode(settings.associationMode ?? false);
         }
+        setHasLoadedSettings(true);
       } catch (e) {
         console.error('Failed to load game settings', e);
       }
@@ -59,6 +62,8 @@ export default function SettingsView() {
 
   // Save settings to localStorage whenever they change
   useEffect(() => {
+    if (!hasLoadedSettings) return;
+
     try {
       const settings = {
         showIntroductions,
@@ -86,7 +91,7 @@ export default function SettingsView() {
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
-  }, [showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, fontShuffle, slowRiver, clickMode, associationMode]);
+  }, [hasLoadedSettings, showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, fontShuffle, slowRiver, clickMode, associationMode]);
 
   const getSpeedLabel = (speed) => {
     if (speed < 14) return t('game.accessibility.speedSlow');
