@@ -139,6 +139,7 @@ export default function AchievementsView() {
   const { t } = useLocalization();
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
+  const languageSelectorRef = useRef(null);
   const gameName = t('app.title');
   const sectionBannerVariant = 'aurora';
 
@@ -162,6 +163,22 @@ export default function AchievementsView() {
       summary
     };
   }, [player.latestBadge, t, gameName]);
+
+  // Close language selector when clicking outside
+  useEffect(() => {
+    if (!appLanguageSelectorExpanded) return;
+
+    const handleClickOutside = (event) => {
+      if (languageSelectorRef.current && !languageSelectorRef.current.contains(event.target)) {
+        setAppLanguageSelectorExpanded(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [appLanguageSelectorExpanded]);
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
   const playerStars = Math.max(0, Math.floor(player?.stars ?? 0));
@@ -276,7 +293,7 @@ export default function AchievementsView() {
             <span className="icon">⭐</span>
             <span className="value">{formatNumber(totalStarsEarned)}</span>
           </div>
-          <div style={{ position: 'relative' }}>
+          <div ref={languageSelectorRef} style={{ position: 'relative' }}>
             <button
               onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
               className="tiny-pill"

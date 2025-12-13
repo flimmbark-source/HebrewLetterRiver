@@ -40,7 +40,10 @@ function clearAllTimers() {
   trackedIntervals.clear();
 }
 
-export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary } = {}) {
+// Store the current app language ID for Association Mode (module-level variable)
+let activeAppLanguageId = 'en';
+
+export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary, appLanguageId = 'en' } = {}) {
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
   const livesContainer = document.getElementById('lives-container');
@@ -105,6 +108,10 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   const t = translate
     ? (key, replacements) => translate(key, replacements)
     : (key, replacements) => translateWithDictionary(activeDictionary, key, replacements);
+
+  // Store the app language ID for Association Mode
+  activeAppLanguageId = appLanguageId || 'en';
+
   const translateWithFallback = (key, fallback, replacements = {}) => {
     const result = t(key, replacements);
     if (!result || result === key) return fallback;
@@ -1813,7 +1820,8 @@ function startClickMode(itemEl, payload) {
       endGame();
       return;
     }
-    if (currentRound.handledCount === currentRound.items.length) {
+    // Only spawn next round if ALL items in current round are handled AND all letters cleared from screen
+    if (currentRound.handledCount === currentRound.items.length && activeItems.size === 0) {
       spawnNextRound();
     }
   }
@@ -1848,9 +1856,16 @@ function startClickMode(itemEl, payload) {
     });
     distractorPool.sort(() => 0.5 - Math.random());
 
+    // Track sounds already in finalChoices to prevent duplicates
+    const usedSounds = new Set(finalChoices.map((i) => getDisplayLabel(i)));
     let i = 0;
     while (finalChoices.length < 4 && i < distractorPool.length) {
-      finalChoices.push(distractorPool[i]);
+      const distractorSound = getDisplayLabel(distractorPool[i]);
+      // Only add if this sound hasn't been used yet
+      if (distractorSound && !usedSounds.has(distractorSound)) {
+        finalChoices.push(distractorPool[i]);
+        usedSounds.add(distractorSound);
+      }
       i++;
     }
 
@@ -1870,9 +1885,11 @@ function startClickMode(itemEl, payload) {
           ? displayLabel
           : (displayLabel || displaySymbol);
 
+      box.dataset.labelText = labelText;
+
       // Check if association mode is enabled and we have an emoji for this sound
       if (associationModeEnabled && displayLabel) {
-        const association = getAssociation(displayLabel);
+        const association = getAssociation(displayLabel, activeAppLanguageId);
         if (association) {
           // Display emoji with optional word label <span class="text-xs text-arcade-text-muted">${association.word}</span>
           box.innerHTML = `<div class="flex flex-col items-center justify-center gap-1">
@@ -1973,6 +1990,17 @@ function startClickMode(itemEl, payload) {
   }
 
   loadSettingsFromLocalStorage();
+
+  function setAppLanguageId(nextAppLanguageId) {
+    const resolved = nextAppLanguageId || 'en';
+    if (resolved === activeAppLanguageId) return;
+
+    activeAppLanguageId = resolved;
+
+    if (associationModeEnabled && currentRound?.correctItems) {
+      generateChoices(currentRound.correctItems, itemPool);
+    }
+  }
 
   // Listen for changes to settings from other sources (like SettingsView)
   window.addEventListener('storage', (e) => {
@@ -2279,16 +2307,21 @@ accessibilityBtn?.addEventListener('click', () => {
       }
     });
 
-    // Resume timers with their remaining time
+    // Resume timers with their remaining time, but only if they have meaningful time left
+    // Filter out timers that were about to fire (< 100ms), preventing letters from spawning immediately on resume
     if (currentRound && currentRound.pausedTimers) {
       currentRound.pausedTimers.forEach((pausedTimer) => {
-        const handle = trackTimeout(pausedTimer.callback, pausedTimer.remaining);
-        currentRound.timers.push({
-          handle: handle,
-          startTime: Date.now(),
-          delay: pausedTimer.remaining,
-          callback: pausedTimer.callback
-        });
+        // Only restore timers with at least 100ms remaining
+        // This prevents letters from spawning immediately when resuming
+        if (pausedTimer.remaining >= 100) {
+          const handle = trackTimeout(pausedTimer.callback, pausedTimer.remaining);
+          currentRound.timers.push({
+            handle: handle,
+            startTime: Date.now(),
+            delay: pausedTimer.remaining,
+            callback: pausedTimer.callback
+          });
+        }
       });
       currentRound.pausedTimers = [];
     }
@@ -2368,5 +2401,5 @@ accessibilityBtn?.addEventListener('click', () => {
     if (match) forcedStartItem = { ...match };
   }
 
-  return { resetToSetupScreen, startGame, setGameMode, forceStartByHebrew };
+  return { resetToSetupScreen, startGame, setGameMode, forceStartByHebrew, setAppLanguageId };
 }

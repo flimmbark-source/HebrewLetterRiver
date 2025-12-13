@@ -1,298 +1,244 @@
 /**
  * Sound Association Mappings
  *
- * This module provides a centralized mapping of phonetic sounds to visual associations
- * (emojis or image descriptions). The mappings are language-agnostic and can be reused
- * across different alphabets that share similar phonetic sounds.
+ * This module provides centralized mapping of phonetic sounds to emojis per language.
+ * IMPORTANT: Emojis are language-specific! The word must start with the target sound in that language.
  *
- * Each sound maps to an object with:
- * - emoji: The visual representation
- * - word: The word that the emoji represents (for accessibility)
- * - alt: Alternative description for screen readers
+ * Example: Sound "B"
+ * - English: 🐻 "Bear" ✓
+ * - Spanish: 🥾 "Bota" ✓ (not 🐻 "Oso" which starts with O!)
  */
 
-export const soundAssociations = {
-  // Vowels and semi-vowels
-  '(A)': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
-  '(Ah)': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
+import { soundAssociationsByLanguage, getAssociationForLanguage } from './soundAssociationsByLanguage.js';
 
-  // Consonants - B
-  'B': { emoji: '🐻', word: 'Bear', alt: 'Brown bear' },
+// Re-export the main data structure
+export const soundAssociations = soundAssociationsByLanguage;
 
-  // Consonants - C/Ch sounds
-  'C': { emoji: '🍒', word: 'Cherry', alt: 'Red cherries' },
-  'Ch': { emoji: '🧀', word: 'Cheese', alt: 'Cheese wedge' },
+/**
+ * Sound aliases to handle variations in how sounds are passed
+ * Maps common variations to their canonical forms in the data
+ */
+const SOUND_ALIASES = {
+  // Vowels with parentheses - all variations
+  'A': '(A)',
+  'a': '(A)',
+  '(A)': '(A)',
+  '(a)': '(A)',
 
-  // Consonants - D
-  'D': { emoji: '🦆', word: 'Duck', alt: 'Yellow duck' },
+  'AH': '(Ah)',
+  'Ah': '(Ah)',
+  'ah': '(Ah)',
+  '(Ah)': '(Ah)',
+  '(ah)': '(Ah)',
 
-  // Consonants - F
-  'F': { emoji: '🐟', word: 'Fish', alt: 'Orange fish' },
+  'E': '(E)',
+  'e': '(E)',
+  '(E)': '(E)',
+  '(e)': '(E)',
 
-  // Consonants - G
-  'G': { emoji: '🍇', word: 'Grapes', alt: 'Purple grapes' },
+  'EH': '(Eh)',
+  'Eh': '(Eh)',
+  'eh': '(Eh)',
+  '(Eh)': '(Eh)',
+  '(eh)': '(Eh)',
 
-  // Consonants - H
-  'H': { emoji: '🏠', word: 'House', alt: 'Small house' },
+  'I': '(I)',
+  'i': '(I)',
+  '(I)': '(I)',
+  '(i)': '(I)',
 
-  // Consonants - J
-  'J': { emoji: '🤹', word: 'Juggler', alt: 'Person juggling' },
+  'IH': '(Ih)',
+  'Ih': '(Ih)',
+  'ih': '(Ih)',
+  '(Ih)': '(Ih)',
+  '(ih)': '(Ih)',
 
-  // Consonants - K
-  'K': { emoji: '🪁', word: 'Kite', alt: 'Colorful kite' },
+  'O': '(O)',
+  'o': '(O)',
+  '(O)': '(O)',
+  '(o)': '(O)',
 
-  // Consonants - L
-  'L': { emoji: '🦙', word: 'Llama', alt: 'Brown llama' },
+  'OH': '(Oh)',
+  'Oh': '(Oh)',
+  'oh': '(Oh)',
+  '(Oh)': '(Oh)',
+  '(oh)': '(Oh)',
 
-  // Consonants - M
-  'M': { emoji: '🐭', word: 'Mouse', alt: 'Gray mouse' },
+  'U': '(U)',
+  'u': '(U)',
+  '(U)': '(U)',
+  '(u)': '(U)',
 
-  // Consonants - N
-  'N': { emoji: '🪹', word: 'Nest', alt: 'Bird nest' },
+  'UH': '(Uh)',
+  'Uh': '(Uh)',
+  'uh': '(Uh)',
+  '(Uh)': '(Uh)',
+  '(uh)': '(Uh)',
 
-  // Consonants - P
-  'P': { emoji: '🍕', word: 'Pizza', alt: 'Pizza slice' },
+  // Consonants
+  'B': 'B',
+  'b': 'B',
 
-  // Consonants - R
-  'R': { emoji: '🚀', word: 'Rocket', alt: 'Red rocket' },
+  'C': 'C',
+  'c': 'C',
 
-  // Consonants - S
-  'S': { emoji: '🍜', word: 'Soup', alt: 'Bowl of soup' },
+  'Ch': 'Ch',
+  'ch': 'Ch',
+  'CH': 'Ch',
+  'Kh': 'Ch',  // Alternative spelling for guttural Ch sound
+  'kh': 'Ch',
+  'KH': 'Ch',
 
-  // Consonants - Sh
-  'Sh': { emoji: '👞', word: 'Shoe', alt: 'Brown shoe' },
+  'D': 'D',
+  'd': 'D',
 
-  // Consonants - T
-  'T': { emoji: '🐯', word: 'Tiger', alt: 'Orange tiger' },
+  'F': 'F',
+  'f': 'F',
 
-  // Consonants - Tz
-  'Tz': { emoji: '👲🏼', word: 'Pizza', alt: 'Pizza slice' },
+  'G': 'G',
+  'g': 'G',
 
-  // Consonants - V
-  'V': { emoji: '🎻', word: 'Violin', alt: 'Brown violin' },
-  'V/o/u': { emoji: '🎻', word: 'Violin', alt: 'Brown violin' },
+  'H': 'H',
+  'h': 'H',
 
-  // Consonants - W
-  'W': { emoji: '🌊', word: 'Wave', alt: 'Ocean wave' },
+  'J': 'J',
+  'j': 'J',
 
-  // Consonants - Y
-  'Y': { emoji: '🪀', word: 'Yo-yo', alt: 'Red yo-yo' },
+  'K': 'K',
+  'k': 'K',
 
-  // Consonants - Z
-  'Z': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
+  'L': 'L',
+  'l': 'L',
 
-  // Vowel combinations (for niqqud mode)
-  'Ba': { emoji: '🍌', word: 'Banana', alt: 'Yellow banana' },
-  'Be': { emoji: '🐝', word: 'Bee', alt: 'Yellow bee' },
-  'Bi': { emoji: '🐦', word: 'Bird', alt: 'Blue bird' },
-  'Bo': { emoji: '🚤', word: 'Boat', alt: 'Small boat' },
-  'Bu': { emoji: '🪲', word: 'Bug', alt: 'Green bug' },
+  'M': 'M',
+  'm': 'M',
 
-  'Da': { emoji: '💃', word: 'Dancer', alt: 'Person dancing' },
-  'De': { emoji: '🦌', word: 'Deer', alt: 'Brown deer' },
-  'Di': { emoji: '🍽️', word: 'Dish', alt: 'Plate and utensils' },
-  'Do': { emoji: '🚪', word: 'Door', alt: 'Brown door' },
-  'Du': { emoji: '🦆', word: 'Duck', alt: 'Yellow duck' },
+  'N': 'N',
+  'n': 'N',
 
-  'Ga': { emoji: '⛽', word: 'Gas', alt: 'Gas pump' },
-  'Ge': { emoji: '💎', word: 'Gem', alt: 'Blue gem' },
-  'Gi': { emoji: '🎁', word: 'Gift', alt: 'Wrapped gift' },
-  'Go': { emoji: '🐐', word: 'Goat', alt: 'White goat' },
-  'Gu': { emoji: '🎸', word: 'Guitar', alt: 'Brown guitar' },
+  'P': 'P',
+  'p': 'P',
 
-  'Ha': { emoji: '🎩', word: 'Hat', alt: 'Black top hat' },
-  'He': { emoji: '🦔', word: 'Hedgehog', alt: 'Brown hedgehog' },
-  'Hi': { emoji: '⛰️', word: 'Hill', alt: 'Mountain hill' },
-  'Ho': { emoji: '🏠', word: 'Home', alt: 'Small house' },
-  'Hu': { emoji: '🤗', word: 'Hug', alt: 'Hugging face' },
+  'R': 'R',
+  'r': 'R',
 
-  'Ka': { emoji: '🚗', word: 'Car', alt: 'Red car' },
-  'Ke': { emoji: '🔑', word: 'Key', alt: 'Gold key' },
-  'Ki': { emoji: '👑', word: 'King', alt: 'Gold crown' },
-  'Ko': { emoji: '🐨', word: 'Koala', alt: 'Gray koala' },
-  'Ku': { emoji: '🧁', word: 'Cupcake', alt: 'Pink cupcake' },
+  'S': 'S',
+  's': 'S',
 
-  'La': { emoji: '🪜', word: 'Ladder', alt: 'Wooden ladder' },
-  'Le': { emoji: '🍋', word: 'Lemon', alt: 'Yellow lemon' },
-  'Li': { emoji: '🦁', word: 'Lion', alt: 'Yellow lion' },
-  'Lo': { emoji: '🔒', word: 'Lock', alt: 'Closed lock' },
-  'Lu': { emoji: '🍀', word: 'luck', alt: 'Four Leaf Clover' },
+  'Sh': 'Sh',
+  'sh': 'Sh',
+  'SH': 'Sh',
 
-  'Ma': { emoji: '🗺️', word: 'Map', alt: 'World map' },
-  'Me': { emoji: '🍖', word: 'Meat', alt: 'Meat on bone' },
-  'Mi': { emoji: '🥛', word: 'Milk', alt: 'Glass of milk' },
-  'Mo': { emoji: '🌕', word: 'Moon', alt: 'Crescent moon' },
-  'Mu': { emoji: '🎵', word: 'Music', alt: 'Musical note' },
+  'T': 'T',
+  't': 'T',
 
-  'Na': { emoji: '👃', word: 'Nose', alt: 'Human nose' },
-  'Ne': { emoji: '🪹', word: 'Nest', alt: 'Bird nest' },
-  'Ni': { emoji: '🌙', word: 'Night', alt: 'Night cityscape' },
-  'No': { emoji: '🔔', word: 'Note', alt: 'Bell' },
-  'Nu': { emoji: '🥜', word: 'Nut', alt: 'Peanuts' },
+  'Tz': 'Tz',
+  'tz': 'Tz',
+  'TZ': 'Tz',
+  'Ts': 'Tz',  // Alternative spelling
+  'ts': 'Tz',
+  'TS': 'Tz',
 
-  'Pa': { emoji: '🐼', word: 'Panda', alt: 'Black and white panda' },
-  'Pe': { emoji: '🐧', word: 'Penguin', alt: 'Black penguin' },
-  'Pi': { emoji: '🍕', word: 'Pizza', alt: 'Pizza slice' },
-  'Po': { emoji: '👉', word: 'Point', alt: 'Point Emoji' },
-  'Pu': { emoji: '🐶', word: 'Puppy', alt: 'Cute dog' },
+  'V': 'V',
+  'v': 'V',
 
-  'Ra': { emoji: '🐀', word: 'Rat', alt: 'Gray rat' },
-  'Re': { emoji: '🔴', word: 'Red', alt: 'Red circle' },
-  'Ri': { emoji: '🍚', word: 'Rice', alt: 'Bowl of rice' },
-  'Ro': { emoji: '🚀', word: 'Rocket', alt: 'Red rocket' },
-  'Ru': { emoji: '📏', word: 'Ruler', alt: 'Measuring ruler' },
+  'V/o/u': 'V/o/u',
+  'v/o/u': 'V/o/u',
 
-  'Sa': { emoji: '🥗', word: 'Salad', alt: 'Green salad' },
-  'Se': { emoji: '🐚', word: 'Seashell', alt: 'Spiral Shell' },
-  'Si': { emoji: '😷', word: 'Sick', alt: 'Sick' },
-  'So': { emoji: '🍜', word: 'Soup', alt: 'Bowl of soup' },
-  'Su': { emoji: '☀️', word: 'Sun', alt: 'Bright sun' },
+  'W': 'W',
+  'w': 'W',
 
-  'Ta': { emoji: '🏷️', word: 'Tag', alt: 'Label tag' },
-  'Te': { emoji: '🫖', word: 'Tea', alt: 'Cup of tea' },
-  'Ti': { emoji: '🐯', word: 'Tiger', alt: 'Orange tiger' },
-  'To': { emoji: '🍅', word: 'Tomato', alt: 'Red tomato' },
-  'Tu': { emoji: '🌷', word: 'Tulip', alt: 'Red flower' },
+  'Y': 'Y',
+  'y': 'Y',
 
-  'Va': { emoji: '🚐', word: 'Van', alt: 'Blue van' },
-  'Ve': { emoji: '🏺', word: 'Vase', alt: 'Decorative vase' },
-  'Vi': { emoji: '🎻', word: 'Violin', alt: 'Brown violin' },
-  'Vo': { emoji: '🗳️', word: 'Vote', alt: 'Ballot box' },
-  'Vu': { emoji: '🌋', word: 'Volcano', alt: 'Erupting volcano' },
+  'Z': 'Z',
+  'z': 'Z',
 
-  'Ya': { emoji: '🧶', word: 'Yarn', alt: 'Ball of yarn' },
-  'Ye': { emoji: '🟡', word: 'Yellow', alt: 'Yellow heart' },
-  'Yi': { emoji: '🪀', word: 'Yo-yo', alt: 'Red yo-yo' },
-  'Yo': { emoji: '🪀', word: 'Yo-yo', alt: 'Red yo-yo' },
-  'Yu': { emoji: '😋', word: 'Yum', alt: 'Bowl with spoon' },
+  // Syllables (vowel combinations)
+  'Ba': 'Ba',
+  'ba': 'Ba',
+  'BA': 'Ba',
 
-  'Za': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
-  'Ze': { emoji: '0️⃣', word: 'Zero', alt: 'Number zero' },
-  'Zi': { emoji: '🤐', word: 'Zip', alt: 'Zipper mouth' },
-  'Zo': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
-  'Zu': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
+  'Be': 'Be',
+  'be': 'Be',
+  'BE': 'Be',
 
-  // ========================================
-  // LANGUAGE-SPECIFIC SOUND ALIASES
-  // ========================================
+  'Bi': 'Bi',
+  'bi': 'Bi',
+  'BI': 'Bi',
 
-  // English letter names
-  'ay': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
-  'bee': { emoji: '🐻', word: 'Bear', alt: 'Brown bear' },
-  'see': { emoji: '🍒', word: 'Cherry', alt: 'Red cherries' },
-  'dee': { emoji: '🦆', word: 'Duck', alt: 'Yellow duck' },
-  'eff': { emoji: '🐟', word: 'Fish', alt: 'Orange fish' },
-  'jee': { emoji: '🍇', word: 'Grapes', alt: 'Purple grapes' },
-  'aitch': { emoji: '🏠', word: 'House', alt: 'Small house' },
-  'eye': { emoji: '👁️', word: 'Eye', alt: 'Human eye' },
-  'jay': { emoji: '🤹', word: 'Juggler', alt: 'Person juggling' },
+  'Bo': 'Bo',
+  'bo': 'Bo',
+  'BO': 'Bo',
 
-  // Spanish sounds
-  'beh': { emoji: '🐻', word: 'Bear', alt: 'Brown bear' },
-  'seh': { emoji: '🍜', word: 'Soup', alt: 'Bowl of soup' },
-  'enyeh': { emoji: '🪹', word: 'Nest', alt: 'Bird nest' },
-  'eh-yeh': { emoji: '🟡', word: 'Yellow', alt: 'Yellow heart' },
-  'ehr-eh': { emoji: '🚀', word: 'Rocket', alt: 'Red rocket' },
+  'Bu': 'Bu',
+  'bu': 'Bu',
+  'BU': 'Bu',
+};
 
-  // French sounds
-  'uh': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
-  'ny': { emoji: '🪹', word: 'Nest', alt: 'Bird nest' },
-  'air': { emoji: '🚀', word: 'Rocket', alt: 'Red rocket' },
-  'ell': { emoji: '🦙', word: 'Llama', alt: 'Brown llama' },
-
-  // Russian sounds
-  'veh': { emoji: '🎻', word: 'Violin', alt: 'Brown violin' },
-  'geh': { emoji: '🍇', word: 'Grapes', alt: 'Purple grapes' },
-  'deh': { emoji: '🦆', word: 'Duck', alt: 'Yellow duck' },
-  'yeh': { emoji: '🟡', word: 'Yellow', alt: 'Yellow heart' },
-  'zh': { emoji: '🤹', word: 'Juggler', alt: 'Person juggling' },
-  'zeh': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
-  'yot': { emoji: '🪀', word: 'Yo-yo', alt: 'Red yo-yo' },
-
-  // Portuguese sounds
-  'lye': { emoji: '🦙', word: 'Llama', alt: 'Brown llama' },
-  'heh': { emoji: '🏠', word: 'House', alt: 'Small house' },
-  'ess': { emoji: '🍜', word: 'Soup', alt: 'Bowl of soup' },
-
-  // Arabic syllables
-  'jeem': { emoji: '🤹', word: 'Juggler', alt: 'Person juggling' },
-  'dal': { emoji: '🦆', word: 'Duck', alt: 'Yellow duck' },
-  'dhal': { emoji: '🦆', word: 'Duck', alt: 'Yellow duck' },
-  'tha': { emoji: '🐯', word: 'Tiger', alt: 'Orange tiger' },
-
-  // Hindi syllables
-  'ā': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
-  'ī': { emoji: '🐦', word: 'Bird', alt: 'Blue bird' },
-  'kha': { emoji: '🪁', word: 'Kite', alt: 'Colorful kite' },
-  'gha': { emoji: '🍇', word: 'Grapes', alt: 'Purple grapes' },
-  'ca': { emoji: '🍒', word: 'Cherry', alt: 'Red cherries' },
-
-  // Bengali syllables
-  'ô': { emoji: '🍎', word: 'Apple', alt: 'Red apple' },
-  'ko': { emoji: '🐨', word: 'Koala', alt: 'Gray koala' },
-  'kho': { emoji: '🪁', word: 'Kite', alt: 'Colorful kite' },
-  'go': { emoji: '🐐', word: 'Goat', alt: 'White goat' },
-  'gho': { emoji: '🍇', word: 'Grapes', alt: 'Purple grapes' },
-  'co': { emoji: '🍒', word: 'Cherry', alt: 'Red cherries' },
-
-  // Japanese syllables (using existing syllable mappings)
-  'ke': { emoji: '🔑', word: 'Key', alt: 'Gold key' },
-  'ku': { emoji: '🧁', word: 'Cupcake', alt: 'Pink cupcake' },
-
-  // Amharic syllables
-  'le': { emoji: '🍋', word: 'Lemon', alt: 'Yellow lemon' },
-  'che': { emoji: '🧀', word: 'Cheese', alt: 'Cheese wedge' },
-  'nye': { emoji: '🌃', word: 'Night', alt: 'Night cityscape' },
-  'we': { emoji: '🌊', word: 'Wave', alt: 'Ocean wave' },
-  'je': { emoji: '🤹', word: 'Juggler', alt: 'Person juggling' },
-  'tse': { emoji: '👲🏼', word: 'Pizza', alt: 'Pizza slice' },
-  'fe': { emoji: '🐟', word: 'Fish', alt: 'Orange fish' },
-  'qe': { emoji: '👑', word: 'King', alt: 'Gold crown' },
-  'zhe': { emoji: '🦓', word: 'Zebra', alt: 'Striped zebra' },
-
-  // Mandarin characters (using descriptive associations)
-  'nǐ': { emoji: '👤', word: 'You', alt: 'Person silhouette' },
-  'hǎo': { emoji: '👍', word: 'Good', alt: 'Thumbs up' },
-  'xué': { emoji: '📚', word: 'Study', alt: 'Books' },
-  'shēng': { emoji: '🌱', word: 'Life', alt: 'Seedling' },
-  'shuǐ': { emoji: '💧', word: 'Water', alt: 'Water droplet' },
-  'huǒ': { emoji: '🔥', word: 'Fire', alt: 'Flame' },
-  'shān': { emoji: '⛰️', word: 'Mountain', alt: 'Mountain' },
-  'tián': { emoji: '🌾', word: 'Field', alt: 'Rice field' },
-  'rì': { emoji: '☀️', word: 'Sun', alt: 'Bright sun' },
-  'yuè': { emoji: '🌕', word: 'Moon', alt: 'Crescent moon' }
+const LANGUAGE_ID_ALIASES = {
+  english: 'en',
+  spanish: 'es',
+  french: 'fr',
+  portuguese: 'pt',
+  hebrew: 'he',
+  russian: 'ru',
+  arabic: 'ar',
+  amharic: 'am',
+  bengali: 'bn',
+  mandarin: 'zh',
+  japanese: 'ja',
+  hindi: 'hi'
 };
 
 /**
- * Get the association for a given sound
- * @param {string} sound - The phonetic sound (e.g., "B", "Ch", "Ba")
- * @returns {object|null} The association object with emoji, word, and alt, or null if not found
+ * Normalize sound key for consistent lookups
+ * @param {string} sound - The sound to normalize
+ * @returns {string} Normalized sound string
  */
-export function getAssociation(sound) {
-  if (!sound) return null;
+function normalizeSoundKey(sound) {
+  return String(sound || '').trim();
+}
 
-  // Direct match
-  if (soundAssociations[sound]) {
-    return soundAssociations[sound];
+function normalizeLanguageId(appLanguageId) {
+  if (!appLanguageId) return 'en';
+  const normalized = String(appLanguageId).trim().toLowerCase();
+  return LANGUAGE_ID_ALIASES[normalized] || normalized;
+}
+
+/**
+ * Get the association for a given sound with localized word and alt text
+ * @param {string} sound - The phonetic sound (e.g., "B", "Ch", "Ba")
+ * @param {string} appLanguageId - The app language ID (e.g., 'en', 'he', 'es') for translations
+ * @returns {object|null} The association object with emoji, word, and alt in the requested language, or null if not found
+ */
+export function getAssociation(sound, appLanguageId = 'en') {
+  const raw = normalizeSoundKey(sound);
+  if (!raw) return null;
+
+  const resolvedLanguageId = normalizeLanguageId(appLanguageId);
+
+  // Try alias first
+  const aliased = SOUND_ALIASES[raw] || SOUND_ALIASES[raw.toUpperCase()] || raw;
+
+  // Try the aliased/normalized sound
+  let association = getAssociationForLanguage(aliased, resolvedLanguageId);
+  if (association) return association;
+
+  // Special handling for vowels: if caller passes "A" when we store "(A)"
+  if (/^[AEIOU]h?$/i.test(raw)) {
+    association = getAssociationForLanguage(`(${raw})`, resolvedLanguageId);
+    if (association) return association;
   }
 
-  // Try without parentheses (e.g., "(A)" -> "A")
-  const withoutParens = sound.replace(/[()]/g, '');
-  if (soundAssociations[withoutParens]) {
-    return soundAssociations[withoutParens];
-  }
+  // Try case variations (useful for "sh" -> "Sh")
+  const lower = raw.toLowerCase();
+  const capitalized = lower.charAt(0).toUpperCase() + lower.slice(1);
+  association = getAssociationForLanguage(capitalized, resolvedLanguageId);
+  if (association) return association;
 
-  // Try case variations
-  const upperSound = sound.toUpperCase();
-  if (soundAssociations[upperSound]) {
-    return soundAssociations[upperSound];
-  }
-
-  const lowerSound = sound.toLowerCase();
-  const capitalizedSound = lowerSound.charAt(0).toUpperCase() + lowerSound.slice(1);
-  if (soundAssociations[capitalizedSound]) {
-    return soundAssociations[capitalizedSound];
-  }
+  association = getAssociationForLanguage(raw.toUpperCase(), resolvedLanguageId);
+  if (association) return association;
 
   return null;
 }
@@ -302,16 +248,17 @@ export function getAssociation(sound) {
  * @returns {string[]} Array of sound keys
  */
 export function getAvailableSounds() {
-  return Object.keys(soundAssociations);
+  return Object.keys(soundAssociationsByLanguage);
 }
 
 /**
  * Check if a sound has an association
  * @param {string} sound - The phonetic sound to check
+ * @param {string} appLanguageId - Optional language ID to check for specific language
  * @returns {boolean} True if the sound has an association
  */
-export function hasAssociation(sound) {
-  return getAssociation(sound) !== null;
+export function hasAssociation(sound, appLanguageId = 'en') {
+  return getAssociation(sound, appLanguageId) !== null;
 }
 
 export default {
