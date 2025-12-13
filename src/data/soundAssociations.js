@@ -15,31 +15,56 @@ import { soundAssociationsByLanguage, getAssociationForLanguage } from './soundA
 export const soundAssociations = soundAssociationsByLanguage;
 
 /**
+ * Sound aliases to handle variations in how sounds are passed
+ * Maps common variations to their canonical forms in the data
+ */
+const SOUND_ALIASES = {
+  'A': '(A)',
+  'AH': '(Ah)',
+  'Ah': '(Ah)',
+  '(A)': '(A)',
+  '(Ah)': '(Ah)',
+};
+
+/**
+ * Normalize sound key for consistent lookups
+ * @param {string} sound - The sound to normalize
+ * @returns {string} Normalized sound string
+ */
+function normalizeSoundKey(sound) {
+  return String(sound || '').trim();
+}
+
+/**
  * Get the association for a given sound with localized word and alt text
  * @param {string} sound - The phonetic sound (e.g., "B", "Ch", "Ba")
  * @param {string} appLanguageId - The app language ID (e.g., 'en', 'he', 'es') for translations
  * @returns {object|null} The association object with emoji, word, and alt in the requested language, or null if not found
  */
 export function getAssociation(sound, appLanguageId = 'en') {
-  if (!sound) return null;
+  const raw = normalizeSoundKey(sound);
+  if (!raw) return null;
 
-  // Direct match
-  let association = getAssociationForLanguage(sound, appLanguageId);
+  // Try alias first
+  const aliased = SOUND_ALIASES[raw] || SOUND_ALIASES[raw.toUpperCase()] || raw;
+
+  // Try the aliased/normalized sound
+  let association = getAssociationForLanguage(aliased, appLanguageId);
   if (association) return association;
 
-  // Try without parentheses (e.g., "(A)" -> "A")
-  const withoutParens = sound.replace(/[()]/g, '');
-  association = getAssociationForLanguage(withoutParens, appLanguageId);
+  // Special handling for vowels: if caller passes "A" when we store "(A)"
+  if (/^[AEIOU]h?$/i.test(raw)) {
+    association = getAssociationForLanguage(`(${raw})`, appLanguageId);
+    if (association) return association;
+  }
+
+  // Try case variations (useful for "sh" -> "Sh")
+  const lower = raw.toLowerCase();
+  const capitalized = lower.charAt(0).toUpperCase() + lower.slice(1);
+  association = getAssociationForLanguage(capitalized, appLanguageId);
   if (association) return association;
 
-  // Try case variations
-  const upperSound = sound.toUpperCase();
-  association = getAssociationForLanguage(upperSound, appLanguageId);
-  if (association) return association;
-
-  const lowerSound = sound.toLowerCase();
-  const capitalizedSound = lowerSound.charAt(0).toUpperCase() + lowerSound.slice(1);
-  association = getAssociationForLanguage(capitalizedSound, appLanguageId);
+  association = getAssociationForLanguage(raw.toUpperCase(), appLanguageId);
   if (association) return association;
 
   return null;

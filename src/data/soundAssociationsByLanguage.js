@@ -92,10 +92,10 @@ export const soundAssociationsByLanguage = {
   'H': {
     en: { emoji: '🏠', word: 'House', alt: 'House' },
     es: { emoji: '🍦', word: 'Helado', alt: 'Helado' },  // Ice cream
-    fr: { emoji: '🚁', word: 'Hélicoptère', alt: 'Hélicoptère' },  // Helicopter
+    fr: { emoji: '🚁', word: 'Hélicoptère', alt: 'Hélicoptère' },  // Helicopter (H often silent in French)
     pt: { emoji: '⏰', word: 'Hora', alt: 'Hora' },  // Hour/Time (H is pronounced)
     he: { emoji: '⛰️', word: 'הר', alt: 'הר' },  // Mountain (Har)
-    ru: { emoji: '🚁', word: 'Вертолёт', alt: 'Вертолёт' },  // Helicopter (V sound, not H)
+    ru: { emoji: '🏠', word: 'Хата', alt: 'Хата' },  // Hut (Kh sound, closest to H in Russian)
   },
 
   'J': {
@@ -221,14 +221,14 @@ export const soundAssociationsByLanguage = {
     fr: { emoji: '🚃', word: 'Wagon', alt: 'Wagon' },  // Wagon
     pt: { emoji: '🌐', word: 'Web', alt: 'Web' },  // Web (borrowed word)
     he: { emoji: '🌸', word: 'ורד', alt: 'ורד' },  // Rose (V/W)
-    ru: { emoji: '🌊', word: 'Волна', alt: 'Волна' },  // Wave (V sound)
+    ru: { emoji: '🌐', word: 'Веб', alt: 'Веб' },  // Web (borrowed word, pronounced "veb" but close to W)
   },
 
   'Y': {
     en: { emoji: '🟡', word: 'Yellow', alt: 'Yellow' },
     es: { emoji: '🪀', word: 'Yo-yo', alt: 'Yo-yo' },
     fr: { emoji: '👀', word: 'Yeux', alt: 'Yeux' },  // Eyes
-    pt: { emoji: '🪀', word: 'Ioiô', alt: 'Ioiô' },  // Yo-yo (I sound)
+    pt: { emoji: '🪀', word: 'Yo-yo', alt: 'Yo-yo' },  // Yo-yo (borrowed word with Y sound)
     he: { emoji: '🌊', word: 'ים', alt: 'ים' },  // Sea (Yam)
     ru: { emoji: '🪀', word: 'Йо-йо', alt: 'Йо-йо' },
   },
@@ -296,13 +296,34 @@ export const soundAssociationsByLanguage = {
  * Get emoji association for a sound in specific language
  * Falls back to English if translation unavailable
  */
+/**
+ * Normalize language ID to handle variants and aliases
+ * @param {string} langId - Language ID (e.g., 'en-US', 'fr-CA', 'iw')
+ * @returns {string} Normalized language ID (e.g., 'en', 'fr', 'he')
+ */
+function normalizeLangId(langId) {
+  if (!langId) return 'en';
+  const s = String(langId).trim().toLowerCase().replace('_', '-');
+
+  // Common aliases
+  if (s === 'iw') return 'he'; // Old Hebrew code
+
+  // Primary subtag fallback: fr-CA -> fr, en-US -> en
+  return s.split('-')[0] || 'en';
+}
+
 export function getAssociationForLanguage(sound, appLanguageId = 'en') {
   if (!sound) return null;
 
-  const soundData = soundAssociationsByLanguage[sound];
+  const key = String(sound).trim();
+  const soundData = soundAssociationsByLanguage[key];
   if (!soundData) return null;
 
-  return soundData[appLanguageId] || soundData.en || null;
+  // Try exact ID first (fr-ca), then primary (fr), then English
+  const exact = String(appLanguageId).trim().toLowerCase().replace('_', '-');
+  const primary = normalizeLangId(exact);
+
+  return soundData[exact] || soundData[primary] || soundData.en || null;
 }
 
 export default {
