@@ -31,6 +31,98 @@ export const soundAssociationsByLanguage = {
     ru: { emoji: '🍊', word: 'Апельсин', alt: 'Апельсин' },
   },
 
+'(E)': {
+en: { emoji: '🐘', word: 'Elephant', alt: 'Elephant' },
+es: { emoji: '🐘', word: 'Elefante', alt: 'Elefante' },
+fr: { emoji: '🐘', word: 'Éléphant', alt: 'Éléphant' },
+pt: { emoji: '🐘', word: 'Elefante', alt: 'Elefante' },
+he: { emoji: '🪨', word: 'אבן', alt: 'אבן' }, // Even (stone)
+ru: { emoji: '🦝', word: 'Енот', alt: 'Енот' }, // Racoon
+},
+
+
+'(Eh)': {
+en: { emoji: '🐘', word: 'Elephant', alt: 'Elephant' },
+es: { emoji: '🐘', word: 'Elefante', alt: 'Elefante' },
+fr: { emoji: '🐘', word: 'Éléphant', alt: 'Éléphant' },
+pt: { emoji: '🐘', word: 'Elefante', alt: 'Elefante' },
+he: { emoji: '🪨', word: 'אבן', alt: 'אבן' },
+ru: { emoji: '🦝', word: 'Енот', alt: 'Енот' },
+},
+
+
+'(I)': {
+en: { emoji: '🧊', word: 'Igloo', alt: 'Igloo' },
+es: { emoji: '🦎', word: 'Iguana', alt: 'Iguana' },
+fr: { emoji: '🦎', word: 'Iguane', alt: 'Iguane' },
+pt: { emoji: '⛪', word: 'Igreja', alt: 'Igreja' }, // Church
+he: { emoji: '🧊', word: 'איגלו', alt: 'איגלו' },
+ru: { emoji: '🪡', word: 'Игла', alt: 'Игла' }, // Needle
+},
+
+
+'(Ee)': {
+// Reusing the same set as (I) for now. Swap these later if you want "long E" specifically.
+en: { emoji: '🧊', word: 'Igloo', alt: 'Igloo' },
+es: { emoji: '🦎', word: 'Iguana', alt: 'Iguana' },
+fr: { emoji: '🦎', word: 'Iguane', alt: 'Iguane' },
+pt: { emoji: '⛪', word: 'Igreja', alt: 'Igreja' },
+he: { emoji: '🧊', word: 'איגלו', alt: 'איגלו' },
+ru: { emoji: '🪡', word: 'Игла', alt: 'Игла' },
+},
+
+
+'(O)': {
+en: { emoji: '🐙', word: 'Octopus', alt: 'Octopus' },
+es: { emoji: '🐻', word: 'Oso', alt: 'Oso' }, // Bear
+fr: { emoji: '🐻', word: 'Ours', alt: 'Ours' }, // Bear
+pt: { emoji: '🥚', word: 'Ovo', alt: 'Ovo' }, // Egg
+he: { emoji: '💡', word: 'אור', alt: 'אור' }, // Light (Or)
+ru: { emoji: '🐙', word: 'Осьминог', alt: 'Осьминог' }, // Octopus
+},
+
+'(Oh)': {
+// Reusing the same set as (O) for now.
+en: { emoji: '🐙', word: 'Octopus', alt: 'Octopus' },
+es: { emoji: '🐻', word: 'Oso', alt: 'Oso' },
+fr: { emoji: '🐻', word: 'Ours', alt: 'Ours' },
+pt: { emoji: '🥚', word: 'Ovo', alt: 'Ovo' },
+he: { emoji: '💡', word: 'אור', alt: 'אור' },
+ru: { emoji: '🐙', word: 'Осьминог', alt: 'Осьминог' },
+},
+
+
+'(U)': {
+en: { emoji: '☂️', word: 'Umbrella', alt: 'Umbrella' },
+es: { emoji: '🍇', word: 'Uva', alt: 'Uva' }, // Grape
+fr: { emoji: '🏭', word: 'Usine', alt: 'Usine' }, // Factory
+pt: { emoji: '🍇', word: 'Uva', alt: 'Uva' },
+he: { emoji: '🎓', word: 'אוניברסיטה', alt: 'אוניברסיטה' }, // University
+ru: { emoji: '🦆', word: 'Утка', alt: 'Утка' }, // Duck
+},
+
+
+'(Uh)': {
+// Reusing the same set as (U) for now.
+en: { emoji: '☂️', word: 'Umbrella', alt: 'Umbrella' },
+es: { emoji: '🍇', word: 'Uva', alt: 'Uva' },
+fr: { emoji: '🏭', word: 'Usine', alt: 'Usine' },
+pt: { emoji: '🍇', word: 'Uva', alt: 'Uva' },
+he: { emoji: '🎓', word: 'אוניברסיטה', alt: 'אוניברסיטה' },
+ru: { emoji: '🦆', word: 'Утка', alt: 'Утка' },
+},
+
+
+'(Oo)': {
+// Reusing the same set as (U) for now.
+en: { emoji: '☂️', word: 'Umbrella', alt: 'Umbrella' },
+es: { emoji: '🍇', word: 'Uva', alt: 'Uva' },
+fr: { emoji: '🏭', word: 'Usine', alt: 'Usine' },
+pt: { emoji: '🍇', word: 'Uva', alt: 'Uva' },
+he: { emoji: '🎓', word: 'אוניברסיטה', alt: 'אוניברסיטה' },
+ru: { emoji: '🦆', word: 'Утка', alt: 'Утка' },
+},
+  
   // ========================================
   // CONSONANTS
   // ========================================
@@ -189,13 +281,13 @@ export const soundAssociationsByLanguage = {
   },
 
   'Tz': {
-    en: { emoji: '🍕', word: 'Pizza', alt: 'Pizza' },
-    es: { emoji: '🍕', word: 'Pizza', alt: 'Pizza' },
-    fr: { emoji: '🍕', word: 'Pizza', alt: 'Pizza' },
-    pt: { emoji: '🍕', word: 'Pizza', alt: 'Pizza' },
-    he: { emoji: '🐢', word: 'צב', alt: 'צב' },  // Turtle (Tzav)
-    ru: { emoji: '🐥', word: 'Цыплёнок', alt: 'Цыплёнок' },  // Chick
-  },
+  en: { emoji: '👲🏼', word: 'Tsar', alt: 'Tsar (emperor)' },
+  es: { emoji: '🪰', word: 'Tsé-tsé', alt: 'Mosca tsé-tsé' },
+  fr: { emoji: '🪰', word: 'Tsé-tsé', alt: 'Mouche tsé-tsé' },
+  pt: { emoji: '👲🏼', word: 'Tsar', alt: 'Tsar (imperador)' },
+  he: { emoji: '🐢', word: 'צב', alt: 'צב' },
+  ru: { emoji: '👲🏼', word: 'Царь', alt: 'Царь' },
+      },
 
   'V': {
     en: { emoji: '🎻', word: 'Violin', alt: 'Violin' },
@@ -217,11 +309,11 @@ export const soundAssociationsByLanguage = {
 
   'W': {
     en: { emoji: '🌊', word: 'Wave', alt: 'Wave' },
-    es: { emoji: '🌐', word: 'Web', alt: 'Web' },  // Web (borrowed word)
+    es: { emoji: '🕸️', word: 'Web', alt: 'Web' },  // Web (borrowed word)
     fr: { emoji: '🚃', word: 'Wagon', alt: 'Wagon' },  // Wagon
-    pt: { emoji: '🌐', word: 'Web', alt: 'Web' },  // Web (borrowed word)
+    pt: { emoji: '🕸️', word: 'Web', alt: 'Web' },  // Web (borrowed word)
     he: { emoji: '🌸', word: 'ורד', alt: 'ורד' },  // Rose (V/W)
-    ru: { emoji: '🌐', word: 'Веб', alt: 'Веб' },  // Web (borrowed word, pronounced "veb" but close to W)
+    ru: { emoji: '🕸️', word: 'Веб', alt: 'Веб' },  // Web (borrowed word, pronounced "veb" but close to W)
   },
 
   'Y': {
