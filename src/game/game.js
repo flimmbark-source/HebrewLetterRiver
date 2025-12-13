@@ -40,6 +40,9 @@ function clearAllTimers() {
   trackedIntervals.clear();
 }
 
+// Store the current app language ID for Association Mode (module-level variable)
+let activeAppLanguageId = 'en';
+
 export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary, appLanguageId = 'en' } = {}) {
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
@@ -943,7 +946,6 @@ function startClickMode(itemEl, payload) {
   let currentCatchStreak = 0;
   let bestWaveCatch = 0;
   let totalWins = 0;
-  let activeAppLanguageId = 'en'; // Store the current app language ID for Association Mode
   const initialLives = 3;
   const learnPhaseDuration = 2500;
   const levelUpThreshold = 50;
