@@ -1813,7 +1813,8 @@ function startClickMode(itemEl, payload) {
       endGame();
       return;
     }
-    if (currentRound.handledCount === currentRound.items.length) {
+    // Only spawn next round if ALL items in current round are handled AND all letters cleared from screen
+    if (currentRound.handledCount === currentRound.items.length && activeItems.size === 0) {
       spawnNextRound();
     }
   }
