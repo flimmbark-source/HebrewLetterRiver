@@ -19,16 +19,61 @@ export const soundAssociations = soundAssociationsByLanguage;
  * Maps common variations to their canonical forms in the data
  */
 const SOUND_ALIASES = {
-  // Vowels with parentheses
+  // Vowels with parentheses - all variations
   'A': '(A)',
   'a': '(A)',
   '(A)': '(A)',
   '(a)': '(A)',
+
   'AH': '(Ah)',
   'Ah': '(Ah)',
   'ah': '(Ah)',
   '(Ah)': '(Ah)',
   '(ah)': '(Ah)',
+
+  'E': '(E)',
+  'e': '(E)',
+  '(E)': '(E)',
+  '(e)': '(E)',
+
+  'EH': '(Eh)',
+  'Eh': '(Eh)',
+  'eh': '(Eh)',
+  '(Eh)': '(Eh)',
+  '(eh)': '(Eh)',
+
+  'I': '(I)',
+  'i': '(I)',
+  '(I)': '(I)',
+  '(i)': '(I)',
+
+  'IH': '(Ih)',
+  'Ih': '(Ih)',
+  'ih': '(Ih)',
+  '(Ih)': '(Ih)',
+  '(ih)': '(Ih)',
+
+  'O': '(O)',
+  'o': '(O)',
+  '(O)': '(O)',
+  '(o)': '(O)',
+
+  'OH': '(Oh)',
+  'Oh': '(Oh)',
+  'oh': '(Oh)',
+  '(Oh)': '(Oh)',
+  '(oh)': '(Oh)',
+
+  'U': '(U)',
+  'u': '(U)',
+  '(U)': '(U)',
+  '(u)': '(U)',
+
+  'UH': '(Uh)',
+  'Uh': '(Uh)',
+  'uh': '(Uh)',
+  '(Uh)': '(Uh)',
+  '(uh)': '(Uh)',
 
   // Consonants
   'B': 'B',
