@@ -41,7 +41,6 @@ function clearAllTimers() {
 }
 
 export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary, appLanguageId = 'en' } = {}) {
-  console.log('🏗️ setupGame called - appLanguageId:', appLanguageId);
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
   const livesContainer = document.getElementById('lives-container');
@@ -924,7 +923,6 @@ function startClickMode(itemEl, payload) {
   let sessionStats;
   let forcedStartItem = null;
   let hasIntroducedForItemInLevel;
-  let spawnCallCounter = 0;
   let randomLettersEnabled = randomLettersToggle?.checked ?? false;
   let slowRiverEnabled = false;
   let clickModeEnabled = false;
@@ -1122,8 +1120,6 @@ function startClickMode(itemEl, payload) {
   }
 
   function startGame() {
-    console.log('🎮 startGame called');
-    spawnCallCounter = 0;
     score = 0;
     lives = initialLives;
     level = 1;
@@ -1428,9 +1424,6 @@ function startClickMode(itemEl, payload) {
   }
 
   function spawnNextRound() {
-    spawnCallCounter++;
-    console.log('🔍 spawnNextRound called - count:', spawnCallCounter, 'timestamp:', Date.now());
-
     if (!gameActive || isPaused) return;
     // Don't spawn new rounds if goal has been reached
     if (hasReachedGoal) return;
@@ -1440,8 +1433,6 @@ function startClickMode(itemEl, payload) {
     let roundItems = [];
     const itemPool = getModePool(gameMode);
     const isFirstWaveOfLevel = !hasIntroducedForItemInLevel;
-
-    console.log('  📊 level:', level, 'isFirstWaveOfLevel:', isFirstWaveOfLevel, 'randomLettersEnabled:', randomLettersEnabled);
 
     if (isRandomLettersModeActive()) {
       const totalItemsInRound = Math.max(1, level);
@@ -1501,7 +1492,6 @@ function startClickMode(itemEl, payload) {
         } else {
           if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
         }
-        console.log('✅ First wave: added', roundItems.length, 'new letters to roundItems');
       }
       hasIntroducedForItemInLevel = true;
     } else {
@@ -1532,8 +1522,6 @@ function startClickMode(itemEl, payload) {
     // Clear spawn position tracking for new round
     recentSpawnPositions = [];
 
-    console.log('📦 Final roundItems count:', roundItems.length, 'isFirstWaveOfLevel:', isFirstWaveOfLevel);
-
     currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [], isFirstWave: isFirstWaveOfLevel };
     generateChoices(roundItems, itemPool);
     processItemsForRound(roundItems, currentRound.id, isFirstWaveOfLevel);
@@ -1544,14 +1532,12 @@ function startClickMode(itemEl, payload) {
   }
 
   function processItemsForRound(items, roundId, isFirstWave) {
-    console.log('⏱️ processItemsForRound - items.length:', items.length, 'isFirstWave:', isFirstWave);
     // First wave of level: spawn items one at a time with delays (for introductions)
     // Subsequent waves: spawn ALL items at once (no delays)
     if (isFirstWave) {
       // First wave: spawn one at a time with delays
       let totalDelay = 0;
-      items.forEach((itemData, index) => {
-        console.log('  📝 Processing item', index, '- totalDelay:', totalDelay, 'ms');
+      items.forEach((itemData) => {
         if (!itemData || !itemData.id) return;
         if (currentRound.id !== roundId) return;
         const isNewItem = !seenItems.has(itemData.id);

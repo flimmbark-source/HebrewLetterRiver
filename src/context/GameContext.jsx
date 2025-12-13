@@ -21,6 +21,7 @@ export function GameProvider({ children }) {
   const containerRef = useRef(null);
   const gameApiRef = useRef(null);
   const [hasMounted, setHasMounted] = useState(false);
+  const shouldAutostartRef = useRef(false);
   const { languagePack, interfaceLanguagePack, t, dictionary } = useLocalization();
   const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
@@ -115,10 +116,12 @@ export function GameProvider({ children }) {
     api.resetToSetupScreen();
     if (options?.mode) api.setGameMode(options.mode);
     if (options?.forceLetter) api.forceStartByHebrew(options.forceLetter);
-    if (options?.autostart) {
+    // Only autostart if the flag is set (prevents multiple starts on dependency changes)
+    if (shouldAutostartRef.current) {
+      shouldAutostartRef.current = false; // Clear flag after using it
       requestAnimationFrame(() => api.startGame());
     }
-  }, [isVisible, options, languagePack, t, dictionary]);
+  }, [isVisible, options, languagePack, t, dictionary, interfaceLanguagePack.id]);
 
   const openGame = useCallback((openOptions = {}) => {
     // If game is already visible, close it (acts as a toggle)
@@ -131,6 +134,10 @@ export function GameProvider({ children }) {
       return;
     }
     setOptions(openOptions);
+    // Set autostart flag if requested
+    if (openOptions.autostart) {
+      shouldAutostartRef.current = true;
+    }
     setIsVisible(true);
   }, [isVisible]);
 
@@ -138,6 +145,7 @@ export function GameProvider({ children }) {
     if (gameApiRef.current) {
       gameApiRef.current.resetToSetupScreen();
     }
+    shouldAutostartRef.current = false;
     setIsVisible(false);
     setIsGameRunning(false);
   }, []);
