@@ -1885,6 +1885,8 @@ function startClickMode(itemEl, payload) {
           ? displayLabel
           : (displayLabel || displaySymbol);
 
+      box.dataset.labelText = labelText;
+
       // Check if association mode is enabled and we have an emoji for this sound
       if (associationModeEnabled && displayLabel) {
         const association = getAssociation(displayLabel, activeAppLanguageId);
@@ -1988,6 +1990,17 @@ function startClickMode(itemEl, payload) {
   }
 
   loadSettingsFromLocalStorage();
+
+  function setAppLanguageId(nextAppLanguageId) {
+    const resolved = nextAppLanguageId || 'en';
+    if (resolved === activeAppLanguageId) return;
+
+    activeAppLanguageId = resolved;
+
+    if (associationModeEnabled && currentRound?.correctItems) {
+      generateChoices(currentRound.correctItems, itemPool);
+    }
+  }
 
   // Listen for changes to settings from other sources (like SettingsView)
   window.addEventListener('storage', (e) => {
@@ -2388,5 +2401,5 @@ accessibilityBtn?.addEventListener('click', () => {
     if (match) forcedStartItem = { ...match };
   }
 
-  return { resetToSetupScreen, startGame, setGameMode, forceStartByHebrew };
+  return { resetToSetupScreen, startGame, setGameMode, forceStartByHebrew, setAppLanguageId };
 }
