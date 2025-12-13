@@ -2287,16 +2287,21 @@ accessibilityBtn?.addEventListener('click', () => {
       }
     });
 
-    // Resume timers with their remaining time
+    // Resume timers with their remaining time, but only if they have meaningful time left
+    // Filter out timers that were about to fire (< 100ms), preventing letters from spawning immediately on resume
     if (currentRound && currentRound.pausedTimers) {
       currentRound.pausedTimers.forEach((pausedTimer) => {
-        const handle = trackTimeout(pausedTimer.callback, pausedTimer.remaining);
-        currentRound.timers.push({
-          handle: handle,
-          startTime: Date.now(),
-          delay: pausedTimer.remaining,
-          callback: pausedTimer.callback
-        });
+        // Only restore timers with at least 100ms remaining
+        // This prevents letters from spawning immediately when resuming
+        if (pausedTimer.remaining >= 100) {
+          const handle = trackTimeout(pausedTimer.callback, pausedTimer.remaining);
+          currentRound.timers.push({
+            handle: handle,
+            startTime: Date.now(),
+            delay: pausedTimer.remaining,
+            callback: pausedTimer.callback
+          });
+        }
       });
       currentRound.pausedTimers = [];
     }
