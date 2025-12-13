@@ -1434,6 +1434,8 @@ function startClickMode(itemEl, payload) {
     const itemPool = getModePool(gameMode);
     const isFirstWaveOfLevel = !hasIntroducedForItemInLevel;
 
+    console.log('🔍 spawnNextRound - level:', level, 'isFirstWaveOfLevel:', isFirstWaveOfLevel, 'randomLettersEnabled:', randomLettersEnabled);
+
     if (isRandomLettersModeActive()) {
       const totalItemsInRound = Math.max(1, level);
 
@@ -1492,6 +1494,7 @@ function startClickMode(itemEl, payload) {
         } else {
           if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
         }
+        console.log('✅ First wave: added', roundItems.length, 'new letters to roundItems');
       }
       hasIntroducedForItemInLevel = true;
     } else {
@@ -1522,6 +1525,8 @@ function startClickMode(itemEl, payload) {
     // Clear spawn position tracking for new round
     recentSpawnPositions = [];
 
+    console.log('📦 Final roundItems count:', roundItems.length, 'isFirstWaveOfLevel:', isFirstWaveOfLevel);
+
     currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [], isFirstWave: isFirstWaveOfLevel };
     generateChoices(roundItems, itemPool);
     processItemsForRound(roundItems, currentRound.id, isFirstWaveOfLevel);
@@ -1532,12 +1537,14 @@ function startClickMode(itemEl, payload) {
   }
 
   function processItemsForRound(items, roundId, isFirstWave) {
+    console.log('⏱️ processItemsForRound - items.length:', items.length, 'isFirstWave:', isFirstWave);
     // First wave of level: spawn items one at a time with delays (for introductions)
     // Subsequent waves: spawn ALL items at once (no delays)
     if (isFirstWave) {
       // First wave: spawn one at a time with delays
       let totalDelay = 0;
-      items.forEach((itemData) => {
+      items.forEach((itemData, index) => {
+        console.log('  📝 Processing item', index, '- totalDelay:', totalDelay, 'ms');
         if (!itemData || !itemData.id) return;
         if (currentRound.id !== roundId) return;
         const isNewItem = !seenItems.has(itemData.id);
