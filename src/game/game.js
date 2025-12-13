@@ -105,6 +105,10 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   const t = translate
     ? (key, replacements) => translate(key, replacements)
     : (key, replacements) => translateWithDictionary(activeDictionary, key, replacements);
+
+  // Store the app language ID for Association Mode
+  activeAppLanguageId = appLanguageId || 'en';
+
   const translateWithFallback = (key, fallback, replacements = {}) => {
     const result = t(key, replacements);
     if (!result || result === key) return fallback;
@@ -939,6 +943,7 @@ function startClickMode(itemEl, payload) {
   let currentCatchStreak = 0;
   let bestWaveCatch = 0;
   let totalWins = 0;
+  let activeAppLanguageId = 'en'; // Store the current app language ID for Association Mode
   const initialLives = 3;
   const learnPhaseDuration = 2500;
   const levelUpThreshold = 50;
@@ -1880,7 +1885,7 @@ function startClickMode(itemEl, payload) {
 
       // Check if association mode is enabled and we have an emoji for this sound
       if (associationModeEnabled && displayLabel) {
-        const association = getAssociation(displayLabel, appLanguageId);
+        const association = getAssociation(displayLabel, activeAppLanguageId);
         if (association) {
           // Display emoji with optional word label <span class="text-xs text-arcade-text-muted">${association.word}</span>
           box.innerHTML = `<div class="flex flex-col items-center justify-center gap-1">
