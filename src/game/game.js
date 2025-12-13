@@ -1848,9 +1848,16 @@ function startClickMode(itemEl, payload) {
     });
     distractorPool.sort(() => 0.5 - Math.random());
 
+    // Track sounds already in finalChoices to prevent duplicates
+    const usedSounds = new Set(finalChoices.map((i) => getDisplayLabel(i)));
     let i = 0;
     while (finalChoices.length < 4 && i < distractorPool.length) {
-      finalChoices.push(distractorPool[i]);
+      const distractorSound = getDisplayLabel(distractorPool[i]);
+      // Only add if this sound hasn't been used yet
+      if (distractorSound && !usedSounds.has(distractorSound)) {
+        finalChoices.push(distractorPool[i]);
+        usedSounds.add(distractorSound);
+      }
       i++;
     }
 
