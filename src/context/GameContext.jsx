@@ -87,6 +87,7 @@ export function GameProvider({ children }) {
   useEffect(() => {
     if (!gameApiRef.current) return;
     const api = gameApiRef.current;
+    api.setAppLanguageId?.(interfaceLanguagePack.id);
     api.resetToSetupScreen?.();
     gameApiRef.current = null;
   }, [languagePack.id, interfaceLanguagePack.id]);
