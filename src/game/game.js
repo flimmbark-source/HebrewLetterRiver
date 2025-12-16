@@ -1924,9 +1924,9 @@ function startClickMode(itemEl, payload) {
     // Update max bucket count if we've exceeded it
     maxBucketCount = Math.max(maxBucketCount, activeBucketCount);
     invalidateBucketMinWidth();
-    applyBucketLayout();
-    clearPendingBucketLayout();
-    refreshDropZones();
+    // Schedule layout update instead of applying immediately
+    // This allows DOM to render first, preventing misalignment
+    scheduleBucketLayoutUpdate();
   }
 
   // Helper to sync settings to localStorage
