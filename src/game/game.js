@@ -556,6 +556,8 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     if (!choicesContainer) return;
     if (!count) {
       choicesContainer.style.removeProperty('grid-template-columns');
+      choicesContainer.style.removeProperty('grid-auto-flow');
+      choicesContainer.style.removeProperty('overflow-x');
       return;
     }
     if (typeof window === 'undefined') return;
@@ -578,6 +580,15 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     const totalGap = gapValue * Math.max(count - 1, 0);
     const availableWidth = containerWidth - totalGap;
     const targetWidth = availableWidth / count;
+
+    // Force single row for 1-4 buckets, allow wrapping for 5+
+    if (count <= 4) {
+      choicesContainer.style.gridAutoFlow = 'column';
+      choicesContainer.style.overflowX = 'auto';
+    } else {
+      choicesContainer.style.removeProperty('grid-auto-flow');
+      choicesContainer.style.removeProperty('overflow-x');
+    }
 
     // Helper function to calculate and apply height based on width ratio
     const applyDynamicHeight = (currentWidth) => {
