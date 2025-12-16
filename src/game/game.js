@@ -556,8 +556,6 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     if (!choicesContainer) return;
     if (!count) {
       choicesContainer.style.removeProperty('grid-template-columns');
-      choicesContainer.style.removeProperty('grid-auto-flow');
-      choicesContainer.style.removeProperty('overflow-x');
       return;
     }
     if (typeof window === 'undefined') return;
@@ -581,15 +579,6 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     const availableWidth = containerWidth - totalGap;
     const targetWidth = availableWidth / count;
 
-    // Force single row for 1-4 buckets, allow wrapping for 5+
-    if (count <= 4) {
-      choicesContainer.style.gridAutoFlow = 'column';
-      choicesContainer.style.overflowX = 'auto';
-    } else {
-      choicesContainer.style.removeProperty('grid-auto-flow');
-      choicesContainer.style.removeProperty('overflow-x');
-    }
-
     // Helper function to calculate and apply height based on width ratio
     const applyDynamicHeight = (currentWidth) => {
       const widthRatio = currentWidth / minBucketWidth;
@@ -600,6 +589,22 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
       });
     };
 
+    // For 4 or fewer buckets, force single row by using 1fr columns (no minmax = no wrapping)
+    // For 5+ buckets, use minmax to allow wrapping
+    if (count <= 4) {
+      if (availableWidth / count >= minBucketWidth) {
+        choicesContainer.style.gridTemplateColumns = `repeat(${count}, 1fr)`;
+        applyDynamicHeight(targetWidth);
+        return;
+      }
+      // If they don't fit comfortably, still force single row but let them shrink
+      const minWidth = Math.max(50, Math.floor(availableWidth / count));
+      choicesContainer.style.gridTemplateColumns = `repeat(${count}, ${minWidth}px)`;
+      applyDynamicHeight(minWidth);
+      return;
+    }
+
+    // For 5+ buckets, use original logic with minmax to allow wrapping
     if (availableWidth / count >= minBucketWidth) {
       choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(${minBucketWidth}px, 1fr))`;
       applyDynamicHeight(minBucketWidth);
