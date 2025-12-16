@@ -367,6 +367,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
 
   let dropZones = [];
   let activeBucketCount = 0;
+  let maxBucketCount = 4; // Track maximum buckets reached in current session
   const BUCKET_MIN_WIDTH_FALLBACK = 80;
   const LAYOUT_GAP_FALLBACK = 8;
   const BUCKET_BASE_HEIGHT = 50; // Base height when containers are full size
@@ -578,16 +579,28 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     const availableWidth = containerWidth - totalGap;
     const targetWidth = availableWidth / count;
 
-    // Helper function to calculate and apply height based on width ratio
     const applyDynamicHeight = (currentWidth) => {
-      const widthRatio = currentWidth / minBucketWidth;
-      const dynamicHeight = BUCKET_BASE_HEIGHT * widthRatio;
-      const finalHeight = Math.max(dynamicHeight, BUCKET_MIN_HEIGHT);
       buckets.forEach(bucket => {
-        bucket.style.minHeight = `${finalHeight}px`;
+        bucket.style.height = `${currentWidth}px`;
       });
     };
 
+    // For 4 or fewer buckets, force single row by using 1fr columns (no minmax = no wrapping)
+    // For 5+ buckets, use minmax to allow wrapping
+    if (count <= 4) {
+      if (availableWidth / count >= minBucketWidth) {
+        choicesContainer.style.gridTemplateColumns = `repeat(${count}, 1fr)`;
+        applyDynamicHeight(targetWidth);
+        return;
+      }
+      // If they don't fit comfortably, still force single row but let them shrink
+      const minWidth = Math.max(50, Math.floor(availableWidth / count));
+      choicesContainer.style.gridTemplateColumns = `repeat(${count}, ${minWidth}px)`;
+      applyDynamicHeight(minWidth);
+      return;
+    }
+
+    // For 5+ buckets, use original logic with minmax to allow wrapping
     if (availableWidth / count >= minBucketWidth) {
       choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(${minBucketWidth}px, 1fr))`;
       applyDynamicHeight(minBucketWidth);
@@ -1043,6 +1056,7 @@ function startClickMode(itemEl, payload) {
     activeItems.clear();
     choicesContainer.innerHTML = '';
     activeBucketCount = 0;
+    maxBucketCount = 4; // Reset to default on game reset
     applyBucketLayout(0);
     invalidateBucketMinWidth();
     refreshDropZones();
@@ -1210,6 +1224,15 @@ function startClickMode(itemEl, payload) {
     if (onGameStart) onGameStart();
 
     spawnNextRound();
+
+    // Extra layout update after initial game start to ensure proper bucket alignment
+    // The container was just made visible, so dimensions may need extra time to stabilize
+    if (typeof window !== 'undefined') {
+      window.setTimeout(() => {
+        scheduleBucketLayoutUpdate();
+      }, 200);
+    }
+
     emit('game:session-start', {
       mode: gameMode,
       settings: {
@@ -1859,7 +1882,9 @@ function startClickMode(itemEl, payload) {
     // Track sounds already in finalChoices to prevent duplicates
     const usedSounds = new Set(finalChoices.map((i) => getDisplayLabel(i)));
     let i = 0;
-    while (finalChoices.length < 4 && i < distractorPool.length) {
+    // Use maxBucketCount to maintain consistent bucket count throughout session
+    const targetBucketCount = Math.max(maxBucketCount, finalChoices.length);
+    while (finalChoices.length < targetBucketCount && i < distractorPool.length) {
       const distractorSound = getDisplayLabel(distractorPool[i]);
       // Only add if this sound hasn't been used yet
       if (distractorSound && !usedSounds.has(distractorSound)) {
@@ -1917,10 +1942,19 @@ function startClickMode(itemEl, payload) {
       choicesContainer.appendChild(box);
     });
     activeBucketCount = finalChoices.length;
+    // Update max bucket count if we've exceeded it
+    maxBucketCount = Math.max(maxBucketCount, activeBucketCount);
     invalidateBucketMinWidth();
-    applyBucketLayout();
-    clearPendingBucketLayout();
-    refreshDropZones();
+
+    // Schedule layout update instead of applying immediately
+    // This allows DOM to render first, preventing misalignment
+    scheduleBucketLayoutUpdate();
+
+    // Schedule a second layout update after a longer delay to catch any late-rendering issues
+    // This ensures proper alignment on initial game start
+    if (typeof window !== 'undefined') {
+      window.setTimeout(() => scheduleBucketLayoutUpdate(), 150);
+    }
   }
 
   // Helper to sync settings to localStorage

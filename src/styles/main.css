@@ -1615,7 +1615,7 @@ body.no-scroll {
 
 @media (min-width: 640px) {
   #modal-content {
-    padding: var(--space-6); /* Desktop: 48px on larger screens */
+    padding: var(--space-4); /* Desktop: 32px on larger screens */
     max-width: 48rem; /* Desktop: 3xl equivalent */
   }
 }
@@ -1803,7 +1803,8 @@ body.no-scroll {
 /* Catcher box / Sound bucket states */
 .catcher-box {
   max-width: 70px;
-  max-height: 65px;
+  max-height: 70px;
+  margin-bottom: 32px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2293,10 +2294,13 @@ body.no-scroll {
   width: 100%;
   flex-shrink: 0;
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  align-items: end;
   gap: var(--space-2); /* 16px between buckets */
   padding: var(--space-2); /* 16px from edges */
   padding-inline-start: calc(max(var(--space-2) + env(safe-area-inset-left, 0px))+ var(--space-1));
-  padding-inline-end: calc(max(var(--space-2) + env(safe-area-inset-right, 0px))+ var(--space-1)) ;
+  padding-inline-end: calc(max(var(--space-2) + env(safe-area-inset-right, 0px))+ var(--space-1));
+  padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); /* 24px + safe area */
   min-height: 120px;
 }
 

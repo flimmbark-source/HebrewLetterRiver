@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
+import { useTutorial } from '../context/TutorialContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { on } from '../lib/eventBus.js';
@@ -136,6 +137,7 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
 
 export default function AchievementsView() {
   const { player, badges, activeBadges, daily, claimBadgeReward, claimDailyReward, starLevelSize } = useProgress();
+  const { startTutorial } = useTutorial();
   const { t } = useLocalization();
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
@@ -289,6 +291,15 @@ export default function AchievementsView() {
           </div>
         </div>
         <div className="top-counters">
+          <button
+            onClick={() => startTutorial('firstTime')}
+            className="tiny-pill"
+            aria-label="Show tutorial"
+            title="Show tutorial"
+            style={{ marginRight: '8px' }}
+          >
+            ?
+          </button>
           <div className="pill-counter">
             <span className="icon">⭐</span>
             <span className="value">{formatNumber(totalStarsEarned)}</span>

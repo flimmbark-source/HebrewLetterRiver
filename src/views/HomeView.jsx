@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react'
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
+import { useTutorial } from '../context/TutorialContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
@@ -33,6 +34,7 @@ export default function HomeView() {
   const { player, streak, daily, starLevelSize, claimDailyReward } = useProgress();
 
   const { openGame } = useGame();
+  const { startTutorial } = useTutorial();
   const { t } = useLocalization();
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
@@ -164,6 +166,15 @@ export default function HomeView() {
           </div>
         </div>
         <div className="top-counters">
+          <button
+            onClick={() => startTutorial('firstTime')}
+            className="tiny-pill"
+            aria-label="Show tutorial"
+            title="Show tutorial"
+            style={{ marginRight: '8px' }}
+          >
+            ?
+          </button>
           <div className="pill-counter">
             <span className="icon">⭐</span>
             <span className="value">{formatNumber(totalStarsEarned)}</span>

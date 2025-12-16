@@ -46,3 +46,10 @@ export function removeState(key) {
     console.warn('failed to remove storage', key, err);
   }
 }
+
+// Export a storage object for backward compatibility
+export const storage = {
+  get: loadState,
+  set: saveState,
+  remove: removeState
+};

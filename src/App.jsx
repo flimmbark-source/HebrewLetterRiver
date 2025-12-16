@@ -4,12 +4,18 @@ import HomeView from './views/HomeView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import LearnView from './views/LearnView.jsx';
 import SettingsView from './views/SettingsView.jsx';
+import DailyView from './views/DailyView.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import { ProgressProvider } from './context/ProgressContext.jsx';
 import { GameProvider, useGame } from './context/GameContext.jsx';
 import { LocalizationProvider, useLocalization } from './context/LocalizationContext.jsx';
 import { LanguageProvider, useLanguage } from './context/LanguageContext.jsx';
+import { TutorialProvider } from './context/TutorialContext.jsx';
 import { getFormattedLanguageName } from './lib/languageUtils.js';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
+import OfflineIndicator from './components/OfflineIndicator.jsx';
+import MigrationInitializer from './components/MigrationInitializer.jsx';
+import PWAInstallPrompt from './components/PWAInstallPrompt.jsx';
 
 function HomeIcon(props) {
   return (
@@ -236,13 +242,17 @@ function Shell() {
   return (
     <div className="app-shell">
       <LanguageOnboardingModal />
+      <OfflineIndicator />
+      <PWAInstallPrompt />
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomeView />} />
           <Route path="/achievements" element={<AchievementsView />} />
           <Route path="/learn" element={<LearnView />} />
+          <Route path="/daily" element={<DailyView />} />
           <Route path="/settings" element={<SettingsView />} />
+          <Route path="/play" element={<Navigate to="/home" replace />} />
         </Routes>
       </main>
       {!(isGameVisible && isGameRunning) && (
@@ -291,16 +301,22 @@ function Shell() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <LocalizationProvider>
-        <ToastProvider>
-          <ProgressProvider>
-            <GameProvider>
-              <Shell />
-            </GameProvider>
-          </ProgressProvider>
-        </ToastProvider>
-      </LocalizationProvider>
-    </LanguageProvider>
+    <ErrorBoundary>
+      <MigrationInitializer>
+        <LanguageProvider>
+          <LocalizationProvider>
+            <ToastProvider>
+              <ProgressProvider>
+                <TutorialProvider>
+                  <GameProvider>
+                    <Shell />
+                  </GameProvider>
+                </TutorialProvider>
+              </ProgressProvider>
+            </ToastProvider>
+          </LocalizationProvider>
+        </LanguageProvider>
+      </MigrationInitializer>
+    </ErrorBoundary>
   );
 }
