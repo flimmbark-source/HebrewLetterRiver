@@ -579,13 +579,13 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     const availableWidth = containerWidth - totalGap;
     const targetWidth = availableWidth / count;
 
-    // Helper function to set height equal to width (square buckets)
+    // Helper function to calculate and apply height based on width ratio
     const applyDynamicHeight = (currentWidth) => {
-      // Set height equal to width for square buckets
+      const widthRatio = currentWidth / minBucketWidth;
+      const dynamicHeight = BUCKET_BASE_HEIGHT * widthRatio;
+      const finalHeight = Math.max(dynamicHeight, BUCKET_MIN_HEIGHT);
       buckets.forEach(bucket => {
-        bucket.style.minHeight = `${currentWidth}px`;
-        bucket.style.height = `${currentWidth}px`;
-        bucket.style.maxHeight = `${currentWidth}px`;
+        bucket.style.minHeight = `${finalHeight}px`;
       });
     };
 

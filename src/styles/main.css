@@ -1802,7 +1802,8 @@ body.no-scroll {
 
 /* Catcher box / Sound bucket states */
 .catcher-box {
-  /* Width and height controlled by JavaScript for responsive square buckets */
+  max-width: 70px;
+  max-height: 65px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
