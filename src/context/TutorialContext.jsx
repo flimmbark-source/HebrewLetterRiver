@@ -94,19 +94,7 @@ export function TutorialProvider({ children }) {
     return storage.get('hlr.tutorials.completed') || [];
   });
 
-  // Check if this is the user's first time
-  useEffect(() => {
-    const hasSeenFirstTime = completedTutorials.includes('firstTime');
-    if (!hasSeenFirstTime) {
-      // Show first-time tutorial after a short delay
-      const timer = setTimeout(() => {
-        startTutorial('firstTime');
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  const startTutorial = (tutorialId) => {
+  const startTutorial = React.useCallback((tutorialId) => {
     const tutorial = TUTORIALS[tutorialId];
     if (!tutorial) {
       console.error(`Tutorial ${tutorialId} not found`);
@@ -115,7 +103,19 @@ export function TutorialProvider({ children }) {
 
     setCurrentTutorial(tutorial);
     setCurrentStepIndex(0);
-  };
+  }, []);
+
+  // Check if this is the user's first time
+  useEffect(() => {
+    const hasSeenFirstTime = completedTutorials.includes('firstTime');
+    if (!hasSeenFirstTime && !currentTutorial) {
+      // Show first-time tutorial after a short delay
+      const timer = setTimeout(() => {
+        startTutorial('firstTime');
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [completedTutorials, currentTutorial, startTutorial]);
 
   const nextStep = () => {
     if (!currentTutorial) return;
