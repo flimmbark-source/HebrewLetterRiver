@@ -1941,11 +1941,14 @@ function startClickMode(itemEl, payload) {
     maxBucketCount = Math.max(maxBucketCount, activeBucketCount);
     invalidateBucketMinWidth();
 
-    // Single delayed update - no glitch
+    // Schedule layout update instead of applying immediately
+    // This allows DOM to render first, preventing misalignment
+    scheduleBucketLayoutUpdate();
+
+    // Schedule a second layout update after a longer delay to catch any late-rendering issues
+    // This ensures proper alignment on initial game start
     if (typeof window !== 'undefined') {
-      window.setTimeout(() => {
-        scheduleBucketLayoutUpdate();
-      }, 100);
+      window.setTimeout(() => scheduleBucketLayoutUpdate(), 150);
     }
   }
 
