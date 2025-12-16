@@ -1228,6 +1228,15 @@ function startClickMode(itemEl, payload) {
     if (onGameStart) onGameStart();
 
     spawnNextRound();
+
+    // Extra layout update after initial game start to ensure proper bucket alignment
+    // The container was just made visible, so dimensions may need extra time to stabilize
+    if (typeof window !== 'undefined') {
+      window.setTimeout(() => {
+        scheduleBucketLayoutUpdate();
+      }, 200);
+    }
+
     emit('game:session-start', {
       mode: gameMode,
       settings: {
