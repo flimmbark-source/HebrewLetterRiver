@@ -28,7 +28,7 @@ const TUTORIALS = {
       {
         id: 'gameplay',
         title: 'How to Play',
-        description: 'Letters will flow down the screen. Tap or click the correct letter button at the bottom to catch them!',
+        description: 'Letters will flow across the screen. Drag each one to the correct letter bucket at the bottom to catch them!',
         icon: '🎮'
       },
       {
