@@ -10,7 +10,6 @@ import React, {
 import { createPortal } from 'react-dom';
 import { setupGame } from '../game/game.js';
 import { useLocalization } from './LocalizationContext.jsx';
-import { useTutorial } from './TutorialContext.jsx';
 import { ErrorBoundary } from '../ErrorBoundary.jsx';
 
 const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
@@ -24,7 +23,6 @@ export function GameProvider({ children }) {
   const [hasMounted, setHasMounted] = useState(false);
   const shouldAutostartRef = useRef(false);
   const { languagePack, interfaceLanguagePack, t, dictionary } = useLocalization();
-  const { startTutorial } = useTutorial();
   const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
 
@@ -338,21 +336,6 @@ function GameCanvas({ fontClass, loadedSettings }) {
               aria-label="Pause game"
             >
               ⏸️
-            </button>
-            <button
-              onClick={() => startTutorial('firstTime')}
-              className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-md px-2 py-1 text-base font-bold transition hover:opacity-80"
-              style={{
-                color: '#b07737',
-                minWidth: 'auto',
-                minHeight: 'auto',
-                background: 'rgba(235, 179, 105, 0.1)',
-                border: '2px solid rgba(235, 179, 105, 0.4)'
-              }}
-              aria-label="Show tutorial"
-              title="Show tutorial"
-            >
-              ?
             </button>
             <div className="top-bar-content flex w-full flex-wrap items-center justify-center gap-3 sm:gap-6">
               <div className="inline-flex items-center gap-2 text-center">
