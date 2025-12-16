@@ -367,6 +367,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
 
   let dropZones = [];
   let activeBucketCount = 0;
+  let maxBucketCount = 4; // Track maximum buckets reached in current session
   const BUCKET_MIN_WIDTH_FALLBACK = 80;
   const LAYOUT_GAP_FALLBACK = 8;
   const BUCKET_BASE_HEIGHT = 50; // Base height when containers are full size
@@ -1043,6 +1044,7 @@ function startClickMode(itemEl, payload) {
     activeItems.clear();
     choicesContainer.innerHTML = '';
     activeBucketCount = 0;
+    maxBucketCount = 4; // Reset to default on game reset
     applyBucketLayout(0);
     invalidateBucketMinWidth();
     refreshDropZones();
@@ -1859,7 +1861,9 @@ function startClickMode(itemEl, payload) {
     // Track sounds already in finalChoices to prevent duplicates
     const usedSounds = new Set(finalChoices.map((i) => getDisplayLabel(i)));
     let i = 0;
-    while (finalChoices.length < 4 && i < distractorPool.length) {
+    // Use maxBucketCount to maintain consistent bucket count throughout session
+    const targetBucketCount = Math.max(maxBucketCount, finalChoices.length);
+    while (finalChoices.length < targetBucketCount && i < distractorPool.length) {
       const distractorSound = getDisplayLabel(distractorPool[i]);
       // Only add if this sound hasn't been used yet
       if (distractorSound && !usedSounds.has(distractorSound)) {
@@ -1917,6 +1921,8 @@ function startClickMode(itemEl, payload) {
       choicesContainer.appendChild(box);
     });
     activeBucketCount = finalChoices.length;
+    // Update max bucket count if we've exceeded it
+    maxBucketCount = Math.max(maxBucketCount, activeBucketCount);
     invalidateBucketMinWidth();
     applyBucketLayout();
     clearPendingBucketLayout();

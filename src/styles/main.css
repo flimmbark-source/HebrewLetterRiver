@@ -2297,7 +2297,8 @@ body.no-scroll {
   gap: var(--space-2); /* 16px between buckets */
   padding: var(--space-2); /* 16px from edges */
   padding-inline-start: calc(max(var(--space-2) + env(safe-area-inset-left, 0px))+ var(--space-1));
-  padding-inline-end: calc(max(var(--space-2) + env(safe-area-inset-right, 0px))+ var(--space-1)) ;
+  padding-inline-end: calc(max(var(--space-2) + env(safe-area-inset-right, 0px))+ var(--space-1));
+  padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); /* 24px + safe area */
   min-height: 120px;
 }
 
