@@ -783,20 +783,56 @@ export function ProgressProvider({ children }) {
   const claimBadgeReward = useCallback(
     (badgeId, tier) => {
       const badgeSpec = badgeSpecById[badgeId];
-      if (!badgeSpec) return { success: false };
+      if (!badgeSpec) {
+        console.warn('claimBadgeReward: Badge spec not found', { badgeId });
+        return { success: false };
+      }
+
+      // First, validate the reward exists and has valid stars BEFORE updating state
       let reward = null;
-      let isMaxTier = false;
+      let starsToAward = 0;
+
       setBadges((prev) => {
         const state = prev[badgeId];
-        if (!state) return prev;
+        if (!state) {
+          console.warn('claimBadgeReward: Badge state not found', { badgeId });
+          return prev;
+        }
         const unclaimed = Array.isArray(state.unclaimed) ? [...state.unclaimed] : [];
         const index =
           typeof tier === 'number'
             ? unclaimed.findIndex((entry) => entry.tier === tier)
             : 0;
-        if (index < 0 || index >= unclaimed.length) return prev;
+        if (index < 0 || index >= unclaimed.length) {
+          console.warn('claimBadgeReward: No unclaimed reward found', { badgeId, tier, unclaimed });
+          return prev;
+        }
+
+        // Extract reward to validate
+        const candidateReward = unclaimed[index];
+        const tierSpec = badgeSpec.tiers.find((item) => item.tier === candidateReward.tier);
+
+        // Calculate stars BEFORE removing from unclaimed
+        const candidateStars = Number.isFinite(candidateReward.stars) && candidateReward.stars > 0
+          ? candidateReward.stars
+          : (Number.isFinite(tierSpec?.stars) && tierSpec.stars > 0 ? tierSpec.stars : 0);
+
+        // Validate stars value
+        if (!Number.isFinite(candidateStars) || candidateStars <= 0) {
+          console.error('claimBadgeReward: Invalid stars value, aborting claim', {
+            badgeId,
+            tier: candidateReward.tier,
+            rewardStars: candidateReward.stars,
+            tierSpecStars: tierSpec?.stars,
+            candidateStars
+          });
+          return prev;
+        }
+
+        // Stars are valid, proceed with removal
         reward = unclaimed.splice(index, 1)[0];
-        isMaxTier = reward.tier === badgeSpec.tiers.length && state.tier === badgeSpec.tiers.length;
+        starsToAward = candidateStars;
+
         return {
           ...prev,
           [badgeId]: {
@@ -805,8 +841,13 @@ export function ProgressProvider({ children }) {
           }
         };
       });
-      if (!reward) return { success: false };
 
+      if (!reward || starsToAward <= 0) {
+        console.warn('claimBadgeReward: Failed to extract reward or invalid stars', { reward, starsToAward });
+        return { success: false };
+      }
+
+      const isMaxTier = reward.tier === badgeSpec.tiers.length;
       if (isMaxTier) {
         replaceCompletedBadge(badgeId);
       }
@@ -816,20 +857,13 @@ export function ProgressProvider({ children }) {
       const tierLabel = tierSpec.labelKey ? t(tierSpec.labelKey) : tierSpec.label ?? `Tier ${reward.tier}`;
       const summary = badgeSpec.summaryKey ? t(badgeSpec.summaryKey) : badgeSpec.summary ?? '';
 
-      // Ensure we have a valid stars value - fallback to tierSpec if reward.stars is missing
-      const starsToAward = Number.isFinite(reward.stars) && reward.stars > 0
-        ? reward.stars
-        : (Number.isFinite(tierSpec.stars) ? tierSpec.stars : 0);
-
-      console.log('claimBadgeReward: Claiming badge', {
+      console.log('claimBadgeReward: Awarding stars', {
         badgeId,
         tier: reward.tier,
-        rewardStars: reward.stars,
-        tierSpecStars: tierSpec.stars,
         starsToAward
       });
 
-      applyStarsToPlayer(starsToAward, {
+      const applyResult = applyStarsToPlayer(starsToAward, {
         latestBadge: {
           id: badgeId,
           tier: reward.tier,
@@ -844,6 +878,24 @@ export function ProgressProvider({ children }) {
         source: 'badge',
         metadata: { badgeId, tier: reward.tier }
       });
+
+      // Verify stars were actually applied
+      if (!applyResult || !applyResult.success) {
+        console.error('claimBadgeReward: Failed to apply stars to player', {
+          badgeId,
+          tier: reward.tier,
+          starsToAward,
+          applyResult
+        });
+        addToast({
+          tone: 'error',
+          title: 'Error claiming reward',
+          description: 'Stars could not be added to your profile. Please try again.',
+          icon: '⚠️'
+        });
+        return { success: false };
+      }
+
       addToast({
         tone: 'success',
         title: `${badgeName} · ${tierLabel}`,
@@ -853,50 +905,70 @@ export function ProgressProvider({ children }) {
         icon: isMaxTier ? '🏆' : '🏅'
       });
       celebrate({ particleCount: 140, spread: 75, originY: 0.55 });
-      return { success: true, reward };
+      return { success: true, reward, starsAwarded: starsToAward };
     },
     [addToast, applyStarsToPlayer, t, replaceCompletedBadge]
   );
 
   const claimDailyReward = useCallback(
     (taskId = null) => {
-      let starsAwarded = 0;
-      let claimedTasks = [];
-      let rewardDateKey = null;
-      let allClaimedAt = null;
+      // First, validate eligible tasks and calculate stars BEFORE updating state
+      let starsToAward = 0;
+      let eligibleTaskIds = [];
+
       setDaily((prev) => {
-        if (!prev?.tasks?.length) return prev;
-        const tasks = prev.tasks.map((task) => {
+        if (!prev?.tasks?.length) {
+          console.warn('claimDailyReward: No tasks found');
+          return prev;
+        }
+
+        // First pass: identify eligible tasks and validate stars
+        const eligibleTasks = prev.tasks.filter((task) => {
           const eligible =
             task.completed &&
             !task.rewardClaimed &&
             task.rewardClaimable &&
             (taskId === null || task.id === taskId);
-          if (!eligible) return task;
-          const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
-          starsAwarded += rewardValue;
-          claimedTasks.push(task.id);
-          rewardDateKey = rewardDateKey ?? prev.dateKey ?? null;
-          return {
-            ...task,
-            rewardClaimable: false,
-            rewardClaimed: true,
-            claimedAt: new Date().toISOString()
-          };
+          if (eligible) {
+            const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
+            if (rewardValue > 0) {
+              eligibleTaskIds.push(task.id);
+              starsToAward += rewardValue;
+            }
+          }
+          return eligible;
         });
-        if (claimedTasks.length === 0) {
+
+        if (eligibleTaskIds.length === 0 || starsToAward <= 0) {
+          console.warn('claimDailyReward: No eligible tasks with valid stars', {
+            eligibleTasks: eligibleTasks.length,
+            starsToAward
+          });
           return prev;
         }
+
+        // Stars are valid, proceed with claiming
+        const claimedAt = new Date().toISOString();
+        const tasks = prev.tasks.map((task) => {
+          if (eligibleTaskIds.includes(task.id)) {
+            return {
+              ...task,
+              rewardClaimable: false,
+              rewardClaimed: true,
+              claimedAt
+            };
+          }
+          return task;
+        });
+
         const completed = tasks.every((task) => task.completed);
         const rewardClaimed = tasks.every((task) => task.rewardClaimed);
         const rewardClaimable = tasks.some((task) => task.rewardClaimable && !task.rewardClaimed);
-        if (rewardClaimed) {
-          allClaimedAt = new Date().toISOString();
-        }
         const rewardStars = tasks.reduce(
           (sum, task) => sum + (Number.isFinite(task.rewardStars) ? task.rewardStars : 0),
           0
         );
+
         return {
           ...prev,
           tasks,
@@ -904,26 +976,52 @@ export function ProgressProvider({ children }) {
           rewardStars,
           rewardClaimed,
           rewardClaimable,
-          claimedAt: rewardClaimed ? allClaimedAt : prev.claimedAt
+          claimedAt: rewardClaimed ? claimedAt : prev.claimedAt
         };
       });
-      if (claimedTasks.length === 0) {
+
+      if (eligibleTaskIds.length === 0 || starsToAward <= 0) {
+        console.warn('claimDailyReward: No tasks claimed or invalid stars', {
+          eligibleTaskIds,
+          starsToAward
+        });
         return { success: false };
       }
-      if (Number.isFinite(starsAwarded) && starsAwarded > 0) {
-        applyStarsToPlayer(starsAwarded, {
-          source: 'daily',
-          metadata: { dateKey: rewardDateKey, tasks: claimedTasks }
+
+      console.log('claimDailyReward: Awarding stars', {
+        tasks: eligibleTaskIds,
+        starsToAward
+      });
+
+      const applyResult = applyStarsToPlayer(starsToAward, {
+        source: 'daily',
+        metadata: { tasks: eligibleTaskIds }
+      });
+
+      // Verify stars were actually applied
+      if (!applyResult || !applyResult.success) {
+        console.error('claimDailyReward: Failed to apply stars to player', {
+          tasks: eligibleTaskIds,
+          starsToAward,
+          applyResult
         });
         addToast({
-          tone: 'success',
-          title: claimedTasks.length > 1 ? 'Daily rewards claimed' : 'Daily reward claimed',
-          description: `+${starsAwarded} ⭐ added to your profile`,
-          icon: '🎉'
+          tone: 'error',
+          title: 'Error claiming reward',
+          description: 'Stars could not be added to your profile. Please try again.',
+          icon: '⚠️'
         });
-        celebrate({ particleCount: 120, spread: 80, originY: 0.6 });
+        return { success: false };
       }
-      return { success: true, stars: starsAwarded, tasks: claimedTasks };
+
+      addToast({
+        tone: 'success',
+        title: eligibleTaskIds.length > 1 ? 'Daily rewards claimed' : 'Daily reward claimed',
+        description: `+${starsToAward} ⭐ added to your profile`,
+        icon: '🎉'
+      });
+      celebrate({ particleCount: 120, spread: 80, originY: 0.6 });
+      return { success: true, stars: starsToAward, tasks: eligibleTaskIds };
     },
     [applyStarsToPlayer, addToast]
   );
