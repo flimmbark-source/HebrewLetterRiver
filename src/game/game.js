@@ -1941,23 +1941,11 @@ function startClickMode(itemEl, payload) {
     maxBucketCount = Math.max(maxBucketCount, activeBucketCount);
     invalidateBucketMinWidth();
 
-    // Hide choices container during layout calculation to prevent visible glitches
-    if (choicesContainer) {
-      choicesContainer.style.opacity = '0';
-    }
-
-    // Schedule layout update instead of applying immediately
-    scheduleBucketLayoutUpdate();
-
-    // Schedule a second layout update and reveal after completion
+    // Single delayed update - no glitch
     if (typeof window !== 'undefined') {
       window.setTimeout(() => {
         scheduleBucketLayoutUpdate();
-        // Reveal choices container after final layout
-        if (choicesContainer) {
-          choicesContainer.style.opacity = '1';
-        }
-      }, 150);
+      }, 100);
     }
   }
 
