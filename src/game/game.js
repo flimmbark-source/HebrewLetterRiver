@@ -1927,6 +1927,11 @@ function startClickMode(itemEl, payload) {
     // Schedule layout update instead of applying immediately
     // This allows DOM to render first, preventing misalignment
     scheduleBucketLayoutUpdate();
+    // Schedule a second layout update after a longer delay to catch any late-rendering issues
+    // This ensures proper alignment on initial game start
+    if (typeof window !== 'undefined') {
+      window.setTimeout(() => scheduleBucketLayoutUpdate(), 150);
+    }
   }
 
   // Helper to sync settings to localStorage
