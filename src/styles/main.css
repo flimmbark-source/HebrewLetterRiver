@@ -2294,7 +2294,7 @@ body.no-scroll {
   flex-shrink: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(70px, 90px));
-  justify-content: center;
+  justify-content: space-evenly;
   gap: var(--space-2); /* 16px between buckets */
   padding: var(--space-2); /* 16px from edges */
   padding-left: calc(var(--space-2) + var(--space-1) + env(safe-area-inset-left, 0px)); /* Equal horizontal padding */
