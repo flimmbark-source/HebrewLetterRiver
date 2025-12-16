@@ -1924,10 +1924,24 @@ function startClickMode(itemEl, payload) {
     // Update max bucket count if we've exceeded it
     maxBucketCount = Math.max(maxBucketCount, activeBucketCount);
     invalidateBucketMinWidth();
-    // Use a single delayed layout update to avoid visual glitches
-    // Longer delay ensures DOM is fully rendered before calculating layout
+
+    // Hide choices container during layout calculation to prevent visible glitches
+    if (choicesContainer) {
+      choicesContainer.style.opacity = '0';
+    }
+
+    // Schedule layout update instead of applying immediately
+    scheduleBucketLayoutUpdate();
+
+    // Schedule a second layout update and reveal after completion
     if (typeof window !== 'undefined') {
-      window.setTimeout(() => scheduleBucketLayoutUpdate(), 100);
+      window.setTimeout(() => {
+        scheduleBucketLayoutUpdate();
+        // Reveal choices container after final layout
+        if (choicesContainer) {
+          choicesContainer.style.opacity = '1';
+        }
+      }, 150);
     }
   }
 
