@@ -584,6 +584,8 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
       // Set height equal to width for square buckets
       buckets.forEach(bucket => {
         bucket.style.minHeight = `${currentWidth}px`;
+        bucket.style.height = `${currentWidth}px`;
+        bucket.style.maxHeight = `${currentWidth}px`;
       });
     };
 
