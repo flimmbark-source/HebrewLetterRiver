@@ -1608,7 +1608,7 @@ body.no-scroll {
 @media (min-width: 640px) {
   #modal-content {
     padding: var(--space-4); /* Desktop: 32px on larger screens */
-    max-width: 48rem; /* Desktop: 3xl equivalent */
+    max-width: 32rem; /* Desktop: 2/3 of original size (512px) */
   }
 }
 
