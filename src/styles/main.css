@@ -1274,7 +1274,7 @@ body.no-scroll {
 
 .mode-info-popup {
   position: absolute;
-  bottom: 8px;
+  bottom: 56px; /* Position just above the footer/start button */
   left: 50%;
   transform: translateX(-50%);
   background: rgba(74, 34, 8, 0.95);
