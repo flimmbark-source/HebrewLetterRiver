@@ -33,14 +33,14 @@ const TUTORIALS = {
       },
       {
         id: 'stars',
-        title: 'Earn Stars',
-        description: 'Each correct catch earns you stars. Stars unlock new levels and badges!',
-        icon: '⭐'
+        title: 'Learn at your own Pace',
+        description: 'Check the Settings for options to tweak the game, so that you can learn in the way that works for you!',
+        icon: '⚙️'
       },
       {
         id: 'daily',
         title: 'Daily Quests',
-        description: 'Complete daily quests for bonus stars and build your streak!',
+        description: 'Complete daily quests to earn stars and level up!',
         icon: '📅'
       },
       {
