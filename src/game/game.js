@@ -1140,6 +1140,9 @@ function startClickMode(itemEl, payload) {
   }
 
   function startGame() {
+    // Clear any pending timers from previous game instances
+    clearAllTimers();
+
     score = 0;
     lives = initialLives;
     level = 1;
@@ -1165,6 +1168,12 @@ function startClickMode(itemEl, payload) {
     lastUsedFont = null; // Reset last used font for new game
     selectedLetter = null;
     waveCorrectCount = 0;
+    forcedStartItem = null; // Clear any forced start item
+    recentSpawnPositions = []; // Clear spawn position tracking
+
+    // Clear any active items from previous sessions
+    activeItems.forEach((item) => item.element.remove());
+    activeItems.clear();
 
     // Get combined pool from all selected modes
     introductionsEnabled = document.getElementById('toggle-introductions').checked;
@@ -1456,6 +1465,10 @@ function startClickMode(itemEl, payload) {
     if (!gameActive || isPaused) return;
     // Don't spawn new rounds if goal has been reached
     if (hasReachedGoal) return;
+    // Prevent concurrent spawn attempts
+    if (currentRound && currentRound.handledCount < currentRound.items.length) {
+      return; // Still processing current round
+    }
     // Reset wave counter at the start of each new wave/round
     waveCorrectCount = 0;
 
@@ -1515,21 +1528,18 @@ function startClickMode(itemEl, payload) {
         forcedStartItem = null;
       } else {
         // Introduce new letters for the first wave
-        if (level === 1) {
-          if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
-          if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
-        } else {
-          if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
+        // At level 1: introduce 2 letters, at higher levels: introduce 1 letter
+        const lettersToIntroduce = level === 1 ? 2 : 1;
+        for (let i = 0; i < lettersToIntroduce && learningOrder.length > 0; i++) {
+          roundItems.push(learningOrder.shift());
         }
       }
       hasIntroducedForItemInLevel = true;
     } else if (seenItems.size === 0 && learningOrder.length > 0) {
       // Safety check: if no items have been seen yet, introduce new letters instead of spawning empty wave
       // This handles edge cases where first wave might be skipped
-      if (level === 1 && learningOrder.length > 0) {
-        roundItems.push(learningOrder.shift());
-        if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
-      } else if (learningOrder.length > 0) {
+      const lettersToIntroduce = level === 1 ? 2 : 1;
+      for (let i = 0; i < lettersToIntroduce && learningOrder.length > 0; i++) {
         roundItems.push(learningOrder.shift());
       }
       hasIntroducedForItemInLevel = true;
