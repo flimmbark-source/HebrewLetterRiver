@@ -1325,12 +1325,12 @@ body.no-scroll {
 @media (max-width: 640px) {
   .start-validation-popup {
     white-space: normal;
-    max-width: calc(100% - 1rem); /* Nearly full width on mobile */
+    max-width: calc(100% - 0.25rem); /* Maximum width on mobile */
     text-align: center;
   }
 
   .mode-info-popup {
-    max-width: calc(100% - 1rem); /* Nearly full width on mobile */
+    max-width: calc(100% - 0.25rem); /* Maximum width on mobile */
   }
 }
 
