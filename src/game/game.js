@@ -1523,6 +1523,16 @@ function startClickMode(itemEl, payload) {
         }
       }
       hasIntroducedForItemInLevel = true;
+    } else if (seenItems.size === 0 && learningOrder.length > 0) {
+      // Safety check: if no items have been seen yet, introduce new letters instead of spawning empty wave
+      // This handles edge cases where first wave might be skipped
+      if (level === 1 && learningOrder.length > 0) {
+        roundItems.push(learningOrder.shift());
+        if (learningOrder.length > 0) roundItems.push(learningOrder.shift());
+      } else if (learningOrder.length > 0) {
+        roundItems.push(learningOrder.shift());
+      }
+      hasIntroducedForItemInLevel = true;
     } else {
       // Subsequent waves: send ALL letters that have been introduced so far
       const availableItems = itemPool.filter((item) => seenItems.has(item.id));
