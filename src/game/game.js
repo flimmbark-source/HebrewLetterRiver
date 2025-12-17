@@ -1524,16 +1524,15 @@ function startClickMode(itemEl, payload) {
       }
       hasIntroducedForItemInLevel = true;
     } else {
-      // Subsequent waves: send ALL letters for this level (including those just introduced)
-      // Fill with all available items up to level count
+      // Subsequent waves: send ALL letters that have been introduced so far
       const availableItems = itemPool.filter((item) => seenItems.has(item.id));
 
       if (selectedModeIds.size > 1 && availableItems.length > 0) {
-        roundItems = getEvenlyDistributedItems(availableItems, totalItemsInRound, new Set());
+        // Send ALL available items with even distribution across modes
+        roundItems = getEvenlyDistributedItems(availableItems, availableItems.length, new Set());
       } else {
-        // Shuffle and take up to totalItemsInRound items
-        const shuffled = [...availableItems].sort(() => Math.random() - 0.5);
-        roundItems = shuffled.slice(0, totalItemsInRound);
+        // Send ALL available items in shuffled order
+        roundItems = [...availableItems].sort(() => Math.random() - 0.5);
       }
     }
 
