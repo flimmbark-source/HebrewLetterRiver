@@ -1325,8 +1325,12 @@ body.no-scroll {
 @media (max-width: 640px) {
   .start-validation-popup {
     white-space: normal;
-    max-width: 250px;
+    max-width: 85%; /* Wider on mobile */
     text-align: center;
+  }
+
+  .mode-info-popup {
+    max-width: 85%; /* Wider on mobile */
   }
 }
 
