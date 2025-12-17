@@ -1165,6 +1165,7 @@ body.no-scroll {
 }
 
 .mode-panel {
+  position: relative;
   padding: 10px 10px 12px;
   border-radius: 16px;
   background: linear-gradient(180deg, #f7ddc3 0%, #f0d9ba 100%);
@@ -1268,14 +1269,14 @@ body.no-scroll {
 }
 
 .mode-button-wrapper {
-  position: relative;
+  /* position: relative removed to allow popups to position relative to .mode-panel */
 }
 
 .mode-info-popup {
   position: absolute;
-  top: 50%;
-  left: 105%;
-  transform: translateY(-50%);
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
   background: rgba(74, 34, 8, 0.95);
   color: #fff9eb;
   padding: 8px 12px;
@@ -1289,15 +1290,6 @@ body.no-scroll {
   max-width: 250px;
   white-space: normal;
   line-height: 1.4;
-}
-
-@media (max-width: 640px) {
-  .mode-info-popup {
-    left: 50%;
-    top: auto;
-    bottom: 105%;
-    transform: translateX(-50%);
-  }
 }
 
 .start-validation-popup {

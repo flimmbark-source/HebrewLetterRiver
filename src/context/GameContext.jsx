@@ -469,7 +469,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
 >
   <div
     id="modal-content"
-    className="relative w-full max-w-3xl shadow-2xl"
+    className="relative w-full max-w-lg shadow-2xl"
     style={{
       border: '2px solid rgba(235, 179, 105, 0.95)',
       background:
