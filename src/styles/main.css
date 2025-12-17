@@ -1165,6 +1165,7 @@ body.no-scroll {
 }
 
 .mode-panel {
+  position: relative;
   padding: 10px 10px 12px;
   border-radius: 16px;
   background: linear-gradient(180deg, #f7ddc3 0%, #f0d9ba 100%);
@@ -1268,17 +1269,17 @@ body.no-scroll {
 }
 
 .mode-button-wrapper {
-  position: relative;
+  /* position: relative removed to allow popups to position relative to .mode-panel */
 }
 
 .mode-info-popup {
   position: absolute;
-  top: 50%;
-  left: 105%;
-  transform: translateY(-50%);
+  bottom: 75px; /* Position just above the footer/start button */
+  left: 50%;
+  transform: translateX(-50%);
   background: rgba(74, 34, 8, 0.95);
   color: #fff9eb;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
@@ -1286,18 +1287,9 @@ body.no-scroll {
   z-index: 1000;
   pointer-events: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  max-width: 250px;
+  max-width: 700px; /* Doubled from 350px */
   white-space: normal;
   line-height: 1.4;
-}
-
-@media (max-width: 640px) {
-  .mode-info-popup {
-    left: 50%;
-    top: auto;
-    bottom: 105%;
-    transform: translateX(-50%);
-  }
 }
 
 .start-validation-popup {
@@ -1315,6 +1307,7 @@ body.no-scroll {
   z-index: 1000;
   pointer-events: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  max-width: 700px; /* Doubled width */
   margin-bottom: 8px;
   animation: validation-bounce 0.3s ease-out;
 }
@@ -1333,8 +1326,14 @@ body.no-scroll {
 @media (max-width: 640px) {
   .start-validation-popup {
     white-space: normal;
-    max-width: 250px;
+    max-width: calc(87% + 1rem); /* Extend beyond panel padding on mobile */
+    width: calc(100% + 1rem);
     text-align: center;
+  }
+
+  .mode-info-popup {
+    max-width: calc(87% + 1rem); /* Extend beyond panel padding on mobile */
+    width: calc(100% + 1rem);
   }
 }
 
@@ -1616,7 +1615,7 @@ body.no-scroll {
 @media (min-width: 640px) {
   #modal-content {
     padding: var(--space-4); /* Desktop: 32px on larger screens */
-    max-width: 48rem; /* Desktop: 3xl equivalent */
+    max-width: 32rem; /* Desktop: 2/3 of original size (512px) */
   }
 }
 

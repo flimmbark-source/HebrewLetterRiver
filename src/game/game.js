@@ -206,7 +206,6 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     practiceModes.forEach((mode) => {
       const buttonWrapper = document.createElement('div');
       buttonWrapper.className = 'mode-button-wrapper';
-      buttonWrapper.style.position = 'relative';
 
       const button = document.createElement('button');
       button.type = 'button';
