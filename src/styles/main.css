@@ -1287,7 +1287,7 @@ body.no-scroll {
   z-index: 1000;
   pointer-events: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  max-width: 350px;
+  max-width: 700px; /* Doubled from 350px */
   white-space: normal;
   line-height: 1.4;
 }
@@ -1307,6 +1307,7 @@ body.no-scroll {
   z-index: 1000;
   pointer-events: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  max-width: 700px; /* Doubled width */
   margin-bottom: 8px;
   animation: validation-bounce 0.3s ease-out;
 }
