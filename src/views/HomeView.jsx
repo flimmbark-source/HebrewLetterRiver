@@ -52,7 +52,7 @@ export default function HomeView() {
 
     const name = nameKey ? t(nameKey) : player.latestBadge.name ?? badge?.name ?? player.latestBadge.id;
     const label = labelKey ? t(labelKey) : player.latestBadge.label ?? tierSpec?.label ?? '';
-    const summary = summaryKey ? t(summaryKey, { gameName: t('app.title') }) : player.latestBadge.summary ?? badge?.summary ?? '';
+    const summary = summaryKey ? t(summaryKey, { gameName: t('app.title'), goal: tierSpec?.goal ?? player.latestBadge.goal }) : player.latestBadge.summary ?? badge?.summary ?? '';
 
     return {
       ...player.latestBadge,
@@ -167,7 +167,7 @@ export default function HomeView() {
         </div>
         <div className="top-counters">
           <button
-            onClick={() => startTutorial('firstTime')}
+            onClick={() => startTutorial('tour')}
             className="tiny-pill"
             aria-label="Show tutorial"
             title="Show tutorial"

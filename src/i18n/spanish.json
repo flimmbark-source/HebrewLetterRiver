@@ -529,5 +529,121 @@
     "patientPaddler": "Remero Paciente",
     "noneYet": "Ninguno todavía",
     "play": "Jugar"
+  },
+  "tutorial": {
+    "stepCounter": "Paso {{current}} de {{total}}",
+    "clickToContinue": "👆 Haga clic en el elemento resaltado para continuar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "gotIt": "¡Entendido!",
+    "skip": "Saltar tutorial"
+  },
+  "tutorials": {
+    "firstTime": {
+      "welcome": {
+        "title": "¡Bienvenidos a Río Letra!",
+        "description": "Letter River te ayuda a aprender letras a través de un juego interactivo. Primero, ¡configuremos sus idiomas!"
+      },
+      "appLanguage": {
+        "title": "Elija el idioma de su interfaz",
+        "description": "Esto establece el idioma de todos los menús, botones e instrucciones. Elija el idioma con el que se sienta más cómodo leyendo."
+      },
+      "practiceLanguage": {
+        "title": "Elija qué aprender",
+        "description": "¡Selecciona el idioma que quieres practicar! Esto determina qué letras verás en el juego."
+      },
+      "confirmLanguages": {
+        "title": "¡Comencemos!",
+        "description": "Haga clic en Continuar cuando esté listo. Siempre puedes cambiarlos más tarde en Configuración."
+      },
+      "navigation": {
+        "title": "Navegación",
+        "description": "Utilice la navegación inferior para explorar. Inicio muestra tu progreso, Aprender muestra información de idioma, Logros muestra insignias y Configuración te permite personalizar."
+      },
+      "progress": {
+        "title": "Tu progreso",
+        "description": "Aquí puedes realizar un seguimiento de tu racha, nivel y última insignia. ¡Cada juego que juegas gana estrellas para subir de nivel!"
+      },
+      "quests": {
+        "title": "Misiones diarias",
+        "description": "Completa misiones diarias para ganar estrellas extra. Las misiones se reinician todos los días a la medianoche, hora de Jerusalén."
+      },
+      "navigateToAchievements": {
+        "title": "¡Revisemos los logros!",
+        "description": "Veamos qué insignias puedes ganar. Navegaremos a la página de Logros ahora."
+      },
+      "achievementsOverview": {
+        "title": "Tu colección de insignias",
+        "description": "¡Gana insignias completando desafíos! Cada insignia rastrea tus logros."
+      },
+      "badgeTiers": {
+        "title": "Niveles de insignia",
+        "description": "Cada insignia tiene niveles Bronce, Plata y Oro. ¡Completa objetivos más difíciles para subir de nivel y ganar más estrellas!"
+      },
+      "navigateToSettings": {
+        "title": "Personaliza tu experiencia",
+        "description": "Ahora visitemos Configuración para ver cómo puedes adaptar el juego a tu estilo de aprendizaje."
+      },
+      "settingsIntro": {
+        "title": "Configuración y accesibilidad",
+        "description": "Aquí puedes personalizar el funcionamiento del juego para adaptarlo a tus necesidades. ¡Todos aprenden de manera diferente!"
+      },
+      "accessibilityOptions": {
+        "title": "Funciones de accesibilidad",
+        "description": "Ajuste la velocidad del juego, use fuentes aptas para dislexia, habilite el modo de clic en lugar de arrastrar y mucho más. ¡Pruebe diferentes configuraciones para encontrar la que funcione mejor para usted!"
+      },
+      "backToHome": {
+        "title": "¿Listo para jugar?",
+        "description": "¡Excelente! Ahora regresemos a casa y comencemos tu primer juego."
+      },
+      "playButton": {
+        "title": "Comienza tu primer juego",
+        "description": "¡Haz clic en el botón Reproducir a continuación cuando estés listo para practicar! Te guiaremos a través de la configuración del juego."
+      }
+    },
+    "tour": {
+      "tourStart": {
+        "title": "Tour rápido",
+        "description": "¡Hagamos un recorrido rápido por Letter River! Visitaremos cada sección principal."
+      },
+      "homeFeatures": {
+        "title": "Pantalla de inicio",
+        "description": "Sigue tu progreso, completa misiones diarias y accede al juego desde aquí."
+      },
+      "tourAchievements": {
+        "title": "Logros",
+        "description": "Vea todas las insignias disponibles y realice un seguimiento de sus logros."
+      },
+      "tourSettings": {
+        "title": "Configuración y accesibilidad",
+        "description": "Personaliza la velocidad del juego, las fuentes y las opciones de accesibilidad para que coincidan con tu estilo de aprendizaje."
+      },
+      "tourLearn": {
+        "title": "aprender",
+        "description": "Explore información sobre idiomas y materiales de referencia."
+      },
+      "tourComplete": {
+        "title": "¡Tour completo!",
+        "description": "Has visto todas las características principales. ¡Haz clic en el botón Reproducir en cualquier momento para comenzar a practicar!"
+      }
+    },
+    "gameSetup": {
+      "setupIntro": {
+        "title": "Configuración del juego",
+        "description": "¡Elige qué practicar y establece tu objetivo antes de jugar!"
+      },
+      "practiceModes": {
+        "title": "Qué practicar",
+        "description": "Selecciona consonantes, vocales o letras combinadas. ¡Puedes practicar un tipo o mezclarlos!"
+      },
+      "goalSetting": {
+        "title": "Establece tu objetivo",
+        "description": "Utilice + y - para establecer cuántas letras practicar. ¡Comienza con 10 si eres nuevo y aumenta a medida que mejoras!"
+      },
+      "startGame": {
+        "title": "¿Listo? ¡Vamos a jugar!",
+        "description": "¡Haga clic en Iniciar para comenzar! Las letras fluirán por la pantalla; arrastre cada una a su cuadro correspondiente en la parte inferior."
+      }
+    }
   }
 }

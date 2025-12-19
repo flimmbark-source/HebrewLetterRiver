@@ -17,7 +17,7 @@ function XIcon({ className = '' }) {
   );
 }
 
-function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
+function BadgeCard({ badge, progress, translate, gameName, onClaim, className = '' }) {
   const totalTiers = badge.tiers.length;
   const unclaimed = Array.isArray(progress?.unclaimed) ? progress.unclaimed : [];
   const hasUnclaimed = unclaimed.length > 0;
@@ -105,7 +105,7 @@ function BadgeCard({ badge, progress, translate, gameName, onClaim }) {
 
   return (
     <div
-      className={`progress-card-small p-5 transition sm:p-6 ${cardClass} ${highlightClass}`}
+      className={`progress-card-small p-5 transition sm:p-6 ${cardClass} ${highlightClass} ${className}`}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role={canClaim ? 'button' : undefined}
@@ -292,7 +292,7 @@ export default function AchievementsView() {
         </div>
         <div className="top-counters">
           <button
-            onClick={() => startTutorial('firstTime')}
+            onClick={() => startTutorial('tour')}
             className="tiny-pill"
             aria-label="Show tutorial"
             title="Show tutorial"
@@ -363,7 +363,7 @@ export default function AchievementsView() {
         </div>
       </header>
 
-      <section className="section" style={{ marginTop: '20px' }}>
+      <section className="section badge-tabs" style={{ marginTop: '20px' }}>
         <div className="section-header">
           <div className="wood-header">{t('achievements.title')}</div>
         </div>
@@ -392,11 +392,12 @@ export default function AchievementsView() {
                 </div>
               </div>
               <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
-                {displayBadges.map((badge) => (
+                {displayBadges.map((badge, index) => (
                   <BadgeCard
                     key={badge.id}
                     badge={badge}
                     progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
+                    className={index === 0 ? 'badge-tier-example' : ''}
                     translate={t}
                     gameName={gameName}
                     onClaim={handleBadgeClaim}

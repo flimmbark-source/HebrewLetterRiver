@@ -530,5 +530,121 @@
     "patientPaddler": "Pagayeur Patient",
     "noneYet": "Aucun encore",
     "play": "Jouer"
+  },
+  "tutorial": {
+    "stepCounter": "Étape {{current}} sur {{total}}",
+    "clickToContinue": "👆 Cliquez sur l'élément en surbrillance pour continuer",
+    "back": "Retour",
+    "next": "Suivant",
+    "gotIt": "Compris !",
+    "skip": "Passer le didacticiel"
+  },
+  "tutorials": {
+    "firstTime": {
+      "welcome": {
+        "title": "Bienvenue à Letter River!",
+        "description": "Letter River vous aide à apprendre les lettres grâce à un jeu interactif. Commençons par configurer vos langues !"
+      },
+      "appLanguage": {
+        "title": "Choisissez la langue de votre interface",
+        "description": "Cela définit la langue de tous les menus, boutons et instructions. Choisissez la langue dans laquelle vous êtes le plus à l'aise pour lire."
+      },
+      "practiceLanguage": {
+        "title": "Choisissez ce que vous voulez apprendre",
+        "description": "Sélectionnez la langue que vous souhaitez pratiquer ! Cela détermine les lettres que vous verrez dans le jeu."
+      },
+      "confirmLanguages": {
+        "title": "Commençons !",
+        "description": "Cliquez sur Continuer lorsque vous êtes prêt. Vous pourrez toujours les modifier ultérieurement dans Paramètres."
+      },
+      "navigation": {
+        "title": "Navigation",
+        "description": "Utilisez la navigation du bas pour explorer. Accueil affiche vos progrès, Apprendre affiche des informations sur la langue, Réalisations affiche des badges et Paramètres vous permet de personnaliser."
+      },
+      "progress": {
+        "title": "Votre progression",
+        "description": "Ici, vous pouvez suivre votre séquence, votre niveau et votre dernier badge. Chaque jeu auquel vous jouez rapporte des étoiles pour passer au niveau supérieur !"
+      },
+      "quests": {
+        "title": "Quêtes quotidiennes",
+        "description": "Terminez des quêtes quotidiennes pour gagner des étoiles bonus. Les quêtes sont réinitialisées chaque jour à minuit, heure de Jérusalem."
+      },
+      "navigateToAchievements": {
+        "title": "Vérifions les réalisations !",
+        "description": "Voyons quels badges vous pouvez gagner. Nous allons maintenant accéder à la page Réalisations."
+      },
+      "achievementsOverview": {
+        "title": "Votre collection de badges",
+        "description": "Gagnez des badges en relevant des défis ! Chaque badge suit vos réalisations."
+      },
+      "badgeTiers": {
+        "title": "Niveaux de badges",
+        "description": "Chaque badge comporte des niveaux Bronze, Argent et Or. Remplissez des objectifs plus difficiles pour passer au niveau supérieur et gagner plus d'étoiles !"
+      },
+      "navigateToSettings": {
+        "title": "Personnalisez votre expérience",
+        "description": "Visitez maintenant les paramètres pour voir comment vous pouvez adapter le jeu à votre style d'apprentissage."
+      },
+      "settingsIntro": {
+        "title": "Paramètres et accessibilité",
+        "description": "Ici, vous pouvez personnaliser le fonctionnement du jeu en fonction de vos besoins. Tout le monde apprend différemment !"
+      },
+      "accessibilityOptions": {
+        "title": "Fonctionnalités d'accessibilité",
+        "description": "Ajustez la vitesse du jeu, utilisez des polices adaptées à la dyslexie, activez le mode clic au lieu de glisser, et bien plus encore. Essayez différents paramètres pour trouver ce qui vous convient le mieux !"
+      },
+      "backToHome": {
+        "title": "Prêt à jouer ?",
+        "description": "Super! Maintenant, rentrons à la maison et commençons votre première partie."
+      },
+      "playButton": {
+        "title": "Commencez votre premier jeu",
+        "description": "Cliquez sur le bouton Jouer ci-dessous chaque fois que vous êtes prêt à vous entraîner ! Nous vous guiderons dans la configuration du jeu."
+      }
+    },
+    "tour": {
+      "tourStart": {
+        "title": "Visite rapide",
+        "description": "Faisons un petit tour de Letter River ! Nous visiterons chaque section principale."
+      },
+      "homeFeatures": {
+        "title": "Écran d'accueil",
+        "description": "Suivez vos progrès, accomplissez des quêtes quotidiennes et accédez au jeu à partir d'ici."
+      },
+      "tourAchievements": {
+        "title": "Réalisations",
+        "description": "Affichez tous les badges disponibles et suivez vos réalisations."
+      },
+      "tourSettings": {
+        "title": "Paramètres et accessibilité",
+        "description": "Personnalisez la vitesse du jeu, les polices et les options d'accessibilité en fonction de votre style d'apprentissage."
+      },
+      "tourLearn": {
+        "title": "Apprendre",
+        "description": "Parcourez les informations linguistiques et les documents de référence."
+      },
+      "tourComplete": {
+        "title": "Visite terminée !",
+        "description": "Vous avez vu toutes les fonctionnalités principales. Cliquez sur le bouton Jouer à tout moment pour commencer à vous entraîner !"
+      }
+    },
+    "gameSetup": {
+      "setupIntro": {
+        "title": "Configuration du jeu",
+        "description": "Choisissez quoi pratiquer et fixez votre objectif avant de jouer !"
+      },
+      "practiceModes": {
+        "title": "Que pratiquer",
+        "description": "Sélectionnez des consonnes, des voyelles ou des lettres combinées. Vous pouvez pratiquer un type ou les mélanger !"
+      },
+      "goalSetting": {
+        "title": "Fixez votre objectif",
+        "description": "Utilisez + et - pour définir le nombre de lettres à pratiquer. Commencez par 10 si vous êtes nouveau, augmentez au fur et à mesure de votre progression !"
+      },
+      "startGame": {
+        "title": "Prêt? Jouons!",
+        "description": "Cliquez sur Démarrer pour commencer ! Les lettres circuleront sur l'écran - faites glisser chacune vers sa case correspondante en bas."
+      }
+    }
   }
 }

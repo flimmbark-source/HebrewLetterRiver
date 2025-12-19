@@ -10,6 +10,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { setupGame } from '../game/game.js';
 import { useLocalization } from './LocalizationContext.jsx';
+import { useTutorial } from './TutorialContext.jsx';
 import { ErrorBoundary } from '../ErrorBoundary.jsx';
 
 const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
@@ -23,6 +24,7 @@ export function GameProvider({ children }) {
   const [hasMounted, setHasMounted] = useState(false);
   const shouldAutostartRef = useRef(false);
   const { languagePack, interfaceLanguagePack, t, dictionary } = useLocalization();
+  const { pendingTutorial, startPendingTutorial } = useTutorial();
   const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
 
@@ -123,6 +125,17 @@ export function GameProvider({ children }) {
       requestAnimationFrame(() => api.startGame());
     }
   }, [isVisible, options, languagePack, t, dictionary, interfaceLanguagePack.id]);
+
+  // Start pending tutorial when game becomes visible
+  useEffect(() => {
+    if (isVisible && pendingTutorial === 'gameSetup') {
+      // Small delay to let the modal render first
+      const timer = setTimeout(() => {
+        startPendingTutorial();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, pendingTutorial, startPendingTutorial]);
 
   const openGame = useCallback((openOptions = {}) => {
     // If game is already visible, close it (acts as a toggle)
@@ -509,7 +522,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 </div>
               </div>
               <div className="setup-body px-4">
-                <aside className="goal-column" aria-label="Goal settings">
+                <aside className="goal-column goal-selector" aria-label="Goal settings">
                   <div
                     className="goal-column__label text-xs font-bold uppercase tracking-wider"
                     style={{ color: '#6c3b14' }}
@@ -609,13 +622,13 @@ function GameCanvas({ fontClass, loadedSettings }) {
                   <div className="mode-panel">
                     <div
                       id="mode-options"
-                      className="mode-buttons-container"
+                      className="mode-buttons-container practice-modes"
                     />
 
                     <div className="mode-panel__footer">
                       <button
                         id="start-button"
-                        className="primary-cta"
+                        className="primary-cta start-game"
                         type="button"
                         style={{
                           border: '2px solid #5aa838',
