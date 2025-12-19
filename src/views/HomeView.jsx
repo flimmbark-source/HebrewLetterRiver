@@ -167,7 +167,7 @@ export default function HomeView() {
         </div>
         <div className="top-counters">
           <button
-            onClick={() => startTutorial('firstTime')}
+            onClick={() => startTutorial('tour')}
             className="tiny-pill"
             aria-label="Show tutorial"
             title="Show tutorial"

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { storage } from '../lib/storage';
 import TutorialSpotlight from '../components/TutorialSpotlight.jsx';
 
@@ -15,6 +16,11 @@ export function useTutorial() {
 
 /**
  * Tutorial steps definition
+ *
+ * - firstTime: Auto-starts for new users, full walkthrough with navigation
+ * - tour: Manual tutorial (triggered by ? button), no language intro
+ * - gameSetup: Triggered when opening game
+ * - achievements: Can be triggered manually
  */
 const TUTORIALS = {
   firstTime: {
@@ -70,83 +76,165 @@ const TUTORIALS = {
         icon: '📅',
         targetSelector: '.quest-card'
       },
+      // Navigate to Achievements
       {
-        id: 'playCTA',
-        title: 'Ready to Play?',
-        description: 'Click the Play button below to start catching letters! We\'ll guide you through the game setup next.',
-        icon: '🎮',
-        targetSelector: '.hero-cta',
-        waitForAction: 'click'
-      }
-    ]
-  },
-  gameSetup: {
-    id: 'gameSetup',
-    steps: [
-      {
-        id: 'welcome',
-        title: 'Game Setup',
-        description: 'Before playing, you can choose what to practice and set your goal. Let\'s go through the options.',
-        icon: '⚙️'
+        id: 'navigateToAchievements',
+        title: 'Let\'s Check Achievements!',
+        description: 'Let\'s see what badges you can earn. We\'ll navigate to the Achievements page now.',
+        icon: '🏆',
+        navigateTo: '/achievements'
       },
       {
-        id: 'modes',
-        title: 'Choose What to Practice',
-        description: 'Select which letters you want to practice. You can choose consonants, vowels, or combined letters. Click one to select it.',
-        icon: '📚',
-        targetSelector: '.practice-modes'
-      },
-      {
-        id: 'goal',
-        title: 'Set Your Goal',
-        description: 'Use the + and - buttons to adjust how many letters you want to reach. Start with a low number like 10 if you\'re just beginning!',
-        icon: '🎯',
-        targetSelector: '.goal-selector'
-      },
-      {
-        id: 'start',
-        title: 'Start the Game!',
-        description: 'When you\'re ready, click the Start button. Letters will flow down the screen - drag each one to the correct box at the bottom!',
-        icon: '🚀',
-        targetSelector: '.start-game',
-        waitForAction: 'click'
-      }
-    ]
-  },
-  achievements: {
-    id: 'achievements',
-    steps: [
-      {
-        id: 'overview',
-        title: 'Achievements',
-        description: 'Track all your accomplishments here! Badges are earned by completing specific challenges.',
-        icon: '🏆'
-      },
-      {
-        id: 'categories',
-        title: 'Badge Categories',
-        description: 'Badges are organized by type: Classic (perfect games, streaks), Polyglot (multi-language progress), and Special events (seasonal challenges).',
+        id: 'achievementsOverview',
+        title: 'Your Badge Collection',
+        description: 'Earn badges by completing challenges! Each badge tracks your accomplishments.',
         icon: '🎖️',
         targetSelector: '.badge-tabs'
       },
       {
-        id: 'tiers',
+        id: 'badgeTiers',
         title: 'Badge Tiers',
-        description: 'Each badge has multiple tiers shown by Bronze, Silver, and Gold levels. Complete harder challenges to reach higher tiers and earn more stars!',
+        description: 'Each badge has Bronze, Silver, and Gold tiers. Complete harder goals to level up and earn more stars!',
         icon: '📊',
         targetSelector: '.badge-tier-example'
+      },
+
+      // Navigate to Settings
+      {
+        id: 'navigateToSettings',
+        title: 'Customize Your Experience',
+        description: 'Now let\'s visit Settings to see how you can tailor the game to your learning style.',
+        icon: '⚙️',
+        navigateTo: '/settings'
+      },
+      {
+        id: 'settingsIntro',
+        title: 'Settings & Accessibility',
+        description: 'Here you can customize how the game works to fit your needs. Everyone learns differently!',
+        icon: '🎨'
+      },
+      {
+        id: 'accessibilityOptions',
+        title: 'Accessibility Features',
+        description: 'Adjust game speed, use dyslexia-friendly fonts, enable click mode instead of dragging, and much more. Try different settings to find what works best for you!',
+        icon: '♿',
+        targetSelector: '.progress-card-small'
+      },
+
+      // Back to home
+      {
+        id: 'backToHome',
+        title: 'Ready to Play?',
+        description: 'Great! Now let\'s head back home and start your first game.',
+        icon: '🎮',
+        navigateTo: '/home'
+      },
+      {
+        id: 'playButton',
+        title: 'Start Your First Game',
+        description: 'Click the Play button below whenever you\'re ready to practice! We\'ll guide you through the game setup.',
+        icon: '▶️',
+        targetSelector: '.hero-cta'
+      }
+    ]
+  },
+
+  // Manual tour (triggered by ? button)
+  tour: {
+    id: 'tour',
+    steps: [
+      {
+        id: 'tourStart',
+        title: 'Quick Tour',
+        description: 'Let\'s take a quick tour of Letter River! We\'ll visit each main section.',
+        icon: '🗺️'
+      },
+      {
+        id: 'homeFeatures',
+        title: 'Home Screen',
+        description: 'Track your progress, complete daily quests, and access the game from here.',
+        icon: '🏠',
+        navigateTo: '/home',
+        targetSelector: '.progress-row'
+      },
+      {
+        id: 'tourAchievements',
+        title: 'Achievements',
+        description: 'View all available badges and track your accomplishments.',
+        icon: '🏆',
+        navigateTo: '/achievements',
+        targetSelector: '.badge-tabs'
+      },
+      {
+        id: 'tourSettings',
+        title: 'Settings & Accessibility',
+        description: 'Customize game speed, fonts, and accessibility options to match your learning style.',
+        icon: '⚙️',
+        navigateTo: '/settings',
+        targetSelector: '.progress-card-small'
+      },
+      {
+        id: 'tourLearn',
+        title: 'Learn',
+        description: 'Browse language information and reference materials.',
+        icon: '📚',
+        navigateTo: '/learn'
+      },
+      {
+        id: 'tourComplete',
+        title: 'Tour Complete!',
+        description: 'You\'ve seen all the main features. Click the Play button anytime to start practicing!',
+        icon: '✨',
+        navigateTo: '/home'
+      }
+    ]
+  },
+
+  // Game setup (triggered when opening game)
+  gameSetup: {
+    id: 'gameSetup',
+    steps: [
+      {
+        id: 'setupIntro',
+        title: 'Game Setup',
+        description: 'Choose what to practice and set your goal before playing!',
+        icon: '⚙️'
+      },
+      {
+        id: 'practiceModes',
+        title: 'What to Practice',
+        description: 'Select consonants, vowels, or combined letters. You can practice one type or mix them!',
+        icon: '📚',
+        targetSelector: '.practice-modes'
+      },
+      {
+        id: 'goalSetting',
+        title: 'Set Your Goal',
+        description: 'Use + and - to set how many letters to practice. Start with 10 if you\'re new, increase as you improve!',
+        icon: '🎯',
+        targetSelector: '.goal-selector'
+      },
+      {
+        id: 'startGame',
+        title: 'Ready? Let\'s Play!',
+        description: 'Click Start to begin! Letters will flow across the screen - drag each to its matching box at the bottom.',
+        icon: '🚀',
+        targetSelector: '.start-game'
       }
     ]
   }
 };
 
 export function TutorialProvider({ children }) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [currentTutorial, setCurrentTutorial] = useState(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedTutorials, setCompletedTutorials] = useState(() => {
     return storage.get('hlr.tutorials.completed') || [];
   });
   const [pendingTutorial, setPendingTutorial] = useState(null);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const startTutorial = React.useCallback((tutorialId) => {
     const tutorial = TUTORIALS[tutorialId];
@@ -158,6 +246,7 @@ export function TutorialProvider({ children }) {
     setCurrentTutorial(tutorial);
     setCurrentStepIndex(0);
     setPendingTutorial(null);
+    setIsNavigating(false);
   }, []);
 
   // Check if this is the user's first time
@@ -179,7 +268,20 @@ export function TutorialProvider({ children }) {
     if (nextIndex >= currentTutorial.steps.length) {
       completeTutorial();
     } else {
-      setCurrentStepIndex(nextIndex);
+      const nextStep = currentTutorial.steps[nextIndex];
+
+      // If next step requires navigation, navigate first
+      if (nextStep.navigateTo && location.pathname !== nextStep.navigateTo) {
+        setIsNavigating(true);
+        navigate(nextStep.navigateTo);
+        // Wait for navigation to complete before advancing
+        setTimeout(() => {
+          setCurrentStepIndex(nextIndex);
+          setIsNavigating(false);
+        }, 300);
+      } else {
+        setCurrentStepIndex(nextIndex);
+      }
     }
   };
 
@@ -233,6 +335,7 @@ export function TutorialProvider({ children }) {
     isLastStep: currentTutorial ? currentStepIndex === currentTutorial.steps.length - 1 : false,
     isFirstStep: currentStepIndex === 0,
     pendingTutorial,
+    isNavigating,
     startTutorial,
     startPendingTutorial,
     nextStep,
@@ -246,7 +349,7 @@ export function TutorialProvider({ children }) {
   return (
     <TutorialContext.Provider value={value}>
       {children}
-      {currentTutorial && (
+      {currentTutorial && !isNavigating && (
         <TutorialSpotlight
           step={value.currentStep}
           isFirst={value.isFirstStep}
