@@ -546,5 +546,121 @@
     "patientPaddler": "חותר סבלני",
     "noneYet": "עדיין אף אחד",
     "play": "שחק"
+  },
+  "tutorial": {
+    "stepCounter": "שלב {{current}} מתוך {{total}}",
+    "clickToContinue": "👆 לחץ על האלמנט המודגש כדי להמשיך",
+    "back": "חזרה",
+    "next": "הבא",
+    "gotIt": "הבנתי!",
+    "skip": "דלג על הדרכה"
+  },
+  "tutorials": {
+    "firstTime": {
+      "welcome": {
+        "title": "ברוכים הבאים ל- Letter River!",
+        "description": "Letter River עוזר לך ללמוד אותיות באמצעות משחק אינטראקטיבי. ראשית, בואו נגדיר את השפות שלכם!"
+      },
+      "appLanguage": {
+        "title": "בחר את שפת הממשק שלך",
+        "description": "זה מגדיר את השפה עבור כל התפריטים, הלחצנים וההוראות. בחר את השפה שהכי נוח לך לקרוא."
+      },
+      "practiceLanguage": {
+        "title": "בחר מה ללמוד",
+        "description": "בחר את השפה שאתה רוצה לתרגל! זה קובע אילו אותיות תראה במשחק."
+      },
+      "confirmLanguages": {
+        "title": "בואו נתחיל!",
+        "description": "לחץ על המשך כשתהיה מוכן. תמיד תוכל לשנות אותם מאוחר יותר בהגדרות."
+      },
+      "navigation": {
+        "title": "ניווט",
+        "description": "השתמש בניווט התחתון כדי לחקור. דף הבית מציג את ההתקדמות שלך, למד מציג מידע על שפה, הישגים מציג תגים והגדרות מאפשרות לך להתאים אישית."
+      },
+      "progress": {
+        "title": "ההתקדמות שלך",
+        "description": "כאן תוכל לעקוב אחר הרצף, הרמה והתג האחרון שלך. כל משחק שאתה משחק זוכה בכוכבים כדי לעלות רמה!"
+      },
+      "quests": {
+        "title": "משימות יומיות",
+        "description": "השלם משימות יומיות כדי לזכות בכוכבי בונוס. קווסטים מתאפסים כל יום בחצות שעון ירושלים."
+      },
+      "navigateToAchievements": {
+        "title": "בואו לבדוק הישגים!",
+        "description": "בוא נראה באילו תגים אתה יכול לזכות. נעבור לדף ההישגים כעת."
+      },
+      "achievementsOverview": {
+        "title": "אוסף התגים שלך",
+        "description": "הרווח תגים על ידי השלמת אתגרים! כל תג עוקב אחר ההישגים שלך."
+      },
+      "badgeTiers": {
+        "title": "שכבות תג",
+        "description": "לכל תג יש שכבות ברונזה, כסף וזהב. השלם יעדים קשים יותר כדי לעלות רמה ולהרוויח יותר כוכבים!"
+      },
+      "navigateToSettings": {
+        "title": "התאם אישית את החוויה שלך",
+        "description": "כעת נבקר בהגדרות כדי לראות כיצד תוכל להתאים את המשחק לסגנון הלמידה שלך."
+      },
+      "settingsIntro": {
+        "title": "הגדרות ונגישות",
+        "description": "כאן תוכל להתאים אישית את אופן הפעולה של המשחק כך שיתאים לצרכים שלך. כל אחד לומד אחרת!"
+      },
+      "accessibilityOptions": {
+        "title": "תכונות נגישות",
+        "description": "התאם את מהירות המשחק, השתמש בגופנים ידידותיים לדיסלקציה, הפעל מצב קליק במקום גרירה ועוד הרבה יותר. נסה הגדרות שונות כדי למצוא את מה שהכי מתאים לך!"
+      },
+      "backToHome": {
+        "title": "מוכן לשחק?",
+        "description": "גָדוֹל! עכשיו בואו נחזור הביתה ונתחיל את המשחק הראשון שלכם."
+      },
+      "playButton": {
+        "title": "התחל את המשחק הראשון שלך",
+        "description": "לחץ על כפתור ההפעלה למטה בכל פעם שאתה מוכן להתאמן! אנו נדריך אותך בהגדרת המשחק."
+      }
+    },
+    "tour": {
+      "tourStart": {
+        "title": "סיור מהיר",
+        "description": "בואו נסייר מהיר ב- Letter River! נבקר בכל חלק מרכזי."
+      },
+      "homeFeatures": {
+        "title": "מסך הבית",
+        "description": "עקוב אחר ההתקדמות שלך, השלם משימות יומיות וקבל גישה למשחק מכאן."
+      },
+      "tourAchievements": {
+        "title": "הישגים",
+        "description": "הצג את כל התגים הזמינים ועקוב אחר ההישגים שלך."
+      },
+      "tourSettings": {
+        "title": "הגדרות ונגישות",
+        "description": "התאם אישית את מהירות המשחק, הגופנים ואפשרויות הנגישות כך שיתאימו לסגנון הלמידה שלך."
+      },
+      "tourLearn": {
+        "title": "למד",
+        "description": "עיין במידע בשפה ובחומרי עזר."
+      },
+      "tourComplete": {
+        "title": "סיור הושלם!",
+        "description": "ראית את כל התכונות העיקריות. לחץ על כפתור הפעל בכל עת כדי להתחיל להתאמן!"
+      }
+    },
+    "gameSetup": {
+      "setupIntro": {
+        "title": "הגדרת משחק",
+        "description": "בחר מה להתאמן והגדר את המטרה שלך לפני המשחק!"
+      },
+      "practiceModes": {
+        "title": "מה להתאמן",
+        "description": "בחר עיצורים, תנועות או אותיות משולבות. אתה יכול לתרגל סוג אחד או לערבב אותם!"
+      },
+      "goalSetting": {
+        "title": "הגדר את המטרה שלך",
+        "description": "השתמש ב-+ וב- כדי להגדיר כמה אותיות לתרגל. התחל עם 10 אם אתה חדש, הגדל ככל שאתה משתפר!"
+      },
+      "startGame": {
+        "title": "מוּכָן? בואו נשחק!",
+        "description": "לחץ על התחל כדי להתחיל! אותיות יזרמו על פני המסך - גררו כל אחת מהתיבה התואמת שלה בתחתית."
+      }
+    }
   }
 }

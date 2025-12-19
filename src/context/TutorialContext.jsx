@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { storage } from '../lib/storage';
 import TutorialSpotlight from '../components/TutorialSpotlight.jsx';
+import { useLocalization } from './LocalizationContext.jsx';
 
 const TutorialContext = createContext();
 
@@ -22,79 +23,69 @@ export function useTutorial() {
  * - gameSetup: Triggered when opening game
  * - achievements: Can be triggered manually
  */
-const TUTORIALS = {
+const TUTORIAL_DEFINITIONS = {
   firstTime: {
     id: 'firstTime',
     steps: [
       {
         id: 'welcome',
-        title: 'Welcome to Letter River!',
-        description: 'Letter River helps you learn letters through an interactive game. First, let\'s set up your languages!',
+        translationKey: 'tutorials.firstTime.welcome',
         icon: '👋',
         targetSelector: '.language-onboarding-card'
       },
       {
         id: 'appLanguage',
-        title: 'Choose Your Interface Language',
-        description: 'This sets the language for all menus, buttons, and instructions. Pick the language you\'re most comfortable reading.',
+        translationKey: 'tutorials.firstTime.appLanguage',
         icon: '🌍',
         targetSelector: '.onboarding-app-language-section'
       },
       {
         id: 'practiceLanguage',
-        title: 'Choose What to Learn',
-        description: 'Select the language you want to practice! This determines which letters you\'ll see in the game.',
+        translationKey: 'tutorials.firstTime.practiceLanguage',
         icon: '📖',
         targetSelector: '.onboarding-practice-language-section'
       },
       {
         id: 'confirmLanguages',
-        title: 'Let\'s Get Started!',
-        description: 'Click Continue when you\'re ready. You can always change these later in Settings.',
+        translationKey: 'tutorials.firstTime.confirmLanguages',
         icon: '✨',
         targetSelector: '.onboarding-continue-button',
         waitForAction: 'click'
       },
       {
         id: 'navigation',
-        title: 'Navigation',
-        description: 'Use the bottom navigation to explore. Home shows your progress, Learn shows language info, Achievements shows badges, and Settings lets you customize.',
+        translationKey: 'tutorials.firstTime.navigation',
         icon: '🧭',
         targetSelector: '.bottom-nav'
       },
       {
         id: 'progress',
-        title: 'Your Progress',
-        description: 'Here you can track your streak, level, and latest badge. Each game you play earns stars to level up!',
+        translationKey: 'tutorials.firstTime.progress',
         icon: '📊',
         targetSelector: '.progress-row'
       },
       {
         id: 'quests',
-        title: 'Daily Quests',
-        description: 'Complete daily quests to earn bonus stars. Quests reset every day at midnight Jerusalem time.',
+        translationKey: 'tutorials.firstTime.quests',
         icon: '📅',
         targetSelector: '.quest-card'
       },
       // Navigate to Achievements
       {
         id: 'navigateToAchievements',
-        title: 'Let\'s Check Achievements!',
-        description: 'Let\'s see what badges you can earn. We\'ll navigate to the Achievements page now.',
+        translationKey: 'tutorials.firstTime.navigateToAchievements',
         icon: '🏆',
         navigateTo: '/achievements'
       },
       {
         id: 'achievementsOverview',
-        title: 'Your Badge Collection',
-        description: 'Earn badges by completing challenges! Each badge tracks your accomplishments.',
+        translationKey: 'tutorials.firstTime.achievementsOverview',
         icon: '🎖️',
         targetSelector: '.badge-tabs'
       },
       {
         id: 'badgeTiers',
-        title: 'Badge Tiers',
-        description: 'Each badge has Bronze, Silver, and Gold tiers. Complete harder goals to level up and earn more stars!',
+        translationKey: 'tutorials.firstTime.badgeTiers',
         icon: '📊',
         targetSelector: '.badge-tier-example'
       },
@@ -102,21 +93,18 @@ const TUTORIALS = {
       // Navigate to Settings
       {
         id: 'navigateToSettings',
-        title: 'Customize Your Experience',
-        description: 'Now let\'s visit Settings to see how you can tailor the game to your learning style.',
+        translationKey: 'tutorials.firstTime.navigateToSettings',
         icon: '⚙️',
         navigateTo: '/settings'
       },
       {
         id: 'settingsIntro',
-        title: 'Settings & Accessibility',
-        description: 'Here you can customize how the game works to fit your needs. Everyone learns differently!',
+        translationKey: 'tutorials.firstTime.settingsIntro',
         icon: '🎨'
       },
       {
         id: 'accessibilityOptions',
-        title: 'Accessibility Features',
-        description: 'Adjust game speed, use dyslexia-friendly fonts, enable click mode instead of dragging, and much more. Try different settings to find what works best for you!',
+        translationKey: 'tutorials.firstTime.accessibilityOptions',
         icon: '♿',
         targetSelector: '.progress-card-small'
       },
@@ -124,15 +112,13 @@ const TUTORIALS = {
       // Back to home
       {
         id: 'backToHome',
-        title: 'Ready to Play?',
-        description: 'Great! Now let\'s head back home and start your first game.',
+        translationKey: 'tutorials.firstTime.backToHome',
         icon: '🎮',
         navigateTo: '/home'
       },
       {
         id: 'playButton',
-        title: 'Start Your First Game',
-        description: 'Click the Play button below whenever you\'re ready to practice! We\'ll guide you through the game setup.',
+        translationKey: 'tutorials.firstTime.playButton',
         icon: '▶️',
         targetSelector: '.hero-cta'
       }
@@ -145,45 +131,39 @@ const TUTORIALS = {
     steps: [
       {
         id: 'tourStart',
-        title: 'Quick Tour',
-        description: 'Let\'s take a quick tour of Letter River! We\'ll visit each main section.',
+        translationKey: 'tutorials.tour.tourStart',
         icon: '🗺️'
       },
       {
         id: 'homeFeatures',
-        title: 'Home Screen',
-        description: 'Track your progress, complete daily quests, and access the game from here.',
+        translationKey: 'tutorials.tour.homeFeatures',
         icon: '🏠',
         navigateTo: '/home',
         targetSelector: '.progress-row'
       },
       {
         id: 'tourAchievements',
-        title: 'Achievements',
-        description: 'View all available badges and track your accomplishments.',
+        translationKey: 'tutorials.tour.tourAchievements',
         icon: '🏆',
         navigateTo: '/achievements',
         targetSelector: '.badge-tabs'
       },
       {
         id: 'tourSettings',
-        title: 'Settings & Accessibility',
-        description: 'Customize game speed, fonts, and accessibility options to match your learning style.',
+        translationKey: 'tutorials.tour.tourSettings',
         icon: '⚙️',
         navigateTo: '/settings',
         targetSelector: '.progress-card-small'
       },
       {
         id: 'tourLearn',
-        title: 'Learn',
-        description: 'Browse language information and reference materials.',
+        translationKey: 'tutorials.tour.tourLearn',
         icon: '📚',
         navigateTo: '/learn'
       },
       {
         id: 'tourComplete',
-        title: 'Tour Complete!',
-        description: 'You\'ve seen all the main features. Click the Play button anytime to start practicing!',
+        translationKey: 'tutorials.tour.tourComplete',
         icon: '✨',
         navigateTo: '/home'
       }
@@ -196,28 +176,24 @@ const TUTORIALS = {
     steps: [
       {
         id: 'setupIntro',
-        title: 'Game Setup',
-        description: 'Choose what to practice and set your goal before playing!',
+        translationKey: 'tutorials.gameSetup.setupIntro',
         icon: '⚙️'
       },
       {
         id: 'practiceModes',
-        title: 'What to Practice',
-        description: 'Select consonants, vowels, or combined letters. You can practice one type or mix them!',
+        translationKey: 'tutorials.gameSetup.practiceModes',
         icon: '📚',
         targetSelector: '.practice-modes'
       },
       {
         id: 'goalSetting',
-        title: 'Set Your Goal',
-        description: 'Use + and - to set how many letters to practice. Start with 10 if you\'re new, increase as you improve!',
+        translationKey: 'tutorials.gameSetup.goalSetting',
         icon: '🎯',
         targetSelector: '.goal-selector'
       },
       {
         id: 'startGame',
-        title: 'Ready? Let\'s Play!',
-        description: 'Click Start to begin! Letters will flow across the screen - drag each to its matching box at the bottom.',
+        translationKey: 'tutorials.gameSetup.startGame',
         icon: '🚀',
         targetSelector: '.start-game'
       }
@@ -226,6 +202,7 @@ const TUTORIALS = {
 };
 
 export function TutorialProvider({ children }) {
+  const { t } = useLocalization();
   const navigate = useNavigate();
   const location = useLocation();
   const [currentTutorial, setCurrentTutorial] = useState(null);
@@ -236,8 +213,23 @@ export function TutorialProvider({ children }) {
   const [pendingTutorial, setPendingTutorial] = useState(null);
   const [isNavigating, setIsNavigating] = useState(false);
 
+  const tutorials = useMemo(() => {
+    const translateStep = (step) => ({
+      ...step,
+      title: t(`${step.translationKey}.title`),
+      description: t(`${step.translationKey}.description`)
+    });
+
+    return Object.fromEntries(
+      Object.entries(TUTORIAL_DEFINITIONS).map(([id, tutorial]) => [
+        id,
+        { ...tutorial, steps: tutorial.steps.map(translateStep) }
+      ])
+    );
+  }, [t]);
+
   const startTutorial = React.useCallback((tutorialId) => {
-    const tutorial = TUTORIALS[tutorialId];
+    const tutorial = tutorials[tutorialId];
     if (!tutorial) {
       console.error(`Tutorial ${tutorialId} not found`);
       return;
@@ -247,7 +239,16 @@ export function TutorialProvider({ children }) {
     setCurrentStepIndex(0);
     setPendingTutorial(null);
     setIsNavigating(false);
-  }, []);
+  }, [tutorials]);
+
+  useEffect(() => {
+    if (!currentTutorial) return;
+
+    const translated = tutorials[currentTutorial.id];
+    if (translated && translated !== currentTutorial) {
+      setCurrentTutorial(translated);
+    }
+  }, [tutorials, currentTutorial]);
 
   // Check if this is the user's first time
   useEffect(() => {
