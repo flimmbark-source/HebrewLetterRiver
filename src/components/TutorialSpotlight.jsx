@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState, useEffect } from 'react';
+import React, { useLayoutEffect, useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 export default function TutorialSpotlight({
@@ -11,126 +11,184 @@ export default function TutorialSpotlight({
   stepIndex,
   totalSteps
 }) {
-  const [rect, setRect] = useState(null);
+  const [targetRect, setTargetRect] = useState(null);
+  const [targetElement, setTargetElement] = useState(null);
 
-  // Measure the target element's bounding box whenever the step changes
+  // Measure and track the target element
   useLayoutEffect(() => {
     if (!step?.targetSelector) {
-      setRect(null);
+      setTargetRect(null);
+      setTargetElement(null);
       return;
     }
 
     const measureElement = () => {
       const element = document.querySelector(step.targetSelector);
       if (element) {
-        const box = element.getBoundingClientRect();
-        setRect({
-          top: box.top,
-          left: box.left,
-          right: box.right,
-          bottom: box.bottom,
-          width: box.width,
-          height: box.height
+        const rect = element.getBoundingClientRect();
+        setTargetRect({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          right: rect.right,
+          bottom: rect.bottom
         });
+        setTargetElement(element);
       } else {
-        setRect(null);
+        setTargetRect(null);
+        setTargetElement(null);
       }
     };
 
-    // Measure immediately
     measureElement();
 
-    // Re-measure on resize
+    const observer = new ResizeObserver(measureElement);
+    const mutationObserver = new MutationObserver(measureElement);
+
+    if (targetElement) {
+      observer.observe(targetElement);
+      mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+    }
+
     window.addEventListener('resize', measureElement);
-    window.addEventListener('scroll', measureElement);
+    window.addEventListener('scroll', measureElement, true);
 
     return () => {
+      observer.disconnect();
+      mutationObserver.disconnect();
       window.removeEventListener('resize', measureElement);
-      window.removeEventListener('scroll', measureElement);
+      window.removeEventListener('scroll', measureElement, true);
     };
-  }, [step]);
+  }, [step?.targetSelector, targetElement]);
 
-  // Add padding around the spotlight
-  const padding = 8;
+  // Handle click detection on target element for interactive steps
+  useEffect(() => {
+    if (!step?.waitForAction || step.waitForAction !== 'click' || !targetElement) {
+      return;
+    }
 
-  // Compute spotlight style with a hole over the target using CSS clip-path
-  const spotlightStyle = rect
-    ? {
-        clipPath: `polygon(
-          0% 0%,
-          0% 100%,
-          100% 100%,
-          100% 0%,
-          0% 0%,
-          0% ${rect.top - padding}px,
-          ${rect.left - padding}px ${rect.top - padding}px,
-          ${rect.left - padding}px ${rect.bottom + padding}px,
-          ${rect.right + padding}px ${rect.bottom + padding}px,
-          ${rect.right + padding}px ${rect.top - padding}px,
-          ${rect.left - padding}px ${rect.top - padding}px,
-          ${rect.left - padding}px 0%,
-          0% 0%
-        )`
+    const handleClick = (e) => {
+      // If clicking on the target element, advance to next step
+      if (targetElement.contains(e.target)) {
+        onNext();
       }
-    : {};
+    };
 
-  // Position the callout below or above the target depending on space
-  const calloutWidth = 320;
-  const calloutHeight = 200; // Approximate
-  const calloutStyle = rect
-    ? {
-        position: 'fixed',
-        top: rect.bottom + padding + 12 < window.innerHeight - calloutHeight
-          ? `${rect.bottom + padding + 12}px`
-          : `${Math.max(rect.top - calloutHeight - padding - 12, 16)}px`,
-        left: `${Math.min(Math.max(rect.left + rect.width / 2 - calloutWidth / 2, 16), window.innerWidth - calloutWidth - 16)}px`,
-        width: `${calloutWidth}px`
-      }
-    : {
+    // Capture phase to intercept before other handlers
+    document.addEventListener('click', handleClick, true);
+
+    return () => {
+      document.removeEventListener('click', handleClick, true);
+    };
+  }, [step?.waitForAction, targetElement, onNext]);
+
+  // Block all interactions except on the target when in interactive mode
+  const handleOverlayClick = useCallback((e) => {
+    // If we're waiting for an action and they clicked the target, let it through
+    if (step?.waitForAction && targetElement?.contains(e.target)) {
+      return;
+    }
+
+    // Otherwise, block the click
+    e.stopPropagation();
+    e.preventDefault();
+  }, [step?.waitForAction, targetElement]);
+
+  // Calculate callout position
+  const getCalloutStyle = () => {
+    if (!targetRect) {
+      // Centered modal if no target
+      return {
         position: 'fixed',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: `${calloutWidth}px`
+        maxWidth: '90vw',
+        width: '400px'
       };
+    }
 
-  // Add pulse animation to highlighted element
-  useEffect(() => {
-    if (!step?.targetSelector) return;
+    const calloutWidth = 340;
+    const calloutMinHeight = 180;
+    const gap = 16;
+    const padding = 20;
 
-    const element = document.querySelector(step.targetSelector);
-    if (!element) return;
+    // Try to position below target first
+    const spaceBelow = window.innerHeight - targetRect.bottom;
+    const spaceAbove = targetRect.top;
 
-    element.style.position = 'relative';
-    element.style.zIndex = '201';
+    let top;
+    if (spaceBelow >= calloutMinHeight + gap) {
+      // Position below
+      top = targetRect.bottom + gap;
+    } else if (spaceAbove >= calloutMinHeight + gap) {
+      // Position above
+      top = targetRect.top - calloutMinHeight - gap;
+    } else {
+      // Not enough space, center it
+      top = window.innerHeight / 2 - calloutMinHeight / 2;
+    }
 
-    return () => {
-      element.style.position = '';
-      element.style.zIndex = '';
+    // Horizontal centering relative to target, with viewport constraints
+    const centerX = targetRect.left + targetRect.width / 2;
+    let left = centerX - calloutWidth / 2;
+
+    // Keep within viewport
+    left = Math.max(padding, Math.min(left, window.innerWidth - calloutWidth - padding));
+
+    return {
+      position: 'fixed',
+      top: `${top}px`,
+      left: `${left}px`,
+      width: `${calloutWidth}px`,
+      maxWidth: `calc(100vw - ${padding * 2}px)`
     };
-  }, [step]);
+  };
 
   return (
-    <div className="fixed inset-0 z-[200]" aria-modal="true" role="dialog">
-      {/* Dark overlay with cut-out around target */}
+    <>
+      {/* Overlay that blocks interactions */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-all duration-300"
-        style={spotlightStyle}
-        onClick={onSkip}
-        aria-label="Click to skip tutorial"
+        className="fixed inset-0 z-[999]"
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+        onClick={handleOverlayClick}
+        onTouchStart={handleOverlayClick}
       />
 
-      {/* Callout card */}
+      {/* Spotlight highlight for target element */}
+      {targetRect && (
+        <div
+          className="fixed z-[1000] pointer-events-none"
+          style={{
+            top: `${targetRect.top - 4}px`,
+            left: `${targetRect.left - 4}px`,
+            width: `${targetRect.width + 8}px`,
+            height: `${targetRect.height + 8}px`,
+            border: '3px solid #3b82f6',
+            borderRadius: '8px',
+            boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.3), 0 0 20px rgba(59, 130, 246, 0.5)',
+            animation: 'pulse 2s ease-in-out infinite'
+          }}
+        />
+      )}
+
+      {/* Tutorial callout card */}
       <div
-        className="bg-slate-800 border-2 border-cyan-500 rounded-xl shadow-2xl transition-all duration-300 animate-fadeIn"
-        style={calloutStyle}
+        className="z-[1001] bg-slate-800 rounded-xl shadow-2xl border-2 border-blue-500"
+        style={getCalloutStyle()}
       >
-        <div className="p-4">
-          <div className="flex items-start mb-3">
-            <div className="text-4xl mr-3 flex-shrink-0">{step.icon}</div>
+        <div className="p-5">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="text-4xl flex-shrink-0">{step.icon}</div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-white font-bold text-lg leading-tight mb-1">{step.title}</h3>
-              <div className="text-cyan-400 text-xs font-semibold">
+              <h3 className="text-white font-bold text-lg leading-tight mb-1">
+                {step.title}
+              </h3>
+              <div className="text-blue-400 text-xs font-semibold">
                 Step {stepIndex + 1} of {totalSteps}
               </div>
             </div>
@@ -140,6 +198,15 @@ export default function TutorialSpotlight({
             {step.description}
           </p>
 
+          {/* Show instruction if waiting for action */}
+          {step.waitForAction === 'click' && targetRect && (
+            <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
+              <p className="text-blue-300 text-sm font-semibold">
+                👆 Click the highlighted element to continue
+              </p>
+            </div>
+          )}
+
           {/* Progress dots */}
           <div className="flex justify-center gap-1.5 mb-4">
             {Array.from({ length: totalSteps }).map((_, index) => (
@@ -147,31 +214,34 @@ export default function TutorialSpotlight({
                 key={index}
                 className={`h-1.5 rounded-full transition-all ${
                   index === stepIndex
-                    ? 'w-6 bg-cyan-500'
+                    ? 'w-6 bg-blue-500'
                     : index < stepIndex
-                    ? 'w-1.5 bg-cyan-700'
+                    ? 'w-1.5 bg-blue-700'
                     : 'w-1.5 bg-slate-700'
                 }`}
               />
             ))}
           </div>
 
-          <div className="flex gap-2">
-            {!isFirst && (
+          {/* Navigation buttons - only show if not waiting for action */}
+          {!step.waitForAction && (
+            <div className="flex gap-2">
+              {!isFirst && (
+                <button
+                  onClick={onBack}
+                  className="flex-1 py-2.5 px-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold transition-colors"
+                >
+                  Back
+                </button>
+              )}
               <button
-                onClick={onBack}
-                className="flex-1 py-2.5 px-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold transition-colors"
+                onClick={onNext}
+                className="flex-1 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors"
               >
-                Back
+                {isLast ? 'Got it!' : 'Next'}
               </button>
-            )}
-            <button
-              onClick={onNext}
-              className="flex-1 py-2.5 px-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-semibold transition-colors"
-            >
-              {isLast ? 'Got it!' : 'Next'}
-            </button>
-          </div>
+            </div>
+          )}
 
           <button
             onClick={onSkip}
@@ -181,7 +251,14 @@ export default function TutorialSpotlight({
           </button>
         </div>
       </div>
-    </div>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.6; }
+        }
+      `}</style>
+    </>
   );
 }
 
@@ -191,7 +268,8 @@ TutorialSpotlight.propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     icon: PropTypes.string.isRequired,
-    targetSelector: PropTypes.string
+    targetSelector: PropTypes.string,
+    waitForAction: PropTypes.oneOf(['click', 'none'])
   }).isRequired,
   isFirst: PropTypes.bool.isRequired,
   isLast: PropTypes.bool.isRequired,

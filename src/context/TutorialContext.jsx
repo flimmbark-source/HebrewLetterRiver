@@ -23,37 +23,37 @@ const TUTORIALS = {
       {
         id: 'welcome',
         title: 'Welcome to Letter River!',
-        description: 'Start by picking the interface language and the language you want to practice. You can change these any time in Settings.',
-        icon: '👋',
-        targetSelector: '.language-selector-popup, .bottom-nav'
+        description: 'Letter River helps you learn letters through an interactive game. Let\'s take a quick tour!',
+        icon: '👋'
       },
       {
         id: 'navigation',
         title: 'Navigation',
-        description: 'Use the navigation bar to explore. \'Home\' shows your progress, \'Play\' launches the game, \'Achievements\' shows your badges, and \'Settings\' lets you customise your experience.',
+        description: 'Use the bottom navigation to explore. Home shows your progress, Learn shows language info, Achievements shows badges, and Settings lets you customize.',
         icon: '🧭',
         targetSelector: '.bottom-nav'
       },
       {
-        id: 'playCTA',
-        title: 'Start Playing',
-        description: 'Ready to practise? Tap here to play the game. You\'ll catch letters as they float down the river.',
-        icon: '🎮',
-        targetSelector: '.hero-cta'
-      },
-      {
         id: 'progress',
-        title: 'Track Your Progress',
-        description: 'Track your streak, level and badges here. Completing games and quests earns you stars and unlocks badges.',
+        title: 'Your Progress',
+        description: 'Here you can track your streak, level, and latest badge. Each game you play earns stars to level up!',
         icon: '📊',
         targetSelector: '.progress-row'
       },
       {
-        id: 'daily',
+        id: 'quests',
         title: 'Daily Quests',
-        description: 'Daily quests give you extra rewards. Complete tasks, claim stars and level up!',
+        description: 'Complete daily quests to earn bonus stars. Quests reset every day at midnight Jerusalem time.',
         icon: '📅',
         targetSelector: '.quest-card'
+      },
+      {
+        id: 'playCTA',
+        title: 'Ready to Play?',
+        description: 'Click the Play button below to start catching letters! We\'ll guide you through the game setup next.',
+        icon: '🎮',
+        targetSelector: '.hero-cta',
+        waitForAction: 'click'
       }
     ]
   },
@@ -61,25 +61,32 @@ const TUTORIALS = {
     id: 'gameSetup',
     steps: [
       {
+        id: 'welcome',
+        title: 'Game Setup',
+        description: 'Before playing, you can choose what to practice and set your goal. Let\'s go through the options.',
+        icon: '⚙️'
+      },
+      {
         id: 'modes',
-        title: 'Practice Modes',
-        description: 'Choose what you want to practise: consonants, vowels or both.',
+        title: 'Choose What to Practice',
+        description: 'Select which letters you want to practice. You can choose consonants, vowels, or combined letters. Click one to select it.',
         icon: '📚',
         targetSelector: '.practice-modes'
       },
       {
         id: 'goal',
         title: 'Set Your Goal',
-        description: 'Set how many letters you want to practise in this session. Start small and increase as you improve.',
+        description: 'Use the + and - buttons to adjust how many letters you want to reach. Start with a low number like 10 if you\'re just beginning!',
         icon: '🎯',
         targetSelector: '.goal-selector'
       },
       {
         id: 'start',
-        title: 'Start Game',
-        description: 'Tap here to start catching letters. Drag each falling letter into the matching bucket.',
+        title: 'Start the Game!',
+        description: 'When you\'re ready, click the Start button. Letters will flow down the screen - drag each one to the correct box at the bottom!',
         icon: '🚀',
-        targetSelector: '.start-game'
+        targetSelector: '.start-game',
+        waitForAction: 'click'
       }
     ]
   },
@@ -87,16 +94,22 @@ const TUTORIALS = {
     id: 'achievements',
     steps: [
       {
-        id: 'badgeTypes',
+        id: 'overview',
+        title: 'Achievements',
+        description: 'Track all your accomplishments here! Badges are earned by completing specific challenges.',
+        icon: '🏆'
+      },
+      {
+        id: 'categories',
         title: 'Badge Categories',
-        description: 'Badges are organised by category. Classic badges reward perfect games and streaks; Polyglot badges mark your progress across different languages; Special event badges celebrate holidays or challenges.',
+        description: 'Badges are organized by type: Classic (perfect games, streaks), Polyglot (multi-language progress), and Special events (seasonal challenges).',
         icon: '🎖️',
         targetSelector: '.badge-tabs'
       },
       {
         id: 'tiers',
         title: 'Badge Tiers',
-        description: 'Each badge has multiple tiers. Earn more stars or complete tougher challenges to reach higher tiers and unlock more rewards.',
+        description: 'Each badge has multiple tiers shown by Bronze, Silver, and Gold levels. Complete harder challenges to reach higher tiers and earn more stars!',
         icon: '📊',
         targetSelector: '.badge-tier-example'
       }
@@ -110,6 +123,7 @@ export function TutorialProvider({ children }) {
   const [completedTutorials, setCompletedTutorials] = useState(() => {
     return storage.get('hlr.tutorials.completed') || [];
   });
+  const [pendingTutorial, setPendingTutorial] = useState(null);
 
   const startTutorial = React.useCallback((tutorialId) => {
     const tutorial = TUTORIALS[tutorialId];
@@ -120,6 +134,7 @@ export function TutorialProvider({ children }) {
 
     setCurrentTutorial(tutorial);
     setCurrentStepIndex(0);
+    setPendingTutorial(null);
   }, []);
 
   // Check if this is the user's first time
@@ -158,9 +173,15 @@ export function TutorialProvider({ children }) {
   const completeTutorial = () => {
     if (!currentTutorial) return;
 
-    const newCompleted = [...completedTutorials, currentTutorial.id];
+    const tutorialId = currentTutorial.id;
+    const newCompleted = [...completedTutorials, tutorialId];
     setCompletedTutorials(newCompleted);
     storage.set('hlr.tutorials.completed', newCompleted);
+
+    // Set up chained tutorials
+    if (tutorialId === 'firstTime' && !newCompleted.includes('gameSetup')) {
+      setPendingTutorial('gameSetup');
+    }
 
     setCurrentTutorial(null);
     setCurrentStepIndex(0);
@@ -175,6 +196,12 @@ export function TutorialProvider({ children }) {
     return completedTutorials.includes(tutorialId);
   };
 
+  const startPendingTutorial = React.useCallback(() => {
+    if (pendingTutorial) {
+      startTutorial(pendingTutorial);
+    }
+  }, [pendingTutorial, startTutorial]);
+
   const value = {
     currentTutorial,
     currentStep: currentTutorial?.steps[currentStepIndex],
@@ -182,7 +209,9 @@ export function TutorialProvider({ children }) {
     totalSteps: currentTutorial?.steps.length || 0,
     isLastStep: currentTutorial ? currentStepIndex === currentTutorial.steps.length - 1 : false,
     isFirstStep: currentStepIndex === 0,
+    pendingTutorial,
     startTutorial,
+    startPendingTutorial,
     nextStep,
     previousStep,
     skipTutorial,
