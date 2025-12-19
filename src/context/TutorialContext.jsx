@@ -365,6 +365,7 @@ export function TutorialProvider({ children }) {
         <TutorialSpotlight
           step={value.currentStep}
           steps={currentTutorial?.steps}
+          tutorialId={currentTutorial?.id}
           isFirst={value.isFirstStep}
           isLast={value.isLastStep}
           onNext={nextStep}

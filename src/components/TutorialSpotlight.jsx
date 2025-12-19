@@ -5,6 +5,7 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 export default function TutorialSpotlight({
   step,
   steps,
+  tutorialId,
   isFirst,
   isLast,
   onNext,
@@ -87,10 +88,11 @@ export default function TutorialSpotlight({
 
   // ✅ Step 5: force navigation to the main page when entering this step
   useEffect(() => {
+    if (tutorialId !== 'firstTime') return;
     if (stepIndex !== STEP_5_INDEX) return;
     navigateTo(getRouteForStepIndex(STEP_5_INDEX) || '/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepIndex]);
+  }, [stepIndex, tutorialId]);
 
   // Measure the callout so we can flip/clamp it reliably
   const calloutRef = useRef(null);
@@ -464,6 +466,7 @@ TutorialSpotlight.propTypes = {
     // Optional: if you ever choose to pass a route per step
     route: PropTypes.string
   }).isRequired,
+  tutorialId: PropTypes.string,
   isFirst: PropTypes.bool.isRequired,
   isLast: PropTypes.bool.isRequired,
   onNext: PropTypes.func.isRequired,
