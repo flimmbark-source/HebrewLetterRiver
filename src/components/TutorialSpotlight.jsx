@@ -128,17 +128,33 @@ export default function TutorialSpotlight({
     let top;
     let left;
 
-    // Priority: below > above > side positions
-    if (spaceBelow >= calloutMinHeight + gap) {
-      // Position below target
+    // Check if target is in the lower half of viewport
+    const targetCenterY = targetRect.top + targetRect.height / 2;
+    const isInLowerHalf = targetCenterY > viewportHeight / 2;
+
+    // Adjust priority based on position
+    // If in lower half: above > below > side positions
+    // If in upper half: below > above > side positions
+    if (isInLowerHalf && spaceAbove >= calloutMinHeight + gap) {
+      // Position above target (preferred when target is in lower half)
+      top = targetRect.top - calloutMinHeight - gap;
+      // Center horizontally relative to target
+      const centerX = targetRect.left + targetRect.width / 2;
+      left = centerX - calloutWidth / 2;
+    } else if (!isInLowerHalf && spaceBelow >= calloutMinHeight + gap) {
+      // Position below target (preferred when target is in upper half)
       top = targetRect.bottom + gap;
       // Center horizontally relative to target
       const centerX = targetRect.left + targetRect.width / 2;
       left = centerX - calloutWidth / 2;
-    } else if (spaceAbove >= calloutMinHeight + gap) {
-      // Position above target
+    } else if (isInLowerHalf && spaceBelow >= calloutMinHeight + gap) {
+      // Position below target (fallback for lower half)
+      top = targetRect.bottom + gap;
+      const centerX = targetRect.left + targetRect.width / 2;
+      left = centerX - calloutWidth / 2;
+    } else if (!isInLowerHalf && spaceAbove >= calloutMinHeight + gap) {
+      // Position above target (fallback for upper half)
       top = targetRect.top - calloutMinHeight - gap;
-      // Center horizontally relative to target
       const centerX = targetRect.left + targetRect.width / 2;
       left = centerX - calloutWidth / 2;
     } else if (spaceRight >= calloutWidth + gap) {
