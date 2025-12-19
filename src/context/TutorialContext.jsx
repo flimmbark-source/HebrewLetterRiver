@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { storage } from '../lib/storage';
+import TutorialSpotlight from '../components/TutorialSpotlight.jsx';
 
 const TutorialContext = createContext();
 
@@ -22,32 +23,37 @@ const TUTORIALS = {
       {
         id: 'welcome',
         title: 'Welcome to Letter River!',
-        description: 'Learn letters by catching them as they flow down the river. Let\'s get started!',
-        icon: '👋'
+        description: 'Start by picking the interface language and the language you want to practice. You can change these any time in Settings.',
+        icon: '👋',
+        targetSelector: '.language-selector-popup, .bottom-nav'
       },
       {
-        id: 'gameplay',
-        title: 'How to Play',
-        description: 'Letters will flow across the screen. Drag each one to the correct letter bucket at the bottom to catch them!',
-        icon: '🎮'
+        id: 'navigation',
+        title: 'Navigation',
+        description: 'Use the navigation bar to explore. \'Home\' shows your progress, \'Play\' launches the game, \'Achievements\' shows your badges, and \'Settings\' lets you customise your experience.',
+        icon: '🧭',
+        targetSelector: '.bottom-nav'
       },
       {
-        id: 'stars',
-        title: 'Learn at your own Pace',
-        description: 'Check the Settings for options to tweak the game, so that you can learn in the way that works for you!',
-        icon: '⚙️'
+        id: 'playCTA',
+        title: 'Start Playing',
+        description: 'Ready to practise? Tap here to play the game. You\'ll catch letters as they float down the river.',
+        icon: '🎮',
+        targetSelector: '.hero-cta'
+      },
+      {
+        id: 'progress',
+        title: 'Track Your Progress',
+        description: 'Track your streak, level and badges here. Completing games and quests earns you stars and unlocks badges.',
+        icon: '📊',
+        targetSelector: '.progress-row'
       },
       {
         id: 'daily',
         title: 'Daily Quests',
-        description: 'Complete daily quests to earn stars and level up!',
-        icon: '📅'
-      },
-      {
-        id: 'badges',
-        title: 'Collect Badges',
-        description: 'Earn badges for achievements like perfect games, speed runs, and consistent practice!',
-        icon: '🏆'
+        description: 'Daily quests give you extra rewards. Complete tasks, claim stars and level up!',
+        icon: '📅',
+        targetSelector: '.quest-card'
       }
     ]
   },
@@ -57,14 +63,23 @@ const TUTORIALS = {
       {
         id: 'modes',
         title: 'Practice Modes',
-        description: 'Choose what you want to practice: consonants, vowels, or combined letters.',
-        icon: '📚'
+        description: 'Choose what you want to practise: consonants, vowels or both.',
+        icon: '📚',
+        targetSelector: '.practice-modes'
       },
       {
         id: 'goal',
         title: 'Set Your Goal',
-        description: 'Pick how many letters you want to practice. Start small and work your way up!',
-        icon: '🎯'
+        description: 'Set how many letters you want to practise in this session. Start small and increase as you improve.',
+        icon: '🎯',
+        targetSelector: '.goal-selector'
+      },
+      {
+        id: 'start',
+        title: 'Start Game',
+        description: 'Tap here to start catching letters. Drag each falling letter into the matching bucket.',
+        icon: '🚀',
+        targetSelector: '.start-game'
       }
     ]
   },
@@ -74,14 +89,16 @@ const TUTORIALS = {
       {
         id: 'badgeTypes',
         title: 'Badge Categories',
-        description: 'Badges are organized by category: Classic achievements, Polyglot progress, and Special events.',
-        icon: '🎖️'
+        description: 'Badges are organised by category. Classic badges reward perfect games and streaks; Polyglot badges mark your progress across different languages; Special event badges celebrate holidays or challenges.',
+        icon: '🎖️',
+        targetSelector: '.badge-tabs'
       },
       {
         id: 'tiers',
         title: 'Badge Tiers',
-        description: 'Each badge has multiple tiers (Bronze, Silver, Gold). Complete higher tiers for more stars!',
-        icon: '📊'
+        description: 'Each badge has multiple tiers. Earn more stars or complete tougher challenges to reach higher tiers and unlock more rewards.',
+        icon: '📊',
+        targetSelector: '.badge-tier-example'
       }
     ]
   }
@@ -177,7 +194,18 @@ export function TutorialProvider({ children }) {
   return (
     <TutorialContext.Provider value={value}>
       {children}
-      {currentTutorial && <TutorialOverlay />}
+      {currentTutorial && (
+        <TutorialSpotlight
+          step={value.currentStep}
+          isFirst={value.isFirstStep}
+          isLast={value.isLastStep}
+          onNext={nextStep}
+          onBack={previousStep}
+          onSkip={skipTutorial}
+          stepIndex={currentStepIndex}
+          totalSteps={value.totalSteps}
+        />
+      )}
     </TutorialContext.Provider>
   );
 }
@@ -185,83 +213,3 @@ export function TutorialProvider({ children }) {
 TutorialProvider.propTypes = {
   children: PropTypes.node.isRequired
 };
-
-/**
- * Tutorial Overlay Component
- */
-function TutorialOverlay() {
-  const {
-    currentStep,
-    currentStepIndex,
-    totalSteps,
-    isLastStep,
-    isFirstStep,
-    nextStep,
-    previousStep,
-    skipTutorial
-  } = useTutorial();
-
-  if (!currentStep) return null;
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full border border-slate-700 overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-cyan-600 to-blue-600 p-6 text-center">
-          <div className="text-6xl mb-3">{currentStep.icon}</div>
-          <h2 className="text-2xl font-bold text-white">{currentStep.title}</h2>
-        </div>
-
-        {/* Content */}
-        <div className="p-6">
-          <p className="text-slate-300 text-center text-lg leading-relaxed mb-6">
-            {currentStep.description}
-          </p>
-
-          {/* Progress indicators */}
-          <div className="flex justify-center gap-2 mb-6">
-            {Array.from({ length: totalSteps }).map((_, index) => (
-              <div
-                key={index}
-                className={`h-2 rounded-full transition-all ${
-                  index === currentStepIndex
-                    ? 'w-8 bg-cyan-500'
-                    : index < currentStepIndex
-                    ? 'w-2 bg-cyan-700'
-                    : 'w-2 bg-slate-700'
-                }`}
-              />
-            ))}
-          </div>
-
-          {/* Navigation */}
-          <div className="flex gap-3">
-            {!isFirstStep && (
-              <button
-                onClick={previousStep}
-                className="flex-1 py-3 px-4 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-colors"
-              >
-                Back
-              </button>
-            )}
-
-            <button
-              onClick={nextStep}
-              className="flex-1 py-3 px-4 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-lg transition-colors"
-            >
-              {isLastStep ? 'Get Started!' : 'Next'}
-            </button>
-          </div>
-
-          {/* Skip button */}
-          <button
-            onClick={skipTutorial}
-            className="w-full mt-3 py-2 text-slate-400 hover:text-slate-300 text-sm transition-colors"
-          >
-            Skip tutorial
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}

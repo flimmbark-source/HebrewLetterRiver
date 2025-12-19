@@ -509,7 +509,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 </div>
               </div>
               <div className="setup-body px-4">
-                <aside className="goal-column" aria-label="Goal settings">
+                <aside className="goal-column goal-selector" aria-label="Goal settings">
                   <div
                     className="goal-column__label text-xs font-bold uppercase tracking-wider"
                     style={{ color: '#6c3b14' }}
@@ -609,13 +609,13 @@ function GameCanvas({ fontClass, loadedSettings }) {
                   <div className="mode-panel">
                     <div
                       id="mode-options"
-                      className="mode-buttons-container"
+                      className="mode-buttons-container practice-modes"
                     />
 
                     <div className="mode-panel__footer">
                       <button
                         id="start-button"
-                        className="primary-cta"
+                        className="primary-cta start-game"
                         type="button"
                         style={{
                           border: '2px solid #5aa838',
