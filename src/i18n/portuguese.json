@@ -532,7 +532,7 @@
     "amharic": "Amárico"
   },
   "tutorial": {
-    "stepCounter": "Etapa {{atual}} de {{total}}",
+    "stepCounter": "Etapa {{current}} de {{total}}",
     "clickToContinue": "👆 Clique no elemento destacado para continuar",
     "back": "Voltar",
     "next": "Próximo",

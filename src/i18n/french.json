@@ -532,7 +532,7 @@
     "play": "Jouer"
   },
   "tutorial": {
-    "stepCounter": "Étape {{actuelle}} sur {{total}}",
+    "stepCounter": "Étape {{current}} sur {{total}}",
     "clickToContinue": "👆 Cliquez sur l'élément en surbrillance pour continuer",
     "back": "Retour",
     "next": "Suivant",
