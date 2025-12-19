@@ -530,5 +530,13 @@
     "russian": "Russo",
     "japanese": "Japonês",
     "amharic": "Amárico"
+  },
+  "tutorial": {
+    "stepCounter": "Etapa {{current}} de {{total}}",
+    "clickToContinue": "👆 Clique no elemento destacado para continuar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "gotIt": "Entendi!",
+    "skip": "Pular tutorial"
   }
 }

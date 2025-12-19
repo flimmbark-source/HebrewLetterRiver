@@ -530,5 +530,13 @@
     "patientPaddler": "耐心的桨手",
     "noneYet": "还没有",
     "play": "玩"
+  },
+  "tutorial": {
+    "stepCounter": "第 {{current}} 步，共 {{total}} 步",
+    "clickToContinue": "👆 点击高亮的元素继续",
+    "back": "返回",
+    "next": "下一步",
+    "gotIt": "明白了！",
+    "skip": "跳过教程"
   }
 }
