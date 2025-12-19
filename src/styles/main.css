@@ -2294,9 +2294,9 @@ body.no-scroll {
   flex-shrink: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-  align-items: end;
+  align-items: end; /* Aligns all buckets to bottom of their row - applies to all rows consistently */
   column-gap: var(--space-2); /* 16px between buckets horizontally */
-  row-gap: var(--space-1); /* 8px between rows - reduced from 16px */
+  row-gap: 2px; /* 2px between rows - minimal spacing */
   padding: var(--space-2); /* 16px from edges */
   padding-inline-start: calc(max(var(--space-2) + env(safe-area-inset-left, 0px))+ var(--space-1));
   padding-inline-end: calc(max(var(--space-2) + env(safe-area-inset-right, 0px))+ var(--space-1));
@@ -2315,7 +2315,7 @@ body.no-scroll {
 @media (max-width: 640px) {
   #choices-container {
     column-gap: var(--space-1); /* 8px between buckets horizontally */
-    row-gap: 4px; /* 4px between rows - reduced from 8px */
+    row-gap: 2px; /* 2px between rows - minimal spacing */
     padding-inline-start: calc(max(var(--space-1) + env(safe-area-inset-left, 0px)) + var(--space-1));
     padding-inline-end: calc(max(var(--space-1) + env(safe-area-inset-right, 0px)) + var(--space-1));
   }
