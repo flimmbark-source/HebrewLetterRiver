@@ -113,72 +113,29 @@ export default function TutorialSpotlight({
     }
 
     const calloutWidth = 340;
-    const calloutMinHeight = 200;
-    const gap = 20; // Increased gap to ensure no overlap
     const padding = 20;
-    const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
 
-    // Calculate available space in all directions
-    const spaceAbove = targetRect.top;
-    const spaceBelow = viewportHeight - targetRect.bottom;
-    const spaceLeft = targetRect.left;
-    const spaceRight = viewportWidth - targetRect.right;
-
-    let top;
-    let left;
-
-    // Check if target is in the lower half of viewport
+    // For elements in the bottom half of the screen, just position at top
     const targetCenterY = targetRect.top + targetRect.height / 2;
-    const isInLowerHalf = targetCenterY > viewportHeight / 2;
+    const isInLowerHalf = targetCenterY > window.innerHeight / 2;
 
-    // Adjust priority based on position
-    // If in lower half: ALWAYS try to position above first, with relaxed space requirements
-    // If in upper half: below > above > side positions
-    if (isInLowerHalf && spaceAbove >= 100) {
-      // Position above target (preferred when target is in lower half)
-      // Relaxed requirement: only need 100px instead of 200px + gap
-      top = Math.max(padding, targetRect.top - calloutMinHeight - gap);
-      // Center horizontally relative to target
-      const centerX = targetRect.left + targetRect.width / 2;
-      left = centerX - calloutWidth / 2;
-    } else if (!isInLowerHalf && spaceBelow >= calloutMinHeight + gap) {
-      // Position below target (preferred when target is in upper half)
-      top = targetRect.bottom + gap;
-      // Center horizontally relative to target
-      const centerX = targetRect.left + targetRect.width / 2;
-      left = centerX - calloutWidth / 2;
-    } else if (!isInLowerHalf && spaceAbove >= calloutMinHeight + gap) {
-      // Position above target (fallback for upper half)
-      top = targetRect.top - calloutMinHeight - gap;
-      const centerX = targetRect.left + targetRect.width / 2;
-      left = centerX - calloutWidth / 2;
-    } else if (spaceRight >= calloutWidth + gap) {
-      // Position to the right
-      left = targetRect.right + gap;
-      // Center vertically relative to target
-      const centerY = targetRect.top + targetRect.height / 2;
-      top = centerY - calloutMinHeight / 2;
-    } else if (spaceLeft >= calloutWidth + gap) {
-      // Position to the left
-      left = targetRect.left - calloutWidth - gap;
-      // Center vertically relative to target
-      const centerY = targetRect.top + targetRect.height / 2;
-      top = centerY - calloutMinHeight / 2;
-    } else if (isInLowerHalf) {
-      // Last resort for lower half: position above with minimal space
-      top = Math.max(padding, targetRect.top - calloutMinHeight - gap);
-      const centerX = targetRect.left + targetRect.width / 2;
-      left = centerX - calloutWidth / 2;
-    } else {
-      // Not enough space anywhere, position in top corner with offset
-      top = padding;
-      left = padding;
+    if (isInLowerHalf) {
+      // Position at top of screen, horizontally centered
+      return {
+        position: 'fixed',
+        top: `${padding}px`,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: `${calloutWidth}px`,
+        maxWidth: `calc(100vw - ${padding * 2}px)`
+      };
     }
 
-    // Keep within viewport bounds
-    top = Math.max(padding, Math.min(top, viewportHeight - calloutMinHeight - padding));
-    left = Math.max(padding, Math.min(left, viewportWidth - calloutWidth - padding));
+    // For upper half, position below the target
+    const top = targetRect.bottom + 20;
+    const centerX = targetRect.left + targetRect.width / 2;
+    const left = Math.max(padding, Math.min(centerX - calloutWidth / 2, viewportWidth - calloutWidth - padding));
 
     return {
       position: 'fixed',
