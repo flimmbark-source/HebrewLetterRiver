@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useLocalization } from '../context/LocalizationContext.jsx';
 
 export default function TutorialSpotlight({
   step,
@@ -11,6 +12,7 @@ export default function TutorialSpotlight({
   stepIndex,
   totalSteps
 }) {
+  const { t } = useLocalization();
   const [targetRect, setTargetRect] = useState(null);
   const [targetElement, setTargetElement] = useState(null);
 
@@ -377,7 +379,10 @@ export default function TutorialSpotlight({
             <div className="flex-1 min-w-0">
               <h3 className="text-white font-bold text-lg leading-tight mb-1">{step.title}</h3>
               <div className="text-blue-400 text-xs font-semibold">
-                Step {stepIndex + 1} of {totalSteps}
+                {t('tutorial.stepCounter', {
+                  current: stepIndex + 1,
+                  total: totalSteps
+                })}
               </div>
             </div>
           </div>
@@ -386,7 +391,7 @@ export default function TutorialSpotlight({
 
           {step.waitForAction === 'click' && targetRect && (
             <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
-              <p className="text-blue-300 text-sm font-semibold">👆 Click the highlighted element to continue</p>
+              <p className="text-blue-300 text-sm font-semibold">{t('tutorial.clickToContinue')}</p>
             </div>
           )}
 
@@ -412,14 +417,14 @@ export default function TutorialSpotlight({
                   onClick={handleBack}
                   className="flex-1 py-2.5 px-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold transition-colors"
                 >
-                  Back
+                  {t('tutorial.back')}
                 </button>
               )}
               <button
                 onClick={onNext}
                 className="flex-1 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors"
               >
-                {isLast ? 'Got it!' : 'Next'}
+                {isLast ? t('tutorial.gotIt') : t('tutorial.next')}
               </button>
             </div>
           )}
@@ -428,7 +433,7 @@ export default function TutorialSpotlight({
             onClick={onSkip}
             className="block w-full mt-2 text-xs text-slate-400 hover:text-slate-300 transition-colors"
           >
-            Skip tutorial
+            {t('tutorial.skip')}
           </button>
         </div>
       </div>
