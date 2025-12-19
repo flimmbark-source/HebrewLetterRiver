@@ -532,11 +532,119 @@
     "play": "玩"
   },
   "tutorial": {
-    "stepCounter": "第 {{current}} 步，共 {{total}} 步",
-    "clickToContinue": "👆 点击高亮的元素继续",
+    "stepCounter": "第 {{current}} 步（共 {{total}} 步）",
+    "clickToContinue": "👆 单击突出显示的元素继续",
     "back": "返回",
     "next": "下一步",
     "gotIt": "明白了！",
     "skip": "跳过教程"
+  },
+  "tutorials": {
+    "firstTime": {
+      "welcome": {
+        "title": "欢迎来到信河！",
+        "description": "Letter River 可帮助您通过互动游戏学习字母。首先，让我们设置您的语言！"
+      },
+      "appLanguage": {
+        "title": "选择您的界面语言",
+        "description": "这将设置所有菜单、按钮和说明的语言。选择您阅读起来最舒服的语言。"
+      },
+      "practiceLanguage": {
+        "title": "选择要学的内容",
+        "description": "选择您要练习的语言！这决定了您将在游戏中看到哪些字母。"
+      },
+      "confirmLanguages": {
+        "title": "让我们开始吧！",
+        "description": "准备好后单击“继续”。您可以稍后在“设置”中更改这些内容。"
+      },
+      "navigation": {
+        "title": "导航",
+        "description": "使用底部导航进行探索。主页显示您的进度，学习显示语言信息，成就显示徽章，设置允许您自定义。"
+      },
+      "progress": {
+        "title": "你的进步",
+        "description": "在这里您可以追踪您的连胜记录、等级和最新徽章。您玩的每场游戏都会赢得星星来升级！"
+      },
+      "quests": {
+        "title": "每日任务",
+        "description": "完成每日任务即可获得奖励星星。任务每天在耶路撒冷时间午夜重置。"
+      },
+      "navigateToAchievements": {
+        "title": "让我们来检查一下成就吧！",
+        "description": "让我们看看您可以获得哪些徽章。我们现在将导航到成就页面。"
+      },
+      "achievementsOverview": {
+        "title": "您的徽章收藏",
+        "description": "通过完成挑战来赢得徽章！每个徽章都会记录您的成就。"
+      },
+      "badgeTiers": {
+        "title": "徽章等级",
+        "description": "每个徽章都分为铜牌、银牌和金牌。完成更艰巨的目标来升级并赢得更多星星！"
+      },
+      "navigateToSettings": {
+        "title": "定制您的体验",
+        "description": "现在，让我们访问“设置”，看看如何根据您的学习风格定制游戏。"
+      },
+      "settingsIntro": {
+        "title": "设置和辅助功能",
+        "description": "在这里您可以自定义游戏的运行方式以满足您的需求。每个人的学习方式都不一样！"
+      },
+      "accessibilityOptions": {
+        "title": "辅助功能",
+        "description": "调整游戏速度、使用适合阅读障碍的字体、启用点击模式而不是拖动等等。尝试不同的设置，找到最适合您的设置！"
+      },
+      "backToHome": {
+        "title": "准备好玩了吗？",
+        "description": "伟大的！现在让我们回家开始你的第一个游戏。"
+      },
+      "playButton": {
+        "title": "开始你的第一个游戏",
+        "description": "当您准备好练习时，请点击下面的“播放”按钮！我们将指导您完成游戏设置。"
+      }
+    },
+    "tour": {
+      "tourStart": {
+        "title": "快速浏览",
+        "description": "让我们快速游览一下字母河吧！我们将参观每个主要部分。"
+      },
+      "homeFeatures": {
+        "title": "主屏幕",
+        "description": "跟踪您的进度、完成每日任务并从这里访问游戏。"
+      },
+      "tourAchievements": {
+        "title": "成就",
+        "description": "查看所有可用徽章并跟踪您的成就。"
+      },
+      "tourSettings": {
+        "title": "设置和辅助功能",
+        "description": "自定义游戏速度、字体和辅助功能选项以匹配您的学习风格。"
+      },
+      "tourLearn": {
+        "title": "学习",
+        "description": "浏览语言信息和参考资料。"
+      },
+      "tourComplete": {
+        "title": "游览结束！",
+        "description": "您已经看到了所有主要功能。随时单击“播放”按钮即可开始练习！"
+      }
+    },
+    "gameSetup": {
+      "setupIntro": {
+        "title": "游戏设置",
+        "description": "在玩之前选择要练习的内容并设定目标！"
+      },
+      "practiceModes": {
+        "title": "练习什么",
+        "description": "选择辅音、元音或组合字母。您可以练习一种类型或混合使用它们！"
+      },
+      "goalSetting": {
+        "title": "设定你的目标",
+        "description": "使用 + 和 - 设置要练习的字母数量。如果您是新手，请从 10 个开始，随着您的进步而增加！"
+      },
+      "startGame": {
+        "title": "准备好？让我们玩！",
+        "description": "单击“开始”开始！字母将在屏幕上流动 - 将每个字母拖到底部的匹配框。"
+      }
+    }
   }
 }
