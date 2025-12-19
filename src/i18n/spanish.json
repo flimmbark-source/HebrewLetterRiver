@@ -529,5 +529,13 @@
     "patientPaddler": "Remero Paciente",
     "noneYet": "Ninguno todavía",
     "play": "Jugar"
+  },
+  "tutorial": {
+    "stepCounter": "Paso {{current}} de {{total}}",
+    "clickToContinue": "👆 Haga clic en el elemento resaltado para continuar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "gotIt": "¡Entendido!",
+    "skip": "Saltar tutorial"
   }
 }

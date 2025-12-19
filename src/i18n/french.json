@@ -530,5 +530,13 @@
     "patientPaddler": "Pagayeur Patient",
     "noneYet": "Aucun encore",
     "play": "Jouer"
+  },
+  "tutorial": {
+    "stepCounter": "Étape {{current}} sur {{total}}",
+    "clickToContinue": "👆 Cliquez sur l'élément en surbrillance pour continuer",
+    "back": "Retour",
+    "next": "Suivant",
+    "gotIt": "Compris !",
+    "skip": "Passer le tutoriel"
   }
 }

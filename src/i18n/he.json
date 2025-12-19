@@ -546,5 +546,13 @@
     "patientPaddler": "חותר סבלני",
     "noneYet": "עדיין אף אחד",
     "play": "שחק"
+  },
+  "tutorial": {
+    "stepCounter": "שלב {{current}} מתוך {{total}}",
+    "clickToContinue": "👆 לחץ על הפריט המודגש כדי להמשיך",
+    "back": "חזרה",
+    "next": "הבא",
+    "gotIt": "הבנתי!",
+    "skip": "דלג על ההדרכה"
   }
 }
