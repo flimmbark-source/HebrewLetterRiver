@@ -98,7 +98,7 @@ export default function TutorialSpotlight({
     e.preventDefault();
   }, [step?.waitForAction, targetElement]);
 
-  // Calculate callout position
+  // Calculate callout position - ensure it doesn't overlap target
   const getCalloutStyle = () => {
     if (!targetRect) {
       // Centered modal if no target
@@ -113,32 +113,55 @@ export default function TutorialSpotlight({
     }
 
     const calloutWidth = 340;
-    const calloutMinHeight = 180;
-    const gap = 16;
+    const calloutMinHeight = 200;
+    const gap = 20; // Increased gap to ensure no overlap
     const padding = 20;
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
 
-    // Try to position below target first
-    const spaceBelow = window.innerHeight - targetRect.bottom;
+    // Calculate available space in all directions
     const spaceAbove = targetRect.top;
+    const spaceBelow = viewportHeight - targetRect.bottom;
+    const spaceLeft = targetRect.left;
+    const spaceRight = viewportWidth - targetRect.right;
 
     let top;
+    let left;
+
+    // Priority: below > above > side positions
     if (spaceBelow >= calloutMinHeight + gap) {
-      // Position below
+      // Position below target
       top = targetRect.bottom + gap;
+      // Center horizontally relative to target
+      const centerX = targetRect.left + targetRect.width / 2;
+      left = centerX - calloutWidth / 2;
     } else if (spaceAbove >= calloutMinHeight + gap) {
-      // Position above
+      // Position above target
       top = targetRect.top - calloutMinHeight - gap;
+      // Center horizontally relative to target
+      const centerX = targetRect.left + targetRect.width / 2;
+      left = centerX - calloutWidth / 2;
+    } else if (spaceRight >= calloutWidth + gap) {
+      // Position to the right
+      left = targetRect.right + gap;
+      // Center vertically relative to target
+      const centerY = targetRect.top + targetRect.height / 2;
+      top = centerY - calloutMinHeight / 2;
+    } else if (spaceLeft >= calloutWidth + gap) {
+      // Position to the left
+      left = targetRect.left - calloutWidth - gap;
+      // Center vertically relative to target
+      const centerY = targetRect.top + targetRect.height / 2;
+      top = centerY - calloutMinHeight / 2;
     } else {
-      // Not enough space, center it
-      top = window.innerHeight / 2 - calloutMinHeight / 2;
+      // Not enough space anywhere, position in top corner with offset
+      top = padding;
+      left = padding;
     }
 
-    // Horizontal centering relative to target, with viewport constraints
-    const centerX = targetRect.left + targetRect.width / 2;
-    let left = centerX - calloutWidth / 2;
-
-    // Keep within viewport
-    left = Math.max(padding, Math.min(left, window.innerWidth - calloutWidth - padding));
+    // Keep within viewport bounds
+    top = Math.max(padding, Math.min(top, viewportHeight - calloutMinHeight - padding));
+    left = Math.max(padding, Math.min(left, viewportWidth - calloutWidth - padding));
 
     return {
       position: 'fixed',
