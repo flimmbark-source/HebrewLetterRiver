@@ -4,6 +4,7 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 
 export default function TutorialSpotlight({
   step,
+  steps,
   isFirst,
   isLast,
   onNext,
@@ -33,7 +34,7 @@ export default function TutorialSpotlight({
     // 1: '/some-page',
     // 2: '/another-page',
     // 3: '/...',
-    4: '/', // Step 5 -> main page
+    4: '/',
     6: '/',
     7: '/achievements',
     9: '/achievements',
@@ -76,6 +77,11 @@ export default function TutorialSpotlight({
     // Prefer an explicit route on the step object if you happen to add it later.
     // (No harm if you never do.)
     if (idx === stepIndex && step?.route) return step.route;
+
+    const stepFromTutorial = steps?.[idx];
+    if (stepFromTutorial?.navigateTo) return stepFromTutorial.navigateTo;
+    if (stepFromTutorial?.route) return stepFromTutorial.route;
+
     return STEP_ROUTE_BY_INDEX[idx] || null;
   };
 
@@ -464,5 +470,12 @@ TutorialSpotlight.propTypes = {
   onBack: PropTypes.func.isRequired,
   onSkip: PropTypes.func.isRequired,
   stepIndex: PropTypes.number.isRequired,
-  totalSteps: PropTypes.number.isRequired
+  totalSteps: PropTypes.number.isRequired,
+  steps: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      navigateTo: PropTypes.string,
+      route: PropTypes.string
+    })
+  )
 };
