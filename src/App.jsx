@@ -122,10 +122,10 @@ function LanguageOnboardingModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6" style={{
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 language-onboarding-overlay" style={{
       background: 'radial-gradient(circle at 15% 0%, #ffe7b6 0, transparent 45%), radial-gradient(circle at 85% 0%, #ffd3b6 0, transparent 45%), radial-gradient(circle at 50% 100%, #ffc38a 0, transparent 55%), linear-gradient(160deg, #f8c792 0%, #f6a66c 40%, #f28e52 100%)'
     }}>
-      <div className="w-full max-w-lg rounded-3xl p-6 text-center shadow-2xl sm:p-8" style={{
+      <div className="w-full max-w-lg rounded-3xl p-6 text-center shadow-2xl sm:p-8 language-onboarding-card" style={{
         background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%)',
         border: '3px solid rgba(235, 179, 105, 0.95)',
         boxShadow: '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)'
@@ -140,7 +140,7 @@ function LanguageOnboardingModal() {
           {translateOnboarding('app.languagePicker.onboardingSubtitle')}
         </p>
         <div className="mt-6 space-y-5 text-left">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 onboarding-app-language-section">
             <label htmlFor="onboarding-app-language" className="text-xs font-bold uppercase tracking-wider" style={{ color: '#b07737' }}>
               {translateOnboarding('app.languagePicker.label')}
             </label>
@@ -148,7 +148,7 @@ function LanguageOnboardingModal() {
               id="onboarding-app-language"
               value={pendingAppId}
               onChange={(event) => handleAppLanguageChange(event.target.value)}
-              className="w-full rounded-xl border-2 px-3 py-2 text-sm font-semibold shadow-inner sm:text-base"
+              className="w-full rounded-xl border-2 px-3 py-2 text-sm font-semibold shadow-inner sm:text-base onboarding-app-language-select"
               style={{
                 borderColor: 'rgba(235, 179, 105, 0.95)',
                 background: '#fff5dd',
@@ -165,7 +165,7 @@ function LanguageOnboardingModal() {
               {translateOnboarding('app.languagePicker.helper')}
             </p>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 onboarding-practice-language-section">
             <label htmlFor="onboarding-language" className="text-xs font-bold uppercase tracking-wider" style={{ color: '#b07737' }}>
               {translateOnboarding('app.practicePicker.label')}
             </label>
@@ -173,7 +173,7 @@ function LanguageOnboardingModal() {
               id="onboarding-language"
               value={pendingPracticeId}
               onChange={(event) => handleChange(event.target.value)}
-              className="w-full rounded-xl border-2 px-3 py-2 text-sm font-semibold shadow-inner sm:text-base"
+              className="w-full rounded-xl border-2 px-3 py-2 text-sm font-semibold shadow-inner sm:text-base onboarding-practice-language-select"
               style={{
                 borderColor: 'rgba(235, 179, 105, 0.95)',
                 background: '#fff5dd',
@@ -194,7 +194,7 @@ function LanguageOnboardingModal() {
         <button
           type="button"
           onClick={handleContinue}
-          className="mt-6 w-full rounded-full px-5 py-3 text-base font-bold shadow-lg transition-all active:translate-y-1 sm:w-auto sm:px-8"
+          className="mt-6 w-full rounded-full px-5 py-3 text-base font-bold shadow-lg transition-all active:translate-y-1 sm:w-auto sm:px-8 onboarding-continue-button"
           style={{
             border: 0,
             fontFamily: '"Nunito", system-ui, sans-serif',

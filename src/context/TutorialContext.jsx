@@ -23,8 +23,31 @@ const TUTORIALS = {
       {
         id: 'welcome',
         title: 'Welcome to Letter River!',
-        description: 'Letter River helps you learn letters through an interactive game. Let\'s take a quick tour!',
-        icon: '👋'
+        description: 'Letter River helps you learn letters through an interactive game. First, let\'s set up your languages!',
+        icon: '👋',
+        targetSelector: '.language-onboarding-card'
+      },
+      {
+        id: 'appLanguage',
+        title: 'Choose Your Interface Language',
+        description: 'This sets the language for all menus, buttons, and instructions. Pick the language you\'re most comfortable reading.',
+        icon: '🌍',
+        targetSelector: '.onboarding-app-language-section'
+      },
+      {
+        id: 'practiceLanguage',
+        title: 'Choose What to Learn',
+        description: 'Select the language you want to practice! This determines which letters you\'ll see in the game.',
+        icon: '📖',
+        targetSelector: '.onboarding-practice-language-section'
+      },
+      {
+        id: 'confirmLanguages',
+        title: 'Let\'s Get Started!',
+        description: 'Click Continue when you\'re ready. You can always change these later in Settings.',
+        icon: '✨',
+        targetSelector: '.onboarding-continue-button',
+        waitForAction: 'click'
       },
       {
         id: 'navigation',
