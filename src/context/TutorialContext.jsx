@@ -7,6 +7,17 @@ import { useLocalization } from './LocalizationContext.jsx';
 
 const TutorialContext = createContext();
 
+// TutorialContext.jsx (top-level in the file)
+const normalizePath = (p) => {
+  if (!p) return '';
+  // Example alias: treat /home as /
+  if (p === '/home') return '/';
+  // remove trailing slash except root
+  return p.length > 1 ? p.replace(/\/+$/, '') : p;
+};
+
+const pathsMatch = (a, b) => normalizePath(a) === normalizePath(b);
+
 export function useTutorial() {
   const context = useContext(TutorialContext);
   if (!context) {
@@ -273,7 +284,7 @@ export function TutorialProvider({ children }) {
       const nextStep = currentTutorial.steps[nextIndex];
 
       // If next step requires navigation, navigate first
-      if (nextStep.navigateTo && location.pathname !== nextStep.navigateTo) {
+      if (nextStep.navigateTo && !pathsMatch(location.pathname, nextStep.navigateTo)) {
         setIsNavigating(true);
         setPendingStepIndex(nextIndex);
         navigate(nextStep.navigateTo);
@@ -288,7 +299,8 @@ export function TutorialProvider({ children }) {
     if (!isNavigating || pendingStepIndex === null || !currentTutorial) return;
 
     const expectedStep = currentTutorial.steps[pendingStepIndex];
-    const hasReachedDestination = !expectedStep.navigateTo || location.pathname === expectedStep.navigateTo;
+    const hasReachedDestination =
++   !expectedStep.navigateTo || pathsMatch(location.pathname, expectedStep.navigateTo);
 
     if (hasReachedDestination) {
       setCurrentStepIndex(pendingStepIndex);

@@ -251,7 +251,7 @@ export default function TutorialSpotlight({
     const stepYOffsetByIndex = {
       1: 500, // Step 2 (stepIndex 1)
       3: -190,
-      5: 500,
+      5: 0,
       6: 0,
       7: -190, // Step 8 (stepIndex 7)
       8: 300,
