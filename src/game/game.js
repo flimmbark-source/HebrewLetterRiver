@@ -1477,34 +1477,50 @@ function startClickMode(itemEl, payload) {
     const isFirstWaveOfLevel = !hasIntroducedForItemInLevel;
 
     if (isRandomLettersModeActive()) {
-      const totalItemsInRound = Math.max(1, level);
+      // First wave of level: introduce new letters
+      if (isFirstWaveOfLevel) {
+        if (forcedStartItem && level === 1) {
+          roundItems.push(forcedStartItem);
+          forcedStartItem = null;
+        } else {
+          // At level 1: introduce 2 letters, at higher levels: introduce 1 letter
+          const lettersToIntroduce = level === 1 ? 2 : 1;
+          const unseenItems = itemPool.filter((item) => !seenItems.has(item.id));
 
-      if (forcedStartItem && level === 1) {
-        roundItems.push(forcedStartItem);
-        forcedStartItem = null;
-      }
-
-      // Use even distribution if multiple modes are selected
-      if (selectedModeIds.size > 1) {
-        const itemsNeeded = totalItemsInRound - roundItems.length;
-        const distributedItems = getEvenlyDistributedItems(itemPool, itemsNeeded, seenItems);
-        roundItems.push(...distributedItems);
-      } else {
-        // Single mode: use original random selection
-        const availablePool = [...itemPool];
-        for (let i = roundItems.length; i < totalItemsInRound; i++) {
-          if (!availablePool.length) {
-            if (!itemPool.length) break;
-            availablePool.push(...itemPool);
+          if (selectedModeIds.size > 1 && unseenItems.length > 0) {
+            // Use even distribution for introducing new items across modes
+            const distributedItems = getEvenlyDistributedItems(unseenItems, lettersToIntroduce, new Set());
+            roundItems.push(...distributedItems);
+          } else {
+            // Single mode: randomly select new items
+            const shuffled = [...unseenItems].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < lettersToIntroduce && i < shuffled.length; i++) {
+              roundItems.push(shuffled[i]);
+            }
           }
-          const randomIndex = Math.floor(Math.random() * availablePool.length);
-          const [selectedItem] = availablePool.splice(randomIndex, 1);
-          if (!selectedItem) break;
-          roundItems.push(selectedItem);
+        }
+        hasIntroducedForItemInLevel = true;
+      } else if (seenItems.size === 0) {
+        // Safety check: if no items have been seen yet, introduce new letters
+        const lettersToIntroduce = level === 1 ? 2 : 1;
+        const unseenItems = itemPool.filter((item) => !seenItems.has(item.id));
+        const shuffled = [...unseenItems].sort(() => Math.random() - 0.5);
+        for (let i = 0; i < lettersToIntroduce && i < shuffled.length; i++) {
+          roundItems.push(shuffled[i]);
+        }
+        hasIntroducedForItemInLevel = true;
+      } else {
+        // Subsequent waves: send ALL letters that have been introduced so far
+        const availableItems = itemPool.filter((item) => seenItems.has(item.id));
+
+        if (selectedModeIds.size > 1 && availableItems.length > 0) {
+          // Send ALL available items with even distribution across modes
+          roundItems = getEvenlyDistributedItems(availableItems, availableItems.length, new Set());
+        } else {
+          // Send ALL available items in shuffled order
+          roundItems = [...availableItems].sort(() => Math.random() - 0.5);
         }
       }
-
-      hasIntroducedForItemInLevel = roundItems.some((item) => item && !seenItems.has(item.id));
 
       // Filter out any invalid items to prevent spawning without buckets
       roundItems = roundItems.filter((item) => item && item.id);

@@ -2295,7 +2295,8 @@ body.no-scroll {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
   align-items: end;
-  gap: var(--space-2); /* 16px between buckets */
+  column-gap: var(--space-2); /* 16px between buckets horizontally */
+  row-gap: var(--space-1); /* 8px between rows - reduced from 16px */
   padding: var(--space-2); /* 16px from edges */
   padding-inline-start: calc(max(var(--space-2) + env(safe-area-inset-left, 0px))+ var(--space-1));
   padding-inline-end: calc(max(var(--space-2) + env(safe-area-inset-right, 0px))+ var(--space-1));
@@ -2313,7 +2314,8 @@ body.no-scroll {
 
 @media (max-width: 640px) {
   #choices-container {
-    gap: var(--space-1); /* Tighter gap to fit more buckets per row */
+    column-gap: var(--space-1); /* 8px between buckets horizontally */
+    row-gap: 4px; /* 4px between rows - reduced from 8px */
     padding-inline-start: calc(max(var(--space-1) + env(safe-area-inset-left, 0px)) + var(--space-1));
     padding-inline-end: calc(max(var(--space-1) + env(safe-area-inset-right, 0px)) + var(--space-1));
   }
