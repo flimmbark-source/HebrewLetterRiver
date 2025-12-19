@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState, useEffect, useCallback } from 'react';
+import React, { useLayoutEffect, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 export default function TutorialSpotlight({
@@ -86,18 +86,6 @@ export default function TutorialSpotlight({
     };
   }, [step?.waitForAction, targetElement, onNext]);
 
-  // Block all interactions except on the target when in interactive mode
-  const handleOverlayClick = useCallback((e) => {
-    // If we're waiting for an action and they clicked the target, let it through
-    if (step?.waitForAction && targetElement?.contains(e.target)) {
-      return;
-    }
-
-    // Otherwise, block the click
-    e.stopPropagation();
-    e.preventDefault();
-  }, [step?.waitForAction, targetElement]);
-
   // Calculate callout position - ensure it doesn't overlap target
   const getCalloutStyle = () => {
     if (!targetRect) {
@@ -148,14 +136,6 @@ export default function TutorialSpotlight({
 
   return (
     <>
-      {/* Overlay that blocks interactions */}
-      <div
-        className="fixed inset-0 z-[999]"
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-        onClick={handleOverlayClick}
-        onTouchStart={handleOverlayClick}
-      />
-
       {/* Spotlight highlight for target element */}
       {targetRect && (
         <div
