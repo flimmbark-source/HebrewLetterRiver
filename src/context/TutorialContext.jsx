@@ -212,6 +212,7 @@ export function TutorialProvider({ children }) {
   });
   const [pendingTutorial, setPendingTutorial] = useState(null);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [pendingStepIndex, setPendingStepIndex] = useState(null);
 
   const tutorials = useMemo(() => {
     const translateStep = (step) => ({
@@ -274,17 +275,27 @@ export function TutorialProvider({ children }) {
       // If next step requires navigation, navigate first
       if (nextStep.navigateTo && location.pathname !== nextStep.navigateTo) {
         setIsNavigating(true);
+        setPendingStepIndex(nextIndex);
         navigate(nextStep.navigateTo);
-        // Wait for navigation to complete before advancing
-        setTimeout(() => {
-          setCurrentStepIndex(nextIndex);
-          setIsNavigating(false);
-        }, 300);
       } else {
         setCurrentStepIndex(nextIndex);
       }
     }
   };
+
+  // Resume tutorial after navigation completes
+  useEffect(() => {
+    if (!isNavigating || pendingStepIndex === null || !currentTutorial) return;
+
+    const expectedStep = currentTutorial.steps[pendingStepIndex];
+    const hasReachedDestination = !expectedStep.navigateTo || location.pathname === expectedStep.navigateTo;
+
+    if (hasReachedDestination) {
+      setCurrentStepIndex(pendingStepIndex);
+      setPendingStepIndex(null);
+      setIsNavigating(false);
+    }
+  }, [currentTutorial, isNavigating, location.pathname, pendingStepIndex]);
 
   const previousStep = () => {
     if (currentStepIndex > 0) {
