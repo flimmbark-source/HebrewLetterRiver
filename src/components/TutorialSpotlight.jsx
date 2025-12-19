@@ -133,11 +133,12 @@ export default function TutorialSpotlight({
     const isInLowerHalf = targetCenterY > viewportHeight / 2;
 
     // Adjust priority based on position
-    // If in lower half: above > below > side positions
+    // If in lower half: ALWAYS try to position above first, with relaxed space requirements
     // If in upper half: below > above > side positions
-    if (isInLowerHalf && spaceAbove >= calloutMinHeight + gap) {
+    if (isInLowerHalf && spaceAbove >= 100) {
       // Position above target (preferred when target is in lower half)
-      top = targetRect.top - calloutMinHeight - gap;
+      // Relaxed requirement: only need 100px instead of 200px + gap
+      top = Math.max(padding, targetRect.top - calloutMinHeight - gap);
       // Center horizontally relative to target
       const centerX = targetRect.left + targetRect.width / 2;
       left = centerX - calloutWidth / 2;
@@ -145,11 +146,6 @@ export default function TutorialSpotlight({
       // Position below target (preferred when target is in upper half)
       top = targetRect.bottom + gap;
       // Center horizontally relative to target
-      const centerX = targetRect.left + targetRect.width / 2;
-      left = centerX - calloutWidth / 2;
-    } else if (isInLowerHalf && spaceBelow >= calloutMinHeight + gap) {
-      // Position below target (fallback for lower half)
-      top = targetRect.bottom + gap;
       const centerX = targetRect.left + targetRect.width / 2;
       left = centerX - calloutWidth / 2;
     } else if (!isInLowerHalf && spaceAbove >= calloutMinHeight + gap) {
@@ -169,6 +165,11 @@ export default function TutorialSpotlight({
       // Center vertically relative to target
       const centerY = targetRect.top + targetRect.height / 2;
       top = centerY - calloutMinHeight / 2;
+    } else if (isInLowerHalf) {
+      // Last resort for lower half: position above with minimal space
+      top = Math.max(padding, targetRect.top - calloutMinHeight - gap);
+      const centerX = targetRect.left + targetRect.width / 2;
+      left = centerX - calloutWidth / 2;
     } else {
       // Not enough space anywhere, position in top corner with offset
       top = padding;
