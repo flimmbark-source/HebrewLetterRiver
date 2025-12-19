@@ -16,6 +16,8 @@ export default function TutorialSpotlight({
   const [targetRect, setTargetRect] = useState(null);
   const [targetElement, setTargetElement] = useState(null);
 
+  const isConfirmLanguagesStep = step?.id === 'confirmLanguages';
+
   // --- CONFIG: step-specific behavior ---------------------------------
   // Step numbers shown to user are 1-based; stepIndex is 0-based.
   const STEP_5_INDEX = 4;
@@ -187,6 +189,8 @@ export default function TutorialSpotlight({
   };
 
   const getBlockers = () => {
+    if (isConfirmLanguagesStep) return [];
+
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
@@ -388,12 +392,6 @@ export default function TutorialSpotlight({
           </div>
 
           <p className="text-slate-300 text-sm mb-4 leading-relaxed">{step.description}</p>
-
-          {step.waitForAction === 'click' && targetRect && (
-            <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
-              <p className="text-blue-300 text-sm font-semibold">{t('tutorial.clickToContinue')}</p>
-            </div>
-          )}
 
           <div className="flex justify-center gap-1.5 mb-4">
             {Array.from({ length: totalSteps }).map((_, index) => (
