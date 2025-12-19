@@ -49,11 +49,10 @@ const TUTORIALS = {
       },
       {
         id: 'confirmLanguages',
-        title: 'Let\'s Get Started!',
-        description: 'Click Continue when you\'re ready. You can always change these later in Settings.',
+        title: 'Ready to Continue!',
+        description: 'When you click Continue below, we\'ll show you around the app. You can always change these language settings later in Settings.',
         icon: '✨',
-        targetSelector: '.onboarding-continue-button',
-        waitForAction: 'click'
+        targetSelector: '.onboarding-continue-button'
       },
       {
         id: 'navigation',
