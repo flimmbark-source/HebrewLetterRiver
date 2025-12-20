@@ -669,7 +669,7 @@
       },
       "goalSetting": {
         "title": "Set Your Goal",
-        "description": "Use + and - to set how many letters to practice. Start with 10 if you're new, increase as you improve!"
+        "description": "Use + and - to set the level you must beat to win a match. Start low if you're new, increase to improve!"
       },
       "startGame": {
         "title": "Ready? Let's Play!",

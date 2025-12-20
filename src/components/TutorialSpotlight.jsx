@@ -265,9 +265,12 @@ export default function TutorialSpotlight({
       1: 500,
       2: 300,
       3: -200,
-      gameSetup: {
-      2: 300,
       },
+      gameSetup: {
+      0: 0,
+      1: 0,
+      2: 300,
+      3: 0,
       },
     };
 

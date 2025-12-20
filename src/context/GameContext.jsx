@@ -24,7 +24,7 @@ export function GameProvider({ children }) {
   const [hasMounted, setHasMounted] = useState(false);
   const shouldAutostartRef = useRef(false);
   const { languagePack, interfaceLanguagePack, t, dictionary } = useLocalization();
-  const { pendingTutorial, startPendingTutorial } = useTutorial();
+  const { pendingTutorial, startPendingTutorial, currentTutorial } = useTutorial();
   const fontClass = languagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
 
@@ -136,6 +136,17 @@ export function GameProvider({ children }) {
       return () => clearTimeout(timer);
     }
   }, [isVisible, pendingTutorial, startPendingTutorial]);
+
+  // Restore game modal if gameSetup tutorial is active (e.g., after page refresh)
+  useEffect(() => {
+    if (currentTutorial?.id === 'gameSetup' && !isVisible && hasMounted) {
+      // Small delay to ensure everything is ready
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [currentTutorial, isVisible, hasMounted]);
 
   const openGame = useCallback((openOptions = {}) => {
     // If game is already visible, close it (acts as a toggle)
