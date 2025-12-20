@@ -94,6 +94,7 @@ function LanguageOnboardingModal() {
     languageOptions
   } = useLanguage();
   const { t: translateOnboarding } = useLocalization();
+  const { currentTutorial, currentStepIndex } = useTutorial();
   const [pendingPracticeId, setPendingPracticeId] = React.useState(languageId);
   const [pendingAppId, setPendingAppId] = React.useState(appLanguageId);
 
@@ -107,6 +108,9 @@ function LanguageOnboardingModal() {
 
   if (hasSelectedLanguage) return null;
 
+  // Disable continue button during tutorial until step 4 (confirmLanguages)
+  const isContinueDisabled = currentTutorial?.id === 'firstTime' && currentStepIndex < 3;
+
   const handleChange = (nextId) => {
     setPendingPracticeId(nextId);
     setLanguageId(nextId);
@@ -118,7 +122,9 @@ function LanguageOnboardingModal() {
   };
 
   const handleContinue = () => {
-    markLanguageSelected();
+    if (!isContinueDisabled) {
+      markLanguageSelected();
+    }
   };
 
   return (
@@ -194,21 +200,28 @@ function LanguageOnboardingModal() {
         <button
           type="button"
           onClick={handleContinue}
+          disabled={isContinueDisabled}
           className="mt-6 w-full rounded-full px-5 py-3 text-base font-bold shadow-lg transition-all active:translate-y-1 sm:w-auto sm:px-8 onboarding-continue-button"
           style={{
             border: 0,
             fontFamily: '"Nunito", system-ui, sans-serif',
             color: '#4a1a06',
             background: 'radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%)',
-            boxShadow: '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)'
+            boxShadow: '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)',
+            opacity: isContinueDisabled ? 0.5 : 1,
+            cursor: isContinueDisabled ? 'not-allowed' : 'pointer'
           }}
           onMouseDown={(e) => {
-            e.currentTarget.style.transform = 'translateY(2px)';
-            e.currentTarget.style.boxShadow = '0 2px 0 #c85a24, 0 5px 12px rgba(200, 90, 36, 0.7)';
+            if (!isContinueDisabled) {
+              e.currentTarget.style.transform = 'translateY(2px)';
+              e.currentTarget.style.boxShadow = '0 2px 0 #c85a24, 0 5px 12px rgba(200, 90, 36, 0.7)';
+            }
           }}
           onMouseUp={(e) => {
-            e.currentTarget.style.transform = '';
-            e.currentTarget.style.boxShadow = '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)';
+            if (!isContinueDisabled) {
+              e.currentTarget.style.transform = '';
+              e.currentTarget.style.boxShadow = '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)';
+            }
           }}
         >
           {translateOnboarding('app.languagePicker.confirm')}
@@ -269,18 +282,7 @@ function Shell() {
             </div>
             <span className="label">{t('app.nav.home')}</span>
           </NavLink>
-          <NavLink
-            to="/learn"
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            onClick={(e) => {
-              if (isPlayDisabled) {
-                e.preventDefault();
-                return;
-              }
-              handleNavClick();
-            }}
-            style={isPlayDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-          >
+          <NavLink to="/learn" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
               <span>📚</span>
             </div>
