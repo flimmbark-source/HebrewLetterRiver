@@ -248,27 +248,39 @@ export default function TutorialSpotlight({
   // Calculate callout position - flip + clamp so it never renders off-screen
   const getCalloutStyle = () => {
     // Minimal per-step y-offsets live here (0-based stepIndex)
-    const stepYOffsetByIndex = {
+    const stepYOffsetByTutorial = {
+      firstTime: {
       1: 500, // Step 2 (stepIndex 1)
       3: -190,
-      5: 0,
+      4: 170,
+      5: 500,
       6: 0,
       7: -190, // Step 8 (stepIndex 7)
       8: 300,
       11: -190,
       12: -190,
+      },
+      tour: {
+      0: 0,
+      1: 500,
+      2: 300,
+      3: -200,
+
+      },
     };
-    const stepYOffset = stepYOffsetByIndex[stepIndex] ?? 0;
+
+  const currentOffsets = stepYOffsetByTutorial[tutorialId] || {};
+  const stepYOffset = currentOffsets[stepIndex] ?? 0;
 
   if (!targetRect) {
-  return {
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: `translate(-50%, calc(-50% + ${stepYOffset}px))`,
-    maxWidth: '90vw',
-    width: '400px'
-  };
+    return {
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: `translate(-50%, calc(-50% + ${stepYOffset}px))`,
+      maxWidth: '90vw',
+      width: '400px'
+    };
 }
 
     const calloutWidth = 340;
