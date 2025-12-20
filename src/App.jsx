@@ -10,7 +10,7 @@ import { ProgressProvider } from './context/ProgressContext.jsx';
 import { GameProvider, useGame } from './context/GameContext.jsx';
 import { LocalizationProvider, useLocalization } from './context/LocalizationContext.jsx';
 import { LanguageProvider, useLanguage } from './context/LanguageContext.jsx';
-import { TutorialProvider } from './context/TutorialContext.jsx';
+import { TutorialProvider, useTutorial } from './context/TutorialContext.jsx';
 import { getFormattedLanguageName } from './lib/languageUtils.js';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import OfflineIndicator from './components/OfflineIndicator.jsx';
@@ -221,15 +221,21 @@ function LanguageOnboardingModal() {
 function Shell() {
   const { openGame, closeGame, isVisible: isGameVisible, isGameRunning } = useGame();
   const { t, interfaceLanguagePack } = useLocalization();
+  const { currentTutorial, currentStepIndex } = useTutorial();
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
+
+  // Check if play button should be disabled during tutorial
+  const isPlayDisabled = currentTutorial?.id === 'firstTime' && currentStepIndex < 4;
 
   const handlePlay = React.useCallback(
     (event) => {
       event.preventDefault();
-      openGame({ autostart: false });
+      if (!isPlayDisabled) {
+        openGame({ autostart: false });
+      }
     },
-    [openGame]
+    [openGame, isPlayDisabled]
   );
 
   const handleNavClick = React.useCallback(() => {
@@ -273,6 +279,8 @@ function Shell() {
             type="button"
             onClick={handlePlay}
             className="nav-item active"
+            disabled={isPlayDisabled}
+            style={isPlayDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
           >
             <div className="play-diamond-shell">
               <div className="play-diamond">

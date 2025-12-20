@@ -34,7 +34,7 @@ export default function HomeView() {
   const { player, streak, daily, starLevelSize, claimDailyReward } = useProgress();
 
   const { openGame } = useGame();
-  const { startTutorial } = useTutorial();
+  const { startTutorial, currentTutorial, currentStepIndex } = useTutorial();
   const { t } = useLocalization();
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
@@ -108,6 +108,9 @@ export default function HomeView() {
       ];
     }
   }, [player.letters, languageId]);
+
+  // Check if play button should be disabled during tutorial
+  const isPlayDisabled = currentTutorial?.id === 'firstTime' && currentStepIndex < 4;
 
   // Close language selector when clicking outside
   useEffect(() => {
@@ -271,7 +274,14 @@ export default function HomeView() {
             </span>
           ))}
         </div>
-        <button className="hero-cta" onClick={() => openGame({ autostart: false })}>{t('home.cta.play')}</button>
+        <button
+          className="hero-cta"
+          onClick={() => !isPlayDisabled && openGame({ autostart: false })}
+          disabled={isPlayDisabled}
+          style={isPlayDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+        >
+          {t('home.cta.play')}
+        </button>
       </section>
 
       {/* Progress Section */}
