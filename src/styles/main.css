@@ -1803,7 +1803,8 @@ body.no-scroll {
 .catcher-box {
   max-width: 70px;
   max-height: 70px;
-  /* margin-bottom removed - container padding provides bottom spacing, and this interfered with multi-row alignment */
+  min-width: 70px;
+  min-height: 70px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2297,11 +2298,11 @@ body.no-scroll {
   align-items: end; /* Aligns all buckets to bottom of their grid row */
   justify-items: center; /* Centers buckets horizontally within their grid cells */
   column-gap: var(--space-2); /* 16px between buckets horizontally */
-  row-gap: 2px; /* 2px between rows - minimal spacing */
+  row-gap: 6px; /* 2px between rows - minimal spacing */
   padding: var(--space-2); /* 16px from edges */
   padding-inline-start: calc(max(var(--space-2) + env(safe-area-inset-left, 0px))+ var(--space-1));
   padding-inline-end: calc(max(var(--space-2) + env(safe-area-inset-right, 0px))+ var(--space-1));
-  padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); /* 24px + safe area */
+  padding-bottom: 54px;
   min-height: 120px;
 }
 
@@ -2316,7 +2317,7 @@ body.no-scroll {
 @media (max-width: 640px) {
   #choices-container {
     column-gap: var(--space-1); /* 8px between buckets horizontally */
-    row-gap: 2px; /* 2px between rows - minimal spacing */
+    row-gap: 6px; /* 2px between rows - minimal spacing */
     padding-inline-start: calc(max(var(--space-1) + env(safe-area-inset-left, 0px)) + var(--space-1));
     padding-inline-end: calc(max(var(--space-1) + env(safe-area-inset-right, 0px)) + var(--space-1));
   }

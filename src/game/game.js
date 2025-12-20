@@ -557,6 +557,17 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
       choicesContainer.style.removeProperty('grid-template-columns');
       return;
     }
+    
+  function markFirstRowBuckets() {
+    if (!choicesContainer) return;
+    const buckets = choicesContainer.querySelectorAll('.catcher-box');
+    if (!buckets.length) return;
+    const firstTop = buckets[0].offsetTop;
+    buckets.forEach(bucket => {
+      bucket.classList.toggle('first-row', bucket.offsetTop === firstTop);
+    });
+  }
+
     if (typeof window === 'undefined') return;
     const buckets = choicesContainer.querySelectorAll('.catcher-box');
     if (!buckets.length) return;
@@ -575,15 +586,22 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     const gapValueRaw = computed?.columnGap || computed?.gap || `${LAYOUT_GAP_FALLBACK}px`;
     const gapValue = parseFloat(gapValueRaw) || LAYOUT_GAP_FALLBACK;
     const totalGap = gapValue * Math.max(count - 1, 0);
-    const availableWidth = containerWidth - totalGap;
+    const paddingLeft = parseFloat(computed?.paddingLeft) || 0;
+    const paddingRight = parseFloat(computed?.paddingRight) || 0;
+    const contentWidth = containerWidth - paddingLeft - paddingRight;
+    const availableWidth = contentWidth - totalGap;
     const targetWidth = availableWidth / count;
 
     const applyDynamicHeight = (currentWidth) => {
+      const measuredWidth = buckets[0]?.getBoundingClientRect?.().width;
+      const widthToUse = Number.isFinite(measuredWidth) && measuredWidth > 0
+        ? measuredWidth
+        : currentWidth;
       buckets.forEach(bucket => {
-        bucket.style.height = `${currentWidth}px`;
+        bucket.style.height = `${widthToUse}px`;
       });
     };
-
+    
     // For 4 or fewer buckets, force single row by using 1fr columns (no minmax = no wrapping)
     // For 5+ buckets, use minmax to allow wrapping
     if (count <= 4) {
@@ -601,7 +619,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
 
     // For 5+ buckets, use original logic with minmax to allow wrapping
     if (availableWidth / count >= minBucketWidth) {
-      choicesContainer.style.gridTemplateColumns = `repeat(${count}, minmax(${minBucketWidth}px, 1fr))`;
+      choicesContainer.style.gridTemplateColumns = `repeat(auto-fit, minmax(${minBucketWidth}px, 1fr))`;
       applyDynamicHeight(minBucketWidth);
       return;
     }
