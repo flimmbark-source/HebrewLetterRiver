@@ -269,7 +269,18 @@ function Shell() {
             </div>
             <span className="label">{t('app.nav.home')}</span>
           </NavLink>
-          <NavLink to="/learn" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
+          <NavLink
+            to="/learn"
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            onClick={(e) => {
+              if (isPlayDisabled) {
+                e.preventDefault();
+                return;
+              }
+              handleNavClick();
+            }}
+            style={isPlayDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+          >
             <div className="nav-icon-shell">
               <span>📚</span>
             </div>
