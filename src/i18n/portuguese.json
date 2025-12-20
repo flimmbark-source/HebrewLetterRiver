@@ -639,7 +639,7 @@
       },
       "goalSetting": {
         "title": "Defina sua meta",
-        "description": "Use + e - para definir quantas letras praticar. Comece com 10 se você for novo, aumente conforme for melhorando!"
+        "description": "Use + e - para definir o nível que você deve vencer para ganhar uma partida. Comece baixo se você for novo, aumente para melhorar!"
       },
       "startGame": {
         "title": "Preparar? Vamos jogar!",

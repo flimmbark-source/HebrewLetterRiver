@@ -639,7 +639,7 @@
       },
       "goalSetting": {
         "title": "Fixez votre objectif",
-        "description": "Utilisez + et - pour définir le nombre de lettres à pratiquer. Commencez par 10 si vous êtes nouveau, augmentez au fur et à mesure de votre progression !"
+        "description": "Utilisez + et - pour définir le niveau que vous devez battre pour gagner un match. Commencez bas si vous êtes nouveau, augmentez pour vous améliorer !"
       },
       "startGame": {
         "title": "Prêt? Jouons!",

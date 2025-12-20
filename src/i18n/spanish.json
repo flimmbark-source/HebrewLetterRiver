@@ -638,7 +638,7 @@
       },
       "goalSetting": {
         "title": "Establece tu objetivo",
-        "description": "Utilice + y - para establecer cuántas letras practicar. ¡Comienza con 10 si eres nuevo y aumenta a medida que mejoras!"
+        "description": "Utilice + y - para establecer el nivel que debes superar para ganar un partido. ¡Comienza bajo si eres nuevo, aumenta para mejorar!"
       },
       "startGame": {
         "title": "¿Listo? ¡Vamos a jugar!",
