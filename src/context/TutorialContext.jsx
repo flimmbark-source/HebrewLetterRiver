@@ -216,11 +216,19 @@ export function TutorialProvider({ children }) {
   const { t } = useLocalization();
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentTutorial, setCurrentTutorial] = useState(null);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedTutorials, setCompletedTutorials] = useState(() => {
     return storage.get('hlr.tutorials.completed') || [];
   });
+
+  // Load tutorial progress from localStorage
+  const [currentTutorialId, setCurrentTutorialId] = useState(() => {
+    return storage.get('hlr.tutorials.current');
+  });
+  const [currentStepIndex, setCurrentStepIndex] = useState(() => {
+    return storage.get('hlr.tutorials.currentStep') || 0;
+  });
+
+  const [currentTutorial, setCurrentTutorial] = useState(null);
   const [pendingTutorial, setPendingTutorial] = useState(null);
   const [isNavigating, setIsNavigating] = useState(false);
   const [pendingStepIndex, setPendingStepIndex] = useState(null);
@@ -248,10 +256,22 @@ export function TutorialProvider({ children }) {
     }
 
     setCurrentTutorial(tutorial);
+    setCurrentTutorialId(tutorialId);
     setCurrentStepIndex(0);
     setPendingTutorial(null);
     setIsNavigating(false);
+
+    // Save tutorial state to localStorage
+    storage.set('hlr.tutorials.current', tutorialId);
+    storage.set('hlr.tutorials.currentStep', 0);
   }, [tutorials]);
+
+  // Restore tutorial from localStorage if it exists
+  useEffect(() => {
+    if (currentTutorialId && !currentTutorial && tutorials[currentTutorialId]) {
+      setCurrentTutorial(tutorials[currentTutorialId]);
+    }
+  }, [currentTutorialId, currentTutorial, tutorials]);
 
   useEffect(() => {
     if (!currentTutorial) return;
@@ -262,10 +282,18 @@ export function TutorialProvider({ children }) {
     }
   }, [tutorials, currentTutorial]);
 
+  // Save current step to localStorage whenever it changes
+  useEffect(() => {
+    if (currentTutorial) {
+      storage.set('hlr.tutorials.currentStep', currentStepIndex);
+    }
+  }, [currentStepIndex, currentTutorial]);
+
   // Check if this is the user's first time
   useEffect(() => {
     const hasSeenFirstTime = completedTutorials.includes('firstTime');
-    if (!hasSeenFirstTime && !currentTutorial) {
+    const hasCurrentTutorial = storage.get('hlr.tutorials.current');
+    if (!hasSeenFirstTime && !currentTutorial && !hasCurrentTutorial) {
       // Show first-time tutorial after a short delay
       const timer = setTimeout(() => {
         startTutorial('firstTime');
@@ -310,8 +338,18 @@ export function TutorialProvider({ children }) {
   }, [currentTutorial, isNavigating, location.pathname, pendingStepIndex]);
 
   const previousStep = () => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex(currentStepIndex - 1);
+    if (!currentTutorial || currentStepIndex <= 0) return;
+
+    const prevIndex = currentStepIndex - 1;
+    const prevStep = currentTutorial.steps[prevIndex];
+
+    // If previous step requires navigation, navigate first
+    if (prevStep.navigateTo && !pathsMatch(location.pathname, prevStep.navigateTo)) {
+      setIsNavigating(true);
+      setPendingStepIndex(prevIndex);
+      navigate(prevStep.navigateTo);
+    } else {
+      setCurrentStepIndex(prevIndex);
     }
   };
 
@@ -327,18 +365,28 @@ export function TutorialProvider({ children }) {
     setCompletedTutorials(newCompleted);
     storage.set('hlr.tutorials.completed', newCompleted);
 
+    // Clear tutorial state from localStorage
+    storage.remove('hlr.tutorials.current');
+    storage.remove('hlr.tutorials.currentStep');
+
     // Set up chained tutorials
     if (tutorialId === 'firstTime' && !newCompleted.includes('gameSetup')) {
       setPendingTutorial('gameSetup');
     }
 
     setCurrentTutorial(null);
+    setCurrentTutorialId(null);
     setCurrentStepIndex(0);
   };
 
   const resetTutorials = () => {
     setCompletedTutorials([]);
     storage.remove('hlr.tutorials.completed');
+    storage.remove('hlr.tutorials.current');
+    storage.remove('hlr.tutorials.currentStep');
+    setCurrentTutorial(null);
+    setCurrentTutorialId(null);
+    setCurrentStepIndex(0);
   };
 
   const hasCompletedTutorial = (tutorialId) => {
