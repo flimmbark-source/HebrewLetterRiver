@@ -343,11 +343,31 @@ export function TutorialProvider({ children }) {
     const prevIndex = currentStepIndex - 1;
     const prevStep = currentTutorial.steps[prevIndex];
 
-    // If previous step requires navigation, navigate first
-    if (prevStep.navigateTo && !pathsMatch(location.pathname, prevStep.navigateTo)) {
+    // Determine the expected route for the previous step
+    // First check if the step itself has a navigateTo property
+    let expectedRoute = prevStep.navigateTo;
+
+    // If not, look backwards through steps to find the most recent navigateTo
+    if (!expectedRoute) {
+      for (let i = prevIndex; i >= 0; i--) {
+        const step = currentTutorial.steps[i];
+        if (step.navigateTo) {
+          expectedRoute = step.navigateTo;
+          break;
+        }
+      }
+    }
+
+    // Default to home if no route is specified
+    if (!expectedRoute) {
+      expectedRoute = '/home';
+    }
+
+    // If we need to navigate to a different route, do so
+    if (!pathsMatch(location.pathname, expectedRoute)) {
       setIsNavigating(true);
       setPendingStepIndex(prevIndex);
-      navigate(prevStep.navigateTo);
+      navigate(expectedRoute);
     } else {
       setCurrentStepIndex(prevIndex);
     }
