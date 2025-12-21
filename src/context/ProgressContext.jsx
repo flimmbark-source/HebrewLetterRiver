@@ -55,7 +55,8 @@ const defaultPlayer = {
     perfectCatches: 0
   },
   letters: {},
-  latestBadge: null
+  latestBadge: null,
+  modesPlayed: []
 };
 
 const defaultBadges = badgesCatalog.reduce((acc, badge) => {
@@ -502,6 +503,11 @@ export function ProgressProvider({ children }) {
   const [activeBadges, setActiveBadges] = useState(() => hydrateActiveBadges());
   const [lastSession, setLastSession] = useState(null);
   const sessionStatsRef = useRef({ uniqueLetters: new Set(), totalCatches: 0, mistakes: 0, modesPlayed: new Set() });
+  const playerRef = useRef(player);
+
+  useEffect(() => {
+    playerRef.current = player;
+  }, [player]);
 
   useEffect(() => {
     hydratedPrefixRef.current = storagePrefix;
@@ -628,7 +634,7 @@ export function ProgressProvider({ children }) {
     [addToast]
   );
 
-  function updateStreakForSession(dateKey) {
+  function updateStreakForSession(dateKey, playerSessionsCount) {
     let shouldAdvanceBadge = false;
     setStreak((prev) => {
       if (prev.lastPlayedDateKey === dateKey) return prev;
@@ -640,6 +646,11 @@ export function ProgressProvider({ children }) {
       } else {
         current = 1;
         shouldAdvanceBadge = prev.lastPlayedDateKey === null;
+
+        // Comeback-kid: player had sessions before, had played before, missed days (diff > 1), streak resets to 1
+        if (playerSessionsCount > 0 && prev.lastPlayedDateKey !== null && diff !== null && diff > 1) {
+          trackBadgeProgress('comeback-kid', 1);
+        }
       }
       const best = Math.max(prev.best, current);
       return {
@@ -1029,7 +1040,13 @@ export function ProgressProvider({ children }) {
   useEffect(() => {
     const offSessionStart = on('game:session-start', (payload) => {
       setLastSession({ start: new Date().toISOString(), settings: payload?.settings ?? {}, mode: payload?.mode });
-      sessionStatsRef.current = { uniqueLetters: new Set(), totalCatches: 0, mistakes: 0, modesPlayed: new Set() };
+      sessionStatsRef.current = {
+        uniqueLetters: new Set(),
+        totalCatches: 0,
+        mistakes: 0,
+        modesPlayed: new Set(),
+        initialLetters: new Set(Object.keys(playerRef.current.letters ?? {}))
+      };
       if (payload?.mode) {
         sessionStatsRef.current.modesPlayed.add(payload.mode);
       }
@@ -1054,13 +1071,9 @@ export function ProgressProvider({ children }) {
       const dayOfWeek = now.getDay();
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
-      updateStreakForSession(dateKey);
-
       setPlayer((prev) => {
-        const hadStreak = prev.totals?.sessions > 0 && (streak.lastPlayedDateKey === null || differenceInJerusalemDays(streak.lastPlayedDateKey, dateKey) > 1);
-        if (hadStreak && streak.current === 1 && streak.lastPlayedDateKey !== dateKey) {
-          trackBadgeProgress('comeback-kid', 1);
-        }
+        // Update streak with current sessions count (before incrementing)
+        updateStreakForSession(dateKey, prev.totals.sessions);
 
         return {
           ...prev,
@@ -1123,17 +1136,14 @@ export function ProgressProvider({ children }) {
         });
       }
 
-      if (uniqueLetterCount > 0) {
-        setPlayer((prev) => {
-          const prevLetters = new Set(Object.keys(prev.letters ?? {}));
-          const newCount = Math.max(0, uniqueLetterCount - prevLetters.size);
+      if (uniqueLetterCount > 0 && sessionStatsRef.current.initialLetters) {
+        const newLetters = Array.from(sessionStatsRef.current.uniqueLetters).filter(
+          letterId => !sessionStatsRef.current.initialLetters.has(letterId)
+        );
 
-          if (newCount > 0) {
-            trackBadgeProgress('variety-seeker', Math.min(newCount, uniqueLetterCount));
-          }
-
-          return prev;
-        });
+        if (newLetters.length > 0) {
+          trackBadgeProgress('variety-seeker', newLetters.length);
+        }
       }
 
       markDailyProgress((task) => task.id === 'warmup' || task.id === 'triple-threat');
@@ -1217,7 +1227,7 @@ export function ProgressProvider({ children }) {
       offSessionComplete();
       offLetter();
     };
-  }, [streak.current, streak.lastPlayedDateKey, assets]);
+  }, [assets]);
 
   const value = useMemo(
     () => ({
