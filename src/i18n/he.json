@@ -44,13 +44,13 @@
   },
   "home": {
     "hero": {
-      "heading": "Choose your river adventure.",
-      "description": "Start with single letters or dive into full words.",
-      "modeSelectTitle": "Select a mode",
+      "heading": "בחרו את הרפתקת הנהר שלכם",
+      "description": "התחילו עם אותיות בודדות או צללו למילים שלמות",
+      "modeSelectTitle": "בחרו מצב משחק",
       "modes": {
         "letters": {
-          "title": "Letter River",
-          "description": "Catch drifting letters and drop them into the right buckets."
+          "title": "נהר האותiות",
+          "description": "תפסו אותיות נסחפות והכניסו אותן לסלים הנכונים"
         }
       }
     },
@@ -58,7 +58,7 @@
       "title": "אותיות שנלמדו לאחרונה"
     },
     "progress": {
-      "level": "רמה {{level}}",
+      "level": "שלב {{level}}",
       "heading": "התקדמות היום",
       "streak": "רצף",
       "days": "{{count}} ימים",
@@ -118,7 +118,9 @@
       "defaultNoun": "פריט",
       "defaultModeLabel": "תרגול בסיסי",
       "defaultModeDescription": "תרגלו את מערך התווים המרכזי.",
-      "selectAtLeastOne": "אנא בחרו לפחות אפשרות אחת לפני התחלת המשחק."
+      "selectAtLeastOne": "אנא בחרו לפחות אפשרות אחת לפני התחלת המשחק.",
+      "goal": "יעד",
+      "goalTooltip": "נצחו שלב זה כדי לנצח את המשחק!"
     },
     "modes": {
       "consonants-basic": {
@@ -245,7 +247,7 @@
     "accessibility": {
       "showIntroductions": "הצג הצגות",
       "highContrast": "ניגודיות גבוהה",
-      "randomLetters": "Send random letters (Letter River)",
+      "randomLetters": "שלחו אותיות אקראיות (נהר האותיות)",
       "reducedMotion": "תנועה מופחתת",
       "speed": "מהירות המשחק",
       "speedFast": "מהיר",
@@ -287,6 +289,12 @@
       "bonusInstruction": "תפסו את האבנים היקרות!",
       "lives": "חיים",
       "levelUp": "עלייה בדרגה!"
+    },
+    "pause": {
+      "title": "השהיה",
+      "message": "",
+      "resume": "המשך",
+      "mainMenu": "תפריט ראשי"
     }
   },
   "achievements": {
@@ -374,134 +382,134 @@
       }
     },
     "dedicatedScholar": {
-      "name": "Dedicated Scholar",
-      "summary": "Catch a total number of items across all sessions.",
+      "name": "תלמיד מסור",
+      "summary": "תפסו מספר כולל של פריטים בכל המפגשים",
       "tiers": {
-        "1": "Studious Starter",
-        "2": "Devoted Reader",
-        "3": "Master Scholar"
+        "1": "מתחיל חרוץ",
+        "2": "קורא מסור",
+        "3": "תלמיד אמן"
       }
     },
     "accuracyAce": {
-      "name": "Accuracy Ace",
-      "summary": "Complete sessions with 90% or higher accuracy.",
+      "name": "אלוף הדיוק",
+      "summary": "השלימו מפגשים עם 90% דיוק או יותר",
       "tiers": {
-        "1": "Sharp Eye",
-        "2": "Keen Focus",
-        "3": "Flawless Precision"
+        "1": "עין חדה",
+        "2": "מיקוד מושלם",
+        "3": "דיוק ללא פגם"
       }
     },
     "speedDemon": {
-      "name": "Speed Demon",
-      "summary": "Complete sessions with fast flow speed enabled.",
+      "name": "שד המהירות",
+      "summary": "השלימו מפגשים עם מהירות זרימה מהירה",
       "tiers": {
-        "1": "Quick Current",
-        "2": "Rapid Runner",
-        "3": "Lightning Flow"
+        "1": "זרם מהיר",
+        "2": "רץ מהיר",
+        "3": "זרימת ברק"
       }
     },
     "explorer": {
-      "name": "Explorer",
-      "summary": "Try different game modes and challenges.",
+      "name": "מגלה ארצות",
+      "summary": "נסו מצבי משחק ואתגרים שונים",
       "tiers": {
-        "1": "Curious Wanderer",
-        "2": "Brave Voyager",
-        "3": "Intrepid Pioneer"
+        "1": "נווד סקרן",
+        "2": "מטייל אמיץ",
+        "3": "חלוץ אמיתי"
       }
     },
     "perfectionist": {
-      "name": "Perfectionist",
-      "summary": "Complete sessions without any mistakes.",
+      "name": "פרפקציוניסט",
+      "summary": "השלימו מפגשים ללא שגיאות",
       "tiers": {
-        "1": "Careful Catcher",
-        "2": "Precision Master",
-        "3": "Absolute Perfection"
+        "1": "תופס זהיר",
+        "2": "אמן הדיוק",
+        "3": "שלמות מוחלטת"
       }
     },
     "earlyBird": {
-      "name": "Early Bird",
-      "summary": "Play sessions in the morning hours (5am-11am).",
+      "name": "ציפור מוקדמת",
+      "summary": "שחקו מפגשים בשעות הבוקר (5:00-11:00)",
       "tiers": {
-        "1": "Dawn Paddler",
-        "2": "Sunrise Swimmer",
-        "3": "Morning Master"
+        "1": "חותר השחר",
+        "2": "שחיין הזריחה",
+        "3": "מאסטר הבוקר"
       }
     },
     "nightOwl": {
-      "name": "Night Owl",
-      "summary": "Play sessions in the evening hours (8pm-2am).",
+      "name": "ינשוף לילה",
+      "summary": "שחקו מפגשים בשעות הערב (20:00-02:00)",
       "tiers": {
-        "1": "Twilight Traveler",
-        "2": "Moonlight Navigator",
-        "3": "Midnight Champion"
+        "1": "מטייל הדמדומים",
+        "2": "נווט אור הירח",
+        "3": "אלוף חצות"
       }
     },
     "comebackKid": {
-      "name": "Comeback Kid",
-      "summary": "Return to play after breaking your streak.",
+      "name": "ילד השיבה",
+      "summary": "חזרו לשחק לאחר שבירת רצף",
       "tiers": {
-        "1": "Fresh Start",
-        "2": "Resilient Spirit",
-        "3": "Unwavering Return"
+        "1": "התחלה רעננה",
+        "2": "רוח עמידה",
+        "3": "שיבה בלתי מעורערת"
       }
     },
     "marathonRunner": {
-      "name": "Marathon Runner",
-      "summary": "Play extended sessions with 30+ catches.",
+      "name": "רץ מרתון",
+      "summary": "שחקו מפגשים ממושכים עם 30+ תפיסות",
       "tiers": {
-        "1": "Endurance Paddler",
-        "2": "Distance Swimmer",
-        "3": "Ultra Runner"
+        "1": "חותר סבלני",
+        "2": "שחיין מרחקים",
+        "3": "רץ אולטרה"
       }
     },
     "weekendWarrior": {
-      "name": "Weekend Warrior",
-      "summary": "Play sessions on weekends (Saturday or Sunday).",
+      "name": "לוחם סוף השבוע",
+      "summary": "שחקו מפגשים בסופי שבוע (שבת או יום ראשון)",
       "tiers": {
-        "1": "Saturday Starter",
-        "2": "Weekend Regular",
-        "3": "Weekend Legend"
+        "1": "מתחיל שבת",
+        "2": "קבוע סוף שבוע",
+        "3": "אגדת סוף השבוע"
       }
     },
     "varietySeeker": {
-      "name": "Variety Seeker",
-      "summary": "Practice many different unique letters.",
+      "name": "מחפש גיוון",
+      "summary": "תרגלו אותיות ייחודיות רבות ושונות",
       "tiers": {
-        "1": "Diverse Learner",
-        "2": "Broad Explorer",
-        "3": "Complete Master"
+        "1": "לומד מגוון",
+        "2": "חוקר רחב",
+        "3": "מאסטר שלם"
       }
     },
     "rapidLearner": {
-      "name": "Rapid Learner",
-      "summary": "Improve accuracy on previously weak letters.",
+      "name": "לומד מהיר",
+      "summary": "שפרו דיוק באותיות שהיו חלשות בעבר",
       "tiers": {
-        "1": "Quick Study",
-        "2": "Fast Improver",
-        "3": "Lightning Learner"
+        "1": "לומד מהיר",
+        "2": "משתפר מהר",
+        "3": "לומד ברק"
       }
     },
     "waveRider": {
       "name": "Wave Rider 🌊",
       "summary": "Catch {{goal}} letters in a single wave.",
       "tiers": {
-        "1": "Ride the Wave",
-        "2": "Wave Master",
-        "3": "Tsunami"
+        "1": "רכיבת הגל",
+        "2": "אמן הגלים",
+        "3": "צונאמי"
       }
     },
     "centuryClub": {
-      "name": "Century Club",
+      "name": "מועדון המאה",
       "summary": "Complete {{goal}} total sessions.",
       "tiers": {
-        "1": "Quarter Century",
-        "2": "Half Century",
-        "3": "Full Century"
+        "1": "רבע מאה",
+        "2": "חצי מאה",
+        "3": "מאה שלמה"
       }
     },
     "levelingLegend": {
-      "name": "Leveling Legend",
-      "summary": "Reach level {{goal}} in a single session.",
+      "name": "אגדת השלבים",
+      "summary": "הגיעו לשלב {{goal}} במפגש אחד",
       "tiers": {
         "1": "Level 10",
         "2": "Level 15",
@@ -512,333 +520,333 @@
       "name": "Flame Keeper 🔥",
       "summary": "Build a {{goal}}-catch streak without mistakes.",
       "tiers": {
-        "1": "Spark",
-        "2": "Bonfire",
-        "3": "Inferno"
+        "1": "ניצוץ",
+        "2": "מדורה",
+        "3": "גיהנום"
       }
     },
     "pointHunter": {
-      "name": "Point Hunter",
+      "name": "צייד הנקודות",
       "summary": "Score {{goal}} points in a single session.",
       "tiers": {
-        "1": "500 Points",
-        "2": "1000 Points",
-        "3": "2000 Points"
+        "1": "500 נקודות",
+        "2": "1000 נקודות",
+        "3": "2000 נקודות"
       }
     },
     "grandMaster": {
-      "name": "Grand Master",
+      "name": "המאסטר הגדול",
       "summary": "Catch {{goal}} correct letters total.",
       "tiers": {
-        "1": "50 Catches",
-        "2": "100 Catches",
-        "3": "200 Catches"
+        "1": "50 תפיסות",
+        "2": "100 תפיסות",
+        "3": "200 תפיסות"
       }
     },
     "risingStar": {
-      "name": "Rising Star",
+      "name": "כוכב עולה",
       "summary": "Level up {{goal}} times in one session.",
       "tiers": {
-        "1": "3 Level-Ups",
-        "2": "7 Level-Ups",
-        "3": "12 Level-Ups"
+        "1": "3 עליות שלב",
+        "2": "7 עליות שלב",
+        "3": "12 עליות שלב"
       }
     },
     "flowState": {
-      "name": "Flow State",
+      "name": "מצב זרימה",
       "summary": "Catch {{goal}} letters perfectly in a row.",
       "tiers": {
-        "1": "15 Perfect",
-        "2": "30 Perfect",
-        "3": "50 Perfect"
+        "1": "15 מושלמות",
+        "2": "30 מושלמות",
+        "3": "50 מושלמות"
       }
     },
     "unstoppable": {
-      "name": "Unstoppable",
+      "name": "בלתי ניתן לעצירה",
       "summary": "Complete {{goal}} full sessions.",
       "tiers": {
-        "1": "5 Sessions",
-        "2": "15 Sessions",
-        "3": "30 Sessions"
+        "1": "5 מפגשים",
+        "2": "15 מפגשים",
+        "3": "30 מפגשים"
       }
     },
     "starCollector": {
       "name": "Star Collector ⭐",
       "summary": "Earn {{goal}} total stars.",
       "tiers": {
-        "1": "100 Stars",
-        "2": "300 Stars",
-        "3": "750 Stars"
+        "1": "100 כוכבים",
+        "2": "300 כוכבים",
+        "3": "750 כוכבים"
       }
     },
     "slowSteady": {
-      "name": "Slow & Steady",
+      "name": "לאט ויציב",
       "summary": "Complete {{goal}} perfect sessions in slow river mode.",
       "tiers": {
-        "1": "First Zen",
-        "2": "Zen Master",
-        "3": "Zen Legend"
+        "1": "זן ראשון",
+        "2": "מאסטר זן",
+        "3": "אגדת זן"
       }
     },
     "clickChampion": {
-      "name": "Click Champion",
+      "name": "אלוף הקליקים",
       "summary": "Win {{goal}} sessions with click mode enabled.",
       "tiers": {
-        "1": "Click Novice",
-        "2": "Click Expert",
-        "3": "Click Master"
+        "1": "מתחיל קליקים",
+        "2": "מומחה קליקים",
+        "3": "אמן קליקים"
       }
     },
     "fontChameleon": {
-      "name": "Font Chameleon",
+      "name": "זיקית הגופנים",
       "summary": "Play {{goal}} sessions with font shuffle enabled.",
       "tiers": {
-        "1": "Font Explorer",
-        "2": "Font Adapter",
-        "3": "Font Shapeshifter"
+        "1": "חוקר גופנים",
+        "2": "מסתגל גופנים",
+        "3": "משנה צורת גופנים"
       }
     },
     "clutchWinner": {
-      "name": "Clutch Winner",
+      "name": "מנצח קריטי",
       "summary": "Win {{goal}} sessions with only 1 life remaining.",
       "tiers": {
-        "1": "Lucky Save",
-        "2": "Clutch Player",
-        "3": "Miracle Worker"
+        "1": "הצלה בר מזל",
+        "2": "שחקן קריטי",
+        "3": "עושה ניסים"
       }
     },
     "associationExpert": {
-      "name": "Association Expert",
+      "name": "מומחה אסוציאציות",
       "summary": "Play {{goal}} sessions with association mode.",
       "tiers": {
-        "1": "Visual Learner",
-        "2": "Image Master",
-        "3": "Association Ace"
+        "1": "לומד חזותי",
+        "2": "אמן תמונות",
+        "3": "אלוף אסוציאציות"
       }
     },
     "accessibilityAlly": {
-      "name": "Accessibility Ally",
+      "name": "בן ברית הנגישות",
       "summary": "Play {{goal}} sessions with accessibility features.",
       "tiers": {
-        "1": "Inclusive Player",
-        "2": "Accessibility Advocate",
-        "3": "Universal Design Champion"
+        "1": "שחקן כולל",
+        "2": "תומך נגישות",
+        "3": "אלוף עיצוב אוניברסלי"
       }
     },
     "noIntroductions": {
-      "name": "No Introductions",
+      "name": "ללא הקדמות",
       "summary": "Play {{goal}} sessions without letter introductions.",
       "tiers": {
-        "1": "Skip Intro",
-        "2": "No Hand-Holding",
-        "3": "Already Knows"
+        "1": "דילוג הקדמה",
+        "2": "ללא תמיכה",
+        "3": "כבר יודע"
       }
     },
     "oneShotWonder": {
-      "name": "One-Shot Wonder",
+      "name": "פלא ניסיון אחד",
       "summary": "Get {{goal}} letters correct on first attempt.",
       "tiers": {
-        "1": "Quick Study",
-        "2": "First Impression",
-        "3": "Instant Recall"
+        "1": "לימוד מהיר",
+        "2": "רושם ראשון",
+        "3": "זכירה מיידית"
       }
     },
     "randomMaster": {
-      "name": "Random Master",
+      "name": "אמן האקראי",
       "summary": "Play {{goal}} sessions with random letters enabled.",
       "tiers": {
-        "1": "Embrace Chaos",
-        "2": "Random Pro",
-        "3": "Chaos Champion"
+        "1": "אימוץ הכאוס",
+        "2": "מקצוען אקראי",
+        "3": "אלוף הכאוס"
       }
     },
     "comebackChampion": {
-      "name": "Comeback Champion",
+      "name": "אלוף השיבה",
       "summary": "Win {{goal}} sessions after losing 2 lives.",
       "tiers": {
-        "1": "Second Chance",
-        "2": "Close Call",
-        "3": "Phoenix Rising"
+        "1": "הזדמנות שנייה",
+        "2": "קרוב מדי",
+        "3": "עליית הפניקס"
       }
     },
     "polyglotPioneer": {
-      "name": "Polyglot Pioneer",
+      "name": "חלוץ הפוליגלוט",
       "summary": "Try {{goal}} different language packs.",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3 שפות",
+        "2": "6 שפות",
+        "3": "10 שפות"
       }
     },
     "unicodeChampion": {
-      "name": "Unicode Champion",
+      "name": "אלוף היוניקוד",
       "summary": "Practice {{goal}} different writing systems.",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "8 Scripts"
+        "1": "3 כתבים",
+        "2": "5 כתבים",
+        "3": "8 כתבים"
       }
     },
     "rtlExpert": {
-      "name": "RTL Expert",
+      "name": "מומחה מימין לשמאל",
       "summary": "Complete {{goal}} sessions in right-to-left languages.",
       "tiers": {
-        "1": "RTL Beginner",
-        "2": "RTL Proficient",
-        "3": "RTL Master"
+        "1": "מתחיל RTL",
+        "2": "מיומן RTL",
+        "3": "מאסטר RTL"
       }
     },
     "vowelVirtuoso": {
-      "name": "Advanced Learner",
+      "name": "לומד מתקדם",
       "summary": "Complete {{goal}} sessions in advanced practice mode.",
       "tiers": {
-        "1": "Advanced Student",
-        "2": "Advanced Scholar",
-        "3": "Advanced Master"
+        "1": "תלמיד מתקדם",
+        "2": "חוקר מתקדם",
+        "3": "מאסטר מתקדם"
       }
     },
     "finalFormMaster": {
-      "name": "Special Forms Expert",
+      "name": "מומחה צורות מיוחדות",
       "summary": "Complete {{goal}} sessions in special characters mode.",
       "tiers": {
-        "1": "Special Forms Novice",
-        "2": "Special Forms Expert",
-        "3": "Special Forms Champion"
+        "1": "מתחיל צורות מיוחדות",
+        "2": "מומחה צורות מיוחדות",
+        "3": "אלוף צורות מיוחדות"
       }
     },
     "modeMixer": {
-      "name": "Mode Mixer",
+      "name": "מערבב מצבים",
       "summary": "Play {{goal}} sessions with multiple modes simultaneously.",
       "tiers": {
-        "1": "Mix It Up",
-        "2": "Mode Juggler",
-        "3": "Ultimate Mixer"
+        "1": "ערבוב",
+        "2": "להטוטן מצבים",
+        "3": "מערבב אולטימטיבי"
       }
     },
     "culturalAmbassador": {
-      "name": "Cultural Ambassador",
+      "name": "שגריר תרבותי",
       "summary": "Try {{goal}} different languages.",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3 שפות",
+        "2": "6 שפות",
+        "3": "10 שפות"
       }
     },
     "scriptScholar": {
-      "name": "Script Scholar",
+      "name": "חוקר כתבים",
       "summary": "Achieve 90%+ accuracy in {{goal}} different scripts.",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "7 Scripts"
+        "1": "3 כתבים",
+        "2": "5 כתבים",
+        "3": "7 כתבים"
       }
     },
     "alphabetAce": {
-      "name": "Alphabet Ace",
+      "name": "אלוף האלפבית",
       "summary": "Master basic mode in {{goal}} different languages.",
       "tiers": {
-        "1": "2 Alphabets",
-        "2": "4 Alphabets",
-        "3": "6 Alphabets"
+        "1": "2 אלפביתים",
+        "2": "4 אלפביתים",
+        "3": "6 אלפביתים"
       }
     },
     "languageSampler": {
-      "name": "Language Sampler",
+      "name": "טועם שפות",
       "summary": "Try a new language {{goal}} times.",
       "tiers": {
-        "1": "Curious Explorer",
-        "2": "Language Taster",
-        "3": "World Linguist"
+        "1": "חוקר סקרן",
+        "2": "טועם שפות",
+        "3": "בלשן עולמי"
       }
     },
     "morningGlory": {
-      "name": "Morning Glory",
+      "name": "תפארת הבוקר",
       "summary": "Play {{goal}} sessions early morning (5am-8am).",
       "tiers": {
-        "1": "Early Riser",
-        "2": "Morning Person",
-        "3": "Dawn Warrior"
+        "1": "קם מוקדם",
+        "2": "איש בוקר",
+        "3": "לוחם השחר"
       }
     },
     "lunchLearner": {
-      "name": "Lunch Learner",
+      "name": "לומד הצהריים",
       "summary": "Play {{goal}} sessions during lunch (11am-2pm).",
       "tiers": {
-        "1": "Lunch Break",
-        "2": "Midday Master",
-        "3": "Lunch Legend"
+        "1": "הפסקת צהריים",
+        "2": "מאסטר הצהריים",
+        "3": "אגדת הצהריים"
       }
     },
     "midnightScholar": {
-      "name": "Midnight Scholar",
+      "name": "חוקר חצות",
       "summary": "Play {{goal}} sessions after midnight (12am-3am).",
       "tiers": {
-        "1": "Night Shift",
-        "2": "Midnight Oil",
-        "3": "Insomniac Legend"
+        "1": "משמרת לילה",
+        "2": "שמן חצות",
+        "3": "אגדת נדודי שינה"
       }
     },
     "primeTimePlayer": {
-      "name": "Prime Time Player",
+      "name": "שחקן שעות השיא",
       "summary": "Play {{goal}} sessions in the evening (6pm-9pm).",
       "tiers": {
-        "1": "Evening Starter",
-        "2": "Prime Timer",
-        "3": "Evening Legend"
+        "1": "מתחיל ערב",
+        "2": "שעות שיא",
+        "3": "אגדת הערב"
       }
     },
     "perfectWeek": {
-      "name": "Perfect Week",
+      "name": "שבוע מושלם",
       "summary": "Play every day for 7 days straight ({{goal}} times).",
       "tiers": {
-        "1": "First Week",
-        "2": "3 Perfect Weeks",
-        "3": "8 Perfect Weeks"
+        "1": "שבוע ראשון",
+        "2": "3 שבועות מושלמים",
+        "3": "8 שבועות מושלמים"
       }
     },
     "monthlyMaven": {
-      "name": "Monthly Maven",
+      "name": "מומחה החודש",
       "summary": "Play 20+ days in a month ({{goal}} months).",
       "tiers": {
-        "1": "1 Active Month",
-        "2": "3 Active Months",
-        "3": "6 Active Months"
+        "1": "חודש פעיל אחד",
+        "2": "3 חודשים פעילים",
+        "3": "6 חודשים פעילים"
       }
     },
     "anniversaryAce": {
-      "name": "Anniversary Ace",
+      "name": "אלוף השנה",
       "summary": "Play on your {{goal}}-year account anniversary.",
       "tiers": {
-        "1": "1 Year",
-        "2": "2 Years",
-        "3": "3 Years"
+        "1": "שנה אחת",
+        "2": "שנתיים",
+        "3": "3 שנים"
       }
     },
     "seasonVeteran": {
-      "name": "Season Veteran",
+      "name": "ותיק העונות",
       "summary": "Play in all {{goal}} seasons of the year.",
       "tiers": {
-        "1": "All Seasons (1 Year)",
-        "2": "All Seasons (2 Years)",
-        "3": "All Seasons (3 Years)"
+        "1": "כל העונות (שנה אחת)",
+        "2": "כל העונות (שנתיים)",
+        "3": "כל העונות (3 שנים)"
       }
     },
     "dawnPatrol": {
-      "name": "Dawn Patrol",
+      "name": "סיור השחר",
       "summary": "Play {{goal}} sessions at sunrise (5am-7am).",
       "tiers": {
-        "1": "First Light",
-        "2": "Dawn Regular",
-        "3": "Sunrise Champion"
+        "1": "אור ראשון",
+        "2": "קבוע שחר",
+        "3": "אלוף הזריחה"
       }
     },
     "consistencyKing": {
-      "name": "Consistency King",
+      "name": "מלך העקביות",
       "summary": "Play {{goal}} days in a row.",
       "tiers": {
-        "1": "14 Day Streak",
-        "2": "30 Day Streak",
-        "3": "60 Day Streak"
+        "1": "רצף 14 ימים",
+        "2": "רצף 30 ימים",
+        "3": "רצף 60 ימים"
       }
     }
   },
@@ -865,92 +873,92 @@
         "description": "נצח סיבוב עם {{constraint}} פעיל."
       },
       "accuracyChallenge": {
-        "title": "Accuracy Challenge",
-        "description": "Complete a session with 90% or better accuracy."
+        "title": "אתגר דיוק",
+        "description": "השלימו מפגש עם דיוק של 90% או יותר"
       },
       "gemCollector": {
-        "title": "Gem Collector",
-        "description": "Win two bonus rounds today."
+        "title": "אוסף אבנים יקרות",
+        "description": "נצחו שני סיבובי בונוס היום"
       },
       "varietyPack": {
-        "title": "Variety Pack",
-        "description": "Catch at least eight different unique letters."
+        "title": "חבילת גיוון",
+        "description": "תפסו לפחות שמונה אותיות ייחודיות שונות"
       },
       "powerSession": {
-        "title": "Power Session",
-        "description": "Catch 25 or more items in a single session."
+        "title": "מפגש כוח",
+        "description": "תפסו 25 פריטים או יותר במפגש אחד"
       },
       "perfectRun": {
-        "title": "Perfect Run",
-        "description": "Complete one session without any mistakes."
+        "title": "ריצה מושלמת",
+        "description": "השלימו מפגש אחד ללא שגיאות"
       },
       "speedPractice": {
-        "title": "Speed Practice",
-        "description": "Complete a session with fast flow speed enabled."
+        "title": "תרגול מהירות",
+        "description": "השלימו מפגש עם מהירות זרימה מהירה"
       },
       "tripleThread": {
-        "title": "Triple Threat",
-        "description": "Play three full sessions today."
+        "title": "איום משולש",
+        "description": "שחקו שלושה מפגשים מלאים היום"
       },
       "waveChallenge": {
-        "title": "Wave Challenge 🌊",
-        "description": "Catch 8 letters in a single wave."
+        "title": "אתגר הגל 🌊",
+        "description": "תפסו 8 אותיות בגל אחד"
       },
       "flameBuilder": {
-        "title": "Flame Builder 🔥",
-        "description": "Build a 15-catch perfect streak."
+        "title": "בונה להבות 🔥",
+        "description": "בנו רצף מושלם של 15 תפיסות"
       },
       "slowRiverZen": {
-        "title": "Slow River Zen",
-        "description": "Complete a session in slow river mode with perfect accuracy."
+        "title": "זן נהר איטי",
+        "description": "השלימו מפגש במצב נהר איטי עם דיוק מושלם"
       },
       "clickMaster": {
-        "title": "Click Master",
-        "description": "Win a session with click mode enabled."
+        "title": "מאסטר הקליקים",
+        "description": "נצחו מפגש עם מצב קליקים מופעל"
       },
       "levelClimber": {
-        "title": "Level Climber",
-        "description": "Reach level 12 or higher in one session."
+        "title": "מטפס שלבים",
+        "description": "הגיעו לשלב 12 או גבוה יותר במפגש אחד"
       },
       "noLivesLost": {
-        "title": "No Lives Lost",
-        "description": "Complete a session without losing a life."
+        "title": "ללא אובדן חיים",
+        "description": "השלימו מפגש מבלי לאבד חיים"
       },
       "associationPractice": {
-        "title": "Association Practice",
-        "description": "Complete a session with association mode enabled."
+        "title": "תרגול אסוציאציות",
+        "description": "השלימו מפגש עם מצב אסוציאציות מופעל"
       },
       "multiModeMaster": {
-        "title": "Multi-Mode Master",
-        "description": "Complete a session with two or more modes enabled."
+        "title": "מאסטר רב מצבים",
+        "description": "השלימו מפגש עם שני מצבים או יותר מופעלים"
       },
       "fontFlexibility": {
-        "title": "Font Flexibility",
-        "description": "Complete a session with font shuffle enabled."
+        "title": "גמישות גופנים",
+        "description": "השלימו מפגש עם ערבוב גופנים מופעל"
       },
       "randomChallenge": {
-        "title": "Random Challenge",
-        "description": "Complete a session with random letters enabled."
+        "title": "אתגר אקראי",
+        "description": "השלימו מפגש עם אותיות אקראיות מופעלות"
       },
       "vowelFocus": {
-        "title": "Advanced Practice",
-        "description": "Complete a session in advanced practice mode."
+        "title": "תרגול מתקדם",
+        "description": "השלימו מפגש במצב תרגול מתקדם"
       },
       "finalFormsPractice": {
-        "title": "Special Characters",
-        "description": "Complete a session in special characters mode."
+        "title": "תווים מיוחדים",
+        "description": "השלימו מפגש במצב תווים מיוחדים"
       },
       "languageExplorer": {
-        "title": "Language Explorer",
-        "description": "Try a new language today."
+        "title": "חוקר שפות",
+        "description": "נסו שפה חדשה היום"
       },
       "pointSurge": {
-        "title": "Point Surge",
-        "description": "Score 400 points or more in one session."
+        "title": "זינוק נקודות",
+        "description": "צברו 400 נקודות או יותר במפגש אחד"
       },
       "doubleSession": {
-        "title": "Double Session",
-        "description": "Complete two sessions today."
+        "title": "מפגש כפול",
+        "description": "השלימו שני מפגשים היום"
       }
     },
     "constraints": {
@@ -1082,5 +1090,11 @@
         "description": "לחץ על התחל כדי להתחיל! אותיות יזרמו על פני המסך - גררו כל אחת מהתיבה התואמת שלה בתחתית."
       }
     }
+  },
+  "achievementSections": {
+    "classic": "קלאסי",
+    "special": "מיוחד",
+    "polyglot": "פוליגלוט",
+    "dedication": "מסירות"
   }
 }
