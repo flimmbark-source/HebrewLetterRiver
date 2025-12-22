@@ -54,9 +54,9 @@
       "name": "Grand Master",
       "summary": "Catch {{goal}} correct letters total.",
       "tiers": {
-        "1": "1000 Catches",
-        "2": "5000 Catches",
-        "3": "10000 Catches"
+        "1": "50 Catches",
+        "2": "100 Catches",
+        "3": "200 Catches"
       }
     },
     "risingStar": {
@@ -382,63 +382,63 @@
 
       "waveChallenge": {
         "title": "Wave Challenge 🌊",
-        "description": "Ride the wave! Catch 8 letters in a single flow without breaking."
+        "description": "Catch 8 letters in a single wave."
       },
       "flameBuilder": {
         "title": "Flame Builder 🔥",
-        "description": "Keep the flame burning with a 15-catch perfect streak."
+        "description": "Build a 15-catch perfect streak."
       },
       "slowRiverZen": {
         "title": "Slow River Zen",
-        "description": "Find your zen in slow river mode with perfect accuracy."
+        "description": "Complete a session in slow river mode with perfect accuracy."
       },
       "clickMaster": {
         "title": "Click Master",
-        "description": "Win a session using click mode precision."
+        "description": "Win a session with click mode enabled."
       },
       "levelClimber": {
         "title": "Level Climber",
-        "description": "Reach the heights of level 12 or beyond in one run."
+        "description": "Reach level 12 or higher in one session."
       },
       "noLivesLost": {
         "title": "No Lives Lost",
-        "description": "Navigate the river perfectly without losing a single life."
+        "description": "Complete a session without losing a life."
       },
       "associationPractice": {
         "title": "Association Practice",
-        "description": "Learn through images with association mode active."
+        "description": "Complete a session with association mode enabled."
       },
       "multiModeMaster": {
         "title": "Multi-Mode Master",
-        "description": "Challenge yourself by mixing two or more modes together."
+        "description": "Complete a session with two or more modes enabled."
       },
       "fontFlexibility": {
         "title": "Font Flexibility",
-        "description": "Adapt to changing styles with font shuffle enabled."
+        "description": "Complete a session with font shuffle enabled."
       },
       "randomChallenge": {
         "title": "Random Challenge",
-        "description": "Embrace the unexpected with random letter order."
+        "description": "Complete a session with random letters enabled."
       },
       "vowelFocus": {
         "title": "Advanced Practice",
-        "description": "Complete one session in advanced practice mode."
+        "description": "Complete a session in advanced practice mode."
       },
       "finalFormsPractice": {
         "title": "Special Characters",
-        "description": "Complete one session in special characters mode."
+        "description": "Complete a session in special characters mode."
       },
       "languageExplorer": {
         "title": "Language Explorer",
-        "description": "Venture into a new language today."
+        "description": "Try a new language today."
       },
       "pointSurge": {
         "title": "Point Surge",
-        "description": "Chase the high score and reach 400 points or more."
+        "description": "Score 400 points or more in one session."
       },
       "doubleSession": {
         "title": "Double Session",
-        "description": "Double down with two complete sessions today."
+        "description": "Complete two sessions today."
       }
     }
   },

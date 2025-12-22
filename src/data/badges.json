@@ -236,9 +236,9 @@
     "nameKey": "badges.grandMaster.name",
     "summaryKey": "badges.grandMaster.summary",
     "tiers": [
-      { "tier": 1, "labelKey": "badges.grandMaster.tiers.1", "goal": 1000, "stars": 35 },
-      { "tier": 2, "labelKey": "badges.grandMaster.tiers.2", "goal": 5000, "stars": 90 },
-      { "tier": 3, "labelKey": "badges.grandMaster.tiers.3", "goal": 10000, "stars": 200 }
+      { "tier": 1, "labelKey": "badges.grandMaster.tiers.1", "goal": 50, "stars": 35 },
+      { "tier": 2, "labelKey": "badges.grandMaster.tiers.2", "goal": 100, "stars": 90 },
+      { "tier": 3, "labelKey": "badges.grandMaster.tiers.3", "goal": 200, "stars": 200 }
     ]
   },
   {
