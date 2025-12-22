@@ -7,7 +7,7 @@
 
     "waveRider": {
       "name": "Wave Rider 🌊",
-      "summary": "Catch consecutive letters in a single wave",
+      "summary": "Catch {{goal}} letters in a single wave.",
       "tiers": {
         "1": "Ride the Wave",
         "2": "Wave Master",
@@ -16,7 +16,7 @@
     },
     "centuryClub": {
       "name": "Century Club",
-      "summary": "Complete milestone numbers of sessions",
+      "summary": "Complete {{goal}} total sessions.",
       "tiers": {
         "1": "Half Century",
         "2": "Full Century",
@@ -25,7 +25,7 @@
     },
     "levelingLegend": {
       "name": "Leveling Legend",
-      "summary": "Reach high levels in a single session",
+      "summary": "Reach level {{goal}} in a single session.",
       "tiers": {
         "1": "Level 10",
         "2": "Level 15",
@@ -34,7 +34,7 @@
     },
     "flameKeeper": {
       "name": "Flame Keeper 🔥",
-      "summary": "Build impressive catch streaks",
+      "summary": "Build a {{goal}}-catch streak without mistakes.",
       "tiers": {
         "1": "Spark",
         "2": "Bonfire",
@@ -43,7 +43,7 @@
     },
     "pointHunter": {
       "name": "Point Hunter",
-      "summary": "Score high points in a single session",
+      "summary": "Score {{goal}} points in a single session.",
       "tiers": {
         "1": "500 Points",
         "2": "1000 Points",
@@ -52,7 +52,7 @@
     },
     "grandMaster": {
       "name": "Grand Master",
-      "summary": "Total correct catches across all sessions",
+      "summary": "Catch {{goal}} correct letters total.",
       "tiers": {
         "1": "1000 Catches",
         "2": "5000 Catches",
@@ -61,7 +61,7 @@
     },
     "risingStar": {
       "name": "Rising Star",
-      "summary": "Level up multiple times in one session",
+      "summary": "Level up {{goal}} times in one session.",
       "tiers": {
         "1": "3 Level-Ups",
         "2": "7 Level-Ups",
@@ -70,7 +70,7 @@
     },
     "flowState": {
       "name": "Flow State",
-      "summary": "Catch many letters without any mistakes",
+      "summary": "Catch {{goal}} letters perfectly in a row.",
       "tiers": {
         "1": "15 Perfect",
         "2": "30 Perfect",
@@ -79,7 +79,7 @@
     },
     "unstoppable": {
       "name": "Unstoppable",
-      "summary": "Complete sessions without quitting",
+      "summary": "Complete {{goal}} full sessions.",
       "tiers": {
         "1": "10 Sessions",
         "2": "25 Sessions",
@@ -88,7 +88,7 @@
     },
     "starCollector": {
       "name": "Star Collector ⭐",
-      "summary": "Earn total stars milestone",
+      "summary": "Earn {{goal}} total stars.",
       "tiers": {
         "1": "500 Stars",
         "2": "1500 Stars",
@@ -100,7 +100,7 @@
 
     "slowSteady": {
       "name": "Slow & Steady",
-      "summary": "Perfect accuracy in slow river mode",
+      "summary": "Complete {{goal}} perfect sessions in slow river mode.",
       "tiers": {
         "1": "First Zen",
         "2": "Zen Master",
@@ -109,7 +109,7 @@
     },
     "clickChampion": {
       "name": "Click Champion",
-      "summary": "Win sessions with click mode enabled",
+      "summary": "Win {{goal}} sessions with click mode enabled.",
       "tiers": {
         "1": "Click Novice",
         "2": "Click Expert",
@@ -118,7 +118,7 @@
     },
     "fontChameleon": {
       "name": "Font Chameleon",
-      "summary": "Play with font shuffle enabled",
+      "summary": "Play {{goal}} sessions with font shuffle enabled.",
       "tiers": {
         "1": "Font Explorer",
         "2": "Font Adapter",
@@ -127,7 +127,7 @@
     },
     "clutchWinner": {
       "name": "Clutch Winner",
-      "summary": "Win with only 1 life remaining",
+      "summary": "Win {{goal}} sessions with only 1 life remaining.",
       "tiers": {
         "1": "Lucky Save",
         "2": "Clutch Player",
@@ -136,7 +136,7 @@
     },
     "associationExpert": {
       "name": "Association Expert",
-      "summary": "Use association mode (image learning)",
+      "summary": "Play {{goal}} sessions with association mode.",
       "tiers": {
         "1": "Visual Learner",
         "2": "Image Master",
@@ -145,7 +145,7 @@
     },
     "accessibilityAlly": {
       "name": "Accessibility Ally",
-      "summary": "Play with accessibility features enabled",
+      "summary": "Play {{goal}} sessions with accessibility features.",
       "tiers": {
         "1": "Inclusive Player",
         "2": "Accessibility Advocate",
@@ -154,7 +154,7 @@
     },
     "noIntroductions": {
       "name": "No Introductions",
-      "summary": "Play without letter introductions",
+      "summary": "Play {{goal}} sessions without letter introductions.",
       "tiers": {
         "1": "Skip Intro",
         "2": "No Hand-Holding",
@@ -163,7 +163,7 @@
     },
     "oneShotWonder": {
       "name": "One-Shot Wonder",
-      "summary": "Get first attempt correct for many letters",
+      "summary": "Get {{goal}} letters correct on first attempt.",
       "tiers": {
         "1": "Quick Study",
         "2": "First Impression",
@@ -172,7 +172,7 @@
     },
     "randomMaster": {
       "name": "Random Master",
-      "summary": "Play with random letters enabled",
+      "summary": "Play {{goal}} sessions with random letters enabled.",
       "tiers": {
         "1": "Embrace Chaos",
         "2": "Random Pro",
@@ -181,7 +181,7 @@
     },
     "comebackChampion": {
       "name": "Comeback Champion",
-      "summary": "Win after losing 2 lives",
+      "summary": "Win {{goal}} sessions after losing 2 lives.",
       "tiers": {
         "1": "Second Chance",
         "2": "Close Call",
@@ -193,7 +193,7 @@
 
     "polyglotPioneer": {
       "name": "Polyglot Pioneer",
-      "summary": "Try different language packs",
+      "summary": "Try {{goal}} different language packs.",
       "tiers": {
         "1": "3 Languages",
         "2": "6 Languages",
@@ -202,7 +202,7 @@
     },
     "unicodeChampion": {
       "name": "Unicode Champion",
-      "summary": "Master different writing systems",
+      "summary": "Practice {{goal}} different writing systems.",
       "tiers": {
         "1": "3 Scripts",
         "2": "5 Scripts",
@@ -211,7 +211,7 @@
     },
     "rtlExpert": {
       "name": "RTL Expert",
-      "summary": "Master right-to-left languages",
+      "summary": "Complete {{goal}} sessions in right-to-left languages.",
       "tiers": {
         "1": "RTL Beginner",
         "2": "RTL Proficient",
@@ -220,7 +220,7 @@
     },
     "vowelVirtuoso": {
       "name": "Vowel Virtuoso",
-      "summary": "Master niqqud/vowel mode",
+      "summary": "Play {{goal}} sessions in niqqud/vowel mode.",
       "tiers": {
         "1": "Vowel Student",
         "2": "Vowel Scholar",
@@ -229,7 +229,7 @@
     },
     "finalFormMaster": {
       "name": "Final Form Master",
-      "summary": "Perfect all final letter forms",
+      "summary": "Play {{goal}} sessions in final forms mode.",
       "tiers": {
         "1": "Final Forms Novice",
         "2": "Final Forms Expert",
@@ -238,7 +238,7 @@
     },
     "modeMixer": {
       "name": "Mode Mixer",
-      "summary": "Play multiple modes simultaneously",
+      "summary": "Play {{goal}} sessions with multiple modes simultaneously.",
       "tiers": {
         "1": "Mix It Up",
         "2": "Mode Juggler",
@@ -247,7 +247,7 @@
     },
     "culturalAmbassador": {
       "name": "Cultural Ambassador",
-      "summary": "Try all available languages",
+      "summary": "Try {{goal}} different languages.",
       "tiers": {
         "1": "World Traveler",
         "2": "Global Citizen",
@@ -256,7 +256,7 @@
     },
     "scriptScholar": {
       "name": "Script Scholar",
-      "summary": "Achieve 90%+ accuracy in 3+ different scripts",
+      "summary": "Achieve 90%+ accuracy in {{goal}} different scripts.",
       "tiers": {
         "1": "3 Scripts",
         "2": "5 Scripts",
@@ -265,7 +265,7 @@
     },
     "alphabetAce": {
       "name": "Alphabet Ace",
-      "summary": "Master basic consonants in multiple languages",
+      "summary": "Master basic mode in {{goal}} different languages.",
       "tiers": {
         "1": "2 Alphabets",
         "2": "4 Alphabets",
@@ -274,7 +274,7 @@
     },
     "languageSampler": {
       "name": "Language Sampler",
-      "summary": "Try new languages frequently",
+      "summary": "Try a new language {{goal}} times.",
       "tiers": {
         "1": "Curious Explorer",
         "2": "Language Taster",
@@ -286,7 +286,7 @@
 
     "morningGlory": {
       "name": "Morning Glory",
-      "summary": "Play very early (5-8am)",
+      "summary": "Play {{goal}} sessions early morning (5am-8am).",
       "tiers": {
         "1": "Early Riser",
         "2": "Morning Person",
@@ -295,7 +295,7 @@
     },
     "lunchLearner": {
       "name": "Lunch Learner",
-      "summary": "Play during lunch hours (11am-2pm)",
+      "summary": "Play {{goal}} sessions during lunch (11am-2pm).",
       "tiers": {
         "1": "Lunch Break",
         "2": "Midday Master",
@@ -304,7 +304,7 @@
     },
     "midnightScholar": {
       "name": "Midnight Scholar",
-      "summary": "Play after midnight (12am-3am)",
+      "summary": "Play {{goal}} sessions after midnight (12am-3am).",
       "tiers": {
         "1": "Night Shift",
         "2": "Midnight Oil",
@@ -313,7 +313,7 @@
     },
     "primeTimePlayer": {
       "name": "Prime Time Player",
-      "summary": "Play during evening (6-9pm)",
+      "summary": "Play {{goal}} sessions in the evening (6pm-9pm).",
       "tiers": {
         "1": "Evening Starter",
         "2": "Prime Timer",
@@ -322,7 +322,7 @@
     },
     "perfectWeek": {
       "name": "Perfect Week",
-      "summary": "Play every day for a week straight",
+      "summary": "Play every day for 7 days straight ({{goal}} times).",
       "tiers": {
         "1": "First Week",
         "2": "3 Perfect Weeks",
@@ -331,7 +331,7 @@
     },
     "monthlyMaven": {
       "name": "Monthly Maven",
-      "summary": "Play 20+ days in a calendar month",
+      "summary": "Play 20+ days in a month ({{goal}} months).",
       "tiers": {
         "1": "1 Active Month",
         "2": "3 Active Months",
@@ -340,7 +340,7 @@
     },
     "anniversaryAce": {
       "name": "Anniversary Ace",
-      "summary": "Play on account anniversary milestones",
+      "summary": "Play on your {{goal}}-year account anniversary.",
       "tiers": {
         "1": "1 Year",
         "2": "2 Years",
@@ -349,7 +349,7 @@
     },
     "seasonVeteran": {
       "name": "Season Veteran",
-      "summary": "Play in all 4 seasons of the year",
+      "summary": "Play in all {{goal}} seasons of the year.",
       "tiers": {
         "1": "All Seasons (1 Year)",
         "2": "All Seasons (2 Years)",
@@ -358,7 +358,7 @@
     },
     "dawnPatrol": {
       "name": "Dawn Patrol",
-      "summary": "Play at sunrise hours (5-7am)",
+      "summary": "Play {{goal}} sessions at sunrise (5am-7am).",
       "tiers": {
         "1": "First Light",
         "2": "Dawn Regular",
@@ -367,7 +367,7 @@
     },
     "consistencyKing": {
       "name": "Consistency King",
-      "summary": "Maintain long daily streaks",
+      "summary": "Play {{goal}} days in a row.",
       "tiers": {
         "1": "14 Day Streak",
         "2": "30 Day Streak",
@@ -382,63 +382,63 @@
 
       "waveChallenge": {
         "title": "Wave Challenge 🌊",
-        "description": "Catch 8 or more letters in a single wave"
+        "description": "Ride the wave! Catch 8 letters in a single flow without breaking."
       },
       "flameBuilder": {
         "title": "Flame Builder 🔥",
-        "description": "Build a 15-catch streak without mistakes"
+        "description": "Keep the flame burning with a 15-catch perfect streak."
       },
       "slowRiverZen": {
         "title": "Slow River Zen",
-        "description": "Complete a perfect session in slow river mode"
+        "description": "Find your zen in slow river mode with perfect accuracy."
       },
       "clickMaster": {
         "title": "Click Master",
-        "description": "Win a session using click mode"
+        "description": "Win a session using click mode precision."
       },
       "levelClimber": {
         "title": "Level Climber",
-        "description": "Reach level 12 or higher in a session"
+        "description": "Reach the heights of level 12 or beyond in one run."
       },
       "noLivesLost": {
         "title": "No Lives Lost",
-        "description": "Win a session without losing any lives"
+        "description": "Navigate the river perfectly without losing a single life."
       },
       "associationPractice": {
         "title": "Association Practice",
-        "description": "Play with association mode (image learning)"
+        "description": "Learn through images with association mode active."
       },
       "multiModeMaster": {
         "title": "Multi-Mode Master",
-        "description": "Play with 2 or more modes simultaneously"
+        "description": "Challenge yourself by mixing two or more modes together."
       },
       "fontFlexibility": {
         "title": "Font Flexibility",
-        "description": "Complete a session with font shuffle enabled"
+        "description": "Adapt to changing styles with font shuffle enabled."
       },
       "randomChallenge": {
         "title": "Random Challenge",
-        "description": "Play with random letter order enabled"
+        "description": "Embrace the unexpected with random letter order."
       },
       "vowelFocus": {
         "title": "Vowel Focus",
-        "description": "Practice niqqud/vowel mode"
+        "description": "Master the vowels in niqqud mode today."
       },
       "finalFormsPractice": {
         "title": "Final Forms Practice",
-        "description": "Practice final letter forms mode"
+        "description": "Perfect the sofit letters in final forms mode."
       },
       "languageExplorer": {
         "title": "Language Explorer",
-        "description": "Try a different language today"
+        "description": "Venture into a new language today."
       },
       "pointSurge": {
         "title": "Point Surge",
-        "description": "Score 400 or more points in a session"
+        "description": "Chase the high score and reach 400 points or more."
       },
       "doubleSession": {
         "title": "Double Session",
-        "description": "Complete 2 full sessions today"
+        "description": "Double down with two complete sessions today."
       }
     }
   },
