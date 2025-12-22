@@ -1,0 +1,447 @@
+{
+  "comment": "ADD THESE TRANSLATION KEYS TO ALL LANGUAGE FILES (en.json, he.json, arabic.json, etc.)",
+  "note": "40 new achievements + 15 new daily quests = 230 translation keys total",
+
+  "badges": {
+    "_comment_classic": "=== CLASSIC SECTION - 10 NEW RESERVE ACHIEVEMENTS ===",
+
+    "waveRider": {
+      "name": "Wave Rider 🌊",
+      "summary": "Catch {{goal}} letters in a single wave.",
+      "tiers": {
+        "1": "Ride the Wave",
+        "2": "Wave Master",
+        "3": "Tsunami"
+      }
+    },
+    "centuryClub": {
+      "name": "Century Club",
+      "summary": "Complete {{goal}} total sessions.",
+      "tiers": {
+        "1": "Quarter Century",
+        "2": "Half Century",
+        "3": "Full Century"
+      }
+    },
+    "levelingLegend": {
+      "name": "Leveling Legend",
+      "summary": "Reach level {{goal}} in a single session.",
+      "tiers": {
+        "1": "Level 10",
+        "2": "Level 15",
+        "3": "Level 20"
+      }
+    },
+    "flameKeeper": {
+      "name": "Flame Keeper 🔥",
+      "summary": "Build a {{goal}}-catch streak without mistakes.",
+      "tiers": {
+        "1": "Spark",
+        "2": "Bonfire",
+        "3": "Inferno"
+      }
+    },
+    "pointHunter": {
+      "name": "Point Hunter",
+      "summary": "Score {{goal}} points in a single session.",
+      "tiers": {
+        "1": "500 Points",
+        "2": "1000 Points",
+        "3": "2000 Points"
+      }
+    },
+    "grandMaster": {
+      "name": "Grand Master",
+      "summary": "Catch {{goal}} correct letters total.",
+      "tiers": {
+        "1": "50 Catches",
+        "2": "100 Catches",
+        "3": "200 Catches"
+      }
+    },
+    "risingStar": {
+      "name": "Rising Star",
+      "summary": "Level up {{goal}} times in one session.",
+      "tiers": {
+        "1": "3 Level-Ups",
+        "2": "7 Level-Ups",
+        "3": "12 Level-Ups"
+      }
+    },
+    "flowState": {
+      "name": "Flow State",
+      "summary": "Catch {{goal}} letters perfectly in a row.",
+      "tiers": {
+        "1": "15 Perfect",
+        "2": "30 Perfect",
+        "3": "50 Perfect"
+      }
+    },
+    "unstoppable": {
+      "name": "Unstoppable",
+      "summary": "Complete {{goal}} full sessions.",
+      "tiers": {
+        "1": "5 Sessions",
+        "2": "15 Sessions",
+        "3": "30 Sessions"
+      }
+    },
+    "starCollector": {
+      "name": "Star Collector ⭐",
+      "summary": "Earn {{goal}} total stars.",
+      "tiers": {
+        "1": "100 Stars",
+        "2": "300 Stars",
+        "3": "750 Stars"
+      }
+    },
+
+    "_comment_special": "=== SPECIAL SECTION - 10 NEW RESERVE ACHIEVEMENTS ===",
+
+    "slowSteady": {
+      "name": "Slow & Steady",
+      "summary": "Complete {{goal}} perfect sessions in slow river mode.",
+      "tiers": {
+        "1": "First Zen",
+        "2": "Zen Master",
+        "3": "Zen Legend"
+      }
+    },
+    "clickChampion": {
+      "name": "Click Champion",
+      "summary": "Win {{goal}} sessions with click mode enabled.",
+      "tiers": {
+        "1": "Click Novice",
+        "2": "Click Expert",
+        "3": "Click Master"
+      }
+    },
+    "fontChameleon": {
+      "name": "Font Chameleon",
+      "summary": "Play {{goal}} sessions with font shuffle enabled.",
+      "tiers": {
+        "1": "Font Explorer",
+        "2": "Font Adapter",
+        "3": "Font Shapeshifter"
+      }
+    },
+    "clutchWinner": {
+      "name": "Clutch Winner",
+      "summary": "Win {{goal}} sessions with only 1 life remaining.",
+      "tiers": {
+        "1": "Lucky Save",
+        "2": "Clutch Player",
+        "3": "Miracle Worker"
+      }
+    },
+    "associationExpert": {
+      "name": "Association Expert",
+      "summary": "Play {{goal}} sessions with association mode.",
+      "tiers": {
+        "1": "Visual Learner",
+        "2": "Image Master",
+        "3": "Association Ace"
+      }
+    },
+    "accessibilityAlly": {
+      "name": "Accessibility Ally",
+      "summary": "Play {{goal}} sessions with accessibility features.",
+      "tiers": {
+        "1": "Inclusive Player",
+        "2": "Accessibility Advocate",
+        "3": "Universal Design Champion"
+      }
+    },
+    "noIntroductions": {
+      "name": "No Introductions",
+      "summary": "Play {{goal}} sessions without letter introductions.",
+      "tiers": {
+        "1": "Skip Intro",
+        "2": "No Hand-Holding",
+        "3": "Already Knows"
+      }
+    },
+    "oneShotWonder": {
+      "name": "One-Shot Wonder",
+      "summary": "Get {{goal}} letters correct on first attempt.",
+      "tiers": {
+        "1": "Quick Study",
+        "2": "First Impression",
+        "3": "Instant Recall"
+      }
+    },
+    "randomMaster": {
+      "name": "Random Master",
+      "summary": "Play {{goal}} sessions with random letters enabled.",
+      "tiers": {
+        "1": "Embrace Chaos",
+        "2": "Random Pro",
+        "3": "Chaos Champion"
+      }
+    },
+    "comebackChampion": {
+      "name": "Comeback Champion",
+      "summary": "Win {{goal}} sessions after losing 2 lives.",
+      "tiers": {
+        "1": "Second Chance",
+        "2": "Close Call",
+        "3": "Phoenix Rising"
+      }
+    },
+
+    "_comment_polyglot": "=== POLYGLOT SECTION - 10 NEW RESERVE ACHIEVEMENTS ===",
+
+    "polyglotPioneer": {
+      "name": "Polyglot Pioneer",
+      "summary": "Try {{goal}} different language packs.",
+      "tiers": {
+        "1": "3 Languages",
+        "2": "6 Languages",
+        "3": "10 Languages"
+      }
+    },
+    "unicodeChampion": {
+      "name": "Unicode Champion",
+      "summary": "Practice {{goal}} different writing systems.",
+      "tiers": {
+        "1": "3 Scripts",
+        "2": "5 Scripts",
+        "3": "8 Scripts"
+      }
+    },
+    "rtlExpert": {
+      "name": "RTL Expert",
+      "summary": "Complete {{goal}} sessions in right-to-left languages.",
+      "tiers": {
+        "1": "RTL Beginner",
+        "2": "RTL Proficient",
+        "3": "RTL Master"
+      }
+    },
+    "vowelVirtuoso": {
+      "name": "Advanced Learner",
+      "summary": "Complete {{goal}} sessions in advanced practice mode.",
+      "tiers": {
+        "1": "Advanced Student",
+        "2": "Advanced Scholar",
+        "3": "Advanced Master"
+      }
+    },
+    "finalFormMaster": {
+      "name": "Special Forms Expert",
+      "summary": "Complete {{goal}} sessions in special characters mode.",
+      "tiers": {
+        "1": "Special Forms Novice",
+        "2": "Special Forms Expert",
+        "3": "Special Forms Champion"
+      }
+    },
+    "modeMixer": {
+      "name": "Mode Mixer",
+      "summary": "Play {{goal}} sessions with multiple modes simultaneously.",
+      "tiers": {
+        "1": "Mix It Up",
+        "2": "Mode Juggler",
+        "3": "Ultimate Mixer"
+      }
+    },
+    "culturalAmbassador": {
+      "name": "Cultural Ambassador",
+      "summary": "Try {{goal}} different languages.",
+      "tiers": {
+        "1": "3 Languages",
+        "2": "6 Languages",
+        "3": "10 Languages"
+      }
+    },
+    "scriptScholar": {
+      "name": "Script Scholar",
+      "summary": "Achieve 90%+ accuracy in {{goal}} different scripts.",
+      "tiers": {
+        "1": "3 Scripts",
+        "2": "5 Scripts",
+        "3": "7 Scripts"
+      }
+    },
+    "alphabetAce": {
+      "name": "Alphabet Ace",
+      "summary": "Master basic mode in {{goal}} different languages.",
+      "tiers": {
+        "1": "2 Alphabets",
+        "2": "4 Alphabets",
+        "3": "6 Alphabets"
+      }
+    },
+    "languageSampler": {
+      "name": "Language Sampler",
+      "summary": "Try a new language {{goal}} times.",
+      "tiers": {
+        "1": "Curious Explorer",
+        "2": "Language Taster",
+        "3": "World Linguist"
+      }
+    },
+
+    "_comment_dedication": "=== DEDICATION SECTION - 10 NEW RESERVE ACHIEVEMENTS ===",
+
+    "morningGlory": {
+      "name": "Morning Glory",
+      "summary": "Play {{goal}} sessions early morning (5am-8am).",
+      "tiers": {
+        "1": "Early Riser",
+        "2": "Morning Person",
+        "3": "Dawn Warrior"
+      }
+    },
+    "lunchLearner": {
+      "name": "Lunch Learner",
+      "summary": "Play {{goal}} sessions during lunch (11am-2pm).",
+      "tiers": {
+        "1": "Lunch Break",
+        "2": "Midday Master",
+        "3": "Lunch Legend"
+      }
+    },
+    "midnightScholar": {
+      "name": "Midnight Scholar",
+      "summary": "Play {{goal}} sessions after midnight (12am-3am).",
+      "tiers": {
+        "1": "Night Shift",
+        "2": "Midnight Oil",
+        "3": "Insomniac Legend"
+      }
+    },
+    "primeTimePlayer": {
+      "name": "Prime Time Player",
+      "summary": "Play {{goal}} sessions in the evening (6pm-9pm).",
+      "tiers": {
+        "1": "Evening Starter",
+        "2": "Prime Timer",
+        "3": "Evening Legend"
+      }
+    },
+    "perfectWeek": {
+      "name": "Perfect Week",
+      "summary": "Play every day for 7 days straight ({{goal}} times).",
+      "tiers": {
+        "1": "First Week",
+        "2": "3 Perfect Weeks",
+        "3": "8 Perfect Weeks"
+      }
+    },
+    "monthlyMaven": {
+      "name": "Monthly Maven",
+      "summary": "Play 20+ days in a month ({{goal}} months).",
+      "tiers": {
+        "1": "1 Active Month",
+        "2": "3 Active Months",
+        "3": "6 Active Months"
+      }
+    },
+    "anniversaryAce": {
+      "name": "Anniversary Ace",
+      "summary": "Play on your {{goal}}-year account anniversary.",
+      "tiers": {
+        "1": "1 Year",
+        "2": "2 Years",
+        "3": "3 Years"
+      }
+    },
+    "seasonVeteran": {
+      "name": "Season Veteran",
+      "summary": "Play in all {{goal}} seasons of the year.",
+      "tiers": {
+        "1": "All Seasons (1 Year)",
+        "2": "All Seasons (2 Years)",
+        "3": "All Seasons (3 Years)"
+      }
+    },
+    "dawnPatrol": {
+      "name": "Dawn Patrol",
+      "summary": "Play {{goal}} sessions at sunrise (5am-7am).",
+      "tiers": {
+        "1": "First Light",
+        "2": "Dawn Regular",
+        "3": "Sunrise Champion"
+      }
+    },
+    "consistencyKing": {
+      "name": "Consistency King",
+      "summary": "Play {{goal}} days in a row.",
+      "tiers": {
+        "1": "14 Day Streak",
+        "2": "30 Day Streak",
+        "3": "60 Day Streak"
+      }
+    }
+  },
+
+  "daily": {
+    "tasks": {
+      "_comment": "=== 15 NEW DAILY QUEST TEMPLATES ===",
+
+      "waveChallenge": {
+        "title": "Wave Challenge 🌊",
+        "description": "Catch 8 letters in a single wave."
+      },
+      "flameBuilder": {
+        "title": "Flame Builder 🔥",
+        "description": "Build a 15-catch perfect streak."
+      },
+      "slowRiverZen": {
+        "title": "Slow River Zen",
+        "description": "Complete a session in slow river mode with perfect accuracy."
+      },
+      "clickMaster": {
+        "title": "Click Master",
+        "description": "Win a session with click mode enabled."
+      },
+      "levelClimber": {
+        "title": "Level Climber",
+        "description": "Reach level 12 or higher in one session."
+      },
+      "noLivesLost": {
+        "title": "No Lives Lost",
+        "description": "Complete a session without losing a life."
+      },
+      "associationPractice": {
+        "title": "Association Practice",
+        "description": "Complete a session with association mode enabled."
+      },
+      "multiModeMaster": {
+        "title": "Multi-Mode Master",
+        "description": "Complete a session with two or more modes enabled."
+      },
+      "fontFlexibility": {
+        "title": "Font Flexibility",
+        "description": "Complete a session with font shuffle enabled."
+      },
+      "randomChallenge": {
+        "title": "Random Challenge",
+        "description": "Complete a session with random letters enabled."
+      },
+      "vowelFocus": {
+        "title": "Advanced Practice",
+        "description": "Complete a session in advanced practice mode."
+      },
+      "finalFormsPractice": {
+        "title": "Special Characters",
+        "description": "Complete a session in special characters mode."
+      },
+      "languageExplorer": {
+        "title": "Language Explorer",
+        "description": "Try a new language today."
+      },
+      "pointSurge": {
+        "title": "Point Surge",
+        "description": "Score 400 points or more in one session."
+      },
+      "doubleSession": {
+        "title": "Double Session",
+        "description": "Complete two sessions today."
+      }
+    }
+  },
+
+  "_implementation_note": "IMPORTANT: These translation keys need to be added to ALL language files:\n  - src/i18n/en.json (English)\n  - src/i18n/he.json (Hebrew)\n  - src/i18n/arabic.json (Arabic)\n  - src/i18n/mandarin.json (Chinese)\n  - src/i18n/hindi.json (Hindi)\n  - src/i18n/spanish.json (Spanish)\n  - src/i18n/french.json (French)\n  - src/i18n/bengali.json (Bengali)\n  - src/i18n/portuguese.json (Portuguese)\n  - src/i18n/russian.json (Russian)\n  - src/i18n/japanese.json (Japanese)\n  - src/i18n/amharic.json (Amharic)\n\nFor non-English files, professional translation is recommended.\nThe English version above can be used as the source for translation."
+}

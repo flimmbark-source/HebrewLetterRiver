@@ -68,5 +68,110 @@
     "descriptionKey": "daily.tasks.tripleThread.description",
     "goal": 3,
     "type": "sessions"
+  },
+  {
+    "id": "wave-challenge",
+    "titleKey": "daily.tasks.waveChallenge.title",
+    "descriptionKey": "daily.tasks.waveChallenge.description",
+    "goal": 8,
+    "type": "waveStreak"
+  },
+  {
+    "id": "flame-builder",
+    "titleKey": "daily.tasks.flameBuilder.title",
+    "descriptionKey": "daily.tasks.flameBuilder.description",
+    "goal": 15,
+    "type": "catchStreak"
+  },
+  {
+    "id": "slow-river-zen",
+    "titleKey": "daily.tasks.slowRiverZen.title",
+    "descriptionKey": "daily.tasks.slowRiverZen.description",
+    "goal": 1,
+    "type": "slowRiverPerfect"
+  },
+  {
+    "id": "click-master",
+    "titleKey": "daily.tasks.clickMaster.title",
+    "descriptionKey": "daily.tasks.clickMaster.description",
+    "goal": 1,
+    "type": "clickModeWin"
+  },
+  {
+    "id": "level-climber",
+    "titleKey": "daily.tasks.levelClimber.title",
+    "descriptionKey": "daily.tasks.levelClimber.description",
+    "goal": 12,
+    "type": "reachLevel"
+  },
+  {
+    "id": "no-lives-lost",
+    "titleKey": "daily.tasks.noLivesLost.title",
+    "descriptionKey": "daily.tasks.noLivesLost.description",
+    "goal": 1,
+    "type": "fullLivesWin"
+  },
+  {
+    "id": "association-practice",
+    "titleKey": "daily.tasks.associationPractice.title",
+    "descriptionKey": "daily.tasks.associationPractice.description",
+    "goal": 1,
+    "type": "associationMode"
+  },
+  {
+    "id": "multi-mode-master",
+    "titleKey": "daily.tasks.multiModeMaster.title",
+    "descriptionKey": "daily.tasks.multiModeMaster.description",
+    "goal": 1,
+    "type": "mixedModes"
+  },
+  {
+    "id": "font-flexibility",
+    "titleKey": "daily.tasks.fontFlexibility.title",
+    "descriptionKey": "daily.tasks.fontFlexibility.description",
+    "goal": 1,
+    "type": "fontShuffle"
+  },
+  {
+    "id": "random-challenge",
+    "titleKey": "daily.tasks.randomChallenge.title",
+    "descriptionKey": "daily.tasks.randomChallenge.description",
+    "goal": 1,
+    "type": "randomLetters"
+  },
+  {
+    "id": "vowel-focus",
+    "titleKey": "daily.tasks.vowelFocus.title",
+    "descriptionKey": "daily.tasks.vowelFocus.description",
+    "goal": 1,
+    "type": "vowelMode"
+  },
+  {
+    "id": "final-forms-practice",
+    "titleKey": "daily.tasks.finalFormsPractice.title",
+    "descriptionKey": "daily.tasks.finalFormsPractice.description",
+    "goal": 1,
+    "type": "finalFormsMode"
+  },
+  {
+    "id": "language-explorer",
+    "titleKey": "daily.tasks.languageExplorer.title",
+    "descriptionKey": "daily.tasks.languageExplorer.description",
+    "goal": 1,
+    "type": "newLanguage"
+  },
+  {
+    "id": "point-surge",
+    "titleKey": "daily.tasks.pointSurge.title",
+    "descriptionKey": "daily.tasks.pointSurge.description",
+    "goal": 400,
+    "type": "scorePoints"
+  },
+  {
+    "id": "double-session",
+    "titleKey": "daily.tasks.doubleSession.title",
+    "descriptionKey": "daily.tasks.doubleSession.description",
+    "goal": 2,
+    "type": "completeSessions"
   }
 ]

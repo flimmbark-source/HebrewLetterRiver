@@ -1,0 +1,127 @@
+[
+  {
+    "comment": "15 NEW daily quest templates to expand the pool",
+    "quests": [
+      {
+        "id": "wave-challenge",
+        "titleKey": "daily.tasks.waveChallenge.title",
+        "descriptionKey": "daily.tasks.waveChallenge.description",
+        "goal": 8,
+        "type": "waveStreak",
+        "comment": "Catch 8+ letters in a single wave 🌊"
+      },
+      {
+        "id": "flame-builder",
+        "titleKey": "daily.tasks.flameBuilder.title",
+        "descriptionKey": "daily.tasks.flameBuilder.description",
+        "goal": 15,
+        "type": "catchStreak",
+        "comment": "Build a 15-catch streak 🔥"
+      },
+      {
+        "id": "slow-river-zen",
+        "titleKey": "daily.tasks.slowRiverZen.title",
+        "descriptionKey": "daily.tasks.slowRiverZen.description",
+        "goal": 1,
+        "type": "slowRiverPerfect",
+        "comment": "Perfect session in slow river mode"
+      },
+      {
+        "id": "click-master",
+        "titleKey": "daily.tasks.clickMaster.title",
+        "descriptionKey": "daily.tasks.clickMaster.description",
+        "goal": 1,
+        "type": "clickModeWin",
+        "comment": "Win a session with click mode"
+      },
+      {
+        "id": "level-climber",
+        "titleKey": "daily.tasks.levelClimber.title",
+        "descriptionKey": "daily.tasks.levelClimber.description",
+        "goal": 12,
+        "type": "reachLevel",
+        "comment": "Reach level 12 or higher"
+      },
+      {
+        "id": "no-lives-lost",
+        "titleKey": "daily.tasks.noLivesLost.title",
+        "descriptionKey": "daily.tasks.noLivesLost.description",
+        "goal": 1,
+        "type": "fullLivesWin",
+        "comment": "Win without losing any lives"
+      },
+      {
+        "id": "association-practice",
+        "titleKey": "daily.tasks.associationPractice.title",
+        "descriptionKey": "daily.tasks.associationPractice.description",
+        "goal": 1,
+        "type": "associationMode",
+        "comment": "Play with association mode (images)"
+      },
+      {
+        "id": "multi-mode-master",
+        "titleKey": "daily.tasks.multiModeMaster.title",
+        "descriptionKey": "daily.tasks.multiModeMaster.description",
+        "goal": 1,
+        "type": "mixedModes",
+        "comment": "Play with 2+ modes simultaneously"
+      },
+      {
+        "id": "font-flexibility",
+        "titleKey": "daily.tasks.fontFlexibility.title",
+        "descriptionKey": "daily.tasks.fontFlexibility.description",
+        "goal": 1,
+        "type": "fontShuffle",
+        "comment": "Complete session with font shuffle"
+      },
+      {
+        "id": "random-challenge",
+        "titleKey": "daily.tasks.randomChallenge.title",
+        "descriptionKey": "daily.tasks.randomChallenge.description",
+        "goal": 1,
+        "type": "randomLetters",
+        "comment": "Play with random letter order"
+      },
+      {
+        "id": "vowel-focus",
+        "titleKey": "daily.tasks.vowelFocus.title",
+        "descriptionKey": "daily.tasks.vowelFocus.description",
+        "goal": 1,
+        "type": "vowelMode",
+        "comment": "Practice niqqud/vowel mode"
+      },
+      {
+        "id": "final-forms-practice",
+        "titleKey": "daily.tasks.finalFormsPractice.title",
+        "descriptionKey": "daily.tasks.finalFormsPractice.description",
+        "goal": 1,
+        "type": "finalFormsMode",
+        "comment": "Practice final letter forms"
+      },
+      {
+        "id": "language-explorer",
+        "titleKey": "daily.tasks.languageExplorer.title",
+        "descriptionKey": "daily.tasks.languageExplorer.description",
+        "goal": 1,
+        "type": "newLanguage",
+        "comment": "Try a different language"
+      },
+      {
+        "id": "point-surge",
+        "titleKey": "daily.tasks.pointSurge.title",
+        "descriptionKey": "daily.tasks.pointSurge.description",
+        "goal": 400,
+        "type": "scorePoints",
+        "comment": "Score 400+ points in a session"
+      },
+      {
+        "id": "double-session",
+        "titleKey": "daily.tasks.doubleSession.title",
+        "descriptionKey": "daily.tasks.doubleSession.description",
+        "goal": 2,
+        "type": "completeSessions",
+        "comment": "Complete 2 full sessions today"
+      }
+    ]
+  }
+]
