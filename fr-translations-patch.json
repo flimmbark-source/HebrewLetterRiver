@@ -1,0 +1,230 @@
+{
+  "home": {
+    "hero": {
+      "heading": "Choisissez votre aventure sur la rivière",
+      "description": "Commencez avec des lettres simples ou plongez dans des mots complets",
+      "modeSelectTitle": "Sélectionnez un mode",
+      "modes": {
+        "letters": {
+          "title": "Rivière des Lettres",
+          "description": "Attrapez les lettres flottantes et déposez-les dans les bons paniers"
+        }
+      }
+    },
+    "progress": {
+      "level": "Niveau {{level}}"
+    }
+  },
+  "game": {
+    "controls": {
+      "exitToMenu": "⬅"
+    },
+    "pause": {
+      "title": "Pause",
+      "message": "",
+      "resume": "Reprendre",
+      "mainMenu": "Menu Principal"
+    },
+    "setup": {
+      "goal": "Objectif",
+      "goalTooltip": "Battez ce niveau pour gagner le jeu !"
+    },
+    "accessibility": {
+      "randomLetters": "Envoyer des lettres aléatoires (Rivière des Lettres)"
+    },
+    "summary": {
+      "finalScore": "Score Final : {{score}}"
+    }
+  },
+  "achievementSections": {
+    "classic": "Classique",
+    "special": "Spécial",
+    "polyglot": "Polyglotte",
+    "dedication": "Dévouement"
+  },
+  "badges": {
+    "dedicatedScholar": {
+      "name": "Érudit Dévoué",
+      "summary": "Attrapez un nombre total d'éléments dans toutes les sessions",
+      "tiers": {
+        "1": "Débutant Studieux",
+        "2": "Lecteur Dévoué",
+        "3": "Maître Érudit"
+      }
+    },
+    "accuracyAce": {
+      "name": "As de la Précision",
+      "summary": "Terminez des sessions avec 90% ou plus de précision",
+      "tiers": {
+        "1": "Œil Aiguisé",
+        "2": "Concentration Précise",
+        "3": "Précision Parfaite"
+      }
+    },
+    "speedDemon": {
+      "name": "Démon de la Vitesse",
+      "summary": "Terminez des sessions avec une vitesse de flux rapide activée",
+      "tiers": {
+        "1": "Courant Rapide",
+        "2": "Coureur Rapide",
+        "3": "Flux Éclair"
+      }
+    },
+    "explorer": {
+      "name": "Explorateur",
+      "summary": "Essayez différents modes de jeu et défis",
+      "tiers": {
+        "1": "Vagabond Curieux",
+        "2": "Voyageur Courageux",
+        "3": "Pionnier Intrépide"
+      }
+    },
+    "perfectionist": {
+      "name": "Perfectionniste",
+      "summary": "Terminez des sessions sans erreur",
+      "tiers": {
+        "1": "Attrapeur Prudent",
+        "2": "Maître de la Précision",
+        "3": "Perfection Absolue"
+      }
+    },
+    "earlyBird": {
+      "name": "Lève-tôt",
+      "summary": "Jouez des sessions le matin (5h-11h)",
+      "tiers": {
+        "1": "Rameur de l'Aube",
+        "2": "Nageur du Lever du Soleil",
+        "3": "Maître du Matin"
+      }
+    },
+    "nightOwl": {
+      "name": "Oiseau de Nuit",
+      "summary": "Jouez des sessions le soir (20h-2h)",
+      "tiers": {
+        "1": "Voyageur du Crépuscule",
+        "2": "Navigateur au Clair de Lune",
+        "3": "Champion de Minuit"
+      }
+    },
+    "comebackKid": {
+      "name": "Le Retour",
+      "summary": "Revenez jouer après avoir cassé une série",
+      "tiers": {
+        "1": "Nouveau Départ",
+        "2": "Esprit Résilient",
+        "3": "Retour Inébranlable"
+      }
+    },
+    "marathonRunner": {
+      "name": "Marathonien",
+      "summary": "Jouez des sessions prolongées avec 30+ captures",
+      "tiers": {
+        "1": "Rameur Endurant",
+        "2": "Nageur de Distance",
+        "3": "Ultra Coureur"
+      }
+    },
+    "weekendWarrior": {
+      "name": "Guerrier du Week-end",
+      "summary": "Jouez des sessions le week-end (samedi ou dimanche)",
+      "tiers": {
+        "1": "Débutant du Samedi",
+        "2": "Habitué du Week-end",
+        "3": "Légende du Week-end"
+      }
+    },
+    "varietySeeker": {
+      "name": "Chercheur de Variété",
+      "summary": "Pratiquez de nombreuses lettres uniques différentes",
+      "tiers": {
+        "1": "Apprenant Diversifié",
+        "2": "Explorateur Large",
+        "3": "Maître Complet"
+      }
+    },
+    "rapidLearner": {
+      "name": "Apprenant Rapide",
+      "summary": "Améliorez la précision sur les lettres qui étaient faibles auparavant",
+      "tiers": {
+        "1": "Apprenant Véloce",
+        "2": "Progresseur Rapide",
+        "3": "Étudiant Éclair"
+      }
+    },
+    "streakMaster": {
+      "name": "Maître des Séries",
+      "summary": "Maintenez une série de jours consécutifs de jeu",
+      "tiers": {
+        "1": "Régularité 7 Jours",
+        "2": "Constance 30 Jours",
+        "3": "Champion 100 Jours"
+      }
+    },
+    "centurion": {
+      "name": "Centurion",
+      "summary": "Atteignez 100 sessions complétées",
+      "tiers": {
+        "1": "100 Sessions",
+        "2": "500 Sessions",
+        "3": "1000 Sessions"
+      }
+    },
+    "polyglot": {
+      "name": "Polyglotte",
+      "summary": "Pratiquez dans plusieurs langues",
+      "tiers": {
+        "1": "Explorateur Bilingue",
+        "2": "Pratiquant Trilingue",
+        "3": "Maître Multilingue"
+      }
+    },
+    "challengeSeeker": {
+      "name": "Chercheur de Défis",
+      "summary": "Terminez des niveaux de difficulté difficile",
+      "tiers": {
+        "1": "Courageux",
+        "2": "Challenger",
+        "3": "Conquérant"
+      }
+    },
+    "wordsmith": {
+      "name": "Maître des Mots",
+      "summary": "Maîtrisez le mode mots",
+      "tiers": {
+        "1": "Constructeur de Mots",
+        "2": "Artisan des Mots",
+        "3": "Maître des Mots"
+      }
+    }
+  },
+  "dailyQuests": {
+    "catch10Letters": {
+      "name": "Pratique Matinale",
+      "description": "Attrapez 10 lettres aujourd'hui"
+    },
+    "completeOneGame": {
+      "name": "Passionné Quotidien",
+      "description": "Terminez 1 session aujourd'hui"
+    },
+    "achieve90Accuracy": {
+      "name": "Tireur d'Élite",
+      "description": "Atteignez 90% de précision dans une session"
+    },
+    "playInMorning": {
+      "name": "Rituel Matinal",
+      "description": "Jouez une session le matin (5h-11h)"
+    },
+    "tryNewMode": {
+      "name": "Nouveauté",
+      "description": "Essayez un mode ou une langue différent"
+    },
+    "perfectRound": {
+      "name": "Perfection",
+      "description": "Terminez un niveau sans erreur"
+    },
+    "catch30Letters": {
+      "name": "Session Prolongée",
+      "description": "Attrapez 30 lettres dans une session"
+    }
+  }
+}

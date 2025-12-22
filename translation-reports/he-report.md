@@ -1,6 +1,6 @@
 # Translation Audit Report: Hebrew (he)
 
-**Generated:** 2025-12-22T13:46:53.661Z
+**Generated:** 2025-12-22T20:55:37.531Z
 
 ## Summary
 

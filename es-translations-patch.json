@@ -1,0 +1,249 @@
+{
+  "languageNames": {
+    "hindi": "Hindi"
+  },
+  "home": {
+    "hero": {
+      "heading": "Elige tu aventura en el río",
+      "description": "Comienza con letras individuales o sumérgete en palabras completas",
+      "modeSelectTitle": "Selecciona un modo",
+      "modes": {
+        "letters": {
+          "title": "Río de Letras",
+          "description": "Atrapa letras flotantes y colócalas en las canastas correctas"
+        }
+      }
+    },
+    "progress": {
+      "totalStars": "{{count}} ⭐ total",
+      "level": "Nivel {{level}}"
+    }
+  },
+  "game": {
+    "controls": {
+      "exitToMenu": "⬅"
+    },
+    "modes": {
+      "katakana": {
+        "label": "Katakana"
+      },
+      "romaji": {
+        "label": "Romaji"
+      },
+      "pinyin": {
+        "label": "Pinyin"
+      },
+      "radicals": {
+        "noun": "radical"
+      }
+    },
+    "pause": {
+      "title": "Pausado",
+      "message": "",
+      "resume": "Continuar",
+      "mainMenu": "Menú Principal"
+    },
+    "setup": {
+      "goal": "Objetivo",
+      "goalTooltip": "¡Vence este nivel para ganar el juego!"
+    },
+    "accessibility": {
+      "speedNormal": "Normal",
+      "randomLetters": "Enviar letras aleatorias (Río de Letras)"
+    },
+    "summary": {
+      "finalScore": "Puntuación Final: {{score}}"
+    }
+  },
+  "achievementSections": {
+    "classic": "Clásico",
+    "special": "Especial",
+    "polyglot": "Políglota",
+    "dedication": "Dedicación"
+  },
+  "badges": {
+    "dedicatedScholar": {
+      "name": "Estudiante Dedicado",
+      "summary": "Atrapa un número total de elementos en todas las sesiones",
+      "tiers": {
+        "1": "Principiante Estudioso",
+        "2": "Lector Devoto",
+        "3": "Maestro Erudito"
+      }
+    },
+    "accuracyAce": {
+      "name": "As de la Precisión",
+      "summary": "Completa sesiones con 90% o más de precisión",
+      "tiers": {
+        "1": "Ojo Agudo",
+        "2": "Enfoque Certero",
+        "3": "Precisión Impecable"
+      }
+    },
+    "speedDemon": {
+      "name": "Demonio de la Velocidad",
+      "summary": "Completa sesiones con velocidad de flujo rápido habilitada",
+      "tiers": {
+        "1": "Corriente Rápida",
+        "2": "Corredor Veloz",
+        "3": "Flujo Relámpago"
+      }
+    },
+    "explorer": {
+      "name": "Explorador",
+      "summary": "Prueba diferentes modos de juego y desafíos",
+      "tiers": {
+        "1": "Vagabundo Curioso",
+        "2": "Viajero Valiente",
+        "3": "Pionero Intrépido"
+      }
+    },
+    "perfectionist": {
+      "name": "Perfeccionista",
+      "summary": "Completa sesiones sin errores",
+      "tiers": {
+        "1": "Atrapador Cuidadoso",
+        "2": "Maestro de la Precisión",
+        "3": "Perfección Absoluta"
+      }
+    },
+    "earlyBird": {
+      "name": "Madrugador",
+      "summary": "Juega sesiones en las horas de la mañana (5am-11am)",
+      "tiers": {
+        "1": "Remero del Amanecer",
+        "2": "Nadador del Alba",
+        "3": "Maestro de la Mañana"
+      }
+    },
+    "nightOwl": {
+      "name": "Búho Nocturno",
+      "summary": "Juega sesiones en las horas de la noche (8pm-2am)",
+      "tiers": {
+        "1": "Viajero del Crepúsculo",
+        "2": "Navegante Lunar",
+        "3": "Campeón de Medianoche"
+      }
+    },
+    "comebackKid": {
+      "name": "El que Vuelve",
+      "summary": "Regresa a jugar después de romper una racha",
+      "tiers": {
+        "1": "Nuevo Comienzo",
+        "2": "Espíritu Resiliente",
+        "3": "Retorno Inquebrantable"
+      }
+    },
+    "marathonRunner": {
+      "name": "Corredor de Maratón",
+      "summary": "Juega sesiones extendidas con 30+ atrapadas",
+      "tiers": {
+        "1": "Remero Resistente",
+        "2": "Nadador de Distancia",
+        "3": "Ultra Corredor"
+      }
+    },
+    "weekendWarrior": {
+      "name": "Guerrero del Fin de Semana",
+      "summary": "Juega sesiones en fines de semana (sábado o domingo)",
+      "tiers": {
+        "1": "Iniciador Sabatino",
+        "2": "Regular de Fin de Semana",
+        "3": "Leyenda del Fin de Semana"
+      }
+    },
+    "varietySeeker": {
+      "name": "Buscador de Variedad",
+      "summary": "Practica muchas letras únicas diferentes",
+      "tiers": {
+        "1": "Aprendiz Diverso",
+        "2": "Explorador Amplio",
+        "3": "Maestro Completo"
+      }
+    },
+    "rapidLearner": {
+      "name": "Aprendiz Rápido",
+      "summary": "Mejora la precisión en letras que antes eran débiles",
+      "tiers": {
+        "1": "Aprendiz Veloz",
+        "2": "Mejorador Rápido",
+        "3": "Alumno Relámpago"
+      }
+    },
+    "streakMaster": {
+      "name": "Maestro de Rachas",
+      "summary": "Mantén una racha de días consecutivos jugando",
+      "tiers": {
+        "1": "Consistente de 7 Días",
+        "2": "Constante de 30 Días",
+        "3": "Campeón de 100 Días"
+      }
+    },
+    "centurion": {
+      "name": "Centurión",
+      "summary": "Alcanza 100 sesiones completadas",
+      "tiers": {
+        "1": "100 Sesiones",
+        "2": "500 Sesiones",
+        "3": "1000 Sesiones"
+      }
+    },
+    "polyglot": {
+      "name": "Políglota",
+      "summary": "Practica en múltiples idiomas",
+      "tiers": {
+        "1": "Explorador Bilingüe",
+        "2": "Practicante Trilingüe",
+        "3": "Maestro Multilingüe"
+      }
+    },
+    "challengeSeeker": {
+      "name": "Buscador de Desafíos",
+      "summary": "Completa niveles de dificultad difícil",
+      "tiers": {
+        "1": "Valiente",
+        "2": "Desafiante",
+        "3": "Conquistador"
+      }
+    },
+    "wordsmith": {
+      "name": "Maestro de Palabras",
+      "summary": "Domina el modo de palabras",
+      "tiers": {
+        "1": "Constructor de Palabras",
+        "2": "Artesano de Palabras",
+        "3": "Maestro de Palabras"
+      }
+    }
+  },
+  "dailyQuests": {
+    "catch10Letters": {
+      "name": "Práctica Matutina",
+      "description": "Atrapa 10 letras hoy"
+    },
+    "completeOneGame": {
+      "name": "Entusiasta Diario",
+      "description": "Completa 1 sesión hoy"
+    },
+    "achieve90Accuracy": {
+      "name": "Tirador Certero",
+      "description": "Logra 90% de precisión en una sesión"
+    },
+    "playInMorning": {
+      "name": "Ritual Matutino",
+      "description": "Juega una sesión en la mañana (5am-11am)"
+    },
+    "tryNewMode": {
+      "name": "Algo Nuevo",
+      "description": "Prueba un modo o idioma diferente"
+    },
+    "perfectRound": {
+      "name": "Perfección",
+      "description": "Completa un nivel sin errores"
+    },
+    "catch30Letters": {
+      "name": "Sesión Extendida",
+      "description": "Atrapa 30 letras en una sesión"
+    }
+  }
+}
