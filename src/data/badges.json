@@ -192,9 +192,9 @@
     "nameKey": "badges.centuryClub.name",
     "summaryKey": "badges.centuryClub.summary",
     "tiers": [
-      { "tier": 1, "labelKey": "badges.centuryClub.tiers.1", "goal": 50, "stars": 30 },
-      { "tier": 2, "labelKey": "badges.centuryClub.tiers.2", "goal": 100, "stars": 75 },
-      { "tier": 3, "labelKey": "badges.centuryClub.tiers.3", "goal": 250, "stars": 180 }
+      { "tier": 1, "labelKey": "badges.centuryClub.tiers.1", "goal": 25, "stars": 30 },
+      { "tier": 2, "labelKey": "badges.centuryClub.tiers.2", "goal": 50, "stars": 75 },
+      { "tier": 3, "labelKey": "badges.centuryClub.tiers.3", "goal": 100, "stars": 180 }
     ]
   },
   {
@@ -269,9 +269,9 @@
     "nameKey": "badges.unstoppable.name",
     "summaryKey": "badges.unstoppable.summary",
     "tiers": [
-      { "tier": 1, "labelKey": "badges.unstoppable.tiers.1", "goal": 10, "stars": 15 },
-      { "tier": 2, "labelKey": "badges.unstoppable.tiers.2", "goal": 25, "stars": 45 },
-      { "tier": 3, "labelKey": "badges.unstoppable.tiers.3", "goal": 50, "stars": 110 }
+      { "tier": 1, "labelKey": "badges.unstoppable.tiers.1", "goal": 5, "stars": 15 },
+      { "tier": 2, "labelKey": "badges.unstoppable.tiers.2", "goal": 15, "stars": 45 },
+      { "tier": 3, "labelKey": "badges.unstoppable.tiers.3", "goal": 30, "stars": 110 }
     ]
   },
   {
@@ -280,9 +280,9 @@
     "nameKey": "badges.starCollector.name",
     "summaryKey": "badges.starCollector.summary",
     "tiers": [
-      { "tier": 1, "labelKey": "badges.starCollector.tiers.1", "goal": 500, "stars": 30 },
-      { "tier": 2, "labelKey": "badges.starCollector.tiers.2", "goal": 1500, "stars": 80 },
-      { "tier": 3, "labelKey": "badges.starCollector.tiers.3", "goal": 3000, "stars": 200 }
+      { "tier": 1, "labelKey": "badges.starCollector.tiers.1", "goal": 100, "stars": 30 },
+      { "tier": 2, "labelKey": "badges.starCollector.tiers.2", "goal": 300, "stars": 80 },
+      { "tier": 3, "labelKey": "badges.starCollector.tiers.3", "goal": 750, "stars": 200 }
     ]
   },
   {
@@ -467,9 +467,9 @@
     "nameKey": "badges.culturalAmbassador.name",
     "summaryKey": "badges.culturalAmbassador.summary",
     "tiers": [
-      { "tier": 1, "labelKey": "badges.culturalAmbassador.tiers.1", "goal": 8, "stars": 40 },
-      { "tier": 2, "labelKey": "badges.culturalAmbassador.tiers.2", "goal": 12, "stars": 100 },
-      { "tier": 3, "labelKey": "badges.culturalAmbassador.tiers.3", "goal": 12, "stars": 250 }
+      { "tier": 1, "labelKey": "badges.culturalAmbassador.tiers.1", "goal": 3, "stars": 40 },
+      { "tier": 2, "labelKey": "badges.culturalAmbassador.tiers.2", "goal": 6, "stars": 100 },
+      { "tier": 3, "labelKey": "badges.culturalAmbassador.tiers.3", "goal": 10, "stars": 250 }
     ]
   },
   {
@@ -500,9 +500,9 @@
     "nameKey": "badges.languageSampler.name",
     "summaryKey": "badges.languageSampler.summary",
     "tiers": [
-      { "tier": 1, "labelKey": "badges.languageSampler.tiers.1", "goal": 5, "stars": 15 },
-      { "tier": 2, "labelKey": "badges.languageSampler.tiers.2", "goal": 12, "stars": 45 },
-      { "tier": 3, "labelKey": "badges.languageSampler.tiers.3", "goal": 25, "stars": 110 }
+      { "tier": 1, "labelKey": "badges.languageSampler.tiers.1", "goal": 3, "stars": 15 },
+      { "tier": 2, "labelKey": "badges.languageSampler.tiers.2", "goal": 6, "stars": 45 },
+      { "tier": 3, "labelKey": "badges.languageSampler.tiers.3", "goal": 10, "stars": 110 }
     ]
   },
   {

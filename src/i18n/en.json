@@ -510,9 +510,9 @@
       "name": "Century Club",
       "summary": "Complete {{goal}} total sessions.",
       "tiers": {
-        "1": "Half Century",
-        "2": "Full Century",
-        "3": "Double Century+"
+        "1": "Quarter Century",
+        "2": "Half Century",
+        "3": "Full Century"
       }
     },
     "levelingLegend": {
@@ -573,18 +573,18 @@
       "name": "Unstoppable",
       "summary": "Complete {{goal}} full sessions.",
       "tiers": {
-        "1": "10 Sessions",
-        "2": "25 Sessions",
-        "3": "50 Sessions"
+        "1": "5 Sessions",
+        "2": "15 Sessions",
+        "3": "30 Sessions"
       }
     },
     "starCollector": {
       "name": "Star Collector ⭐",
       "summary": "Earn {{goal}} total stars.",
       "tiers": {
-        "1": "500 Stars",
-        "2": "1500 Stars",
-        "3": "3000 Stars"
+        "1": "100 Stars",
+        "2": "300 Stars",
+        "3": "750 Stars"
       }
     },
     "slowSteady": {
@@ -735,9 +735,9 @@
       "name": "Cultural Ambassador",
       "summary": "Try {{goal}} different languages.",
       "tiers": {
-        "1": "World Traveler",
-        "2": "Global Citizen",
-        "3": "All Languages"
+        "1": "3 Languages",
+        "2": "6 Languages",
+        "3": "10 Languages"
       }
     },
     "scriptScholar": {
