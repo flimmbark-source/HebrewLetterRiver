@@ -219,21 +219,21 @@
       }
     },
     "vowelVirtuoso": {
-      "name": "Vowel Virtuoso",
-      "summary": "Play {{goal}} sessions in niqqud/vowel mode.",
+      "name": "Advanced Learner",
+      "summary": "Complete {{goal}} sessions in advanced practice mode.",
       "tiers": {
-        "1": "Vowel Student",
-        "2": "Vowel Scholar",
-        "3": "Niqqud Master"
+        "1": "Advanced Student",
+        "2": "Advanced Scholar",
+        "3": "Advanced Master"
       }
     },
     "finalFormMaster": {
-      "name": "Final Form Master",
-      "summary": "Play {{goal}} sessions in final forms mode.",
+      "name": "Special Forms Expert",
+      "summary": "Complete {{goal}} sessions in special characters mode.",
       "tiers": {
-        "1": "Final Forms Novice",
-        "2": "Final Forms Expert",
-        "3": "Sofit Champion"
+        "1": "Special Forms Novice",
+        "2": "Special Forms Expert",
+        "3": "Special Forms Champion"
       }
     },
     "modeMixer": {
@@ -421,12 +421,12 @@
         "description": "Embrace the unexpected with random letter order."
       },
       "vowelFocus": {
-        "title": "Vowel Focus",
-        "description": "Master the vowels in niqqud mode today."
+        "title": "Advanced Practice",
+        "description": "Complete one session in advanced practice mode."
       },
       "finalFormsPractice": {
-        "title": "Final Forms Practice",
-        "description": "Perfect the sofit letters in final forms mode."
+        "title": "Special Characters",
+        "description": "Complete one session in special characters mode."
       },
       "languageExplorer": {
         "title": "Language Explorer",
