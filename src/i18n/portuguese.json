@@ -888,92 +888,92 @@
         "description": "Ganhe uma rodada com o {{constraint}} ativo."
       },
       "accuracyChallenge": {
-        "title": "Accuracy Challenge",
-        "description": "Complete a session with 90% or better accuracy."
+        "title": "Desafio de Precisão",
+        "description": "Complete uma sessão com 90% ou mais de precisão."
       },
       "gemCollector": {
-        "title": "Gem Collector",
-        "description": "Win two bonus rounds today."
+        "title": "Colecionador de Gemas",
+        "description": "Vença duas rodadas de bônus hoje."
       },
       "varietyPack": {
-        "title": "Variety Pack",
-        "description": "Catch at least eight different unique letters."
+        "title": "Pacote Variado",
+        "description": "Capture pelo menos oito letras únicas diferentes."
       },
       "powerSession": {
-        "title": "Power Session",
-        "description": "Catch 25 or more items in a single session."
+        "title": "Sessão Poderosa",
+        "description": "Capture 25 ou mais itens em uma única sessão."
       },
       "perfectRun": {
-        "title": "Perfect Run",
-        "description": "Complete one session without any mistakes."
+        "title": "Corrida Perfeita",
+        "description": "Complete uma sessão sem nenhum erro."
       },
       "speedPractice": {
-        "title": "Speed Practice",
-        "description": "Complete a session with fast flow speed enabled."
+        "title": "Prática de Velocidade",
+        "description": "Complete uma sessão com velocidade de fluxo rápido ativada."
       },
       "tripleThread": {
-        "title": "Triple Threat",
-        "description": "Play three full sessions today."
+        "title": "Tripla Ameaça",
+        "description": "Jogue três sessões completas hoje."
       },
       "waveChallenge": {
-        "title": "Wave Challenge 🌊",
-        "description": "Catch 8 letters in a single wave."
+        "title": "Desafio de Ondas 🌊",
+        "description": "Capture 8 letras em uma única onda."
       },
       "flameBuilder": {
-        "title": "Flame Builder 🔥",
-        "description": "Build a 15-catch perfect streak."
+        "title": "Construtor de Chamas 🔥",
+        "description": "Construa uma sequência perfeita de 15 capturas."
       },
       "slowRiverZen": {
-        "title": "Slow River Zen",
-        "description": "Complete a session in slow river mode with perfect accuracy."
+        "title": "Zen do Rio Lento",
+        "description": "Complete uma sessão no modo rio lento com precisão perfeita."
       },
       "clickMaster": {
-        "title": "Click Master",
-        "description": "Win a session with click mode enabled."
+        "title": "Mestre do Clique",
+        "description": "Vença uma sessão com o modo de clique ativado."
       },
       "levelClimber": {
-        "title": "Level Climber",
-        "description": "Reach level 12 or higher in one session."
+        "title": "Escalador de Níveis",
+        "description": "Alcance o nível 12 ou superior em uma sessão."
       },
       "noLivesLost": {
-        "title": "No Lives Lost",
-        "description": "Complete a session without losing a life."
+        "title": "Sem Vidas Perdidas",
+        "description": "Complete uma sessão sem perder uma vida."
       },
       "associationPractice": {
-        "title": "Association Practice",
-        "description": "Complete a session with association mode enabled."
+        "title": "Prática de Associação",
+        "description": "Complete uma sessão com modo de associação ativado."
       },
       "multiModeMaster": {
-        "title": "Multi-Mode Master",
-        "description": "Complete a session with two or more modes enabled."
+        "title": "Mestre Multi-Modo",
+        "description": "Complete uma sessão com dois ou mais modos ativados."
       },
       "fontFlexibility": {
-        "title": "Font Flexibility",
-        "description": "Complete a session with font shuffle enabled."
+        "title": "Flexibilidade de Fontes",
+        "description": "Complete uma sessão com alternância de fontes ativada."
       },
       "randomChallenge": {
-        "title": "Random Challenge",
-        "description": "Complete a session with random letters enabled."
+        "title": "Desafio Aleatório",
+        "description": "Complete uma sessão com letras aleatórias ativadas."
       },
       "vowelFocus": {
-        "title": "Advanced Practice",
-        "description": "Complete a session in advanced practice mode."
+        "title": "Prática Avançada",
+        "description": "Complete uma sessão no modo de prática avançada."
       },
       "finalFormsPractice": {
-        "title": "Special Characters",
-        "description": "Complete a session in special characters mode."
+        "title": "Caracteres Especiais",
+        "description": "Complete uma sessão no modo de caracteres especiais."
       },
       "languageExplorer": {
-        "title": "Language Explorer",
-        "description": "Try a new language today."
+        "title": "Explorador de Idiomas",
+        "description": "Experimente um novo idioma hoje."
       },
       "pointSurge": {
-        "title": "Point Surge",
-        "description": "Score 400 points or more in one session."
+        "title": "Explosão de Pontos",
+        "description": "Marque 400 pontos ou mais em uma sessão."
       },
       "doubleSession": {
-        "title": "Double Session",
-        "description": "Complete two sessions today."
+        "title": "Sessão Dupla",
+        "description": "Complete duas sessões hoje."
       }
     },
     "constraints": {

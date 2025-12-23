@@ -888,92 +888,92 @@
         "description": "اربح جولة مع {{constraint}} نشط."
       },
       "accuracyChallenge": {
-        "title": "Accuracy Challenge",
-        "description": "Complete a session with 90% or better accuracy."
+        "title": "تحدي الدقة",
+        "description": "أكمل جلسة بدقة 90٪ أو أفضل."
       },
       "gemCollector": {
-        "title": "Gem Collector",
-        "description": "Win two bonus rounds today."
+        "title": "جامع الجواهر",
+        "description": "اربح جولتين إضافيتين اليوم."
       },
       "varietyPack": {
-        "title": "Variety Pack",
-        "description": "Catch at least eight different unique letters."
+        "title": "حزمة التنوع",
+        "description": "اصطد ثمانية أحرف فريدة مختلفة على الأقل."
       },
       "powerSession": {
-        "title": "Power Session",
-        "description": "Catch 25 or more items in a single session."
+        "title": "الجلسة القوية",
+        "description": "اصطد 25 عنصراً أو أكثر في جلسة واحدة."
       },
       "perfectRun": {
-        "title": "Perfect Run",
-        "description": "Complete one session without any mistakes."
+        "title": "الجولة المثالية",
+        "description": "أكمل جلسة واحدة دون أي أخطاء."
       },
       "speedPractice": {
-        "title": "Speed Practice",
-        "description": "Complete a session with fast flow speed enabled."
+        "title": "تدريب السرعة",
+        "description": "أكمل جلسة مع تفعيل سرعة التدفق السريع."
       },
       "tripleThread": {
-        "title": "Triple Threat",
-        "description": "Play three full sessions today."
+        "title": "التهديد الثلاثي",
+        "description": "العب ثلاث جلسات كاملة اليوم."
       },
       "waveChallenge": {
-        "title": "Wave Challenge 🌊",
-        "description": "Catch 8 letters in a single wave."
+        "title": "تحدي الموجة 🌊",
+        "description": "اصطد 8 أحرف في موجة واحدة."
       },
       "flameBuilder": {
-        "title": "Flame Builder 🔥",
-        "description": "Build a 15-catch perfect streak."
+        "title": "بناء اللهب 🔥",
+        "description": "ابنِ سلسلة مثالية من 15 التقاطة."
       },
       "slowRiverZen": {
-        "title": "Slow River Zen",
-        "description": "Complete a session in slow river mode with perfect accuracy."
+        "title": "زِن النهر البطيء",
+        "description": "أكمل جلسة في وضع النهر البطيء بدقة مثالية."
       },
       "clickMaster": {
-        "title": "Click Master",
-        "description": "Win a session with click mode enabled."
+        "title": "سيد النقر",
+        "description": "اربح جلسة مع تفعيل وضع النقر."
       },
       "levelClimber": {
-        "title": "Level Climber",
-        "description": "Reach level 12 or higher in one session."
+        "title": "متسلق المستويات",
+        "description": "اصل إلى المستوى 12 أو أعلى في جلسة واحدة."
       },
       "noLivesLost": {
-        "title": "No Lives Lost",
-        "description": "Complete a session without losing a life."
+        "title": "بدون خسارة حياة",
+        "description": "أكمل جلسة دون فقدان حياة."
       },
       "associationPractice": {
-        "title": "Association Practice",
-        "description": "Complete a session with association mode enabled."
+        "title": "تدريب الربط",
+        "description": "أكمل جلسة مع تفعيل وضع الربط."
       },
       "multiModeMaster": {
-        "title": "Multi-Mode Master",
-        "description": "Complete a session with two or more modes enabled."
+        "title": "سيد الأوضاع المتعددة",
+        "description": "أكمل جلسة مع تفعيل وضعين أو أكثر."
       },
       "fontFlexibility": {
-        "title": "Font Flexibility",
-        "description": "Complete a session with font shuffle enabled."
+        "title": "مرونة الخطوط",
+        "description": "أكمل جلسة مع تفعيل خلط الخطوط."
       },
       "randomChallenge": {
-        "title": "Random Challenge",
-        "description": "Complete a session with random letters enabled."
+        "title": "التحدي العشوائي",
+        "description": "أكمل جلسة مع تفعيل الأحرف العشوائية."
       },
       "vowelFocus": {
-        "title": "Advanced Practice",
-        "description": "Complete a session in advanced practice mode."
+        "title": "التدريب المتقدم",
+        "description": "أكمل جلسة في وضع التدريب المتقدم."
       },
       "finalFormsPractice": {
-        "title": "Special Characters",
-        "description": "Complete a session in special characters mode."
+        "title": "الأحرف الخاصة",
+        "description": "أكمل جلسة في وضع الأحرف الخاصة."
       },
       "languageExplorer": {
-        "title": "Language Explorer",
-        "description": "Try a new language today."
+        "title": "مستكشف اللغات",
+        "description": "جرب لغة جديدة اليوم."
       },
       "pointSurge": {
-        "title": "Point Surge",
-        "description": "Score 400 points or more in one session."
+        "title": "اندفاع النقاط",
+        "description": "احرز 400 نقطة أو أكثر في جلسة واحدة."
       },
       "doubleSession": {
-        "title": "Double Session",
-        "description": "Complete two sessions today."
+        "title": "الجلسة المزدوجة",
+        "description": "أكمل جلستين اليوم."
       }
     },
     "constraints": {

@@ -896,92 +896,92 @@
         "description": "{{constraint}} በሚንቀሳቀስበት ጊዜ ዙር ያሸንፉ።"
       },
       "accuracyChallenge": {
-        "title": "Accuracy Challenge",
-        "description": "Complete a session with 90% or better accuracy."
+        "title": "የትክክለኛነት ፈተና",
+        "description": "በ90% ወይም ከዚያ በላይ ትክክለኛነት ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "gemCollector": {
-        "title": "Gem Collector",
-        "description": "Win two bonus rounds today."
+        "title": "የዕንቁ ሰብሳቢ",
+        "description": "ዛሬ ሁለት የቦነስ ዙሮችን ያሸንፉ።"
       },
       "varietyPack": {
-        "title": "Variety Pack",
-        "description": "Catch at least eight different unique letters."
+        "title": "የተለያዩ ፓኬጅ",
+        "description": "ቢያንስ ስምንት የተለያዩ ልዩ ፊደላትን ያዙ።"
       },
       "powerSession": {
-        "title": "Power Session",
-        "description": "Catch 25 or more items in a single session."
+        "title": "የኃይል ክፍለ ጊዜ",
+        "description": "በአንድ ክፍለ ጊዜ 25 ወይም ከዚያ በላይ ንጥሎችን ያዙ።"
       },
       "perfectRun": {
-        "title": "Perfect Run",
-        "description": "Complete one session without any mistakes."
+        "title": "ፍጹም ሩጫ",
+        "description": "ያለ ስህተት አንድ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "speedPractice": {
-        "title": "Speed Practice",
-        "description": "Complete a session with fast flow speed enabled."
+        "title": "የፍጥነት ልምምድ",
+        "description": "ፈጣን ፍሰት ፍጥነት ሲነቃ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "tripleThread": {
-        "title": "Triple Threat",
-        "description": "Play three full sessions today."
+        "title": "ሶስት እጥፍ ፈተና",
+        "description": "ዛሬ ሶስት ሙሉ ክፍለ ጊዜዎችን ይጫወቱ።"
       },
       "waveChallenge": {
-        "title": "Wave Challenge 🌊",
-        "description": "Catch 8 letters in a single wave."
+        "title": "የሞገድ ፈተና 🌊",
+        "description": "በአንድ ሞገድ 8 ፊደላትን ያዙ።"
       },
       "flameBuilder": {
-        "title": "Flame Builder 🔥",
-        "description": "Build a 15-catch perfect streak."
+        "title": "የነበልባል ገንቢ 🔥",
+        "description": "15-መያዣ ፍጹም ተከታታይ ይገንቡ።"
       },
       "slowRiverZen": {
-        "title": "Slow River Zen",
-        "description": "Complete a session in slow river mode with perfect accuracy."
+        "title": "የቀርፋፋ ወንዝ ዘን",
+        "description": "በቀርፋፋ ወንዝ ሁነታ ውስጥ በፍጹም ትክክለኛነት ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "clickMaster": {
-        "title": "Click Master",
-        "description": "Win a session with click mode enabled."
+        "title": "የጠቅታ ማስተር",
+        "description": "የጠቅታ ሁነታ ሲነቃ ክፍለ ጊዜ ያሸንፉ።"
       },
       "levelClimber": {
-        "title": "Level Climber",
-        "description": "Reach level 12 or higher in one session."
+        "title": "የደረጃ ወጪ",
+        "description": "በአንድ ክፍለ ጊዜ ደረጃ 12 ወይም ከዚያ በላይ ይድረሱ።"
       },
       "noLivesLost": {
-        "title": "No Lives Lost",
-        "description": "Complete a session without losing a life."
+        "title": "ምንም ህይወቶች አልጠፉም",
+        "description": "ያለ ህይወት ማጣት ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "associationPractice": {
-        "title": "Association Practice",
-        "description": "Complete a session with association mode enabled."
+        "title": "የማህበር ልምምድ",
+        "description": "የማህበር ሁነታ ሲነቃ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "multiModeMaster": {
-        "title": "Multi-Mode Master",
-        "description": "Complete a session with two or more modes enabled."
+        "title": "ባለብዙ-ሁነታ ማስተር",
+        "description": "ሁለት ወይም ከዚያ በላይ ሁነታዎች ሲነቁ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "fontFlexibility": {
-        "title": "Font Flexibility",
-        "description": "Complete a session with font shuffle enabled."
+        "title": "የፊደል ተለዋዋጭነት",
+        "description": "የፊደል ቅይጥ ሲነቃ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "randomChallenge": {
-        "title": "Random Challenge",
-        "description": "Complete a session with random letters enabled."
+        "title": "ዘፈቀደ ፈተና",
+        "description": "ዘፈቀደ ፊደላት ሲነቁ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "vowelFocus": {
-        "title": "Advanced Practice",
-        "description": "Complete a session in advanced practice mode."
+        "title": "የላቀ ልምምድ",
+        "description": "በላቀ ልምምድ ሁነታ ውስጥ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "finalFormsPractice": {
-        "title": "Special Characters",
-        "description": "Complete a session in special characters mode."
+        "title": "ልዩ ቁምፊዎች",
+        "description": "በልዩ ቁምፊዎች ሁነታ ውስጥ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "languageExplorer": {
-        "title": "Language Explorer",
-        "description": "Try a new language today."
+        "title": "የቋንቋ አሳሽ",
+        "description": "ዛሬ አዲስ ቋንቋ ይሞክሩ።"
       },
       "pointSurge": {
-        "title": "Point Surge",
-        "description": "Score 400 points or more in one session."
+        "title": "የነጥብ መጨመር",
+        "description": "በአንድ ክፍለ ጊዜ 400 ነጥቦች ወይም ከዚያ በላይ ያግኙ።"
       },
       "doubleSession": {
-        "title": "Double Session",
-        "description": "Complete two sessions today."
+        "title": "ድርብ ክፍለ ጊዜ",
+        "description": "ዛሬ ሁለት ክፍለ ጊዜዎችን ያጠናቅቁ።"
       }
     },
     "constraints": {

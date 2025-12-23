@@ -888,92 +888,92 @@
         "description": "Выиграйте раунд с активным {{constraint}}."
       },
       "accuracyChallenge": {
-        "title": "Accuracy Challenge",
-        "description": "Complete a session with 90% or better accuracy."
+        "title": "Вызов Точности",
+        "description": "Завершите сессию с точностью 90% или выше."
       },
       "gemCollector": {
-        "title": "Gem Collector",
-        "description": "Win two bonus rounds today."
+        "title": "Собиратель Драгоценностей",
+        "description": "Выиграйте два бонусных раунда сегодня."
       },
       "varietyPack": {
-        "title": "Variety Pack",
-        "description": "Catch at least eight different unique letters."
+        "title": "Разнообразие",
+        "description": "Поймайте не менее восьми разных уникальных букв."
       },
       "powerSession": {
-        "title": "Power Session",
-        "description": "Catch 25 or more items in a single session."
+        "title": "Мощная Сессия",
+        "description": "Поймайте 25 или более элементов за одну сессию."
       },
       "perfectRun": {
-        "title": "Perfect Run",
-        "description": "Complete one session without any mistakes."
+        "title": "Идеальный Забег",
+        "description": "Завершите одну сессию без единой ошибки."
       },
       "speedPractice": {
-        "title": "Speed Practice",
-        "description": "Complete a session with fast flow speed enabled."
+        "title": "Скоростная Практика",
+        "description": "Завершите сессию с включенной быстрой скоростью потока."
       },
       "tripleThread": {
-        "title": "Triple Threat",
-        "description": "Play three full sessions today."
+        "title": "Тройная Угроза",
+        "description": "Сыграйте три полных сессии сегодня."
       },
       "waveChallenge": {
-        "title": "Wave Challenge 🌊",
-        "description": "Catch 8 letters in a single wave."
+        "title": "Волновой Вызов 🌊",
+        "description": "Поймайте 8 букв за одну волну."
       },
       "flameBuilder": {
-        "title": "Flame Builder 🔥",
-        "description": "Build a 15-catch perfect streak."
+        "title": "Строитель Пламени 🔥",
+        "description": "Постройте серию из 15 идеальных захватов."
       },
       "slowRiverZen": {
-        "title": "Slow River Zen",
-        "description": "Complete a session in slow river mode with perfect accuracy."
+        "title": "Дзен Медленной Реки",
+        "description": "Завершите сессию в режиме медленной реки с идеальной точностью."
       },
       "clickMaster": {
-        "title": "Click Master",
-        "description": "Win a session with click mode enabled."
+        "title": "Мастер Кликов",
+        "description": "Выиграйте сессию с включенным режимом кликов."
       },
       "levelClimber": {
-        "title": "Level Climber",
-        "description": "Reach level 12 or higher in one session."
+        "title": "Покоритель Уровней",
+        "description": "Достигните 12 уровня или выше за одну сессию."
       },
       "noLivesLost": {
-        "title": "No Lives Lost",
-        "description": "Complete a session without losing a life."
+        "title": "Без Потерь Жизней",
+        "description": "Завершите сессию, не потеряв ни одной жизни."
       },
       "associationPractice": {
-        "title": "Association Practice",
-        "description": "Complete a session with association mode enabled."
+        "title": "Практика Ассоциаций",
+        "description": "Завершите сессию с включенным режимом ассоциаций."
       },
       "multiModeMaster": {
-        "title": "Multi-Mode Master",
-        "description": "Complete a session with two or more modes enabled."
+        "title": "Мастер Мультирежима",
+        "description": "Завершите сессию с двумя или более включенными режимами."
       },
       "fontFlexibility": {
-        "title": "Font Flexibility",
-        "description": "Complete a session with font shuffle enabled."
+        "title": "Гибкость Шрифтов",
+        "description": "Завершите сессию с включенным перемешиванием шрифтов."
       },
       "randomChallenge": {
-        "title": "Random Challenge",
-        "description": "Complete a session with random letters enabled."
+        "title": "Случайный Вызов",
+        "description": "Завершите сессию с включенными случайными буквами."
       },
       "vowelFocus": {
-        "title": "Advanced Practice",
-        "description": "Complete a session in advanced practice mode."
+        "title": "Продвинутая Практика",
+        "description": "Завершите сессию в режиме продвинутой практики."
       },
       "finalFormsPractice": {
-        "title": "Special Characters",
-        "description": "Complete a session in special characters mode."
+        "title": "Специальные Символы",
+        "description": "Завершите сессию в режиме специальных символов."
       },
       "languageExplorer": {
-        "title": "Language Explorer",
-        "description": "Try a new language today."
+        "title": "Исследователь Языков",
+        "description": "Попробуйте новый язык сегодня."
       },
       "pointSurge": {
-        "title": "Point Surge",
-        "description": "Score 400 points or more in one session."
+        "title": "Всплеск Очков",
+        "description": "Наберите 400 очков или более за одну сессию."
       },
       "doubleSession": {
-        "title": "Double Session",
-        "description": "Complete two sessions today."
+        "title": "Двойная Сессия",
+        "description": "Завершите две сессии сегодня."
       }
     },
     "constraints": {

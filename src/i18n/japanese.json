@@ -888,92 +888,92 @@
         "description": "{{constraint}}がアクティブな状態でラウンドに勝ちます。"
       },
       "accuracyChallenge": {
-        "title": "Accuracy Challenge",
-        "description": "Complete a session with 90% or better accuracy."
+        "title": "精度チャレンジ",
+        "description": "90%以上の精度でセッションを完了する。"
       },
       "gemCollector": {
-        "title": "Gem Collector",
-        "description": "Win two bonus rounds today."
+        "title": "宝石コレクター",
+        "description": "今日、2回のボーナスラウンドで勝利する。"
       },
       "varietyPack": {
-        "title": "Variety Pack",
-        "description": "Catch at least eight different unique letters."
+        "title": "バラエティパック",
+        "description": "少なくとも8種類の異なる文字をキャッチする。"
       },
       "powerSession": {
-        "title": "Power Session",
-        "description": "Catch 25 or more items in a single session."
+        "title": "パワーセッション",
+        "description": "1回のセッションで25個以上のアイテムをキャッチする。"
       },
       "perfectRun": {
-        "title": "Perfect Run",
-        "description": "Complete one session without any mistakes."
+        "title": "完璧な実行",
+        "description": "ミスなしで1セッションを完了する。"
       },
       "speedPractice": {
-        "title": "Speed Practice",
-        "description": "Complete a session with fast flow speed enabled."
+        "title": "スピード練習",
+        "description": "速い流れ速度を有効にしてセッションを完了する。"
       },
       "tripleThread": {
-        "title": "Triple Threat",
-        "description": "Play three full sessions today."
+        "title": "トリプルスレット",
+        "description": "今日、3回の完全なセッションをプレイする。"
       },
       "waveChallenge": {
-        "title": "Wave Challenge 🌊",
-        "description": "Catch 8 letters in a single wave."
+        "title": "ウェーブチャレンジ 🌊",
+        "description": "1つの波で8文字をキャッチする。"
       },
       "flameBuilder": {
-        "title": "Flame Builder 🔥",
-        "description": "Build a 15-catch perfect streak."
+        "title": "炎ビルダー 🔥",
+        "description": "15キャッチの完璧な連続を構築する。"
       },
       "slowRiverZen": {
-        "title": "Slow River Zen",
-        "description": "Complete a session in slow river mode with perfect accuracy."
+        "title": "スローリバー禅",
+        "description": "スローリバーモードで完璧な精度でセッションを完了する。"
       },
       "clickMaster": {
-        "title": "Click Master",
-        "description": "Win a session with click mode enabled."
+        "title": "クリックマスター",
+        "description": "クリックモードを有効にしてセッションで勝利する。"
       },
       "levelClimber": {
-        "title": "Level Climber",
-        "description": "Reach level 12 or higher in one session."
+        "title": "レベルクライマー",
+        "description": "1セッションでレベル12以上に到達する。"
       },
       "noLivesLost": {
-        "title": "No Lives Lost",
-        "description": "Complete a session without losing a life."
+        "title": "ライフ無傷",
+        "description": "ライフを失わずにセッションを完了する。"
       },
       "associationPractice": {
-        "title": "Association Practice",
-        "description": "Complete a session with association mode enabled."
+        "title": "連想練習",
+        "description": "連想モードを有効にしてセッションを完了する。"
       },
       "multiModeMaster": {
-        "title": "Multi-Mode Master",
-        "description": "Complete a session with two or more modes enabled."
+        "title": "マルチモードマスター",
+        "description": "2つ以上のモードを有効にしてセッションを完了する。"
       },
       "fontFlexibility": {
-        "title": "Font Flexibility",
-        "description": "Complete a session with font shuffle enabled."
+        "title": "フォント柔軟性",
+        "description": "フォントシャッフルを有効にしてセッションを完了する。"
       },
       "randomChallenge": {
-        "title": "Random Challenge",
-        "description": "Complete a session with random letters enabled."
+        "title": "ランダムチャレンジ",
+        "description": "ランダム文字を有効にしてセッションを完了する。"
       },
       "vowelFocus": {
-        "title": "Advanced Practice",
-        "description": "Complete a session in advanced practice mode."
+        "title": "上級練習",
+        "description": "上級練習モードでセッションを完了する。"
       },
       "finalFormsPractice": {
-        "title": "Special Characters",
-        "description": "Complete a session in special characters mode."
+        "title": "特殊文字",
+        "description": "特殊文字モードでセッションを完了する。"
       },
       "languageExplorer": {
-        "title": "Language Explorer",
-        "description": "Try a new language today."
+        "title": "言語探検家",
+        "description": "今日、新しい言語を試す。"
       },
       "pointSurge": {
-        "title": "Point Surge",
-        "description": "Score 400 points or more in one session."
+        "title": "ポイントサージ",
+        "description": "1セッションで400ポイント以上を獲得する。"
       },
       "doubleSession": {
-        "title": "Double Session",
-        "description": "Complete two sessions today."
+        "title": "ダブルセッション",
+        "description": "今日、2回のセッションを完了する。"
       }
     },
     "constraints": {

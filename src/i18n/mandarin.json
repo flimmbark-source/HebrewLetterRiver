@@ -902,92 +902,92 @@
         "description": "在 {{constraint}} 激活的情况下赢得一轮。"
       },
       "accuracyChallenge": {
-        "title": "Accuracy Challenge",
-        "description": "Complete a session with 90% or better accuracy."
+        "title": "精准挑战",
+        "description": "以90%或更高的准确率完成一次会话。"
       },
       "gemCollector": {
-        "title": "Gem Collector",
-        "description": "Win two bonus rounds today."
+        "title": "宝石收集者",
+        "description": "今天赢得两次奖励回合。"
       },
       "varietyPack": {
-        "title": "Variety Pack",
-        "description": "Catch at least eight different unique letters."
+        "title": "多样套装",
+        "description": "至少捕获八个不同的独特字母。"
       },
       "powerSession": {
-        "title": "Power Session",
-        "description": "Catch 25 or more items in a single session."
+        "title": "强力会话",
+        "description": "在单次会话中捕获25个或更多物品。"
       },
       "perfectRun": {
-        "title": "Perfect Run",
-        "description": "Complete one session without any mistakes."
+        "title": "完美奔跑",
+        "description": "无任何错误完成一次会话。"
       },
       "speedPractice": {
-        "title": "Speed Practice",
-        "description": "Complete a session with fast flow speed enabled."
+        "title": "速度练习",
+        "description": "在启用快速流动速度的情况下完成一次会话。"
       },
       "tripleThread": {
-        "title": "Triple Threat",
-        "description": "Play three full sessions today."
+        "title": "三重威胁",
+        "description": "今天完成三次完整会话。"
       },
       "waveChallenge": {
-        "title": "Wave Challenge 🌊",
-        "description": "Catch 8 letters in a single wave."
+        "title": "波浪挑战 🌊",
+        "description": "在单次波浪中捕获8个字母。"
       },
       "flameBuilder": {
-        "title": "Flame Builder 🔥",
-        "description": "Build a 15-catch perfect streak."
+        "title": "火焰构建者 🔥",
+        "description": "建立15次完美连续捕获。"
       },
       "slowRiverZen": {
-        "title": "Slow River Zen",
-        "description": "Complete a session in slow river mode with perfect accuracy."
+        "title": "慢河禅境",
+        "description": "在慢速河流模式下以完美准确度完成一次会话。"
       },
       "clickMaster": {
-        "title": "Click Master",
-        "description": "Win a session with click mode enabled."
+        "title": "点击大师",
+        "description": "在启用点击模式的情况下赢得一次会话。"
       },
       "levelClimber": {
-        "title": "Level Climber",
-        "description": "Reach level 12 or higher in one session."
+        "title": "等级攀登者",
+        "description": "在一次会话中达到12级或更高。"
       },
       "noLivesLost": {
-        "title": "No Lives Lost",
-        "description": "Complete a session without losing a life."
+        "title": "零生命损失",
+        "description": "完成一次会话且不损失生命。"
       },
       "associationPractice": {
-        "title": "Association Practice",
-        "description": "Complete a session with association mode enabled."
+        "title": "联想练习",
+        "description": "在启用联想模式的情况下完成一次会话。"
       },
       "multiModeMaster": {
-        "title": "Multi-Mode Master",
-        "description": "Complete a session with two or more modes enabled."
+        "title": "多模式大师",
+        "description": "在启用两种或更多模式的情况下完成一次会话。"
       },
       "fontFlexibility": {
-        "title": "Font Flexibility",
-        "description": "Complete a session with font shuffle enabled."
+        "title": "字体灵活性",
+        "description": "在启用字体随机的情况下完成一次会话。"
       },
       "randomChallenge": {
-        "title": "Random Challenge",
-        "description": "Complete a session with random letters enabled."
+        "title": "随机挑战",
+        "description": "在启用随机字母的情况下完成一次会话。"
       },
       "vowelFocus": {
-        "title": "Advanced Practice",
-        "description": "Complete a session in advanced practice mode."
+        "title": "高级练习",
+        "description": "在高级练习模式下完成一次会话。"
       },
       "finalFormsPractice": {
-        "title": "Special Characters",
-        "description": "Complete a session in special characters mode."
+        "title": "特殊字符",
+        "description": "在特殊字符模式下完成一次会话。"
       },
       "languageExplorer": {
-        "title": "Language Explorer",
-        "description": "Try a new language today."
+        "title": "语言探索者",
+        "description": "今天尝试一种新语言。"
       },
       "pointSurge": {
-        "title": "Point Surge",
-        "description": "Score 400 points or more in one session."
+        "title": "分数飙升",
+        "description": "在一次会话中得分400分或更高。"
       },
       "doubleSession": {
-        "title": "Double Session",
-        "description": "Complete two sessions today."
+        "title": "双倍会话",
+        "description": "今天完成两次会话。"
       }
     },
     "constraints": {

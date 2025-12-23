@@ -888,92 +888,92 @@
         "description": "{{constraint}} সক্রিয় থাকা একটি রাউন্ড জিতুন।"
       },
       "accuracyChallenge": {
-        "title": "Accuracy Challenge",
-        "description": "Complete a session with 90% or better accuracy."
+        "title": "নির্ভুলতা চ্যালেঞ্জ",
+        "description": "৯০% বা তার বেশি নির্ভুলতার সাথে একটি সেশন সম্পূর্ণ করুন।"
       },
       "gemCollector": {
-        "title": "Gem Collector",
-        "description": "Win two bonus rounds today."
+        "title": "মণি সংগ্রাহক",
+        "description": "আজ দুটি বোনাস রাউন্ড জিতুন।"
       },
       "varietyPack": {
-        "title": "Variety Pack",
-        "description": "Catch at least eight different unique letters."
+        "title": "বৈচিত্র্য প্যাক",
+        "description": "কমপক্ষে আটটি ভিন্ন অনন্য অক্ষর ধরুন।"
       },
       "powerSession": {
-        "title": "Power Session",
-        "description": "Catch 25 or more items in a single session."
+        "title": "শক্তি সেশন",
+        "description": "একটি একক সেশনে ২৫ বা তার বেশি আইটেম ধরুন।"
       },
       "perfectRun": {
-        "title": "Perfect Run",
-        "description": "Complete one session without any mistakes."
+        "title": "নিখুঁত রান",
+        "description": "ভুল ছাড়াই একটি সেশন সম্পূর্ণ করুন।"
       },
       "speedPractice": {
-        "title": "Speed Practice",
-        "description": "Complete a session with fast flow speed enabled."
+        "title": "দ্রুত অনুশীলন",
+        "description": "দ্রুত প্রবাহ গতি সক্ষম করে একটি সেশন সম্পূর্ণ করুন।"
       },
       "tripleThread": {
-        "title": "Triple Threat",
-        "description": "Play three full sessions today."
+        "title": "ত্রিগুণ হুমকি",
+        "description": "আজ তিনটি সম্পূর্ণ সেশন খেলুন।"
       },
       "waveChallenge": {
-        "title": "Wave Challenge 🌊",
-        "description": "Catch 8 letters in a single wave."
+        "title": "ঢেউ চ্যালেঞ্জ 🌊",
+        "description": "একটি একক ঢেউয়ে ৮টি অক্ষর ধরুন।"
       },
       "flameBuilder": {
-        "title": "Flame Builder 🔥",
-        "description": "Build a 15-catch perfect streak."
+        "title": "শিখা নির্মাতা 🔥",
+        "description": "একটি ১৫-ধরা নিখুঁত ধারা তৈরি করুন।"
       },
       "slowRiverZen": {
-        "title": "Slow River Zen",
-        "description": "Complete a session in slow river mode with perfect accuracy."
+        "title": "ধীর নদী শান্তি",
+        "description": "ধীর নদী মোডে নিখুঁত নির্ভুলতার সাথে একটি সেশন সম্পূর্ণ করুন।"
       },
       "clickMaster": {
-        "title": "Click Master",
-        "description": "Win a session with click mode enabled."
+        "title": "ক্লিক মাস্টার",
+        "description": "ক্লিক মোড সক্ষম করে একটি সেশন জিতুন।"
       },
       "levelClimber": {
-        "title": "Level Climber",
-        "description": "Reach level 12 or higher in one session."
+        "title": "স্তর আরোহী",
+        "description": "একটি সেশনে স্তর ১২ বা তার বেশি পৌঁছান।"
       },
       "noLivesLost": {
-        "title": "No Lives Lost",
-        "description": "Complete a session without losing a life."
+        "title": "কোনো জীবন হারানো হয়নি",
+        "description": "জীবন না হারিয়ে একটি সেশন সম্পূর্ণ করুন।"
       },
       "associationPractice": {
-        "title": "Association Practice",
-        "description": "Complete a session with association mode enabled."
+        "title": "সংযোগ অনুশীলন",
+        "description": "সংযোগ মোড সক্ষম করে একটি সেশন সম্পূর্ণ করুন।"
       },
       "multiModeMaster": {
-        "title": "Multi-Mode Master",
-        "description": "Complete a session with two or more modes enabled."
+        "title": "মাল্টি-মোড মাস্টার",
+        "description": "দুই বা তার বেশি মোড সক্ষম করে একটি সেশন সম্পূর্ণ করুন।"
       },
       "fontFlexibility": {
-        "title": "Font Flexibility",
-        "description": "Complete a session with font shuffle enabled."
+        "title": "ফন্ট নমনীয়তা",
+        "description": "ফন্ট শাফল সক্ষম করে একটি সেশন সম্পূর্ণ করুন।"
       },
       "randomChallenge": {
-        "title": "Random Challenge",
-        "description": "Complete a session with random letters enabled."
+        "title": "যাদৃচ্ছিক চ্যালেঞ্জ",
+        "description": "যাদৃচ্ছিক অক্ষর সক্ষম করে একটি সেশন সম্পূর্ণ করুন।"
       },
       "vowelFocus": {
-        "title": "Advanced Practice",
-        "description": "Complete a session in advanced practice mode."
+        "title": "উন্নত অনুশীলন",
+        "description": "উন্নত অনুশীলন মোডে একটি সেশন সম্পূর্ণ করুন।"
       },
       "finalFormsPractice": {
-        "title": "Special Characters",
-        "description": "Complete a session in special characters mode."
+        "title": "বিশেষ অক্ষর",
+        "description": "বিশেষ অক্ষর মোডে একটি সেশন সম্পূর্ণ করুন।"
       },
       "languageExplorer": {
-        "title": "Language Explorer",
-        "description": "Try a new language today."
+        "title": "ভাষা অনুসন্ধানকারী",
+        "description": "আজ একটি নতুন ভাষা চেষ্টা করুন।"
       },
       "pointSurge": {
-        "title": "Point Surge",
-        "description": "Score 400 points or more in one session."
+        "title": "পয়েন্ট উত্থান",
+        "description": "একটি সেশনে ৪০০ পয়েন্ট বা তার বেশি স্কোর করুন।"
       },
       "doubleSession": {
-        "title": "Double Session",
-        "description": "Complete two sessions today."
+        "title": "দ্বিগুণ সেশন",
+        "description": "আজ দুটি সেশন সম্পূর্ণ করুন।"
       }
     },
     "constraints": {
