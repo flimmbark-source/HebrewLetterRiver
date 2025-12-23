@@ -30,13 +30,13 @@
   },
   "home": {
     "hero": {
-      "heading": "Choose your river adventure.",
-      "description": "Start with single letters or dive into full words.",
-      "modeSelectTitle": "Select a mode",
+      "heading": "अपना नदी साहसिक चुनें",
+      "description": "एकल अक्षरों से शुरू करें या पूर्ण शब्दों में गोता लगाएं",
+      "modeSelectTitle": "एक मोड चुनें",
       "modes": {
         "letters": {
-          "title": "Letter River",
-          "description": "Catch drifting letters and drop them into the right buckets."
+          "title": "अक्षर नदी",
+          "description": "बहते अक्षरों को पकड़ें और सही टोकरियों में डालें"
         }
       }
     },
@@ -103,7 +103,9 @@
       "installDescription": "एप्लिकेशन इंस्टॉल करो",
       "defaultNoun": "अक्षर",
       "defaultModeLabel": "मूल अभ्यास",
-      "defaultModeDescription": "पात्रों के मुख्य समूह का अभ्यास करें।"
+      "defaultModeDescription": "पात्रों के मुख्य समूह का अभ्यास करें।",
+      "goal": "लक्ष्य",
+      "goalTooltip": "खेल जीतने के लिए इस स्तर को हराएं!"
     },
     "modes": {
       "letters": {
@@ -215,7 +217,7 @@
     "accessibility": {
       "showIntroductions": "परिचय दिखाएँ",
       "highContrast": "उच्च कंट्रास्ट मोड",
-      "randomLetters": "Send random letters (Letter River)",
+      "randomLetters": "यादृच्छिक अक्षर भेजें (अक्षर नदी)",
       "reducedMotion": "कम गति",
       "speed": "खेल की गति",
       "speedFast": "तेज़",
@@ -257,6 +259,12 @@
       "bonusInstruction": "रत्न पकड़ो!",
       "lives": "ज़िंदगियाँ",
       "levelUp": "ऊपर का स्तर!"
+    },
+    "pause": {
+      "title": "रोका गया",
+      "message": "",
+      "resume": "फिर से शुरू करें",
+      "mainMenu": "मुख्य मेनू"
     }
   },
   "achievements": {
@@ -344,111 +352,111 @@
       }
     },
     "dedicatedScholar": {
-      "name": "Dedicated Scholar",
-      "summary": "Catch a total number of items across all sessions.",
+      "name": "समर्पित विद्वान",
+      "summary": "सभी सत्रों में कुल वस्तुओं को पकड़ें",
       "tiers": {
-        "1": "Studious Starter",
-        "2": "Devoted Reader",
-        "3": "Master Scholar"
+        "1": "मेहनती शुरुआतकर्ता",
+        "2": "समर्पित पाठक",
+        "3": "मास्टर विद्वान"
       }
     },
     "accuracyAce": {
-      "name": "Accuracy Ace",
-      "summary": "Complete sessions with 90% or higher accuracy.",
+      "name": "सटीकता के इक्का",
+      "summary": "90% या अधिक सटीकता के साथ सत्र पूरे करें",
       "tiers": {
-        "1": "Sharp Eye",
-        "2": "Keen Focus",
-        "3": "Flawless Precision"
+        "1": "तीक्ष्ण नज़र",
+        "2": "गहन फोकस",
+        "3": "निर्दोष सटीकता"
       }
     },
     "speedDemon": {
-      "name": "Speed Demon",
-      "summary": "Complete sessions with fast flow speed enabled.",
+      "name": "गति दानव",
+      "summary": "तेज प्रवाह गति सक्षम करके सत्र पूरे करें",
       "tiers": {
-        "1": "Quick Current",
-        "2": "Rapid Runner",
-        "3": "Lightning Flow"
+        "1": "तेज धारा",
+        "2": "तीव्र धावक",
+        "3": "बिजली प्रवाह"
       }
     },
     "explorer": {
-      "name": "Explorer",
-      "summary": "Try different game modes and challenges.",
+      "name": "अन्वेषक",
+      "summary": "विभिन्न खेल मोड और चुनौतियां आज़माएं",
       "tiers": {
-        "1": "Curious Wanderer",
-        "2": "Brave Voyager",
-        "3": "Intrepid Pioneer"
+        "1": "जिज्ञासु भटकने वाला",
+        "2": "बहादुर यात्री",
+        "3": "निडर अग्रदूत"
       }
     },
     "perfectionist": {
-      "name": "Perfectionist",
-      "summary": "Complete sessions without any mistakes.",
+      "name": "पूर्णतावादी",
+      "summary": "बिना त्रुटियों के सत्र पूरे करें",
       "tiers": {
-        "1": "Careful Catcher",
-        "2": "Precision Master",
-        "3": "Absolute Perfection"
+        "1": "सावधान पकड़ने वाला",
+        "2": "सटीकता मास्टर",
+        "3": "पूर्ण पूर्णता"
       }
     },
     "earlyBird": {
-      "name": "Early Bird",
-      "summary": "Play sessions in the morning hours (5am-11am).",
+      "name": "प्रारंभिक पक्षी",
+      "summary": "सुबह के घंटों में सत्र खेलें (5:00-11:00)",
       "tiers": {
-        "1": "Dawn Paddler",
-        "2": "Sunrise Swimmer",
-        "3": "Morning Master"
+        "1": "भोर का पैडलर",
+        "2": "सूर्योदय तैराक",
+        "3": "सुबह के मास्टर"
       }
     },
     "nightOwl": {
-      "name": "Night Owl",
-      "summary": "Play sessions in the evening hours (8pm-2am).",
+      "name": "रात्रि उल्लू",
+      "summary": "शाम के घंटों में सत्र खेलें (20:00-2:00)",
       "tiers": {
-        "1": "Twilight Traveler",
-        "2": "Moonlight Navigator",
-        "3": "Midnight Champion"
+        "1": "गोधूलि यात्री",
+        "2": "चांदनी नाविक",
+        "3": "मध्यरात्रि चैंपियन"
       }
     },
     "comebackKid": {
-      "name": "Comeback Kid",
-      "summary": "Return to play after breaking your streak.",
+      "name": "वापसी करने वाला",
+      "summary": "लकीर तोड़ने के बाद वापस खेलें",
       "tiers": {
-        "1": "Fresh Start",
-        "2": "Resilient Spirit",
-        "3": "Unwavering Return"
+        "1": "नई शुरुआत",
+        "2": "लचीली आत्मा",
+        "3": "अडिग वापसी"
       }
     },
     "marathonRunner": {
-      "name": "Marathon Runner",
-      "summary": "Play extended sessions with 30+ catches.",
+      "name": "मैराथन धावक",
+      "summary": "30+ पकड़ों के साथ विस्तारित सत्र खेलें",
       "tiers": {
-        "1": "Endurance Paddler",
-        "2": "Distance Swimmer",
-        "3": "Ultra Runner"
+        "1": "सहनशक्ति पैडलर",
+        "2": "दूरी तैराक",
+        "3": "अल्ट्रा धावक"
       }
     },
     "weekendWarrior": {
-      "name": "Weekend Warrior",
-      "summary": "Play sessions on weekends (Saturday or Sunday).",
+      "name": "सप्ताहांत योद्धा",
+      "summary": "सप्ताहांत पर सत्र खेलें (शनिवार या रविवार)",
       "tiers": {
-        "1": "Saturday Starter",
-        "2": "Weekend Regular",
-        "3": "Weekend Legend"
+        "1": "शनिवार स्टार्टर",
+        "2": "सप्ताहांत नियमित",
+        "3": "सप्ताहांत किंवदंती"
       }
     },
     "varietySeeker": {
-      "name": "Variety Seeker",
-      "summary": "Practice many different unique letters.",
+      "name": "विविधता खोजने वाला",
+      "summary": "कई अलग-अलग अद्वितीय अक्षरों का अभ्यास करें",
       "tiers": {
-        "1": "Diverse Learner",
-        "2": "Broad Explorer",
-        "3": "Complete Master"
+        "1": "विविध शिक्षार्थी",
+        "2": "व्यापक अन्वेषक",
+        "3": "पूर्ण मास्टर"
       }
     },
     "rapidLearner": {
-      "name": "Rapid Learner",
-      "summary": "Improve accuracy on previously weak letters.",
+      "name": "तेजी से सीखने वाला",
+      "summary": "पहले कमजोर अक्षरों पर सटीकता में सुधार करें",
       "tiers": {
-        "1": "Quick Study",
-        "2": "Fast Improver",
-        "3": "Lightning Learner"
+        "1": "तेज शिक्षार्थी",
+        "2": "तीव्र सुधारक",
+        "3": "बिजली छात्र"
       }
     },
     "waveRider": {
@@ -810,6 +818,51 @@
         "2": "30 Day Streak",
         "3": "60 Day Streak"
       }
+    },
+    "streakMaster": {
+      "name": "लकीर मास्टर",
+      "summary": "लगातार खेल दिनों की लकीर बनाए रखें",
+      "tiers": {
+        "1": "7-दिन की निरंतरता",
+        "2": "30-दिन की स्थिरता",
+        "3": "100-दिन चैंपियन"
+      }
+    },
+    "centurion": {
+      "name": "शताब्दी",
+      "summary": "100 पूर्ण सत्रों तक पहुंचें",
+      "tiers": {
+        "1": "100 सत्र",
+        "2": "500 सत्र",
+        "3": "1000 सत्र"
+      }
+    },
+    "polyglot": {
+      "name": "बहुभाषी",
+      "summary": "कई भाषाओं में अभ्यास करें",
+      "tiers": {
+        "1": "द्विभाषी अन्वेषक",
+        "2": "त्रिभाषी अभ्यासकर्ता",
+        "3": "बहुभाषी मास्टर"
+      }
+    },
+    "challengeSeeker": {
+      "name": "चुनौती खोजने वाला",
+      "summary": "कठिन कठिनाई स्तर पूरे करें",
+      "tiers": {
+        "1": "बहादुर",
+        "2": "चुनौती देने वाला",
+        "3": "विजेता"
+      }
+    },
+    "wordsmith": {
+      "name": "शब्द मास्टर",
+      "summary": "शब्द मोड में महारत हासिल करें",
+      "tiers": {
+        "1": "शब्द निर्माता",
+        "2": "शब्द शिल्पकार",
+        "3": "शब्द मास्टर"
+      }
     }
   },
   "daily": {
@@ -1065,6 +1118,42 @@
         "title": "तैयार? आइए खेलते हैं!",
         "description": "आरंभ करने के लिए प्रारंभ पर क्लिक करें! अक्षर स्क्रीन पर प्रवाहित होंगे - प्रत्येक को नीचे उसके मिलान बॉक्स में खींचें।"
       }
+    }
+  },
+  "achievementSections": {
+    "classic": "क्लासिक",
+    "special": "विशेष",
+    "polyglot": "बहुभाषी",
+    "dedication": "समर्पण"
+  },
+  "dailyQuests": {
+    "catch10Letters": {
+      "name": "सुबह का अभ्यास",
+      "description": "आज 10 अक्षर पकड़ें"
+    },
+    "completeOneGame": {
+      "name": "दैनिक उत्साही",
+      "description": "आज 1 सत्र पूरा करें"
+    },
+    "achieve90Accuracy": {
+      "name": "तीक्ष्ण निशानेबाज",
+      "description": "एक सत्र में 90% सटीकता प्राप्त करें"
+    },
+    "playInMorning": {
+      "name": "सुबह की रस्म",
+      "description": "सुबह में एक सत्र खेलें (5:00-11:00)"
+    },
+    "tryNewMode": {
+      "name": "कुछ नया",
+      "description": "एक अलग मोड या भाषा आज़माएं"
+    },
+    "perfectRound": {
+      "name": "पूर्णता",
+      "description": "बिना त्रुटियों के एक स्तर पूरा करें"
+    },
+    "catch30Letters": {
+      "name": "विस्तारित सत्र",
+      "description": "एक सत्र में 30 अक्षर पकड़ें"
     }
   }
 }

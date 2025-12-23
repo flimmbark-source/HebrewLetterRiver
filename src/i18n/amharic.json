@@ -38,13 +38,13 @@
   },
   "home": {
     "hero": {
-      "heading": "የወንዝ ጀብዱዎን ይምረጡ።",
-      "description": "በነጠላ ፊደላት ይጀምሩ ወይም ወደ ሙሉ ቃላት ይግቡ።",
+      "heading": "የወንዝ ጀብድዎን ይምረጡ",
+      "description": "በነጠላ ፊደላት ይጀምሩ ወይም ወደ ሙሉ ቃላት ይግቡ",
       "modeSelectTitle": "ሁነታ ይምረጡ",
       "modes": {
         "letters": {
           "title": "የፊደል ወንዝ",
-          "description": "የሚንሳፈፉ ፊደሎችን ያዙ እና ወደ ትክክለኛው ባልዲ ይጣሉ።"
+          "description": "የሚንሳፈፉ ፊደላትን ያዙ እና ወደ ትክክለኛው መያዣዎች ያስቀምጡ"
         }
       }
     },
@@ -111,7 +111,9 @@
       "installDescription": "መተግበሪያ ጫን",
       "defaultNoun": "ንጥል",
       "defaultModeLabel": "ዋና መለማመጃ",
-      "defaultModeDescription": "ዋናውን የቁምፊዎች ስብስብ ይለማመዱ።"
+      "defaultModeDescription": "ዋናውን የቁምፊዎች ስብስብ ይለማመዱ።",
+      "goal": "ግብ",
+      "goalTooltip": "ጨዋታውን ለማሸነፍ ይህን ደረጃ ያሸንፉ!"
     },
     "modes": {
       "letters": {
@@ -223,7 +225,7 @@
     "accessibility": {
       "showIntroductions": "መግቢያዎችን አሳይ",
       "highContrast": "ከፍተኛ ንጽጽር ሁነታ",
-      "randomLetters": "በዘፈቀደ ፊደሎች",
+      "randomLetters": "ዘፈቀደ ፊደላት ላክ (የፊደል ወንዝ)",
       "reducedMotion": "የተቀነሰ እንቅስቃሴ",
       "speed": "የጨዋታ ፍጥነት",
       "speedFast": "ፈጣን",
@@ -242,7 +244,7 @@
       "heading": "የተገናኙ ፊደላት",
       "empty": "ለዚህ ዙር ለማሳየት ምንም ስታቲስቲክስ የለም።",
       "gameOver": "ጨዋታው ተጠናቀቀ",
-      "finalScore": "የመጨረሻ ነጥብ: {{score}}",
+      "finalScore": "የመጨረሻ ውጤት: {{score}}",
       "weakestLink": "ደካማው አገናኝ",
       "weakestLinkDescription": "በሚቀጥለው ጊዜ በዚህ ንጥል ላይ ያተኩሩ።",
       "characterLabel": "ቁምፊ {{symbol}}",
@@ -265,6 +267,12 @@
       "bonusInstruction": "ዕንቁዎቹን ያዙ!",
       "lives": "ህይወቶች",
       "levelUp": "ደረጃ ከፍ ማድረግ!"
+    },
+    "pause": {
+      "title": "ቆሟል",
+      "message": "",
+      "resume": "ቀጥል",
+      "mainMenu": "ዋና ምናሌ"
     }
   },
   "achievements": {
@@ -352,111 +360,111 @@
       }
     },
     "dedicatedScholar": {
-      "name": "Dedicated Scholar",
-      "summary": "Catch a total number of items across all sessions.",
+      "name": "ቁርጠኛ ምሁር",
+      "summary": "በሁሉም ክፍለ ጊዜዎች ውስጥ አጠቃላይ ዕቃዎች ብዛት ያዙ",
       "tiers": {
-        "1": "Studious Starter",
-        "2": "Devoted Reader",
-        "3": "Master Scholar"
+        "1": "ተጣጣሪ ጀማሪ",
+        "2": "ቁርጠኛ አንባቢ",
+        "3": "ማስተር ምሁር"
       }
     },
     "accuracyAce": {
-      "name": "Accuracy Ace",
-      "summary": "Complete sessions with 90% or higher accuracy.",
+      "name": "የትክክለኛነት ኤስ",
+      "summary": "ክፍለ ጊዜዎችን በ90% ወይም ከዚያ በላይ ትክክለኛነት ያጠናቅቁ",
       "tiers": {
-        "1": "Sharp Eye",
-        "2": "Keen Focus",
-        "3": "Flawless Precision"
+        "1": "ጠለቅ ያለ ዓይን",
+        "2": "ጠንካራ ትኩረት",
+        "3": "ፍጹም ትክክለኛነት"
       }
     },
     "speedDemon": {
-      "name": "Speed Demon",
-      "summary": "Complete sessions with fast flow speed enabled.",
+      "name": "የፍጥነት አጋንንት",
+      "summary": "በፈጣን የፍሰት ፍጥነት ክፍለ ጊዜዎችን ያጠናቅቁ",
       "tiers": {
-        "1": "Quick Current",
-        "2": "Rapid Runner",
-        "3": "Lightning Flow"
+        "1": "ፈጣን ጅረት",
+        "2": "ፈጣን ሯጭ",
+        "3": "የመብረቅ ፍሰት"
       }
     },
     "explorer": {
-      "name": "Explorer",
-      "summary": "Try different game modes and challenges.",
+      "name": "አሳሽ",
+      "summary": "የተለያዩ የጨዋታ ሁነታዎችን እና ተግዳሮቶችን ይሞክሩ",
       "tiers": {
-        "1": "Curious Wanderer",
-        "2": "Brave Voyager",
-        "3": "Intrepid Pioneer"
+        "1": "የማወቅ ጉጉት ያለው ተከታይ",
+        "2": "ጀግና ተጓዥ",
+        "3": "የማይፈራ ፈር ቀዳጅ"
       }
     },
     "perfectionist": {
-      "name": "Perfectionist",
-      "summary": "Complete sessions without any mistakes.",
+      "name": "ፍጹማዊ",
+      "summary": "ክፍለ ጊዜዎችን ያለስህተት ያጠናቅቁ",
       "tiers": {
-        "1": "Careful Catcher",
-        "2": "Precision Master",
-        "3": "Absolute Perfection"
+        "1": "ጥንቃቄ የሚያደርግ ያዥ",
+        "2": "የትክክለኛነት ማስተር",
+        "3": "ፍጹም ፍጽምና"
       }
     },
     "earlyBird": {
-      "name": "Early Bird",
-      "summary": "Play sessions in the morning hours (5am-11am).",
+      "name": "ቀደምት ወፍ",
+      "summary": "በማለዳ ሰዓቶች ክፍለ ጊዜዎችን ይጫወቱ (5:00-11:00)",
       "tiers": {
-        "1": "Dawn Paddler",
-        "2": "Sunrise Swimmer",
-        "3": "Morning Master"
+        "1": "የንጋት ጀልባ መቆጣጠሪያ",
+        "2": "የፀሐይ መውጣት ዋናተኛ",
+        "3": "የጥዋት ማስተር"
       }
     },
     "nightOwl": {
-      "name": "Night Owl",
-      "summary": "Play sessions in the evening hours (8pm-2am).",
+      "name": "የሌሊት ጉጉት",
+      "summary": "በምሽት ሰዓቶች ክፍለ ጊዜዎችን ይጫወቱ (20:00-2:00)",
       "tiers": {
-        "1": "Twilight Traveler",
-        "2": "Moonlight Navigator",
-        "3": "Midnight Champion"
+        "1": "የድንግዝግዝ ተጓዥ",
+        "2": "የጨረቃ ብርሃን ኒቪጌተር",
+        "3": "የመሀል ሌሊት ሻምፒዮን"
       }
     },
     "comebackKid": {
-      "name": "Comeback Kid",
-      "summary": "Return to play after breaking your streak.",
+      "name": "ተመላሽ",
+      "summary": "ተከታታይነትን ካበላሸ በኋላ ወደ መጫወት ይመለሱ",
       "tiers": {
-        "1": "Fresh Start",
-        "2": "Resilient Spirit",
-        "3": "Unwavering Return"
+        "1": "አዲስ መጀመር",
+        "2": "መቋቋም የሚችል መንፈስ",
+        "3": "የማይናወጥ መመለስ"
       }
     },
     "marathonRunner": {
-      "name": "Marathon Runner",
-      "summary": "Play extended sessions with 30+ catches.",
+      "name": "የማራቶን ሯጭ",
+      "summary": "30+ ካፕቸሮች ጋር የተራዘመ ክፍለ ጊዜዎችን ይጫወቱ",
       "tiers": {
-        "1": "Endurance Paddler",
-        "2": "Distance Swimmer",
-        "3": "Ultra Runner"
+        "1": "የመቋቋም ጀልባ መቆጣጠሪያ",
+        "2": "የርቀት ዋናተኛ",
+        "3": "አልትራ ሯጭ"
       }
     },
     "weekendWarrior": {
-      "name": "Weekend Warrior",
-      "summary": "Play sessions on weekends (Saturday or Sunday).",
+      "name": "የሳምንት መጨረሻ ተዋጊ",
+      "summary": "በሳምንት መጨረሻዎች ክፍለ ጊዜዎችን ይጫወቱ (ቅዳሜ ወይም እሁድ)",
       "tiers": {
-        "1": "Saturday Starter",
-        "2": "Weekend Regular",
-        "3": "Weekend Legend"
+        "1": "የቅዳሜ ጀማሪ",
+        "2": "የሳምንት መጨረሻ መደበኛ",
+        "3": "የሳምንት መጨረሻ አፈ-ታሪክ"
       }
     },
     "varietySeeker": {
-      "name": "Variety Seeker",
-      "summary": "Practice many different unique letters.",
+      "name": "ልዩነት ፈላጊ",
+      "summary": "ብዙ የተለያዩ ልዩ ፊደላትን ይለማመዱ",
       "tiers": {
-        "1": "Diverse Learner",
-        "2": "Broad Explorer",
-        "3": "Complete Master"
+        "1": "ልዩ ተማሪ",
+        "2": "ሰፊ አሳሽ",
+        "3": "ሙሉ ማስተር"
       }
     },
     "rapidLearner": {
-      "name": "Rapid Learner",
-      "summary": "Improve accuracy on previously weak letters.",
+      "name": "ፈጣን ተማሪ",
+      "summary": "ቀደም ሲል ደካማ በነበሩ ፊደላት ላይ ትክክለኛነትን ያሻሽሉ",
       "tiers": {
-        "1": "Quick Study",
-        "2": "Fast Improver",
-        "3": "Lightning Learner"
+        "1": "ፈጣን ተማሪ",
+        "2": "ፈጣን መሻሻያ",
+        "3": "የመብረቅ ተማሪ"
       }
     },
     "waveRider": {
@@ -818,6 +826,51 @@
         "2": "30 Day Streak",
         "3": "60 Day Streak"
       }
+    },
+    "streakMaster": {
+      "name": "የተከታታይ ማስተር",
+      "summary": "ተከታታይ የጨዋታ ቀናትን ያስቀምጡ",
+      "tiers": {
+        "1": "7-ቀን ቋሚነት",
+        "2": "30-ቀን ቋሚነት",
+        "3": "100-ቀን ሻምፒዮን"
+      }
+    },
+    "centurion": {
+      "name": "ሴንቹሪየን",
+      "summary": "100 የተጠናቀቁ ክፍለ ጊዜዎችን ይድረሱ",
+      "tiers": {
+        "1": "100 ክፍለ ጊዜዎች",
+        "2": "500 ክፍለ ጊዜዎች",
+        "3": "1000 ክፍለ ጊዜዎች"
+      }
+    },
+    "polyglot": {
+      "name": "ፖሊግሎት",
+      "summary": "በብዙ ቋንቋዎች ይለማመዱ",
+      "tiers": {
+        "1": "ባይሊንጋል አሳሽ",
+        "2": "ትሪሊንጋል ልምምድ",
+        "3": "ሁለንተናዊ ማስተር"
+      }
+    },
+    "challengeSeeker": {
+      "name": "ተግዳሮት ፈላጊ",
+      "summary": "ከባድ የችግር ደረጃዎችን ያጠናቅቁ",
+      "tiers": {
+        "1": "ጀግና",
+        "2": "ተቃዋሚ",
+        "3": "ድል አድራጊ"
+      }
+    },
+    "wordsmith": {
+      "name": "የቃላት ማስተር",
+      "summary": "የቃላት ሁነታን ይቆጣጠሩ",
+      "tiers": {
+        "1": "የቃላት ግንቢ",
+        "2": "የቃላት የእጅ ባለሙያ",
+        "3": "የቃላት ማስተር"
+      }
     }
   },
   "daily": {
@@ -1065,6 +1118,42 @@
         "title": "ዝግጁ? እንጫወት!",
         "description": "ለመጀመር ጀምርን ጠቅ ያድርጉ! ፊደሎች በማያ ገጹ ላይ ይፈስሳሉ - እያንዳንዱን ከታች ወደ ሚዛመደው ሳጥን ይጎትቱ።"
       }
+    }
+  },
+  "achievementSections": {
+    "classic": "ክላሲክ",
+    "special": "ልዩ",
+    "polyglot": "ፖሊግሎት",
+    "dedication": "ትጋት"
+  },
+  "dailyQuests": {
+    "catch10Letters": {
+      "name": "የጥዋት ልምምድ",
+      "description": "ዛሬ 10 ፊደላትን ያዙ"
+    },
+    "completeOneGame": {
+      "name": "ዕለታዊ ጠበብ",
+      "description": "ዛሬ 1 ክፍለ ጊዜ ያጠናቅቁ"
+    },
+    "achieve90Accuracy": {
+      "name": "ጠለቅ ያለ ተኳሽ",
+      "description": "በአንድ ክፍለ ጊዜ 90% ትክክለኛነት ይድረሱ"
+    },
+    "playInMorning": {
+      "name": "የጥዋት ሥነ-ሥርዓት",
+      "description": "በጥዋት አንድ ክፍለ ጊዜ ይጫወቱ (5:00-11:00)"
+    },
+    "tryNewMode": {
+      "name": "አዲስ ነገር",
+      "description": "የተለየ ሁነታ ወይም ቋንቋ ይሞክሩ"
+    },
+    "perfectRound": {
+      "name": "ፍጽምና",
+      "description": "ያለስህተት አንድ ደረጃ ያጠናቅቁ"
+    },
+    "catch30Letters": {
+      "name": "የተራዘመ ክፍለ ጊዜ",
+      "description": "በአንድ ክፍለ ጊዜ 30 ፊደላትን ያዙ"
     }
   }
 }

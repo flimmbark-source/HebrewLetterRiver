@@ -30,13 +30,13 @@
   },
   "home": {
     "hero": {
-      "heading": "Choose your river adventure.",
-      "description": "Start with single letters or dive into full words.",
-      "modeSelectTitle": "Select a mode",
+      "heading": "Escolha sua aventura no rio",
+      "description": "Comece com letras individuais ou mergulhe em palavras completas",
+      "modeSelectTitle": "Selecione um modo",
       "modes": {
         "letters": {
-          "title": "Letter River",
-          "description": "Catch drifting letters and drop them into the right buckets."
+          "title": "Rio de Letras",
+          "description": "Capture letras flutuantes e coloque-as nas cestas certas"
         }
       }
     },
@@ -103,7 +103,9 @@
       "installDescription": "Instalar aplicativo",
       "defaultNoun": "letra",
       "defaultModeLabel": "Prática Básica",
-      "defaultModeDescription": "Pratique o conjunto principal de personagens."
+      "defaultModeDescription": "Pratique o conjunto principal de personagens.",
+      "goal": "Objetivo",
+      "goalTooltip": "Vença este nível para ganhar o jogo!"
     },
     "modes": {
       "letters": {
@@ -215,7 +217,7 @@
     "accessibility": {
       "showIntroductions": "Mostrar apresentações",
       "highContrast": "Modo de alto contraste",
-      "randomLetters": "Send random letters (Letter River)",
+      "randomLetters": "Enviar letras aleatórias (Rio de Letras)",
       "reducedMotion": "Movimento Reduzido",
       "speed": "Velocidade do jogo",
       "speedFast": "Rápido",
@@ -234,7 +236,7 @@
       "heading": "Letras encontradas",
       "empty": "Não há estatísticas para mostrar para esta rodada.",
       "gameOver": "Game Over",
-      "finalScore": "Pontuação final: {{score}}",
+      "finalScore": "Pontuação Final: {{score}}",
       "weakestLink": "Elo mais fraco",
       "weakestLinkDescription": "Concentre-se neste item na próxima vez.",
       "characterLabel": "Personagem {{symbol}}",
@@ -257,6 +259,12 @@
       "bonusInstruction": "Pegue as joias!",
       "lives": "Vidas",
       "levelUp": "Suba de nível!"
+    },
+    "pause": {
+      "title": "Pausado",
+      "message": "",
+      "resume": "Continuar",
+      "mainMenu": "Menu Principal"
     }
   },
   "achievements": {
@@ -344,111 +352,111 @@
       }
     },
     "dedicatedScholar": {
-      "name": "Dedicated Scholar",
-      "summary": "Catch a total number of items across all sessions.",
+      "name": "Estudante Dedicado",
+      "summary": "Capture um número total de itens em todas as sessões",
       "tiers": {
-        "1": "Studious Starter",
-        "2": "Devoted Reader",
-        "3": "Master Scholar"
+        "1": "Iniciante Estudioso",
+        "2": "Leitor Dedicado",
+        "3": "Mestre Erudito"
       }
     },
     "accuracyAce": {
-      "name": "Accuracy Ace",
-      "summary": "Complete sessions with 90% or higher accuracy.",
+      "name": "Ás da Precisão",
+      "summary": "Complete sessões com 90% ou mais de precisão",
       "tiers": {
-        "1": "Sharp Eye",
-        "2": "Keen Focus",
-        "3": "Flawless Precision"
+        "1": "Olho Afiado",
+        "2": "Foco Certeiro",
+        "3": "Precisão Impecável"
       }
     },
     "speedDemon": {
-      "name": "Speed Demon",
-      "summary": "Complete sessions with fast flow speed enabled.",
+      "name": "Demônio da Velocidade",
+      "summary": "Complete sessões com velocidade de fluxo rápido ativada",
       "tiers": {
-        "1": "Quick Current",
-        "2": "Rapid Runner",
-        "3": "Lightning Flow"
+        "1": "Correnteza Rápida",
+        "2": "Corredor Veloz",
+        "3": "Fluxo Relâmpago"
       }
     },
     "explorer": {
-      "name": "Explorer",
-      "summary": "Try different game modes and challenges.",
+      "name": "Explorador",
+      "summary": "Experimente diferentes modos de jogo e desafios",
       "tiers": {
-        "1": "Curious Wanderer",
-        "2": "Brave Voyager",
-        "3": "Intrepid Pioneer"
+        "1": "Andarilho Curioso",
+        "2": "Viajante Corajoso",
+        "3": "Pioneiro Intrépido"
       }
     },
     "perfectionist": {
-      "name": "Perfectionist",
-      "summary": "Complete sessions without any mistakes.",
+      "name": "Perfeccionista",
+      "summary": "Complete sessões sem erros",
       "tiers": {
-        "1": "Careful Catcher",
-        "2": "Precision Master",
-        "3": "Absolute Perfection"
+        "1": "Apanhador Cuidadoso",
+        "2": "Mestre da Precisão",
+        "3": "Perfeição Absoluta"
       }
     },
     "earlyBird": {
-      "name": "Early Bird",
-      "summary": "Play sessions in the morning hours (5am-11am).",
+      "name": "Madrugador",
+      "summary": "Jogue sessões de manhã (5h-11h)",
       "tiers": {
-        "1": "Dawn Paddler",
-        "2": "Sunrise Swimmer",
-        "3": "Morning Master"
+        "1": "Remador da Aurora",
+        "2": "Nadador do Amanhecer",
+        "3": "Mestre da Manhã"
       }
     },
     "nightOwl": {
-      "name": "Night Owl",
-      "summary": "Play sessions in the evening hours (8pm-2am).",
+      "name": "Coruja Noturna",
+      "summary": "Jogue sessões à noite (20h-2h)",
       "tiers": {
-        "1": "Twilight Traveler",
-        "2": "Moonlight Navigator",
-        "3": "Midnight Champion"
+        "1": "Viajante do Crepúsculo",
+        "2": "Navegador ao Luar",
+        "3": "Campeão da Meia-Noite"
       }
     },
     "comebackKid": {
-      "name": "Comeback Kid",
-      "summary": "Return to play after breaking your streak.",
+      "name": "O que Volta",
+      "summary": "Volte a jogar depois de quebrar uma sequência",
       "tiers": {
-        "1": "Fresh Start",
-        "2": "Resilient Spirit",
-        "3": "Unwavering Return"
+        "1": "Novo Começo",
+        "2": "Espírito Resiliente",
+        "3": "Retorno Inabalável"
       }
     },
     "marathonRunner": {
-      "name": "Marathon Runner",
-      "summary": "Play extended sessions with 30+ catches.",
+      "name": "Maratonista",
+      "summary": "Jogue sessões prolongadas com 30+ capturas",
       "tiers": {
-        "1": "Endurance Paddler",
-        "2": "Distance Swimmer",
-        "3": "Ultra Runner"
+        "1": "Remador Resistente",
+        "2": "Nadador de Distância",
+        "3": "Ultra Corredor"
       }
     },
     "weekendWarrior": {
-      "name": "Weekend Warrior",
-      "summary": "Play sessions on weekends (Saturday or Sunday).",
+      "name": "Guerreiro de Fim de Semana",
+      "summary": "Jogue sessões nos fins de semana (sábado ou domingo)",
       "tiers": {
-        "1": "Saturday Starter",
-        "2": "Weekend Regular",
-        "3": "Weekend Legend"
+        "1": "Iniciante de Sábado",
+        "2": "Regular de Fim de Semana",
+        "3": "Lenda do Fim de Semana"
       }
     },
     "varietySeeker": {
-      "name": "Variety Seeker",
-      "summary": "Practice many different unique letters.",
+      "name": "Buscador de Variedade",
+      "summary": "Pratique muitas letras únicas diferentes",
       "tiers": {
-        "1": "Diverse Learner",
-        "2": "Broad Explorer",
-        "3": "Complete Master"
+        "1": "Aprendiz Diversificado",
+        "2": "Explorador Amplo",
+        "3": "Mestre Completo"
       }
     },
     "rapidLearner": {
-      "name": "Rapid Learner",
-      "summary": "Improve accuracy on previously weak letters.",
+      "name": "Aprendiz Rápido",
+      "summary": "Melhore a precisão em letras que eram fracas anteriormente",
       "tiers": {
-        "1": "Quick Study",
-        "2": "Fast Improver",
-        "3": "Lightning Learner"
+        "1": "Aprendiz Veloz",
+        "2": "Melhorador Rápido",
+        "3": "Aluno Relâmpago"
       }
     },
     "waveRider": {
@@ -810,6 +818,51 @@
         "2": "30 Day Streak",
         "3": "60 Day Streak"
       }
+    },
+    "streakMaster": {
+      "name": "Mestre das Sequências",
+      "summary": "Mantenha uma sequência de dias consecutivos jogando",
+      "tiers": {
+        "1": "Consistente de 7 Dias",
+        "2": "Constante de 30 Dias",
+        "3": "Campeão de 100 Dias"
+      }
+    },
+    "centurion": {
+      "name": "Centurião",
+      "summary": "Alcance 100 sessões completadas",
+      "tiers": {
+        "1": "100 Sessões",
+        "2": "500 Sessões",
+        "3": "1000 Sessões"
+      }
+    },
+    "polyglot": {
+      "name": "Poliglota",
+      "summary": "Pratique em vários idiomas",
+      "tiers": {
+        "1": "Explorador Bilíngue",
+        "2": "Praticante Trilíngue",
+        "3": "Mestre Multilíngue"
+      }
+    },
+    "challengeSeeker": {
+      "name": "Buscador de Desafios",
+      "summary": "Complete níveis de dificuldade difícil",
+      "tiers": {
+        "1": "Corajoso",
+        "2": "Desafiante",
+        "3": "Conquistador"
+      }
+    },
+    "wordsmith": {
+      "name": "Mestre das Palavras",
+      "summary": "Domine o modo de palavras",
+      "tiers": {
+        "1": "Construtor de Palavras",
+        "2": "Artesão de Palavras",
+        "3": "Mestre das Palavras"
+      }
     }
   },
   "daily": {
@@ -1065,6 +1118,42 @@
         "title": "Preparar? Vamos jogar!",
         "description": "Clique em Iniciar para começar! As letras fluirão pela tela - arraste cada uma para a caixa correspondente na parte inferior."
       }
+    }
+  },
+  "achievementSections": {
+    "classic": "Clássico",
+    "special": "Especial",
+    "polyglot": "Poliglota",
+    "dedication": "Dedicação"
+  },
+  "dailyQuests": {
+    "catch10Letters": {
+      "name": "Prática Matinal",
+      "description": "Capture 10 letras hoje"
+    },
+    "completeOneGame": {
+      "name": "Entusiasta Diário",
+      "description": "Complete 1 sessão hoje"
+    },
+    "achieve90Accuracy": {
+      "name": "Atirador Certeiro",
+      "description": "Alcance 90% de precisão em uma sessão"
+    },
+    "playInMorning": {
+      "name": "Ritual Matinal",
+      "description": "Jogue uma sessão de manhã (5h-11h)"
+    },
+    "tryNewMode": {
+      "name": "Algo Novo",
+      "description": "Experimente um modo ou idioma diferente"
+    },
+    "perfectRound": {
+      "name": "Perfeição",
+      "description": "Complete um nível sem erros"
+    },
+    "catch30Letters": {
+      "name": "Sessão Prolongada",
+      "description": "Capture 30 letras em uma sessão"
     }
   }
 }

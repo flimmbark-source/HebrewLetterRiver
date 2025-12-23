@@ -1,0 +1,557 @@
+{
+  "home": {
+    "hero": {
+      "heading": "בחרו את הרפתקת הנהר שלכם",
+      "description": "התחילו עם אותיות בודדות או צללו למילים שלמות",
+      "modeSelectTitle": "בחרו מצב משחק",
+      "modes": {
+        "letters": {
+          "title": "נהר האותiות",
+          "description": "תפסו אותיות נסחפות והכניסו אותן לסלים הנכונים"
+        }
+      }
+    },
+    "progress": {
+      "level": "שלב {{level}}"
+    }
+  },
+  "game": {
+    "pause": {
+      "title": "השהיה",
+      "message": "",
+      "resume": "המשך",
+      "mainMenu": "תפריט ראשי"
+    },
+    "setup": {
+      "goal": "יעד",
+      "goalTooltip": "נצחו שלב זה כדי לנצח את המשחק!"
+    },
+    "accessibility": {
+      "randomLetters": "שלחו אותיות אקראיות (נהר האותיות)"
+    },
+    "summary": {
+      "finalScore": "ניקוד סופי: {{score}}"
+    }
+  },
+  "achievementSections": {
+    "classic": "קלאסי",
+    "special": "מיוחד",
+    "polyglot": "פוליגלוט",
+    "dedication": "מסירות"
+  },
+  "badges": {
+    "dedicatedScholar": {
+      "name": "תלמיד מסור",
+      "summary": "תפסו מספר כולל של פריטים בכל המפגשים",
+      "tiers": {
+        "1": "מתחיל חרוץ",
+        "2": "קורא מסור",
+        "3": "תלמיד אמן"
+      }
+    },
+    "accuracyAce": {
+      "name": "אלוף הדיוק",
+      "summary": "השלימו מפגשים עם 90% דיוק או יותר",
+      "tiers": {
+        "1": "עין חדה",
+        "2": "מיקוד מושלם",
+        "3": "דיוק ללא פגם"
+      }
+    },
+    "speedDemon": {
+      "name": "שד המהירות",
+      "summary": "השלימו מפגשים עם מהירות זרימה מהירה",
+      "tiers": {
+        "1": "זרם מהיר",
+        "2": "רץ מהיר",
+        "3": "זרימת ברק"
+      }
+    },
+    "explorer": {
+      "name": "מגלה ארצות",
+      "summary": "נסו מצבי משחק ואתגרים שונים",
+      "tiers": {
+        "1": "נווד סקרן",
+        "2": "מטייל אמיץ",
+        "3": "חלוץ אמיתי"
+      }
+    },
+    "perfectionist": {
+      "name": "פרפקציוניסט",
+      "summary": "השלימו מפגשים ללא שגיאות",
+      "tiers": {
+        "1": "תופס זהיר",
+        "2": "אמן הדיוק",
+        "3": "שלמות מוחלטת"
+      }
+    },
+    "earlyBird": {
+      "name": "ציפור מוקדמת",
+      "summary": "שחקו מפגשים בשעות הבוקר (5:00-11:00)",
+      "tiers": {
+        "1": "חותר השחר",
+        "2": "שחיין הזריחה",
+        "3": "מאסטר הבוקר"
+      }
+    },
+    "nightOwl": {
+      "name": "ינשוף לילה",
+      "summary": "שחקו מפגשים בשעות הערב (20:00-02:00)",
+      "tiers": {
+        "1": "מטייל הדמדומים",
+        "2": "נווט אור הירח",
+        "3": "אלוף חצות"
+      }
+    },
+    "comebackKid": {
+      "name": "ילד השיבה",
+      "summary": "חזרו לשחק לאחר שבירת רצף",
+      "tiers": {
+        "1": "התחלה רעננה",
+        "2": "רוח עמידה",
+        "3": "שיבה בלתי מעורערת"
+      }
+    },
+    "marathonRunner": {
+      "name": "רץ מרתון",
+      "summary": "שחקו מפגשים ממושכים עם 30+ תפיסות",
+      "tiers": {
+        "1": "חותר סבלני",
+        "2": "שחיין מרחקים",
+        "3": "רץ אולטרה"
+      }
+    },
+    "weekendWarrior": {
+      "name": "לוחם סוף השבוע",
+      "summary": "שחקו מפגשים בסופי שבוע (שבת או יום ראשון)",
+      "tiers": {
+        "1": "מתחיל שבת",
+        "2": "קבוע סוף שבוע",
+        "3": "אגדת סוף השבוע"
+      }
+    },
+    "varietySeeker": {
+      "name": "מחפש גיוון",
+      "summary": "תרגלו אותיות ייחודיות רבות ושונות",
+      "tiers": {
+        "1": "לומד מגוון",
+        "2": "חוקר רחב",
+        "3": "מאסטר שלם"
+      }
+    },
+    "rapidLearner": {
+      "name": "לומד מהיר",
+      "summary": "שפרו דיוק באותיות שהיו חלשות בעבר",
+      "tiers": {
+        "1": "לומד מהיר",
+        "2": "משתפר מהר",
+        "3": "לומד ברק"
+      }
+    },
+    "waveRider": {
+      "tiers": {
+        "1": "רכיבת הגל",
+        "2": "אמן הגלים",
+        "3": "צונאמי"
+      }
+    },
+    "centuryClub": {
+      "name": "מועדון המאה",
+      "tiers": {
+        "1": "רבע מאה",
+        "2": "חצי מאה",
+        "3": "מאה שלמה"
+      }
+    },
+    "levelingLegend": {
+      "name": "אגדת השלבים",
+      "summary": "הגיעו לשלב {{goal}} במפגש אחד"
+    },
+    "flameKeeper": {
+      "tiers": {
+        "1": "ניצוץ",
+        "2": "מדורה",
+        "3": "גיהנום"
+      }
+    },
+    "pointHunter": {
+      "name": "צייד הנקודות",
+      "tiers": {
+        "1": "500 נקודות",
+        "2": "1000 נקודות",
+        "3": "2000 נקודות"
+      }
+    },
+    "grandMaster": {
+      "name": "המאסטר הגדול",
+      "tiers": {
+        "1": "50 תפיסות",
+        "2": "100 תפיסות",
+        "3": "200 תפיסות"
+      }
+    },
+    "risingStar": {
+      "name": "כוכב עולה",
+      "tiers": {
+        "1": "3 עליות שלב",
+        "2": "7 עליות שלב",
+        "3": "12 עליות שלב"
+      }
+    },
+    "flowState": {
+      "name": "מצב זרימה",
+      "tiers": {
+        "1": "15 מושלמות",
+        "2": "30 מושלמות",
+        "3": "50 מושלמות"
+      }
+    },
+    "unstoppable": {
+      "name": "בלתי ניתן לעצירה",
+      "tiers": {
+        "1": "5 מפגשים",
+        "2": "15 מפגשים",
+        "3": "30 מפגשים"
+      }
+    },
+    "starCollector": {
+      "tiers": {
+        "1": "100 כוכבים",
+        "2": "300 כוכבים",
+        "3": "750 כוכבים"
+      }
+    },
+    "slowSteady": {
+      "name": "לאט ויציב",
+      "tiers": {
+        "1": "זן ראשון",
+        "2": "מאסטר זן",
+        "3": "אגדת זן"
+      }
+    },
+    "clickChampion": {
+      "name": "אלוף הקליקים",
+      "tiers": {
+        "1": "מתחיל קליקים",
+        "2": "מומחה קליקים",
+        "3": "אמן קליקים"
+      }
+    },
+    "fontChameleon": {
+      "name": "זיקית הגופנים",
+      "tiers": {
+        "1": "חוקר גופנים",
+        "2": "מסתגל גופנים",
+        "3": "משנה צורת גופנים"
+      }
+    },
+    "clutchWinner": {
+      "name": "מנצח קריטי",
+      "tiers": {
+        "1": "הצלה בר מזל",
+        "2": "שחקן קריטי",
+        "3": "עושה ניסים"
+      }
+    },
+    "associationExpert": {
+      "name": "מומחה אסוציאציות",
+      "tiers": {
+        "1": "לומד חזותי",
+        "2": "אמן תמונות",
+        "3": "אלוף אסוציאציות"
+      }
+    },
+    "accessibilityAlly": {
+      "name": "בן ברית הנגישות",
+      "tiers": {
+        "1": "שחקן כולל",
+        "2": "תומך נגישות",
+        "3": "אלוף עיצוב אוניברסלי"
+      }
+    },
+    "noIntroductions": {
+      "name": "ללא הקדמות",
+      "tiers": {
+        "1": "דילוג הקדמה",
+        "2": "ללא תמיכה",
+        "3": "כבר יודע"
+      }
+    },
+    "oneShotWonder": {
+      "name": "פלא ניסיון אחד",
+      "tiers": {
+        "1": "לימוד מהיר",
+        "2": "רושם ראשון",
+        "3": "זכירה מיידית"
+      }
+    },
+    "randomMaster": {
+      "name": "אמן האקראי",
+      "tiers": {
+        "1": "אימוץ הכאוס",
+        "2": "מקצוען אקראי",
+        "3": "אלוף הכאוס"
+      }
+    },
+    "comebackChampion": {
+      "name": "אלוף השיבה",
+      "tiers": {
+        "1": "הזדמנות שנייה",
+        "2": "קרוב מדי",
+        "3": "עליית הפניקס"
+      }
+    },
+    "polyglotPioneer": {
+      "name": "חלוץ הפוליגלוט",
+      "tiers": {
+        "1": "3 שפות",
+        "2": "6 שפות",
+        "3": "10 שפות"
+      }
+    },
+    "unicodeChampion": {
+      "name": "אלוף היוניקוד",
+      "tiers": {
+        "1": "3 כתבים",
+        "2": "5 כתבים",
+        "3": "8 כתבים"
+      }
+    },
+    "rtlExpert": {
+      "name": "מומחה מימין לשמאל",
+      "tiers": {
+        "1": "מתחיל RTL",
+        "2": "מיומן RTL",
+        "3": "מאסטר RTL"
+      }
+    },
+    "vowelVirtuoso": {
+      "name": "לומד מתקדם",
+      "tiers": {
+        "1": "תלמיד מתקדם",
+        "2": "חוקר מתקדם",
+        "3": "מאסטר מתקדם"
+      }
+    },
+    "finalFormMaster": {
+      "name": "מומחה צורות מיוחדות",
+      "tiers": {
+        "1": "מתחיל צורות מיוחדות",
+        "2": "מומחה צורות מיוחדות",
+        "3": "אלוף צורות מיוחדות"
+      }
+    },
+    "modeMixer": {
+      "name": "מערבב מצבים",
+      "tiers": {
+        "1": "ערבוב",
+        "2": "להטוטן מצבים",
+        "3": "מערבב אולטימטיבי"
+      }
+    },
+    "culturalAmbassador": {
+      "name": "שגריר תרבותי",
+      "tiers": {
+        "1": "3 שפות",
+        "2": "6 שפות",
+        "3": "10 שפות"
+      }
+    },
+    "scriptScholar": {
+      "name": "חוקר כתבים",
+      "tiers": {
+        "1": "3 כתבים",
+        "2": "5 כתבים",
+        "3": "7 כתבים"
+      }
+    },
+    "alphabetAce": {
+      "name": "אלוף האלפבית",
+      "tiers": {
+        "1": "2 אלפביתים",
+        "2": "4 אלפביתים",
+        "3": "6 אלפביתים"
+      }
+    },
+    "languageSampler": {
+      "name": "טועם שפות",
+      "tiers": {
+        "1": "חוקר סקרן",
+        "2": "טועם שפות",
+        "3": "בלשן עולמי"
+      }
+    },
+    "morningGlory": {
+      "name": "תפארת הבוקר",
+      "tiers": {
+        "1": "קם מוקדם",
+        "2": "איש בוקר",
+        "3": "לוחם השחר"
+      }
+    },
+    "lunchLearner": {
+      "name": "לומד הצהריים",
+      "tiers": {
+        "1": "הפסקת צהריים",
+        "2": "מאסטר הצהריים",
+        "3": "אגדת הצהריים"
+      }
+    },
+    "midnightScholar": {
+      "name": "חוקר חצות",
+      "tiers": {
+        "1": "משמרת לילה",
+        "2": "שמן חצות",
+        "3": "אגדת נדודי שינה"
+      }
+    },
+    "primeTimePlayer": {
+      "name": "שחקן שעות השיא",
+      "tiers": {
+        "1": "מתחיל ערב",
+        "2": "שעות שיא",
+        "3": "אגדת הערב"
+      }
+    },
+    "perfectWeek": {
+      "name": "שבוע מושלם",
+      "tiers": {
+        "1": "שבוע ראשון",
+        "2": "3 שבועות מושלמים",
+        "3": "8 שבועות מושלמים"
+      }
+    },
+    "monthlyMaven": {
+      "name": "מומחה החודש",
+      "tiers": {
+        "1": "חודש פעיל אחד",
+        "2": "3 חודשים פעילים",
+        "3": "6 חודשים פעילים"
+      }
+    },
+    "anniversaryAce": {
+      "name": "אלוף השנה",
+      "tiers": {
+        "1": "שנה אחת",
+        "2": "שנתיים",
+        "3": "3 שנים"
+      }
+    },
+    "seasonVeteran": {
+      "name": "ותיק העונות",
+      "tiers": {
+        "1": "כל העונות (שנה אחת)",
+        "2": "כל העונות (שנתיים)",
+        "3": "כל העונות (3 שנים)"
+      }
+    },
+    "dawnPatrol": {
+      "name": "סיור השחר",
+      "tiers": {
+        "1": "אור ראשון",
+        "2": "קבוע שחר",
+        "3": "אלוף הזריחה"
+      }
+    },
+    "consistencyKing": {
+      "name": "מלך העקביות",
+      "tiers": {
+        "1": "רצף 14 ימים",
+        "2": "רצף 30 ימים",
+        "3": "רצף 60 ימים"
+      }
+    }
+  },
+  "daily": {
+    "tasks": {
+      "accuracyChallenge": {
+        "title": "אתגר דיוק",
+        "description": "השלימו מפגש עם דיוק של 90% או יותר"
+      },
+      "gemCollector": {
+        "title": "אוסף אבנים יקרות",
+        "description": "נצחו שני סיבובי בונוס היום"
+      },
+      "varietyPack": {
+        "title": "חבילת גיוון",
+        "description": "תפסו לפחות שמונה אותיות ייחודיות שונות"
+      },
+      "powerSession": {
+        "title": "מפגש כוח",
+        "description": "תפסו 25 פריטים או יותר במפגש אחד"
+      },
+      "perfectRun": {
+        "title": "ריצה מושלמת",
+        "description": "השלימו מפגש אחד ללא שגיאות"
+      },
+      "speedPractice": {
+        "title": "תרגול מהירות",
+        "description": "השלימו מפגש עם מהירות זרימה מהירה"
+      },
+      "tripleThread": {
+        "title": "איום משולש",
+        "description": "שחקו שלושה מפגשים מלאים היום"
+      },
+      "waveChallenge": {
+        "title": "אתגר הגל 🌊",
+        "description": "תפסו 8 אותיות בגל אחד"
+      },
+      "flameBuilder": {
+        "title": "בונה להבות 🔥",
+        "description": "בנו רצף מושלם של 15 תפיסות"
+      },
+      "slowRiverZen": {
+        "title": "זן נהר איטי",
+        "description": "השלימו מפגש במצב נהר איטי עם דיוק מושלם"
+      },
+      "clickMaster": {
+        "title": "מאסטר הקליקים",
+        "description": "נצחו מפגש עם מצב קליקים מופעל"
+      },
+      "levelClimber": {
+        "title": "מטפס שלבים",
+        "description": "הגיעו לשלב 12 או גבוה יותר במפגש אחד"
+      },
+      "noLivesLost": {
+        "title": "ללא אובדן חיים",
+        "description": "השלימו מפגש מבלי לאבד חיים"
+      },
+      "associationPractice": {
+        "title": "תרגול אסוציאציות",
+        "description": "השלימו מפגש עם מצב אסוציאציות מופעל"
+      },
+      "multiModeMaster": {
+        "title": "מאסטר רב מצבים",
+        "description": "השלימו מפגש עם שני מצבים או יותר מופעלים"
+      },
+      "fontFlexibility": {
+        "title": "גמישות גופנים",
+        "description": "השלימו מפגש עם ערבוב גופנים מופעל"
+      },
+      "randomChallenge": {
+        "title": "אתגר אקראי",
+        "description": "השלימו מפגש עם אותיות אקראיות מופעלות"
+      },
+      "vowelFocus": {
+        "title": "תרגול מתקדם",
+        "description": "השלימו מפגש במצב תרגול מתקדם"
+      },
+      "finalFormsPractice": {
+        "title": "תווים מיוחדים",
+        "description": "השלימו מפגש במצב תווים מיוחדים"
+      },
+      "languageExplorer": {
+        "title": "חוקר שפות",
+        "description": "נסו שפה חדשה היום"
+      },
+      "pointSurge": {
+        "title": "זינוק נקודות",
+        "description": "צברו 400 נקודות או יותר במפגש אחד"
+      },
+      "doubleSession": {
+        "title": "מפגש כפול",
+        "description": "השלימו שני מפגשים היום"
+      }
+    }
+  }
+}

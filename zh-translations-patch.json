@@ -1,0 +1,230 @@
+{
+  "home": {
+    "hero": {
+      "heading": "选择你的河流冒险",
+      "description": "从单个字母开始或直接进入完整单词",
+      "modeSelectTitle": "选择模式",
+      "modes": {
+        "letters": {
+          "title": "字母之河",
+          "description": "捕捉漂流的字母并放入正确的篮子"
+        }
+      }
+    },
+    "progress": {
+      "level": "第{{level}}级"
+    }
+  },
+  "game": {
+    "controls": {
+      "exitToMenu": "⬅"
+    },
+    "pause": {
+      "title": "暂停",
+      "message": "",
+      "resume": "继续",
+      "mainMenu": "主菜单"
+    },
+    "setup": {
+      "goal": "目标",
+      "goalTooltip": "击败这一级别以赢得游戏！"
+    },
+    "accessibility": {
+      "randomLetters": "发送随机字母（字母之河）"
+    },
+    "summary": {
+      "finalScore": "最终得分：{{score}}"
+    }
+  },
+  "achievementSections": {
+    "classic": "经典",
+    "special": "特殊",
+    "polyglot": "多语言者",
+    "dedication": "奉献"
+  },
+  "badges": {
+    "dedicatedScholar": {
+      "name": "专注学者",
+      "summary": "在所有会话中捕获总数量的项目",
+      "tiers": {
+        "1": "勤奋新手",
+        "2": "专注读者",
+        "3": "大师学者"
+      }
+    },
+    "accuracyAce": {
+      "name": "精准高手",
+      "summary": "以90%或更高的准确率完成会话",
+      "tiers": {
+        "1": "锐利之眼",
+        "2": "敏锐专注",
+        "3": "完美精准"
+      }
+    },
+    "speedDemon": {
+      "name": "速度恶魔",
+      "summary": "启用快速流动速度完成会话",
+      "tiers": {
+        "1": "急流",
+        "2": "快速跑者",
+        "3": "闪电流动"
+      }
+    },
+    "explorer": {
+      "name": "探险家",
+      "summary": "尝试不同的游戏模式和挑战",
+      "tiers": {
+        "1": "好奇旅者",
+        "2": "勇敢航海家",
+        "3": "无畏先锋"
+      }
+    },
+    "perfectionist": {
+      "name": "完美主义者",
+      "summary": "无错误完成会话",
+      "tiers": {
+        "1": "细心捕手",
+        "2": "精准大师",
+        "3": "绝对完美"
+      }
+    },
+    "earlyBird": {
+      "name": "早起鸟",
+      "summary": "在早晨时段玩会话（5:00-11:00）",
+      "tiers": {
+        "1": "黎明划手",
+        "2": "日出游泳者",
+        "3": "早晨大师"
+      }
+    },
+    "nightOwl": {
+      "name": "夜猫子",
+      "summary": "在晚上时段玩会话（20:00-2:00）",
+      "tiers": {
+        "1": "暮光旅者",
+        "2": "月光导航者",
+        "3": "午夜冠军"
+      }
+    },
+    "comebackKid": {
+      "name": "回归者",
+      "summary": "在打破连胜后回来玩",
+      "tiers": {
+        "1": "全新开始",
+        "2": "坚韧精神",
+        "3": "不屈回归"
+      }
+    },
+    "marathonRunner": {
+      "name": "马拉松跑者",
+      "summary": "玩30次以上捕获的延长会话",
+      "tiers": {
+        "1": "耐力划手",
+        "2": "长距离游泳者",
+        "3": "超级跑者"
+      }
+    },
+    "weekendWarrior": {
+      "name": "周末勇士",
+      "summary": "在周末玩会话（周六或周日）",
+      "tiers": {
+        "1": "周六新手",
+        "2": "周末常客",
+        "3": "周末传奇"
+      }
+    },
+    "varietySeeker": {
+      "name": "多样化追求者",
+      "summary": "练习许多不同的独特字母",
+      "tiers": {
+        "1": "多样化学习者",
+        "2": "广泛探索者",
+        "3": "完全大师"
+      }
+    },
+    "rapidLearner": {
+      "name": "快速学习者",
+      "summary": "在以前薄弱的字母上提高准确性",
+      "tiers": {
+        "1": "快速学生",
+        "2": "迅速进步者",
+        "3": "闪电学者"
+      }
+    },
+    "streakMaster": {
+      "name": "连胜大师",
+      "summary": "保持连续游戏天数",
+      "tiers": {
+        "1": "7天一致性",
+        "2": "30天稳定性",
+        "3": "100天冠军"
+      }
+    },
+    "centurion": {
+      "name": "百夫长",
+      "summary": "达到100次完成的会话",
+      "tiers": {
+        "1": "100次会话",
+        "2": "500次会话",
+        "3": "1000次会话"
+      }
+    },
+    "polyglot": {
+      "name": "多语言者",
+      "summary": "用多种语言练习",
+      "tiers": {
+        "1": "双语探索者",
+        "2": "三语练习者",
+        "3": "多语大师"
+      }
+    },
+    "challengeSeeker": {
+      "name": "挑战追求者",
+      "summary": "完成困难难度级别",
+      "tiers": {
+        "1": "勇敢者",
+        "2": "挑战者",
+        "3": "征服者"
+      }
+    },
+    "wordsmith": {
+      "name": "文字大师",
+      "summary": "掌握单词模式",
+      "tiers": {
+        "1": "单词建造者",
+        "2": "单词工匠",
+        "3": "单词大师"
+      }
+    }
+  },
+  "dailyQuests": {
+    "catch10Letters": {
+      "name": "晨间练习",
+      "description": "今天捕获10个字母"
+    },
+    "completeOneGame": {
+      "name": "每日热情者",
+      "description": "今天完成1次会话"
+    },
+    "achieve90Accuracy": {
+      "name": "神枪手",
+      "description": "在一次会话中达到90%的准确率"
+    },
+    "playInMorning": {
+      "name": "晨间仪式",
+      "description": "在早晨玩一次会话（5:00-11:00）"
+    },
+    "tryNewMode": {
+      "name": "尝试新事物",
+      "description": "尝试不同的模式或语言"
+    },
+    "perfectRound": {
+      "name": "完美",
+      "description": "无错误完成一个级别"
+    },
+    "catch30Letters": {
+      "name": "延长会话",
+      "description": "在一次会话中捕获30个字母"
+    }
+  }
+}

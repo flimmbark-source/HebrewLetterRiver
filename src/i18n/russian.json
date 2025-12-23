@@ -30,13 +30,13 @@
   },
   "home": {
     "hero": {
-      "heading": "Choose your river adventure.",
-      "description": "Start with single letters or dive into full words.",
-      "modeSelectTitle": "Select a mode",
+      "heading": "Выберите свое приключение на реке",
+      "description": "Начните с отдельных букв или погрузитесь в целые слова",
+      "modeSelectTitle": "Выберите режим",
       "modes": {
         "letters": {
-          "title": "Letter River",
-          "description": "Catch drifting letters and drop them into the right buckets."
+          "title": "Река Букв",
+          "description": "Ловите плывущие буквы и складывайте их в правильные корзины"
         }
       }
     },
@@ -103,7 +103,9 @@
       "installDescription": "Установить приложение",
       "defaultNoun": "буква",
       "defaultModeLabel": "Основная практика",
-      "defaultModeDescription": "Попрактикуйтесь в основном наборе персонажей."
+      "defaultModeDescription": "Попрактикуйтесь в основном наборе персонажей.",
+      "goal": "Цель",
+      "goalTooltip": "Пройдите этот уровень, чтобы выиграть игру!"
     },
     "modes": {
       "letters": {
@@ -215,7 +217,7 @@
     "accessibility": {
       "showIntroductions": "Показать знакомства",
       "highContrast": "Режим высокой контрастности",
-      "randomLetters": "Send random letters (Letter River)",
+      "randomLetters": "Отправить случайные буквы (Река Букв)",
       "reducedMotion": "Уменьшенное движение",
       "speed": "Скорость игры",
       "speedFast": "Быстрый",
@@ -234,7 +236,7 @@
       "heading": "Встреченные буквы",
       "empty": "Для этого раунда нет статистики.",
       "gameOver": "Игра закончена",
-      "finalScore": "Итоговый результат: {{score}}",
+      "finalScore": "Финальный Счет: {{score}}",
       "weakestLink": "Самое слабое звено",
       "weakestLinkDescription": "В следующий раз сосредоточьтесь на этом пункте.",
       "characterLabel": "Персонаж {{symbol}}",
@@ -257,6 +259,12 @@
       "bonusInstruction": "Лови драгоценные камни!",
       "lives": "Жизни",
       "levelUp": "Уровень выше!"
+    },
+    "pause": {
+      "title": "Пауза",
+      "message": "",
+      "resume": "Продолжить",
+      "mainMenu": "Главное Меню"
     }
   },
   "achievements": {
@@ -344,111 +352,111 @@
       }
     },
     "dedicatedScholar": {
-      "name": "Dedicated Scholar",
-      "summary": "Catch a total number of items across all sessions.",
+      "name": "Преданный Ученик",
+      "summary": "Поймайте общее количество предметов во всех сессиях",
       "tiers": {
-        "1": "Studious Starter",
-        "2": "Devoted Reader",
-        "3": "Master Scholar"
+        "1": "Прилежный Начинающий",
+        "2": "Преданный Читатель",
+        "3": "Мастер-Эрудит"
       }
     },
     "accuracyAce": {
-      "name": "Accuracy Ace",
-      "summary": "Complete sessions with 90% or higher accuracy.",
+      "name": "Ас Точности",
+      "summary": "Завершите сессии с точностью 90% или выше",
       "tiers": {
-        "1": "Sharp Eye",
-        "2": "Keen Focus",
-        "3": "Flawless Precision"
+        "1": "Острый Глаз",
+        "2": "Точный Фокус",
+        "3": "Безупречная Точность"
       }
     },
     "speedDemon": {
-      "name": "Speed Demon",
-      "summary": "Complete sessions with fast flow speed enabled.",
+      "name": "Демон Скорости",
+      "summary": "Завершите сессии с включенной быстрой скоростью потока",
       "tiers": {
-        "1": "Quick Current",
-        "2": "Rapid Runner",
-        "3": "Lightning Flow"
+        "1": "Быстрое Течение",
+        "2": "Быстрый Бегун",
+        "3": "Молниеносный Поток"
       }
     },
     "explorer": {
-      "name": "Explorer",
-      "summary": "Try different game modes and challenges.",
+      "name": "Исследователь",
+      "summary": "Попробуйте разные игровые режимы и вызовы",
       "tiers": {
-        "1": "Curious Wanderer",
-        "2": "Brave Voyager",
-        "3": "Intrepid Pioneer"
+        "1": "Любопытный Странник",
+        "2": "Храбрый Путешественник",
+        "3": "Бесстрашный Первопроходец"
       }
     },
     "perfectionist": {
-      "name": "Perfectionist",
-      "summary": "Complete sessions without any mistakes.",
+      "name": "Перфекционист",
+      "summary": "Завершите сессии без ошибок",
       "tiers": {
-        "1": "Careful Catcher",
-        "2": "Precision Master",
-        "3": "Absolute Perfection"
+        "1": "Осторожный Ловец",
+        "2": "Мастер Точности",
+        "3": "Абсолютное Совершенство"
       }
     },
     "earlyBird": {
-      "name": "Early Bird",
-      "summary": "Play sessions in the morning hours (5am-11am).",
+      "name": "Ранняя Пташка",
+      "summary": "Играйте в утренние часы (5:00-11:00)",
       "tiers": {
-        "1": "Dawn Paddler",
-        "2": "Sunrise Swimmer",
-        "3": "Morning Master"
+        "1": "Гребец Рассвета",
+        "2": "Пловец Восхода",
+        "3": "Мастер Утра"
       }
     },
     "nightOwl": {
-      "name": "Night Owl",
-      "summary": "Play sessions in the evening hours (8pm-2am).",
+      "name": "Ночная Сова",
+      "summary": "Играйте в вечерние часы (20:00-2:00)",
       "tiers": {
-        "1": "Twilight Traveler",
-        "2": "Moonlight Navigator",
-        "3": "Midnight Champion"
+        "1": "Путешественник Сумерек",
+        "2": "Лунный Навигатор",
+        "3": "Чемпион Полуночи"
       }
     },
     "comebackKid": {
-      "name": "Comeback Kid",
-      "summary": "Return to play after breaking your streak.",
+      "name": "Возвращающийся",
+      "summary": "Вернитесь к игре после прерывания серии",
       "tiers": {
-        "1": "Fresh Start",
-        "2": "Resilient Spirit",
-        "3": "Unwavering Return"
+        "1": "Новый Старт",
+        "2": "Стойкий Дух",
+        "3": "Непоколебимое Возвращение"
       }
     },
     "marathonRunner": {
-      "name": "Marathon Runner",
-      "summary": "Play extended sessions with 30+ catches.",
+      "name": "Марафонец",
+      "summary": "Играйте продолжительные сессии с 30+ захватами",
       "tiers": {
-        "1": "Endurance Paddler",
-        "2": "Distance Swimmer",
-        "3": "Ultra Runner"
+        "1": "Выносливый Гребец",
+        "2": "Пловец на Дистанции",
+        "3": "Ультра Бегун"
       }
     },
     "weekendWarrior": {
-      "name": "Weekend Warrior",
-      "summary": "Play sessions on weekends (Saturday or Sunday).",
+      "name": "Воин Выходного Дня",
+      "summary": "Играйте в выходные дни (суббота или воскресенье)",
       "tiers": {
-        "1": "Saturday Starter",
-        "2": "Weekend Regular",
-        "3": "Weekend Legend"
+        "1": "Субботний Новичок",
+        "2": "Постоянный Игрок Выходных",
+        "3": "Легенда Выходных"
       }
     },
     "varietySeeker": {
-      "name": "Variety Seeker",
-      "summary": "Practice many different unique letters.",
+      "name": "Искатель Разнообразия",
+      "summary": "Практикуйте много разных уникальных букв",
       "tiers": {
-        "1": "Diverse Learner",
-        "2": "Broad Explorer",
-        "3": "Complete Master"
+        "1": "Разносторонний Ученик",
+        "2": "Широкий Исследователь",
+        "3": "Полный Мастер"
       }
     },
     "rapidLearner": {
-      "name": "Rapid Learner",
-      "summary": "Improve accuracy on previously weak letters.",
+      "name": "Быстрый Ученик",
+      "summary": "Улучшите точность на буквах, которые раньше были слабыми",
       "tiers": {
-        "1": "Quick Study",
-        "2": "Fast Improver",
-        "3": "Lightning Learner"
+        "1": "Быстрый Учащийся",
+        "2": "Стремительный Улучшитель",
+        "3": "Молниеносный Студент"
       }
     },
     "waveRider": {
@@ -810,6 +818,51 @@
         "2": "30 Day Streak",
         "3": "60 Day Streak"
       }
+    },
+    "streakMaster": {
+      "name": "Мастер Серий",
+      "summary": "Поддерживайте серию последовательных дней игры",
+      "tiers": {
+        "1": "7-Дневная Последовательность",
+        "2": "30-Дневная Стабильность",
+        "3": "100-Дневный Чемпион"
+      }
+    },
+    "centurion": {
+      "name": "Центурион",
+      "summary": "Достигните 100 завершенных сессий",
+      "tiers": {
+        "1": "100 Сессий",
+        "2": "500 Сессий",
+        "3": "1000 Сессий"
+      }
+    },
+    "polyglot": {
+      "name": "Полиглот",
+      "summary": "Практикуйтесь на нескольких языках",
+      "tiers": {
+        "1": "Двуязычный Исследователь",
+        "2": "Трехъязычный Практик",
+        "3": "Многоязычный Мастер"
+      }
+    },
+    "challengeSeeker": {
+      "name": "Искатель Вызовов",
+      "summary": "Завершите уровни сложной трудности",
+      "tiers": {
+        "1": "Смелый",
+        "2": "Вызывающий",
+        "3": "Завоеватель"
+      }
+    },
+    "wordsmith": {
+      "name": "Мастер Слов",
+      "summary": "Освойте словесный режим",
+      "tiers": {
+        "1": "Строитель Слов",
+        "2": "Ремесленник Слов",
+        "3": "Мастер Слов"
+      }
     }
   },
   "daily": {
@@ -1065,6 +1118,42 @@
         "title": "Готовый? Давайте играть!",
         "description": "Нажмите «Пуск», чтобы начать! Буквы будут течь по экрану — перетащите каждую в соответствующее поле внизу."
       }
+    }
+  },
+  "achievementSections": {
+    "classic": "Классический",
+    "special": "Особый",
+    "polyglot": "Полиглот",
+    "dedication": "Преданность"
+  },
+  "dailyQuests": {
+    "catch10Letters": {
+      "name": "Утренняя Практика",
+      "description": "Поймайте 10 букв сегодня"
+    },
+    "completeOneGame": {
+      "name": "Ежедневный Энтузиаст",
+      "description": "Завершите 1 сессию сегодня"
+    },
+    "achieve90Accuracy": {
+      "name": "Меткий Стрелок",
+      "description": "Достигните 90% точности в одной сессии"
+    },
+    "playInMorning": {
+      "name": "Утренний Ритуал",
+      "description": "Сыграйте сессию утром (5:00-11:00)"
+    },
+    "tryNewMode": {
+      "name": "Что-то Новое",
+      "description": "Попробуйте другой режим или язык"
+    },
+    "perfectRound": {
+      "name": "Совершенство",
+      "description": "Завершите уровень без ошибок"
+    },
+    "catch30Letters": {
+      "name": "Продолжительная Сессия",
+      "description": "Поймайте 30 букв за одну сессию"
     }
   }
 }
