@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'icons/*.png', 'manifest.webmanifest'],
+      includeAssets: ['favicon.ico', 'icons/*.png'],
 
       manifest: {
         name: 'Hebrew Letter River',
