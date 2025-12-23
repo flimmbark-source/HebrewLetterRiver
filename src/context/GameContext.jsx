@@ -681,7 +681,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
               <div>
                 <div className="flex flex-col gap-2 sm:flex-row sm:justify-center mt-8">
                   <button
-                    id="win-exit-button"
+                    id="game-over-exit-button"
                     className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
                     style={{
                       border: 0,
