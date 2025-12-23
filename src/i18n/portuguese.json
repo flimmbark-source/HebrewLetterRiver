@@ -460,363 +460,363 @@
       }
     },
     "waveRider": {
-      "name": "Wave Rider 🌊",
-      "summary": "Catch {{goal}} letters in a single wave.",
+      "name": "Surfista de Ondas 🌊",
+      "summary": "Capture {{goal}} letras em uma única onda.",
       "tiers": {
-        "1": "Ride the Wave",
-        "2": "Wave Master",
+        "1": "Surfando a Onda",
+        "2": "Mestre das Ondas",
         "3": "Tsunami"
       }
     },
     "centuryClub": {
-      "name": "Century Club",
-      "summary": "Complete {{goal}} total sessions.",
+      "name": "Clube do Século",
+      "summary": "Complete {{goal}} sessões no total.",
       "tiers": {
-        "1": "Quarter Century",
-        "2": "Half Century",
-        "3": "Full Century"
+        "1": "Quarto de Século",
+        "2": "Meio Século",
+        "3": "Século Completo"
       }
     },
     "levelingLegend": {
-      "name": "Leveling Legend",
-      "summary": "Reach level {{goal}} in a single session.",
+      "name": "Lenda da Evolução",
+      "summary": "Alcance o nível {{goal}} em uma única sessão.",
       "tiers": {
-        "1": "Level 10",
-        "2": "Level 15",
-        "3": "Level 20"
+        "1": "Nível 10",
+        "2": "Nível 15",
+        "3": "Nível 20"
       }
     },
     "flameKeeper": {
-      "name": "Flame Keeper 🔥",
-      "summary": "Build a {{goal}}-catch streak without mistakes.",
+      "name": "Guardião da Chama 🔥",
+      "summary": "Construa uma sequência de {{goal}} capturas sem erros.",
       "tiers": {
-        "1": "Spark",
-        "2": "Bonfire",
+        "1": "Faísca",
+        "2": "Fogueira",
         "3": "Inferno"
       }
     },
     "pointHunter": {
-      "name": "Point Hunter",
-      "summary": "Score {{goal}} points in a single session.",
+      "name": "Caçador de Pontos",
+      "summary": "Marque {{goal}} pontos em uma única sessão.",
       "tiers": {
-        "1": "500 Points",
-        "2": "1000 Points",
-        "3": "2000 Points"
+        "1": "500 Pontos",
+        "2": "1000 Pontos",
+        "3": "2000 Pontos"
       }
     },
     "grandMaster": {
-      "name": "Grand Master",
-      "summary": "Catch {{goal}} correct letters total.",
+      "name": "Grão-Mestre",
+      "summary": "Capture {{goal}} letras corretas no total.",
       "tiers": {
-        "1": "50 Catches",
-        "2": "100 Catches",
-        "3": "200 Catches"
+        "1": "50 Capturas",
+        "2": "100 Capturas",
+        "3": "200 Capturas"
       }
     },
     "risingStar": {
-      "name": "Rising Star",
-      "summary": "Level up {{goal}} times in one session.",
+      "name": "Estrela em Ascensão",
+      "summary": "Suba de nível {{goal}} vezes em uma sessão.",
       "tiers": {
-        "1": "3 Level-Ups",
-        "2": "7 Level-Ups",
-        "3": "12 Level-Ups"
+        "1": "3 Subidas de Nível",
+        "2": "7 Subidas de Nível",
+        "3": "12 Subidas de Nível"
       }
     },
     "flowState": {
-      "name": "Flow State",
-      "summary": "Catch {{goal}} letters perfectly in a row.",
+      "name": "Estado de Fluxo",
+      "summary": "Capture {{goal}} letras perfeitamente em sequência.",
       "tiers": {
-        "1": "15 Perfect",
-        "2": "30 Perfect",
-        "3": "50 Perfect"
+        "1": "15 Perfeitas",
+        "2": "30 Perfeitas",
+        "3": "50 Perfeitas"
       }
     },
     "unstoppable": {
-      "name": "Unstoppable",
-      "summary": "Complete {{goal}} full sessions.",
+      "name": "Imparável",
+      "summary": "Complete {{goal}} sessões completas.",
       "tiers": {
-        "1": "5 Sessions",
-        "2": "15 Sessions",
-        "3": "30 Sessions"
+        "1": "5 Sessões",
+        "2": "15 Sessões",
+        "3": "30 Sessões"
       }
     },
     "starCollector": {
-      "name": "Star Collector ⭐",
-      "summary": "Earn {{goal}} total stars.",
+      "name": "Colecionador de Estrelas ⭐",
+      "summary": "Ganhe {{goal}} estrelas no total.",
       "tiers": {
-        "1": "100 Stars",
-        "2": "300 Stars",
-        "3": "750 Stars"
+        "1": "100 Estrelas",
+        "2": "300 Estrelas",
+        "3": "750 Estrelas"
       }
     },
     "slowSteady": {
-      "name": "Slow & Steady",
-      "summary": "Complete {{goal}} perfect sessions in slow river mode.",
+      "name": "Devagar e Sempre",
+      "summary": "Complete {{goal}} sessões perfeitas no modo rio lento.",
       "tiers": {
-        "1": "First Zen",
-        "2": "Zen Master",
-        "3": "Zen Legend"
+        "1": "Primeiro Zen",
+        "2": "Mestre Zen",
+        "3": "Lenda Zen"
       }
     },
     "clickChampion": {
-      "name": "Click Champion",
-      "summary": "Win {{goal}} sessions with click mode enabled.",
+      "name": "Campeão de Cliques",
+      "summary": "Vença {{goal}} sessões com o modo de clique ativado.",
       "tiers": {
-        "1": "Click Novice",
-        "2": "Click Expert",
-        "3": "Click Master"
+        "1": "Novato de Clique",
+        "2": "Especialista de Clique",
+        "3": "Mestre de Clique"
       }
     },
     "fontChameleon": {
-      "name": "Font Chameleon",
-      "summary": "Play {{goal}} sessions with font shuffle enabled.",
+      "name": "Camaleão de Fontes",
+      "summary": "Jogue {{goal}} sessões com fontes alternadas ativadas.",
       "tiers": {
-        "1": "Font Explorer",
-        "2": "Font Adapter",
-        "3": "Font Shapeshifter"
+        "1": "Explorador de Fontes",
+        "2": "Adaptador de Fontes",
+        "3": "Metamorfo de Fontes"
       }
     },
     "clutchWinner": {
-      "name": "Clutch Winner",
-      "summary": "Win {{goal}} sessions with only 1 life remaining.",
+      "name": "Vencedor Heroico",
+      "summary": "Vença {{goal}} sessões com apenas 1 vida restante.",
       "tiers": {
-        "1": "Lucky Save",
-        "2": "Clutch Player",
-        "3": "Miracle Worker"
+        "1": "Salvação da Sorte",
+        "2": "Jogador Heroico",
+        "3": "Trabalhador de Milagres"
       }
     },
     "associationExpert": {
-      "name": "Association Expert",
-      "summary": "Play {{goal}} sessions with association mode.",
+      "name": "Especialista em Associação",
+      "summary": "Jogue {{goal}} sessões com modo de associação.",
       "tiers": {
-        "1": "Visual Learner",
-        "2": "Image Master",
-        "3": "Association Ace"
+        "1": "Aprendiz Visual",
+        "2": "Mestre de Imagens",
+        "3": "Ás da Associação"
       }
     },
     "accessibilityAlly": {
-      "name": "Accessibility Ally",
-      "summary": "Play {{goal}} sessions with accessibility features.",
+      "name": "Aliado da Acessibilidade",
+      "summary": "Jogue {{goal}} sessões com recursos de acessibilidade.",
       "tiers": {
-        "1": "Inclusive Player",
-        "2": "Accessibility Advocate",
-        "3": "Universal Design Champion"
+        "1": "Jogador Inclusivo",
+        "2": "Defensor da Acessibilidade",
+        "3": "Campeão do Design Universal"
       }
     },
     "noIntroductions": {
-      "name": "No Introductions",
-      "summary": "Play {{goal}} sessions without letter introductions.",
+      "name": "Sem Apresentações",
+      "summary": "Jogue {{goal}} sessões sem introduções de letras.",
       "tiers": {
-        "1": "Skip Intro",
-        "2": "No Hand-Holding",
-        "3": "Already Knows"
+        "1": "Pular Introdução",
+        "2": "Sem Ajuda",
+        "3": "Já Conhece"
       }
     },
     "oneShotWonder": {
-      "name": "One-Shot Wonder",
-      "summary": "Get {{goal}} letters correct on first attempt.",
+      "name": "Prodígio de Primeira",
+      "summary": "Acerte {{goal}} letras na primeira tentativa.",
       "tiers": {
-        "1": "Quick Study",
-        "2": "First Impression",
-        "3": "Instant Recall"
+        "1": "Estudo Rápido",
+        "2": "Primeira Impressão",
+        "3": "Memória Instantânea"
       }
     },
     "randomMaster": {
-      "name": "Random Master",
-      "summary": "Play {{goal}} sessions with random letters enabled.",
+      "name": "Mestre do Aleatório",
+      "summary": "Jogue {{goal}} sessões com letras aleatórias ativadas.",
       "tiers": {
-        "1": "Embrace Chaos",
-        "2": "Random Pro",
-        "3": "Chaos Champion"
+        "1": "Abraçar o Caos",
+        "2": "Profissional Aleatório",
+        "3": "Campeão do Caos"
       }
     },
     "comebackChampion": {
-      "name": "Comeback Champion",
-      "summary": "Win {{goal}} sessions after losing 2 lives.",
+      "name": "Campeão da Virada",
+      "summary": "Vença {{goal}} sessões depois de perder 2 vidas.",
       "tiers": {
-        "1": "Second Chance",
-        "2": "Close Call",
-        "3": "Phoenix Rising"
+        "1": "Segunda Chance",
+        "2": "Por Um Triz",
+        "3": "Fênix Renascida"
       }
     },
     "polyglotPioneer": {
-      "name": "Polyglot Pioneer",
-      "summary": "Try {{goal}} different language packs.",
+      "name": "Pioneiro Poliglota",
+      "summary": "Experimente {{goal}} pacotes de idiomas diferentes.",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3 Idiomas",
+        "2": "6 Idiomas",
+        "3": "10 Idiomas"
       }
     },
     "unicodeChampion": {
-      "name": "Unicode Champion",
-      "summary": "Practice {{goal}} different writing systems.",
+      "name": "Campeão Unicode",
+      "summary": "Pratique {{goal}} sistemas de escrita diferentes.",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "8 Scripts"
+        "1": "3 Escritas",
+        "2": "5 Escritas",
+        "3": "8 Escritas"
       }
     },
     "rtlExpert": {
-      "name": "RTL Expert",
-      "summary": "Complete {{goal}} sessions in right-to-left languages.",
+      "name": "Especialista RTL",
+      "summary": "Complete {{goal}} sessões em idiomas da direita para a esquerda.",
       "tiers": {
-        "1": "RTL Beginner",
-        "2": "RTL Proficient",
-        "3": "RTL Master"
+        "1": "Iniciante RTL",
+        "2": "Proficiente RTL",
+        "3": "Mestre RTL"
       }
     },
     "vowelVirtuoso": {
-      "name": "Advanced Learner",
-      "summary": "Complete {{goal}} sessions in advanced practice mode.",
+      "name": "Aprendiz Avançado",
+      "summary": "Complete {{goal}} sessões no modo de prática avançada.",
       "tiers": {
-        "1": "Advanced Student",
-        "2": "Advanced Scholar",
-        "3": "Advanced Master"
+        "1": "Estudante Avançado",
+        "2": "Acadêmico Avançado",
+        "3": "Mestre Avançado"
       }
     },
     "finalFormMaster": {
-      "name": "Special Forms Expert",
-      "summary": "Complete {{goal}} sessions in special characters mode.",
+      "name": "Especialista em Formas Especiais",
+      "summary": "Complete {{goal}} sessões no modo de caracteres especiais.",
       "tiers": {
-        "1": "Special Forms Novice",
-        "2": "Special Forms Expert",
-        "3": "Special Forms Champion"
+        "1": "Novato em Formas Especiais",
+        "2": "Especialista em Formas Especiais",
+        "3": "Campeão de Formas Especiais"
       }
     },
     "modeMixer": {
-      "name": "Mode Mixer",
-      "summary": "Play {{goal}} sessions with multiple modes simultaneously.",
+      "name": "Misturador de Modos",
+      "summary": "Jogue {{goal}} sessões com múltiplos modos simultaneamente.",
       "tiers": {
-        "1": "Mix It Up",
-        "2": "Mode Juggler",
-        "3": "Ultimate Mixer"
+        "1": "Misturar Tudo",
+        "2": "Malabarista de Modos",
+        "3": "Misturador Supremo"
       }
     },
     "culturalAmbassador": {
-      "name": "Cultural Ambassador",
-      "summary": "Try {{goal}} different languages.",
+      "name": "Embaixador Cultural",
+      "summary": "Experimente {{goal}} idiomas diferentes.",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3 Idiomas",
+        "2": "6 Idiomas",
+        "3": "10 Idiomas"
       }
     },
     "scriptScholar": {
-      "name": "Script Scholar",
-      "summary": "Achieve 90%+ accuracy in {{goal}} different scripts.",
+      "name": "Erudito de Escritas",
+      "summary": "Alcance 90%+ de precisão em {{goal}} escritas diferentes.",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "7 Scripts"
+        "1": "3 Escritas",
+        "2": "5 Escritas",
+        "3": "7 Escritas"
       }
     },
     "alphabetAce": {
-      "name": "Alphabet Ace",
-      "summary": "Master basic mode in {{goal}} different languages.",
+      "name": "Ás do Alfabeto",
+      "summary": "Domine o modo básico em {{goal}} idiomas diferentes.",
       "tiers": {
-        "1": "2 Alphabets",
-        "2": "4 Alphabets",
-        "3": "6 Alphabets"
+        "1": "2 Alfabetos",
+        "2": "4 Alfabetos",
+        "3": "6 Alfabetos"
       }
     },
     "languageSampler": {
-      "name": "Language Sampler",
-      "summary": "Try a new language {{goal}} times.",
+      "name": "Degustador de Idiomas",
+      "summary": "Experimente um novo idioma {{goal}} vezes.",
       "tiers": {
-        "1": "Curious Explorer",
-        "2": "Language Taster",
-        "3": "World Linguist"
+        "1": "Explorador Curioso",
+        "2": "Degustador de Idiomas",
+        "3": "Linguista Mundial"
       }
     },
     "morningGlory": {
-      "name": "Morning Glory",
-      "summary": "Play {{goal}} sessions early morning (5am-8am).",
+      "name": "Glória Matinal",
+      "summary": "Jogue {{goal}} sessões de manhã cedo (5h-8h).",
       "tiers": {
-        "1": "Early Riser",
-        "2": "Morning Person",
-        "3": "Dawn Warrior"
+        "1": "Madrugador",
+        "2": "Pessoa Matinal",
+        "3": "Guerreiro da Aurora"
       }
     },
     "lunchLearner": {
-      "name": "Lunch Learner",
-      "summary": "Play {{goal}} sessions during lunch (11am-2pm).",
+      "name": "Aprendiz do Almoço",
+      "summary": "Jogue {{goal}} sessões durante o almoço (11h-14h).",
       "tiers": {
-        "1": "Lunch Break",
-        "2": "Midday Master",
-        "3": "Lunch Legend"
+        "1": "Pausa para o Almoço",
+        "2": "Mestre do Meio-Dia",
+        "3": "Lenda do Almoço"
       }
     },
     "midnightScholar": {
-      "name": "Midnight Scholar",
-      "summary": "Play {{goal}} sessions after midnight (12am-3am).",
+      "name": "Estudioso da Meia-Noite",
+      "summary": "Jogue {{goal}} sessões depois da meia-noite (0h-3h).",
       "tiers": {
-        "1": "Night Shift",
-        "2": "Midnight Oil",
-        "3": "Insomniac Legend"
+        "1": "Turno da Noite",
+        "2": "Queimando a Meia-Noite",
+        "3": "Lenda Insone"
       }
     },
     "primeTimePlayer": {
-      "name": "Prime Time Player",
-      "summary": "Play {{goal}} sessions in the evening (6pm-9pm).",
+      "name": "Jogador do Horário Nobre",
+      "summary": "Jogue {{goal}} sessões à noite (18h-21h).",
       "tiers": {
-        "1": "Evening Starter",
-        "2": "Prime Timer",
-        "3": "Evening Legend"
+        "1": "Iniciante Noturno",
+        "2": "Jogador Prime",
+        "3": "Lenda Noturna"
       }
     },
     "perfectWeek": {
-      "name": "Perfect Week",
-      "summary": "Play every day for 7 days straight ({{goal}} times).",
+      "name": "Semana Perfeita",
+      "summary": "Jogue todos os dias por 7 dias seguidos ({{goal}} vezes).",
       "tiers": {
-        "1": "First Week",
-        "2": "3 Perfect Weeks",
-        "3": "8 Perfect Weeks"
+        "1": "Primeira Semana",
+        "2": "3 Semanas Perfeitas",
+        "3": "8 Semanas Perfeitas"
       }
     },
     "monthlyMaven": {
-      "name": "Monthly Maven",
-      "summary": "Play 20+ days in a month ({{goal}} months).",
+      "name": "Mestre Mensal",
+      "summary": "Jogue 20+ dias em um mês ({{goal}} meses).",
       "tiers": {
-        "1": "1 Active Month",
-        "2": "3 Active Months",
-        "3": "6 Active Months"
+        "1": "1 Mês Ativo",
+        "2": "3 Meses Ativos",
+        "3": "6 Meses Ativos"
       }
     },
     "anniversaryAce": {
-      "name": "Anniversary Ace",
-      "summary": "Play on your {{goal}}-year account anniversary.",
+      "name": "Ás do Aniversário",
+      "summary": "Jogue no aniversário de {{goal}} ano(s) da sua conta.",
       "tiers": {
-        "1": "1 Year",
-        "2": "2 Years",
-        "3": "3 Years"
+        "1": "1 Ano",
+        "2": "2 Anos",
+        "3": "3 Anos"
       }
     },
     "seasonVeteran": {
-      "name": "Season Veteran",
-      "summary": "Play in all {{goal}} seasons of the year.",
+      "name": "Veterano das Estações",
+      "summary": "Jogue em todas as {{goal}} estações do ano.",
       "tiers": {
-        "1": "All Seasons (1 Year)",
-        "2": "All Seasons (2 Years)",
-        "3": "All Seasons (3 Years)"
+        "1": "Todas as Estações (1 Ano)",
+        "2": "Todas as Estações (2 Anos)",
+        "3": "Todas as Estações (3 Anos)"
       }
     },
     "dawnPatrol": {
-      "name": "Dawn Patrol",
-      "summary": "Play {{goal}} sessions at sunrise (5am-7am).",
+      "name": "Patrulha da Aurora",
+      "summary": "Jogue {{goal}} sessões ao nascer do sol (5h-7h).",
       "tiers": {
-        "1": "First Light",
-        "2": "Dawn Regular",
-        "3": "Sunrise Champion"
+        "1": "Primeira Luz",
+        "2": "Frequentador da Aurora",
+        "3": "Campeão do Nascer do Sol"
       }
     },
     "consistencyKing": {
-      "name": "Consistency King",
-      "summary": "Play {{goal}} days in a row.",
+      "name": "Rei da Consistência",
+      "summary": "Jogue {{goal}} dias seguidos.",
       "tiers": {
-        "1": "14 Day Streak",
-        "2": "30 Day Streak",
-        "3": "60 Day Streak"
+        "1": "Sequência de 14 Dias",
+        "2": "Sequência de 30 Dias",
+        "3": "Sequência de 60 Dias"
       }
     },
     "streakMaster": {

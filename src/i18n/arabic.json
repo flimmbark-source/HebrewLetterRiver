@@ -460,363 +460,363 @@
       }
     },
     "waveRider": {
-      "name": "Wave Rider 🌊",
-      "summary": "Catch {{goal}} letters in a single wave.",
+      "name": "راكب الموجة 🌊",
+      "summary": "اصطد {{goal}} أحرف في موجة واحدة.",
       "tiers": {
-        "1": "Ride the Wave",
-        "2": "Wave Master",
-        "3": "Tsunami"
+        "1": "راكب الموجة",
+        "2": "سيد الأمواج",
+        "3": "تسونامي"
       }
     },
     "centuryClub": {
-      "name": "Century Club",
-      "summary": "Complete {{goal}} total sessions.",
+      "name": "نادي المائة",
+      "summary": "أكمل {{goal}} جلسة إجمالية.",
       "tiers": {
-        "1": "Quarter Century",
-        "2": "Half Century",
-        "3": "Full Century"
+        "1": "ربع القرن",
+        "2": "نصف القرن",
+        "3": "القرن الكامل"
       }
     },
     "levelingLegend": {
-      "name": "Leveling Legend",
-      "summary": "Reach level {{goal}} in a single session.",
+      "name": "أسطورة المستويات",
+      "summary": "اصل إلى المستوى {{goal}} في جلسة واحدة.",
       "tiers": {
-        "1": "Level 10",
-        "2": "Level 15",
-        "3": "Level 20"
+        "1": "المستوى 10",
+        "2": "المستوى 15",
+        "3": "المستوى 20"
       }
     },
     "flameKeeper": {
-      "name": "Flame Keeper 🔥",
-      "summary": "Build a {{goal}}-catch streak without mistakes.",
+      "name": "حارس اللهب 🔥",
+      "summary": "ابنِ سلسلة من {{goal}} التقاطة دون أخطاء.",
       "tiers": {
-        "1": "Spark",
-        "2": "Bonfire",
-        "3": "Inferno"
+        "1": "الشرارة",
+        "2": "النار المشتعلة",
+        "3": "الجحيم"
       }
     },
     "pointHunter": {
-      "name": "Point Hunter",
-      "summary": "Score {{goal}} points in a single session.",
+      "name": "صياد النقاط",
+      "summary": "اسجل {{goal}} نقطة في جلسة واحدة.",
       "tiers": {
-        "1": "500 Points",
-        "2": "1000 Points",
-        "3": "2000 Points"
+        "1": "500 نقطة",
+        "2": "1000 نقطة",
+        "3": "2000 نقطة"
       }
     },
     "grandMaster": {
-      "name": "Grand Master",
-      "summary": "Catch {{goal}} correct letters total.",
+      "name": "السيد الأعظم",
+      "summary": "اصطد {{goal}} حرف صحيح إجمالاً.",
       "tiers": {
-        "1": "50 Catches",
-        "2": "100 Catches",
-        "3": "200 Catches"
+        "1": "50 التقاطة",
+        "2": "100 التقاطة",
+        "3": "200 التقاطة"
       }
     },
     "risingStar": {
-      "name": "Rising Star",
-      "summary": "Level up {{goal}} times in one session.",
+      "name": "النجم الصاعد",
+      "summary": "ارتقِ بمستواك {{goal}} مرة في جلسة واحدة.",
       "tiers": {
-        "1": "3 Level-Ups",
-        "2": "7 Level-Ups",
-        "3": "12 Level-Ups"
+        "1": "3 مستويات",
+        "2": "7 مستويات",
+        "3": "12 مستوى"
       }
     },
     "flowState": {
-      "name": "Flow State",
-      "summary": "Catch {{goal}} letters perfectly in a row.",
+      "name": "حالة التدفق",
+      "summary": "اصطد {{goal}} حرف بشكل مثالي على التوالي.",
       "tiers": {
-        "1": "15 Perfect",
-        "2": "30 Perfect",
-        "3": "50 Perfect"
+        "1": "15 مثالية",
+        "2": "30 مثالية",
+        "3": "50 مثالية"
       }
     },
     "unstoppable": {
-      "name": "Unstoppable",
-      "summary": "Complete {{goal}} full sessions.",
+      "name": "لا يُقهر",
+      "summary": "أكمل {{goal}} جلسة كاملة.",
       "tiers": {
-        "1": "5 Sessions",
-        "2": "15 Sessions",
-        "3": "30 Sessions"
+        "1": "5 جلسات",
+        "2": "15 جلسة",
+        "3": "30 جلسة"
       }
     },
     "starCollector": {
-      "name": "Star Collector ⭐",
-      "summary": "Earn {{goal}} total stars.",
+      "name": "جامع النجوم ⭐",
+      "summary": "اكسب {{goal}} نجمة إجمالية.",
       "tiers": {
-        "1": "100 Stars",
-        "2": "300 Stars",
-        "3": "750 Stars"
+        "1": "100 نجمة",
+        "2": "300 نجمة",
+        "3": "750 نجمة"
       }
     },
     "slowSteady": {
-      "name": "Slow & Steady",
-      "summary": "Complete {{goal}} perfect sessions in slow river mode.",
+      "name": "البطيء والثابت",
+      "summary": "أكمل {{goal}} جلسة مثالية في وضع النهر البطيء.",
       "tiers": {
-        "1": "First Zen",
-        "2": "Zen Master",
-        "3": "Zen Legend"
+        "1": "زِن الأول",
+        "2": "سيد الزِن",
+        "3": "أسطورة الزِن"
       }
     },
     "clickChampion": {
-      "name": "Click Champion",
-      "summary": "Win {{goal}} sessions with click mode enabled.",
+      "name": "بطل النقر",
+      "summary": "اربح {{goal}} جلسة مع تمكين وضع النقر.",
       "tiers": {
-        "1": "Click Novice",
-        "2": "Click Expert",
-        "3": "Click Master"
+        "1": "مبتدئ النقر",
+        "2": "خبير النقر",
+        "3": "سيد النقر"
       }
     },
     "fontChameleon": {
-      "name": "Font Chameleon",
-      "summary": "Play {{goal}} sessions with font shuffle enabled.",
+      "name": "الحرباء الخطية",
+      "summary": "العب {{goal}} جلسة مع تمكين تبديل الخطوط.",
       "tiers": {
-        "1": "Font Explorer",
-        "2": "Font Adapter",
-        "3": "Font Shapeshifter"
+        "1": "مستكشف الخطوط",
+        "2": "متكيف الخطوط",
+        "3": "متحول الخطوط"
       }
     },
     "clutchWinner": {
-      "name": "Clutch Winner",
-      "summary": "Win {{goal}} sessions with only 1 life remaining.",
+      "name": "الفائز الحاسم",
+      "summary": "اربح {{goal}} جلسة مع حياة واحدة فقط متبقية.",
       "tiers": {
-        "1": "Lucky Save",
-        "2": "Clutch Player",
-        "3": "Miracle Worker"
+        "1": "إنقاذ محظوظ",
+        "2": "اللاعب الحاسم",
+        "3": "صانع المعجزات"
       }
     },
     "associationExpert": {
-      "name": "Association Expert",
-      "summary": "Play {{goal}} sessions with association mode.",
+      "name": "خبير الربط",
+      "summary": "العب {{goal}} جلسة بوضع الربط.",
       "tiers": {
-        "1": "Visual Learner",
-        "2": "Image Master",
-        "3": "Association Ace"
+        "1": "المتعلم البصري",
+        "2": "سيد الصور",
+        "3": "بطل الربط"
       }
     },
     "accessibilityAlly": {
-      "name": "Accessibility Ally",
-      "summary": "Play {{goal}} sessions with accessibility features.",
+      "name": "حليف إمكانية الوصول",
+      "summary": "العب {{goal}} جلسة مع ميزات إمكانية الوصول.",
       "tiers": {
-        "1": "Inclusive Player",
-        "2": "Accessibility Advocate",
-        "3": "Universal Design Champion"
+        "1": "اللاعب الشامل",
+        "2": "مدافع إمكانية الوصول",
+        "3": "بطل التصميم الشامل"
       }
     },
     "noIntroductions": {
-      "name": "No Introductions",
-      "summary": "Play {{goal}} sessions without letter introductions.",
+      "name": "بدون مقدمات",
+      "summary": "العب {{goal}} جلسة بدون مقدمات الأحرف.",
       "tiers": {
-        "1": "Skip Intro",
-        "2": "No Hand-Holding",
-        "3": "Already Knows"
+        "1": "تخطي المقدمة",
+        "2": "بدون مساعدة",
+        "3": "يعرف مسبقاً"
       }
     },
     "oneShotWonder": {
-      "name": "One-Shot Wonder",
-      "summary": "Get {{goal}} letters correct on first attempt.",
+      "name": "أعجوبة المحاولة الأولى",
+      "summary": "أصِب {{goal}} حرف من المحاولة الأولى.",
       "tiers": {
-        "1": "Quick Study",
-        "2": "First Impression",
-        "3": "Instant Recall"
+        "1": "الدراسة السريعة",
+        "2": "الانطباع الأول",
+        "3": "التذكر الفوري"
       }
     },
     "randomMaster": {
-      "name": "Random Master",
-      "summary": "Play {{goal}} sessions with random letters enabled.",
+      "name": "سيد العشوائية",
+      "summary": "العب {{goal}} جلسة مع تمكين الأحرف العشوائية.",
       "tiers": {
-        "1": "Embrace Chaos",
-        "2": "Random Pro",
-        "3": "Chaos Champion"
+        "1": "معانقة الفوضى",
+        "2": "محترف العشوائية",
+        "3": "بطل الفوضى"
       }
     },
     "comebackChampion": {
-      "name": "Comeback Champion",
-      "summary": "Win {{goal}} sessions after losing 2 lives.",
+      "name": "بطل العودة",
+      "summary": "اربح {{goal}} جلسة بعد خسارة حياتين.",
       "tiers": {
-        "1": "Second Chance",
-        "2": "Close Call",
-        "3": "Phoenix Rising"
+        "1": "الفرصة الثانية",
+        "2": "النجاة بالكاد",
+        "3": "العنقاء الصاعد"
       }
     },
     "polyglotPioneer": {
-      "name": "Polyglot Pioneer",
-      "summary": "Try {{goal}} different language packs.",
+      "name": "رائد متعدد اللغات",
+      "summary": "جرب {{goal}} حزمة لغة مختلفة.",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3 لغات",
+        "2": "6 لغات",
+        "3": "10 لغات"
       }
     },
     "unicodeChampion": {
-      "name": "Unicode Champion",
-      "summary": "Practice {{goal}} different writing systems.",
+      "name": "بطل يونيكود",
+      "summary": "تدرب على {{goal}} نظام كتابة مختلف.",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "8 Scripts"
+        "1": "3 نصوص",
+        "2": "5 نصوص",
+        "3": "8 نصوص"
       }
     },
     "rtlExpert": {
-      "name": "RTL Expert",
-      "summary": "Complete {{goal}} sessions in right-to-left languages.",
+      "name": "خبير من اليمين لليسار",
+      "summary": "أكمل {{goal}} جلسة باللغات من اليمين إلى اليسار.",
       "tiers": {
-        "1": "RTL Beginner",
-        "2": "RTL Proficient",
-        "3": "RTL Master"
+        "1": "مبتدئ من اليمين لليسار",
+        "2": "متقن من اليمين لليسار",
+        "3": "سيد من اليمين لليسار"
       }
     },
     "vowelVirtuoso": {
-      "name": "Advanced Learner",
-      "summary": "Complete {{goal}} sessions in advanced practice mode.",
+      "name": "المتعلم المتقدم",
+      "summary": "أكمل {{goal}} جلسة في وضع التدريب المتقدم.",
       "tiers": {
-        "1": "Advanced Student",
-        "2": "Advanced Scholar",
-        "3": "Advanced Master"
+        "1": "الطالب المتقدم",
+        "2": "الباحث المتقدم",
+        "3": "السيد المتقدم"
       }
     },
     "finalFormMaster": {
-      "name": "Special Forms Expert",
-      "summary": "Complete {{goal}} sessions in special characters mode.",
+      "name": "خبير الأشكال الخاصة",
+      "summary": "أكمل {{goal}} جلسة في وضع الأحرف الخاصة.",
       "tiers": {
-        "1": "Special Forms Novice",
-        "2": "Special Forms Expert",
-        "3": "Special Forms Champion"
+        "1": "مبتدئ الأشكال الخاصة",
+        "2": "خبير الأشكال الخاصة",
+        "3": "بطل الأشكال الخاصة"
       }
     },
     "modeMixer": {
-      "name": "Mode Mixer",
-      "summary": "Play {{goal}} sessions with multiple modes simultaneously.",
+      "name": "خلّاط الأوضاع",
+      "summary": "العب {{goal}} جلسة بأوضاع متعددة في نفس الوقت.",
       "tiers": {
-        "1": "Mix It Up",
-        "2": "Mode Juggler",
-        "3": "Ultimate Mixer"
+        "1": "امزجها",
+        "2": "مشعوذ الأوضاع",
+        "3": "الخلّاط الأسمى"
       }
     },
     "culturalAmbassador": {
-      "name": "Cultural Ambassador",
-      "summary": "Try {{goal}} different languages.",
+      "name": "السفير الثقافي",
+      "summary": "جرب {{goal}} لغة مختلفة.",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3 لغات",
+        "2": "6 لغات",
+        "3": "10 لغات"
       }
     },
     "scriptScholar": {
-      "name": "Script Scholar",
-      "summary": "Achieve 90%+ accuracy in {{goal}} different scripts.",
+      "name": "عالم النصوص",
+      "summary": "حقق دقة 90%+ في {{goal}} نص مختلف.",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "7 Scripts"
+        "1": "3 نصوص",
+        "2": "5 نصوص",
+        "3": "7 نصوص"
       }
     },
     "alphabetAce": {
-      "name": "Alphabet Ace",
-      "summary": "Master basic mode in {{goal}} different languages.",
+      "name": "بطل الأبجديات",
+      "summary": "أتقن الوضع الأساسي في {{goal}} لغة مختلفة.",
       "tiers": {
-        "1": "2 Alphabets",
-        "2": "4 Alphabets",
-        "3": "6 Alphabets"
+        "1": "أبجديتان",
+        "2": "4 أبجديات",
+        "3": "6 أبجديات"
       }
     },
     "languageSampler": {
-      "name": "Language Sampler",
-      "summary": "Try a new language {{goal}} times.",
+      "name": "متذوق اللغات",
+      "summary": "جرب لغة جديدة {{goal}} مرة.",
       "tiers": {
-        "1": "Curious Explorer",
-        "2": "Language Taster",
-        "3": "World Linguist"
+        "1": "المستكشف الفضولي",
+        "2": "متذوق اللغات",
+        "3": "لغوي العالم"
       }
     },
     "morningGlory": {
-      "name": "Morning Glory",
-      "summary": "Play {{goal}} sessions early morning (5am-8am).",
+      "name": "مجد الصباح",
+      "summary": "العب {{goal}} جلسة في الصباح الباكر (5 صباحاً-8 صباحاً).",
       "tiers": {
-        "1": "Early Riser",
-        "2": "Morning Person",
-        "3": "Dawn Warrior"
+        "1": "الناهض المبكر",
+        "2": "شخص الصباح",
+        "3": "محارب الفجر"
       }
     },
     "lunchLearner": {
-      "name": "Lunch Learner",
-      "summary": "Play {{goal}} sessions during lunch (11am-2pm).",
+      "name": "متعلم الغداء",
+      "summary": "العب {{goal}} جلسة خلال الغداء (11 صباحاً-2 ظهراً).",
       "tiers": {
-        "1": "Lunch Break",
-        "2": "Midday Master",
-        "3": "Lunch Legend"
+        "1": "استراحة الغداء",
+        "2": "سيد الظهيرة",
+        "3": "أسطورة الغداء"
       }
     },
     "midnightScholar": {
-      "name": "Midnight Scholar",
-      "summary": "Play {{goal}} sessions after midnight (12am-3am).",
+      "name": "عالم منتصف الليل",
+      "summary": "العب {{goal}} جلسة بعد منتصف الليل (12 صباحاً-3 صباحاً).",
       "tiers": {
-        "1": "Night Shift",
-        "2": "Midnight Oil",
-        "3": "Insomniac Legend"
+        "1": "نوبة الليل",
+        "2": "زيت منتصف الليل",
+        "3": "أسطورة الأرق"
       }
     },
     "primeTimePlayer": {
-      "name": "Prime Time Player",
-      "summary": "Play {{goal}} sessions in the evening (6pm-9pm).",
+      "name": "لاعب الوقت الذهبي",
+      "summary": "العب {{goal}} جلسة في المساء (6 مساءً-9 مساءً).",
       "tiers": {
-        "1": "Evening Starter",
-        "2": "Prime Timer",
-        "3": "Evening Legend"
+        "1": "مبتدئ المساء",
+        "2": "توقيت ذهبي",
+        "3": "أسطورة المساء"
       }
     },
     "perfectWeek": {
-      "name": "Perfect Week",
-      "summary": "Play every day for 7 days straight ({{goal}} times).",
+      "name": "الأسبوع المثالي",
+      "summary": "العب كل يوم لمدة 7 أيام متتالية ({{goal}} مرة).",
       "tiers": {
-        "1": "First Week",
-        "2": "3 Perfect Weeks",
-        "3": "8 Perfect Weeks"
+        "1": "الأسبوع الأول",
+        "2": "3 أسابيع مثالية",
+        "3": "8 أسابيع مثالية"
       }
     },
     "monthlyMaven": {
-      "name": "Monthly Maven",
-      "summary": "Play 20+ days in a month ({{goal}} months).",
+      "name": "خبير الشهر",
+      "summary": "العب 20+ يوماً في الشهر ({{goal}} شهر).",
       "tiers": {
-        "1": "1 Active Month",
-        "2": "3 Active Months",
-        "3": "6 Active Months"
+        "1": "شهر نشط واحد",
+        "2": "3 أشهر نشطة",
+        "3": "6 أشهر نشطة"
       }
     },
     "anniversaryAce": {
-      "name": "Anniversary Ace",
-      "summary": "Play on your {{goal}}-year account anniversary.",
+      "name": "بطل الذكرى السنوية",
+      "summary": "العب في ذكرى حسابك السنوية رقم {{goal}}.",
       "tiers": {
-        "1": "1 Year",
-        "2": "2 Years",
-        "3": "3 Years"
+        "1": "سنة واحدة",
+        "2": "سنتان",
+        "3": "3 سنوات"
       }
     },
     "seasonVeteran": {
-      "name": "Season Veteran",
-      "summary": "Play in all {{goal}} seasons of the year.",
+      "name": "المخضرم الموسمي",
+      "summary": "العب في جميع فصول السنة الـ {{goal}}.",
       "tiers": {
-        "1": "All Seasons (1 Year)",
-        "2": "All Seasons (2 Years)",
-        "3": "All Seasons (3 Years)"
+        "1": "جميع الفصول (سنة واحدة)",
+        "2": "جميع الفصول (سنتان)",
+        "3": "جميع الفصول (3 سنوات)"
       }
     },
     "dawnPatrol": {
-      "name": "Dawn Patrol",
-      "summary": "Play {{goal}} sessions at sunrise (5am-7am).",
+      "name": "دورية الفجر",
+      "summary": "العب {{goal}} جلسة عند شروق الشمس (5 صباحاً-7 صباحاً).",
       "tiers": {
-        "1": "First Light",
-        "2": "Dawn Regular",
-        "3": "Sunrise Champion"
+        "1": "الضوء الأول",
+        "2": "منتظم الفجر",
+        "3": "بطل الشروق"
       }
     },
     "consistencyKing": {
-      "name": "Consistency King",
-      "summary": "Play {{goal}} days in a row.",
+      "name": "ملك الاتساق",
+      "summary": "العب {{goal}} يوم على التوالي.",
       "tiers": {
-        "1": "14 Day Streak",
-        "2": "30 Day Streak",
-        "3": "60 Day Streak"
+        "1": "سلسلة 14 يوماً",
+        "2": "سلسلة 30 يوماً",
+        "3": "سلسلة 60 يوماً"
       }
     },
     "streakMaster": {

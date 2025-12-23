@@ -474,363 +474,363 @@
       }
     },
     "waveRider": {
-      "name": "Wave Rider 🌊",
-      "summary": "Catch {{goal}} letters in a single wave.",
+      "name": "乘波者 🌊",
+      "summary": "在单次波浪中捕获{{goal}}个字母",
       "tiers": {
-        "1": "Ride the Wave",
-        "2": "Wave Master",
-        "3": "Tsunami"
+        "1": "驾驭波浪",
+        "2": "波浪大师",
+        "3": "海啸"
       }
     },
     "centuryClub": {
-      "name": "Century Club",
-      "summary": "Complete {{goal}} total sessions.",
+      "name": "百场俱乐部",
+      "summary": "总共完成{{goal}}个会话",
       "tiers": {
-        "1": "Quarter Century",
-        "2": "Half Century",
-        "3": "Full Century"
+        "1": "四分之一世纪",
+        "2": "半世纪",
+        "3": "完整世纪"
       }
     },
     "levelingLegend": {
-      "name": "Leveling Legend",
-      "summary": "Reach level {{goal}} in a single session.",
+      "name": "升级传奇",
+      "summary": "在单次会话中达到{{goal}}级",
       "tiers": {
-        "1": "Level 10",
-        "2": "Level 15",
-        "3": "Level 20"
+        "1": "10级",
+        "2": "15级",
+        "3": "20级"
       }
     },
     "flameKeeper": {
-      "name": "Flame Keeper 🔥",
-      "summary": "Build a {{goal}}-catch streak without mistakes.",
+      "name": "守火者 🔥",
+      "summary": "建立{{goal}}次连续捕获无误的纪录",
       "tiers": {
-        "1": "Spark",
-        "2": "Bonfire",
-        "3": "Inferno"
+        "1": "火花",
+        "2": "篝火",
+        "3": "烈焰"
       }
     },
     "pointHunter": {
-      "name": "Point Hunter",
-      "summary": "Score {{goal}} points in a single session.",
+      "name": "分数猎手",
+      "summary": "在单次会话中获得{{goal}}分",
       "tiers": {
-        "1": "500 Points",
-        "2": "1000 Points",
-        "3": "2000 Points"
+        "1": "500分",
+        "2": "1000分",
+        "3": "2000分"
       }
     },
     "grandMaster": {
-      "name": "Grand Master",
-      "summary": "Catch {{goal}} correct letters total.",
+      "name": "宗师",
+      "summary": "总共正确捕获{{goal}}个字母",
       "tiers": {
-        "1": "50 Catches",
-        "2": "100 Catches",
-        "3": "200 Catches"
+        "1": "50次捕获",
+        "2": "100次捕获",
+        "3": "200次捕获"
       }
     },
     "risingStar": {
-      "name": "Rising Star",
-      "summary": "Level up {{goal}} times in one session.",
+      "name": "冉冉新星",
+      "summary": "在一次会话中升级{{goal}}次",
       "tiers": {
-        "1": "3 Level-Ups",
-        "2": "7 Level-Ups",
-        "3": "12 Level-Ups"
+        "1": "3次升级",
+        "2": "7次升级",
+        "3": "12次升级"
       }
     },
     "flowState": {
-      "name": "Flow State",
-      "summary": "Catch {{goal}} letters perfectly in a row.",
+      "name": "心流状态",
+      "summary": "连续完美捕获{{goal}}个字母",
       "tiers": {
-        "1": "15 Perfect",
-        "2": "30 Perfect",
-        "3": "50 Perfect"
+        "1": "15次完美",
+        "2": "30次完美",
+        "3": "50次完美"
       }
     },
     "unstoppable": {
-      "name": "Unstoppable",
-      "summary": "Complete {{goal}} full sessions.",
+      "name": "势不可挡",
+      "summary": "完成{{goal}}个完整会话",
       "tiers": {
-        "1": "5 Sessions",
-        "2": "15 Sessions",
-        "3": "30 Sessions"
+        "1": "5次会话",
+        "2": "15次会话",
+        "3": "30次会话"
       }
     },
     "starCollector": {
-      "name": "Star Collector ⭐",
-      "summary": "Earn {{goal}} total stars.",
+      "name": "星星收集者 ⭐",
+      "summary": "总共赚取{{goal}}颗星星",
       "tiers": {
-        "1": "100 Stars",
-        "2": "300 Stars",
-        "3": "750 Stars"
+        "1": "100颗星",
+        "2": "300颗星",
+        "3": "750颗星"
       }
     },
     "slowSteady": {
-      "name": "Slow & Steady",
-      "summary": "Complete {{goal}} perfect sessions in slow river mode.",
+      "name": "慢而稳",
+      "summary": "在慢速河流模式中完成{{goal}}个完美会话",
       "tiers": {
-        "1": "First Zen",
-        "2": "Zen Master",
-        "3": "Zen Legend"
+        "1": "初入禅境",
+        "2": "禅道大师",
+        "3": "禅宗传奇"
       }
     },
     "clickChampion": {
-      "name": "Click Champion",
-      "summary": "Win {{goal}} sessions with click mode enabled.",
+      "name": "点击冠军",
+      "summary": "在启用点击模式下赢得{{goal}}次会话",
       "tiers": {
-        "1": "Click Novice",
-        "2": "Click Expert",
-        "3": "Click Master"
+        "1": "点击新手",
+        "2": "点击专家",
+        "3": "点击大师"
       }
     },
     "fontChameleon": {
-      "name": "Font Chameleon",
-      "summary": "Play {{goal}} sessions with font shuffle enabled.",
+      "name": "字体变色龙",
+      "summary": "在启用字体随机模式下玩{{goal}}次会话",
       "tiers": {
-        "1": "Font Explorer",
-        "2": "Font Adapter",
-        "3": "Font Shapeshifter"
+        "1": "字体探索者",
+        "2": "字体适应者",
+        "3": "字体变形者"
       }
     },
     "clutchWinner": {
-      "name": "Clutch Winner",
-      "summary": "Win {{goal}} sessions with only 1 life remaining.",
+      "name": "关键制胜者",
+      "summary": "仅剩1条生命时赢得{{goal}}次会话",
       "tiers": {
-        "1": "Lucky Save",
-        "2": "Clutch Player",
-        "3": "Miracle Worker"
+        "1": "幸运脱险",
+        "2": "关键时刻玩家",
+        "3": "奇迹创造者"
       }
     },
     "associationExpert": {
-      "name": "Association Expert",
-      "summary": "Play {{goal}} sessions with association mode.",
+      "name": "联想专家",
+      "summary": "在联想模式下玩{{goal}}次会话",
       "tiers": {
-        "1": "Visual Learner",
-        "2": "Image Master",
-        "3": "Association Ace"
+        "1": "视觉学习者",
+        "2": "图像大师",
+        "3": "联想高手"
       }
     },
     "accessibilityAlly": {
-      "name": "Accessibility Ally",
-      "summary": "Play {{goal}} sessions with accessibility features.",
+      "name": "无障碍盟友",
+      "summary": "使用无障碍功能玩{{goal}}次会话",
       "tiers": {
-        "1": "Inclusive Player",
-        "2": "Accessibility Advocate",
-        "3": "Universal Design Champion"
+        "1": "包容性玩家",
+        "2": "无障碍倡导者",
+        "3": "通用设计冠军"
       }
     },
     "noIntroductions": {
-      "name": "No Introductions",
-      "summary": "Play {{goal}} sessions without letter introductions.",
+      "name": "无需介绍",
+      "summary": "在无字母介绍下玩{{goal}}次会话",
       "tiers": {
-        "1": "Skip Intro",
-        "2": "No Hand-Holding",
-        "3": "Already Knows"
+        "1": "跳过介绍",
+        "2": "无需辅助",
+        "3": "已然知晓"
       }
     },
     "oneShotWonder": {
-      "name": "One-Shot Wonder",
-      "summary": "Get {{goal}} letters correct on first attempt.",
+      "name": "一击即中",
+      "summary": "首次尝试正确捕获{{goal}}个字母",
       "tiers": {
-        "1": "Quick Study",
-        "2": "First Impression",
-        "3": "Instant Recall"
+        "1": "快速学习",
+        "2": "第一印象",
+        "3": "瞬间回忆"
       }
     },
     "randomMaster": {
-      "name": "Random Master",
-      "summary": "Play {{goal}} sessions with random letters enabled.",
+      "name": "随机大师",
+      "summary": "在启用随机字母模式下玩{{goal}}次会话",
       "tiers": {
-        "1": "Embrace Chaos",
-        "2": "Random Pro",
-        "3": "Chaos Champion"
+        "1": "拥抱混沌",
+        "2": "随机专家",
+        "3": "混沌冠军"
       }
     },
     "comebackChampion": {
-      "name": "Comeback Champion",
-      "summary": "Win {{goal}} sessions after losing 2 lives.",
+      "name": "逆转冠军",
+      "summary": "失去2条生命后赢得{{goal}}次会话",
       "tiers": {
-        "1": "Second Chance",
-        "2": "Close Call",
-        "3": "Phoenix Rising"
+        "1": "二次机会",
+        "2": "险胜",
+        "3": "凤凰涅槃"
       }
     },
     "polyglotPioneer": {
-      "name": "Polyglot Pioneer",
-      "summary": "Try {{goal}} different language packs.",
+      "name": "多语言先锋",
+      "summary": "尝试{{goal}}个不同语言包",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3种语言",
+        "2": "6种语言",
+        "3": "10种语言"
       }
     },
     "unicodeChampion": {
-      "name": "Unicode Champion",
-      "summary": "Practice {{goal}} different writing systems.",
+      "name": "Unicode冠军",
+      "summary": "练习{{goal}}个不同书写系统",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "8 Scripts"
+        "1": "3种文字",
+        "2": "5种文字",
+        "3": "8种文字"
       }
     },
     "rtlExpert": {
-      "name": "RTL Expert",
-      "summary": "Complete {{goal}} sessions in right-to-left languages.",
+      "name": "从右到左专家",
+      "summary": "完成{{goal}}次从右到左语言的会话",
       "tiers": {
-        "1": "RTL Beginner",
-        "2": "RTL Proficient",
-        "3": "RTL Master"
+        "1": "从右到左初学者",
+        "2": "从右到左熟练者",
+        "3": "从右到左大师"
       }
     },
     "vowelVirtuoso": {
-      "name": "Advanced Learner",
-      "summary": "Complete {{goal}} sessions in advanced practice mode.",
+      "name": "高级学习者",
+      "summary": "在高级练习模式下完成{{goal}}次会话",
       "tiers": {
-        "1": "Advanced Student",
-        "2": "Advanced Scholar",
-        "3": "Advanced Master"
+        "1": "高级学生",
+        "2": "高级学者",
+        "3": "高级大师"
       }
     },
     "finalFormMaster": {
-      "name": "Special Forms Expert",
-      "summary": "Complete {{goal}} sessions in special characters mode.",
+      "name": "特殊形式专家",
+      "summary": "在特殊字符模式下完成{{goal}}次会话",
       "tiers": {
-        "1": "Special Forms Novice",
-        "2": "Special Forms Expert",
-        "3": "Special Forms Champion"
+        "1": "特殊形式新手",
+        "2": "特殊形式专家",
+        "3": "特殊形式冠军"
       }
     },
     "modeMixer": {
-      "name": "Mode Mixer",
-      "summary": "Play {{goal}} sessions with multiple modes simultaneously.",
+      "name": "模式混搭者",
+      "summary": "同时使用多种模式玩{{goal}}次会话",
       "tiers": {
-        "1": "Mix It Up",
-        "2": "Mode Juggler",
-        "3": "Ultimate Mixer"
+        "1": "混搭开始",
+        "2": "模式杂耍者",
+        "3": "终极混搭者"
       }
     },
     "culturalAmbassador": {
-      "name": "Cultural Ambassador",
-      "summary": "Try {{goal}} different languages.",
+      "name": "文化大使",
+      "summary": "尝试{{goal}}种不同语言",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3种语言",
+        "2": "6种语言",
+        "3": "10种语言"
       }
     },
     "scriptScholar": {
-      "name": "Script Scholar",
-      "summary": "Achieve 90%+ accuracy in {{goal}} different scripts.",
+      "name": "文字学者",
+      "summary": "在{{goal}}种不同文字中达到90%以上准确率",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "7 Scripts"
+        "1": "3种文字",
+        "2": "5种文字",
+        "3": "7种文字"
       }
     },
     "alphabetAce": {
-      "name": "Alphabet Ace",
-      "summary": "Master basic mode in {{goal}} different languages.",
+      "name": "字母高手",
+      "summary": "在{{goal}}种不同语言中掌握基础模式",
       "tiers": {
-        "1": "2 Alphabets",
-        "2": "4 Alphabets",
-        "3": "6 Alphabets"
+        "1": "2种字母表",
+        "2": "4种字母表",
+        "3": "6种字母表"
       }
     },
     "languageSampler": {
-      "name": "Language Sampler",
-      "summary": "Try a new language {{goal}} times.",
+      "name": "语言品鉴师",
+      "summary": "尝试新语言{{goal}}次",
       "tiers": {
-        "1": "Curious Explorer",
-        "2": "Language Taster",
-        "3": "World Linguist"
+        "1": "好奇探索者",
+        "2": "语言品尝者",
+        "3": "世界语言学家"
       }
     },
     "morningGlory": {
-      "name": "Morning Glory",
-      "summary": "Play {{goal}} sessions early morning (5am-8am).",
+      "name": "晨曦荣耀",
+      "summary": "在清晨（上午5点-8点）玩{{goal}}次会话",
       "tiers": {
-        "1": "Early Riser",
-        "2": "Morning Person",
-        "3": "Dawn Warrior"
+        "1": "早起者",
+        "2": "晨间达人",
+        "3": "黎明战士"
       }
     },
     "lunchLearner": {
-      "name": "Lunch Learner",
-      "summary": "Play {{goal}} sessions during lunch (11am-2pm).",
+      "name": "午间学习者",
+      "summary": "在午餐时间（上午11点-下午2点）玩{{goal}}次会话",
       "tiers": {
-        "1": "Lunch Break",
-        "2": "Midday Master",
-        "3": "Lunch Legend"
+        "1": "午休时光",
+        "2": "正午大师",
+        "3": "午餐传奇"
       }
     },
     "midnightScholar": {
-      "name": "Midnight Scholar",
-      "summary": "Play {{goal}} sessions after midnight (12am-3am).",
+      "name": "午夜学者",
+      "summary": "在午夜后（凌晨12点-3点）玩{{goal}}次会话",
       "tiers": {
-        "1": "Night Shift",
-        "2": "Midnight Oil",
-        "3": "Insomniac Legend"
+        "1": "夜班时光",
+        "2": "夜半挑灯",
+        "3": "失眠传奇"
       }
     },
     "primeTimePlayer": {
-      "name": "Prime Time Player",
-      "summary": "Play {{goal}} sessions in the evening (6pm-9pm).",
+      "name": "黄金时段玩家",
+      "summary": "在晚间（下午6点-9点）玩{{goal}}次会话",
       "tiers": {
-        "1": "Evening Starter",
-        "2": "Prime Timer",
-        "3": "Evening Legend"
+        "1": "晚间新手",
+        "2": "黄金时段者",
+        "3": "晚间传奇"
       }
     },
     "perfectWeek": {
-      "name": "Perfect Week",
-      "summary": "Play every day for 7 days straight ({{goal}} times).",
+      "name": "完美周",
+      "summary": "连续7天每天游玩（{{goal}}次）",
       "tiers": {
-        "1": "First Week",
-        "2": "3 Perfect Weeks",
-        "3": "8 Perfect Weeks"
+        "1": "第一周",
+        "2": "3个完美周",
+        "3": "8个完美周"
       }
     },
     "monthlyMaven": {
-      "name": "Monthly Maven",
-      "summary": "Play 20+ days in a month ({{goal}} months).",
+      "name": "月度行家",
+      "summary": "在一个月内游玩20天以上（{{goal}}个月）",
       "tiers": {
-        "1": "1 Active Month",
-        "2": "3 Active Months",
-        "3": "6 Active Months"
+        "1": "1个活跃月",
+        "2": "3个活跃月",
+        "3": "6个活跃月"
       }
     },
     "anniversaryAce": {
-      "name": "Anniversary Ace",
-      "summary": "Play on your {{goal}}-year account anniversary.",
+      "name": "周年纪念高手",
+      "summary": "在你账户{{goal}}周年纪念日游玩",
       "tiers": {
-        "1": "1 Year",
-        "2": "2 Years",
-        "3": "3 Years"
+        "1": "1年",
+        "2": "2年",
+        "3": "3年"
       }
     },
     "seasonVeteran": {
-      "name": "Season Veteran",
-      "summary": "Play in all {{goal}} seasons of the year.",
+      "name": "四季老兵",
+      "summary": "在一年的所有{{goal}}个季节游玩",
       "tiers": {
-        "1": "All Seasons (1 Year)",
-        "2": "All Seasons (2 Years)",
-        "3": "All Seasons (3 Years)"
+        "1": "全部季节（1年）",
+        "2": "全部季节（2年）",
+        "3": "全部季节（3年）"
       }
     },
     "dawnPatrol": {
-      "name": "Dawn Patrol",
-      "summary": "Play {{goal}} sessions at sunrise (5am-7am).",
+      "name": "破晓巡逻",
+      "summary": "在日出时（上午5点-7点）玩{{goal}}次会话",
       "tiers": {
-        "1": "First Light",
-        "2": "Dawn Regular",
-        "3": "Sunrise Champion"
+        "1": "第一缕光",
+        "2": "破晓常客",
+        "3": "日出冠军"
       }
     },
     "consistencyKing": {
-      "name": "Consistency King",
-      "summary": "Play {{goal}} days in a row.",
+      "name": "坚持之王",
+      "summary": "连续游玩{{goal}}天",
       "tiers": {
-        "1": "14 Day Streak",
-        "2": "30 Day Streak",
-        "3": "60 Day Streak"
+        "1": "14天连续",
+        "2": "30天连续",
+        "3": "60天连续"
       }
     },
     "streakMaster": {

@@ -490,8 +490,8 @@
       }
     },
     "waveRider": {
-      "name": "Wave Rider 🌊",
-      "summary": "Catch {{goal}} letters in a single wave.",
+      "name": "רוכב הגלים 🌊",
+      "summary": "תפסו {{goal}} אותיות בגל אחד.",
       "tiers": {
         "1": "רכיבת הגל",
         "2": "אמן הגלים",
@@ -500,7 +500,7 @@
     },
     "centuryClub": {
       "name": "מועדון המאה",
-      "summary": "Complete {{goal}} total sessions.",
+      "summary": "השלימו {{goal}} מפגשים בסך הכל.",
       "tiers": {
         "1": "רבע מאה",
         "2": "חצי מאה",
@@ -517,8 +517,8 @@
       }
     },
     "flameKeeper": {
-      "name": "Flame Keeper 🔥",
-      "summary": "Build a {{goal}}-catch streak without mistakes.",
+      "name": "שומר הלהבה 🔥",
+      "summary": "בנו רצף של {{goal}} תפיסות ללא שגיאות.",
       "tiers": {
         "1": "ניצוץ",
         "2": "מדורה",
@@ -527,7 +527,7 @@
     },
     "pointHunter": {
       "name": "צייד הנקודות",
-      "summary": "Score {{goal}} points in a single session.",
+      "summary": "צברו {{goal}} נקודות במפגש אחד.",
       "tiers": {
         "1": "500 נקודות",
         "2": "1000 נקודות",
@@ -536,7 +536,7 @@
     },
     "grandMaster": {
       "name": "המאסטר הגדול",
-      "summary": "Catch {{goal}} correct letters total.",
+      "summary": "תפסו {{goal}} אותיות נכונות בסך הכל.",
       "tiers": {
         "1": "50 תפיסות",
         "2": "100 תפיסות",
@@ -545,7 +545,7 @@
     },
     "risingStar": {
       "name": "כוכב עולה",
-      "summary": "Level up {{goal}} times in one session.",
+      "summary": "עלו {{goal}} שלבים במפגש אחד.",
       "tiers": {
         "1": "3 עליות שלב",
         "2": "7 עליות שלב",
@@ -554,7 +554,7 @@
     },
     "flowState": {
       "name": "מצב זרימה",
-      "summary": "Catch {{goal}} letters perfectly in a row.",
+      "summary": "תפסו {{goal}} אותיות בצורה מושלמת ברצף.",
       "tiers": {
         "1": "15 מושלמות",
         "2": "30 מושלמות",
@@ -563,7 +563,7 @@
     },
     "unstoppable": {
       "name": "בלתי ניתן לעצירה",
-      "summary": "Complete {{goal}} full sessions.",
+      "summary": "השלימו {{goal}} מפגשים מלאים.",
       "tiers": {
         "1": "5 מפגשים",
         "2": "15 מפגשים",
@@ -571,8 +571,8 @@
       }
     },
     "starCollector": {
-      "name": "Star Collector ⭐",
-      "summary": "Earn {{goal}} total stars.",
+      "name": "אוסף הכוכבים ⭐",
+      "summary": "הרוויחו {{goal}} כוכבים בסך הכל.",
       "tiers": {
         "1": "100 כוכבים",
         "2": "300 כוכבים",
@@ -581,7 +581,7 @@
     },
     "slowSteady": {
       "name": "לאט ויציב",
-      "summary": "Complete {{goal}} perfect sessions in slow river mode.",
+      "summary": "השלימו {{goal}} מפגשים מושלמים במצב נהר איטי.",
       "tiers": {
         "1": "זן ראשון",
         "2": "מאסטר זן",
@@ -590,7 +590,7 @@
     },
     "clickChampion": {
       "name": "אלוף הקליקים",
-      "summary": "Win {{goal}} sessions with click mode enabled.",
+      "summary": "נצחו {{goal}} מפגשים עם מצב קליקים מופעל.",
       "tiers": {
         "1": "מתחיל קליקים",
         "2": "מומחה קליקים",
@@ -599,7 +599,7 @@
     },
     "fontChameleon": {
       "name": "זיקית הגופנים",
-      "summary": "Play {{goal}} sessions with font shuffle enabled.",
+      "summary": "שחקו {{goal}} מפגשים עם ערבוב גופנים מופעל.",
       "tiers": {
         "1": "חוקר גופנים",
         "2": "מסתגל גופנים",
@@ -608,7 +608,7 @@
     },
     "clutchWinner": {
       "name": "מנצח קריטי",
-      "summary": "Win {{goal}} sessions with only 1 life remaining.",
+      "summary": "נצחו {{goal}} מפגשים עם חיים אחד בלבד שנותר.",
       "tiers": {
         "1": "הצלה בר מזל",
         "2": "שחקן קריטי",
@@ -617,7 +617,7 @@
     },
     "associationExpert": {
       "name": "מומחה אסוציאציות",
-      "summary": "Play {{goal}} sessions with association mode.",
+      "summary": "שחקו {{goal}} מפגשים עם מצב אסוציאציות.",
       "tiers": {
         "1": "לומד חזותי",
         "2": "אמן תמונות",
@@ -626,7 +626,7 @@
     },
     "accessibilityAlly": {
       "name": "בן ברית הנגישות",
-      "summary": "Play {{goal}} sessions with accessibility features.",
+      "summary": "שחקו {{goal}} מפגשים עם תכונות נגישות.",
       "tiers": {
         "1": "שחקן כולל",
         "2": "תומך נגישות",
@@ -635,7 +635,7 @@
     },
     "noIntroductions": {
       "name": "ללא הקדמות",
-      "summary": "Play {{goal}} sessions without letter introductions.",
+      "summary": "שחקו {{goal}} מפגשים ללא הקדמות לאותיות.",
       "tiers": {
         "1": "דילוג הקדמה",
         "2": "ללא תמיכה",
@@ -644,7 +644,7 @@
     },
     "oneShotWonder": {
       "name": "פלא ניסיון אחד",
-      "summary": "Get {{goal}} letters correct on first attempt.",
+      "summary": "קבלו {{goal}} אותיות נכונות בניסיון הראשון.",
       "tiers": {
         "1": "לימוד מהיר",
         "2": "רושם ראשון",
@@ -653,7 +653,7 @@
     },
     "randomMaster": {
       "name": "אמן האקראי",
-      "summary": "Play {{goal}} sessions with random letters enabled.",
+      "summary": "שחקו {{goal}} מפגשים עם אותיות אקראיות מופעלות.",
       "tiers": {
         "1": "אימוץ הכאוס",
         "2": "מקצוען אקראי",
@@ -662,7 +662,7 @@
     },
     "comebackChampion": {
       "name": "אלוף השיבה",
-      "summary": "Win {{goal}} sessions after losing 2 lives.",
+      "summary": "נצחו {{goal}} מפגשים אחרי אובדן 2 חיים.",
       "tiers": {
         "1": "הזדמנות שנייה",
         "2": "קרוב מדי",
@@ -671,7 +671,7 @@
     },
     "polyglotPioneer": {
       "name": "חלוץ הפוליגלוט",
-      "summary": "Try {{goal}} different language packs.",
+      "summary": "נסו {{goal}} חבילות שפה שונות.",
       "tiers": {
         "1": "3 שפות",
         "2": "6 שפות",
@@ -680,7 +680,7 @@
     },
     "unicodeChampion": {
       "name": "אלוף היוניקוד",
-      "summary": "Practice {{goal}} different writing systems.",
+      "summary": "תרגלו {{goal}} מערכות כתיבה שונות.",
       "tiers": {
         "1": "3 כתבים",
         "2": "5 כתבים",
@@ -689,7 +689,7 @@
     },
     "rtlExpert": {
       "name": "מומחה מימין לשמאל",
-      "summary": "Complete {{goal}} sessions in right-to-left languages.",
+      "summary": "השלימו {{goal}} מפגשים בשפות מימין לשמאל.",
       "tiers": {
         "1": "מתחיל RTL",
         "2": "מיומן RTL",
@@ -698,7 +698,7 @@
     },
     "vowelVirtuoso": {
       "name": "לומד מתקדם",
-      "summary": "Complete {{goal}} sessions in advanced practice mode.",
+      "summary": "השלימו {{goal}} מפגשים במצב תרגול מתקדם.",
       "tiers": {
         "1": "תלמיד מתקדם",
         "2": "חוקר מתקדם",
@@ -707,7 +707,7 @@
     },
     "finalFormMaster": {
       "name": "מומחה צורות מיוחדות",
-      "summary": "Complete {{goal}} sessions in special characters mode.",
+      "summary": "השלימו {{goal}} מפגשים במצב תווים מיוחדים.",
       "tiers": {
         "1": "מתחיל צורות מיוחדות",
         "2": "מומחה צורות מיוחדות",
@@ -716,7 +716,7 @@
     },
     "modeMixer": {
       "name": "מערבב מצבים",
-      "summary": "Play {{goal}} sessions with multiple modes simultaneously.",
+      "summary": "שחקו {{goal}} מפגשים עם מספר מצבים בו זמנית.",
       "tiers": {
         "1": "ערבוב",
         "2": "להטוטן מצבים",
@@ -725,7 +725,7 @@
     },
     "culturalAmbassador": {
       "name": "שגריר תרבותי",
-      "summary": "Try {{goal}} different languages.",
+      "summary": "נסו {{goal}} שפות שונות.",
       "tiers": {
         "1": "3 שפות",
         "2": "6 שפות",
@@ -734,7 +734,7 @@
     },
     "scriptScholar": {
       "name": "חוקר כתבים",
-      "summary": "Achieve 90%+ accuracy in {{goal}} different scripts.",
+      "summary": "השיגו דיוק של 90%+ ב-{{goal}} כתבים שונים.",
       "tiers": {
         "1": "3 כתבים",
         "2": "5 כתבים",
@@ -743,7 +743,7 @@
     },
     "alphabetAce": {
       "name": "אלוף האלפבית",
-      "summary": "Master basic mode in {{goal}} different languages.",
+      "summary": "שלטו במצב הבסיסי ב-{{goal}} שפות שונות.",
       "tiers": {
         "1": "2 אלפביתים",
         "2": "4 אלפביתים",
@@ -752,7 +752,7 @@
     },
     "languageSampler": {
       "name": "טועם שפות",
-      "summary": "Try a new language {{goal}} times.",
+      "summary": "נסו שפה חדשה {{goal}} פעמים.",
       "tiers": {
         "1": "חוקר סקרן",
         "2": "טועם שפות",
@@ -761,7 +761,7 @@
     },
     "morningGlory": {
       "name": "תפארת הבוקר",
-      "summary": "Play {{goal}} sessions early morning (5am-8am).",
+      "summary": "שחקו {{goal}} מפגשים בבוקר מוקדם (5:00-8:00).",
       "tiers": {
         "1": "קם מוקדם",
         "2": "איש בוקר",
@@ -770,7 +770,7 @@
     },
     "lunchLearner": {
       "name": "לומד הצהריים",
-      "summary": "Play {{goal}} sessions during lunch (11am-2pm).",
+      "summary": "שחקו {{goal}} מפגשים בזמן הצהריים (11:00-14:00).",
       "tiers": {
         "1": "הפסקת צהריים",
         "2": "מאסטר הצהריים",
@@ -779,7 +779,7 @@
     },
     "midnightScholar": {
       "name": "חוקר חצות",
-      "summary": "Play {{goal}} sessions after midnight (12am-3am).",
+      "summary": "שחקו {{goal}} מפגשים אחרי חצות (00:00-3:00).",
       "tiers": {
         "1": "משמרת לילה",
         "2": "שמן חצות",
@@ -788,7 +788,7 @@
     },
     "primeTimePlayer": {
       "name": "שחקן שעות השיא",
-      "summary": "Play {{goal}} sessions in the evening (6pm-9pm).",
+      "summary": "שחקו {{goal}} מפגשים בערב (18:00-21:00).",
       "tiers": {
         "1": "מתחיל ערב",
         "2": "שעות שיא",
@@ -797,7 +797,7 @@
     },
     "perfectWeek": {
       "name": "שבוע מושלם",
-      "summary": "Play every day for 7 days straight ({{goal}} times).",
+      "summary": "שחקו כל יום במשך 7 ימים רצופים ({{goal}} פעמים).",
       "tiers": {
         "1": "שבוע ראשון",
         "2": "3 שבועות מושלמים",
@@ -806,7 +806,7 @@
     },
     "monthlyMaven": {
       "name": "מומחה החודש",
-      "summary": "Play 20+ days in a month ({{goal}} months).",
+      "summary": "שחקו 20+ ימים בחודש ({{goal}} חודשים).",
       "tiers": {
         "1": "חודש פעיל אחד",
         "2": "3 חודשים פעילים",
@@ -815,7 +815,7 @@
     },
     "anniversaryAce": {
       "name": "אלוף השנה",
-      "summary": "Play on your {{goal}}-year account anniversary.",
+      "summary": "שחקו ביום השנה ה-{{goal}} של החשבון שלכם.",
       "tiers": {
         "1": "שנה אחת",
         "2": "שנתיים",
@@ -824,7 +824,7 @@
     },
     "seasonVeteran": {
       "name": "ותיק העונות",
-      "summary": "Play in all {{goal}} seasons of the year.",
+      "summary": "שחקו בכל {{goal}} עונות השנה.",
       "tiers": {
         "1": "כל העונות (שנה אחת)",
         "2": "כל העונות (שנתיים)",
@@ -833,7 +833,7 @@
     },
     "dawnPatrol": {
       "name": "סיור השחר",
-      "summary": "Play {{goal}} sessions at sunrise (5am-7am).",
+      "summary": "שחקו {{goal}} מפגשים בזריחה (5:00-7:00).",
       "tiers": {
         "1": "אור ראשון",
         "2": "קבוע שחר",
@@ -842,7 +842,7 @@
     },
     "consistencyKing": {
       "name": "מלך העקביות",
-      "summary": "Play {{goal}} days in a row.",
+      "summary": "שחקו {{goal}} ימים ברצף.",
       "tiers": {
         "1": "רצף 14 ימים",
         "2": "רצף 30 ימים",
