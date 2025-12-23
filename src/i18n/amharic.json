@@ -468,363 +468,363 @@
       }
     },
     "waveRider": {
-      "name": "Wave Rider 🌊",
-      "summary": "Catch {{goal}} letters in a single wave.",
+      "name": "የሞገድ ጋላቢ 🌊",
+      "summary": "በአንድ ሞገድ {{goal}} ፊደላት ይያዙ።",
       "tiers": {
-        "1": "Ride the Wave",
-        "2": "Wave Master",
-        "3": "Tsunami"
+        "1": "ሞገዱን ይጋልቡ",
+        "2": "የሞገድ ማስተር",
+        "3": "ሱናሚ"
       }
     },
     "centuryClub": {
-      "name": "Century Club",
-      "summary": "Complete {{goal}} total sessions.",
+      "name": "የመቶ ክበብ",
+      "summary": "{{goal}} ጠቅላላ ክፍለ ጊዜዎችን ያጠናቅቁ።",
       "tiers": {
-        "1": "Quarter Century",
-        "2": "Half Century",
-        "3": "Full Century"
+        "1": "ሩብ መቶ",
+        "2": "ግማሽ መቶ",
+        "3": "ሙሉ መቶ"
       }
     },
     "levelingLegend": {
-      "name": "Leveling Legend",
-      "summary": "Reach level {{goal}} in a single session.",
+      "name": "የደረጃ አፈ ታሪክ",
+      "summary": "በአንድ ክፍለ ጊዜ ደረጃ {{goal}} ይድረሱ።",
       "tiers": {
-        "1": "Level 10",
-        "2": "Level 15",
-        "3": "Level 20"
+        "1": "ደረጃ 10",
+        "2": "ደረጃ 15",
+        "3": "ደረጃ 20"
       }
     },
     "flameKeeper": {
-      "name": "Flame Keeper 🔥",
-      "summary": "Build a {{goal}}-catch streak without mistakes.",
+      "name": "የነበልባል ጠባቂ 🔥",
+      "summary": "ያለስህተት {{goal}}-መያዣ ተከታታይ ያሳድጉ።",
       "tiers": {
-        "1": "Spark",
-        "2": "Bonfire",
-        "3": "Inferno"
+        "1": "ብልጭታ",
+        "2": "እሳት",
+        "3": "ገሃነም"
       }
     },
     "pointHunter": {
-      "name": "Point Hunter",
-      "summary": "Score {{goal}} points in a single session.",
+      "name": "የነቁጥ አዳኝ",
+      "summary": "በአንድ ክፍለ ጊዜ {{goal}} ነቁጦች ያግኙ።",
       "tiers": {
-        "1": "500 Points",
-        "2": "1000 Points",
-        "3": "2000 Points"
+        "1": "500 ነቁጦች",
+        "2": "1000 ነቁጦች",
+        "3": "2000 ነቁጦች"
       }
     },
     "grandMaster": {
-      "name": "Grand Master",
-      "summary": "Catch {{goal}} correct letters total.",
+      "name": "ታላቅ ማስተር",
+      "summary": "ጠቅላላ {{goal}} ትክክለኛ ፊደላት ይያዙ።",
       "tiers": {
-        "1": "50 Catches",
-        "2": "100 Catches",
-        "3": "200 Catches"
+        "1": "50 መያዣዎች",
+        "2": "100 መያዣዎች",
+        "3": "200 መያዣዎች"
       }
     },
     "risingStar": {
-      "name": "Rising Star",
-      "summary": "Level up {{goal}} times in one session.",
+      "name": "ከፍ ያለ ኮከብ",
+      "summary": "በአንድ ክፍለ ጊዜ {{goal}} ጊዜ ደረጃ ያሳድጉ።",
       "tiers": {
-        "1": "3 Level-Ups",
-        "2": "7 Level-Ups",
-        "3": "12 Level-Ups"
+        "1": "3 ደረጃ-መጨመሮች",
+        "2": "7 ደረጃ-መጨመሮች",
+        "3": "12 ደረጃ-መጨመሮች"
       }
     },
     "flowState": {
-      "name": "Flow State",
-      "summary": "Catch {{goal}} letters perfectly in a row.",
+      "name": "የፍሰት ሁኔታ",
+      "summary": "{{goal}} ፊደላት በወረፋ ትክክል በመሆን ይያዙ።",
       "tiers": {
-        "1": "15 Perfect",
-        "2": "30 Perfect",
-        "3": "50 Perfect"
+        "1": "15 ፍጹም",
+        "2": "30 ፍጹም",
+        "3": "50 ፍጹም"
       }
     },
     "unstoppable": {
-      "name": "Unstoppable",
-      "summary": "Complete {{goal}} full sessions.",
+      "name": "የማይቆም",
+      "summary": "{{goal}} ሙሉ ክፍለ ጊዜዎችን ያጠናቅቁ።",
       "tiers": {
-        "1": "5 Sessions",
-        "2": "15 Sessions",
-        "3": "30 Sessions"
+        "1": "5 ክፍለ ጊዜዎች",
+        "2": "15 ክፍለ ጊዜዎች",
+        "3": "30 ክፍለ ጊዜዎች"
       }
     },
     "starCollector": {
-      "name": "Star Collector ⭐",
-      "summary": "Earn {{goal}} total stars.",
+      "name": "የኮከብ ሰብሳቢ ⭐",
+      "summary": "ጠቅላላ {{goal}} ኮከቦች ያግኙ።",
       "tiers": {
-        "1": "100 Stars",
-        "2": "300 Stars",
-        "3": "750 Stars"
+        "1": "100 ኮከቦች",
+        "2": "300 ኮከቦች",
+        "3": "750 ኮከቦች"
       }
     },
     "slowSteady": {
-      "name": "Slow & Steady",
-      "summary": "Complete {{goal}} perfect sessions in slow river mode.",
+      "name": "ቀርፋፋ እና ቋሚ",
+      "summary": "በቀርፋፋ ወንዝ ሁነታ {{goal}} ፍጹም ክፍለ ጊዜዎችን ያጠናቅቁ።",
       "tiers": {
-        "1": "First Zen",
-        "2": "Zen Master",
-        "3": "Zen Legend"
+        "1": "የመጀመሪያ ዘን",
+        "2": "የዘን ማስተር",
+        "3": "የዘን አፈ ታሪክ"
       }
     },
     "clickChampion": {
-      "name": "Click Champion",
-      "summary": "Win {{goal}} sessions with click mode enabled.",
+      "name": "የጠቅታ ሻምፒዮን",
+      "summary": "በጠቅታ ሁነታ ሲነቃ {{goal}} ክፍለ ጊዜዎችን ያሸንፉ።",
       "tiers": {
-        "1": "Click Novice",
-        "2": "Click Expert",
-        "3": "Click Master"
+        "1": "የጠቅታ ጀማሪ",
+        "2": "የጠቅታ ባለሙያ",
+        "3": "የጠቅታ ማስተር"
       }
     },
     "fontChameleon": {
-      "name": "Font Chameleon",
-      "summary": "Play {{goal}} sessions with font shuffle enabled.",
+      "name": "የፊደል አገልባጭ",
+      "summary": "በፊደል ቅይጥ ሲነቃ {{goal}} ክፍለ ጊዜዎችን ይጫወቱ።",
       "tiers": {
-        "1": "Font Explorer",
-        "2": "Font Adapter",
-        "3": "Font Shapeshifter"
+        "1": "የፊደል አሳሽ",
+        "2": "የፊደል መላመጃ",
+        "3": "የፊደል ቅርጽ ቀያሪ"
       }
     },
     "clutchWinner": {
-      "name": "Clutch Winner",
-      "summary": "Win {{goal}} sessions with only 1 life remaining.",
+      "name": "የአስቸኳይ አሸናፊ",
+      "summary": "1 ህይወት ብቻ ቀርቶ {{goal}} ክፍለ ጊዜዎችን ያሸንፉ።",
       "tiers": {
-        "1": "Lucky Save",
-        "2": "Clutch Player",
-        "3": "Miracle Worker"
+        "1": "ዕድለኛ መዳን",
+        "2": "የአስቸኳይ ተጫዋች",
+        "3": "የተአምር ሰሪ"
       }
     },
     "associationExpert": {
-      "name": "Association Expert",
-      "summary": "Play {{goal}} sessions with association mode.",
+      "name": "የማህበር ባለሙያ",
+      "summary": "በማህበር ሁነታ {{goal}} ክፍለ ጊዜዎችን ይጫወቱ።",
       "tiers": {
-        "1": "Visual Learner",
-        "2": "Image Master",
-        "3": "Association Ace"
+        "1": "የእይታ ተማሪ",
+        "2": "የምስል ማስተር",
+        "3": "የማህበር ቱንጋ"
       }
     },
     "accessibilityAlly": {
-      "name": "Accessibility Ally",
-      "summary": "Play {{goal}} sessions with accessibility features.",
+      "name": "የተደራሽነት አጋር",
+      "summary": "በተደራሽነት ባህሪያት {{goal}} ክፍለ ጊዜዎችን ይጫወቱ።",
       "tiers": {
-        "1": "Inclusive Player",
-        "2": "Accessibility Advocate",
-        "3": "Universal Design Champion"
+        "1": "አሳታፊ ተጫዋች",
+        "2": "የተደራሽነት ተሟጋች",
+        "3": "የአለም አቀፍ ዲዛይን ሻምፒዮን"
       }
     },
     "noIntroductions": {
-      "name": "No Introductions",
-      "summary": "Play {{goal}} sessions without letter introductions.",
+      "name": "ምንም መግቢያዎች የሉም",
+      "summary": "ያለ ፊደል መግቢያዎች {{goal}} ክፍለ ጊዜዎችን ይጫወቱ።",
       "tiers": {
-        "1": "Skip Intro",
-        "2": "No Hand-Holding",
-        "3": "Already Knows"
+        "1": "መግቢያ ዝለል",
+        "2": "ምንም እርዳታ የለም",
+        "3": "ቀድሞውንም ያውቃል"
       }
     },
     "oneShotWonder": {
-      "name": "One-Shot Wonder",
-      "summary": "Get {{goal}} letters correct on first attempt.",
+      "name": "አንድ-ጥይት ድንቅ",
+      "summary": "{{goal}} ፊደላት በመጀመሪያው ሙከራ ትክክል ያድርጉ።",
       "tiers": {
-        "1": "Quick Study",
-        "2": "First Impression",
-        "3": "Instant Recall"
+        "1": "ፈጣን ጥናት",
+        "2": "የመጀመሪያ ስሜት",
+        "3": "ፈጣን ማስታወስ"
       }
     },
     "randomMaster": {
-      "name": "Random Master",
-      "summary": "Play {{goal}} sessions with random letters enabled.",
+      "name": "የዘፈቀደ ማስተር",
+      "summary": "በዘፈቀደ ፊደላት ሲነቃ {{goal}} ክፍለ ጊዜዎችን ይጫወቱ።",
       "tiers": {
-        "1": "Embrace Chaos",
-        "2": "Random Pro",
-        "3": "Chaos Champion"
+        "1": "ግርግር ተቀበል",
+        "2": "የዘፈቀደ ፕሮ",
+        "3": "የግርግር ሻምፒዮን"
       }
     },
     "comebackChampion": {
-      "name": "Comeback Champion",
-      "summary": "Win {{goal}} sessions after losing 2 lives.",
+      "name": "የመመለሻ ሻምፒዮን",
+      "summary": "2 ህይወቶችን ካጡ በኋላ {{goal}} ክፍለ ጊዜዎችን ያሸንፉ።",
       "tiers": {
-        "1": "Second Chance",
-        "2": "Close Call",
-        "3": "Phoenix Rising"
+        "1": "ሁለተኛ ዕድል",
+        "2": "የቅርብ ጥሪ",
+        "3": "ፊኒክስ በማገገም ላይ"
       }
     },
     "polyglotPioneer": {
-      "name": "Polyglot Pioneer",
-      "summary": "Try {{goal}} different language packs.",
+      "name": "የፖሊግሎት ፈር ቀዳጅ",
+      "summary": "{{goal}} የተለያዩ የቋንቋ ፓኬጆችን ይሞክሩ።",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3 ቋንቋዎች",
+        "2": "6 ቋንቋዎች",
+        "3": "10 ቋንቋዎች"
       }
     },
     "unicodeChampion": {
-      "name": "Unicode Champion",
-      "summary": "Practice {{goal}} different writing systems.",
+      "name": "የዩኒኮድ ሻምፒዮን",
+      "summary": "{{goal}} የተለያዩ የመጻፍ ስርዓቶች ይለማመዱ።",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "8 Scripts"
+        "1": "3 ስክሪፕቶች",
+        "2": "5 ስክሪፕቶች",
+        "3": "8 ስክሪፕቶች"
       }
     },
     "rtlExpert": {
-      "name": "RTL Expert",
-      "summary": "Complete {{goal}} sessions in right-to-left languages.",
+      "name": "የRTL ባለሙያ",
+      "summary": "በቀኝ-ወደ-ግራ ቋንቋዎች {{goal}} ክፍለ ጊዜዎችን ያጠናቅቁ።",
       "tiers": {
-        "1": "RTL Beginner",
-        "2": "RTL Proficient",
-        "3": "RTL Master"
+        "1": "የRTL ጀማሪ",
+        "2": "የRTL ብቃት ያለው",
+        "3": "የRTL ማስተር"
       }
     },
     "vowelVirtuoso": {
-      "name": "Advanced Learner",
-      "summary": "Complete {{goal}} sessions in advanced practice mode.",
+      "name": "የላቀ ተማሪ",
+      "summary": "በላቀ ልምምድ ሁነታ {{goal}} ክፍለ ጊዜዎችን ያጠናቅቁ።",
       "tiers": {
-        "1": "Advanced Student",
-        "2": "Advanced Scholar",
-        "3": "Advanced Master"
+        "1": "የላቀ ተማሪ",
+        "2": "የላቀ ምሁር",
+        "3": "የላቀ ማስተር"
       }
     },
     "finalFormMaster": {
-      "name": "Special Forms Expert",
-      "summary": "Complete {{goal}} sessions in special characters mode.",
+      "name": "የልዩ ቅጾች ባለሙያ",
+      "summary": "በልዩ ቁምፊዎች ሁነታ {{goal}} ክፍለ ጊዜዎችን ያጠናቅቁ።",
       "tiers": {
-        "1": "Special Forms Novice",
-        "2": "Special Forms Expert",
-        "3": "Special Forms Champion"
+        "1": "የልዩ ቅጾች ጀማሪ",
+        "2": "የልዩ ቅጾች ባለሙያ",
+        "3": "የልዩ ቅጾች ሻምፒዮን"
       }
     },
     "modeMixer": {
-      "name": "Mode Mixer",
-      "summary": "Play {{goal}} sessions with multiple modes simultaneously.",
+      "name": "የሁነታ ቀላቃይ",
+      "summary": "በአንድ ጊዜ በብዙ ሁነታዎች {{goal}} ክፍለ ጊዜዎችን ይጫወቱ።",
       "tiers": {
-        "1": "Mix It Up",
-        "2": "Mode Juggler",
-        "3": "Ultimate Mixer"
+        "1": "ቀላቅለው",
+        "2": "የሁነታ ተዋጊ",
+        "3": "ልዩ ቀላቃይ"
       }
     },
     "culturalAmbassador": {
-      "name": "Cultural Ambassador",
-      "summary": "Try {{goal}} different languages.",
+      "name": "የባህል አምባሳደር",
+      "summary": "{{goal}} የተለያዩ ቋንቋዎችን ይሞክሩ።",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3 ቋንቋዎች",
+        "2": "6 ቋንቋዎች",
+        "3": "10 ቋንቋዎች"
       }
     },
     "scriptScholar": {
-      "name": "Script Scholar",
-      "summary": "Achieve 90%+ accuracy in {{goal}} different scripts.",
+      "name": "የስክሪፕት ምሁር",
+      "summary": "በ{{goal}} የተለያዩ ስክሪፕቶች 90%+ ትክክለኛነት ያግኙ።",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "7 Scripts"
+        "1": "3 ስክሪፕቶች",
+        "2": "5 ስክሪፕቶች",
+        "3": "7 ስክሪፕቶች"
       }
     },
     "alphabetAce": {
-      "name": "Alphabet Ace",
-      "summary": "Master basic mode in {{goal}} different languages.",
+      "name": "የፊደል ቱንጋ",
+      "summary": "በ{{goal}} የተለያዩ ቋንቋዎች መሰረታዊ ሁነታን ይቆጣጠሩ።",
       "tiers": {
-        "1": "2 Alphabets",
-        "2": "4 Alphabets",
-        "3": "6 Alphabets"
+        "1": "2 ፊደላት",
+        "2": "4 ፊደላት",
+        "3": "6 ፊደላት"
       }
     },
     "languageSampler": {
-      "name": "Language Sampler",
-      "summary": "Try a new language {{goal}} times.",
+      "name": "የቋንቋ ናሙና አሰባሰቢ",
+      "summary": "አዲስ ቋንቋ {{goal}} ጊዜ ይሞክሩ።",
       "tiers": {
-        "1": "Curious Explorer",
-        "2": "Language Taster",
-        "3": "World Linguist"
+        "1": "የጉጉት አሳሽ",
+        "2": "የቋንቋ ሙጫ",
+        "3": "የአለም የቋንቋ ባለሙያ"
       }
     },
     "morningGlory": {
-      "name": "Morning Glory",
-      "summary": "Play {{goal}} sessions early morning (5am-8am).",
+      "name": "የጠዋት ክብር",
+      "summary": "በጠዋት ቀድሞ (5am-8am) {{goal}} ክፍለ ጊዜዎችን ይጫወቱ።",
       "tiers": {
-        "1": "Early Riser",
-        "2": "Morning Person",
-        "3": "Dawn Warrior"
+        "1": "ቀድሞ የሚነሳ",
+        "2": "የጠዋት ሰው",
+        "3": "የንጋት ተዋጊ"
       }
     },
     "lunchLearner": {
-      "name": "Lunch Learner",
-      "summary": "Play {{goal}} sessions during lunch (11am-2pm).",
+      "name": "የምሳ ተማሪ",
+      "summary": "በምሳ ጊዜ (11am-2pm) {{goal}} ክፍለ ጊዜዎችን ይጫወቱ።",
       "tiers": {
-        "1": "Lunch Break",
-        "2": "Midday Master",
-        "3": "Lunch Legend"
+        "1": "የምሳ እረፍት",
+        "2": "የቀትር ማስተር",
+        "3": "የምሳ አፈ ታሪክ"
       }
     },
     "midnightScholar": {
-      "name": "Midnight Scholar",
-      "summary": "Play {{goal}} sessions after midnight (12am-3am).",
+      "name": "የምሽት ምሁር",
+      "summary": "ከግማሽ ሌሊት በኋላ (12am-3am) {{goal}} ክፍለ ጊዜዎችን ይጫወቱ።",
       "tiers": {
-        "1": "Night Shift",
-        "2": "Midnight Oil",
-        "3": "Insomniac Legend"
+        "1": "የሌሊት ፈረቃ",
+        "2": "የግማሽ ሌሊት ዘይት",
+        "3": "የእንቅልፍ ማጣት አፈ ታሪክ"
       }
     },
     "primeTimePlayer": {
-      "name": "Prime Time Player",
-      "summary": "Play {{goal}} sessions in the evening (6pm-9pm).",
+      "name": "የዋና ጊዜ ተጫዋች",
+      "summary": "በማታ (6pm-9pm) {{goal}} ክፍለ ጊዜዎችን ይጫወቱ።",
       "tiers": {
-        "1": "Evening Starter",
-        "2": "Prime Timer",
-        "3": "Evening Legend"
+        "1": "የማታ ጀማሪ",
+        "2": "የዋና ጊዜ ተጫዋች",
+        "3": "የማታ አፈ ታሪክ"
       }
     },
     "perfectWeek": {
-      "name": "Perfect Week",
-      "summary": "Play every day for 7 days straight ({{goal}} times).",
+      "name": "ፍጹም ሳምንት",
+      "summary": "ለ7 ቀናት ቀጥተኛ በየቀኑ ይጫወቱ ({{goal}} ጊዜ)።",
       "tiers": {
-        "1": "First Week",
-        "2": "3 Perfect Weeks",
-        "3": "8 Perfect Weeks"
+        "1": "የመጀመሪያ ሳምንት",
+        "2": "3 ፍጹም ሳምንታት",
+        "3": "8 ፍጹም ሳምንታት"
       }
     },
     "monthlyMaven": {
-      "name": "Monthly Maven",
-      "summary": "Play 20+ days in a month ({{goal}} months).",
+      "name": "የወርሃዊ ባለሙያ",
+      "summary": "በወር 20+ ቀናት ይጫወቱ ({{goal}} ወራት)።",
       "tiers": {
-        "1": "1 Active Month",
-        "2": "3 Active Months",
-        "3": "6 Active Months"
+        "1": "1 ንቁ ወር",
+        "2": "3 ንቁ ወራት",
+        "3": "6 ንቁ ወራት"
       }
     },
     "anniversaryAce": {
-      "name": "Anniversary Ace",
-      "summary": "Play on your {{goal}}-year account anniversary.",
+      "name": "የዓመታዊ ቱንጋ",
+      "summary": "በእርስዎ {{goal}}-ዓመት መለያ አመታዊ በዓል ላይ ይጫወቱ።",
       "tiers": {
-        "1": "1 Year",
-        "2": "2 Years",
-        "3": "3 Years"
+        "1": "1 ዓመት",
+        "2": "2 ዓመታት",
+        "3": "3 ዓመታት"
       }
     },
     "seasonVeteran": {
-      "name": "Season Veteran",
-      "summary": "Play in all {{goal}} seasons of the year.",
+      "name": "የወቅት አርበኛ",
+      "summary": "በሁሉም {{goal}} የዓመቱ ወቅቶች ይጫወቱ።",
       "tiers": {
-        "1": "All Seasons (1 Year)",
-        "2": "All Seasons (2 Years)",
-        "3": "All Seasons (3 Years)"
+        "1": "ሁሉም ወቅቶች (1 ዓመት)",
+        "2": "ሁሉም ወቅቶች (2 ዓመታት)",
+        "3": "ሁሉም ወቅቶች (3 ዓመታት)"
       }
     },
     "dawnPatrol": {
-      "name": "Dawn Patrol",
-      "summary": "Play {{goal}} sessions at sunrise (5am-7am).",
+      "name": "የንጋት ፓትሮል",
+      "summary": "በማለዳ (5am-7am) {{goal}} ክፍለ ጊዜዎችን ይጫወቱ።",
       "tiers": {
-        "1": "First Light",
-        "2": "Dawn Regular",
-        "3": "Sunrise Champion"
+        "1": "የመጀመሪያ ብርሃን",
+        "2": "የንጋት መደበኛ",
+        "3": "የማግስት ሻምፒዮን"
       }
     },
     "consistencyKing": {
-      "name": "Consistency King",
-      "summary": "Play {{goal}} days in a row.",
+      "name": "የቋሚነት ንጉስ",
+      "summary": "{{goal}} ቀናት በወረፋ ይጫወቱ።",
       "tiers": {
-        "1": "14 Day Streak",
-        "2": "30 Day Streak",
-        "3": "60 Day Streak"
+        "1": "14 ቀን ተከታታይ",
+        "2": "30 ቀን ተከታታይ",
+        "3": "60 ቀን ተከታታይ"
       }
     },
     "streakMaster": {
@@ -896,92 +896,92 @@
         "description": "{{constraint}} በሚንቀሳቀስበት ጊዜ ዙር ያሸንፉ።"
       },
       "accuracyChallenge": {
-        "title": "Accuracy Challenge",
-        "description": "Complete a session with 90% or better accuracy."
+        "title": "የትክክለኛነት ፈተና",
+        "description": "በ90% ወይም ከዚያ በላይ ትክክለኛነት ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "gemCollector": {
-        "title": "Gem Collector",
-        "description": "Win two bonus rounds today."
+        "title": "የዕንቁ ሰብሳቢ",
+        "description": "ዛሬ ሁለት የቦነስ ዙሮችን ያሸንፉ።"
       },
       "varietyPack": {
-        "title": "Variety Pack",
-        "description": "Catch at least eight different unique letters."
+        "title": "የተለያዩ ፓኬጅ",
+        "description": "ቢያንስ ስምንት የተለያዩ ልዩ ፊደላትን ያዙ።"
       },
       "powerSession": {
-        "title": "Power Session",
-        "description": "Catch 25 or more items in a single session."
+        "title": "የኃይል ክፍለ ጊዜ",
+        "description": "በአንድ ክፍለ ጊዜ 25 ወይም ከዚያ በላይ ንጥሎችን ያዙ።"
       },
       "perfectRun": {
-        "title": "Perfect Run",
-        "description": "Complete one session without any mistakes."
+        "title": "ፍጹም ሩጫ",
+        "description": "ያለ ስህተት አንድ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "speedPractice": {
-        "title": "Speed Practice",
-        "description": "Complete a session with fast flow speed enabled."
+        "title": "የፍጥነት ልምምድ",
+        "description": "ፈጣን ፍሰት ፍጥነት ሲነቃ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "tripleThread": {
-        "title": "Triple Threat",
-        "description": "Play three full sessions today."
+        "title": "ሶስት እጥፍ ፈተና",
+        "description": "ዛሬ ሶስት ሙሉ ክፍለ ጊዜዎችን ይጫወቱ።"
       },
       "waveChallenge": {
-        "title": "Wave Challenge 🌊",
-        "description": "Catch 8 letters in a single wave."
+        "title": "የሞገድ ፈተና 🌊",
+        "description": "በአንድ ሞገድ 8 ፊደላትን ያዙ።"
       },
       "flameBuilder": {
-        "title": "Flame Builder 🔥",
-        "description": "Build a 15-catch perfect streak."
+        "title": "የነበልባል ገንቢ 🔥",
+        "description": "15-መያዣ ፍጹም ተከታታይ ይገንቡ።"
       },
       "slowRiverZen": {
-        "title": "Slow River Zen",
-        "description": "Complete a session in slow river mode with perfect accuracy."
+        "title": "የቀርፋፋ ወንዝ ዘን",
+        "description": "በቀርፋፋ ወንዝ ሁነታ ውስጥ በፍጹም ትክክለኛነት ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "clickMaster": {
-        "title": "Click Master",
-        "description": "Win a session with click mode enabled."
+        "title": "የጠቅታ ማስተር",
+        "description": "የጠቅታ ሁነታ ሲነቃ ክፍለ ጊዜ ያሸንፉ።"
       },
       "levelClimber": {
-        "title": "Level Climber",
-        "description": "Reach level 12 or higher in one session."
+        "title": "የደረጃ ወጪ",
+        "description": "በአንድ ክፍለ ጊዜ ደረጃ 12 ወይም ከዚያ በላይ ይድረሱ።"
       },
       "noLivesLost": {
-        "title": "No Lives Lost",
-        "description": "Complete a session without losing a life."
+        "title": "ምንም ህይወቶች አልጠፉም",
+        "description": "ያለ ህይወት ማጣት ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "associationPractice": {
-        "title": "Association Practice",
-        "description": "Complete a session with association mode enabled."
+        "title": "የማህበር ልምምድ",
+        "description": "የማህበር ሁነታ ሲነቃ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "multiModeMaster": {
-        "title": "Multi-Mode Master",
-        "description": "Complete a session with two or more modes enabled."
+        "title": "ባለብዙ-ሁነታ ማስተር",
+        "description": "ሁለት ወይም ከዚያ በላይ ሁነታዎች ሲነቁ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "fontFlexibility": {
-        "title": "Font Flexibility",
-        "description": "Complete a session with font shuffle enabled."
+        "title": "የፊደል ተለዋዋጭነት",
+        "description": "የፊደል ቅይጥ ሲነቃ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "randomChallenge": {
-        "title": "Random Challenge",
-        "description": "Complete a session with random letters enabled."
+        "title": "ዘፈቀደ ፈተና",
+        "description": "ዘፈቀደ ፊደላት ሲነቁ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "vowelFocus": {
-        "title": "Advanced Practice",
-        "description": "Complete a session in advanced practice mode."
+        "title": "የላቀ ልምምድ",
+        "description": "በላቀ ልምምድ ሁነታ ውስጥ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "finalFormsPractice": {
-        "title": "Special Characters",
-        "description": "Complete a session in special characters mode."
+        "title": "ልዩ ቁምፊዎች",
+        "description": "በልዩ ቁምፊዎች ሁነታ ውስጥ ክፍለ ጊዜ ያጠናቅቁ።"
       },
       "languageExplorer": {
-        "title": "Language Explorer",
-        "description": "Try a new language today."
+        "title": "የቋንቋ አሳሽ",
+        "description": "ዛሬ አዲስ ቋንቋ ይሞክሩ።"
       },
       "pointSurge": {
-        "title": "Point Surge",
-        "description": "Score 400 points or more in one session."
+        "title": "የነጥብ መጨመር",
+        "description": "በአንድ ክፍለ ጊዜ 400 ነጥቦች ወይም ከዚያ በላይ ያግኙ።"
       },
       "doubleSession": {
-        "title": "Double Session",
-        "description": "Complete two sessions today."
+        "title": "ድርብ ክፍለ ጊዜ",
+        "description": "ዛሬ ሁለት ክፍለ ጊዜዎችን ያጠናቅቁ።"
       }
     },
     "constraints": {

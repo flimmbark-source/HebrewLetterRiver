@@ -460,363 +460,363 @@
       }
     },
     "waveRider": {
-      "name": "Wave Rider 🌊",
-      "summary": "Catch {{goal}} letters in a single wave.",
+      "name": "波乗り 🌊",
+      "summary": "一つの波で{{goal}}文字をキャッチ。",
       "tiers": {
-        "1": "Ride the Wave",
-        "2": "Wave Master",
-        "3": "Tsunami"
+        "1": "波に乗る",
+        "2": "波のマスター",
+        "3": "津波"
       }
     },
     "centuryClub": {
-      "name": "Century Club",
-      "summary": "Complete {{goal}} total sessions.",
+      "name": "センチュリークラブ",
+      "summary": "合計{{goal}}セッションを完了。",
       "tiers": {
-        "1": "Quarter Century",
-        "2": "Half Century",
-        "3": "Full Century"
+        "1": "25セッション",
+        "2": "50セッション",
+        "3": "100セッション"
       }
     },
     "levelingLegend": {
-      "name": "Leveling Legend",
-      "summary": "Reach level {{goal}} in a single session.",
+      "name": "レベリング伝説",
+      "summary": "単一セッションでレベル{{goal}}に到達。",
       "tiers": {
-        "1": "Level 10",
-        "2": "Level 15",
-        "3": "Level 20"
+        "1": "レベル10",
+        "2": "レベル15",
+        "3": "レベル20"
       }
     },
     "flameKeeper": {
-      "name": "Flame Keeper 🔥",
-      "summary": "Build a {{goal}}-catch streak without mistakes.",
+      "name": "炎の番人 🔥",
+      "summary": "ミスなしで{{goal}}キャッチの連続を構築。",
       "tiers": {
-        "1": "Spark",
-        "2": "Bonfire",
-        "3": "Inferno"
+        "1": "火花",
+        "2": "焚き火",
+        "3": "地獄の炎"
       }
     },
     "pointHunter": {
-      "name": "Point Hunter",
-      "summary": "Score {{goal}} points in a single session.",
+      "name": "ポイントハンター",
+      "summary": "単一セッションで{{goal}}ポイントを獲得。",
       "tiers": {
-        "1": "500 Points",
-        "2": "1000 Points",
-        "3": "2000 Points"
+        "1": "500ポイント",
+        "2": "1000ポイント",
+        "3": "2000ポイント"
       }
     },
     "grandMaster": {
-      "name": "Grand Master",
-      "summary": "Catch {{goal}} correct letters total.",
+      "name": "グランドマスター",
+      "summary": "合計{{goal}}個の正しい文字をキャッチ。",
       "tiers": {
-        "1": "50 Catches",
-        "2": "100 Catches",
-        "3": "200 Catches"
+        "1": "50キャッチ",
+        "2": "100キャッチ",
+        "3": "200キャッチ"
       }
     },
     "risingStar": {
-      "name": "Rising Star",
-      "summary": "Level up {{goal}} times in one session.",
+      "name": "ライジングスター",
+      "summary": "1セッション中に{{goal}}回レベルアップ。",
       "tiers": {
-        "1": "3 Level-Ups",
-        "2": "7 Level-Ups",
-        "3": "12 Level-Ups"
+        "1": "3レベルアップ",
+        "2": "7レベルアップ",
+        "3": "12レベルアップ"
       }
     },
     "flowState": {
-      "name": "Flow State",
-      "summary": "Catch {{goal}} letters perfectly in a row.",
+      "name": "フロー状態",
+      "summary": "{{goal}}文字を連続で完璧にキャッチ。",
       "tiers": {
-        "1": "15 Perfect",
-        "2": "30 Perfect",
-        "3": "50 Perfect"
+        "1": "15完璧",
+        "2": "30完璧",
+        "3": "50完璧"
       }
     },
     "unstoppable": {
-      "name": "Unstoppable",
-      "summary": "Complete {{goal}} full sessions.",
+      "name": "止められない",
+      "summary": "{{goal}}回の完全なセッションを完了。",
       "tiers": {
-        "1": "5 Sessions",
-        "2": "15 Sessions",
-        "3": "30 Sessions"
+        "1": "5セッション",
+        "2": "15セッション",
+        "3": "30セッション"
       }
     },
     "starCollector": {
-      "name": "Star Collector ⭐",
-      "summary": "Earn {{goal}} total stars.",
+      "name": "スターコレクター ⭐",
+      "summary": "合計{{goal}}個のスターを獲得。",
       "tiers": {
-        "1": "100 Stars",
-        "2": "300 Stars",
-        "3": "750 Stars"
+        "1": "100スター",
+        "2": "300スター",
+        "3": "750スター"
       }
     },
     "slowSteady": {
-      "name": "Slow & Steady",
-      "summary": "Complete {{goal}} perfect sessions in slow river mode.",
+      "name": "ゆっくり着実",
+      "summary": "スローリバーモードで{{goal}}回の完璧なセッションを完了。",
       "tiers": {
-        "1": "First Zen",
-        "2": "Zen Master",
-        "3": "Zen Legend"
+        "1": "最初の禅",
+        "2": "禅マスター",
+        "3": "禅レジェンド"
       }
     },
     "clickChampion": {
-      "name": "Click Champion",
-      "summary": "Win {{goal}} sessions with click mode enabled.",
+      "name": "クリックチャンピオン",
+      "summary": "クリックモードを有効にして{{goal}}セッションで勝利。",
       "tiers": {
-        "1": "Click Novice",
-        "2": "Click Expert",
-        "3": "Click Master"
+        "1": "クリック初心者",
+        "2": "クリックエキスパート",
+        "3": "クリックマスター"
       }
     },
     "fontChameleon": {
-      "name": "Font Chameleon",
-      "summary": "Play {{goal}} sessions with font shuffle enabled.",
+      "name": "フォントカメレオン",
+      "summary": "フォントシャッフルを有効にして{{goal}}セッションをプレイ。",
       "tiers": {
-        "1": "Font Explorer",
-        "2": "Font Adapter",
-        "3": "Font Shapeshifter"
+        "1": "フォント探検家",
+        "2": "フォント適応者",
+        "3": "フォント変身者"
       }
     },
     "clutchWinner": {
-      "name": "Clutch Winner",
-      "summary": "Win {{goal}} sessions with only 1 life remaining.",
+      "name": "逆転勝利者",
+      "summary": "残りライフ1で{{goal}}セッションに勝利。",
       "tiers": {
-        "1": "Lucky Save",
-        "2": "Clutch Player",
-        "3": "Miracle Worker"
+        "1": "幸運の救済",
+        "2": "クラッチプレイヤー",
+        "3": "奇跡の働き手"
       }
     },
     "associationExpert": {
-      "name": "Association Expert",
-      "summary": "Play {{goal}} sessions with association mode.",
+      "name": "連想エキスパート",
+      "summary": "連想モードで{{goal}}セッションをプレイ。",
       "tiers": {
-        "1": "Visual Learner",
-        "2": "Image Master",
-        "3": "Association Ace"
+        "1": "視覚学習者",
+        "2": "イメージマスター",
+        "3": "連想エース"
       }
     },
     "accessibilityAlly": {
-      "name": "Accessibility Ally",
-      "summary": "Play {{goal}} sessions with accessibility features.",
+      "name": "アクセシビリティの味方",
+      "summary": "アクセシビリティ機能を使用して{{goal}}セッションをプレイ。",
       "tiers": {
-        "1": "Inclusive Player",
-        "2": "Accessibility Advocate",
-        "3": "Universal Design Champion"
+        "1": "包括的プレイヤー",
+        "2": "アクセシビリティ提唱者",
+        "3": "ユニバーサルデザインチャンピオン"
       }
     },
     "noIntroductions": {
-      "name": "No Introductions",
-      "summary": "Play {{goal}} sessions without letter introductions.",
+      "name": "導入不要",
+      "summary": "文字の導入なしで{{goal}}セッションをプレイ。",
       "tiers": {
-        "1": "Skip Intro",
-        "2": "No Hand-Holding",
-        "3": "Already Knows"
+        "1": "イントロスキップ",
+        "2": "手助け不要",
+        "3": "既に知っている"
       }
     },
     "oneShotWonder": {
-      "name": "One-Shot Wonder",
-      "summary": "Get {{goal}} letters correct on first attempt.",
+      "name": "一発成功",
+      "summary": "最初の試みで{{goal}}文字を正しく獲得。",
       "tiers": {
-        "1": "Quick Study",
-        "2": "First Impression",
-        "3": "Instant Recall"
+        "1": "速習",
+        "2": "第一印象",
+        "3": "即座の記憶"
       }
     },
     "randomMaster": {
-      "name": "Random Master",
-      "summary": "Play {{goal}} sessions with random letters enabled.",
+      "name": "ランダムマスター",
+      "summary": "ランダム文字を有効にして{{goal}}セッションをプレイ。",
       "tiers": {
-        "1": "Embrace Chaos",
-        "2": "Random Pro",
-        "3": "Chaos Champion"
+        "1": "混沌を受け入れる",
+        "2": "ランダムプロ",
+        "3": "混沌チャンピオン"
       }
     },
     "comebackChampion": {
-      "name": "Comeback Champion",
-      "summary": "Win {{goal}} sessions after losing 2 lives.",
+      "name": "カムバックチャンピオン",
+      "summary": "ライフを2つ失った後に{{goal}}セッションで勝利。",
       "tiers": {
-        "1": "Second Chance",
-        "2": "Close Call",
-        "3": "Phoenix Rising"
+        "1": "セカンドチャンス",
+        "2": "際どい勝利",
+        "3": "不死鳥の復活"
       }
     },
     "polyglotPioneer": {
-      "name": "Polyglot Pioneer",
-      "summary": "Try {{goal}} different language packs.",
+      "name": "多言語パイオニア",
+      "summary": "{{goal}}種類の異なる言語パックを試す。",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3言語",
+        "2": "6言語",
+        "3": "10言語"
       }
     },
     "unicodeChampion": {
-      "name": "Unicode Champion",
-      "summary": "Practice {{goal}} different writing systems.",
+      "name": "ユニコードチャンピオン",
+      "summary": "{{goal}}種類の異なる文字体系を練習。",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "8 Scripts"
+        "1": "3文字体系",
+        "2": "5文字体系",
+        "3": "8文字体系"
       }
     },
     "rtlExpert": {
-      "name": "RTL Expert",
-      "summary": "Complete {{goal}} sessions in right-to-left languages.",
+      "name": "右から左エキスパート",
+      "summary": "右から左の言語で{{goal}}セッションを完了。",
       "tiers": {
-        "1": "RTL Beginner",
-        "2": "RTL Proficient",
-        "3": "RTL Master"
+        "1": "右から左初心者",
+        "2": "右から左熟練者",
+        "3": "右から左マスター"
       }
     },
     "vowelVirtuoso": {
-      "name": "Advanced Learner",
-      "summary": "Complete {{goal}} sessions in advanced practice mode.",
+      "name": "上級学習者",
+      "summary": "上級練習モードで{{goal}}セッションを完了。",
       "tiers": {
-        "1": "Advanced Student",
-        "2": "Advanced Scholar",
-        "3": "Advanced Master"
+        "1": "上級生徒",
+        "2": "上級学者",
+        "3": "上級マスター"
       }
     },
     "finalFormMaster": {
-      "name": "Special Forms Expert",
-      "summary": "Complete {{goal}} sessions in special characters mode.",
+      "name": "特殊形式エキスパート",
+      "summary": "特殊文字モードで{{goal}}セッションを完了。",
       "tiers": {
-        "1": "Special Forms Novice",
-        "2": "Special Forms Expert",
-        "3": "Special Forms Champion"
+        "1": "特殊形式初心者",
+        "2": "特殊形式エキスパート",
+        "3": "特殊形式チャンピオン"
       }
     },
     "modeMixer": {
-      "name": "Mode Mixer",
-      "summary": "Play {{goal}} sessions with multiple modes simultaneously.",
+      "name": "モードミキサー",
+      "summary": "複数のモードを同時に使用して{{goal}}セッションをプレイ。",
       "tiers": {
-        "1": "Mix It Up",
-        "2": "Mode Juggler",
-        "3": "Ultimate Mixer"
+        "1": "混ぜてみる",
+        "2": "モードジャグラー",
+        "3": "究極ミキサー"
       }
     },
     "culturalAmbassador": {
-      "name": "Cultural Ambassador",
-      "summary": "Try {{goal}} different languages.",
+      "name": "文化大使",
+      "summary": "{{goal}}種類の異なる言語を試す。",
       "tiers": {
-        "1": "3 Languages",
-        "2": "6 Languages",
-        "3": "10 Languages"
+        "1": "3言語",
+        "2": "6言語",
+        "3": "10言語"
       }
     },
     "scriptScholar": {
-      "name": "Script Scholar",
-      "summary": "Achieve 90%+ accuracy in {{goal}} different scripts.",
+      "name": "文字学者",
+      "summary": "{{goal}}種類の異なる文字体系で90%以上の精度を達成。",
       "tiers": {
-        "1": "3 Scripts",
-        "2": "5 Scripts",
-        "3": "7 Scripts"
+        "1": "3文字体系",
+        "2": "5文字体系",
+        "3": "7文字体系"
       }
     },
     "alphabetAce": {
-      "name": "Alphabet Ace",
-      "summary": "Master basic mode in {{goal}} different languages.",
+      "name": "アルファベットエース",
+      "summary": "{{goal}}種類の異なる言語で基本モードをマスター。",
       "tiers": {
-        "1": "2 Alphabets",
-        "2": "4 Alphabets",
-        "3": "6 Alphabets"
+        "1": "2文字セット",
+        "2": "4文字セット",
+        "3": "6文字セット"
       }
     },
     "languageSampler": {
-      "name": "Language Sampler",
-      "summary": "Try a new language {{goal}} times.",
+      "name": "言語サンプラー",
+      "summary": "新しい言語を{{goal}}回試す。",
       "tiers": {
-        "1": "Curious Explorer",
-        "2": "Language Taster",
-        "3": "World Linguist"
+        "1": "好奇心旺盛な探検家",
+        "2": "言語テイスター",
+        "3": "世界の言語学者"
       }
     },
     "morningGlory": {
-      "name": "Morning Glory",
-      "summary": "Play {{goal}} sessions early morning (5am-8am).",
+      "name": "朝顔",
+      "summary": "早朝（5:00-8:00）に{{goal}}セッションをプレイ。",
       "tiers": {
-        "1": "Early Riser",
-        "2": "Morning Person",
-        "3": "Dawn Warrior"
+        "1": "早起き者",
+        "2": "朝型人間",
+        "3": "夜明けの戦士"
       }
     },
     "lunchLearner": {
-      "name": "Lunch Learner",
-      "summary": "Play {{goal}} sessions during lunch (11am-2pm).",
+      "name": "ランチ学習者",
+      "summary": "ランチタイム（11:00-14:00）に{{goal}}セッションをプレイ。",
       "tiers": {
-        "1": "Lunch Break",
-        "2": "Midday Master",
-        "3": "Lunch Legend"
+        "1": "昼休み",
+        "2": "正午のマスター",
+        "3": "ランチレジェンド"
       }
     },
     "midnightScholar": {
-      "name": "Midnight Scholar",
-      "summary": "Play {{goal}} sessions after midnight (12am-3am).",
+      "name": "真夜中の学者",
+      "summary": "深夜（0:00-3:00）に{{goal}}セッションをプレイ。",
       "tiers": {
-        "1": "Night Shift",
-        "2": "Midnight Oil",
-        "3": "Insomniac Legend"
+        "1": "夜勤",
+        "2": "夜なべ",
+        "3": "不眠症レジェンド"
       }
     },
     "primeTimePlayer": {
-      "name": "Prime Time Player",
-      "summary": "Play {{goal}} sessions in the evening (6pm-9pm).",
+      "name": "ゴールデンタイムプレイヤー",
+      "summary": "夕方（18:00-21:00）に{{goal}}セッションをプレイ。",
       "tiers": {
-        "1": "Evening Starter",
-        "2": "Prime Timer",
-        "3": "Evening Legend"
+        "1": "夕方スターター",
+        "2": "ゴールデンタイマー",
+        "3": "夕方レジェンド"
       }
     },
     "perfectWeek": {
-      "name": "Perfect Week",
-      "summary": "Play every day for 7 days straight ({{goal}} times).",
+      "name": "完璧な週",
+      "summary": "7日間連続で毎日プレイ（{{goal}}回）。",
       "tiers": {
-        "1": "First Week",
-        "2": "3 Perfect Weeks",
-        "3": "8 Perfect Weeks"
+        "1": "最初の週",
+        "2": "3回の完璧な週",
+        "3": "8回の完璧な週"
       }
     },
     "monthlyMaven": {
-      "name": "Monthly Maven",
-      "summary": "Play 20+ days in a month ({{goal}} months).",
+      "name": "月間達人",
+      "summary": "1ヶ月に20日以上プレイ（{{goal}}ヶ月）。",
       "tiers": {
-        "1": "1 Active Month",
-        "2": "3 Active Months",
-        "3": "6 Active Months"
+        "1": "1ヶ月アクティブ",
+        "2": "3ヶ月アクティブ",
+        "3": "6ヶ月アクティブ"
       }
     },
     "anniversaryAce": {
-      "name": "Anniversary Ace",
-      "summary": "Play on your {{goal}}-year account anniversary.",
+      "name": "記念日エース",
+      "summary": "アカウント開設{{goal}}周年にプレイ。",
       "tiers": {
-        "1": "1 Year",
-        "2": "2 Years",
-        "3": "3 Years"
+        "1": "1周年",
+        "2": "2周年",
+        "3": "3周年"
       }
     },
     "seasonVeteran": {
-      "name": "Season Veteran",
-      "summary": "Play in all {{goal}} seasons of the year.",
+      "name": "四季のベテラン",
+      "summary": "1年の全{{goal}}季節でプレイ。",
       "tiers": {
-        "1": "All Seasons (1 Year)",
-        "2": "All Seasons (2 Years)",
-        "3": "All Seasons (3 Years)"
+        "1": "全季節（1年）",
+        "2": "全季節（2年）",
+        "3": "全季節（3年）"
       }
     },
     "dawnPatrol": {
-      "name": "Dawn Patrol",
-      "summary": "Play {{goal}} sessions at sunrise (5am-7am).",
+      "name": "夜明けパトロール",
+      "summary": "日の出の時間（5:00-7:00）に{{goal}}セッションをプレイ。",
       "tiers": {
-        "1": "First Light",
-        "2": "Dawn Regular",
-        "3": "Sunrise Champion"
+        "1": "最初の光",
+        "2": "夜明けの常連",
+        "3": "日の出チャンピオン"
       }
     },
     "consistencyKing": {
-      "name": "Consistency King",
-      "summary": "Play {{goal}} days in a row.",
+      "name": "一貫性の王",
+      "summary": "{{goal}}日連続でプレイ。",
       "tiers": {
-        "1": "14 Day Streak",
-        "2": "30 Day Streak",
-        "3": "60 Day Streak"
+        "1": "14日連続",
+        "2": "30日連続",
+        "3": "60日連続"
       }
     },
     "streakMaster": {
@@ -888,92 +888,92 @@
         "description": "{{constraint}}がアクティブな状態でラウンドに勝ちます。"
       },
       "accuracyChallenge": {
-        "title": "Accuracy Challenge",
-        "description": "Complete a session with 90% or better accuracy."
+        "title": "精度チャレンジ",
+        "description": "90%以上の精度でセッションを完了する。"
       },
       "gemCollector": {
-        "title": "Gem Collector",
-        "description": "Win two bonus rounds today."
+        "title": "宝石コレクター",
+        "description": "今日、2回のボーナスラウンドで勝利する。"
       },
       "varietyPack": {
-        "title": "Variety Pack",
-        "description": "Catch at least eight different unique letters."
+        "title": "バラエティパック",
+        "description": "少なくとも8種類の異なる文字をキャッチする。"
       },
       "powerSession": {
-        "title": "Power Session",
-        "description": "Catch 25 or more items in a single session."
+        "title": "パワーセッション",
+        "description": "1回のセッションで25個以上のアイテムをキャッチする。"
       },
       "perfectRun": {
-        "title": "Perfect Run",
-        "description": "Complete one session without any mistakes."
+        "title": "完璧な実行",
+        "description": "ミスなしで1セッションを完了する。"
       },
       "speedPractice": {
-        "title": "Speed Practice",
-        "description": "Complete a session with fast flow speed enabled."
+        "title": "スピード練習",
+        "description": "速い流れ速度を有効にしてセッションを完了する。"
       },
       "tripleThread": {
-        "title": "Triple Threat",
-        "description": "Play three full sessions today."
+        "title": "トリプルスレット",
+        "description": "今日、3回の完全なセッションをプレイする。"
       },
       "waveChallenge": {
-        "title": "Wave Challenge 🌊",
-        "description": "Catch 8 letters in a single wave."
+        "title": "ウェーブチャレンジ 🌊",
+        "description": "1つの波で8文字をキャッチする。"
       },
       "flameBuilder": {
-        "title": "Flame Builder 🔥",
-        "description": "Build a 15-catch perfect streak."
+        "title": "炎ビルダー 🔥",
+        "description": "15キャッチの完璧な連続を構築する。"
       },
       "slowRiverZen": {
-        "title": "Slow River Zen",
-        "description": "Complete a session in slow river mode with perfect accuracy."
+        "title": "スローリバー禅",
+        "description": "スローリバーモードで完璧な精度でセッションを完了する。"
       },
       "clickMaster": {
-        "title": "Click Master",
-        "description": "Win a session with click mode enabled."
+        "title": "クリックマスター",
+        "description": "クリックモードを有効にしてセッションで勝利する。"
       },
       "levelClimber": {
-        "title": "Level Climber",
-        "description": "Reach level 12 or higher in one session."
+        "title": "レベルクライマー",
+        "description": "1セッションでレベル12以上に到達する。"
       },
       "noLivesLost": {
-        "title": "No Lives Lost",
-        "description": "Complete a session without losing a life."
+        "title": "ライフ無傷",
+        "description": "ライフを失わずにセッションを完了する。"
       },
       "associationPractice": {
-        "title": "Association Practice",
-        "description": "Complete a session with association mode enabled."
+        "title": "連想練習",
+        "description": "連想モードを有効にしてセッションを完了する。"
       },
       "multiModeMaster": {
-        "title": "Multi-Mode Master",
-        "description": "Complete a session with two or more modes enabled."
+        "title": "マルチモードマスター",
+        "description": "2つ以上のモードを有効にしてセッションを完了する。"
       },
       "fontFlexibility": {
-        "title": "Font Flexibility",
-        "description": "Complete a session with font shuffle enabled."
+        "title": "フォント柔軟性",
+        "description": "フォントシャッフルを有効にしてセッションを完了する。"
       },
       "randomChallenge": {
-        "title": "Random Challenge",
-        "description": "Complete a session with random letters enabled."
+        "title": "ランダムチャレンジ",
+        "description": "ランダム文字を有効にしてセッションを完了する。"
       },
       "vowelFocus": {
-        "title": "Advanced Practice",
-        "description": "Complete a session in advanced practice mode."
+        "title": "上級練習",
+        "description": "上級練習モードでセッションを完了する。"
       },
       "finalFormsPractice": {
-        "title": "Special Characters",
-        "description": "Complete a session in special characters mode."
+        "title": "特殊文字",
+        "description": "特殊文字モードでセッションを完了する。"
       },
       "languageExplorer": {
-        "title": "Language Explorer",
-        "description": "Try a new language today."
+        "title": "言語探検家",
+        "description": "今日、新しい言語を試す。"
       },
       "pointSurge": {
-        "title": "Point Surge",
-        "description": "Score 400 points or more in one session."
+        "title": "ポイントサージ",
+        "description": "1セッションで400ポイント以上を獲得する。"
       },
       "doubleSession": {
-        "title": "Double Session",
-        "description": "Complete two sessions today."
+        "title": "ダブルセッション",
+        "description": "今日、2回のセッションを完了する。"
       }
     },
     "constraints": {
