@@ -1054,8 +1054,8 @@ export function ProgressProvider({ children }) {
     const offSessionComplete = on('game:session-complete', (payload) => {
       const dateKey = getJerusalemDateKey();
       const stats = payload?.stats ?? {};
-      const correct = stats.correct ?? 0;
-      const incorrect = stats.incorrect ?? 0;
+      const correct = Object.values(stats).reduce((sum, item) => sum + (item.correct ?? 0), 0);
+      const incorrect = Object.values(stats).reduce((sum, item) => sum + (item.incorrect ?? 0), 0);
       const total = correct + incorrect;
       const accuracy = total > 0 ? correct / total : 0;
       const speed = payload?.settings?.speed ?? 0;
