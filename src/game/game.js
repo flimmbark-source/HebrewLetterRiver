@@ -303,6 +303,23 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
 
   function showWinScreen() {
     gameActive = false;
+
+    emit('game:session-complete', {
+      mode: gameMode,
+      score,
+      stats: sessionStats,
+      settings: {
+        mode: gameMode,
+        speed: baseSpeedSetting,
+        introductions: introductionsEnabled,
+        randomLetters: isRandomLettersModeActive(),
+        clickMode: clickModeEnabled,
+        slowRiver: slowRiverEnabled,
+        fontShuffle: fontShuffleEnabled
+      },
+      languageId: activeLanguage.id
+    });
+
     modal.classList.remove('hidden');
     setupView.classList.add('hidden');
     gameOverView.classList.add('hidden');
