@@ -2001,8 +2001,11 @@ function startClickMode(itemEl, payload) {
     const combinedLabel = itemGroup.map(item => getDisplayLabel(item)).join(' ');
 
     // Store the combined display text
-    box.textContent = combinedSymbol;
     box.dataset.labelText = combinedSymbol;
+
+    // Check if association mode is enabled - DON'T use associations for combined letters
+    // Combined letters should always show the actual symbols
+    box.textContent = combinedSymbol;
 
     // Store all item IDs separated by pipe character for matching
     box.dataset.itemIds = itemGroup.map(item => item.id).join('|');
@@ -2084,6 +2087,23 @@ function startClickMode(itemEl, payload) {
             lastGroup.push(distractor);
             usedSounds.add(sound);
           }
+        }
+      }
+
+      // Ensure we have at least 4 buckets (or maxBucketCount) by adding distractor groups
+      const minBuckets = Math.max(4, maxBucketCount);
+      while (combinedGroups.length < minBuckets && distractorPool.length >= lettersPerBox) {
+        const newGroup = [];
+        for (let i = 0; i < lettersPerBox && distractorPool.length > 0; i++) {
+          const distractor = distractorPool.shift();
+          const sound = getDisplayLabel(distractor);
+          if (sound && !usedSounds.has(sound)) {
+            newGroup.push(distractor);
+            usedSounds.add(sound);
+          }
+        }
+        if (newGroup.length === lettersPerBox) {
+          combinedGroups.push(newGroup);
         }
       }
 
