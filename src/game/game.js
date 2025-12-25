@@ -1674,12 +1674,28 @@ function startClickMode(itemEl, payload) {
       for (let i = 0; i < uniqueItems.length; i += lettersPerBox) {
         const group = uniqueItems.slice(i, i + lettersPerBox);
         if (group.length > 0) {
-          // Create a combined item object
+          // Create a combined item object with romanized labels
+          const combinedSymbol = group.map(item => {
+            const displayLabel = getDisplayLabel(item);
+            const displaySymbol = getDisplaySymbol(item);
+            const isFinalForm = item.isFinalForm || item.id.startsWith('final-');
+            const isVowel = item.type === 'vowel';
+
+            // Match the logic from regular buckets
+            if (isFinalForm) {
+              return `[${displayLabel || displaySymbol}]`;
+            } else if (isVowel) {
+              return displayLabel;
+            } else {
+              return displayLabel || displaySymbol;
+            }
+          }).join(' ');
+
           groupedItems.push({
             isCombined: true,
             items: group,
             id: group.map(item => item.id).join('|'),
-            symbol: group.map(item => getDisplaySymbol(item)).join(''),
+            symbol: combinedSymbol,  // Now uses romanized sounds with spaces
             sound: group.map(item => getDisplayLabel(item)).join('|')
           });
         }
@@ -1996,16 +2012,26 @@ function startClickMode(itemEl, payload) {
 
     const box = document.createElement('div');
 
-    // Combine all symbols from the group
-    const combinedSymbol = itemGroup.map(item => getDisplaySymbol(item)).join('');
-    const combinedLabel = itemGroup.map(item => getDisplayLabel(item)).join(' ');
+    // Combine all labels (romanized sounds) from the group with spaces
+    const combinedLabel = itemGroup.map(item => {
+      const displayLabel = getDisplayLabel(item);
+      const displaySymbol = getDisplaySymbol(item);
+      const isFinalForm = item.isFinalForm || item.id.startsWith('final-');
+      const isVowel = item.type === 'vowel';
 
-    // Store the combined display text
-    box.dataset.labelText = combinedSymbol;
+      // Match the logic from regular buckets
+      if (isFinalForm) {
+        return `[${displayLabel || displaySymbol}]`;
+      } else if (isVowel) {
+        return displayLabel;
+      } else {
+        return displayLabel || displaySymbol;
+      }
+    }).join(' ');
 
-    // Check if association mode is enabled - DON'T use associations for combined letters
-    // Combined letters should always show the actual symbols
-    box.textContent = combinedSymbol;
+    // Store and display the combined label text (app language - romanized)
+    box.dataset.labelText = combinedLabel;
+    box.textContent = combinedLabel;
 
     // Store all item IDs separated by pipe character for matching
     box.dataset.itemIds = itemGroup.map(item => item.id).join('|');
