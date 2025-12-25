@@ -2084,7 +2084,7 @@ function startClickMode(itemEl, payload) {
       const combinedGroups = [];
       for (let i = 0; i < uniqueItems.length; i += lettersPerBox) {
         const group = uniqueItems.slice(i, i + lettersPerBox);
-        if (group.length > 0) {
+        if (group.length === lettersPerBox) { // Only complete groups
           combinedGroups.push(group);
         }
       }
