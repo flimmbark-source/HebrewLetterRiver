@@ -49,6 +49,7 @@ export function GameProvider({ children }) {
       fontShuffle: false,
       slowRiver: false,
       clickMode: false,
+      combinedLetters: false,
     };
   }, []);
 
@@ -291,6 +292,11 @@ function GameCanvas({ fontClass, loadedSettings }) {
       title: 'Association Mode',
       description:
         'Buckets display images, drag to the image which starts with the letter sound.',
+    },
+    combinedLetters: {
+      title: 'Combined Letters Mode',
+      description:
+        'Instead of adding more boxes as you progress, every 4 levels the letters will combine into longer groups. This makes the game more challenging by requiring you to recognize multiple letters at once.',
     },
   };
 
@@ -992,6 +998,24 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 id="association-mode-toggle"
                 type="checkbox"
                 defaultChecked={loadedSettings.associationMode}
+                className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
+                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+              />
+            </label>
+
+            <label className="flex items-center justify-between">
+              <span
+                className="cursor-pointer hover:text-amber-700"
+                onClick={(e) => showInfo('combinedLetters', e)}
+                onMouseEnter={(e) => showInfo('combinedLetters', e)}
+                onMouseLeave={() => setShowInfoPopup(false)}
+              >
+                Combined Letters Mode
+              </span>
+              <input
+                id="combined-letters-toggle"
+                type="checkbox"
+                defaultChecked={loadedSettings.combinedLetters}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />

@@ -74,6 +74,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   const slowRiverToggle = document.getElementById('slow-river-toggle');
   const clickModeToggle = document.getElementById('click-mode-toggle');
   const associationModeToggle = document.getElementById('association-mode-toggle');
+  const combinedLettersToggle = document.getElementById('combined-letters-toggle');
   const installBtn = document.getElementById('install-btn');
   const pauseButton = document.getElementById('pause-button');
   const pauseModal = document.getElementById('pause-modal');
@@ -388,6 +389,24 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   const LAYOUT_GAP_FALLBACK = 8;
   const BUCKET_BASE_HEIGHT = 50; // Base height when containers are full size
   const BUCKET_MIN_HEIGHT = 44; // Minimum height for touch accessibility
+
+  // Combined Letters Mode Configuration - Easy to tweak!
+  const COMBINED_LETTERS_LEVEL_INTERVAL = 4; // Every N levels, add one more letter
+  const COMBINED_LETTERS_START_COUNT = 1; // Start with this many letters at level 1
+  const COMBINED_LETTERS_MAX_COUNT = 5; // Maximum letters to combine (prevents text overflow)
+
+  /**
+   * Calculate how many letters should be combined based on the current level
+   * @param {number} currentLevel - The current game level
+   * @returns {number} - Number of letters to combine (1-5)
+   */
+  function getLettersPerBoxForLevel(currentLevel) {
+    if (!combinedLettersEnabled) return 1;
+    const additionalLetters = Math.floor((currentLevel - 1) / COMBINED_LETTERS_LEVEL_INTERVAL);
+    const lettersPerBox = COMBINED_LETTERS_START_COUNT + additionalLetters;
+    return Math.min(lettersPerBox, COMBINED_LETTERS_MAX_COUNT);
+  }
+
   let pendingBucketLayoutHandle = null;
   let pendingBucketLayoutIsAnimationFrame = false;
   let isApplyingBucketLayout = false;
@@ -982,6 +1001,7 @@ function startClickMode(itemEl, payload) {
   let slowRiverEnabled = false;
   let clickModeEnabled = false;
   let associationModeEnabled = false;
+  let combinedLettersEnabled = false;
   let selectedFont = 'default';
   let fontShuffleEnabled = false;
   let lastUsedFont = null; // Track last used font to prevent consecutive repeats
@@ -1632,12 +1652,48 @@ function startClickMode(itemEl, payload) {
   }
 
   function processItemsForRound(items, roundId, isFirstWave) {
+    // In Combined Letters mode, group items before processing
+    let processedItems = items;
+    if (combinedLettersEnabled) {
+      const lettersPerBox = getLettersPerBoxForLevel(level);
+      const groupedItems = [];
+
+      // Group items by sound first to get unique items
+      const uniqueBySound = new Map();
+      items.forEach((item) => {
+        if (!item) return;
+        const sound = getDisplayLabel(item);
+        if (!sound) return;
+        if (!uniqueBySound.has(sound)) {
+          uniqueBySound.set(sound, item);
+        }
+      });
+      const uniqueItems = Array.from(uniqueBySound.values());
+
+      // Create combined groups
+      for (let i = 0; i < uniqueItems.length; i += lettersPerBox) {
+        const group = uniqueItems.slice(i, i + lettersPerBox);
+        if (group.length > 0) {
+          // Create a combined item object
+          groupedItems.push({
+            isCombined: true,
+            items: group,
+            id: group.map(item => item.id).join('|'),
+            symbol: group.map(item => getDisplaySymbol(item)).join(''),
+            sound: group.map(item => getDisplayLabel(item)).join('|')
+          });
+        }
+      }
+
+      processedItems = groupedItems;
+    }
+
     // First wave of level: spawn items one at a time with delays (for introductions)
     // Subsequent waves: spawn ALL items at once (no delays)
     if (isFirstWave) {
       // First wave: spawn one at a time with delays
       let totalDelay = 0;
-      items.forEach((itemData) => {
+      processedItems.forEach((itemData) => {
         if (!itemData || !itemData.id) return;
         if (currentRound.id !== roundId) return;
         const isNewItem = !seenItems.has(itemData.id);
@@ -1692,7 +1748,7 @@ function startClickMode(itemEl, payload) {
       // Subsequent waves: spawn all items at once with no delays
     const STAGGER_MS = 500;
 
-    items.forEach((itemData, index) => {
+    processedItems.forEach((itemData, index) => {
     if (!itemData || !itemData.id) return;
     if (currentRound.id !== roundId) return;
 
@@ -1761,7 +1817,11 @@ function startClickMode(itemEl, payload) {
     const itemEl = document.createElement('div');
     itemEl.id = elementId;
     itemEl.isDropped = false;
-    itemEl.textContent = itemData.symbol;
+
+    // Handle combined items
+    const isCombined = itemData.isCombined || false;
+    const displaySymbol = itemData.symbol;
+    itemEl.textContent = displaySymbol;
 
     // Determine animation based on settings
     let animationName;
@@ -1811,16 +1871,24 @@ function startClickMode(itemEl, payload) {
     const invertedSpeed = slowRiverEnabled ? Math.max(10, 34 - sliderValue) : 34 - sliderValue;
     itemEl.style.animationDuration = `${invertedSpeed}s`;
     itemEl.draggable = true;
-    const pronunciation = itemData.pronunciation ?? itemData.sound ?? '';
-    const transliteration = itemData.transliteration ?? itemData.name ?? '';
-    const ariaLabel = letterDescriptionTemplate
-      ? formatTemplate(letterDescriptionTemplate, {
-          symbol: itemData.symbol ?? '',
-          name: itemData.name ?? '',
-          transliteration,
-          pronunciation
-        })
-      : `${transliteration} ${pronunciation}`.trim();
+
+    // Create aria label for combined or single items
+    let ariaLabel = '';
+    if (isCombined && itemData.items) {
+      const ariaLabels = itemData.items.map(item => getCharacterAriaLabel(item)).filter(Boolean);
+      ariaLabel = ariaLabels.join(', ');
+    } else {
+      const pronunciation = itemData.pronunciation ?? itemData.sound ?? '';
+      const transliteration = itemData.transliteration ?? itemData.name ?? '';
+      ariaLabel = letterDescriptionTemplate
+        ? formatTemplate(letterDescriptionTemplate, {
+            symbol: itemData.symbol ?? '',
+            name: itemData.name ?? '',
+            transliteration,
+            pronunciation
+          })
+        : `${transliteration} ${pronunciation}`.trim();
+    }
     if (ariaLabel) itemEl.setAttribute('aria-label', ariaLabel);
     itemEl.addEventListener('dragstart', (e) => {
       const dragData = JSON.stringify({
@@ -1919,6 +1987,51 @@ function startClickMode(itemEl, payload) {
     }
   }
 
+  /**
+   * Create a bucket that displays combined letters
+   * @param {Array} itemGroup - Array of items to combine in one bucket
+   */
+  function createCombinedBucket(itemGroup) {
+    if (!itemGroup || itemGroup.length === 0) return;
+
+    const box = document.createElement('div');
+
+    // Combine all symbols from the group
+    const combinedSymbol = itemGroup.map(item => getDisplaySymbol(item)).join('');
+    const combinedLabel = itemGroup.map(item => getDisplayLabel(item)).join(' ');
+
+    // Store the combined display text
+    box.textContent = combinedSymbol;
+    box.dataset.labelText = combinedSymbol;
+
+    // Store all item IDs separated by pipe character for matching
+    box.dataset.itemIds = itemGroup.map(item => item.id).join('|');
+
+    // Store all sounds separated by pipe for matching
+    box.dataset.sounds = itemGroup.map(item => getDisplayLabel(item)).join('|');
+
+    // Mark as combined bucket
+    box.dataset.isCombined = 'true';
+    box.dataset.itemCount = itemGroup.length.toString();
+
+    box.className = 'catcher-box bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium text-arcade-text-main font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-arcade-panel-border shadow-arcade-sm';
+
+    // Create aria label from all items
+    const ariaLabels = itemGroup.map(item => getCharacterAriaLabel(item)).filter(Boolean);
+    if (ariaLabels.length > 0) {
+      box.setAttribute('aria-label', ariaLabels.join(', '));
+    }
+
+    box.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      box.classList.add('drag-over');
+    });
+    box.addEventListener('dragleave', () => box.classList.remove('drag-over'));
+    box.addEventListener('drop', handleDrop);
+
+    choicesContainer.appendChild(box);
+  }
+
   function generateChoices(correctItems, itemPool) {
     choicesContainer.innerHTML = '';
     activeBucketCount = 0;
@@ -1928,7 +2041,69 @@ function startClickMode(itemEl, payload) {
     refreshDropZones();
     if (correctItems.length === 0) return;
 
-    // Group items by sound - multiple letters with same sound share one bucket
+    // In Combined Letters mode, group items into combined buckets
+    if (combinedLettersEnabled) {
+      const lettersPerBox = getLettersPerBoxForLevel(level);
+
+      // Group items by sound first to get unique items
+      const uniqueBySound = new Map();
+      correctItems.forEach((item) => {
+        if (!item) return;
+        const sound = getDisplayLabel(item);
+        if (!sound) return;
+        if (!uniqueBySound.has(sound)) {
+          uniqueBySound.set(sound, item);
+        }
+      });
+      const uniqueItems = Array.from(uniqueBySound.values());
+
+      // Create combined letter groups
+      const combinedGroups = [];
+      for (let i = 0; i < uniqueItems.length; i += lettersPerBox) {
+        const group = uniqueItems.slice(i, i + lettersPerBox);
+        if (group.length > 0) {
+          combinedGroups.push(group);
+        }
+      }
+
+      // Add distractors to fill out the groups if needed
+      const usedSounds = new Set(uniqueItems.map((i) => getDisplayLabel(i)));
+      let distractorPool = itemPool.filter((i) => {
+        const sound = getDisplayLabel(i);
+        return sound && !usedSounds.has(sound);
+      });
+      distractorPool.sort(() => 0.5 - Math.random());
+
+      // If last group is incomplete, fill it with distractors
+      if (combinedGroups.length > 0) {
+        const lastGroup = combinedGroups[combinedGroups.length - 1];
+        while (lastGroup.length < lettersPerBox && distractorPool.length > 0) {
+          const distractor = distractorPool.shift();
+          const sound = getDisplayLabel(distractor);
+          if (sound && !usedSounds.has(sound)) {
+            lastGroup.push(distractor);
+            usedSounds.add(sound);
+          }
+        }
+      }
+
+      // Create buckets for each combined group
+      combinedGroups.sort(() => 0.5 - Math.random());
+      combinedGroups.forEach((group) => {
+        createCombinedBucket(group);
+      });
+
+      activeBucketCount = combinedGroups.length;
+      maxBucketCount = Math.max(maxBucketCount, activeBucketCount);
+      invalidateBucketMinWidth();
+      scheduleBucketLayoutUpdate();
+      if (typeof window !== 'undefined') {
+        window.setTimeout(() => scheduleBucketLayoutUpdate(), 150);
+      }
+      return;
+    }
+
+    // Regular mode: Group items by sound - multiple letters with same sound share one bucket
     const uniqueBySound = new Map();
     correctItems.forEach((item) => {
       if (!item) return;
@@ -2040,7 +2215,8 @@ function startClickMode(itemEl, payload) {
         fontShuffle: fontShuffleToggle?.checked ?? false,
         slowRiver: slowRiverToggle?.checked ?? false,
         clickMode: clickModeToggle?.checked ?? false,
-        associationMode: associationModeToggle?.checked ?? false
+        associationMode: associationModeToggle?.checked ?? false,
+        combinedLetters: combinedLettersToggle?.checked ?? false
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
       // Dispatch custom event to notify other components
@@ -2067,6 +2243,7 @@ function startClickMode(itemEl, payload) {
         if (slowRiverToggle) slowRiverToggle.checked = settings.slowRiver ?? false;
         if (clickModeToggle) clickModeToggle.checked = settings.clickMode ?? false;
         if (associationModeToggle) associationModeToggle.checked = settings.associationMode ?? false;
+        if (combinedLettersToggle) combinedLettersToggle.checked = settings.combinedLetters ?? false;
 
         // Update internal variables
         randomLettersEnabled = settings.randomLetters ?? false;
@@ -2074,6 +2251,7 @@ function startClickMode(itemEl, payload) {
         fontShuffleEnabled = settings.fontShuffle ?? false;
         clickModeEnabled = settings.clickMode ?? false;
         associationModeEnabled = settings.associationMode ?? false;
+        combinedLettersEnabled = settings.combinedLetters ?? false;
         selectedFont = settings.gameFont ?? 'default';
 
         // Apply high contrast
@@ -2187,6 +2365,14 @@ accessibilityBtn?.addEventListener('click', () => {
     }
     syncSettingsToLocalStorage();
   });
+  combinedLettersToggle?.addEventListener('change', (e) => {
+    combinedLettersEnabled = e.target.checked;
+    // Regenerate choices to update bucket display with combined letters
+    if (currentRound && currentRound.correctItems) {
+      generateChoices(currentRound.correctItems, itemPool);
+    }
+    syncSettingsToLocalStorage();
+  });
   gameFontSelect?.addEventListener('change', (e) => {
     selectedFont = e.target.value;
     syncSettingsToLocalStorage();
@@ -2278,21 +2464,40 @@ accessibilityBtn?.addEventListener('click', () => {
     if (!gameActive || !activeItems.has(droppedId)) return;
 
     const targetSound = targetBox.dataset.sound;
+    const targetSounds = targetBox.dataset.sounds; // For combined buckets
     const item = activeItems.get(droppedId);
 
     item.element.isDropped = true;
-    if (droppedItemId && !sessionStats[droppedItemId]) {
-      sessionStats[droppedItemId] = { correct: 0, incorrect: 0 };
-    }
 
-    // Match by sound - allows multiple letters with same sound to share a bucket
-    const isCorrect = targetSound === droppedSound;
+    // Handle session stats for combined items (pipe-separated IDs)
+    const itemIds = droppedItemId ? droppedItemId.split('|') : [];
+    itemIds.forEach(id => {
+      if (id && !sessionStats[id]) {
+        sessionStats[id] = { correct: 0, incorrect: 0 };
+      }
+    });
+
+    // Match by sound - handles both single and combined letters
+    // For combined letters, both droppedSound and targetSounds are pipe-separated
+    let isCorrect = false;
+    if (targetSounds) {
+      // Combined bucket - match exact combined sound
+      isCorrect = targetSounds === droppedSound;
+    } else {
+      // Regular bucket - match single sound
+      isCorrect = targetSound === droppedSound;
+    }
 
     if (isCorrect) {
       updateScore(10);
       targetBox.classList.add('feedback-correct');
       if (droppedItemId) {
-        sessionStats[droppedItemId].correct++;
+        // Update stats for all items in combined letter
+        itemIds.forEach(id => {
+          if (id && sessionStats[id]) {
+            sessionStats[id].correct++;
+          }
+        });
         waveCorrectCount++;
         currentCatchStreak++;
         if (waveCorrectCount > bestWaveCatch) {
@@ -2312,13 +2517,22 @@ accessibilityBtn?.addEventListener('click', () => {
       updateLives(true);
       targetBox.classList.add('feedback-incorrect');
       if (droppedItemId) {
-        sessionStats[droppedItemId].incorrect++;
+        // Update stats for all items in combined letter
+        itemIds.forEach(id => {
+          if (id && sessionStats[id]) {
+            sessionStats[id].incorrect++;
+          }
+        });
         waveCorrectCount = 0;
         currentCatchStreak = 0;
       }
 
       // Find the correct bucket to show its sound/label
-      const correctBucket = choicesContainer.querySelector(`[data-sound="${droppedSound}"]`);
+      // Check both data-sound and data-sounds for combined letters
+      let correctBucket = choicesContainer.querySelector(`[data-sound="${droppedSound}"]`);
+      if (!correctBucket) {
+        correctBucket = choicesContainer.querySelector(`[data-sounds="${droppedSound}"]`);
+      }
       const correctLabel = correctBucket ? correctBucket.textContent : (droppedSound || getDisplayLabel(item.data) || getDisplaySymbol(item.data));
       const boxRect = targetBox.getBoundingClientRect();
       const gameRect = gameContainer.getBoundingClientRect();

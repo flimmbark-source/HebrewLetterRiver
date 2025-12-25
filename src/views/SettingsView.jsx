@@ -18,6 +18,7 @@ export default function SettingsView() {
   const [slowRiver, setSlowRiver] = useState(false);
   const [clickMode, setClickMode] = useState(false);
   const [associationMode, setAssociationMode] = useState(false);
+  const [combinedLetters, setCombinedLetters] = useState(false);
 
   // Info popup state
   const [showInfoPopup, setShowInfoPopup] = useState(false);
@@ -43,6 +44,7 @@ export default function SettingsView() {
           setSlowRiver(settings.slowRiver ?? false);
           setClickMode(settings.clickMode ?? false);
           setAssociationMode(settings.associationMode ?? false);
+          setCombinedLetters(settings.combinedLetters ?? false);
         }
         setHasLoadedSettings(true);
       } catch (e) {
@@ -75,7 +77,8 @@ export default function SettingsView() {
         fontShuffle,
         slowRiver,
         clickMode,
-        associationMode
+        associationMode,
+        combinedLetters
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
 
@@ -91,7 +94,7 @@ export default function SettingsView() {
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
-  }, [hasLoadedSettings, showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, fontShuffle, slowRiver, clickMode, associationMode]);
+  }, [hasLoadedSettings, showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, fontShuffle, slowRiver, clickMode, associationMode, combinedLetters]);
 
   const getSpeedLabel = (speed) => {
     if (speed < 14) return t('game.accessibility.speedSlow');
@@ -140,6 +143,10 @@ export default function SettingsView() {
     associationMode: {
       title: 'Association Mode',
       description: 'Buckets display images, drag to the image which starts with the letter sound.'
+    },
+    combinedLetters: {
+      title: 'Combined Letters Mode',
+      description: 'Instead of adding more boxes as you progress, every 4 levels the letters will combine into longer groups. This makes the game more challenging by requiring you to recognize multiple letters at once.'
     }
   };
 
@@ -421,6 +428,24 @@ const showInfo = (settingKey, event) => {
                 type="checkbox"
                 checked={associationMode}
                 onChange={(e) => setAssociationMode(e.target.checked)}
+                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
+              />
+            </label>
+
+            <label className="flex items-center justify-between">
+              <span
+                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
+                onClick={(e) => showInfo('combinedLetters', e)}
+                onMouseEnter={(e) => showInfo('combinedLetters', e)}
+                onMouseLeave={() => setShowInfoPopup(false)}
+              >
+                Combined Letters Mode
+              </span>
+              <input
+                id="settings-combined-letters-toggle"
+                type="checkbox"
+                checked={combinedLetters}
+                onChange={(e) => setCombinedLetters(e.target.checked)}
                 className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
               />
             </label>
