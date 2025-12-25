@@ -402,7 +402,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
    */
   function getLettersPerBoxForLevel(currentLevel) {
     if (!combinedLettersEnabled) return 1;
-    const additionalLetters = Math.floor((currentLevel - 1) / COMBINED_LETTERS_LEVEL_INTERVAL);
+    const additionalLetters = Math.floor(currentLevel / COMBINED_LETTERS_LEVEL_INTERVAL);
     const lettersPerBox = COMBINED_LETTERS_START_COUNT + additionalLetters;
     return Math.min(lettersPerBox, COMBINED_LETTERS_MAX_COUNT);
   }
