@@ -2072,7 +2072,7 @@ function startClickMode(itemEl, payload) {
       });
       const uniqueItems = Array.from(uniqueBySound.values());
 
-      // Create combined letter groups
+      // Create combined letter groups from correct items only
       const combinedGroups = [];
       for (let i = 0; i < uniqueItems.length; i += lettersPerBox) {
         const group = uniqueItems.slice(i, i + lettersPerBox);
@@ -2081,7 +2081,7 @@ function startClickMode(itemEl, payload) {
         }
       }
 
-      // Add distractors to fill out the groups if needed
+      // Prepare distractors
       const usedSounds = new Set(uniqueItems.map((i) => getDisplayLabel(i)));
       let distractorPool = itemPool.filter((i) => {
         const sound = getDisplayLabel(i);
@@ -2089,20 +2089,8 @@ function startClickMode(itemEl, payload) {
       });
       distractorPool.sort(() => 0.5 - Math.random());
 
-      // If last group is incomplete, fill it with distractors
-      if (combinedGroups.length > 0) {
-        const lastGroup = combinedGroups[combinedGroups.length - 1];
-        while (lastGroup.length < lettersPerBox && distractorPool.length > 0) {
-          const distractor = distractorPool.shift();
-          const sound = getDisplayLabel(distractor);
-          if (sound && !usedSounds.has(sound)) {
-            lastGroup.push(distractor);
-            usedSounds.add(sound);
-          }
-        }
-      }
-
-      // Ensure we have at least 4 buckets (or maxBucketCount) by adding distractor groups
+      // Add complete distractor groups to reach minimum bucket count
+      // Do NOT mix distractors with correct items - keep groups pure
       const minBuckets = Math.max(4, maxBucketCount);
       while (combinedGroups.length < minBuckets && distractorPool.length >= lettersPerBox) {
         const newGroup = [];
