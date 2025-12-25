@@ -2023,7 +2023,10 @@ function startClickMode(itemEl, payload) {
     box.dataset.itemIds = itemGroup.map(item => item.id).join('|');
 
     // Store all sounds separated by pipe for matching
-    box.dataset.sounds = itemGroup.map(item => getDisplayLabel(item)).join('|');
+    const soundString = itemGroup.map(item => getDisplayLabel(item)).join('|');
+    box.dataset.sounds = soundString;
+    // Also set singular 'sound' for compatibility (needed for proper matching)
+    box.dataset.sound = soundString;
 
     // Mark as combined bucket
     box.dataset.isCombined = 'true';
