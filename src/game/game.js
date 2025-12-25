@@ -1670,10 +1670,11 @@ function startClickMode(itemEl, payload) {
       });
       const uniqueItems = Array.from(uniqueBySound.values());
 
-      // Create combined groups
+      // Create combined groups - only create complete groups (matching lettersPerBox)
       for (let i = 0; i < uniqueItems.length; i += lettersPerBox) {
         const group = uniqueItems.slice(i, i + lettersPerBox);
-        if (group.length > 0) {
+        // Only create floating letters for complete groups (prevents single letters at level 4+)
+        if (group.length === lettersPerBox) {
           // Floating letters use target language (Hebrew symbols)
           const combinedSymbol = group.map(item => getDisplaySymbol(item)).join('');
 
@@ -2033,6 +2034,10 @@ function startClickMode(itemEl, payload) {
     box.dataset.itemCount = itemGroup.length.toString();
 
     box.className = 'catcher-box bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium text-arcade-text-main font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-arcade-panel-border shadow-arcade-sm';
+
+    // Ensure text doesn't wrap and bucket expands to fit content
+    box.style.whiteSpace = 'nowrap';
+    box.style.minWidth = 'fit-content';
 
     // Create aria label from all items
     const ariaLabels = itemGroup.map(item => getCharacterAriaLabel(item)).filter(Boolean);
