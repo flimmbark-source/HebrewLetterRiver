@@ -1674,28 +1674,14 @@ function startClickMode(itemEl, payload) {
       for (let i = 0; i < uniqueItems.length; i += lettersPerBox) {
         const group = uniqueItems.slice(i, i + lettersPerBox);
         if (group.length > 0) {
-          // Create a combined item object with romanized labels
-          const combinedSymbol = group.map(item => {
-            const displayLabel = getDisplayLabel(item);
-            const displaySymbol = getDisplaySymbol(item);
-            const isFinalForm = item.isFinalForm || item.id.startsWith('final-');
-            const isVowel = item.type === 'vowel';
-
-            // Match the logic from regular buckets
-            if (isFinalForm) {
-              return `[${displayLabel || displaySymbol}]`;
-            } else if (isVowel) {
-              return displayLabel;
-            } else {
-              return displayLabel || displaySymbol;
-            }
-          }).join(' ');
+          // Floating letters use target language (Hebrew symbols)
+          const combinedSymbol = group.map(item => getDisplaySymbol(item)).join('');
 
           groupedItems.push({
             isCombined: true,
             items: group,
             id: group.map(item => item.id).join('|'),
-            symbol: combinedSymbol,  // Now uses romanized sounds with spaces
+            symbol: combinedSymbol,  // Hebrew symbols for floating letters
             sound: group.map(item => getDisplayLabel(item)).join('|')
           });
         }
