@@ -528,7 +528,7 @@ export default function ReadingArea({ textId, onBack }) {
                     style={{ width: '2ch' }}
                     data-active="true"
                   >
-                    <span className="inline-block w-full text-center font-mono text-xl leading-none">
+                    <span className="inline-block w-full text-center font-mono text-2xl leading-none">
                       {' '}
                     </span>
                   </div>
@@ -695,7 +695,7 @@ function GhostChar({ char, cls, fontClass, delay }) {
 
   return (
     <span
-      className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-xl leading-none transition-all ${colorClass} ${
+      className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none transition-all ${colorClass} ${
         visible ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'
       }`}
       style={{ transitionDuration: '160ms' }}
