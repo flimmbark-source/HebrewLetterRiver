@@ -530,7 +530,7 @@ export default function ReadingArea({ textId, onBack }) {
                   {/* Active ghost box (empty) */}
                   <div
                     className="box-border inline-block align-bottom"
-                    style={{ minWidth: `${activeWordWidth}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+                    style={{ minWidth: `${activeWordWidth}ch`, paddingInline: 0 }}
                     data-active="true"
                   >
                     <span className="inline-block min-w-[1ch] text-center font-mono text-2xl leading-none">
