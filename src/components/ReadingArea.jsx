@@ -35,8 +35,14 @@ export default function ReadingArea({ textId, onBack }) {
   const [streak, setStreak] = useState(0);
   const [isGrading, setIsGrading] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
-  // Prototype parity: keep interactions desktop-first, but still allow toggling mobile-specific UI blocks.
-  const isMobile = false;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const updateIsMobile = () => setIsMobile(window.innerWidth <= 640);
+    updateIsMobile();
+    window.addEventListener('resize', updateIsMobile);
+    return () => window.removeEventListener('resize', updateIsMobile);
+  }, []);
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -354,15 +360,15 @@ export default function ReadingArea({ textId, onBack }) {
   const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 sm:space-y-5">
       {/* Header */}
-      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-slate-200 shadow-lg shadow-slate-950/40">
-        <div className="flex items-start justify-between gap-4">
+      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-white">{title}</h2>
             <p className="mt-2 text-sm text-slate-400">{subtitle}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 sm:flex-nowrap">
             <button
               onClick={onBack}
               className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium hover:bg-slate-700"
@@ -380,7 +386,7 @@ export default function ReadingArea({ textId, onBack }) {
       </section>
 
       {/* Reading Area */}
-      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-slate-200 shadow-lg shadow-slate-950/40">
+      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
         {/* HUD */}
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
