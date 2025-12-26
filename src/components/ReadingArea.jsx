@@ -314,6 +314,8 @@ export default function ReadingArea({ textId, onBack }) {
       // Keep hidden input focused so IME / keyboard routing stays consistent
       if (inputRef.current && document.activeElement !== inputRef.current) {
         inputRef.current.focus();
+        processKeyDown(e);
+        return;
       }
 
       processKeyDown(e);
