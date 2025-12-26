@@ -359,6 +359,9 @@ export default function ReadingArea({ textId, onBack }) {
   const title = readingText.title[appLanguageId] || readingText.title.en || readingText.id;
   const subtitle = readingText.subtitle?.[appLanguageId] || readingText.subtitle?.en || '';
 
+  const activeChars = normalizeForLanguage(typedWord, appLanguageId).split('');
+  const activeWidth = Math.max(activeChars.length + 1, 2);
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -487,7 +490,7 @@ export default function ReadingArea({ textId, onBack }) {
                   {committedWords.length > 0 && <WordGap />}
                   {/* Active typing box */}
                   <ActiveWordBox
-                    chars={normalizeForLanguage(typedWord, appLanguageId).split('')}
+                    chars={activeChars}
                     fontClass={appFontClass}
                     showCaret={!isGrading}
                   />
@@ -523,15 +526,7 @@ export default function ReadingArea({ textId, onBack }) {
                   ))}
                   {committedWords.length > 0 && <WordGap />}
                   {/* Active ghost box (empty) */}
-                  <div
-                    className="inline-block align-bottom"
-                    style={{ width: '2ch' }}
-                    data-active="true"
-                  >
-                    <span className="inline-block w-full text-center font-mono text-xl leading-none">
-                      {' '}
-                    </span>
-                  </div>
+                  <GhostActivePlaceholder width={activeWidth} fontClass={appFontClass} />
                 </div>
               </div>
             </div>
@@ -608,13 +603,13 @@ function WordBox({ chars, width, fontClass }) {
   return (
     <span
       className="box-border inline-block align-bottom"
-      style={{ width: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      style={{ minWidth: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
     >
       <span className="inline-flex">
         {chars.map((char, i) => (
           <span
             key={i}
-            className={`${fontClass} inline-block w-[1ch] text-center font-mono text-2xl leading-none text-white`}
+            className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none text-white`}
           >
             {char}
           </span>
@@ -631,23 +626,40 @@ function ActiveWordBox({ chars, fontClass, showCaret }) {
   return (
     <span
       className="box-border inline-block align-bottom drop-shadow-lg"
-      style={{ width: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      style={{ minWidth: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
       data-active="true"
     >
       <span className="inline-flex">
         {chars.map((char, i) => (
           <span
             key={i}
-            className={`${fontClass} inline-block w-[1ch] text-center font-mono text-2xl leading-none text-white`}
+            className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none text-white`}
           >
             {char}
           </span>
         ))}
         {showCaret && (
-          <span className="inline-block w-[1ch] animate-pulse text-center font-mono text-2xl leading-none text-orange-400">
+          <span className="inline-block min-w-[1ch] animate-pulse text-center font-mono text-2xl leading-none text-orange-400">
             |
           </span>
         )}
+      </span>
+    </span>
+  );
+}
+
+// Active ghost placeholder that mirrors the typed box sizing
+function GhostActivePlaceholder({ width, fontClass }) {
+  return (
+    <span
+      className="box-border inline-block align-bottom"
+      style={{ minWidth: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      data-active="true"
+    >
+      <span className="inline-flex">
+        <span className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none text-transparent`}>
+          {' '}
+        </span>
       </span>
     </span>
   );
@@ -658,7 +670,7 @@ function GhostWordBox({ ghost, width, fontClass, delay }) {
   return (
     <span
       className="box-border inline-block align-bottom"
-      style={{ width: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      style={{ minWidth: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
     >
       <span className="inline-flex">
         {ghost.map((g, i) => (
@@ -695,7 +707,7 @@ function GhostChar({ char, cls, fontClass, delay }) {
 
   return (
     <span
-      className={`${fontClass} inline-block w-[1ch] text-center font-mono text-xl leading-none transition-all ${colorClass} ${
+      className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none transition-all ${colorClass} ${
         visible ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'
       }`}
       style={{ transitionDuration: '160ms' }}
