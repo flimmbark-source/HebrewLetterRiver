@@ -3,6 +3,7 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { getReadingTextsForLanguage } from '../data/readingTexts';
 import ReadingArea from '../components/ReadingArea';
+import { getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
 
 export default function LearnView() {
   const { t } = useLocalization();
@@ -58,8 +59,8 @@ export default function LearnView() {
 
 // Card component for each reading text
 function ReadingTextCard({ text, appLanguageId, onSelect }) {
-  const title = text.title[appLanguageId] || text.title.en || text.id;
-  const subtitle = text.subtitle?.[appLanguageId] || text.subtitle?.en || '';
+  const title = getLocalizedTitle(text, appLanguageId);
+  const subtitle = getLocalizedSubtitle(text, appLanguageId);
 
   // Count words (exclude punctuation)
   const wordCount = text.tokens.filter(t => t.type === 'word').length;
