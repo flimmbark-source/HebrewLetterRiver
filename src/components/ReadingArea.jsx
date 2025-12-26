@@ -5,10 +5,19 @@ import { getReadingTextById } from '../data/readingTexts';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
 
-// Detect if device is mobile/touch
-const isTouchDevice = () => {
+// Detect if device is mobile (use user agent and screen size)
+const isMobileDevice = () => {
   if (typeof window === 'undefined') return false;
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+  // Check for mobile user agent
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+
+  // Check for small screen size (typical mobile viewport)
+  const isSmallScreen = window.innerWidth <= 768;
+
+  // Require both mobile UA and small screen to consider it mobile
+  return isMobileUA && isSmallScreen;
 };
 
 /**
@@ -149,7 +158,9 @@ export default function ReadingArea({ textId, onBack }) {
 
   // Detect mobile device
   useEffect(() => {
-    setIsMobile(isTouchDevice());
+    const mobile = isMobileDevice();
+    console.log('[DEBUG] Mobile detection:', mobile, 'UA:', navigator.userAgent, 'Width:', window.innerWidth);
+    setIsMobile(mobile);
   }, []);
 
   // Initialize centering
@@ -183,11 +194,14 @@ export default function ReadingArea({ textId, onBack }) {
 
   // Grade and commit the current word (defined first so other callbacks can reference it)
   const gradeAndCommit = useCallback(() => {
+    console.log('[DEBUG] gradeAndCommit called, isGrading:', isGrading, 'currentWord:', currentWord);
     if (isGrading || !currentWord) return;
 
     const translation = getTranslation();
+    console.log('[DEBUG] translation:', translation);
     if (!translation) return;
 
+    console.log('[DEBUG] Starting grading...');
     setIsGrading(true);
 
     // Grade the word
@@ -265,10 +279,16 @@ export default function ReadingArea({ textId, onBack }) {
     // Space - commit word (desktop only, on mobile we use the button)
     if (key === ' ' && !isMobile) {
       e.preventDefault();
+      console.log('[DEBUG] Space pressed, typedWord:', typedWord, 'isMobile:', isMobile);
       const normalized = normalizeForLanguage(typedWord, appLanguageId);
-      if (!normalized) return;
+      console.log('[DEBUG] Normalized:', normalized);
+      if (!normalized) {
+        console.log('[DEBUG] No normalized word, skipping');
+        return;
+      }
 
       // Grade and commit word
+      console.log('[DEBUG] Calling gradeAndCommit');
       gradeAndCommit();
       return;
     }
