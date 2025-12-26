@@ -359,6 +359,9 @@ export default function ReadingArea({ textId, onBack }) {
   const title = readingText.title[appLanguageId] || readingText.title.en || readingText.id;
   const subtitle = readingText.subtitle?.[appLanguageId] || readingText.subtitle?.en || '';
 
+  const activeChars = normalizeForLanguage(typedWord, appLanguageId).split('');
+  const activeWidth = Math.max(activeChars.length + 1, 2);
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -487,7 +490,7 @@ export default function ReadingArea({ textId, onBack }) {
                   {committedWords.length > 0 && <WordGap />}
                   {/* Active typing box */}
                   <ActiveWordBox
-                    chars={normalizeForLanguage(typedWord, appLanguageId).split('')}
+                    chars={activeChars}
                     fontClass={appFontClass}
                     showCaret={!isGrading}
                   />
@@ -523,15 +526,7 @@ export default function ReadingArea({ textId, onBack }) {
                   ))}
                   {committedWords.length > 0 && <WordGap />}
                   {/* Active ghost box (empty) */}
-                  <div
-                    className="inline-block align-bottom"
-                    style={{ width: '2ch' }}
-                    data-active="true"
-                  >
-                    <span className="inline-block w-full text-center font-mono text-2xl leading-none">
-                      {' '}
-                    </span>
-                  </div>
+                  <GhostActivePlaceholder width={activeWidth} fontClass={appFontClass} />
                 </div>
               </div>
             </div>
@@ -648,6 +643,23 @@ function ActiveWordBox({ chars, fontClass, showCaret }) {
             |
           </span>
         )}
+      </span>
+    </span>
+  );
+}
+
+// Active ghost placeholder that mirrors the typed box sizing
+function GhostActivePlaceholder({ width, fontClass }) {
+  return (
+    <span
+      className="box-border inline-block align-bottom"
+      style={{ minWidth: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      data-active="true"
+    >
+      <span className="inline-flex">
+        <span className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none text-transparent`}>
+          {' '}
+        </span>
       </span>
     </span>
   );
