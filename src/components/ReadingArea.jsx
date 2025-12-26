@@ -255,6 +255,12 @@ export default function ReadingArea({ textId, onBack }) {
     setTypedWord(e.target.value);
   }, [isGrading]);
 
+  const focusInput = useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
   // Shared keyboard handler for both focused input and document listener (desktop)
   const processKeyDown = useCallback((e) => {
     if (isGrading) return;
@@ -352,9 +358,9 @@ export default function ReadingArea({ textId, onBack }) {
   const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
 
   return (
-    <div className="w-full max-w-5xl space-y-4 px-3 sm:space-y-5 sm:px-0">
+    <div className="w-full max-w-5xl space-y-4 px-2 sm:space-y-5 sm:px-0">
       {/* Header */}
-      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
+      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
@@ -377,8 +383,11 @@ export default function ReadingArea({ textId, onBack }) {
         </div>
       </section>
 
-      {/* Reading Area */}
-      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
+        {/* Reading Area */}
+        <section
+          className="relative rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6"
+          onClick={focusInput}
+        >
         {/* HUD */}
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
@@ -396,28 +405,28 @@ export default function ReadingArea({ textId, onBack }) {
         </div>
 
         {/* Practice Track */}
-        <div className="mb-3 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-800/90 to-slate-900/90 shadow-lg">
-          <div
-            ref={practiceViewportRef}
-            className="relative flex items-center overflow-hidden px-3 py-4 sm:px-4 sm:py-6"
-            style={{ minHeight: '86px' }}
-          >
+          <div className="mb-3 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-800/90 to-slate-900/90 shadow-lg">
             <div
-              ref={practiceTrackRef}
-              className="inline-flex items-center gap-6 transition-transform duration-[260ms] ease-out"
-              style={{ willChange: 'transform' }}
-              dir={practiceDirection}
+              ref={practiceViewportRef}
+              className="relative flex items-center overflow-hidden px-2 py-3 sm:px-4 sm:py-6"
+              style={{ minHeight: '72px' }}
             >
+              <div
+                ref={practiceTrackRef}
+                className="inline-flex items-center gap-4 sm:gap-6 transition-transform duration-[260ms] ease-out"
+                style={{ willChange: 'transform' }}
+                dir={practiceDirection}
+              >
               {readingText.tokens.map((token, idx) => {
                 if (token.type === 'punct') {
                   return (
-                    <span
-                      key={`punct-${idx}`}
-                      className="text-4xl opacity-40"
-                      style={{ letterSpacing: '0.4px' }}
-                    >
-                      {token.text}
-                    </span>
+                      <span
+                        key={`punct-${idx}`}
+                        className="text-3xl opacity-40 sm:text-4xl"
+                        style={{ letterSpacing: '0.4px' }}
+                      >
+                        {token.text}
+                      </span>
                   );
                 }
 
@@ -427,7 +436,7 @@ export default function ReadingArea({ textId, onBack }) {
                 return (
                   <span
                     key={token.id || idx}
-                    className={`${practiceFontClass} text-4xl leading-tight transition-opacity ${
+                    className={`${practiceFontClass} text-3xl leading-tight transition-opacity sm:text-4xl ${
                       isActive ? 'opacity-100' : 'opacity-50'
                     }`}
                     style={{ letterSpacing: '0.4px', transform: 'translateY(1px)' }}
@@ -443,7 +452,7 @@ export default function ReadingArea({ textId, onBack }) {
 
         {/* Output Track */}
         <div className="overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             <div
               ref={typedViewportRef}
               className="overflow-hidden"
@@ -529,26 +538,23 @@ export default function ReadingArea({ textId, onBack }) {
           </div>
         </div>
 
-        {/* Mobile input overlay (no extra controls). Becomes hidden but focusable on larger screens. */}
-        <div className="mt-4 sm:mt-0 sm:h-0 sm:overflow-hidden">
-          <input
-            ref={inputRef}
-            type="text"
-            value={typedWord}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            disabled={isGrading}
-            placeholder={t('reading.typeHere')}
-            className={`${appFontClass} w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-base text-white placeholder-slate-500 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-400/20 disabled:opacity-50 sm:absolute sm:left-0 sm:top-0 sm:h-px sm:w-px sm:-translate-y-full sm:opacity-0`}
-            autoComplete="off"
-            autoCapitalize="off"
-            autoCorrect="off"
-            spellCheck="false"
-          />
-          <p className="mt-2 text-center text-xs text-slate-500 sm:hidden">
-            {t('reading.mobileInstruction')}
-          </p>
-        </div>
+        {/* Invisible but focusable input for all viewports */}
+        <input
+          ref={inputRef}
+          type="text"
+          value={typedWord}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          disabled={isGrading}
+          placeholder={t('reading.typeHere')}
+          className={`${appFontClass} pointer-events-none absolute inset-x-3 bottom-3 h-11 w-[calc(100%-24px)] rounded-md bg-transparent text-transparent opacity-0 focus:opacity-0 sm:inset-auto sm:left-1/2 sm:top-0 sm:h-px sm:w-px sm:-translate-x-1/2 sm:-translate-y-1/2`}
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck="false"
+          inputMode="latin-prose"
+          aria-label={t('reading.typeHere')}
+        />
 
         {/* Answer Display */}
         {showAnswer && (
