@@ -399,8 +399,8 @@ export default function ReadingArea({ textId, onBack }) {
         <div className="mb-3 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-800/90 to-slate-900/90 shadow-lg">
           <div
             ref={practiceViewportRef}
-            className="relative flex items-center overflow-hidden px-4 py-6"
-            style={{ minHeight: '92px' }}
+            className="relative flex items-center overflow-hidden px-3 py-4 sm:px-4 sm:py-6"
+            style={{ minHeight: '86px' }}
           >
             <div
               ref={practiceTrackRef}
@@ -529,32 +529,23 @@ export default function ReadingArea({ textId, onBack }) {
           </div>
         </div>
 
-        {/* Mobile Input Area (kept inside main card) */}
-        <div className="mt-4 flex flex-col gap-2 sm:hidden">
-          <div className="flex gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={typedWord}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              disabled={isGrading}
-              placeholder={t('reading.typeHere')}
-              className={`${appFontClass} flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-lg text-white placeholder-slate-500 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-400/20 disabled:opacity-50`}
-              autoComplete="off"
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck="false"
-            />
-            <button
-              onClick={handleSubmit}
-              disabled={isGrading || !normalizeForLanguage(typedWord, appLanguageId)}
-              className="rounded-lg bg-orange-500 px-6 py-3 font-semibold text-white transition-all hover:bg-orange-600 active:scale-95 disabled:opacity-50 disabled:hover:bg-orange-500"
-            >
-              {t('reading.next')}
-            </button>
-          </div>
-          <p className="text-center text-xs text-slate-500">
+        {/* Mobile input overlay (no extra controls). Becomes hidden but focusable on larger screens. */}
+        <div className="mt-4 sm:mt-0 sm:h-0 sm:overflow-hidden">
+          <input
+            ref={inputRef}
+            type="text"
+            value={typedWord}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            disabled={isGrading}
+            placeholder={t('reading.typeHere')}
+            className={`${appFontClass} w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-base text-white placeholder-slate-500 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-400/20 disabled:opacity-50 sm:absolute sm:left-0 sm:top-0 sm:h-px sm:w-px sm:-translate-y-full sm:opacity-0`}
+            autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck="false"
+          />
+          <p className="mt-2 text-center text-xs text-slate-500 sm:hidden">
             {t('reading.mobileInstruction')}
           </p>
         </div>
@@ -573,22 +564,10 @@ export default function ReadingArea({ textId, onBack }) {
             )}
           </div>
         )}
-      </section>
-
-      {/* Hidden input for keyboard capture on larger screens */}
-      <input
-        ref={inputRef}
-        type="text"
-        className="pointer-events-none absolute h-px w-px opacity-0 sm:pointer-events-auto sm:absolute sm:opacity-0"
-        autoComplete="off"
-        onKeyDown={handleKeyDown}
-        value=""
-        onChange={() => {}}
-        aria-hidden="true"
-      />
-    </div>
-  );
-}
+        </section>
+      </div>
+    );
+  }
 
 // Word box for committed typed words
 function WordBox({ chars, width, fontClass }) {
