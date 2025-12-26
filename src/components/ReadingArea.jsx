@@ -23,6 +23,7 @@ const TRANSLATION_KEY_MAP = {
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 1.25;
 const WORD_GAP_WITH_PADDING_CH = WORD_GAP_CH + WORD_BOX_PADDING_CH * 2;
+const MAX_WORD_BOX_CH = 18;
 
 /**
  * ReadingArea Component
@@ -226,9 +227,12 @@ export default function ReadingArea({ textId, onBack }) {
     }
 
     // Commit to history
-    const wordBoxWidth = calculateWordBoxWidth(
-      result.typedChars.length,
-      result.ghostSequence.length
+    const wordBoxWidth = Math.min(
+      calculateWordBoxWidth(
+        result.typedChars.length,
+        result.ghostSequence.length
+      ),
+      MAX_WORD_BOX_CH
     );
 
     setCommittedWords(prev => [...prev, {
@@ -361,7 +365,7 @@ export default function ReadingArea({ textId, onBack }) {
   const subtitle = readingText.subtitle?.[appLanguageId] || readingText.subtitle?.en || '';
 
   const activeChars = normalizeForLanguage(typedWord, appLanguageId).split('');
-  const activeWordWidth = Math.max(activeChars.length + 1, 2);
+  const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
 
   return (
     <div className="w-full space-y-4">
