@@ -22,6 +22,7 @@ const TRANSLATION_KEY_MAP = {
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 1.25;
+const WORD_GAP_WITH_PADDING_CH = WORD_GAP_CH + WORD_BOX_PADDING_CH * 2;
 
 /**
  * ReadingArea Component
@@ -359,6 +360,9 @@ export default function ReadingArea({ textId, onBack }) {
   const title = readingText.title[appLanguageId] || readingText.title.en || readingText.id;
   const subtitle = readingText.subtitle?.[appLanguageId] || readingText.subtitle?.en || '';
 
+  const activeChars = normalizeForLanguage(typedWord, appLanguageId).split('');
+  const activeWordWidth = Math.max(activeChars.length + 1, 2);
+
   return (
     <div className="w-full space-y-4">
       {/* Header */}
@@ -484,12 +488,13 @@ export default function ReadingArea({ textId, onBack }) {
                       {idx < committedWords.length - 1 && <WordGap />}
                     </Fragment>
                   ))}
-                  {committedWords.length > 0 && <WordGap />}
+                  {committedWords.length > 0 && <WordGap width={WORD_GAP_WITH_PADDING_CH} />}
                   {/* Active typing box */}
                   <ActiveWordBox
-                    chars={normalizeForLanguage(typedWord, appLanguageId).split('')}
+                    chars={activeChars}
                     fontClass={appFontClass}
                     showCaret={!isGrading}
+                    width={activeWordWidth}
                   />
                 </div>
               </div>
@@ -521,14 +526,14 @@ export default function ReadingArea({ textId, onBack }) {
                       {idx < committedWords.length - 1 && <WordGap />}
                     </Fragment>
                   ))}
-                  {committedWords.length > 0 && <WordGap />}
+                  {committedWords.length > 0 && <WordGap width={WORD_GAP_WITH_PADDING_CH} />}
                   {/* Active ghost box (empty) */}
                   <div
-                    className="inline-block align-bottom"
-                    style={{ width: '2ch' }}
+                    className="box-border inline-block align-bottom"
+                    style={{ minWidth: `${activeWordWidth}ch`, paddingInline: 0 }}
                     data-active="true"
                   >
-                    <span className="inline-block w-full text-center font-mono text-2xl leading-none">
+                    <span className="inline-block min-w-[1ch] text-center font-mono text-2xl leading-none">
                       {' '}
                     </span>
                   </div>
@@ -625,13 +630,13 @@ function WordBox({ chars, width, fontClass }) {
 }
 
 // Active word box with caret
-function ActiveWordBox({ chars, fontClass, showCaret }) {
-  const width = Math.max(chars.length + 1, 2);
+function ActiveWordBox({ chars, fontClass, showCaret, width }) {
+  const resolvedWidth = width ?? Math.max(chars.length + 1, 2);
 
   return (
     <span
       className="box-border inline-block align-bottom drop-shadow-lg"
-      style={{ minWidth: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      style={{ minWidth: `${resolvedWidth}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
       data-active="true"
     >
       <span className="inline-flex">
@@ -706,9 +711,9 @@ function GhostChar({ char, cls, fontClass, delay }) {
 }
 
 // Gap between words
-function WordGap() {
+function WordGap({ width = WORD_GAP_CH }) {
   return (
-    <span className="inline-block" style={{ width: `${WORD_GAP_CH}ch` }}>
+    <span className="inline-block" style={{ width: `${width}ch` }}>
       {' '}
     </span>
   );
