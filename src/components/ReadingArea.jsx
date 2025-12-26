@@ -255,6 +255,13 @@ export default function ReadingArea({ textId, onBack }) {
 
     const key = e.key;
 
+    // Backspace - delete last character (desktop only)
+    if (key === 'Backspace' && !isMobile) {
+      e.preventDefault();
+      setTypedWord(prev => prev.slice(0, -1));
+      return;
+    }
+
     // Space - commit word (desktop only, on mobile we use the button)
     if (key === ' ' && !isMobile) {
       e.preventDefault();
@@ -274,6 +281,13 @@ export default function ReadingArea({ textId, onBack }) {
 
       // Grade and commit word
       gradeAndCommit();
+      return;
+    }
+
+    // Regular character input (desktop only)
+    if (key.length === 1 && !isMobile) {
+      e.preventDefault();
+      setTypedWord(prev => prev + key);
       return;
     }
   }, [isGrading, typedWord, appLanguageId, gradeAndCommit, isMobile]);
@@ -555,8 +569,8 @@ export default function ReadingArea({ textId, onBack }) {
           className="pointer-events-none absolute h-px w-px opacity-0"
           autoComplete="off"
           onKeyDown={handleKeyDown}
-          value={typedWord}
-          onChange={handleInputChange}
+          value=""
+          onChange={() => {}}
           aria-hidden="true"
         />
       )}
