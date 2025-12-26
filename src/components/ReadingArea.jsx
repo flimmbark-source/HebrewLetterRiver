@@ -23,6 +23,7 @@ const TRANSLATION_KEY_MAP = {
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 1.25;
 const WORD_GAP_WITH_PADDING_CH = WORD_GAP_CH + WORD_BOX_PADDING_CH * 2;
+const MAX_WORD_BOX_CH = 18;
 
 /**
  * ReadingArea Component
@@ -226,9 +227,12 @@ export default function ReadingArea({ textId, onBack }) {
     }
 
     // Commit to history
-    const wordBoxWidth = calculateWordBoxWidth(
-      result.typedChars.length,
-      result.ghostSequence.length
+    const wordBoxWidth = Math.min(
+      calculateWordBoxWidth(
+        result.typedChars.length,
+        result.ghostSequence.length
+      ),
+      MAX_WORD_BOX_CH
     );
 
     setCommittedWords(prev => [...prev, {
@@ -361,7 +365,7 @@ export default function ReadingArea({ textId, onBack }) {
   const subtitle = readingText.subtitle?.[appLanguageId] || readingText.subtitle?.en || '';
 
   const activeChars = normalizeForLanguage(typedWord, appLanguageId).split('');
-  const activeWordWidth = Math.max(activeChars.length + 1, 2);
+  const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
 
   return (
     <div className="w-full space-y-4">
@@ -530,7 +534,7 @@ export default function ReadingArea({ textId, onBack }) {
                   {/* Active ghost box (empty) */}
                   <div
                     className="box-border inline-block align-bottom"
-                    style={{ minWidth: `${activeWordWidth}ch`, paddingInline: 0 }}
+                    style={{ width: `${activeWordWidth}ch`, maxWidth: `${MAX_WORD_BOX_CH}ch`, paddingInline: 0 }}
                     data-active="true"
                   >
                     <span className="inline-block min-w-[1ch] text-center font-mono text-2xl leading-none">
@@ -613,7 +617,7 @@ function WordBox({ chars, width, fontClass }) {
   return (
     <span
       className="box-border inline-block align-bottom"
-      style={{ minWidth: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      style={{ width: `${width}ch`, maxWidth: `${MAX_WORD_BOX_CH}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
     >
       <span className="inline-flex">
         {chars.map((char, i) => (
@@ -636,7 +640,7 @@ function ActiveWordBox({ chars, fontClass, showCaret, width }) {
   return (
     <span
       className="box-border inline-block align-bottom drop-shadow-lg"
-      style={{ minWidth: `${resolvedWidth}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      style={{ width: `${resolvedWidth}ch`, maxWidth: `${MAX_WORD_BOX_CH}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
       data-active="true"
     >
       <span className="inline-flex">
@@ -663,7 +667,7 @@ function GhostWordBox({ ghost, width, fontClass, delay }) {
   return (
     <span
       className="box-border inline-block align-bottom"
-      style={{ minWidth: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      style={{ width: `${width}ch`, maxWidth: `${MAX_WORD_BOX_CH}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
     >
       <span className="inline-flex">
         {ghost.map((g, i) => (
