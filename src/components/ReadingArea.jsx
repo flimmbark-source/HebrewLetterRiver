@@ -488,7 +488,7 @@ export default function ReadingArea({ textId, onBack }) {
                       {idx < committedWords.length - 1 && <WordGap />}
                     </Fragment>
                   ))}
-                  {committedWords.length > 0 && <WordGap />}
+                  {committedWords.length > 0 && <WordGap width={WORD_GAP_WITH_PADDING_CH} />}
                   {/* Active typing box */}
                   <ActiveWordBox
                     chars={activeChars}
