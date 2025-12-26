@@ -1,9 +1,27 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react';
 import { useLocalization } from '../context/LocalizationContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getReadingTextById } from '../data/readingTexts';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
+
+const TRANSLATION_KEY_MAP = {
+  english: 'en',
+  hebrew: 'he',
+  spanish: 'es',
+  french: 'fr',
+  arabic: 'ar',
+  portuguese: 'pt',
+  russian: 'ru',
+  hindi: 'hi',
+  japanese: 'ja',
+  mandarin: 'zh',
+  bengali: 'bn',
+  amharic: 'am'
+};
+
+const WORD_BOX_PADDING_CH = 0.35;
+const WORD_GAP_CH = 1.25;
 
 /**
  * ReadingArea Component
@@ -55,7 +73,11 @@ export default function ReadingArea({ textId, onBack }) {
   // Get translation for current word
   const getTranslation = useCallback(() => {
     if (!readingText || !currentWord) return null;
-    const translations = readingText.translations?.[appLanguageId];
+
+    const translationsForAppLanguage = readingText.translations?.[appLanguageId];
+    const translationsForLocale = readingText.translations?.[TRANSLATION_KEY_MAP[appLanguageId]];
+    const translations = translationsForAppLanguage || translationsForLocale;
+
     if (!translations) return null;
     return translations[currentWord.id];
   }, [readingText, currentWord, appLanguageId]);
@@ -445,28 +467,25 @@ export default function ReadingArea({ textId, onBack }) {
                   className="inline-flex items-end transition-transform duration-[260ms] ease-out"
                   style={{ willChange: 'transform' }}
                 >
-                  {committedWords.map((word, idx) => {
-                    if (word.type === 'gap') {
-                      return (
+                  {committedWords.map((word, idx) => (
+                    <Fragment key={`typed-frag-${idx}`}>
+                      {word.type === 'gap' ? (
                         <span
-                          key={`gap-${idx}`}
                           className="inline-block"
                           style={{ width: `${word.width}ch` }}
                         >
                           {' '}
                         </span>
-                      );
-                    }
-
-                    return (
-                      <WordBox
-                        key={`typed-${idx}`}
-                        chars={word.typed}
-                        width={word.width}
-                        fontClass={appFontClass}
-                      />
-                    );
-                  })}
+                      ) : (
+                        <WordBox
+                          chars={word.typed}
+                          width={word.width}
+                          fontClass={appFontClass}
+                        />
+                      )}
+                      {idx < committedWords.length - 1 && <WordGap />}
+                    </Fragment>
+                  ))}
                   {committedWords.length > 0 && <WordGap />}
                   {/* Active typing box */}
                   <ActiveWordBox
@@ -484,29 +503,26 @@ export default function ReadingArea({ textId, onBack }) {
                   className="inline-flex items-end transition-transform duration-[260ms] ease-out"
                   style={{ willChange: 'transform' }}
                 >
-                  {committedWords.map((word, idx) => {
-                    if (word.type === 'gap') {
-                      return (
+                  {committedWords.map((word, idx) => (
+                    <Fragment key={`ghost-frag-${idx}`}>
+                      {word.type === 'gap' ? (
                         <span
-                          key={`gap-ghost-${idx}`}
                           className="inline-block"
                           style={{ width: `${word.width}ch` }}
                         >
                           {' '}
                         </span>
-                      );
-                    }
-
-                    return (
-                      <GhostWordBox
-                        key={`ghost-${idx}`}
-                        ghost={word.ghost}
-                        width={word.width}
-                        fontClass={appFontClass}
-                        delay={idx === committedWords.length - 1 ? 0 : -1}
-                      />
-                    );
-                  })}
+                      ) : (
+                        <GhostWordBox
+                          ghost={word.ghost}
+                          width={word.width}
+                          fontClass={appFontClass}
+                          delay={idx === committedWords.length - 1 ? 0 : -1}
+                        />
+                      )}
+                      {idx < committedWords.length - 1 && <WordGap />}
+                    </Fragment>
+                  ))}
                   {committedWords.length > 0 && <WordGap />}
                   {/* Active ghost box (empty) */}
                   <div
@@ -593,8 +609,8 @@ export default function ReadingArea({ textId, onBack }) {
 function WordBox({ chars, width, fontClass }) {
   return (
     <span
-      className="inline-block align-bottom"
-      style={{ width: `${width}ch` }}
+      className="box-border inline-block align-bottom"
+      style={{ width: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
     >
       <span className="inline-flex">
         {chars.map((char, i) => (
@@ -616,8 +632,8 @@ function ActiveWordBox({ chars, fontClass, showCaret }) {
 
   return (
     <span
-      className="inline-block align-bottom drop-shadow-lg"
-      style={{ width: `${width}ch` }}
+      className="box-border inline-block align-bottom drop-shadow-lg"
+      style={{ width: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
       data-active="true"
     >
       <span className="inline-flex">
@@ -643,8 +659,8 @@ function ActiveWordBox({ chars, fontClass, showCaret }) {
 function GhostWordBox({ ghost, width, fontClass, delay }) {
   return (
     <span
-      className="inline-block align-bottom"
-      style={{ width: `${width}ch` }}
+      className="box-border inline-block align-bottom"
+      style={{ width: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
     >
       <span className="inline-flex">
         {ghost.map((g, i) => (
@@ -694,7 +710,7 @@ function GhostChar({ char, cls, fontClass, delay }) {
 // Gap between words
 function WordGap() {
   return (
-    <span className="inline-block" style={{ width: '3ch' }}>
+    <span className="inline-block" style={{ width: `${WORD_GAP_CH}ch` }}>
       {' '}
     </span>
   );
