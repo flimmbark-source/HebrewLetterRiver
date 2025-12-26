@@ -52,13 +52,45 @@ export default function ReadingArea({ textId, onBack }) {
   const words = readingText?.tokens?.filter(t => t.type === 'word') || [];
   const currentWord = words[wordIndex];
 
-  // Get translation for current word
-  const getTranslation = useCallback(() => {
+  // Map app language IDs ("english") to translation buckets ("en") so grading always finds a target word
+  const resolveTranslation = useCallback(() => {
     if (!readingText || !currentWord) return null;
-    const translations = readingText.translations?.[appLanguageId];
-    if (!translations) return null;
-    return translations[currentWord.id];
+
+    const translations = readingText.translations || {};
+
+    const langAlias = {
+      english: 'en',
+      spanish: 'es',
+      french: 'fr',
+      portuguese: 'pt',
+      hebrew: 'he',
+      arabic: 'ar',
+      mandarin: 'zh',
+      chinese: 'zh',
+      hindi: 'hi',
+      russian: 'ru',
+      japanese: 'ja',
+      bengali: 'bn',
+      amharic: 'am'
+    };
+
+    const candidates = [
+      appLanguageId,
+      langAlias[appLanguageId],
+      appLanguageId?.split('-')?.[0]
+    ].filter(Boolean);
+
+    for (const key of candidates) {
+      const bucket = translations[key];
+      if (bucket && bucket[currentWord.id]) {
+        return { key, word: bucket[currentWord.id] };
+      }
+    }
+
+    return null;
   }, [readingText, currentWord, appLanguageId]);
+
+  const getTranslation = useCallback(() => resolveTranslation()?.word || null, [resolveTranslation]);
 
   // Center practice track on current word
   const centerPracticeTrack = useCallback((instant = false) => {
@@ -176,17 +208,18 @@ export default function ReadingArea({ textId, onBack }) {
     console.log('[DEBUG] gradeAndCommit called, isGrading:', isGrading, 'currentWord:', currentWord);
     if (isGrading || !currentWord) return;
 
-    const translation = getTranslation();
+    const translation = resolveTranslation();
     const typedNormalized = normalizeForLanguage(typedWord, appLanguageId);
-    console.log('[DEBUG] translation:', translation);
     if (!typedNormalized) return;
 
     console.log('[DEBUG] Starting grading...');
     setIsGrading(true);
 
-    const wordDef = translation || (currentWord
-      ? { canonical: currentWord.text, variants: [currentWord.text] }
-      : { canonical: '', variants: [] });
+    const fallbackText = typedWord || currentWord?.text || '';
+    const wordDef = translation?.word || {
+      canonical: fallbackText,
+      variants: [fallbackText]
+    };
 
     const result = gradeWithGhostSequence(
       typedWord,
