@@ -357,10 +357,10 @@ export default function ReadingArea({ textId, onBack }) {
   const activeChars = normalizeForLanguage(typedWord, appLanguageId).split('');
   const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
 
-  return (
-    <div className="mx-auto w-full max-w-full min-w-0 space-y-4 overflow-x-hidden px-3 sm:max-w-5xl sm:space-y-5 sm:px-0">
+    return (
+      <div className="mx-auto w-full max-w-screen-sm min-w-0 space-y-4 overflow-x-hidden px-3 sm:max-w-5xl sm:space-y-5 sm:px-0">
       {/* Header */}
-      <section className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
+        <section className="w-full max-w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
@@ -384,10 +384,10 @@ export default function ReadingArea({ textId, onBack }) {
       </section>
 
         {/* Reading Area */}
-        <section
-          className="relative min-w-0 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6"
-          onClick={focusInput}
-        >
+          <section
+            className="relative w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6"
+            onClick={focusInput}
+          >
         {/* HUD */}
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
@@ -405,7 +405,7 @@ export default function ReadingArea({ textId, onBack }) {
         </div>
 
         {/* Practice Track */}
-          <div className="mb-3 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-800/90 to-slate-900/90 shadow-lg">
+            <div className="mb-3 w-full max-w-full overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-800/90 to-slate-900/90 shadow-lg">
             <div
               ref={practiceViewportRef}
               className="relative flex w-full min-w-0 items-center overflow-hidden px-2 py-3 sm:px-4 sm:py-6"
@@ -451,7 +451,7 @@ export default function ReadingArea({ textId, onBack }) {
         </div>
 
         {/* Output Track */}
-        <div className="min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
+          <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
           <div className="p-3 sm:p-4">
             <div
               ref={typedViewportRef}
