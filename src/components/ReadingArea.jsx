@@ -299,17 +299,29 @@ export default function ReadingArea({ textId, onBack }) {
     gradeAndCommit();
   }, [typedWord, appLanguageId, isGrading, gradeAndCommit]);
 
-  // Handle Escape to go back
+  // Auto-refocus input when user interacts (desktop only)
   useEffect(() => {
-    const handleEscape = (e) => {
+    if (isMobile) return;
+
+    const handleDocumentKeydown = (e) => {
+      // Let Tab work normally
+      if (e.key === 'Tab') return;
+
+      // Escape to go back
       if (e.key === 'Escape') {
         onBack?.();
+        return;
+      }
+
+      // If reading area is active and input is not focused, refocus it
+      if (inputRef.current && document.activeElement !== inputRef.current) {
+        inputRef.current.focus();
       }
     };
 
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [onBack]);
+    document.addEventListener('keydown', handleDocumentKeydown);
+    return () => document.removeEventListener('keydown', handleDocumentKeydown);
+  }, [isMobile, onBack]);
 
   if (!readingText) {
     return (
