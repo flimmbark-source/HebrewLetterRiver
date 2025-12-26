@@ -29,6 +29,9 @@ export default function ReadingArea({ textId, onBack }) {
   const readingText = getReadingTextById(textId);
 
   // State
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1024
+  );
   const [wordIndex, setWordIndex] = useState(0);
   const [typedWord, setTypedWord] = useState('');
   const [committedWords, setCommittedWords] = useState([]);
@@ -51,6 +54,15 @@ export default function ReadingArea({ textId, onBack }) {
   // Get font classes
   const practiceFontClass = getFontClass(practiceLanguageId);
   const appFontClass = getFontClass(appLanguageId);
+
+  // Track viewport width to clamp container sizing on very small screens
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Filter out punctuation for word navigation
   const words = readingText?.tokens?.filter(t => t.type === 'word') || [];
@@ -356,9 +368,14 @@ export default function ReadingArea({ textId, onBack }) {
 
   const activeChars = normalizeForLanguage(typedWord, appLanguageId).split('');
   const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
+  const containerMaxWidth = Math.max(Math.min(viewportWidth - 24, 1280), 320);
+  const responsiveContainerStyle = { maxWidth: `${containerMaxWidth}px` };
 
     return (
-      <div className="mx-auto w-full max-w-screen-sm min-w-0 space-y-4 overflow-x-hidden px-3 sm:max-w-5xl sm:space-y-5 sm:px-0">
+      <div
+        className="mx-auto w-full min-w-0 space-y-4 overflow-x-hidden px-3 sm:space-y-5 sm:px-4"
+        style={responsiveContainerStyle}
+      >
       {/* Header */}
         <section className="w-full max-w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -547,7 +564,7 @@ export default function ReadingArea({ textId, onBack }) {
           onKeyDown={handleKeyDown}
           disabled={isGrading}
           placeholder={t('reading.typeHere')}
-          className={`${appFontClass} pointer-events-none absolute left-3 right-3 bottom-3 h-11 w-auto max-w-full rounded-md bg-transparent text-transparent opacity-0 focus:opacity-0 sm:inset-auto sm:left-1/2 sm:top-0 sm:h-px sm:w-px sm:-translate-x-1/2 sm:-translate-y-1/2`}
+          className={`${appFontClass} sr-only`}
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
