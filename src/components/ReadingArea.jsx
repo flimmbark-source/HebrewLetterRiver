@@ -528,7 +528,7 @@ export default function ReadingArea({ textId, onBack }) {
                     style={{ width: '2ch' }}
                     data-active="true"
                   >
-                    <span className="inline-block w-full text-center font-mono text-xl leading-none">
+                    <span className="inline-block w-full text-center font-mono text-2xl leading-none">
                       {' '}
                     </span>
                   </div>
@@ -608,13 +608,13 @@ function WordBox({ chars, width, fontClass }) {
   return (
     <span
       className="box-border inline-block align-bottom"
-      style={{ width: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      style={{ minWidth: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
     >
       <span className="inline-flex">
         {chars.map((char, i) => (
           <span
             key={i}
-            className={`${fontClass} inline-block w-[1ch] text-center font-mono text-2xl leading-none text-white`}
+            className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none text-white`}
           >
             {char}
           </span>
@@ -631,20 +631,20 @@ function ActiveWordBox({ chars, fontClass, showCaret }) {
   return (
     <span
       className="box-border inline-block align-bottom drop-shadow-lg"
-      style={{ width: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      style={{ minWidth: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
       data-active="true"
     >
       <span className="inline-flex">
         {chars.map((char, i) => (
           <span
             key={i}
-            className={`${fontClass} inline-block w-[1ch] text-center font-mono text-2xl leading-none text-white`}
+            className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none text-white`}
           >
             {char}
           </span>
         ))}
         {showCaret && (
-          <span className="inline-block w-[1ch] animate-pulse text-center font-mono text-2xl leading-none text-orange-400">
+          <span className="inline-block min-w-[1ch] animate-pulse text-center font-mono text-2xl leading-none text-orange-400">
             |
           </span>
         )}
@@ -658,7 +658,7 @@ function GhostWordBox({ ghost, width, fontClass, delay }) {
   return (
     <span
       className="box-border inline-block align-bottom"
-      style={{ width: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
+      style={{ minWidth: `${width}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
     >
       <span className="inline-flex">
         {ghost.map((g, i) => (
@@ -695,7 +695,7 @@ function GhostChar({ char, cls, fontClass, delay }) {
 
   return (
     <span
-      className={`${fontClass} inline-block w-[1ch] text-center font-mono text-xl leading-none transition-all ${colorClass} ${
+      className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none transition-all ${colorClass} ${
         visible ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'
       }`}
       style={{ transitionDuration: '160ms' }}
