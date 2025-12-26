@@ -335,8 +335,6 @@ export default function ReadingArea({ textId, onBack }) {
         processKeyDown(e);
         return;
       }
-
-      processKeyDown(e);
     };
 
     // Capture phase so space is handled before other listeners can stop it
