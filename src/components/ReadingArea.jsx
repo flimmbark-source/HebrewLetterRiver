@@ -5,21 +5,6 @@ import { getReadingTextById } from '../data/readingTexts';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
 
-// Detect if device is mobile (use user agent and screen size)
-const isMobileDevice = () => {
-  if (typeof window === 'undefined') return false;
-
-  // Check for mobile user agent
-  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-  const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
-
-  // Check for small screen size (typical mobile viewport)
-  const isSmallScreen = window.innerWidth <= 768;
-
-  // Require both mobile UA and small screen to consider it mobile
-  return isMobileUA && isSmallScreen;
-};
-
 /**
  * ReadingArea Component
  *
@@ -44,7 +29,8 @@ export default function ReadingArea({ textId, onBack }) {
   const [streak, setStreak] = useState(0);
   const [isGrading, setIsGrading] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  // Prototype parity: keep interactions desktop-first, but still allow toggling mobile-specific UI blocks.
+  const isMobile = false;
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -156,13 +142,6 @@ export default function ReadingArea({ textId, onBack }) {
     }
   }, []);
 
-  // Detect mobile device
-  useEffect(() => {
-    const mobile = isMobileDevice();
-    console.log('[DEBUG] Mobile detection:', mobile, 'UA:', navigator.userAgent, 'Width:', window.innerWidth);
-    setIsMobile(mobile);
-  }, []);
-
   // Initialize centering
   useEffect(() => {
     // Initial centering should be instant
@@ -198,19 +177,28 @@ export default function ReadingArea({ textId, onBack }) {
     if (isGrading || !currentWord) return;
 
     const translation = getTranslation();
+    const typedNormalized = normalizeForLanguage(typedWord, appLanguageId);
     console.log('[DEBUG] translation:', translation);
-    if (!translation) return;
+    if (!typedNormalized) return;
 
     console.log('[DEBUG] Starting grading...');
     setIsGrading(true);
 
-    // Grade the word
-    const result = gradeWithGhostSequence(
-      typedWord,
-      translation,
-      practiceLanguageId,
-      appLanguageId
-    );
+    const result = translation
+      ? gradeWithGhostSequence(
+          typedWord,
+          translation,
+          practiceLanguageId,
+          appLanguageId
+        )
+      : {
+          isCorrect: false,
+          ghostSequence: [],
+          typedChars: typedNormalized.split(''),
+          isAvailable: false,
+          variants: [],
+          expected: '',
+        };
 
     // Update streak
     if (result.isCorrect) {
@@ -260,35 +248,25 @@ export default function ReadingArea({ textId, onBack }) {
     setTypedWord(e.target.value);
   }, [isGrading]);
 
-  // Handle keyboard input (for desktop)
-  const handleKeyDown = useCallback((e) => {
-    if (isGrading) {
-      e.preventDefault();
-      return;
-    }
+  // Shared keyboard handler for both focused input and document listener (desktop)
+  const processKeyDown = useCallback((e) => {
+    if (isGrading) return;
 
     const key = e.key;
 
-    // Backspace - delete last character (desktop only)
-    if (key === 'Backspace' && !isMobile) {
+    // Backspace - delete last character
+    if (key === 'Backspace') {
       e.preventDefault();
       setTypedWord(prev => prev.slice(0, -1));
       return;
     }
 
-    // Space - commit word (desktop only, on mobile we use the button)
-    if (key === ' ' && !isMobile) {
+    // Space - commit word
+    const isSpace = key === ' ' || key === 'Space' || key === 'Spacebar' || e.code === 'Space';
+    if (isSpace) {
       e.preventDefault();
-      console.log('[DEBUG] Space pressed, typedWord:', typedWord, 'isMobile:', isMobile);
       const normalized = normalizeForLanguage(typedWord, appLanguageId);
-      console.log('[DEBUG] Normalized:', normalized);
-      if (!normalized) {
-        console.log('[DEBUG] No normalized word, skipping');
-        return;
-      }
-
-      // Grade and commit word
-      console.log('[DEBUG] Calling gradeAndCommit');
+      if (!normalized) return;
       gradeAndCommit();
       return;
     }
@@ -298,31 +276,31 @@ export default function ReadingArea({ textId, onBack }) {
       e.preventDefault();
       const normalized = normalizeForLanguage(typedWord, appLanguageId);
       if (!normalized) return;
-
-      // Grade and commit word
       gradeAndCommit();
       return;
     }
 
-    // Regular character input (desktop only)
-    if (key.length === 1 && !isMobile) {
+    // Regular character input
+    if (key.length === 1) {
       e.preventDefault();
       setTypedWord(prev => prev + key);
-      return;
     }
-  }, [isGrading, typedWord, appLanguageId, gradeAndCommit, isMobile]);
+  }, [isGrading, typedWord, appLanguageId, gradeAndCommit]);
 
-  // Handle submit button click (mobile)
+  // Handle keyboard input (for desktop)
+  const handleKeyDown = useCallback((e) => {
+    processKeyDown(e);
+  }, [processKeyDown]);
+
+  // Handle submit button click (mobile/desktop shared)
   const handleSubmit = useCallback(() => {
     const normalized = normalizeForLanguage(typedWord, appLanguageId);
     if (!normalized || isGrading) return;
     gradeAndCommit();
   }, [typedWord, appLanguageId, isGrading, gradeAndCommit]);
 
-  // Auto-refocus input when user interacts (desktop only)
+  // Global keydown handler (mirrors the prototype: always listen, refocus hidden input, never gated by mobile detection)
   useEffect(() => {
-    if (isMobile) return;
-
     const handleDocumentKeydown = (e) => {
       // Let Tab work normally
       if (e.key === 'Tab') return;
@@ -333,15 +311,18 @@ export default function ReadingArea({ textId, onBack }) {
         return;
       }
 
-      // If reading area is active and input is not focused, refocus it
+      // Keep hidden input focused so IME / keyboard routing stays consistent
       if (inputRef.current && document.activeElement !== inputRef.current) {
         inputRef.current.focus();
       }
+
+      processKeyDown(e);
     };
 
-    document.addEventListener('keydown', handleDocumentKeydown);
-    return () => document.removeEventListener('keydown', handleDocumentKeydown);
-  }, [isMobile, onBack]);
+    // Capture phase so space is handled before other listeners can stop it
+    document.addEventListener('keydown', handleDocumentKeydown, true);
+    return () => document.removeEventListener('keydown', handleDocumentKeydown, true);
+  }, [onBack, processKeyDown]);
 
   if (!readingText) {
     return (
