@@ -343,8 +343,25 @@
   },
   "learn": {
     "title": "Learn",
-    "intro": "Dive into curated lessons to master each letter. Fresh learning modules will appear here soon!",
-    "body": "Until then, keep exploring the river and check back regularly for guided practice sessions, pronunciation tips, and cultural insights."
+    "intro": "Dive into curated lessons to master each letter and practice reading!",
+    "readingMode": "Reading Mode",
+    "readingModeDesc": "Select a text to practice translating word by word. Type the translation and press Space to continue.",
+    "noTexts": "No reading texts available for this language yet.",
+    "comingSoon": "Check back soon for more practice content!"
+  },
+  "reading": {
+    "textNotFound": "Reading text not found.",
+    "back": "Back",
+    "showAnswer": "Show answer",
+    "hideAnswer": "Hide answer",
+    "word": "Word",
+    "streak": "Streak",
+    "instruction": "Type then press Space",
+    "typeHere": "Type translation...",
+    "next": "Next",
+    "mobileInstruction": "Type the translation and tap Next to continue",
+    "answer": "Answer",
+    "accepted": "accepted"
   },
   "settings": {
     "title": "Settings",
