@@ -358,9 +358,9 @@ export default function ReadingArea({ textId, onBack }) {
   const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
 
   return (
-    <div className="w-full max-w-5xl space-y-4 px-2 sm:space-y-5 sm:px-0">
+    <div className="mx-auto w-full max-w-full space-y-4 px-3 sm:max-w-5xl sm:space-y-5 sm:px-0">
       {/* Header */}
-      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
+      <section className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
@@ -385,7 +385,7 @@ export default function ReadingArea({ textId, onBack }) {
 
         {/* Reading Area */}
         <section
-          className="relative rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6"
+          className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6"
           onClick={focusInput}
         >
         {/* HUD */}
