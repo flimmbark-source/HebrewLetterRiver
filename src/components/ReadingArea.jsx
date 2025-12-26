@@ -260,35 +260,25 @@ export default function ReadingArea({ textId, onBack }) {
     setTypedWord(e.target.value);
   }, [isGrading]);
 
-  // Handle keyboard input (for desktop)
-  const handleKeyDown = useCallback((e) => {
-    if (isGrading) {
-      e.preventDefault();
-      return;
-    }
+  // Shared keyboard handler for both focused input and document listener (desktop)
+  const processKeyDown = useCallback((e) => {
+    if (isGrading) return;
 
     const key = e.key;
 
-    // Backspace - delete last character (desktop only)
-    if (key === 'Backspace' && !isMobile) {
+    // Backspace - delete last character
+    if (key === 'Backspace') {
       e.preventDefault();
       setTypedWord(prev => prev.slice(0, -1));
       return;
     }
 
-    // Space - commit word (desktop only, on mobile we use the button)
-    if (key === ' ' && !isMobile) {
+    // Space - commit word
+    const isSpace = key === ' ' || key === 'Space' || key === 'Spacebar' || e.code === 'Space';
+    if (isSpace) {
       e.preventDefault();
-      console.log('[DEBUG] Space pressed, typedWord:', typedWord, 'isMobile:', isMobile);
       const normalized = normalizeForLanguage(typedWord, appLanguageId);
-      console.log('[DEBUG] Normalized:', normalized);
-      if (!normalized) {
-        console.log('[DEBUG] No normalized word, skipping');
-        return;
-      }
-
-      // Grade and commit word
-      console.log('[DEBUG] Calling gradeAndCommit');
+      if (!normalized) return;
       gradeAndCommit();
       return;
     }
@@ -298,19 +288,21 @@ export default function ReadingArea({ textId, onBack }) {
       e.preventDefault();
       const normalized = normalizeForLanguage(typedWord, appLanguageId);
       if (!normalized) return;
-
-      // Grade and commit word
       gradeAndCommit();
       return;
     }
 
-    // Regular character input (desktop only)
-    if (key.length === 1 && !isMobile) {
+    // Regular character input
+    if (key.length === 1) {
       e.preventDefault();
       setTypedWord(prev => prev + key);
-      return;
     }
-  }, [isGrading, typedWord, appLanguageId, gradeAndCommit, isMobile]);
+  }, [isGrading, typedWord, appLanguageId, gradeAndCommit]);
+
+  // Handle keyboard input (for desktop)
+  const handleKeyDown = useCallback((e) => {
+    processKeyDown(e);
+  }, [processKeyDown]);
 
   // Handle submit button click (mobile)
   const handleSubmit = useCallback(() => {
@@ -333,15 +325,19 @@ export default function ReadingArea({ textId, onBack }) {
         return;
       }
 
-      // If reading area is active and input is not focused, refocus it
+      // If reading area is active and input is not focused, refocus it and handle key
       if (inputRef.current && document.activeElement !== inputRef.current) {
         inputRef.current.focus();
+        processKeyDown(e);
+        return;
       }
+
+      processKeyDown(e);
     };
 
     document.addEventListener('keydown', handleDocumentKeydown);
     return () => document.removeEventListener('keydown', handleDocumentKeydown);
-  }, [isMobile, onBack]);
+  }, [isMobile, onBack, processKeyDown]);
 
   if (!readingText) {
     return (
