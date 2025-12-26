@@ -29,14 +29,15 @@ export default function ReadingArea({ textId, onBack }) {
   const readingText = getReadingTextById(textId);
 
   // State
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1024
+  );
   const [wordIndex, setWordIndex] = useState(0);
   const [typedWord, setTypedWord] = useState('');
   const [committedWords, setCommittedWords] = useState([]);
   const [streak, setStreak] = useState(0);
   const [isGrading, setIsGrading] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
-  // Prototype parity: keep interactions desktop-first, but still allow toggling mobile-specific UI blocks.
-  const isMobile = false;
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -53,6 +54,15 @@ export default function ReadingArea({ textId, onBack }) {
   // Get font classes
   const practiceFontClass = getFontClass(practiceLanguageId);
   const appFontClass = getFontClass(appLanguageId);
+
+  // Track viewport width to clamp container sizing on very small screens
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Filter out punctuation for word navigation
   const words = readingText?.tokens?.filter(t => t.type === 'word') || [];
@@ -257,6 +267,12 @@ export default function ReadingArea({ textId, onBack }) {
     setTypedWord(e.target.value);
   }, [isGrading]);
 
+  const focusInput = useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
   // Shared keyboard handler for both focused input and document listener (desktop)
   const processKeyDown = useCallback((e) => {
     if (isGrading) return;
@@ -352,17 +368,22 @@ export default function ReadingArea({ textId, onBack }) {
 
   const activeChars = normalizeForLanguage(typedWord, appLanguageId).split('');
   const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
+  const containerMaxWidth = Math.max(Math.min(viewportWidth - 24, 1280), 320);
+  const responsiveContainerStyle = { maxWidth: `${containerMaxWidth}px` };
 
-  return (
-    <div className="w-full space-y-4">
+    return (
+      <div
+        className="mx-auto w-full min-w-0 space-y-4 overflow-x-hidden px-3 sm:space-y-5 sm:px-4"
+        style={responsiveContainerStyle}
+      >
       {/* Header */}
-      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-slate-200 shadow-lg shadow-slate-950/40">
-        <div className="flex items-start justify-between gap-4">
+        <section className="w-full max-w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-white">{title}</h2>
-            <p className="mt-2 text-sm text-slate-400">{subtitle}</p>
+            <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400 sm:text-base">{subtitle}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 sm:flex-nowrap">
             <button
               onClick={onBack}
               className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium hover:bg-slate-700"
@@ -379,8 +400,11 @@ export default function ReadingArea({ textId, onBack }) {
         </div>
       </section>
 
-      {/* Reading Area */}
-      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-slate-200 shadow-lg shadow-slate-950/40">
+        {/* Reading Area */}
+          <section
+            className="relative w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6"
+            onClick={focusInput}
+          >
         {/* HUD */}
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
@@ -392,36 +416,34 @@ export default function ReadingArea({ textId, onBack }) {
             <span className="text-slate-400">{t('reading.streak')}</span>
             <strong className="text-emerald-400">{streak}</strong>
           </div>
-          {!isMobile && (
-            <div className="rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-slate-400">
-              {t('reading.instruction')}
-            </div>
-          )}
+          <div className="hidden rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-slate-400 sm:block">
+            {t('reading.instruction')}
+          </div>
         </div>
 
         {/* Practice Track */}
-        <div className="mb-3 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-800/90 to-slate-900/90 shadow-lg">
-          <div
-            ref={practiceViewportRef}
-            className="relative flex items-center overflow-hidden px-4 py-6"
-            style={{ minHeight: '92px' }}
-          >
+            <div className="mb-3 w-full max-w-full overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-800/90 to-slate-900/90 shadow-lg">
             <div
-              ref={practiceTrackRef}
-              className="inline-flex items-center gap-6 transition-transform duration-[260ms] ease-out"
-              style={{ willChange: 'transform' }}
-              dir={practiceDirection}
+              ref={practiceViewportRef}
+              className="relative flex w-full min-w-0 items-center overflow-hidden px-2 py-3 sm:px-4 sm:py-6"
+              style={{ minHeight: '72px' }}
             >
+              <div
+                ref={practiceTrackRef}
+                className="inline-flex items-center gap-4 sm:gap-6 transition-transform duration-[260ms] ease-out"
+                style={{ willChange: 'transform' }}
+                dir={practiceDirection}
+              >
               {readingText.tokens.map((token, idx) => {
                 if (token.type === 'punct') {
                   return (
-                    <span
-                      key={`punct-${idx}`}
-                      className="text-4xl opacity-40"
-                      style={{ letterSpacing: '0.4px' }}
-                    >
-                      {token.text}
-                    </span>
+                      <span
+                        key={`punct-${idx}`}
+                        className="text-3xl opacity-40 sm:text-4xl"
+                        style={{ letterSpacing: '0.4px' }}
+                      >
+                        {token.text}
+                      </span>
                   );
                 }
 
@@ -431,7 +453,7 @@ export default function ReadingArea({ textId, onBack }) {
                 return (
                   <span
                     key={token.id || idx}
-                    className={`${practiceFontClass} text-4xl leading-tight transition-opacity ${
+                    className={`${practiceFontClass} text-3xl leading-tight transition-opacity sm:text-4xl ${
                       isActive ? 'opacity-100' : 'opacity-50'
                     }`}
                     style={{ letterSpacing: '0.4px', transform: 'translateY(1px)' }}
@@ -446,14 +468,14 @@ export default function ReadingArea({ textId, onBack }) {
         </div>
 
         {/* Output Track */}
-        <div className="overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
-          <div className="p-4">
+          <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
+          <div className="p-3 sm:p-4">
             <div
               ref={typedViewportRef}
-              className="overflow-hidden"
+              className="w-full min-w-0 overflow-hidden"
             >
               {/* Typed Row */}
-              <div className="flex items-end whitespace-nowrap" dir={appDirection}>
+              <div className="flex min-w-0 items-end whitespace-nowrap" dir={appDirection}>
                 <div
                   ref={typedTrackRef}
                   className="inline-flex items-end transition-transform duration-[260ms] ease-out"
@@ -533,6 +555,24 @@ export default function ReadingArea({ textId, onBack }) {
           </div>
         </div>
 
+        {/* Invisible but focusable input for all viewports */}
+        <input
+          ref={inputRef}
+          type="text"
+          value={typedWord}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          disabled={isGrading}
+          placeholder={t('reading.typeHere')}
+          className={`${appFontClass} sr-only`}
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck="false"
+          inputMode="latin-prose"
+          aria-label={t('reading.typeHere')}
+        />
+
         {/* Answer Display */}
         {showAnswer && (
           <div className="mt-3 text-sm text-slate-400">
@@ -547,56 +587,10 @@ export default function ReadingArea({ textId, onBack }) {
             )}
           </div>
         )}
-      </section>
-
-      {/* Mobile Input Area */}
-      {isMobile && (
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg shadow-slate-950/40">
-          <div className="flex gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={typedWord}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              disabled={isGrading}
-              placeholder={t('reading.typeHere')}
-              className={`${appFontClass} flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-lg text-white placeholder-slate-500 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-400/20 disabled:opacity-50`}
-              autoComplete="off"
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck="false"
-            />
-            <button
-              onClick={handleSubmit}
-              disabled={isGrading || !normalizeForLanguage(typedWord, appLanguageId)}
-              className="rounded-lg bg-orange-500 px-6 py-3 font-semibold text-white transition-all hover:bg-orange-600 active:scale-95 disabled:opacity-50 disabled:hover:bg-orange-500"
-            >
-              {t('reading.next')}
-            </button>
-          </div>
-          <p className="mt-2 text-center text-xs text-slate-500">
-            {t('reading.mobileInstruction')}
-          </p>
         </section>
-      )}
-
-      {/* Desktop: Hidden input for keyboard capture */}
-      {!isMobile && (
-        <input
-          ref={inputRef}
-          type="text"
-          className="pointer-events-none absolute h-px w-px opacity-0"
-          autoComplete="off"
-          onKeyDown={handleKeyDown}
-          value=""
-          onChange={() => {}}
-          aria-hidden="true"
-        />
-      )}
-    </div>
-  );
-}
+      </div>
+    );
+  }
 
 // Word box for committed typed words
 function WordBox({ chars, width, fontClass }) {
