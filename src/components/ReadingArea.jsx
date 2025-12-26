@@ -184,21 +184,16 @@ export default function ReadingArea({ textId, onBack }) {
     console.log('[DEBUG] Starting grading...');
     setIsGrading(true);
 
-    const result = translation
-      ? gradeWithGhostSequence(
-          typedWord,
-          translation,
-          practiceLanguageId,
-          appLanguageId
-        )
-      : {
-          isCorrect: false,
-          ghostSequence: [],
-          typedChars: typedNormalized.split(''),
-          isAvailable: false,
-          variants: [],
-          expected: '',
-        };
+    const wordDef = translation || (currentWord
+      ? { canonical: currentWord.text, variants: [currentWord.text] }
+      : { canonical: '', variants: [] });
+
+    const result = gradeWithGhostSequence(
+      typedWord,
+      wordDef,
+      practiceLanguageId,
+      appLanguageId
+    );
 
     // Update streak
     if (result.isCorrect) {
@@ -236,9 +231,10 @@ export default function ReadingArea({ textId, onBack }) {
     }
 
     // Animate ghost letters
+    const revealDuration = Math.max(result.ghostSequence.length, result.typedChars.length) * 75 + 120;
     setTimeout(() => {
       setIsGrading(false);
-    }, result.ghostSequence.length * 75 + 100);
+    }, revealDuration);
 
   }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId]);
 
