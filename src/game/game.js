@@ -1600,8 +1600,13 @@ function startClickMode(itemEl, payload) {
         forcedStartItem = null;
       } else {
         // Introduce new letters for the first wave
-        // At level 1: introduce 2 letters, at higher levels: introduce 1 letter
-        const lettersToIntroduce = level === 1 ? 2 : 1;
+        // In Combined Letters mode: introduce enough letters to form at least one complete group
+        // At level 1: introduce 2 letters, at higher levels: introduce lettersPerBox or 1
+        let lettersToIntroduce = level === 1 ? 2 : 1;
+        if (combinedLettersEnabled && level > 1) {
+          const lettersPerBox = getLettersPerBoxForLevel(level);
+          lettersToIntroduce = lettersPerBox;
+        }
         for (let i = 0; i < lettersToIntroduce && learningOrder.length > 0; i++) {
           roundItems.push(learningOrder.shift());
         }
@@ -1610,7 +1615,11 @@ function startClickMode(itemEl, payload) {
     } else if (seenItems.size === 0 && learningOrder.length > 0) {
       // Safety check: if no items have been seen yet, introduce new letters instead of spawning empty wave
       // This handles edge cases where first wave might be skipped
-      const lettersToIntroduce = level === 1 ? 2 : 1;
+      let lettersToIntroduce = level === 1 ? 2 : 1;
+      if (combinedLettersEnabled && level > 1) {
+        const lettersPerBox = getLettersPerBoxForLevel(level);
+        lettersToIntroduce = lettersPerBox;
+      }
       for (let i = 0; i < lettersToIntroduce && learningOrder.length > 0; i++) {
         roundItems.push(learningOrder.shift());
       }
