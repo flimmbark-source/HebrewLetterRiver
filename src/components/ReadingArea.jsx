@@ -358,7 +358,7 @@ export default function ReadingArea({ textId, onBack }) {
   const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
 
   return (
-    <div className="mx-auto w-full max-w-full space-y-4 px-3 sm:max-w-5xl sm:space-y-5 sm:px-0">
+    <div className="mx-auto w-full max-w-full space-y-4 overflow-x-hidden px-3 sm:max-w-5xl sm:space-y-5 sm:px-0">
       {/* Header */}
       <section className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -547,7 +547,7 @@ export default function ReadingArea({ textId, onBack }) {
           onKeyDown={handleKeyDown}
           disabled={isGrading}
           placeholder={t('reading.typeHere')}
-          className={`${appFontClass} pointer-events-none absolute inset-x-3 bottom-3 h-11 w-[calc(100%-24px)] rounded-md bg-transparent text-transparent opacity-0 focus:opacity-0 sm:inset-auto sm:left-1/2 sm:top-0 sm:h-px sm:w-px sm:-translate-x-1/2 sm:-translate-y-1/2`}
+          className={`${appFontClass} pointer-events-none absolute left-3 right-3 bottom-3 h-11 w-auto max-w-full rounded-md bg-transparent text-transparent opacity-0 focus:opacity-0 sm:inset-auto sm:left-1/2 sm:top-0 sm:h-px sm:w-px sm:-translate-x-1/2 sm:-translate-y-1/2`}
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
