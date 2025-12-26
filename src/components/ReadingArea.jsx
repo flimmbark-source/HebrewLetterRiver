@@ -199,7 +199,7 @@ export default function ReadingArea({ textId, onBack }) {
       setTypedWord(prev => prev + key);
       return;
     }
-  }, [isGrading, typedWord, appLanguageId]);
+  }, [isGrading, typedWord, appLanguageId, gradeAndCommit]);
 
   // Grade and commit the current word
   const gradeAndCommit = useCallback(() => {
