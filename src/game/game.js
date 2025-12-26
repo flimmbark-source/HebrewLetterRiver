@@ -1653,7 +1653,11 @@ function startClickMode(itemEl, payload) {
 
     currentRound = { id: Date.now(), items: roundItems, handledCount: 0, timers: [], isFirstWave: isFirstWaveOfLevel };
     generateChoices(roundItems, itemPool);
-    processItemsForRound(roundItems, currentRound.id, isFirstWaveOfLevel);
+    const processedItems = processItemsForRound(roundItems, currentRound.id, isFirstWaveOfLevel);
+    // In Combined Letters mode, update items to match actual spawned letters
+    if (processedItems && processedItems.length > 0) {
+      currentRound.items = processedItems;
+    }
   }
 
   function isRandomLettersModeActive() {
@@ -1780,6 +1784,9 @@ function startClickMode(itemEl, payload) {
       });
      });
     }
+
+    // Return processed items so currentRound can track the correct count
+    return processedItems;
   } 
 
   /**
