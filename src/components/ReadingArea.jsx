@@ -35,14 +35,6 @@ export default function ReadingArea({ textId, onBack }) {
   const [streak, setStreak] = useState(0);
   const [isGrading, setIsGrading] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const updateIsMobile = () => setIsMobile(window.innerWidth <= 640);
-    updateIsMobile();
-    window.addEventListener('resize', updateIsMobile);
-    return () => window.removeEventListener('resize', updateIsMobile);
-  }, []);
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -360,13 +352,13 @@ export default function ReadingArea({ textId, onBack }) {
   const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
 
   return (
-    <div className="w-full space-y-4 sm:space-y-5">
+    <div className="w-full max-w-5xl space-y-4 px-3 sm:space-y-5 sm:px-0">
       {/* Header */}
       <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-white">{title}</h2>
-            <p className="mt-2 text-sm text-slate-400">{subtitle}</p>
+            <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400 sm:text-base">{subtitle}</p>
           </div>
           <div className="flex flex-wrap gap-2 sm:flex-nowrap">
             <button
@@ -398,11 +390,9 @@ export default function ReadingArea({ textId, onBack }) {
             <span className="text-slate-400">{t('reading.streak')}</span>
             <strong className="text-emerald-400">{streak}</strong>
           </div>
-          {!isMobile && (
-            <div className="rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-slate-400">
-              {t('reading.instruction')}
-            </div>
-          )}
+          <div className="hidden rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-slate-400 sm:block">
+            {t('reading.instruction')}
+          </div>
         </div>
 
         {/* Practice Track */}
@@ -539,25 +529,8 @@ export default function ReadingArea({ textId, onBack }) {
           </div>
         </div>
 
-        {/* Answer Display */}
-        {showAnswer && (
-          <div className="mt-3 text-sm text-slate-400">
-            {t('reading.answer')}:{' '}
-            <span className="rounded bg-slate-800 px-2 py-1 font-mono text-slate-300">
-              {getTranslation()?.canonical || '—'}
-            </span>
-            {getTranslation()?.variants && getTranslation().variants.length > 1 && (
-              <span className="ml-2">
-                ({t('reading.accepted')}: {getTranslation().variants.join(', ')})
-              </span>
-            )}
-          </div>
-        )}
-      </section>
-
-      {/* Mobile Input Area */}
-      {isMobile && (
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg shadow-slate-950/40">
+        {/* Mobile Input Area (kept inside main card) */}
+        <div className="mt-4 flex flex-col gap-2 sm:hidden">
           <div className="flex gap-2">
             <input
               ref={inputRef}
@@ -581,25 +554,38 @@ export default function ReadingArea({ textId, onBack }) {
               {t('reading.next')}
             </button>
           </div>
-          <p className="mt-2 text-center text-xs text-slate-500">
+          <p className="text-center text-xs text-slate-500">
             {t('reading.mobileInstruction')}
           </p>
-        </section>
-      )}
+        </div>
 
-      {/* Desktop: Hidden input for keyboard capture */}
-      {!isMobile && (
-        <input
-          ref={inputRef}
-          type="text"
-          className="pointer-events-none absolute h-px w-px opacity-0"
-          autoComplete="off"
-          onKeyDown={handleKeyDown}
-          value=""
-          onChange={() => {}}
-          aria-hidden="true"
-        />
-      )}
+        {/* Answer Display */}
+        {showAnswer && (
+          <div className="mt-3 text-sm text-slate-400">
+            {t('reading.answer')}:{' '}
+            <span className="rounded bg-slate-800 px-2 py-1 font-mono text-slate-300">
+              {getTranslation()?.canonical || '—'}
+            </span>
+            {getTranslation()?.variants && getTranslation().variants.length > 1 && (
+              <span className="ml-2">
+                ({t('reading.accepted')}: {getTranslation().variants.join(', ')})
+              </span>
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* Hidden input for keyboard capture on larger screens */}
+      <input
+        ref={inputRef}
+        type="text"
+        className="pointer-events-none absolute h-px w-px opacity-0 sm:pointer-events-auto sm:absolute sm:opacity-0"
+        autoComplete="off"
+        onKeyDown={handleKeyDown}
+        value=""
+        onChange={() => {}}
+        aria-hidden="true"
+      />
     </div>
   );
 }
