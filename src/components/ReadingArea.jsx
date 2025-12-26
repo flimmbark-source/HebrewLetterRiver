@@ -22,6 +22,7 @@ const TRANSLATION_KEY_MAP = {
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 1.25;
+const WORD_GAP_WITH_PADDING_CH = WORD_GAP_CH + WORD_BOX_PADDING_CH * 2;
 
 /**
  * ReadingArea Component
@@ -487,7 +488,7 @@ export default function ReadingArea({ textId, onBack }) {
                       {idx < committedWords.length - 1 && <WordGap />}
                     </Fragment>
                   ))}
-                  {committedWords.length > 0 && <WordGap />}
+                  {committedWords.length > 0 && <WordGap width={WORD_GAP_WITH_PADDING_CH} />}
                   {/* Active typing box */}
                   <ActiveWordBox
                     chars={activeChars}
@@ -525,7 +526,7 @@ export default function ReadingArea({ textId, onBack }) {
                       {idx < committedWords.length - 1 && <WordGap />}
                     </Fragment>
                   ))}
-                  {committedWords.length > 0 && <WordGap />}
+                  {committedWords.length > 0 && <WordGap width={WORD_GAP_WITH_PADDING_CH} />}
                   {/* Active ghost box (empty) */}
                   <div
                     className="box-border inline-block align-bottom"
@@ -710,9 +711,9 @@ function GhostChar({ char, cls, fontClass, delay }) {
 }
 
 // Gap between words
-function WordGap() {
+function WordGap({ width = WORD_GAP_CH }) {
   return (
-    <span className="inline-block" style={{ width: `${WORD_GAP_CH}ch` }}>
+    <span className="inline-block" style={{ width: `${width}ch` }}>
       {' '}
     </span>
   );
