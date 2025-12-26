@@ -4,21 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { getReadingTextById } from '../data/readingTexts';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
-
-const TRANSLATION_KEY_MAP = {
-  english: 'en',
-  hebrew: 'he',
-  spanish: 'es',
-  french: 'fr',
-  arabic: 'ar',
-  portuguese: 'pt',
-  russian: 'ru',
-  hindi: 'hi',
-  japanese: 'ja',
-  mandarin: 'zh',
-  bengali: 'bn',
-  amharic: 'am'
-};
+import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -361,8 +347,8 @@ export default function ReadingArea({ textId, onBack }) {
     );
   }
 
-  const title = readingText.title[appLanguageId] || readingText.title.en || readingText.id;
-  const subtitle = readingText.subtitle?.[appLanguageId] || readingText.subtitle?.en || '';
+  const title = getLocalizedTitle(readingText, appLanguageId);
+  const subtitle = getLocalizedSubtitle(readingText, appLanguageId);
 
   const activeChars = normalizeForLanguage(typedWord, appLanguageId).split('');
   const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
