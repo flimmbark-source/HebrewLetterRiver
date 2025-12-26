@@ -181,52 +181,7 @@ export default function ReadingArea({ textId, onBack }) {
     }
   }, [isGrading]);
 
-  // Handle input change (for mobile typing)
-  const handleInputChange = useCallback((e) => {
-    if (isGrading) return;
-    setTypedWord(e.target.value);
-  }, [isGrading]);
-
-  // Handle keyboard input (for desktop)
-  const handleKeyDown = useCallback((e) => {
-    if (isGrading) {
-      e.preventDefault();
-      return;
-    }
-
-    const key = e.key;
-
-    // Space - commit word (desktop only, on mobile we use the button)
-    if (key === ' ' && !isMobile) {
-      e.preventDefault();
-      const normalized = normalizeForLanguage(typedWord, appLanguageId);
-      if (!normalized) return;
-
-      // Grade and commit word
-      gradeAndCommit();
-      return;
-    }
-
-    // Enter - also commit word
-    if (key === 'Enter') {
-      e.preventDefault();
-      const normalized = normalizeForLanguage(typedWord, appLanguageId);
-      if (!normalized) return;
-
-      // Grade and commit word
-      gradeAndCommit();
-      return;
-    }
-  }, [isGrading, typedWord, appLanguageId, gradeAndCommit, isMobile]);
-
-  // Handle submit button click (mobile)
-  const handleSubmit = useCallback(() => {
-    const normalized = normalizeForLanguage(typedWord, appLanguageId);
-    if (!normalized || isGrading) return;
-    gradeAndCommit();
-  }, [typedWord, appLanguageId, isGrading, gradeAndCommit]);
-
-  // Grade and commit the current word
+  // Grade and commit the current word (defined first so other callbacks can reference it)
   const gradeAndCommit = useCallback(() => {
     if (isGrading || !currentWord) return;
 
@@ -284,6 +239,51 @@ export default function ReadingArea({ textId, onBack }) {
     }, result.ghostSequence.length * 75 + 100);
 
   }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId]);
+
+  // Handle input change (for mobile typing)
+  const handleInputChange = useCallback((e) => {
+    if (isGrading) return;
+    setTypedWord(e.target.value);
+  }, [isGrading]);
+
+  // Handle keyboard input (for desktop)
+  const handleKeyDown = useCallback((e) => {
+    if (isGrading) {
+      e.preventDefault();
+      return;
+    }
+
+    const key = e.key;
+
+    // Space - commit word (desktop only, on mobile we use the button)
+    if (key === ' ' && !isMobile) {
+      e.preventDefault();
+      const normalized = normalizeForLanguage(typedWord, appLanguageId);
+      if (!normalized) return;
+
+      // Grade and commit word
+      gradeAndCommit();
+      return;
+    }
+
+    // Enter - also commit word
+    if (key === 'Enter') {
+      e.preventDefault();
+      const normalized = normalizeForLanguage(typedWord, appLanguageId);
+      if (!normalized) return;
+
+      // Grade and commit word
+      gradeAndCommit();
+      return;
+    }
+  }, [isGrading, typedWord, appLanguageId, gradeAndCommit, isMobile]);
+
+  // Handle submit button click (mobile)
+  const handleSubmit = useCallback(() => {
+    const normalized = normalizeForLanguage(typedWord, appLanguageId);
+    if (!normalized || isGrading) return;
+    gradeAndCommit();
+  }, [typedWord, appLanguageId, isGrading, gradeAndCommit]);
 
   // Handle Escape to go back
   useEffect(() => {
