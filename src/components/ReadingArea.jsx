@@ -564,13 +564,14 @@ export default function ReadingArea({ textId, onBack }) {
           onKeyDown={handleKeyDown}
           disabled={isGrading}
           placeholder={t('reading.typeHere')}
-          className={`${appFontClass} sr-only`}
+          className={`${appFontClass} pointer-events-none absolute inset-x-3 bottom-3 h-10 w-[calc(100%-24px)] rounded opacity-0`}
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
           spellCheck="false"
           inputMode="latin-prose"
           aria-label={t('reading.typeHere')}
+          style={{ transform: 'translateZ(0)' }}
         />
 
         {/* Answer Display */}
