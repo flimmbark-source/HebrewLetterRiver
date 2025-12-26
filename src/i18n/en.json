@@ -357,6 +357,9 @@
     "word": "Word",
     "streak": "Streak",
     "instruction": "Type then press Space",
+    "typeHere": "Type translation...",
+    "next": "Next",
+    "mobileInstruction": "Type the translation and tap Next to continue",
     "answer": "Answer",
     "accepted": "accepted"
   },

@@ -5,6 +5,12 @@ import { getReadingTextById } from '../data/readingTexts';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
 
+// Detect if device is mobile/touch
+const isTouchDevice = () => {
+  if (typeof window === 'undefined') return false;
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+};
+
 /**
  * ReadingArea Component
  *
@@ -29,6 +35,7 @@ export default function ReadingArea({ textId, onBack }) {
   const [streak, setStreak] = useState(0);
   const [isGrading, setIsGrading] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -36,7 +43,7 @@ export default function ReadingArea({ textId, onBack }) {
   const typedTrackRef = useRef(null);
   const typedViewportRef = useRef(null);
   const ghostTrackRef = useRef(null);
-  const hiddenInputRef = useRef(null);
+  const inputRef = useRef(null);
 
   // Get practice and app language directions
   const practiceDirection = getTextDirection(practiceLanguageId);
@@ -140,6 +147,11 @@ export default function ReadingArea({ textId, onBack }) {
     }
   }, []);
 
+  // Detect mobile device
+  useEffect(() => {
+    setIsMobile(isTouchDevice());
+  }, []);
+
   // Initialize centering
   useEffect(() => {
     // Initial centering should be instant
@@ -159,14 +171,23 @@ export default function ReadingArea({ textId, onBack }) {
     centerOutputTrack(false);
   }, [typedWord, committedWords, centerOutputTrack]);
 
-  // Focus hidden input on mount and when grading ends
+  // Focus input on mount and when grading ends
   useEffect(() => {
-    if (!isGrading && hiddenInputRef.current) {
-      hiddenInputRef.current.focus();
+    if (!isGrading && inputRef.current) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     }
   }, [isGrading]);
 
-  // Handle keyboard input
+  // Handle input change (for mobile typing)
+  const handleInputChange = useCallback((e) => {
+    if (isGrading) return;
+    setTypedWord(e.target.value);
+  }, [isGrading]);
+
+  // Handle keyboard input (for desktop)
   const handleKeyDown = useCallback((e) => {
     if (isGrading) {
       e.preventDefault();
@@ -175,15 +196,8 @@ export default function ReadingArea({ textId, onBack }) {
 
     const key = e.key;
 
-    // Backspace
-    if (key === 'Backspace') {
-      e.preventDefault();
-      setTypedWord(prev => prev.slice(0, -1));
-      return;
-    }
-
-    // Space - commit word
-    if (key === ' ') {
+    // Space - commit word (desktop only, on mobile we use the button)
+    if (key === ' ' && !isMobile) {
       e.preventDefault();
       const normalized = normalizeForLanguage(typedWord, appLanguageId);
       if (!normalized) return;
@@ -193,13 +207,24 @@ export default function ReadingArea({ textId, onBack }) {
       return;
     }
 
-    // Regular character input
-    if (key.length === 1) {
+    // Enter - also commit word
+    if (key === 'Enter') {
       e.preventDefault();
-      setTypedWord(prev => prev + key);
+      const normalized = normalizeForLanguage(typedWord, appLanguageId);
+      if (!normalized) return;
+
+      // Grade and commit word
+      gradeAndCommit();
       return;
     }
-  }, [isGrading, typedWord, appLanguageId, gradeAndCommit]);
+  }, [isGrading, typedWord, appLanguageId, gradeAndCommit, isMobile]);
+
+  // Handle submit button click (mobile)
+  const handleSubmit = useCallback(() => {
+    const normalized = normalizeForLanguage(typedWord, appLanguageId);
+    if (!normalized || isGrading) return;
+    gradeAndCommit();
+  }, [typedWord, appLanguageId, isGrading, gradeAndCommit]);
 
   // Grade and commit the current word
   const gradeAndCommit = useCallback(() => {
@@ -328,9 +353,11 @@ export default function ReadingArea({ textId, onBack }) {
             <span className="text-slate-400">{t('reading.streak')}</span>
             <strong className="text-emerald-400">{streak}</strong>
           </div>
-          <div className="rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-slate-400">
-            {t('reading.instruction')}
-          </div>
+          {!isMobile && (
+            <div className="rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-slate-400">
+              {t('reading.instruction')}
+            </div>
+          )}
         </div>
 
         {/* Practice Track */}
@@ -488,17 +515,51 @@ export default function ReadingArea({ textId, onBack }) {
         )}
       </section>
 
-      {/* Hidden input for keyboard capture */}
-      <input
-        ref={hiddenInputRef}
-        type="text"
-        className="pointer-events-none absolute h-px w-px opacity-0"
-        autoComplete="off"
-        onKeyDown={handleKeyDown}
-        value=""
-        onChange={() => {}}
-        aria-hidden="true"
-      />
+      {/* Mobile Input Area */}
+      {isMobile && (
+        <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg shadow-slate-950/40">
+          <div className="flex gap-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={typedWord}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              disabled={isGrading}
+              placeholder={t('reading.typeHere')}
+              className={`${appFontClass} flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-lg text-white placeholder-slate-500 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-400/20 disabled:opacity-50`}
+              autoComplete="off"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck="false"
+            />
+            <button
+              onClick={handleSubmit}
+              disabled={isGrading || !normalizeForLanguage(typedWord, appLanguageId)}
+              className="rounded-lg bg-orange-500 px-6 py-3 font-semibold text-white transition-all hover:bg-orange-600 active:scale-95 disabled:opacity-50 disabled:hover:bg-orange-500"
+            >
+              {t('reading.next')}
+            </button>
+          </div>
+          <p className="mt-2 text-center text-xs text-slate-500">
+            {t('reading.mobileInstruction')}
+          </p>
+        </section>
+      )}
+
+      {/* Desktop: Hidden input for keyboard capture */}
+      {!isMobile && (
+        <input
+          ref={inputRef}
+          type="text"
+          className="pointer-events-none absolute h-px w-px opacity-0"
+          autoComplete="off"
+          onKeyDown={handleKeyDown}
+          value={typedWord}
+          onChange={handleInputChange}
+          aria-hidden="true"
+        />
+      )}
     </div>
   );
 }
