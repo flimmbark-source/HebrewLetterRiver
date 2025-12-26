@@ -2046,7 +2046,11 @@ function startClickMode(itemEl, payload) {
 
     // Ensure text doesn't wrap and bucket expands to fit content
     box.style.whiteSpace = 'nowrap';
-    box.style.minWidth = 'fit-content';
+    // Match regular box dimensions: min 70px width/height, but allow expansion for combined letters
+    box.style.minWidth = '70px';
+    box.style.minHeight = '70px';
+    box.style.maxWidth = 'none'; // Remove max-width constraint to allow expansion
+    box.style.maxHeight = '70px'; // Keep consistent height with regular boxes
 
     // Create aria label from all items
     const ariaLabels = itemGroup.map(item => getCharacterAriaLabel(item)).filter(Boolean);
