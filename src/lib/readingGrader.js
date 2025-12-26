@@ -160,8 +160,11 @@ export function buildGhostSequence(typed, expected, practiceLanguageId, appLangu
 
     // Case 3: Extra typed character (no corresponding expected char)
     if (typedIndex < typedChars.length && map[typedIndex] === -1) {
+      const lastExpectedChar = expectedChars[Math.min(expectedIndex, expectedChars.length - 1)] || '';
       ghostChars.push({
-        char: '—',
+        // Show the correct translated letter so the ghost displays the target
+        // word rather than the raw extra input.
+        char: lastExpectedChar,
         cls: 'extra',
         phase: 'typed'
       });
