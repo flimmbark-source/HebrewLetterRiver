@@ -262,7 +262,7 @@ export default function ReadingArea({ textId, onBack }) {
 
   // Shared keyboard handler for both focused input and document listener (desktop)
   const processKeyDown = useCallback((e) => {
-    if (isGrading || isMobile) return;
+    if (isGrading) return;
 
     const key = e.key;
 
@@ -297,7 +297,7 @@ export default function ReadingArea({ textId, onBack }) {
       e.preventDefault();
       setTypedWord(prev => prev + key);
     }
-  }, [isGrading, isMobile, typedWord, appLanguageId, gradeAndCommit]);
+  }, [isGrading, typedWord, appLanguageId, gradeAndCommit]);
 
   // Handle keyboard input (for desktop)
   const handleKeyDown = useCallback((e) => {
