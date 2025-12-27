@@ -406,18 +406,18 @@ export default function ReadingArea({ textId, onBack }) {
             onClick={focusInput}
           >
         {/* HUD */}
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
-            <span className="text-slate-400">{t('reading.word')}</span>
-            <strong className="text-white">
-              {currentWord?.text || '—'} ({wordIndex + 1}/{words.length})
-            </strong>
-            <span className="text-slate-600">•</span>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm">
             <span className="text-slate-400">{t('reading.streak')}</span>
             <strong className="text-emerald-400">{streak}</strong>
           </div>
-          <div className="hidden rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-slate-400 sm:block">
-            {t('reading.instruction')}
+          <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
+            <span className={`${appFontClass} text-base font-medium text-white`}>
+              {getTranslation()?.canonical || '—'}
+            </span>
+          </div>
+          <div className="rounded-full border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-400">
+            Press Enter
           </div>
         </div>
 
