@@ -7,7 +7,6 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'icons/*.png'],
 
       manifest: {
         name: 'Hebrew Letter River',
@@ -20,39 +19,9 @@ export default defineConfig({
         categories: ['education', 'games'],
         icons: [
           {
-            src: '/icons/icon-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: '/icons/icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
-          }
-        ],
-        shortcuts: [
-          {
-            name: 'Play Game',
-            short_name: 'Play',
-            description: 'Start playing Letter River',
-            url: '/play',
-            icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }]
-          },
-          {
-            name: 'Daily Quests',
-            short_name: 'Quests',
-            description: 'View daily quests',
-            url: '/daily',
-            icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }]
-          },
-          {
-            name: 'Achievements',
-            short_name: 'Badges',
-            description: 'View your achievements',
-            url: '/achievements',
-            icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }]
+            src: '/favicon.ico',
+            sizes: '48x48',
+            type: 'image/x-icon'
           }
         ]
       },
@@ -117,8 +86,8 @@ export default defineConfig({
             }
           },
           {
-            // Cache images
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
+            // Cache images (excluding .ico which is precached by globPatterns)
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
             handler: 'CacheFirst',
             options: {
               cacheName: 'images-cache',
