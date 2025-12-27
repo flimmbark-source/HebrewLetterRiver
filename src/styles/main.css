@@ -19,9 +19,8 @@ body.no-scroll {
 }
 
 .game-font-opendyslexic {
-  /* Using Comic Sans as dyslexic-friendly alternative (OpenDyslexic CDN blocked) */
-  /* Comic Sans has unique letter shapes that help with dyslexia */
-  font-family: 'Comic Sans MS', 'Comic Sans', 'Heebo', 'Noto Sans Hebrew', 'Amiri', cursive, sans-serif !important;
+  /* Self-hosted OpenDyslexic font via @fontsource/opendyslexic */
+  font-family: 'OpenDyslexic', 'Heebo', 'Noto Sans Hebrew', 'Amiri', 'Noto Naskh Arabic', sans-serif !important;
 }
 
 .game-font-comic-sans {
