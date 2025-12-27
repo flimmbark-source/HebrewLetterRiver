@@ -1,6 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['index.html', './src/**/*.{js,jsx,ts,tsx}'],
+  safelist: [
+    // Game font classes - dynamically generated, so must be safelisted
+    'game-font-default',
+    'game-font-opendyslexic',
+    'game-font-comic-sans',
+    'game-font-arial',
+    'game-font-verdana',
+    // Hebrew font shuffle classes - also dynamically generated
+    'game-font-frank-ruhl',
+    'game-font-noto-serif',
+    'game-font-taamey-frank',
+    'game-font-ezra-sil',
+    'game-font-keter-yg'
+  ],
   theme: {
     extend: {
       fontFamily: {
