@@ -18,9 +18,12 @@ body.no-scroll {
   /* Uses the language-specific font class already set */
 }
 
+.game-font-lexend,
 .game-font-opendyslexic {
-  /* Self-hosted OpenDyslexic font via @fontsource/opendyslexic */
-  font-family: 'OpenDyslexic', 'Heebo', 'Noto Sans Hebrew', 'Amiri', 'Noto Naskh Arabic', sans-serif !important;
+  /* Dyslexia-friendly stack with multi-script coverage */
+  font-family: 'Lexend', 'Atkinson Hyperlegible', 'Noto Sans', 'Noto Sans Hebrew', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Sans Devanagari', 'Noto Sans Bengali', sans-serif !important;
+  font-feature-settings: 'liga' 0;
+  font-variation-settings: 'wght' 600;
 }
 
 .game-font-comic-sans {
