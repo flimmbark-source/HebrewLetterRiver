@@ -40,6 +40,7 @@ export default function ReadingArea({ textId, onBack }) {
   const [showAnswer, setShowAnswer] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [completedResults, setCompletedResults] = useState([]);
+  const [gameFont, setGameFont] = useState('default');
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -56,6 +57,30 @@ export default function ReadingArea({ textId, onBack }) {
   // Get font classes
   const practiceFontClass = getFontClass(practiceLanguageId);
   const appFontClass = getFontClass(appLanguageId);
+
+  // Compute game font class
+  const gameFontClass = gameFont !== 'default' ? `game-font-${gameFont}` : '';
+
+  // Load game font from settings
+  useEffect(() => {
+    const loadGameFont = () => {
+      try {
+        const saved = localStorage.getItem('gameSettings');
+        if (saved) {
+          const settings = JSON.parse(saved);
+          setGameFont(settings.gameFont ?? 'default');
+        }
+      } catch (e) {
+        console.error('Failed to load game font setting', e);
+      }
+    };
+
+    loadGameFont();
+
+    // Listen for settings changes
+    window.addEventListener('gameSettingsChanged', loadGameFont);
+    return () => window.removeEventListener('gameSettingsChanged', loadGameFont);
+  }, []);
 
   // Track viewport width to clamp container sizing on very small screens
   useEffect(() => {
@@ -497,7 +522,7 @@ export default function ReadingArea({ textId, onBack }) {
                 return (
                   <span
                     key={token.id || idx}
-                    className={`${practiceFontClass} text-3xl leading-tight transition-opacity sm:text-4xl ${
+                    className={`${practiceFontClass} ${gameFontClass} text-3xl leading-tight transition-opacity sm:text-4xl ${
                       isActive ? 'opacity-100' : 'opacity-50'
                     }`}
                     style={{ letterSpacing: '0.4px', transform: 'translateY(1px)' }}
@@ -667,7 +692,7 @@ export default function ReadingArea({ textId, onBack }) {
                       <tr key={idx} className="border-b border-slate-700/50 last:border-0">
                         {/* Practice Word */}
                         <td className="p-3">
-                          <span className={`${practiceFontClass} text-xl text-white`}>
+                          <span className={`${practiceFontClass} ${gameFontClass} text-xl text-white`}>
                             {result.practiceWord}
                           </span>
                         </td>
