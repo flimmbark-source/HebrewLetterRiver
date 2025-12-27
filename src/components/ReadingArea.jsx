@@ -58,20 +58,10 @@ export default function ReadingArea({ textId, onBack }) {
   const practiceFontClass = getFontClass(practiceLanguageId);
   const appFontClass = getFontClass(appLanguageId);
 
-  // Determine if game font should be applied based on script compatibility
-  // Game fonts (OpenDyslexic, Comic Sans, Arial, Verdana) only support Latin scripts
-  const isLatinScript = ['english', 'spanish', 'french', 'portuguese'].includes(practiceLanguageId);
-  const shouldApplyGameFont = gameFont !== 'default' && isLatinScript;
-  const gameFontClass = shouldApplyGameFont ? `game-font-${gameFont}` : '';
-
-  // Debug logging
-  useEffect(() => {
-    console.log('[ReadingArea] Current game font:', gameFont);
-    console.log('[ReadingArea] Practice language:', practiceLanguageId);
-    console.log('[ReadingArea] Is Latin script:', isLatinScript);
-    console.log('[ReadingArea] Should apply game font:', shouldApplyGameFont);
-    console.log('[ReadingArea] Game font class:', gameFontClass);
-  }, [gameFont, practiceLanguageId, isLatinScript, shouldApplyGameFont, gameFontClass]);
+  // Compute game font class - apply to all languages
+  // Note: OpenDyslexic only has Latin chars, will fall back for Hebrew/Arabic
+  // TODO: Add Dyslex-Kriyah or other Hebrew dyslexic fonts as options
+  const gameFontClass = gameFont !== 'default' ? `game-font-${gameFont}` : '';
 
   // Load game font from settings
   useEffect(() => {
