@@ -501,6 +501,7 @@ useEffect(() => {
           <section
             className="relative w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6"
             onClick={focusHiddenInput}
+            dir={appDirection}
           >
         {/* HUD */}
         <div className="mb-4 flex items-center justify-between gap-3">
@@ -597,6 +598,7 @@ useEffect(() => {
                           chars={word.typed}
                           width={word.width}
                           fontClass={appFontClass}
+                          direction={appDirection}
                         />
                       )}
                       {idx < committedWords.length - 1 && <WordGap />}
@@ -609,6 +611,7 @@ useEffect(() => {
                     fontClass={appFontClass}
                     showCaret={!isGrading}
                     width={activeWordWidth}
+                    direction={appDirection}
                   />
                 </div>
               </div>
@@ -635,6 +638,7 @@ useEffect(() => {
                           width={word.width}
                           fontClass={appFontClass}
                           delay={idx === committedWords.length - 1 ? 0 : -1}
+                          direction={appDirection}
                         />
                       )}
                       {idx < committedWords.length - 1 && <WordGap />}
@@ -793,13 +797,13 @@ useEffect(() => {
   }
 
 // Word box for committed typed words
-function WordBox({ chars, width, fontClass }) {
+function WordBox({ chars, width, fontClass, direction }) {
   return (
     <span
       className="box-border inline-block align-bottom"
       style={{ width: `${width}ch`, maxWidth: `${MAX_WORD_BOX_CH}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
     >
-      <span className="inline-flex">
+      <span className="inline-flex" style={{ direction: direction || 'ltr' }}>
         {chars.map((char, i) => (
           <span
             key={i}
@@ -814,7 +818,7 @@ function WordBox({ chars, width, fontClass }) {
 }
 
 // Active word box with caret
-function ActiveWordBox({ chars, fontClass, showCaret, width }) {
+function ActiveWordBox({ chars, fontClass, showCaret, width, direction }) {
   const resolvedWidth = width ?? Math.max(chars.length + 1, 2);
 
   return (
@@ -823,7 +827,7 @@ function ActiveWordBox({ chars, fontClass, showCaret, width }) {
       style={{ width: `${resolvedWidth}ch`, maxWidth: `${MAX_WORD_BOX_CH}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
       data-active="true"
     >
-      <span className="inline-flex">
+      <span className="inline-flex" style={{ direction: direction || 'ltr' }}>
         {chars.map((char, i) => (
           <span
             key={i}
@@ -843,13 +847,13 @@ function ActiveWordBox({ chars, fontClass, showCaret, width }) {
 }
 
 // Ghost word box with color-coded feedback
-function GhostWordBox({ ghost, width, fontClass, delay }) {
+function GhostWordBox({ ghost, width, fontClass, delay, direction }) {
   return (
     <span
       className="box-border inline-block align-bottom"
       style={{ width: `${width}ch`, maxWidth: `${MAX_WORD_BOX_CH}ch`, paddingInline: `${WORD_BOX_PADDING_CH}ch` }}
     >
-      <span className="inline-flex">
+      <span className="inline-flex" style={{ direction: direction || 'ltr' }}>
         {ghost.map((g, i) => (
           <GhostChar
             key={i}
