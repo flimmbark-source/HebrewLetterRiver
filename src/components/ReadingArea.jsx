@@ -316,13 +316,18 @@ export default function ReadingArea({ textId, onBack }) {
 const focusHiddenInput = useCallback(() => {
   const el = inputRef.current;
   if (!el) return;
-  if (document.activeElement === el) return;
 
   try {
     el.focus({ preventScroll: true });
   } catch {
     el.focus();
   }
+
+  // Put caret at end (or select all if you prefer)
+  const end = el.value?.length ?? 0;
+  try {
+    el.setSelectionRange(end, end);
+  } catch {}
 }, []);
 
 
@@ -337,11 +342,10 @@ const focusHiddenInput = useCallback(() => {
   }, [isGrading, focusHiddenInput]);
 
   // Re-apply scroll-preventing focus whenever the active word changes
-  useEffect(() => {
-    if (!isGrading) {
-      focusHiddenInput();
-    }
-  }, [wordIndex, isGrading, focusHiddenInput]);
+useEffect(() => {
+  if (showResults) return;
+  if (!isGrading) requestAnimationFrame(focusHiddenInput);
+}, [wordIndex, isGrading, showResults, focusHiddenInput]);
 
   // Shared keyboard handler for both focused input and document listener (desktop)
   const processKeyDown = useCallback((e) => {
