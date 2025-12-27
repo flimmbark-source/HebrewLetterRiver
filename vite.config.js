@@ -93,21 +93,6 @@ export default defineConfig({
             }
           },
           {
-            // Cache CDN fonts (jsdelivr for OpenDyslexic)
-            urlPattern: /^https:\/\/cdn\.jsdelivr\.net\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'cdn-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          },
-          {
             // Cache language pack JSON files
             urlPattern: /\/i18n\/.*\.json$/,
             handler: 'StaleWhileRevalidate',
@@ -157,7 +142,7 @@ export default defineConfig({
       },
 
       devOptions: {
-        enabled: false, // Disable PWA in development to avoid CORS issues in Codespaces
+        enabled: true,
         type: 'module'
       }
     })
