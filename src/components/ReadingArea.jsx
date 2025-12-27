@@ -224,6 +224,24 @@ export default function ReadingArea({ textId, onBack }) {
     centerOutputTrack(false);
   }, [typedWord, committedWords, centerOutputTrack]);
 
+  // Focus helper for hidden input
+  const focusHiddenInput = useCallback(() => {
+    const el = inputRef.current;
+    if (!el) return;
+
+    try {
+      el.focus({ preventScroll: true });
+    } catch {
+      el.focus();
+    }
+
+    // Put caret at end (or select all if you prefer)
+    const end = el.value?.length ?? 0;
+    try {
+      el.setSelectionRange(end, end);
+    } catch {}
+  }, []);
+
   // Grade and commit the current word (defined first so other callbacks can reference it)
   const gradeAndCommit = useCallback(() => {
     console.log('[DEBUG] gradeAndCommit called, isGrading:', isGrading, 'currentWord:', currentWord);
@@ -314,24 +332,6 @@ export default function ReadingArea({ textId, onBack }) {
     if (isGrading) return;
     setTypedWord(e.target.value);
   }, [isGrading]);
-
-const focusHiddenInput = useCallback(() => {
-  const el = inputRef.current;
-  if (!el) return;
-
-  try {
-    el.focus({ preventScroll: true });
-  } catch {
-    el.focus();
-  }
-
-  // Put caret at end (or select all if you prefer)
-  const end = el.value?.length ?? 0;
-  try {
-    el.setSelectionRange(end, end);
-  } catch {}
-}, []);
-
 
   // Focus input on mount and when grading ends
   useEffect(() => {
