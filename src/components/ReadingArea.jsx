@@ -636,7 +636,7 @@ export default function ReadingArea({ textId, onBack }) {
 
         {/* Results Modal */}
         {showResults && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+          <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 p-4 pt-15">
             <div className="w-full max-w-4xl rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
               {/* Title */}
               <h2 className="mb-6 text-center text-2xl font-bold text-white">
