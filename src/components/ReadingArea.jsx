@@ -229,11 +229,10 @@ export default function ReadingArea({ textId, onBack }) {
     const el = inputRef.current;
     if (!el) return;
 
+    // On mobile, we need to focus without preventScroll to trigger keyboard
     try {
-      el.focus({ preventScroll: true });
-    } catch {
       el.focus();
-    }
+    } catch {}
 
     // Put caret at end (or select all if you prefer)
     const end = el.value?.length ?? 0;
@@ -688,11 +687,15 @@ useEffect(() => {
   spellCheck={false}
   inputMode="text"
   dir={appDirection}
-  // Key change: fixed + tiny + invisible
-  className={`${appFontClass} fixed left-0 top-0 h-[1px] w-[1px] opacity-0 pointer-events-none`}
+  // Position off-screen but keep real size for mobile keyboard
+  className={`${appFontClass} fixed`}
   style={{
-    // optional: reduces "caret flash" on some browsers
-    caretColor: 'transparent',
+    // Position way off screen but keep normal input size
+    left: '-9999px',
+    top: '0',
+    width: '100px',
+    height: '40px',
+    opacity: 0,
     // Explicit direction for mobile browsers
     direction: appDirection,
     // Prevents "visual reversal" issues with bidirectional text
