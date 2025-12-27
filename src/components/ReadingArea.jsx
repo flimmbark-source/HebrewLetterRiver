@@ -303,9 +303,11 @@ export default function ReadingArea({ textId, onBack }) {
     }
     setTimeout(() => {
       setIsGrading(false);
+      // Refocus input after grading animation completes
+      focusHiddenInput();
     }, revealDuration);
 
-  }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId]);
+  }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId, focusHiddenInput]);
 
   // Handle input change (for mobile typing)
   const handleInputChange = useCallback((e) => {
@@ -669,10 +671,11 @@ useEffect(() => {
   autoCorrect="off"
   spellCheck={false}
   inputMode="latin-prose"
+  dir={appDirection}
   // Key change: fixed + tiny + invisible
   className={`${appFontClass} fixed left-0 top-0 h-[1px] w-[1px] opacity-0 pointer-events-none`}
   style={{
-    // optional: reduces “caret flash” on some browsers
+    // optional: reduces "caret flash" on some browsers
     caretColor: 'transparent',
   }}
 />
