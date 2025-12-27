@@ -1,15 +1,5 @@
 /* === ARCADE CARTOON UI STYLES === */
 
-/* OpenDyslexic font from CDN */
-@font-face {
-  font-family: 'OpenDyslexic';
-  src: url('https://cdn.jsdelivr.net/gh/antijingoist/opendyslexic@master/compiled/OpenDyslexic-Regular.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/antijingoist/open-dyslexic@master/woff/OpenDyslexic-Regular.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
 html, body { width: 100%; overflow-x: hidden; }
 body {
   font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -29,8 +19,9 @@ body.no-scroll {
 }
 
 .game-font-opendyslexic {
-  /* OpenDyslexic with fallbacks for Hebrew, Arabic, and other scripts */
-  font-family: 'OpenDyslexic', 'Heebo', 'Noto Sans Hebrew', 'Amiri', 'Noto Naskh Arabic', sans-serif !important;
+  /* Using Comic Sans as dyslexic-friendly alternative (OpenDyslexic CDN blocked) */
+  /* Comic Sans has unique letter shapes that help with dyslexia */
+  font-family: 'Comic Sans MS', 'Comic Sans', 'Heebo', 'Noto Sans Hebrew', 'Amiri', cursive, sans-serif !important;
 }
 
 .game-font-comic-sans {
