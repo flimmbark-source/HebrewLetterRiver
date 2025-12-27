@@ -19,7 +19,7 @@ export default defineConfig({
         categories: ['education', 'games'],
         icons: [
           {
-            src: '',
+            src: '/favicon.ico',
             sizes: '48x48',
             type: 'image/x-icon'
           }
