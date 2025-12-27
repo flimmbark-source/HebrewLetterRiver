@@ -501,9 +501,6 @@ export default function ReadingArea({ textId, onBack }) {
               })()}
             </span>
           </div>
-          <div className="rounded-full border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-400">
-            Press Enter
-          </div>
         </div>
 
         {/* Practice Track */}
