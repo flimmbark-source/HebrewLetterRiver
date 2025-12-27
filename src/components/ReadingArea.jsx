@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { getReadingTextById } from '../data/readingTexts';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
-import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
+import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib/languageUtils';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -38,6 +38,8 @@ export default function ReadingArea({ textId, onBack }) {
   const [streak, setStreak] = useState(0);
   const [isGrading, setIsGrading] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [completedResults, setCompletedResults] = useState([]);
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -238,23 +240,36 @@ export default function ReadingArea({ textId, onBack }) {
       isCorrect: result.isCorrect
     }]);
 
+    // Store result for results screen
+    const langCode = getLanguageCode(appLanguageId);
+    const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
+                ?? readingText.glosses?.en?.[currentWord.id]
+                ?? '—';
+
+    setCompletedResults(prev => [...prev, {
+      practiceWord: currentWord.text,
+      typedChars: result.typedChars,
+      ghostSequence: result.ghostSequence,
+      gloss: gloss,
+      isCorrect: result.isCorrect
+    }]);
+
     // Clear typed word
     setTypedWord('');
+
+    // Animate ghost letters
+    const revealDuration = Math.max(result.ghostSequence.length, result.typedChars.length) * 75 + 120;
 
     // Advance to next word immediately (before ghost animation)
     const nextIndex = wordIndex + 1;
     if (nextIndex >= words.length) {
-      // Loop back to start
-      setWordIndex(0);
-      setStreak(0);
-      // Add extra spacing to indicate loop
-      setCommittedWords(prev => [...prev, { type: 'gap', width: 6 }]);
+      // Show results screen instead of looping
+      setTimeout(() => {
+        setShowResults(true);
+      }, revealDuration + 200);
     } else {
       setWordIndex(nextIndex);
     }
-
-    // Animate ghost letters
-    const revealDuration = Math.max(result.ghostSequence.length, result.typedChars.length) * 75 + 120;
     setTimeout(() => {
       setIsGrading(false);
     }, revealDuration);
@@ -323,6 +338,27 @@ export default function ReadingArea({ textId, onBack }) {
     if (!normalized || isGrading) return;
     gradeAndCommit();
   }, [typedWord, appLanguageId, isGrading, gradeAndCommit]);
+
+  // Handle Try Again from results screen
+  const handleTryAgain = useCallback(() => {
+    setShowResults(false);
+    setCompletedResults([]);
+    setWordIndex(0);
+    setTypedWord('');
+    setCommittedWords([]);
+    setStreak(0);
+    setShowAnswer(false);
+    // Re-center tracks after reset
+    setTimeout(() => {
+      centerPracticeTrack(true);
+      centerOutputTrack(true);
+    }, 50);
+  }, [centerPracticeTrack, centerOutputTrack]);
+
+  // Handle Back from results screen
+  const handleResultsBack = useCallback(() => {
+    onBack?.();
+  }, [onBack]);
 
   // Global keydown handler (mirrors the prototype: always listen, refocus hidden input, never gated by mobile detection)
   useEffect(() => {
@@ -406,18 +442,26 @@ export default function ReadingArea({ textId, onBack }) {
             onClick={focusInput}
           >
         {/* HUD */}
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
-            <span className="text-slate-400">{t('reading.word')}</span>
-            <strong className="text-white">
-              {currentWord?.text || '—'} ({wordIndex + 1}/{words.length})
-            </strong>
-            <span className="text-slate-600">•</span>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm">
             <span className="text-slate-400">{t('reading.streak')}</span>
             <strong className="text-emerald-400">{streak}</strong>
           </div>
-          <div className="hidden rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-slate-400 sm:block">
-            {t('reading.instruction')}
+          <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
+            <span className={`${appFontClass} text-base font-medium text-white`}>
+              {(() => {
+                if (!readingText || !currentWord) return '—';
+                // Use glosses for semantic meaning display
+                const langCode = getLanguageCode(appLanguageId);
+                const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
+                           ?? readingText.glosses?.en?.[currentWord.id]
+                           ?? '—';
+                return gloss;
+              })()}
+            </span>
+          </div>
+          <div className="rounded-full border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-400">
+            Press Enter
           </div>
         </div>
 
@@ -589,6 +633,98 @@ export default function ReadingArea({ textId, onBack }) {
           </div>
         )}
         </section>
+
+        {/* Results Modal */}
+        {showResults && (
+          <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 p-4 pt-15">
+            <div className="w-full max-w-4xl rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
+              {/* Title */}
+              <h2 className="mb-6 text-center text-2xl font-bold text-white">
+                {t('reading.results.title')}
+              </h2>
+
+              {/* Results Table */}
+              <div className="mb-6 max-h-[60vh] overflow-y-auto rounded-2xl border border-slate-700 bg-slate-800/50">
+                <table className="w-full">
+                  <thead className="sticky top-0 bg-slate-800 text-sm">
+                    <tr className="border-b border-slate-700">
+                      <th className="p-3 text-left font-semibold text-slate-300">
+                        {t('reading.results.practiceWord')}
+                      </th>
+                      <th className="p-3 text-left font-semibold text-slate-300">
+                        {t('reading.results.yourAnswer')}
+                      </th>
+                      <th className="p-3 text-left font-semibold text-slate-300">
+                        {t('reading.results.translation')}
+                      </th>
+                      <th className="p-3 text-left font-semibold text-slate-300">
+                        {t('reading.results.meaning')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {completedResults.map((result, idx) => (
+                      <tr key={idx} className="border-b border-slate-700/50 last:border-0">
+                        {/* Practice Word */}
+                        <td className="p-3">
+                          <span className={`${practiceFontClass} text-xl text-white`}>
+                            {result.practiceWord}
+                          </span>
+                        </td>
+                        {/* Your Answer (raw typed text) */}
+                        <td className="p-3">
+                          <span className={`${appFontClass} font-mono text-base text-white`}>
+                            {result.typedChars.join('')}
+                          </span>
+                        </td>
+                        {/* Translation (Ghost with colors) */}
+                        <td className="p-3">
+                          <div className="inline-flex gap-0.5">
+                            {result.ghostSequence.map((g, i) => {
+                              const colorClass = {
+                                ok: 'text-emerald-400',
+                                bad: 'text-rose-400',
+                                miss: 'text-slate-500',
+                                extra: 'text-yellow-400'
+                              }[g.cls] || 'text-slate-500';
+                              return (
+                                <span key={i} className={`${appFontClass} font-mono text-lg ${colorClass}`}>
+                                  {g.char}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </td>
+                        {/* Meaning */}
+                        <td className="p-3">
+                          <span className={`${appFontClass} text-base text-slate-300`}>
+                            {result.gloss}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={handleTryAgain}
+                  className="rounded-lg border border-orange-600 bg-orange-500 px-6 py-3 font-semibold text-white transition-colors hover:bg-orange-600"
+                >
+                  {t('reading.results.tryAgain')}
+                </button>
+                <button
+                  onClick={handleResultsBack}
+                  className="rounded-lg border border-emerald-600 bg-emerald-500 px-6 py-3 font-semibold text-white transition-colors hover:bg-emerald-600"
+                >
+                  {t('reading.results.back')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

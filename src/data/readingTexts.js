@@ -150,6 +150,92 @@ export const hebrewReadingTexts = [
         torah: { canonical: 'torah', variants: ['torah', 'tora'] },
         emet: { canonical: 'emet', variants: ['emet'] }
       }
+    },
+    glosses: {
+      en: {
+        shalom: 'hello / peace',
+        todah: 'thanks / thank you',
+        ken: 'yes',
+        torah: 'Torah / law',
+        emet: 'truth'
+      },
+      he: {
+        shalom: 'שלום / שלום',
+        todah: 'תודה',
+        ken: 'כן',
+        torah: 'תורה',
+        emet: 'אמת'
+      },
+      es: {
+        shalom: 'hola / paz',
+        todah: 'gracias',
+        ken: 'sí',
+        torah: 'Torá / ley',
+        emet: 'verdad'
+      },
+      fr: {
+        shalom: 'bonjour / paix',
+        todah: 'merci',
+        ken: 'oui',
+        torah: 'Torah / loi',
+        emet: 'vérité'
+      },
+      ar: {
+        shalom: 'مرحبا / سلام',
+        todah: 'شكرا',
+        ken: 'نعم',
+        torah: 'التوراة / القانون',
+        emet: 'حقيقة'
+      },
+      pt: {
+        shalom: 'olá / paz',
+        todah: 'obrigado',
+        ken: 'sim',
+        torah: 'Torá / lei',
+        emet: 'verdade'
+      },
+      ru: {
+        shalom: 'привет / мир',
+        todah: 'спасибо',
+        ken: 'да',
+        torah: 'Тора / закон',
+        emet: 'правда'
+      },
+      ja: {
+        shalom: 'こんにちは / 平和',
+        todah: 'ありがとう',
+        ken: 'はい',
+        torah: 'トーラー / 律法',
+        emet: '真実'
+      },
+      zh: {
+        shalom: '你好 / 和平',
+        todah: '谢谢',
+        ken: '是',
+        torah: '托拉 / 律法',
+        emet: '真理'
+      },
+      hi: {
+        shalom: 'नमस्ते / शांति',
+        todah: 'धन्यवाद',
+        ken: 'हाँ',
+        torah: 'तोराह / कानून',
+        emet: 'सत्य'
+      },
+      bn: {
+        shalom: 'নমস্কার / শান্তি',
+        todah: 'ধন্যবাদ',
+        ken: 'হ্যাঁ',
+        torah: 'তোরাহ / আইন',
+        emet: 'সত্য'
+      },
+      am: {
+        shalom: 'ሰላም / ሰላም',
+        todah: 'አመሰግናለሁ',
+        ken: 'አዎ',
+        torah: 'ቶራ / ሕግ',
+        emet: 'እውነት'
+      }
     }
   },
   {
@@ -288,6 +374,104 @@ export const hebrewReadingTexts = [
         erev: { canonical: 'erev', variants: ['erev', 'ማታ'] },
         tov2: { canonical: 'tov', variants: ['tov', 'ጥሩ'] },
         lehitraot: { canonical: 'lehitraot', variants: ['lehitraot', 'ቻው'] }
+      }
+    },
+    glosses: {
+      en: {
+        shalom: 'hello / peace',
+        boker: 'morning',
+        tov: 'good',
+        erev: 'evening',
+        tov2: 'good',
+        lehitraot: 'goodbye'
+      },
+      he: {
+        shalom: 'שלום',
+        boker: 'בוקר',
+        tov: 'טוב',
+        erev: 'ערב',
+        tov2: 'טוב',
+        lehitraot: 'להתראות'
+      },
+      es: {
+        shalom: 'hola / paz',
+        boker: 'mañana',
+        tov: 'bueno',
+        erev: 'noche',
+        tov2: 'bueno',
+        lehitraot: 'adiós'
+      },
+      fr: {
+        shalom: 'bonjour / paix',
+        boker: 'matin',
+        tov: 'bon',
+        erev: 'soir',
+        tov2: 'bon',
+        lehitraot: 'au revoir'
+      },
+      ar: {
+        shalom: 'مرحبا / سلام',
+        boker: 'صباح',
+        tov: 'جيد',
+        erev: 'مساء',
+        tov2: 'جيد',
+        lehitraot: 'وداعا'
+      },
+      pt: {
+        shalom: 'olá / paz',
+        boker: 'manhã',
+        tov: 'bom',
+        erev: 'noite',
+        tov2: 'bom',
+        lehitraot: 'adeus'
+      },
+      ru: {
+        shalom: 'привет / мир',
+        boker: 'утро',
+        tov: 'хороший',
+        erev: 'вечер',
+        tov2: 'хороший',
+        lehitraot: 'до свидания'
+      },
+      ja: {
+        shalom: 'こんにちは / 平和',
+        boker: '朝',
+        tov: 'いい',
+        erev: '夕',
+        tov2: 'いい',
+        lehitraot: 'さようなら'
+      },
+      zh: {
+        shalom: '你好 / 和平',
+        boker: '早晨',
+        tov: '好',
+        erev: '晚上',
+        tov2: '好',
+        lehitraot: '再见'
+      },
+      hi: {
+        shalom: 'नमस्ते / शांति',
+        boker: 'सुबह',
+        tov: 'अच्छा',
+        erev: 'शाम',
+        tov2: 'अच्छा',
+        lehitraot: 'अलविदा'
+      },
+      bn: {
+        shalom: 'নমস্কার / শান্তি',
+        boker: 'সকাল',
+        tov: 'ভালো',
+        erev: 'সন্ধ্যা',
+        tov2: 'ভালো',
+        lehitraot: 'বিদায়'
+      },
+      am: {
+        shalom: 'ሰላም / ሰላም',
+        boker: 'ጠዋት',
+        tov: 'ጥሩ',
+        erev: 'ማታ',
+        tov2: 'ጥሩ',
+        lehitraot: 'ቻው'
       }
     }
   }
