@@ -314,7 +314,7 @@ export default function ReadingArea({ textId, onBack }) {
   }, [isGrading]);
 
   const focusHiddenInput = useCallback(() => {
-    if (inputRef.current) {
+    if (inputRef.current && !inputRef.current.disabled) {
       // Prevent the browser from scrolling the viewport when the keyboard opens on mobile
       try {
         inputRef.current.focus({ preventScroll: true });
@@ -334,6 +334,13 @@ export default function ReadingArea({ textId, onBack }) {
       }, 100);
     }
   }, [isGrading, focusHiddenInput]);
+
+  // Re-apply scroll-preventing focus whenever the active word changes
+  useEffect(() => {
+    if (!isGrading) {
+      focusHiddenInput();
+    }
+  }, [wordIndex, isGrading, focusHiddenInput]);
 
   // Shared keyboard handler for both focused input and document listener (desktop)
   const processKeyDown = useCallback((e) => {
