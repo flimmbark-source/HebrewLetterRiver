@@ -58,7 +58,9 @@ export default function ReadingArea({ textId, onBack }) {
   const practiceFontClass = getFontClass(practiceLanguageId);
   const appFontClass = getFontClass(appLanguageId);
 
-  // Compute game font class
+  // Compute game font class - apply to all languages
+  // Note: OpenDyslexic only has Latin chars, will fall back for Hebrew/Arabic
+  // TODO: Add Dyslex-Kriyah or other Hebrew dyslexic fonts as options
   const gameFontClass = gameFont !== 'default' ? `game-font-${gameFont}` : '';
 
   // Load game font from settings
@@ -68,7 +70,9 @@ export default function ReadingArea({ textId, onBack }) {
         const saved = localStorage.getItem('gameSettings');
         if (saved) {
           const settings = JSON.parse(saved);
-          setGameFont(settings.gameFont ?? 'default');
+          const fontValue = settings.gameFont ?? 'default';
+          console.log('[ReadingArea] Loading game font:', fontValue);
+          setGameFont(fontValue);
         }
       } catch (e) {
         console.error('Failed to load game font setting', e);
