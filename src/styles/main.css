@@ -1,11 +1,9 @@
 /* === ARCADE CARTOON UI STYLES === */
 
-/* Import OpenDyslexic font from CDN */
-@import url('https://cdn.jsdelivr.net/npm/opendyslexic@3.0.0/web/OpenDyslexic-Regular.woff2');
-
+/* OpenDyslexic font from CDN */
 @font-face {
   font-family: 'OpenDyslexic';
-  src: url('https://cdn.jsdelivr.net/npm/opendyslexic@3.0.0/web/OpenDyslexic-Regular.woff2') format('woff2');
+  src: url('https://cdn.jsdelivr.net/gh/antijingoist/opendyslexic@master/compiled/OpenDyslexic-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
