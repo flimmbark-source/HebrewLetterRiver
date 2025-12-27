@@ -58,8 +58,20 @@ export default function ReadingArea({ textId, onBack }) {
   const practiceFontClass = getFontClass(practiceLanguageId);
   const appFontClass = getFontClass(appLanguageId);
 
-  // Compute game font class
-  const gameFontClass = gameFont !== 'default' ? `game-font-${gameFont}` : '';
+  // Determine if game font should be applied based on script compatibility
+  // Game fonts (OpenDyslexic, Comic Sans, Arial, Verdana) only support Latin scripts
+  const isLatinScript = ['english', 'spanish', 'french', 'portuguese'].includes(practiceLanguageId);
+  const shouldApplyGameFont = gameFont !== 'default' && isLatinScript;
+  const gameFontClass = shouldApplyGameFont ? `game-font-${gameFont}` : '';
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[ReadingArea] Current game font:', gameFont);
+    console.log('[ReadingArea] Practice language:', practiceLanguageId);
+    console.log('[ReadingArea] Is Latin script:', isLatinScript);
+    console.log('[ReadingArea] Should apply game font:', shouldApplyGameFont);
+    console.log('[ReadingArea] Game font class:', gameFontClass);
+  }, [gameFont, practiceLanguageId, isLatinScript, shouldApplyGameFont, gameFontClass]);
 
   // Load game font from settings
   useEffect(() => {
@@ -68,7 +80,9 @@ export default function ReadingArea({ textId, onBack }) {
         const saved = localStorage.getItem('gameSettings');
         if (saved) {
           const settings = JSON.parse(saved);
-          setGameFont(settings.gameFont ?? 'default');
+          const fontValue = settings.gameFont ?? 'default';
+          console.log('[ReadingArea] Loading game font:', fontValue);
+          setGameFont(fontValue);
         }
       } catch (e) {
         console.error('Failed to load game font setting', e);
