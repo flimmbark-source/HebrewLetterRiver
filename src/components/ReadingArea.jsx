@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { getReadingTextById } from '../data/readingTexts';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
-import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
+import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib/languageUtils';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -416,7 +416,8 @@ export default function ReadingArea({ textId, onBack }) {
               {(() => {
                 if (!readingText || !currentWord) return '—';
                 // Use glosses for semantic meaning display
-                const gloss = readingText.glosses?.[appLanguageId]?.[currentWord.id]
+                const langCode = getLanguageCode(appLanguageId);
+                const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
                            ?? readingText.glosses?.en?.[currentWord.id]
                            ?? '—';
                 return gloss;
