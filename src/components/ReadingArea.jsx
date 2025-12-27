@@ -229,10 +229,10 @@ export default function ReadingArea({ textId, onBack }) {
     if (!isGrading && inputRef.current) {
       // Small delay to ensure DOM is ready
       setTimeout(() => {
-        inputRef.current?.focus();
+        focusHiddenInput();
       }, 100);
     }
-  }, [isGrading]);
+  }, [isGrading, focusHiddenInput]);
 
   // Grade and commit the current word (defined first so other callbacks can reference it)
   const gradeAndCommit = useCallback(() => {
@@ -323,9 +323,15 @@ export default function ReadingArea({ textId, onBack }) {
     setTypedWord(e.target.value);
   }, [isGrading]);
 
-  const focusInput = useCallback(() => {
+  const focusHiddenInput = useCallback(() => {
     if (inputRef.current) {
-      inputRef.current.focus();
+      // Prevent the browser from scrolling the viewport when the keyboard opens on mobile
+      try {
+        inputRef.current.focus({ preventScroll: true });
+      } catch (err) {
+        // Fallback for browsers that don't support focus options
+        inputRef.current.focus();
+      }
     }
   }, []);
 
@@ -415,7 +421,7 @@ export default function ReadingArea({ textId, onBack }) {
 
       // Keep hidden input focused so IME / keyboard routing stays consistent
       if (inputRef.current && document.activeElement !== inputRef.current) {
-        inputRef.current.focus();
+        focusHiddenInput();
         processKeyDown(e);
         return;
       }
@@ -424,7 +430,7 @@ export default function ReadingArea({ textId, onBack }) {
     // Capture phase so space is handled before other listeners can stop it
     document.addEventListener('keydown', handleDocumentKeydown, true);
     return () => document.removeEventListener('keydown', handleDocumentKeydown, true);
-  }, [onBack, processKeyDown]);
+  }, [onBack, processKeyDown, focusHiddenInput]);
 
   if (!readingText) {
     return (
@@ -480,7 +486,7 @@ export default function ReadingArea({ textId, onBack }) {
         {/* Reading Area */}
           <section
             className="relative w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6"
-            onClick={focusInput}
+            onClick={focusHiddenInput}
           >
         {/* HUD */}
         <div className="mb-4 flex items-center justify-between gap-3">
