@@ -58,8 +58,6 @@ export default function ReadingArea({ textId, onBack }) {
   const appFontClass = getFontClass(appLanguageId);
 
   // Compute game font class - apply to all languages
-  // Note: OpenDyslexic only has Latin chars, will fall back for Hebrew/Arabic
-  // TODO: Add Dyslex-Kriyah or other Hebrew dyslexic fonts as options
   const gameFontClass = gameFont !== 'default' ? `game-font-${gameFont}` : '';
 
   // Only use language-specific font if no game font is selected

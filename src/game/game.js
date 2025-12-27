@@ -2056,13 +2056,16 @@ function startClickMode(itemEl, payload) {
       const saved = localStorage.getItem('gameSettings');
       if (saved) {
         const settings = JSON.parse(saved);
+        const normalizedFont = settings.gameFont === 'opendyslexic'
+          ? 'lexend'
+          : (settings.gameFont ?? 'default');
         const introductionsToggle = document.getElementById('toggle-introductions');
         if (introductionsToggle) introductionsToggle.checked = settings.showIntroductions ?? true;
         if (highContrastToggle) highContrastToggle.checked = settings.highContrast ?? false;
         if (randomLettersToggle) randomLettersToggle.checked = settings.randomLetters ?? false;
         if (reducedMotionToggle) reducedMotionToggle.checked = settings.reducedMotion ?? false;
         if (gameSpeedSlider) gameSpeedSlider.value = settings.gameSpeed ?? 17;
-        if (gameFontSelect) gameFontSelect.value = settings.gameFont ?? 'default';
+        if (gameFontSelect) gameFontSelect.value = normalizedFont;
         if (fontShuffleToggle) fontShuffleToggle.checked = settings.fontShuffle ?? false;
         if (slowRiverToggle) slowRiverToggle.checked = settings.slowRiver ?? false;
         if (clickModeToggle) clickModeToggle.checked = settings.clickMode ?? false;
@@ -2074,7 +2077,7 @@ function startClickMode(itemEl, payload) {
         fontShuffleEnabled = settings.fontShuffle ?? false;
         clickModeEnabled = settings.clickMode ?? false;
         associationModeEnabled = settings.associationMode ?? false;
-        selectedFont = settings.gameFont ?? 'default';
+        selectedFont = normalizedFont;
 
         // Apply high contrast
         if (settings.highContrast) {

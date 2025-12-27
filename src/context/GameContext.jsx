@@ -33,7 +33,11 @@ export function GameProvider({ children }) {
     try {
       const saved = localStorage.getItem('gameSettings');
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed.gameFont === 'opendyslexic') {
+          parsed.gameFont = 'lexend';
+        }
+        return parsed;
       }
     } catch (error) {
       console.error('Failed to load game settings:', error);
@@ -864,7 +868,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 }}
               >
                 <option value="default">Default</option>
-                <option value="opendyslexic">OpenDyslexic</option>
+                <option value="lexend">Lexend / Noto Sans (dyslexia-friendly)</option>
                 <option value="comic-sans">Comic Sans</option>
                 <option value="arial">Arial</option>
                 <option value="verdana">Verdana</option>
