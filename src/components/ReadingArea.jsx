@@ -63,16 +63,27 @@ export default function ReadingArea({ textId, onBack }) {
   // TODO: Add Dyslex-Kriyah or other Hebrew dyslexic fonts as options
   const gameFontClass = gameFont !== 'default' ? `game-font-${gameFont}` : '';
 
+  // Debug: log when font changes
+  useEffect(() => {
+    console.log('[ReadingArea] gameFont state:', gameFont);
+    console.log('[ReadingArea] computed gameFontClass:', gameFontClass);
+    console.log('[ReadingArea] practiceFontClass:', practiceFontClass);
+  }, [gameFont, gameFontClass, practiceFontClass]);
+
   // Load game font from settings
   useEffect(() => {
     const loadGameFont = () => {
       try {
         const saved = localStorage.getItem('gameSettings');
+        console.log('[ReadingArea] Raw localStorage value:', saved);
         if (saved) {
           const settings = JSON.parse(saved);
+          console.log('[ReadingArea] Parsed settings:', settings);
           const fontValue = settings.gameFont ?? 'default';
-          console.log('[ReadingArea] Loading game font:', fontValue);
+          console.log('[ReadingArea] Setting game font to:', fontValue);
           setGameFont(fontValue);
+        } else {
+          console.log('[ReadingArea] No gameSettings in localStorage');
         }
       } catch (e) {
         console.error('Failed to load game font setting', e);
