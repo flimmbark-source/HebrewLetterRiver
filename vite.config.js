@@ -101,8 +101,8 @@ export default defineConfig({
             }
           },
           {
-            // Cache images
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
+            // Cache images (excluding .ico which is precached by globPatterns)
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
             handler: 'CacheFirst',
             options: {
               cacheName: 'images-cache',
