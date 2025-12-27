@@ -670,13 +670,15 @@ useEffect(() => {
   autoCapitalize="off"
   autoCorrect="off"
   spellCheck={false}
-  inputMode="latin-prose"
+  inputMode="text"
   dir={appDirection}
   // Key change: fixed + tiny + invisible
   className={`${appFontClass} fixed left-0 top-0 h-[1px] w-[1px] opacity-0 pointer-events-none`}
   style={{
     // optional: reduces "caret flash" on some browsers
     caretColor: 'transparent',
+    // Explicit direction for mobile browsers
+    direction: appDirection,
   }}
 />
         {/* Answer Display */}
