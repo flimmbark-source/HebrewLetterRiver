@@ -413,7 +413,15 @@ export default function ReadingArea({ textId, onBack }) {
           </div>
           <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
             <span className={`${appFontClass} text-base font-medium text-white`}>
-              {getTranslation()?.canonical || '—'}
+              {(() => {
+                const translation = getTranslation();
+                if (!translation) return '—';
+                // Show the English meaning (second variant) if available, otherwise canonical
+                const meaning = translation.variants?.[1] !== translation.canonical
+                  ? translation.variants?.[1]
+                  : null;
+                return meaning || translation.canonical || '—';
+              })()}
             </span>
           </div>
           <div className="rounded-full border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-400">
