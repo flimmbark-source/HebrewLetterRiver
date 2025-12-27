@@ -313,17 +313,18 @@ export default function ReadingArea({ textId, onBack }) {
     setTypedWord(e.target.value);
   }, [isGrading]);
 
-  const focusHiddenInput = useCallback(() => {
-    if (inputRef.current && !inputRef.current.disabled) {
-      // Prevent the browser from scrolling the viewport when the keyboard opens on mobile
-      try {
-        inputRef.current.focus({ preventScroll: true });
-      } catch (err) {
-        // Fallback for browsers that don't support focus options
-        inputRef.current.focus();
-      }
-    }
-  }, []);
+const focusHiddenInput = useCallback(() => {
+  const el = inputRef.current;
+  if (!el) return;
+  if (document.activeElement === el) return;
+
+  try {
+    el.focus({ preventScroll: true });
+  } catch {
+    el.focus();
+  }
+}, []);
+
 
   // Focus input on mount and when grading ends
   useEffect(() => {
@@ -652,25 +653,25 @@ export default function ReadingArea({ textId, onBack }) {
 
         {/* Invisible but focusable input for all viewports */}
         <input
-          ref={inputRef}
-          type="text"
-          value={typedWord}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          // Keep the element focusable so preventScroll continues working between words
-          readOnly={isGrading}
-          aria-disabled={isGrading}
-          placeholder={t('reading.typeHere')}
-          className={`${appFontClass} pointer-events-none absolute inset-x-3 bottom-3 h-10 w-[calc(100%-24px)] rounded opacity-0`}
-          autoComplete="off"
-          autoCapitalize="off"
-          autoCorrect="off"
-          spellCheck="false"
-          inputMode="latin-prose"
-          aria-label={t('reading.typeHere')}
-          style={{ transform: 'translateZ(0)' }}
-        />
-
+  ref={inputRef}
+  type="text"
+  value={typedWord}
+  onChange={handleInputChange}
+  onKeyDown={handleKeyDown}
+  readOnly={isGrading}
+  aria-label={t('reading.typeHere')}
+  autoComplete="off"
+  autoCapitalize="off"
+  autoCorrect="off"
+  spellCheck={false}
+  inputMode="latin-prose"
+  // Key change: fixed + tiny + invisible
+  className={`${appFontClass} fixed left-0 top-0 h-[1px] w-[1px] opacity-0 pointer-events-none`}
+  style={{
+    // optional: reduces “caret flash” on some browsers
+    caretColor: 'transparent',
+  }}
+/>
         {/* Answer Display */}
         {showAnswer && (
           <div className="mt-3 text-sm text-slate-400">
