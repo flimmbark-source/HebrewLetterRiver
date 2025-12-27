@@ -655,6 +655,9 @@ export default function ReadingArea({ textId, onBack }) {
                         {t('reading.results.yourAnswer')}
                       </th>
                       <th className="p-3 text-left font-semibold text-slate-300">
+                        {t('reading.results.translation')}
+                      </th>
+                      <th className="p-3 text-left font-semibold text-slate-300">
                         {t('reading.results.meaning')}
                       </th>
                     </tr>
@@ -668,7 +671,13 @@ export default function ReadingArea({ textId, onBack }) {
                             {result.practiceWord}
                           </span>
                         </td>
-                        {/* Typed Answer with Ghost Colors */}
+                        {/* Your Answer (raw typed text) */}
+                        <td className="p-3">
+                          <span className={`${appFontClass} font-mono text-base text-white`}>
+                            {result.typedChars.join('')}
+                          </span>
+                        </td>
+                        {/* Translation (Ghost with colors) */}
                         <td className="p-3">
                           <div className="inline-flex gap-0.5">
                             {result.ghostSequence.map((g, i) => {
