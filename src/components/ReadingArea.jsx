@@ -224,16 +224,6 @@ export default function ReadingArea({ textId, onBack }) {
     centerOutputTrack(false);
   }, [typedWord, committedWords, centerOutputTrack]);
 
-  // Focus input on mount and when grading ends
-  useEffect(() => {
-    if (!isGrading && inputRef.current) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        focusHiddenInput();
-      }, 100);
-    }
-  }, [isGrading, focusHiddenInput]);
-
   // Grade and commit the current word (defined first so other callbacks can reference it)
   const gradeAndCommit = useCallback(() => {
     console.log('[DEBUG] gradeAndCommit called, isGrading:', isGrading, 'currentWord:', currentWord);
@@ -334,6 +324,16 @@ export default function ReadingArea({ textId, onBack }) {
       }
     }
   }, []);
+
+  // Focus input on mount and when grading ends
+  useEffect(() => {
+    if (!isGrading && inputRef.current) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        focusHiddenInput();
+      }, 100);
+    }
+  }, [isGrading, focusHiddenInput]);
 
   // Shared keyboard handler for both focused input and document listener (desktop)
   const processKeyDown = useCallback((e) => {
