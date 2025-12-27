@@ -320,11 +320,10 @@ export default function ReadingArea({ textId, onBack }) {
     }
     setTimeout(() => {
       setIsGrading(false);
-      // Refocus input after grading animation completes
-      focusHiddenInput();
+      // Don't need to refocus - input should stay focused (just changes from readOnly to editable)
     }, revealDuration);
 
-  }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId, focusHiddenInput]);
+  }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId]);
 
   // Handle input change (for mobile typing)
   const handleInputChange = useCallback((e) => {
@@ -512,6 +511,7 @@ useEffect(() => {
           <section
             className="relative w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6"
             onClick={focusHiddenInput}
+            onTouchStart={focusHiddenInput}
             dir={appDirection}
           >
         {/* HUD */}
@@ -679,7 +679,6 @@ useEffect(() => {
   value={typedWord}
   onChange={handleInputChange}
   onKeyDown={handleKeyDown}
-  readOnly={isGrading}
   aria-label={t('reading.typeHere')}
   autoComplete="off"
   autoCapitalize="off"
