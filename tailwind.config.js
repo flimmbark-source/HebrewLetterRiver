@@ -4,6 +4,7 @@ export default {
   safelist: [
     // Game font classes - dynamically generated, so must be safelisted
     'game-font-default',
+    'game-font-lexend',
     'game-font-opendyslexic',
     'game-font-comic-sans',
     'game-font-arial',

@@ -38,7 +38,8 @@ export default function SettingsView() {
           setRandomLetters(settings.randomLetters ?? false);
           setReducedMotion(settings.reducedMotion ?? false);
           setGameSpeed(settings.gameSpeed ?? 17);
-          setGameFont(settings.gameFont ?? 'default');
+          const savedFont = settings.gameFont === 'opendyslexic' ? 'lexend' : (settings.gameFont ?? 'default');
+          setGameFont(savedFont);
           setFontShuffle(settings.fontShuffle ?? false);
           setSlowRiver(settings.slowRiver ?? false);
           setClickMode(settings.clickMode ?? false);
@@ -181,7 +182,7 @@ const showInfo = (settingKey, event) => {
 
   const fontOptions = [
     { value: 'default', label: 'Default' },
-    { value: 'opendyslexic', label: 'OpenDyslexic' },
+    { value: 'lexend', label: 'Lexend / Noto Sans (dyslexia-friendly)' },
     { value: 'comic-sans', label: 'Comic Sans' },
     { value: 'arial', label: 'Arial' },
     { value: 'verdana', label: 'Verdana' }
