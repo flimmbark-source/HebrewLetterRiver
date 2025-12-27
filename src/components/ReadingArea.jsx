@@ -326,7 +326,12 @@ export default function ReadingArea({ textId, onBack }) {
   const focusHiddenInput = useCallback(() => {
     if (inputRef.current) {
       // Prevent the browser from scrolling the viewport when the keyboard opens on mobile
-      inputRef.current.focus({ preventScroll: true });
+      try {
+        inputRef.current.focus({ preventScroll: true });
+      } catch (err) {
+        // Fallback for browsers that don't support focus options
+        inputRef.current.focus();
+      }
     }
   }, []);
 
