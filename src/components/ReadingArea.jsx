@@ -657,7 +657,9 @@ export default function ReadingArea({ textId, onBack }) {
           value={typedWord}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          disabled={isGrading}
+          // Keep the element focusable so preventScroll continues working between words
+          readOnly={isGrading}
+          aria-disabled={isGrading}
           placeholder={t('reading.typeHere')}
           className={`${appFontClass} pointer-events-none absolute inset-x-3 bottom-3 h-10 w-[calc(100%-24px)] rounded opacity-0`}
           autoComplete="off"
