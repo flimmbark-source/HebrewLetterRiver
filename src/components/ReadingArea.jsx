@@ -330,7 +330,19 @@ export default function ReadingArea({ textId, onBack }) {
   // Handle input change (for mobile typing)
   const handleInputChange = useCallback((e) => {
     if (isGrading) return;
-    setTypedWord(e.target.value);
+
+    const v = e.target.value;
+    setTypedWord(v);
+
+    // Mobile keyboards can insert at caret; keep caret at end
+    requestAnimationFrame(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      const len = el.value.length;
+      try {
+        el.setSelectionRange(len, len);
+      } catch {}
+    });
   }, [isGrading]);
 
   // Focus input on mount and when grading ends
@@ -683,6 +695,8 @@ useEffect(() => {
     caretColor: 'transparent',
     // Explicit direction for mobile browsers
     direction: appDirection,
+    // Prevents "visual reversal" issues with bidirectional text
+    unicodeBidi: 'plaintext',
   }}
 />
         {/* Answer Display */}
