@@ -361,7 +361,15 @@
     "next": "Next",
     "mobileInstruction": "Type the translation and tap Next to continue",
     "answer": "Answer",
-    "accepted": "accepted"
+    "accepted": "accepted",
+    "results": {
+      "title": "Reading Results",
+      "practiceWord": "Practice Word",
+      "yourAnswer": "Your Answer",
+      "meaning": "Meaning",
+      "tryAgain": "Try Again",
+      "back": "Back"
+    }
   },
   "settings": {
     "title": "Settings",
