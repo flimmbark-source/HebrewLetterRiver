@@ -487,7 +487,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
         <div
   id="modal"
   className="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto pt-10 p-4 sm:p-6"
-  style={{ background: 'rgba(74, 34, 8, 0.8)' }}
+  style={{ background: 'rgba(6, 78, 59, 0.85)' }}
   onClick={(e) => {
     // Only trigger when clicking the dark overlay, not the inner content
     if (e.target === e.currentTarget) {
@@ -499,38 +499,38 @@ function GameCanvas({ fontClass, loadedSettings }) {
     id="modal-content"
     className="relative w-full max-w-lg shadow-2xl"
     style={{
-      border: '2px solid rgba(235, 179, 105, 0.95)',
+      border: '2px solid #A7F3D0',
       background:
-        'linear-gradient(180deg, #dfcba5ff 0%, #e0bf95ff 55%, #d3b894ff 100%)',
+        'linear-gradient(180deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%)',
       boxShadow:
-        '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)',
+        '0 8px 0 rgba(123, 255, 97, 0.3), 0 16px 24px rgba(73, 229, 235, 0.2)',
     }}
     onClick={(e) => e.stopPropagation()}
   >
 
             <button
               id="accessibility-btn"
-              className="absolute left-2 top-1 text-2xl transition p-2 rounded-lg hover:bg-amber-100/50 active:bg-amber-200/50"
+              className="absolute left-2 top-1 text-2xl transition p-2 rounded-lg hover:bg-emerald-100/50 active:bg-emerald-200/50"
               aria-label={t('game.accessibility.gear')}
-              style={{ color: '#b07737', minWidth: '44px', minHeight: '44px', zIndex: 10 }}            >
+              style={{ color: '#059669', minWidth: '44px', minHeight: '44px', zIndex: 10 }}            >
               ⚙️
             </button>
             <div id="setup-view" className="flex flex-col h-full">
               <div
                 className="relative flex items-center justify-center px-3 py-2 border-b-2"
-                style={{ borderColor: 'rgba(235, 179, 105, 0.3)' }}
+                style={{ borderColor: '#D1FAE5' }}
               >
                 <div className="flex flex-col items-center flex-1 text-center gap-1">
                   <h1
                     className={`modal-title text-xl sm:text-2xl font-bold ${fontClass}`}
-                    style={{ color: '#ff9247' }}
+                    style={{ color: '#059669' }}
                   >
                     {t('game.setup.title')}
                   </h1>
                   <p
                     id="modal-subtitle"
                     className="text-xs font-semibold sm:text-sm"
-                    style={{ color: '#6c3b14' }}
+                    style={{ color: '#065F46' }}
                   >
                     {t('game.setup.subtitleFallback')}
                   </p>
@@ -540,7 +540,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 <aside className="goal-column goal-selector" aria-label="Goal settings">
                   <div
                     className="goal-column__label text-xs font-bold uppercase tracking-wider"
-                    style={{ color: '#6c3b14' }}
+                    style={{ color: '#065F46' }}
                   >
                     {t('game.setup.goal', 'Goal')}
                   </div>
@@ -629,7 +629,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 <section className="mode-column">
                   <h2
                     className="mode-column__headline text-xs font-bold uppercase tracking-wider"
-                    style={{ color: '#6c3b14' }}
+                    style={{ color: '#065F46' }}
                   >
                     {t('game.setup.prompt')}
                   </h2>
@@ -1084,16 +1084,16 @@ function GameCanvas({ fontClass, loadedSettings }) {
         <div
           id="pause-modal"
           className="fixed inset-0 z-40 hidden flex items-center justify-center p-4"
-          style={{ background: 'rgba(74, 34, 8, 0.95)' }}
+          style={{ background: 'rgba(6, 78, 59, 0.95)' }}
         >
           <div
             className="relative w-full max-w-md rounded-3xl shadow-2xl"
             style={{
-              border: '2px solid rgba(235, 179, 105, 0.95)',
+              border: '2px solid #A7F3D0',
               background:
-                'linear-gradient(180deg, #dfcba5ff 0%, #e0bf95ff 55%, #d3b894ff 100%)',
+                'linear-gradient(180deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%)',
               boxShadow:
-                '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)',
+                '0 8px 0 rgba(123, 255, 97, 0.3), 0 16px 24px rgba(73, 229, 235, 0.2)',
             }}
           >
             <div className="relative pt-8 pb-8 text-center px-6">
@@ -1101,13 +1101,13 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 <div className="text-6xl">⏸️</div>
                 <h2
                   className={`text-4xl font-bold ${fontClass}`}
-                  style={{ color: '#ff9247' }}
+                  style={{ color: '#059669' }}
                 >
                   {t('game.pause.title', 'Paused')}
                 </h2>
                 <p
                   className="text-lg font-semibold"
-                  style={{ color: '#6c3b14' }}
+                  style={{ color: '#065F46' }}
                 >
                   {t('game.pause.message', '')}
                 </p>

@@ -225,7 +225,7 @@ body.no-scroll {
   height: 6px;
   min-width: 40px;
   border-radius: 999px;
-  background: #D1FAE5;
+  background: #A7F3D0;
   overflow: hidden;
 }
 
@@ -553,7 +553,7 @@ body.no-scroll {
   margin-top: 2px;
   height: 6px;
   border-radius: 999px;
-  background: #D1FAE5;
+  background: #A7F3D0;
   overflow: hidden;
 }
 
@@ -629,7 +629,7 @@ body.no-scroll {
   margin-top: 0;
   height: 4px;
   border-radius: 999px;
-  background: #D1FAE5;
+  background: #A7F3D0;
   overflow: hidden;
 }
 
@@ -936,7 +936,7 @@ body.no-scroll {
 
 /* IMPORTANT: Prevent shift when selected (thicker border) */
 .mode-card.selected {
-  border: 3px solid rgb(94, 234, 212);
+  border: 3px solid #7BFF61;
   padding: calc(var(--space-2) - 1px); /* Compensate for 1px border difference */
 }
 
@@ -1331,8 +1331,8 @@ body.no-scroll {
   bottom: 75px; /* Position just above the footer/start button */
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(74, 34, 8, 0.95);
-  color: #fff9eb;
+  background: rgba(6, 78, 59, 0.95);
+  color: #E8FFE3;
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 13px;
