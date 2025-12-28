@@ -483,30 +483,6 @@ useEffect(() => {
         className="mx-auto w-full min-w-0 space-y-4 overflow-x-hidden px-3 sm:space-y-5 sm:px-4"
         style={responsiveContainerStyle}
       >
-      {/* Header */}
-        <section className="w-full max-w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-slate-400 sm:text-base">{subtitle}</p>
-          </div>
-          <div className="flex flex-wrap gap-2 sm:flex-nowrap">
-            <button
-              onClick={onBack}
-              className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium hover:bg-slate-700"
-            >
-              {t('reading.back')}
-            </button>
-            <button
-              onClick={() => setShowAnswer(!showAnswer)}
-              className="rounded-lg border border-slate-700 bg-transparent px-4 py-2 text-sm font-medium hover:bg-slate-800"
-            >
-              {showAnswer ? t('reading.hideAnswer') : t('reading.showAnswer')}
-            </button>
-          </div>
-        </div>
-      </section>
-
         {/* Reading Area */}
           <section
             className="relative w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6"
@@ -716,6 +692,30 @@ useEffect(() => {
           </div>
         )}
         </section>
+
+      {/* Header */}
+        <section className="w-full max-w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400 sm:text-base">{subtitle}</p>
+          </div>
+          <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+            <button
+              onClick={onBack}
+              className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium hover:bg-slate-700"
+            >
+              {t('reading.back')}
+            </button>
+            <button
+              onClick={() => setShowAnswer(!showAnswer)}
+              className="rounded-lg border border-slate-700 bg-transparent px-4 py-2 text-sm font-medium hover:bg-slate-800"
+            >
+              {showAnswer ? t('reading.hideAnswer') : t('reading.showAnswer')}
+            </button>
+          </div>
+        </div>
+      </section>
 
         {/* Results Modal */}
         {showResults && (
