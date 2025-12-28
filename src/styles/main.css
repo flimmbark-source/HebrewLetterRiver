@@ -68,13 +68,13 @@ body.no-scroll {
   max-width: 100%;
   min-height: 100vh;
   border-radius: 0;
-  background: linear-gradient(180deg, #fffaf0 0%, #ffe9c9 45%, #ffe2b8 100%);
+  background: linear-gradient(180deg, #E7E748 0%, #7BFF61 45%, #63D052 100%);
   padding: 12px 12px 90px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   overflow-x: hidden;
-  box-shadow: inset 0 3px 0 rgba(255,255,255,0.8);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,0.3);
 }
 
 /* Desktop styling */
@@ -92,10 +92,10 @@ body.no-scroll {
 /* Wooden header bar */
 
 .section-banner {
-  --banner-bg: linear-gradient(180deg, #f2b15b 0%, #c97932 45%, #aa622d 100%);
-  --banner-shadow: 0 3px 0 rgba(133, 63, 21, 1), 0 6px 10px rgba(133, 63, 21, 0.7);
-  --banner-pin: radial-gradient(circle at 30% 30%, #fff 0, #ffd27b 40%, #c27b2a 100%);
-  --banner-text: #fff7e5;
+  --banner-bg: linear-gradient(180deg, #7BFF61 0%, #63D052 45%, #4AC2DD 100%);
+  --banner-shadow: 0 4px 6px -1px rgba(99, 208, 82, 0.15), 0 2px 4px -1px rgba(99, 208, 82, 0.1);
+  --banner-pin: radial-gradient(circle at 30% 30%, #fff 0, #49E5EB 40%, #4AC2DD 100%);
+  --banner-text: #1a4d14;
 
   position: relative;
   display: inline-flex;
@@ -104,9 +104,10 @@ body.no-scroll {
   margin-bottom: 4px;
   background: var(--banner-bg);
   color: var(--banner-text);
-  font-family: "Baloo 2", system-ui, sans-serif;
-  font-size: 13px;
-  letter-spacing: 0.08em;
+  font-family: "Inter", "Roboto", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   border-radius: 14px;
   box-shadow: var(--banner-shadow);
@@ -129,17 +130,17 @@ body.no-scroll {
 .section-banner::after { right: -6px; }
 
 .section-banner--wood {
-  --banner-bg: linear-gradient(180deg, #f2b15b 0%, #c97932 45%, #aa622d 100%);
-  --banner-shadow: 0 3px 0 rgba(133, 63, 21, 1), 0 6px 10px rgba(133, 63, 21, 0.7);
-  --banner-pin: radial-gradient(circle at 30% 30%, #fff 0, #ffd27b 40%, #c27b2a 100%);
-  --banner-text: #fff7e5;
+  --banner-bg: linear-gradient(180deg, #E7E748 0%, #63D052 45%, #4AC2DD 100%);
+  --banner-shadow: 0 4px 6px -1px rgba(231, 231, 72, 0.15), 0 2px 4px -1px rgba(231, 231, 72, 0.1);
+  --banner-pin: radial-gradient(circle at 30% 30%, #fff 0, #7BFF61 40%, #63D052 100%);
+  --banner-text: #1a4d14;
 }
 
 .section-banner--aurora {
-  --banner-bg: linear-gradient(135deg, #6dd5fa 0%, #3a7bd5 45%, #283e75 100%);
-  --banner-shadow: 0 3px 0 rgba(26, 64, 122, 1), 0 6px 12px rgba(26, 64, 122, 0.65);
-  --banner-pin: radial-gradient(circle at 30% 30%, #e1f3ff 0, #8ad0ff 45%, #2b6fa3 100%);
-  --banner-text: #e6f3ff;
+  --banner-bg: linear-gradient(135deg, #49E5EB 0%, #4AC2DD 45%, #63D052 100%);
+  --banner-shadow: 0 4px 6px -1px rgba(74, 194, 221, 0.15), 0 2px 4px -1px rgba(74, 194, 221, 0.1);
+  --banner-pin: radial-gradient(circle at 30% 30%, #fff 0, #49E5EB 45%, #4AC2DD 100%);
+  --banner-text: #1a4d14;
 }
 
 .wood-header {
@@ -148,14 +149,15 @@ body.no-scroll {
   align-items: center;
   padding: 3px 10px 5px;
   margin-bottom: 4px;
-  background: linear-gradient(180deg, #f2b15b 0%, #c97932 45%, #aa622d 100%);
-  color: #fff7e5;
-  font-family: "Baloo 2", system-ui, sans-serif;
-  font-size: 13px;
-  letter-spacing: 0.08em;
+  background: linear-gradient(180deg, #7BFF61 0%, #63D052 45%, #4AC2DD 100%);
+  color: #1a4d14;
+  font-family: "Inter", "Roboto", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   border-radius: 14px;
-  box-shadow: 0 3px 0 rgba(133, 63, 21, 1), 0 6px 10px rgba(133, 63, 21, 0.7);
+  box-shadow: 0 4px 6px -1px rgba(99, 208, 82, 0.15), 0 2px 4px -1px rgba(99, 208, 82, 0.1);
 }
 
 .wood-header::before,
@@ -167,8 +169,8 @@ body.no-scroll {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #fff 0, #ffd27b 40%, #c27b2a 100%);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.6);
+  background: radial-gradient(circle at 30% 30%, #fff 0, #49E5EB 40%, #4AC2DD 100%);
+  box-shadow: 0 1px 2px 0 rgba(74, 194, 221, 0.1), 0 1px 3px 0 rgba(74, 194, 221, 0.15);
 }
 
 .wood-header::before { left: -6px; }
@@ -193,8 +195,8 @@ body.no-scroll {
   height: 34px;
   border-radius: 12px;
   background: url('https://thumbs.dreamstime.com/z/cartoon-flat-monsters-icon-colorful-kids-toy-cute-monster-vector-cartoon-flat-monsters-icon-colorful-kids-toy-cute-monster-vector-152007484.jpg?ct=jpeg') center/cover;
-  box-shadow: 0 5px 10px rgba(149, 70, 18, 0.8);
-  border: 2px solid #fff3c8;
+  box-shadow: 0 4px 6px -1px rgba(99, 208, 82, 0.2), 0 2px 4px -1px rgba(99, 208, 82, 0.1);
+  border: 2px solid rgba(74, 194, 221, 0.3);
 }
 
 .player-text {
@@ -204,10 +206,10 @@ body.no-scroll {
 }
 
 .player-name {
-  font-family: "Baloo 2", system-ui, sans-serif;
+  font-family: "Inter", "Roboto", system-ui, sans-serif;
   font-size: 14px;
-  font-weight: 600;
-  color: #4a2208;
+  font-weight: 700;
+  color: #1a4d14;
 }
 
 .player-level-row {
@@ -218,7 +220,8 @@ body.no-scroll {
 
 .player-level {
   font-size: 13px;
-  color: #6c3b14;
+  color: #2d6626;
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -227,22 +230,23 @@ body.no-scroll {
   height: 4px;
   min-width: 30px;
   border-radius: 999px;
-  background: #f0cda0;
+  background: #63D052;
   overflow: hidden;
-  box-shadow: inset 0 1px 1px rgba(255,255,255,0.8);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
 }
 
 .player-level-progress-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #ffce4a 0%, #ff9247 50%, #ff5a4f 100%);
-  box-shadow: 0 0 4px rgba(255, 146, 71, 0.65);
+  background: linear-gradient(90deg, #49E5EB 0%, #4AC2DD 50%, #7BFF61 100%);
+  box-shadow: 0 0 4px rgba(74, 194, 221, 0.5);
   transition: width 0.3s ease;
 }
 
 .player-rank {
   font-size: 11px;
-  color: #b07737;
+  color: #2d6626;
+  font-weight: 500;
 }
 
 /* Top counters */
@@ -259,15 +263,15 @@ body.no-scroll {
   padding: 4px 8px;
   border-radius: 999px;
   font-size: 11px;
-  background: radial-gradient(circle at 20% 0, #fff6e0 0, #ffe2b8 40%, #f0ae60 100%);
-  border: 2px solid rgba(214, 140, 64, 0.9);
-  box-shadow: 0 3px 0 rgba(176, 104, 38, 1), 0 6px 10px rgba(176, 104, 38, 0.7);
+  background: radial-gradient(circle at 20% 0, #E7E748 0, #7BFF61 40%, #63D052 100%);
+  border: 2px solid rgba(74, 194, 221, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(123, 255, 97, 0.1), 0 2px 4px -1px rgba(123, 255, 97, 0.06);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .pill-counter span.value {
-  color: #4a2208;
+  color: #1a4d14;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -278,14 +282,14 @@ body.no-scroll {
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  background: radial-gradient(circle at 20% 0, #fff 0, #ffe6c7 40%, #f0b35f 100%);
-  border: 2px solid rgba(214, 140, 64, 0.9);
+  background: radial-gradient(circle at 20% 0, #7BFF61 0, #4AC2DD 40%, #49E5EB 100%);
+  border: 2px solid rgba(74, 194, 221, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  color: #6c3b14;
-  box-shadow: 0 3px 0 rgba(176, 104, 38, 1), 0 6px 10px rgba(176, 104, 38, 0.7);
+  color: #1a4d14;
+  box-shadow: 0 4px 6px -1px rgba(99, 208, 82, 0.1), 0 2px 4px -1px rgba(99, 208, 82, 0.06);
   cursor: pointer;
 }
 
@@ -298,11 +302,11 @@ body.no-scroll {
   max-width: calc(100vw - 24px);
   max-height: calc(100vh - 100px);
   overflow-y: auto;
-  background: linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%);
+  background: linear-gradient(180deg, #7BFF61 0%, #E7E748 55%, #63D052 100%);
   border-radius: 18px;
   padding: 20px 12px 12px;
-  border: 2px solid rgba(235, 179, 105, 0.95);
-  box-shadow: 0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6);
+  border: 2px solid rgba(74, 194, 221, 0.3);
+  box-shadow: 0 10px 20px -5px rgba(74, 194, 221, 0.15), 0 4px 6px -2px rgba(74, 194, 221, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.5);
   z-index: 1000;
 }
 
@@ -326,16 +330,16 @@ body.no-scroll {
   transform: translateX(-50%);
   margin-bottom: 8px;
   padding: 6px 12px;
-  background: linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%);
-  border: 2px solid rgba(235, 179, 105, 0.95);
+  background: linear-gradient(180deg, #7BFF61 0%, #E7E748 55%, #63D052 100%);
+  border: 2px solid rgba(74, 194, 221, 0.3);
   border-radius: 12px;
-  box-shadow: 0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6);
+  box-shadow: 0 10px 20px -5px rgba(74, 194, 221, 0.15), 0 4px 6px -2px rgba(74, 194, 221, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.5);
   white-space: nowrap;
   font-size: 14px;
-  font-weight: 600;
-  color: #4a2208;
+  font-weight: 700;
+  color: #1a4d14;
   z-index: 10;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Inter', 'Roboto', sans-serif;
   pointer-events: none;
 }
 
@@ -354,27 +358,28 @@ body.no-scroll {
 .hero-card {
   margin-top: 4px;
   background:
-    radial-gradient(circle at 10% 0, #fff9eb 0, transparent 40%),
-    linear-gradient(180deg, #fff3d9 0%, #ffe5bd 55%, #ffd29e 100%);
+    radial-gradient(circle at 10% 0, #E7E748 0, transparent 40%),
+    linear-gradient(180deg, #7BFF61 0%, #63D052 55%, #4AC2DD 100%);
   border-radius: 24px;
   padding: 10px 12px 14px;
-  box-shadow: 0 8px 14px rgba(199, 124, 52, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.8);
-  color: #4a2208;
+  box-shadow: 0 10px 20px -5px rgba(74, 194, 221, 0.15), 0 4px 6px -2px rgba(74, 194, 221, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.5);
+  color: #1a4d14;
   position: relative;
-  border: 2px solid #e49b5a;
+  border: 2px solid rgba(74, 194, 221, 0.3);
 }
 
 .hero-title {
-  font-family: "Baloo 2", system-ui, sans-serif;
+  font-family: "Inter", "Roboto", system-ui, sans-serif;
   font-size: 18px;
+  font-weight: 700;
   margin: 0 0 4px;
-  color: #4a2208;
+  color: #1a4d14;
 }
 
 .hero-body {
   font-size: 18px;
   margin: 0;
-  color: #f46a2b;
+  color: #4AC2DD;
 }
 
 .hero-body span { letter-spacing: 0.08em; }
@@ -388,16 +393,16 @@ body.no-scroll {
   border: 0;
   font-size: 12px;
   font-weight: 700;
-  font-family: "Nunito", system-ui, sans-serif;
-  color: #4a1a06;
-  background: radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%);
-  box-shadow: 0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7);
+  font-family: "Inter", "Roboto", system-ui, sans-serif;
+  color: #1a4d14;
+  background: radial-gradient(circle at 20% 0, #7BFF61 0, #4AC2DD 40%, #49E5EB 100%);
+  box-shadow: 0 4px 6px -1px rgba(231, 231, 72, 0.15), 0 2px 4px -1px rgba(231, 231, 72, 0.1), 0 -2px 0 0 rgba(99, 208, 82, 0.2) inset;
   cursor: pointer;
 }
 
 .hero-cta:active {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 #c85a24, 0 5px 12px rgba(200, 90, 36, 0.7);
+  box-shadow: 0 2px 4px -1px rgba(231, 231, 72, 0.15), 0 1px 2px -1px rgba(231, 231, 72, 0.1), 0 -2px 0 0 rgba(99, 208, 82, 0.2) inset;
 }
 
 /* Section headers */
@@ -425,7 +430,8 @@ body.no-scroll {
 
 .section-link {
   font-size: 11px;
-  color: #b07737;
+  color: #2d6626;
+  font-weight: 500;
 }
 
 /* Achievements banners */
@@ -454,11 +460,11 @@ body.no-scroll {
 
 /* Progress cards - arcade style */
 .progress-card-small {
-  background: linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%);
+  background: linear-gradient(180deg, #E7E748 0%, #7BFF61 55%, #63D052 100%);
   border-radius: 20px;
   padding: 8px 10px 9px;
-  border: 2px solid rgba(235, 179, 105, 0.95);
-  box-shadow: 0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.55);
+  border: 2px solid rgba(74, 194, 221, 0.3);
+  box-shadow: 0 10px 20px -5px rgba(74, 194, 221, 0.15), 0 4px 6px -2px rgba(74, 194, 221, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.5);
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -473,64 +479,66 @@ body.no-scroll {
   justify-content: center;
   font-size: 14px;
   margin-bottom: 2px;
-  box-shadow: 0 2px 0 rgba(176, 104, 38, 0.9);
+  box-shadow: 0 4px 6px -1px rgba(99, 208, 82, 0.1), 0 2px 4px -1px rgba(99, 208, 82, 0.06);
 }
 
 .progress-icon.red {
-  background: radial-gradient(circle at 20% 0, #ffe5dd 0, #ff9a7a 45%, #e14d3a 100%);
-  color: #7f1d1d;
+  background: radial-gradient(circle at 20% 0, #E7E748 0, #63D052 45%, #4AC2DD 100%);
+  color: #1a4d14;
 }
 
 .progress-icon.gold {
-  background: radial-gradient(circle at 20% 0, #fff7cf 0, #ffd96d 45%, #e79b26 100%);
-  color: #7b3f00;
+  background: radial-gradient(circle at 20% 0, #E7E748 0, #7BFF61 45%, #63D052 100%);
+  color: #1a4d14;
 }
 
 .progress-icon.cyan {
-  background: radial-gradient(circle at 20% 0, #dffff7 0, #7be2ff 45%, #1f9dbf 100%);
-  color: #074352;
+  background: radial-gradient(circle at 20% 0, #49E5EB 0, #4AC2DD 45%, #63D052 100%);
+  color: #1a4d14;
 }
 
 .progress-label {
   font-size: 11px;
-  color: #b07737;
+  color: #2d6626;
+  font-weight: 500;
 }
 
 .progress-value {
-  font-family: "Baloo 2", system-ui, sans-serif;
+  font-family: "Inter", "Roboto", system-ui, sans-serif;
   font-size: 16px;
-  color: #4a2208;
+  font-weight: 700;
+  color: #1a4d14;
 }
 
 .progress-sub {
   font-size: 10px;
-  color: #b07737;
+  color: #2d6626;
 }
 
 .progress-bar-shell {
   margin-top: 2px;
   height: 6px;
   border-radius: 999px;
-  background: #f0cda0;
+  background: #63D052;
   overflow: hidden;
-  box-shadow: inset 0 1px 1px rgba(255,255,255,0.8);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
 }
 
 .progress-bar-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #ffce4a 0%, #ff9247 50%, #ff5a4f 100%);
-  box-shadow: 0 0 6px rgba(255, 146, 71, 0.65);
+  background: linear-gradient(90deg, #49E5EB 0%, #4AC2DD 50%, #7BFF61 100%);
+  box-shadow: 0 0 6px rgba(74, 194, 221, 0.4);
   transition: width 0.3s ease;
 }
 
 /* Quest card */
 .quest-card {
-  background: linear-gradient(180deg, #fff5dd 0%, #ffe8c4 55%, #ffd7a6 100%);
+  background: linear-gradient(180deg, #7BFF61 0%, #E7E748 55%, #63D052 100%);
   border-radius: 22px;
   padding: 8px 10px 8px 12px;
-  border: 2px solid rgba(235, 179, 105, 0.95);
-  box-shadow: 0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6);
+  border: 2px solid rgba(74, 194, 221, 0.3);
+  box-shadow: 0 10px 20px -5px rgba(74, 194, 221, 0.15), 0 4px 6px -2px rgba(74, 194, 221, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.5);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -554,39 +562,41 @@ body.no-scroll {
 
 .quest-title {
   font-size: 13px;
-  color: #4a2208;
+  color: #1a4d14;
   font-weight: 700;
 }
 
 .quest-reward-inline {
   font-size: 11px;
-  color: #6c3b14;
+  color: #2d6626;
+  font-weight: 500;
 }
 
 .quest-reward-inline .star-inline {
-  color: #ffce4a;
+  color: #E7E748;
   margin-left: 2px;
 }
 
 .quest-progress-meta {
   font-size: 11px;
-  color: #6c3b14;
+  color: #2d6626;
+  font-weight: 500;
 }
 
 .quest-progress-bar {
   margin-top: 1px;
   height: 6px;
   border-radius: 999px;
-  background: #f0cda0;
+  background: #63D052;
   overflow: hidden;
-  box-shadow: inset 0 1px 1px rgba(255,255,255,0.8);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
 }
 
 .quest-progress-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #7be2ff 0%, #ffce4a 60%, #ffb347 100%);
-  box-shadow: 0 0 6px rgba(123, 226, 255, 0.7);
+  background: linear-gradient(90deg, #49E5EB 0%, #4AC2DD 60%, #7BFF61 100%);
+  box-shadow: 0 0 6px rgba(73, 229, 235, 0.5);
   transition: width 0.3s ease;
 }
 
@@ -596,25 +606,25 @@ body.no-scroll {
   border: 0;
   font-size: 12px;
   font-weight: 700;
-  color: #c9a474;
-  background: radial-gradient(circle at 20% 0, #fff7e2 0, #f3d5a8 45%, #e5b879 100%);
-  box-shadow: 0 3px 0 rgba(196, 144, 79, 1), 0 6px 10px rgba(196, 144, 79, 0.7);
+  color: #2d6626;
+  background: radial-gradient(circle at 20% 0, #E7E748 0, #7BFF61 45%, #63D052 100%);
+  box-shadow: 0 4px 6px -1px rgba(123, 255, 97, 0.1), 0 2px 4px -1px rgba(123, 255, 97, 0.06);
   cursor: default;
   white-space: nowrap;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .quest-cta.active {
   opacity: 1;
   cursor: pointer;
-  color: #4a1a06;
-  background: radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%);
-  box-shadow: 0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7);
+  color: #1a4d14;
+  background: radial-gradient(circle at 20% 0, #7BFF61 0, #4AC2DD 40%, #49E5EB 100%);
+  box-shadow: 0 4px 6px -1px rgba(231, 231, 72, 0.15), 0 2px 4px -1px rgba(231, 231, 72, 0.1), 0 -2px 0 0 rgba(99, 208, 82, 0.2) inset;
 }
 
 .quest-cta.active:active {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 #c85a24, 0 5px 12px rgba(200, 90, 36, 0.7);
+  box-shadow: 0 2px 4px -1px rgba(231, 231, 72, 0.15), 0 1px 2px -1px rgba(231, 231, 72, 0.1), 0 -2px 0 0 rgba(99, 208, 82, 0.2) inset;
 }
 
 .quest-cta:disabled {
@@ -628,13 +638,13 @@ body.no-scroll {
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(180deg, #fffaf0 0%, #ffe9c9 45%, #ffe2b8 100%);
+  background: linear-gradient(180deg, #E7E748 0%, #7BFF61 45%, #63D052 100%);
   padding: 8px 12px 10px;
   display: grid;
   grid-template-columns: repeat(5, minmax(0,1fr));
   align-items: center;
   gap: 4px;
-  box-shadow: 0 -2px 10px rgba(169, 77, 21, 0.3);
+  box-shadow: 0 -4px 15px rgba(74, 194, 221, 0.2);
   z-index: 100;
 }
 
@@ -653,7 +663,8 @@ body.no-scroll {
   align-items: center;
   gap: 2px;
   font-size: 10px;
-  color: #b07737;
+  color: #2d6626;
+  font-weight: 500;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 12px;
@@ -661,7 +672,7 @@ body.no-scroll {
 }
 
 .nav-item:hover {
-  background: rgba(255, 146, 71, 0.1);
+  background: rgba(74, 194, 221, 0.1);
 }
 
 .nav-icon-shell {
@@ -671,20 +682,20 @@ body.no-scroll {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 20% 0, #fffaf0 0, #ffe0b5 45%, #f4b267 100%);
-  border: 2px solid rgba(214, 140, 64, 0.9);
-  box-shadow: 0 3px 0 rgba(199, 124, 52, 1), 0 6px 10px rgba(199, 124, 52, 0.7);
+  background: radial-gradient(circle at 20% 0, #E7E748 0, #7BFF61 45%, #63D052 100%);
+  border: 2px solid rgba(74, 194, 221, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(99, 208, 82, 0.1), 0 2px 4px -1px rgba(99, 208, 82, 0.06);
 }
 
 .nav-icon-shell span { font-size: 15px; }
 
 .nav-item.active .nav-icon-shell {
-  background: radial-gradient(circle at 20% 0, #fff7e2 0, #ffd36b 40%, #ff9247 100%);
-  box-shadow: 0 4px 0 #e27b31, 0 7px 12px rgba(226, 123, 49, 0.8);
+  background: radial-gradient(circle at 20% 0, #7BFF61 0, #4AC2DD 40%, #49E5EB 100%);
+  box-shadow: 0 4px 6px -1px rgba(231, 231, 72, 0.15), 0 2px 4px -1px rgba(231, 231, 72, 0.1), 0 -2px 0 0 rgba(99, 208, 82, 0.2) inset;
 }
 
 .nav-item.active span.label {
-  color: #4a2208;
+  color: #1a4d14;
   font-weight: 700;
 }
 
@@ -699,9 +710,9 @@ body.no-scroll {
   height: 44px;
   transform: rotate(45deg);
   border-radius: 18px;
-  background: radial-gradient(circle at 20% 0, #fff7e2 0, #ffd874 40%, #ff9247 100%);
-  border: 2px solid rgba(214, 140, 64, 0.9);
-  box-shadow: 0 5px 0 #d86a2a, 0 10px 14px rgba(216, 106, 42, 0.85);
+  background: radial-gradient(circle at 20% 0, #7BFF61 0, #4AC2DD 40%, #49E5EB 100%);
+  border: 2px solid rgba(74, 194, 221, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(231, 231, 72, 0.15), 0 2px 4px -1px rgba(231, 231, 72, 0.1), 0 -2px 0 0 rgba(99, 208, 82, 0.2) inset;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -710,7 +721,7 @@ body.no-scroll {
 .play-diamond span {
   transform: rotate(-45deg);
   font-size: 18px;
-  color: #7a330a;
+  color: #1a4d14;
 }
 
 /* === END ARCADE CARTOON UI STYLES === */
@@ -2078,12 +2089,12 @@ body.no-scroll {
 
 /* === FINAL POLISH === */
 
-/* Consistent shadow system */
+/* Consistent shadow system - Beautiful shadows inspired by modern design */
 :root {
-  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.2);
-  --shadow-xl: 0 12px 28px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 2px 0 rgba(74, 194, 221, 0.05), 0 1px 3px 0 rgba(74, 194, 221, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(99, 208, 82, 0.1), 0 2px 4px -1px rgba(99, 208, 82, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(74, 194, 221, 0.1), 0 4px 6px -2px rgba(74, 194, 221, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(99, 208, 82, 0.1), 0 10px 10px -5px rgba(99, 208, 82, 0.04);
 }
 
 /* Consistent border colors */
@@ -2103,12 +2114,12 @@ body.no-scroll {
   --z-max: 9999;
 }
 
-/* WCAG AA Compliant text colors */
+/* WCAG AA Compliant text colors - Updated for new palette */
 :root {
-  --text-primary: rgba(125, 74, 74, 0.95);    /* 18.5:1 ratio ✓ */
-  --text-secondary: rgba(96, 31, 31, 0.75);  /* 11.2:1 ratio ✓ */
-  --text-tertiary: rgba(255, 255, 255, 0.6);    /* 7.8:1 ratio ✓ */
-  --text-disabled: rgba(255, 255, 255, 0.38);   /* 4.5:1 ratio ✓ */
+  --text-primary: #1a4d14;    /* Dark green for high contrast */
+  --text-secondary: #2d6626;  /* Medium green for secondary text */
+  --text-tertiary: #4a8040;    /* Lighter green for tertiary text */
+  --text-disabled: rgba(26, 77, 20, 0.4);   /* Disabled state */
 }
 
 /* Apply improved contrast throughout */
