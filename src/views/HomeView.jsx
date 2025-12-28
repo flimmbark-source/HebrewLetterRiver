@@ -339,29 +339,31 @@ export default function HomeView() {
 
             return (
               <div key={task.id} className="quest-card">
-                <div className="quest-left">
-                  <div className="quest-top-row">
+                <div className="quest-top-row">
+                  <div className="quest-left">
                     <div className="quest-title">{task.description}</div>
+                    <div className="quest-progress-meta">
+                      {currentProgress} / {task.goal}
+                    </div>
+                  </div>
+                  <div className="quest-right">
                     {rewardValue > 0 && (
                       <div className="quest-reward-inline">
                         +{rewardValue} <span className="star-inline">★</span>
                       </div>
                     )}
-                  </div>
-                  <div className="quest-progress-meta">
-                    {currentProgress} / {task.goal}
-                  </div>
-                  <div className="quest-progress-bar">
-                    <div className="quest-progress-fill" style={{ width: `${percentage}%` }}></div>
+                    <button
+                      className={`quest-cta ${canClaimReward ? 'active' : ''}`}
+                      onClick={() => canClaimReward && handleDailyClaim(task.id)}
+                      disabled={!canClaimReward || claimingTaskId === task.id}
+                    >
+                      {task.rewardClaimed ? t('home.quest.claimed') : canClaimReward ? t('home.quest.claim') : t('home.quest.locked')}
+                    </button>
                   </div>
                 </div>
-                <button
-                  className={`quest-cta ${canClaimReward ? 'active' : ''}`}
-                  onClick={() => canClaimReward && handleDailyClaim(task.id)}
-                  disabled={!canClaimReward || claimingTaskId === task.id}
-                >
-                  {task.rewardClaimed ? t('home.quest.claimed') : canClaimReward ? t('home.quest.claim') : t('home.quest.locked')}
-                </button>
+                <div className="quest-progress-bar">
+                  <div className="quest-progress-fill" style={{ width: `${percentage}%` }}></div>
+                </div>
               </div>
             );
           })}

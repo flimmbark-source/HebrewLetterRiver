@@ -291,16 +291,13 @@ function Shell() {
           <button
             type="button"
             onClick={handlePlay}
-            className="nav-item active"
+            className="nav-item nav-item-fab"
             disabled={isPlayDisabled}
             style={isPlayDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
           >
-            <div className="play-diamond-shell">
-              <div className="play-diamond">
-                <span>▶</span>
-              </div>
+            <div className="play-fab">
+              <span>▶</span>
             </div>
-            <span className="label">{t('app.nav.play')}</span>
           </button>
           <NavLink to="/achievements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">

@@ -379,6 +379,7 @@ body.no-scroll {
   color: #064E3B;
   position: relative;
   border: 1px solid #E5E7EB;
+  overflow: hidden;
 }
 
 @media (min-width: 640px) {
@@ -386,6 +387,17 @@ body.no-scroll {
     border-radius: 16px;
     padding: 16px;
   }
+}
+
+/* Green accent stroke for primary card */
+.hero-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #10B981 0%, #059669 100%);
 }
 
 .hero-title {
@@ -462,7 +474,7 @@ body.no-scroll {
 
 /* Section headers */
 .section {
-  margin-top: 0;
+  margin-top: 24px;
 }
 
 .section-header {
@@ -470,6 +482,12 @@ body.no-scroll {
   align-items: center;
   justify-content: space-between;
   padding: 0 0 12px 0;
+}
+
+@media (min-width: 640px) {
+  .section {
+    margin-top: 32px;
+  }
 }
 
 .section-title {
@@ -487,14 +505,20 @@ body.no-scroll {
 
 .section-link {
   font-size: 12px;
-  color: #065F46;
-  font-weight: 400;
+  color: #059669;
+  font-weight: 500;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .section-link:hover {
   color: #064E3B;
+  text-decoration: underline;
+}
+
+.section-link:active {
+  color: #047857;
 }
 
 /* Achievements banners */
@@ -551,15 +575,7 @@ body.no-scroll {
   }
 }
 
-.progress-card-small::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #7BFF61 0%, #49E5EB 100%);
-}
+/* Removed colorful stroke - neutral borders only */
 
 .progress-icon {
   width: 28px;
@@ -663,15 +679,14 @@ body.no-scroll {
 .quest-card {
   background: #FFFFFF !important;
   border-radius: 12px;
-  padding: 12px;
+  padding: 0;
   border: 1px solid #E5E7EB;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
   margin-bottom: 8px;
   transition: all 0.2s ease;
+  overflow: hidden;
 }
 
 @media (min-width: 640px) {
@@ -685,34 +700,54 @@ body.no-scroll {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 
+/* Quest card top section with text and rewards */
+.quest-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 12px 8px;
+}
+
 .quest-left {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.quest-top-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 4px;
+  min-width: 0;
 }
 
 .quest-title {
   font-size: 13px;
   color: #064E3B;
   font-weight: 500;
-  line-height: 1.3;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+.quest-progress-meta {
+  font-size: 12px;
+  color: #6B7280;
+  font-weight: 400;
+}
+
+/* Quest right column - reward and status stacked */
+.quest-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .quest-reward-inline {
   font-size: 12px;
   color: #065F46;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 }
 
 .quest-reward-inline .star-inline {
@@ -720,17 +755,11 @@ body.no-scroll {
   font-size: 14px;
 }
 
-.quest-progress-meta {
-  font-size: 12px;
-  color: #065F46;
-  font-weight: 400;
-}
-
+/* Quest progress bar - full bleed at bottom */
 .quest-progress-bar {
-  margin-top: 0;
+  width: 100%;
   height: 4px;
-  border-radius: 999px;
-  background: #A7F3D0;
+  background: #E5E7EB;
   overflow: hidden;
 }
 
@@ -816,8 +845,8 @@ body.no-scroll {
   align-items: center;
   gap: 2px;
   font-size: 10px;
-  color: #059669;
-  font-weight: 600;
+  color: #6B7280;
+  font-weight: 500;
   cursor: pointer;
   padding: 4px 2px;
   border-radius: 8px;
@@ -825,13 +854,13 @@ body.no-scroll {
 }
 
 .nav-item:hover {
-  background: rgba(231, 231, 72, 0.1);
+  background: rgba(16, 185, 129, 0.05);
 }
 
 .nav-icon-shell {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -841,44 +870,55 @@ body.no-scroll {
 
 .nav-icon-shell span {
   font-size: 20px;
+  filter: grayscale(0.3) opacity(0.7);
   transition: all 0.2s ease;
 }
 
 .nav-item.active {
-  color: #064E3B;
+  color: #059669;
 }
 
 .nav-item.active .nav-icon-shell {
-  background: linear-gradient(135deg, #E7E748 0%, #7BFF61 100%);
-  box-shadow: 0 2px 4px 0 rgba(123, 255, 97, 0.3);
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+}
+
+.nav-item.active .nav-icon-shell span {
+  filter: none;
+  transform: scale(1.1);
 }
 
 .nav-item.active span.label {
-  color: #064E3B;
+  color: #059669;
   font-weight: 700;
 }
 
-.play-diamond-shell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* FAB button - no label, elevated style */
+.nav-item-fab {
+  padding: 0;
+  background: transparent;
 }
 
-.play-diamond {
-  width: 50px;
-  height: 50px;
+.nav-item-fab:hover {
+  background: transparent;
+}
+
+/* Play FAB - elevated floating button */
+.play-fab {
+  width: 56px;
+  height: 56px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #49E5EB 0%, #4AC2DD 100%);
-  box-shadow: 0 4px 8px -2px rgba(73, 229, 235, 0.4), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  box-shadow: 0 6px 12px -2px rgba(16, 185, 129, 0.4), 0 3px 6px 0 rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  margin-top: -8px;
 }
 
-.play-diamond::before {
+.play-fab::before {
   content: "";
   position: absolute;
   inset: -2px;
@@ -889,24 +929,21 @@ body.no-scroll {
   z-index: -1;
 }
 
-.play-diamond:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 16px -4px rgba(73, 229, 235, 0.5), 0 4px 8px 0 rgba(0, 0, 0, 0.15);
+.play-fab:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 16px -2px rgba(16, 185, 129, 0.5), 0 4px 8px 0 rgba(0, 0, 0, 0.15);
 }
 
-.play-diamond:hover::before {
-  opacity: 1;
+.play-fab:active {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 8px -2px rgba(16, 185, 129, 0.4);
 }
 
-.play-diamond:active {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 4px 8px -2px rgba(73, 229, 235, 0.4);
-}
-
-.play-diamond span {
-  font-size: 24px;
+.play-fab span {
+  font-size: 26px;
   color: #FFFFFF;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+  margin-left: 2px;
 }
 
 /* === END ARCADE CARTOON UI STYLES === */
@@ -1090,15 +1127,7 @@ body.no-scroll {
   overflow: visible;
 }
 
-.goal-column::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #E7E748 0%, #7BFF61 100%);
-}
+/* Removed colorful stroke - neutral borders only */
 
 @media (max-width: 640px) {
   .goal-column {
