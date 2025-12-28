@@ -240,6 +240,27 @@ body.no-scroll {
   overflow: hidden;
 }
 
+.player-stars-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: #F9FAFB;
+  border-radius: 999px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+.player-stars-badge .star-icon {
+  font-size: 14px;
+}
+
+.player-stars-badge .star-value {
+  font-size: 12px;
+  color: #1F2937;
+  font-weight: 700;
+}
+
 .player-level-progress-fill {
   height: 100%;
   border-radius: inherit;
@@ -389,8 +410,10 @@ body.no-scroll {
   }
 }
 
-/* Green accent stroke for primary card */
-.hero-card::before {
+/* Green accent stroke for updated cards */
+.hero-card.card-updated::before,
+.progress-card-small.card-updated::before,
+.quest-card.card-updated::before {
   content: "";
   position: absolute;
   top: 0;
@@ -398,6 +421,7 @@ body.no-scroll {
   right: 0;
   height: 3px;
   background: linear-gradient(90deg, #10B981 0%, #059669 100%);
+  z-index: 1;
 }
 
 .hero-title {
