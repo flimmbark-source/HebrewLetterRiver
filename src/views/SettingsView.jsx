@@ -242,7 +242,7 @@ const showInfo = (settingKey, event) => {
       </section>
 
       {/* Game Accessibility Settings */}
-      <section className="section">
+      <section className="section" style={{ marginTop: '20px' }}>
         <div className="section-header">
           <div className="section-title">
             <div className="wood-header">{t('settings.gameSettings')}</div>
@@ -444,7 +444,7 @@ const showInfo = (settingKey, event) => {
                 max="24"
                 value={gameSpeed}
                 onChange={(e) => setGameSpeed(parseInt(e.target.value, 10))}
-                className="w-full h-2 bg-arcade-panel-border rounded-lg appearance-none cursor-pointer accent-arcade-accent-orange"
+                className="w-full h-2 bg-black rounded-lg appearance-none cursor-pointer"
               />
             </div>
           </div>

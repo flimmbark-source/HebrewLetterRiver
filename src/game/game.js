@@ -264,8 +264,15 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
       });
 
       buttonWrapper.appendChild(button);
-      buttonWrapper.appendChild(infoPopup);
       modeOptionsContainer.appendChild(buttonWrapper);
+
+      // Append popup to mode-panel (higher level) to prevent clipping
+      const modePanel = modeOptionsContainer.closest('.mode-panel');
+      if (modePanel) {
+        modePanel.appendChild(infoPopup);
+      } else {
+        buttonWrapper.appendChild(infoPopup);
+      }
     });
 
     updateModalSubtitle();

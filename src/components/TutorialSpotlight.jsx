@@ -257,6 +257,7 @@ export default function TutorialSpotlight({
       6: 0,
       7: -190, // Step 8 (stepIndex 7)
       8: 300,
+      9: 500,
       11: -190,
       12: -190,
       },

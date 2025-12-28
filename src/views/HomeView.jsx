@@ -10,6 +10,7 @@ import { getFormattedLanguageName } from '../lib/languageUtils.js';
 import { classNames } from '../lib/classNames.js';
 import { getPlayerTitle } from '../utils/playerTitles.js';
 import { loadLanguage } from '../lib/languageLoader.js';
+import { useCardUpdates } from '../hooks/useCardUpdates.js';
 
 function GlobeIcon({ className = '' }) {
   return (
@@ -27,6 +28,46 @@ function XIcon({ className = '' }) {
       <line x1="18" y1="6" x2="6" y2="18" />
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
+  );
+}
+
+function QuestCard({ task, onClaim, claimingTaskId, t }) {
+  const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
+  const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
+  const canClaimReward = Boolean(task.rewardClaimable) && !task.rewardClaimed;
+  const currentProgress = Math.min(task.progress ?? 0, task.goal);
+
+  // Track quest progress for green stroke
+  const questUpdate = useCardUpdates(`quest-${task.id}`, task.progress ?? 0);
+
+  return (
+    <div className={classNames('quest-card', questUpdate.isUpdated && 'card-updated')}>
+      <div className="quest-top-row">
+        <div className="quest-left">
+          <div className="quest-title">{task.description}</div>
+          <div className="quest-progress-meta">
+            {currentProgress} / {task.goal}
+          </div>
+        </div>
+        <div className="quest-right">
+          {rewardValue > 0 && (
+            <div className="quest-reward-inline">
+              +{rewardValue} <span className="star-inline">★</span>
+            </div>
+          )}
+          <button
+            className={`quest-cta ${canClaimReward ? 'active' : ''}`}
+            onClick={() => canClaimReward && onClaim(task.id)}
+            disabled={!canClaimReward || claimingTaskId === task.id}
+          >
+            {task.rewardClaimed ? t('home.quest.claimed') : canClaimReward ? t('home.quest.claim') : t('home.quest.locked')}
+          </button>
+        </div>
+      </div>
+      <div className="quest-progress-bar">
+        <div className="quest-progress-fill" style={{ width: `${percentage}%` }}></div>
+      </div>
+    </div>
   );
 }
 
@@ -109,6 +150,12 @@ export default function HomeView() {
     }
   }, [player.letters, languageId]);
 
+  // Track card updates for green stroke
+  const heroCardUpdate = useCardUpdates('hero-card', recentLetters.map(l => l.symbol).join(','));
+  const streakCardUpdate = useCardUpdates('streak-card', player.streakCount ?? 0);
+  const levelCardUpdate = useCardUpdates('level-card', level);
+  const badgeCardUpdate = useCardUpdates('badge-card', player.latestBadge?.id ?? '');
+
   // Check if play button should be disabled during tutorial
   const isPlayDisabled = currentTutorial?.id === 'firstTime' && currentStepIndex < 4;
 
@@ -164,6 +211,10 @@ export default function HomeView() {
               <div className="player-level-progress">
                 <div className="player-level-progress-fill" style={{ width: `${starsProgress * 100}%` }}></div>
               </div>
+              <div className="player-stars-badge">
+                <span className="star-icon">⭐</span>
+                <span className="star-value">{formatNumber(totalStarsEarned)}</span>
+              </div>
             </div>
             <div className="player-rank">{getPlayerTitle(level)}</div>
           </div>
@@ -174,14 +225,9 @@ export default function HomeView() {
             className="tiny-pill"
             aria-label="Show tutorial"
             title="Show tutorial"
-            style={{ marginRight: '8px' }}
           >
             ?
           </button>
-          <div className="pill-counter">
-            <span className="icon">⭐</span>
-            <span className="value">{formatNumber(totalStarsEarned)}</span>
-          </div>
           <div ref={languageSelectorRef} style={{ position: 'relative' }}>
             <button
               onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
@@ -243,7 +289,7 @@ export default function HomeView() {
 
       {/* Hero Card */}
       <section className="section" style={{ marginTop: '20px',  }}></section>
-      <section className="hero-card" style={{ position: 'relative' }}>
+      <section className={classNames('hero-card', heroCardUpdate.isUpdated && 'card-updated')} style={{ position: 'relative' }}>
         <h1 className="hero-title">{t('home.recentLetters.title')}</h1>
         <div className="hero-body" style={{ display: 'flex', gap: '12px', fontSize: '24px', flexWrap: 'wrap' }}>
           {recentLetters.map((letter, index) => (
@@ -295,13 +341,13 @@ export default function HomeView() {
         </div>
         <section className="section" style={{ marginTop: '5px',  }}></section>
         <div className="progress-row">
-          <div className="progress-card-small">
+          <div className={classNames('progress-card-small', streakCardUpdate.isUpdated && 'card-updated')}>
             <div className="progress-icon red">🔥</div>
             <div className="progress-label">{t('home.progress.streak')}</div>
             <div className="progress-value">{t('home.progress.days', { count: streak.current })}</div>
             <div className="progress-sub">{t('home.progress.resetsAt', { time: nextResetTime })}</div>
           </div>
-          <div className="progress-card-small">
+          <div className={classNames('progress-card-small', levelCardUpdate.isUpdated && 'card-updated')}>
             <div className="progress-icon gold">★</div>
             <div className="progress-label">{t('home.progress.starLevel')}</div>
             <div className="progress-value">{t('home.progress.level', { level })}</div>
@@ -312,7 +358,7 @@ export default function HomeView() {
               {t('home.progress.toNextLevel', { current: formatNumber(levelProgress), total: formatNumber(starsPerLevel) })}
             </div>
           </div>
-          <div className="progress-card-small">
+          <div className={classNames('progress-card-small', badgeCardUpdate.isUpdated && 'card-updated')}>
             <div className="progress-icon cyan">🏅</div>
             <div className="progress-label">{t('home.progress.latestBadge')}</div>
             <div className="progress-value">{latestBadge?.name || t('common.noneYet')}</div>
@@ -332,40 +378,15 @@ export default function HomeView() {
             <div className="section-link">{t('home.dailyQuests.resetsAt', { time: nextResetTime })}</div>
           </div>
           <section className="section" style={{ marginTop: '5px',  }}></section>
-          {daily.tasks.map((task, index) => {
-            const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
-            const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
-            const canClaimReward = Boolean(task.rewardClaimable) && !task.rewardClaimed;
-            const currentProgress = Math.min(task.progress ?? 0, task.goal);
-
-            return (
-              <div key={task.id} className="quest-card">
-                <div className="quest-left">
-                  <div className="quest-top-row">
-                    <div className="quest-title">{task.description}</div>
-                    {rewardValue > 0 && (
-                      <div className="quest-reward-inline">
-                        +{rewardValue} <span className="star-inline">★</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="quest-progress-meta">
-                    {currentProgress} / {task.goal}
-                  </div>
-                  <div className="quest-progress-bar">
-                    <div className="quest-progress-fill" style={{ width: `${percentage}%` }}></div>
-                  </div>
-                </div>
-                <button
-                  className={`quest-cta ${canClaimReward ? 'active' : ''}`}
-                  onClick={() => canClaimReward && handleDailyClaim(task.id)}
-                  disabled={!canClaimReward || claimingTaskId === task.id}
-                >
-                  {task.rewardClaimed ? t('home.quest.claimed') : canClaimReward ? t('home.quest.claim') : t('home.quest.locked')}
-                </button>
-              </div>
-            );
-          })}
+          {daily.tasks.map((task) => (
+            <QuestCard
+              key={task.id}
+              task={task}
+              onClaim={handleDailyClaim}
+              claimingTaskId={claimingTaskId}
+              t={t}
+            />
+          ))}
         </section>
       )}
     </>

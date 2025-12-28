@@ -27,7 +27,14 @@ function TaskCard({ task, accent, onClaim, claiming }) {
           <p className="quest-category text-slate-400">{task.title}</p>
           <h3 className="quest-title text-white">{task.description}</h3>
         </div>
-        <span className={`quest-badge rounded-full px-3 py-1 ${accent}`}>
+        <span
+          className={`quest-badge rounded-full px-3 py-1 ${accent}`}
+          style={!task.completed ? {
+            backgroundColor: 'rgba(231, 231, 72, 0.2)',
+            color: '#4a2208',
+            border: '1px solid rgba(231, 231, 72, 0.4)'
+          } : {}}
+        >
           {task.completed ? 'Complete' : 'In Progress'}
         </span>
       </div>
@@ -195,7 +202,7 @@ export default function DailyView() {
           <TaskCard
             key={task.id}
             task={task}
-            accent={task.completed ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40' : 'bg-cyan-500/10 text-cyan-200 border border-cyan-500/20'}
+            accent={task.completed ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40' : ''}
             onClaim={handleClaimTask}
             claiming={claiming || claimingTaskId === task.id}
           />

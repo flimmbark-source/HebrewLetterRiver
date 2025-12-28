@@ -286,6 +286,10 @@ export default function AchievementsView() {
               <div className="player-level-progress">
                 <div className="player-level-progress-fill" style={{ width: `${levelPercent}%` }}></div>
               </div>
+              <div className="player-stars-badge">
+                <span className="star-icon">⭐</span>
+                <span className="star-value">{formatNumber(totalStarsEarned)}</span>
+              </div>
             </div>
             <div className="player-rank">{getPlayerTitle(level)}</div>
           </div>
@@ -296,14 +300,9 @@ export default function AchievementsView() {
             className="tiny-pill"
             aria-label="Show tutorial"
             title="Show tutorial"
-            style={{ marginRight: '8px' }}
           >
             ?
           </button>
-          <div className="pill-counter">
-            <span className="icon">⭐</span>
-            <span className="value">{formatNumber(totalStarsEarned)}</span>
-          </div>
           <div ref={languageSelectorRef} style={{ position: 'relative' }}>
             <button
               onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
