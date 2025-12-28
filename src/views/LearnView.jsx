@@ -9,15 +9,15 @@ import { getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
 export default function LearnView() {
   const { t } = useLocalization();
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
-  const { startTutorial, completedTutorials } = useTutorial();
+  const { startTutorial, hasCompletedTutorial } = useTutorial();
   const [selectedTextId, setSelectedTextId] = useState(null);
 
   // Auto-trigger readIntro tutorial on first visit
   useEffect(() => {
-    if (!completedTutorials.includes('readIntro')) {
+    if (!hasCompletedTutorial('readIntro')) {
       startTutorial('readIntro');
     }
-  }, []); // Empty dependency array to only run once on mount
+  }, [hasCompletedTutorial, startTutorial]); // Added dependencies
 
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
