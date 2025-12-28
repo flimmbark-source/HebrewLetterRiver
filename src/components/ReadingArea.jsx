@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, Fragment } from 'react';
 import { useLocalization } from '../context/LocalizationContext';
 import { useLanguage } from '../context/LanguageContext';
-import { getReadingTextById } from '../data/readingTexts';
+import { getReadingTextById } from '../data/readingTexts/index.js';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
 import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib/languageUtils';
