@@ -25,32 +25,30 @@ export default {
       },
       colors: {
         arcade: {
-          // Modern color system with clear hierarchy
-          // Primary accent - Canary Yellow (progress, success, highlights)
-          'accent': '#E7E748',
-          'accent-hover': '#d4d43f',
+          // Vibrant colorful palette - modern & playful
+          'mint': '#7BFF61',
+          'mint-light': '#E8FFE3',
+          'aqua': '#49E5EB',
+          'aqua-light': '#E0FBFD',
+          'yellow': '#E7E748',
+          'yellow-light': '#FDFCE5',
 
-          // CTA color - Sky Surge (buttons, interactive elements)
+          // Primary CTA
           'cta': '#4AC2DD',
           'cta-hover': '#3ab0c4',
 
-          // Supporting colors (use sparingly)
-          'success': '#63D052',
-          'info': '#49E5EB',
-
-          // Neutral backgrounds
-          'bg-base': '#FAFAFA',
+          // Neutral backgrounds with color tints
+          'bg-base': '#F0FFF4', // Very light mint tint
           'bg-surface': '#FFFFFF',
-          'bg-elevated': '#FFFFFF',
 
-          // Borders
-          'border-subtle': '#E5E7EB',
-          'border-medium': '#D1D5DB',
+          // Borders - colorful but subtle
+          'border-subtle': '#D1FAE5',
+          'border-medium': '#A7F3D0',
 
           // Text hierarchy
-          'text-primary': '#1F2937',
-          'text-secondary': '#6B7280',
-          'text-tertiary': '#9CA3AF',
+          'text-primary': '#064E3B', // Dark green for contrast
+          'text-secondary': '#065F46',
+          'text-tertiary': '#059669',
           'text-disabled': '#D1D5DB'
         }
       },
