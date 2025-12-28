@@ -7,6 +7,20 @@
 import { englishReadingTexts } from './languages/english.js';
 import { hebrewReadingTexts } from './languages/hebrew.js';
 
+// Import Cafe Talk modules
+import { hebrewCafeTalkTexts } from './cafeTalk/hebrew.js';
+import { arabicCafeTalkTexts } from './cafeTalk/arabic.js';
+import { mandarinCafeTalkTexts } from './cafeTalk/mandarin.js';
+import { hindiCafeTalkTexts } from './cafeTalk/hindi.js';
+import { englishCafeTalkTexts } from './cafeTalk/english.js';
+import { spanishCafeTalkTexts } from './cafeTalk/spanish.js';
+import { frenchCafeTalkTexts } from './cafeTalk/french.js';
+import { portugueseCafeTalkTexts } from './cafeTalk/portuguese.js';
+import { russianCafeTalkTexts } from './cafeTalk/russian.js';
+import { japaneseCafeTalkTexts } from './cafeTalk/japanese.js';
+import { bengaliCafeTalkTexts } from './cafeTalk/bengali.js';
+import { amharicCafeTalkTexts } from './cafeTalk/amharic.js';
+
 // Temporarily import from old file for languages not yet migrated
 import {
   arabicReadingTexts,
@@ -20,6 +34,52 @@ import {
   bengaliReadingTexts,
   amharicReadingTexts
 } from '../readingTexts.js';
+
+/**
+ * Add sectionId to texts
+ * @param {Array} texts - Reading texts
+ * @param {string} sectionId - Section identifier
+ * @returns {Array} Texts with sectionId added
+ */
+function addSectionId(texts, sectionId) {
+  return texts.map(text => ({ ...text, sectionId }));
+}
+
+/**
+ * Cafe Talk texts by language
+ */
+const cafeTalkByLanguage = {
+  hebrew: hebrewCafeTalkTexts,
+  arabic: arabicCafeTalkTexts,
+  mandarin: mandarinCafeTalkTexts,
+  hindi: hindiCafeTalkTexts,
+  english: englishCafeTalkTexts,
+  spanish: spanishCafeTalkTexts,
+  french: frenchCafeTalkTexts,
+  portuguese: portugueseCafeTalkTexts,
+  russian: russianCafeTalkTexts,
+  japanese: japaneseCafeTalkTexts,
+  bengali: bengaliCafeTalkTexts,
+  amharic: amharicCafeTalkTexts
+};
+
+// Validation: Run in development to ensure Cafe Talk texts are complete
+if (import.meta.env.DEV || import.meta.env.MODE === 'test') {
+  import('./cafeTalk/validateCafeTalk.js').then(({ assertCafeTalkValid }) => {
+    try {
+      assertCafeTalkValid(cafeTalkByLanguage);
+      console.log('✓ Cafe Talk validation passed');
+    } catch (error) {
+      console.error('✗ Cafe Talk validation failed:', error.message);
+      // Don't throw in dev, just warn
+      if (import.meta.env.MODE === 'test') {
+        throw error; // But do throw in tests
+      }
+    }
+  }).catch(err => {
+    console.error('Failed to load Cafe Talk validator:', err);
+  });
+}
 
 /**
  * Aggregate all reading texts by practice language
@@ -42,11 +102,18 @@ export const readingTextsByLanguage = {
 
 /**
  * Get all reading texts for a specific practice language
+ * Includes both Starter and Cafe Talk sections with sectionId
  * @param {string} practiceLanguage - Language ID
- * @returns {Array} Reading texts for that language
+ * @returns {Array} Reading texts for that language with sectionId
  */
 export function getReadingTextsForLanguage(practiceLanguage) {
-  return readingTextsByLanguage[practiceLanguage] || [];
+  const starterTexts = readingTextsByLanguage[practiceLanguage] || [];
+  const cafeTalkTexts = cafeTalkByLanguage[practiceLanguage] || [];
+
+  return [
+    ...addSectionId(starterTexts, 'starter'),
+    ...addSectionId(cafeTalkTexts, 'cafeTalk')
+  ];
 }
 
 /**
@@ -55,10 +122,18 @@ export function getReadingTextsForLanguage(practiceLanguage) {
  * @returns {Object|null} Reading text object or null
  */
 export function getReadingTextById(textId) {
+  // Search in starter texts
   for (const texts of Object.values(readingTextsByLanguage)) {
     const text = texts.find(t => t.id === textId);
-    if (text) return text;
+    if (text) return { ...text, sectionId: 'starter' };
   }
+
+  // Search in Cafe Talk texts
+  for (const texts of Object.values(cafeTalkByLanguage)) {
+    const text = texts.find(t => t.id === textId);
+    if (text) return { ...text, sectionId: 'cafeTalk' };
+  }
+
   return null;
 }
 
