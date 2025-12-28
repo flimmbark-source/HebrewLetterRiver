@@ -1770,7 +1770,7 @@ body.no-scroll {
 #setup-view, #game-over-view {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: visible;
   margin-bottom: var(--space-2); /* 16px - reduced to prevent overflow */
   /* Add some padding for the scroll */
   padding-right: 8px;
