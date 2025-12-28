@@ -240,7 +240,7 @@ body.no-scroll {
 .player-level-progress-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #E7E748 0%, #7BFF61 100%);
+  background: linear-gradient(90deg, #FF6B6B 0%, #FFA500 20%, #FFD93D 40%, #6BCB77 60%, #4D96FF 80%, #A78BFA 100%);
   transition: width 0.3s ease;
 }
 
@@ -648,7 +648,7 @@ body.no-scroll {
 .progress-bar-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #7BFF61 0%, #49E5EB 100%);
+  background: linear-gradient(90deg, #FF6B6B 0%, #FFA500 20%, #FFD93D 40%, #6BCB77 60%, #4D96FF 80%, #A78BFA 100%);
   transition: width 0.3s ease;
 }
 
@@ -730,7 +730,7 @@ body.no-scroll {
 .quest-progress-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #E7E748 0%, #7BFF61 100%);
+  background: linear-gradient(90deg, #FF6B6B 0%, #FFA500 20%, #FFD93D 40%, #6BCB77 60%, #4D96FF 80%, #A78BFA 100%);
   transition: width 0.3s ease;
 }
 
@@ -1301,7 +1301,7 @@ body.no-scroll {
   inset-inline: 3px;
   bottom: 3px;
   border-radius: 8px;
-  background: linear-gradient(180deg, #E7E748 0%, #7BFF61 100%);
+  background: linear-gradient(180deg, #A78BFA 0%, #4D96FF 20%, #6BCB77 40%, #FFD93D 60%, #FFA500 80%, #FF6B6B 100%);
   transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   height: 20%;
 }
