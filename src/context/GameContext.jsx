@@ -499,11 +499,9 @@ function GameCanvas({ fontClass, loadedSettings }) {
     id="modal-content"
     className="relative w-full max-w-lg shadow-2xl"
     style={{
-      border: '2px solid #A7F3D0',
-      background:
-        'linear-gradient(180deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%)',
-      boxShadow:
-        '0 8px 0 rgba(123, 255, 97, 0.3), 0 16px 24px rgba(73, 229, 235, 0.2)',
+      border: '1px solid #E5E7EB',
+      background: '#FFFFFF',
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
     }}
     onClick={(e) => e.stopPropagation()}
   >
@@ -570,6 +568,15 @@ function GameCanvas({ fontClass, loadedSettings }) {
                         🎯
                       </span>
                     </div>
+                    <div
+                      className="goal-badge__tooltip hidden"
+                      id="goalTooltip"
+                    >
+                      {t(
+                        'game.setup.goalTooltip',
+                        'The Goal number represents the level you need to reach to win the game. Collect letters and earn points to level up!',
+                      )}
+                    </div>
                   </div>
 
                   <div className="goal-column__controls" aria-label="Adjust goal">
@@ -616,17 +623,6 @@ function GameCanvas({ fontClass, loadedSettings }) {
                     </button>
                   </div>
                 </aside>
-
-                {/* Goal tooltip - rendered outside goal-column to prevent clipping */}
-                <div
-                  className="goal-badge__tooltip hidden"
-                  id="goalTooltip"
-                >
-                  {t(
-                    'game.setup.goalTooltip',
-                    'The Goal number represents the level you need to reach to win the game. Collect letters and earn points to level up!',
-                  )}
-                </div>
 
                 <section className="mode-column">
                   <h2
@@ -1091,11 +1087,9 @@ function GameCanvas({ fontClass, loadedSettings }) {
           <div
             className="relative w-full max-w-md rounded-3xl shadow-2xl"
             style={{
-              border: '2px solid #A7F3D0',
-              background:
-                'linear-gradient(180deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%)',
-              boxShadow:
-                '0 8px 0 rgba(123, 255, 97, 0.3), 0 16px 24px rgba(73, 229, 235, 0.2)',
+              border: '1px solid #E5E7EB',
+              background: '#FFFFFF',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
             }}
           >
             <div className="relative pt-8 pb-8 text-center px-6">

@@ -77,7 +77,7 @@ body.no-scroll {
 }
 
 .main-content {
-  background: linear-gradient(135deg, #7BFF61 0%, #49E5EB 100%) !important;
+  background: #F8FDF9 !important;
   border-radius: 0;
   padding: 12px;
   box-shadow: none;
@@ -365,13 +365,13 @@ body.no-scroll {
 /* Hero card - green accent */
 .hero-card {
   margin-top: 0;
-  background: linear-gradient(135deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%) !important;
+  background: #FFFFFF !important;
   border-radius: 12px;
   padding: 12px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   color: #064E3B;
   position: relative;
-  border: none;
+  border: 1px solid #E5E7EB;
 }
 
 @media (min-width: 640px) {
@@ -427,8 +427,8 @@ body.no-scroll {
   font-weight: 700;
   font-family: "Nunito", system-ui, sans-serif;
   color: #FFFFFF;
-  background: linear-gradient(135deg, #4AC2DD 0%, #49E5EB 100%);
-  box-shadow: 0 2px 4px 0 rgba(73, 229, 235, 0.3);
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  box-shadow: 0 2px 4px 0 rgba(16, 185, 129, 0.3);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -443,14 +443,14 @@ body.no-scroll {
 }
 
 .hero-cta:hover {
-  background: linear-gradient(135deg, #3ab0c4 0%, #38d4da 100%);
-  box-shadow: 0 4px 8px 0 rgba(73, 229, 235, 0.4);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 8px 0 rgba(16, 185, 129, 0.4);
   transform: translateY(-2px);
 }
 
 .hero-cta:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px 0 rgba(73, 229, 235, 0.3);
+  box-shadow: 0 2px 4px 0 rgba(16, 185, 129, 0.3);
 }
 
 /* Section headers */
@@ -522,10 +522,10 @@ body.no-scroll {
 
 /* Progress cards - colorful compact style */
 .progress-card-small {
-  background: linear-gradient(135deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%) !important;
+  background: #FFFFFF !important;
   border-radius: 12px;
   padding: 12px;
-  border: 2px solid transparent;
+  border: 1px solid #E5E7EB;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -654,10 +654,10 @@ body.no-scroll {
 
 /* Quest card - colorful modern style */
 .quest-card {
-  background: linear-gradient(135deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%) !important;
+  background: #FFFFFF !important;
   border-radius: 12px;
   padding: 12px;
-  border-left: none;
+  border: 1px solid #E5E7EB;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
@@ -751,13 +751,13 @@ body.no-scroll {
 .quest-cta.active {
   cursor: pointer;
   color: #FFFFFF;
-  background: linear-gradient(135deg, #4AC2DD 0%, #49E5EB 100%);
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   border-color: transparent;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .quest-cta.active:hover {
-  background: linear-gradient(135deg, #3ab0c4 0%, #38d4da 100%);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
@@ -1080,7 +1080,7 @@ body.no-scroll {
   min-width: 105px;
   height: 100%;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .goal-column::before {
@@ -1186,7 +1186,10 @@ body.no-scroll {
 }
 
 .goal-badge__tooltip {
-  position: fixed;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 120%;
+  transform: translateX(-50%);
   background: #064E3B;
   color: #fff;
   padding: 12px;

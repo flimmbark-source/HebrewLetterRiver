@@ -2463,34 +2463,8 @@ accessibilityBtn?.addEventListener('click', () => {
   winExitButton?.addEventListener('click', exitFromWin);
 
   const setGoalTooltipVisibility = (isVisible) => {
-    if (!goalTooltip || !goalInfoIcon) return;
-
-    goalTooltip.classList.toggle('hidden', !isVisible);
-    goalInfoIcon.setAttribute('aria-expanded', isVisible ? 'true' : 'false');
-
-    // Position tooltip next to the info icon when visible
-    if (isVisible) {
-      const iconRect = goalInfoIcon.getBoundingClientRect();
-      const tooltipWidth = 220; // matches CSS width
-      const gap = 8;
-
-      // Position to the right of the icon
-      let left = iconRect.right + gap;
-      let top = iconRect.top;
-
-      // Adjust if tooltip would go off-screen to the right
-      if (left + tooltipWidth > window.innerWidth) {
-        left = iconRect.left - tooltipWidth - gap;
-      }
-
-      // Adjust if tooltip would go off-screen at the top
-      if (top < gap) {
-        top = gap;
-      }
-
-      goalTooltip.style.left = `${left}px`;
-      goalTooltip.style.top = `${top}px`;
-    }
+    goalTooltip?.classList.toggle('hidden', !isVisible);
+    goalInfoIcon?.setAttribute('aria-expanded', isVisible ? 'true' : 'false');
   };
 
   // Goal info icon tooltip handlers
