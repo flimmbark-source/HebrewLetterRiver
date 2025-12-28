@@ -290,9 +290,15 @@ export default function ReadingArea({ textId, onBack }) {
 
     // Store result for results screen
     const langCode = getLanguageCode(appLanguageId);
-    const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
-                ?? readingText.glosses?.en?.[currentWord.id]
-                ?? '—';
+    let gloss = readingText.glosses?.[langCode]?.[currentWord.id]
+                ?? readingText.glosses?.en?.[currentWord.id];
+
+    // If no gloss, try meaningKeys with i18n translation
+    if (!gloss && readingText.meaningKeys?.[currentWord.id]) {
+      gloss = t(readingText.meaningKeys[currentWord.id]);
+    }
+
+    gloss = gloss ?? '—';
 
     setCompletedResults(prev => [...prev, {
       practiceWord: currentWord.text,
@@ -503,9 +509,14 @@ useEffect(() => {
                 // Use glosses for semantic meaning display
                 const langCode = getLanguageCode(appLanguageId);
                 const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
-                           ?? readingText.glosses?.en?.[currentWord.id]
-                           ?? '—';
-                return gloss;
+                           ?? readingText.glosses?.en?.[currentWord.id];
+
+                // If no gloss, try meaningKeys with i18n translation
+                if (!gloss && readingText.meaningKeys?.[currentWord.id]) {
+                  return t(readingText.meaningKeys[currentWord.id]);
+                }
+
+                return gloss ?? '—';
               })()}
             </span>
           </div>
