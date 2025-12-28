@@ -185,12 +185,15 @@ body.no-scroll {
   align-items: center;
   justify-content: space-between;
   padding: 4px 4px 0;
+  gap: 12px;
 }
 
 .player-meta {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
 
 .avatar {
@@ -250,23 +253,28 @@ body.no-scroll {
   font-weight: 500;
 }
 
-/* Top counters */
+/* Top counters - unified container */
 .top-counters {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  padding: 6px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 999px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 
 .pill-counter {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 999px;
   font-size: 13px;
-  background: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  background: #F9FAFB;
+  border: none;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -285,14 +293,13 @@ body.no-scroll {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: #FFFFFF;
-  border: 1px solid #E5E7EB;
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
   color: #1F2937;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   cursor: pointer;
   transition: all 0.2s ease;
 }

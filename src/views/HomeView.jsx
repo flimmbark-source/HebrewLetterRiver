@@ -174,7 +174,6 @@ export default function HomeView() {
             className="tiny-pill"
             aria-label="Show tutorial"
             title="Show tutorial"
-            style={{ marginRight: '8px' }}
           >
             ?
           </button>
