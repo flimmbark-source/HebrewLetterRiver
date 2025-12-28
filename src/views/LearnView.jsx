@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useTutorial } from '../context/TutorialContext.jsx';
-import { getReadingTextsForLanguage } from '../data/readingTexts';
+import { getReadingTextsForLanguage } from '../data/readingTexts/index.js';
 import ReadingArea from '../components/ReadingArea';
 import { getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
 
