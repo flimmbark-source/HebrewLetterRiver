@@ -129,12 +129,12 @@ function LanguageOnboardingModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 language-onboarding-overlay" style={{
-      background: 'radial-gradient(circle at 15% 0%, #ffe7b6 0, transparent 45%), radial-gradient(circle at 85% 0%, #ffd3b6 0, transparent 45%), radial-gradient(circle at 50% 100%, #ffc38a 0, transparent 55%), linear-gradient(160deg, #f8c792 0%, #f6a66c 40%, #f28e52 100%)'
+      background: 'linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%)'
     }}>
       <div className="w-full max-w-lg rounded-3xl p-6 text-center shadow-2xl sm:p-8 language-onboarding-card" style={{
-        background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 55%, #ffd8a8 100%)',
-        border: '3px solid rgba(235, 179, 105, 0.95)',
-        boxShadow: '0 8px 0 rgba(214, 140, 64, 1), 0 16px 24px rgba(214, 140, 64, 0.6)'
+        background: '#FFFFFF',
+        border: '3px solid #A7F3D0',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)'
       }}>
         <h2 className="text-2xl font-bold sm:text-3xl" style={{
           fontFamily: '"Baloo 2", system-ui, sans-serif',

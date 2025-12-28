@@ -68,7 +68,7 @@ body.no-scroll {
   max-width: 100%;
   min-height: 100vh;
   border-radius: 0;
-  background: linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 50%, #FDFCE5 100%);
+  background: linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%);
   padding: 16px 16px 80px;
   display: flex;
   flex-direction: column;
