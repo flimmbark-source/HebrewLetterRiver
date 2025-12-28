@@ -242,7 +242,7 @@ const showInfo = (settingKey, event) => {
       </section>
 
       {/* Game Accessibility Settings */}
-      <section className="section mt-10">
+      <section className="section" style={{ marginTop: '40px' }}>
         <div className="section-header">
           <div className="section-title">
             <div className="wood-header">{t('settings.gameSettings')}</div>
