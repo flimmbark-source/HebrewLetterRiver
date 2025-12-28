@@ -62,14 +62,14 @@ body.no-scroll {
   font-family: 'Heebo', sans-serif !important;
 }
 
-/* App shell container - responsive with colorful gradient */
+/* App shell container - responsive with vibrant gradient */
 .app-shell {
   width: 100%;
   max-width: 100%;
   min-height: 100vh;
   border-radius: 0;
-  background: linear-gradient(135deg, #F0FFF4 0%, #E0FBFD 50%, #FDFCE5 100%);
-  padding: 16px 16px 90px;
+  background: linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 50%, #FDFCE5 100%);
+  padding: 16px 16px 80px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -83,7 +83,7 @@ body.no-scroll {
     margin: 0 auto;
     border-radius: 0;
     min-height: auto;
-    padding: 20px 20px 90px;
+    padding: 20px 20px 80px;
     gap: 20px;
   }
 }
@@ -347,16 +347,16 @@ body.no-scroll {
   }
 }
 
-/* Hero card - colorful accent */
+/* Hero card - green accent */
 .hero-card {
   margin-top: 0;
-  background: linear-gradient(135deg, rgba(231, 231, 72, 0.1) 0%, rgba(123, 255, 97, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(123, 255, 97, 0.15) 0%, rgba(123, 255, 97, 0.08) 100%);
   border-radius: 16px;
   padding: 16px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   color: #064E3B;
   position: relative;
-  border: 2px solid #D1FAE5;
+  border: 2px solid #A7F3D0;
 }
 
 .hero-title {
@@ -470,16 +470,16 @@ body.no-scroll {
   gap: 12px;
 }
 
-/* Progress cards - colorful modern style */
+/* Progress cards - colorful compact style */
 .progress-card-small {
   background: #FFFFFF;
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 12px;
   border: 2px solid transparent;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   position: relative;
   overflow: hidden;
 }
@@ -495,14 +495,14 @@ body.no-scroll {
 }
 
 .progress-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  margin-bottom: 4px;
+  font-size: 16px;
+  margin-bottom: 2px;
 }
 
 .progress-icon.red {
@@ -521,7 +521,7 @@ body.no-scroll {
 }
 
 .progress-label {
-  font-size: 11px;
+  font-size: 10px;
   color: #059669;
   font-weight: 600;
   text-transform: uppercase;
@@ -530,21 +530,21 @@ body.no-scroll {
 
 .progress-value {
   font-family: "Nunito", system-ui, sans-serif;
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 800;
   color: #064E3B;
   line-height: 1;
 }
 
 .progress-sub {
-  font-size: 12px;
+  font-size: 11px;
   color: #065F46;
   font-weight: 500;
 }
 
 .progress-bar-shell {
-  margin-top: 4px;
-  height: 8px;
+  margin-top: 2px;
+  height: 6px;
   border-radius: 999px;
   background: #D1FAE5;
   overflow: hidden;
@@ -673,20 +673,19 @@ body.no-scroll {
   cursor: not-allowed;
 }
 
-/* Bottom navigation - colorful modern style */
+/* Bottom navigation - colorful modern style (compact) */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.98) 100%);
-  backdrop-filter: blur(10px);
-  padding: 12px 16px 12px;
+  background: #FFFFFF;
+  padding: 6px 12px 8px;
   display: grid;
   grid-template-columns: repeat(5, minmax(0,1fr));
   align-items: center;
-  gap: 4px;
-  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+  gap: 2px;
+  box-shadow: 0 -2px 8px 0 rgba(0, 0, 0, 0.1);
   border-top: 2px solid transparent;
   background-image: linear-gradient(white, white), linear-gradient(90deg, #7BFF61 0%, #49E5EB 50%, #E7E748 100%);
   background-origin: border-box;
@@ -707,13 +706,13 @@ body.no-scroll {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: #A7F3D0;
+  gap: 2px;
+  font-size: 10px;
+  color: #059669;
   font-weight: 600;
   cursor: pointer;
-  padding: 6px 4px;
-  border-radius: 12px;
+  padding: 4px 2px;
+  border-radius: 8px;
   transition: all 0.2s ease;
 }
 
@@ -722,9 +721,9 @@ body.no-scroll {
 }
 
 .nav-icon-shell {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -733,8 +732,7 @@ body.no-scroll {
 }
 
 .nav-icon-shell span {
-  font-size: 22px;
-  filter: grayscale(1) opacity(0.5);
+  font-size: 20px;
   transition: all 0.2s ease;
 }
 
@@ -745,10 +743,6 @@ body.no-scroll {
 .nav-item.active .nav-icon-shell {
   background: linear-gradient(135deg, #E7E748 0%, #7BFF61 100%);
   box-shadow: 0 2px 4px 0 rgba(123, 255, 97, 0.3);
-}
-
-.nav-item.active .nav-icon-shell span {
-  filter: grayscale(0) opacity(1);
 }
 
 .nav-item.active span.label {
@@ -763,11 +757,11 @@ body.no-scroll {
 }
 
 .play-diamond {
-  width: 60px;
-  height: 60px;
-  border-radius: 18px;
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
   background: linear-gradient(135deg, #49E5EB 0%, #4AC2DD 100%);
-  box-shadow: 0 6px 12px -2px rgba(73, 229, 235, 0.4), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px -2px rgba(73, 229, 235, 0.4), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -780,7 +774,7 @@ body.no-scroll {
   content: "";
   position: absolute;
   inset: -2px;
-  border-radius: 20px;
+  border-radius: 18px;
   background: linear-gradient(135deg, #7BFF61 0%, #49E5EB 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -788,8 +782,8 @@ body.no-scroll {
 }
 
 .play-diamond:hover {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 12px 20px -4px rgba(73, 229, 235, 0.5), 0 4px 8px 0 rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 16px -4px rgba(73, 229, 235, 0.5), 0 4px 8px 0 rgba(0, 0, 0, 0.15);
 }
 
 .play-diamond:hover::before {
@@ -802,7 +796,7 @@ body.no-scroll {
 }
 
 .play-diamond span {
-  font-size: 28px;
+  font-size: 24px;
   color: #FFFFFF;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
 }
