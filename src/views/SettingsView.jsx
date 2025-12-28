@@ -242,7 +242,7 @@ const showInfo = (settingKey, event) => {
       </section>
 
       {/* Game Accessibility Settings */}
-      <section className="section mt-6">
+      <section className="section mt-10">
         <div className="section-header">
           <div className="section-title">
             <div className="wood-header">{t('settings.gameSettings')}</div>
