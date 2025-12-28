@@ -567,15 +567,15 @@ body.no-scroll {
 /* Quest card - colorful modern style */
 .quest-card {
   background: linear-gradient(135deg, #FDFCE5 0%, #FFF5DD 50%, #FFEFB3 100%) !important;
-  border-radius: 12px;
-  padding: 6px 12px;
-  border-left: 4px solid #E7E748;
+  border-radius: 10px;
+  padding: 4px 10px;
+  border-left: 3px solid #E7E748;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 6px;
   transition: all 0.2s ease;
 }
 
@@ -588,21 +588,21 @@ body.no-scroll {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .quest-top-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
 }
 
 .quest-title {
-  font-size: 14px;
+  font-size: 13px;
   color: #064E3B;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .quest-reward-inline {
@@ -627,7 +627,7 @@ body.no-scroll {
 
 .quest-progress-bar {
   margin-top: 0;
-  height: 6px;
+  height: 4px;
   border-radius: 999px;
   background: #D1FAE5;
   overflow: hidden;
@@ -641,10 +641,10 @@ body.no-scroll {
 }
 
 .quest-cta {
-  padding: 6px 16px;
+  padding: 4px 12px;
   border-radius: 999px;
   border: 2px solid #D1FAE5;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #A7F3D0;
   background: #FFFFFF;
