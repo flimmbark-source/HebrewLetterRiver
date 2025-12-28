@@ -566,7 +566,7 @@ body.no-scroll {
 
 /* Quest card - colorful modern style */
 .quest-card {
-  background: linear-gradient(135deg, #FDFCE5 0%, #FFF5DD 50%, #FFEFB3 100%) !important;
+  background: linear-gradient(135deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%) !important;
   border-radius: 10px;
   padding: 4px 10px;
   border-left: 3px solid #E7E748;
