@@ -357,7 +357,7 @@ body.no-scroll {
 /* Hero card - green accent */
 .hero-card {
   margin-top: 0;
-  background: linear-gradient(135deg, rgba(123, 255, 97, 0.15) 0%, rgba(123, 255, 97, 0.08) 100%);
+  background: linear-gradient(135deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%) !important;
   border-radius: 16px;
   padding: 16px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
