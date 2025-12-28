@@ -570,15 +570,6 @@ function GameCanvas({ fontClass, loadedSettings }) {
                         🎯
                       </span>
                     </div>
-                    <div
-                      className="goal-badge__tooltip hidden"
-                      id="goalTooltip"
-                    >
-                      {t(
-                        'game.setup.goalTooltip',
-                        'The Goal number represents the level you need to reach to win the game. Collect letters and earn points to level up!',
-                      )}
-                    </div>
                   </div>
 
                   <div className="goal-column__controls" aria-label="Adjust goal">
@@ -625,6 +616,17 @@ function GameCanvas({ fontClass, loadedSettings }) {
                     </button>
                   </div>
                 </aside>
+
+                {/* Goal tooltip - rendered outside goal-column to prevent clipping */}
+                <div
+                  className="goal-badge__tooltip hidden"
+                  id="goalTooltip"
+                >
+                  {t(
+                    'game.setup.goalTooltip',
+                    'The Goal number represents the level you need to reach to win the game. Collect letters and earn points to level up!',
+                  )}
+                </div>
 
                 <section className="mode-column">
                   <h2

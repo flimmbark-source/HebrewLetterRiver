@@ -1186,10 +1186,7 @@ body.no-scroll {
 }
 
 .goal-badge__tooltip {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 120%;
-  transform: translateX(-50%);
+  position: fixed;
   background: #064E3B;
   color: #fff;
   padding: 12px;
