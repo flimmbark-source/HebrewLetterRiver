@@ -64,7 +64,7 @@ const cafeTalkByLanguage = {
 };
 
 // Validation: Run in development to ensure Cafe Talk texts are complete
-if (import.meta.env.DEV || import.meta.env.MODE === 'test') {
+if (import.meta.env?.DEV || import.meta.env?.MODE === 'test') {
   import('./cafeTalk/validateCafeTalk.js').then(({ assertCafeTalkValid }) => {
     try {
       assertCafeTalkValid(cafeTalkByLanguage);
@@ -72,7 +72,7 @@ if (import.meta.env.DEV || import.meta.env.MODE === 'test') {
     } catch (error) {
       console.error('✗ Cafe Talk validation failed:', error.message);
       // Don't throw in dev, just warn
-      if (import.meta.env.MODE === 'test') {
+      if (import.meta.env?.MODE === 'test') {
         throw error; // But do throw in tests
       }
     }
