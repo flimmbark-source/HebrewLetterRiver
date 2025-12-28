@@ -1055,6 +1055,7 @@ body.no-scroll {
   align-items: stretch;
   padding: 10px;
   flex: 1;
+  overflow: visible;
 }
 
 @media (max-width: 640px) {
@@ -1348,6 +1349,7 @@ body.no-scroll {
   flex-direction: column;
   gap: 6px;
   flex: 1;
+  overflow: visible;
 }
 
 @media (max-width: 640px) {
@@ -1758,6 +1760,7 @@ body.no-scroll {
   border-radius: var(--radius-lg); /* 16px */
   max-height: calc(100vh - 1.5rem);
   max-width: 100%; /* Full width on mobile */
+  overflow: visible;
 }
 
 @media (min-width: 640px) {
