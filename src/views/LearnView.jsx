@@ -7,8 +7,10 @@ import ReadingArea from '../components/ReadingArea';
 import { getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
 
 export default function LearnView() {
+  console.log('[LearnView] Component rendering');
   const { t } = useLocalization();
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
+  console.log('[LearnView] Practice language:', practiceLanguageId);
   const { startTutorial, hasCompletedTutorial } = useTutorial();
   const [selectedTextId, setSelectedTextId] = useState(null);
 
@@ -21,6 +23,8 @@ export default function LearnView() {
 
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
+  console.log('[LearnView] Reading texts loaded:', readingTexts.length, 'texts');
+  console.log('[LearnView] Reading texts:', readingTexts);
 
   // Group texts by section
   const sections = [
@@ -55,11 +59,14 @@ export default function LearnView() {
         <div className="space-y-8">
           {sections.map(section => {
             const sectionTexts = readingTexts.filter(text => text.sectionId === section.id);
+            console.log(`[LearnView] Section "${section.id}": ${sectionTexts.length} texts`);
 
             if (sectionTexts.length === 0) {
+              console.log(`[LearnView] Skipping section "${section.id}" - no texts`);
               return null;
             }
 
+            console.log(`[LearnView] Rendering section "${section.id}"`);
             return (
               <div key={section.id} className="space-y-4">
                 <div className="px-1">

@@ -110,6 +110,10 @@ export function getReadingTextsForLanguage(practiceLanguage) {
   const starterTexts = readingTextsByLanguage[practiceLanguage] || [];
   const cafeTalkTexts = cafeTalkByLanguage[practiceLanguage] || [];
 
+  console.log(`[getReadingTextsForLanguage] Language: ${practiceLanguage}`);
+  console.log(`[getReadingTextsForLanguage] Starter texts: ${starterTexts.length}`);
+  console.log(`[getReadingTextsForLanguage] Cafe Talk texts: ${cafeTalkTexts.length}`);
+
   return [
     ...addSectionId(starterTexts, 'starter'),
     ...addSectionId(cafeTalkTexts, 'cafeTalk')
