@@ -25,21 +25,23 @@ export default function LearnView() {
 
   // Show reading text selection
   return (
-    <section className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <header className="space-y-2">
-        <h2 className="text-2xl font-semibold text-gray-900">{t('learn.title')}</h2>
-        <p className="text-sm text-gray-600">{t('learn.intro')}</p>
+    <div className="space-y-6">
+      <header className="space-y-2 px-1">
+        <h2 className="text-2xl font-semibold" style={{ color: '#1F2937' }}>{t('learn.title')}</h2>
+        <p className="text-sm" style={{ color: '#6B7280' }}>{t('learn.intro')}</p>
       </header>
 
       {readingTexts.length === 0 ? (
-        <div className="space-y-3">
-          <p className="text-sm text-gray-700">{t('learn.noTexts')}</p>
-          <p className="text-xs text-gray-500">{t('learn.comingSoon')}</p>
+        <div className="space-y-3 px-1">
+          <p className="text-sm" style={{ color: '#374151' }}>{t('learn.noTexts')}</p>
+          <p className="text-xs" style={{ color: '#9CA3AF' }}>{t('learn.comingSoon')}</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-gray-900">{t('learn.readingMode')}</h3>
-          <p className="text-sm text-gray-600">{t('learn.readingModeDesc')}</p>
+        <div className="space-y-4">
+          <div className="px-1">
+            <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{t('learn.readingMode')}</h3>
+            <p className="text-sm" style={{ color: '#6B7280' }}>{t('learn.readingModeDesc')}</p>
+          </div>
 
           <div className="grid gap-3 md:grid-cols-2">
             {readingTexts.map((text) => (
@@ -53,7 +55,7 @@ export default function LearnView() {
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }
 
@@ -67,19 +69,38 @@ function ReadingTextCard({ text, appLanguageId, onSelect }) {
 
   return (
     <article
-      className="group cursor-pointer rounded-2xl border border-gray-200 bg-white p-4 transition-all hover:border-emerald-300 hover:shadow-md"
+      className="cursor-pointer transition-all"
+      style={{
+        background: '#FFFFFF',
+        borderRadius: '12px',
+        padding: '12px',
+        border: '1px solid #E5E7EB',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -2px rgba(0, 0, 0, 0.1)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)';
+      }}
       onClick={onSelect}
     >
       <div className="mb-2 flex items-start justify-between gap-2">
-        <h4 className="text-lg font-semibold text-gray-900 group-hover:text-emerald-600">
+        <h4 className="text-lg font-semibold" style={{ color: '#064E3B' }}>
           {title}
         </h4>
-        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+        <span
+          className="rounded-full px-2 py-0.5 text-xs font-medium"
+          style={{
+            background: '#F9FAFB',
+            color: '#6B7280',
+          }}
+        >
           {wordCount} words
         </span>
       </div>
-      <p className="text-sm text-gray-600">{subtitle}</p>
-      <div className="mt-3 flex items-center gap-2 text-xs text-emerald-600 font-medium">
+      <p className="text-sm" style={{ color: '#6B7280' }}>{subtitle}</p>
+      <div className="mt-3 flex items-center gap-2 text-xs font-medium" style={{ color: '#059669' }}>
         <span>Start Reading</span>
         <span>→</span>
       </div>
