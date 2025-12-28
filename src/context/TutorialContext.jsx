@@ -167,10 +167,10 @@ const TUTORIAL_DEFINITIONS = {
         targetSelector: '.progress-card-small'
       },
       {
-        id: 'tourLearn',
-        translationKey: 'tutorials.tour.tourLearn',
+        id: 'tourRead',
+        translationKey: 'tutorials.tour.tourRead',
         icon: '📚',
-        navigateTo: '/learn'
+        navigateTo: '/read'
       },
       {
         id: 'tourComplete',
