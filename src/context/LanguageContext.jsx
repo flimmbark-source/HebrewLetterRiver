@@ -27,13 +27,28 @@ function buildLanguageOptions() {
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 }
 
+function normalizeLanguageId(value) {
+  return typeof value === 'string' ? value.trim().toLowerCase() : value;
+}
+
+function getValidLanguageId(candidateId, fallbackId) {
+  const normalized = normalizeLanguageId(candidateId);
+  return languagePacks[normalized] ? normalized : fallbackId;
+}
+
 export function LanguageProvider({ children }) {
   const storedPractice = loadState(PRACTICE_STORAGE_KEY, null);
   const storedApp = loadState(APP_STORAGE_KEY, null);
   const legacyPreferences = loadState('preferences.language', null);
 
-  const initialPracticeId = storedPractice?.id ?? legacyPreferences?.id ?? defaultLanguageId;
-  const initialAppId = storedApp?.id ?? legacyPreferences?.id ?? defaultAppLanguageId;
+  const initialPracticeId = getValidLanguageId(
+    storedPractice?.id ?? legacyPreferences?.id,
+    defaultLanguageId
+  );
+  const initialAppId = getValidLanguageId(
+    storedApp?.id ?? legacyPreferences?.id,
+    defaultAppLanguageId
+  );
   const initialConfirmed =
     (storedPractice?.confirmed ?? legacyPreferences?.confirmed) === true &&
     (storedApp?.confirmed ?? legacyPreferences?.confirmed) === true;
@@ -43,20 +58,20 @@ export function LanguageProvider({ children }) {
   const [hasSelectedLanguage, setHasSelectedLanguage] = useState(initialConfirmed);
 
   const setLanguageId = useCallback((nextId) => {
-    setLanguageIdState(nextId);
+    setLanguageIdState((current) => getValidLanguageId(nextId, current));
   }, []);
 
   const selectLanguage = useCallback((nextId) => {
-    setLanguageIdState(nextId);
+    setLanguageIdState((current) => getValidLanguageId(nextId, current));
     setHasSelectedLanguage(true);
   }, []);
 
   const setAppLanguageId = useCallback((nextId) => {
-    setAppLanguageIdState(nextId);
+    setAppLanguageIdState((current) => getValidLanguageId(nextId, current));
   }, []);
 
   const selectAppLanguage = useCallback((nextId) => {
-    setAppLanguageIdState(nextId);
+    setAppLanguageIdState((current) => getValidLanguageId(nextId, current));
     setHasSelectedLanguage(true);
   }, []);
 
