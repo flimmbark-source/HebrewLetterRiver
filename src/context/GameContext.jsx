@@ -500,7 +500,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
     className="relative w-full max-w-lg shadow-2xl"
     style={{
       border: '1px solid #E5E7EB',
-      background: 'linear-gradient(180deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%)',
+      background: 'linear-gradient(180deg, #fffce3ff 0%, #fae5d1ff 50%, #fdf4e0ff 100%)',
       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
     }}
     onClick={(e) => e.stopPropagation()}
