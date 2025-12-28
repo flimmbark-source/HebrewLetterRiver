@@ -567,15 +567,15 @@ body.no-scroll {
 /* Quest card - colorful modern style */
 .quest-card {
   background: linear-gradient(135deg, #FDFCE5 0%, #FFF5DD 50%, #FFEFB3 100%) !important;
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 10px 12px;
   border-left: 4px solid #E7E748;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 10px;
   transition: all 0.2s ease;
 }
 
