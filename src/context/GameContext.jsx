@@ -668,14 +668,14 @@ function GameCanvas({ fontClass, loadedSettings }) {
               <h2
                 id="game-over-heading"
                 className={`mb-4 text-4xl font-bold ${fontClass}`}
-                style={{ color: '#ff9247' }}
+                style={{ color: '#064E3B' }}
               >
                 {t('game.summary.gameOver')}
               </h2>
               <p
                 id="final-score"
                 className="mb-6 text-2xl"
-                style={{ color: '#4a2208' }}
+                style={{ color: '#374151' }}
               >
                 {t('game.summary.finalScore', { score: 0 })}
               </p>
@@ -686,12 +686,10 @@ function GameCanvas({ fontClass, loadedSettings }) {
                     id="game-over-exit-button"
                     className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
                     style={{
-                      border: 0,
-                      background:
-                        'radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%)',
-                      color: '#4a1a06',
-                      boxShadow:
-                        '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)',
+                      border: '2px solid #10B981',
+                      background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                      color: '#FFFFFF',
+                      boxShadow: '0 2px 4px 0 rgba(16, 185, 129, 0.3)',
                     }}
                   >
                     {t('game.controls.backToMenu')}
@@ -708,22 +706,23 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 <div className="text-6xl">🎉</div>
                 <h2
                   className={`text-5xl font-bold ${fontClass}`}
-                  style={{ color: '#7bd74f' }}
+                  style={{ color: '#10B981' }}
                 >
                   {t('game.win.title', 'You Win!')}
                 </h2>
                 <p
                   className="text-xl font-semibold"
-                  style={{ color: '#4a2208' }}
+                  style={{ color: '#374151' }}
                 >
                   {t('game.win.message', 'You reached your goal!')}
                 </p>
                 <div className="space-y-2">
-                  <p className="text-lg" style={{ color: '#6c3b14' }}>
+                  <p className="text-lg" style={{ color: '#6B7280' }}>
                     {t('game.win.sessionCorrectPrefix', 'You caught')}{' '}
                     <span
                       className="font-bold"
                       id="session-correct-display"
+                      style={{ color: '#1F2937' }}
                     >
                       0
                     </span>{' '}
@@ -732,11 +731,12 @@ function GameCanvas({ fontClass, loadedSettings }) {
                       'letters in a row this game!',
                     )}
                   </p>
-                  <p className="text-base" style={{ color: '#6c3b14' }}>
+                  <p className="text-base" style={{ color: '#6B7280' }}>
                     {t('game.win.totalWins', 'Total wins')}:{' '}
                     <span
                       className="font-bold"
                       id="total-wins-display"
+                      style={{ color: '#1F2937' }}
                     >
                       0
                     </span>
@@ -747,13 +747,10 @@ function GameCanvas({ fontClass, loadedSettings }) {
                     id="continue-playing-button"
                     className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
                     style={{
-                      border: '2px solid #5aa838',
-                      background:
-                        'linear-gradient(135deg, #e8ffd8 0%, #7bd74f 100%)',
-                      color: '#ffffff',
-                      boxShadow:
-                        '0 4px 0 #5aa838, 0 6px 12px rgba(90, 168, 56, 0.3)',
-                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
+                      border: '2px solid #10B981',
+                      background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                      color: '#FFFFFF',
+                      boxShadow: '0 2px 4px 0 rgba(16, 185, 129, 0.3)',
                     }}
                   >
                     {t('game.win.continue', 'Continue Playing')}
@@ -762,12 +759,10 @@ function GameCanvas({ fontClass, loadedSettings }) {
                     id="win-exit-button"
                     className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
                     style={{
-                      border: 0,
-                      background:
-                        'radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%)',
-                      color: '#4a1a06',
-                      boxShadow:
-                        '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)',
+                      border: '2px solid #E5E7EB',
+                      background: '#FFFFFF',
+                      color: '#374151',
+                      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
                     }}
                   >
                     {t('game.controls.backToMenu')}
