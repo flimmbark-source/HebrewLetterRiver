@@ -195,7 +195,7 @@ export default function DailyView() {
           <TaskCard
             key={task.id}
             task={task}
-            accent={task.completed ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40' : 'bg-cyan-500/10 text-cyan-200 border border-cyan-500/20'}
+            accent={task.completed ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40' : 'bg-yellow-500/20 text-yellow-900 border border-yellow-500/40'}
             onClaim={handleClaimTask}
             claiming={claiming || claimingTaskId === task.id}
           />
