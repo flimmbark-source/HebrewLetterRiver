@@ -1083,7 +1083,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
             className="relative w-full max-w-md rounded-3xl shadow-2xl"
             style={{
               border: '1px solid #E5E7EB',
-              background: '#FFFFFF',
+              background: 'linear-gradient(135deg, #fffcea 0%, #fcfff2 100%)',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
             }}
           >

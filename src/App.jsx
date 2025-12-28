@@ -132,7 +132,7 @@ function LanguageOnboardingModal() {
       background: 'linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%)'
     }}>
       <div className="w-full max-w-lg rounded-3xl p-6 text-center shadow-2xl sm:p-8 language-onboarding-card" style={{
-        background: '#FFFFFF',
+        background: 'linear-gradient(135deg, #fffcea 0%, #fcfff2 100%)',
         border: '3px solid #A7F3D0',
         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)'
       }}>

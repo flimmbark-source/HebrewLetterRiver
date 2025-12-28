@@ -71,7 +71,7 @@ function ReadingTextCard({ text, appLanguageId, onSelect }) {
     <article
       className="cursor-pointer transition-all"
       style={{
-        background: '#FFFFFF',
+        background: 'linear-gradient(135deg, #fffcea 0%, #fcfff2 100%)',
         borderRadius: '12px',
         padding: '12px',
         border: '1px solid #E5E7EB',

@@ -77,7 +77,7 @@ body.no-scroll {
 }
 
 .main-content {
-  background: linear-gradient(135deg, #e4fcd3 0%, #d8fef1 100%) !important;
+  background: #FFFFFF !important;
   border-radius: 0;
   padding: 12px;
   box-shadow: none;
@@ -280,7 +280,7 @@ body.no-scroll {
   align-items: center;
   gap: 8px;
   padding: 6px;
-  background: #FFFFFF;
+  background: linear-gradient(135deg, #fffcea 0%, #fcfff2 100%);
   border: 1px solid #E5E7EB;
   border-radius: 999px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -339,7 +339,7 @@ body.no-scroll {
   max-width: calc(100vw - 32px);
   max-height: calc(100vh - 100px);
   overflow-y: auto;
-  background: #FFFFFF;
+  background: linear-gradient(135deg, #fffcea 0%, #fcfff2 100%);
   border-radius: 16px;
   padding: 20px 16px 16px;
   border: 1px solid #E5E7EB;
@@ -393,7 +393,7 @@ body.no-scroll {
 /* Hero card - green accent */
 .hero-card {
   margin-top: 0;
-  background: #FFFFFF !important;
+  background: linear-gradient(135deg, #fffcea 0%, #fcfff2 100%) !important;
   border-radius: 12px;
   padding: 12px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
@@ -577,7 +577,7 @@ body.no-scroll {
 
 /* Progress cards - colorful compact style */
 .progress-card-small {
-  background: #FFFFFF !important;
+  background: linear-gradient(135deg, #fffcea 0%, #fcfff2 100%) !important;
   border-radius: 12px;
   padding: 12px;
   border: 1px solid #E5E7EB;
@@ -701,7 +701,7 @@ body.no-scroll {
 
 /* Quest card - colorful modern style */
 .quest-card {
-  background: #FFFFFF !important;
+  background: linear-gradient(135deg, #fffcea 0%, #fcfff2 100%) !important;
   border-radius: 12px;
   padding: 0;
   border: 1px solid #E5E7EB;
@@ -1142,7 +1142,7 @@ body.no-scroll {
   gap: 8px;
   padding: 12px 8px;
   border-radius: 16px;
-  background: #FFFFFF;
+  background: linear-gradient(135deg, #fffcea 0%, #fcfff2 100%);
   border: 2px solid #A7F3D0;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   min-width: 105px;
@@ -1326,7 +1326,7 @@ body.no-scroll {
   width: 56px;
   border-radius: 12px;
   padding: 5px 4px;
-  background: #FFFFFF;
+  background: linear-gradient(135deg, #fffcea 0%, #fcfff2 100%);
   border: 2px solid #A7F3D0;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   display: flex;
@@ -1402,7 +1402,7 @@ body.no-scroll {
   position: relative;
   padding: 10px 10px 12px;
   border-radius: 16px;
-  background: #FFFFFF;
+  background: linear-gradient(135deg, #fffcea 0%, #fcfff2 100%);
   border: 2px solid #A7F3D0;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   display: flex;
