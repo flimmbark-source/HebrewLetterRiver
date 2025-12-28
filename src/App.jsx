@@ -268,7 +268,7 @@ function Shell() {
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomeView />} />
           <Route path="/achievements" element={<AchievementsView />} />
-          <Route path="/learn" element={<LearnView />} />
+          <Route path="/read" element={<LearnView />} />
           <Route path="/daily" element={<DailyView />} />
           <Route path="/settings" element={<SettingsView />} />
           <Route path="/play" element={<Navigate to="/home" replace />} />
@@ -282,11 +282,11 @@ function Shell() {
             </div>
             <span className="label">{t('app.nav.home')}</span>
           </NavLink>
-          <NavLink to="/learn" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
+          <NavLink to="/read" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
               <span>📚</span>
             </div>
-            <span className="label">{t('app.nav.learn')}</span>
+            <span className="label">{t('app.nav.read')}</span>
           </NavLink>
           <button
             type="button"

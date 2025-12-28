@@ -32,7 +32,7 @@
       "home": "Home",
       "play": "Play",
       "achievements": "Achievements",
-      "learn": "Learn",
+      "read": "Read",
       "settings": "Settings"
     },
     "languagePicker": {
@@ -341,11 +341,11 @@
       "10": "River Master"
     }
   },
-  "learn": {
-    "title": "Learn",
-    "intro": "Dive into curated lessons to master each letter and practice reading!",
-    "readingMode": "Reading Mode",
-    "readingModeDesc": "Select a text to practice translating word by word. Type the translation and press Space to continue.",
+  "read": {
+    "title": "Read",
+    "intro": "Select a text to practice translating word by word. Type the translation and press Enter to continue.",
+    "starter": "Starter",
+    "starterDesc": "Perfect for beginners. Short, simple texts to build your foundation.",
     "noTexts": "No reading texts available for this language yet.",
     "comingSoon": "Check back soon for more practice content!"
   },

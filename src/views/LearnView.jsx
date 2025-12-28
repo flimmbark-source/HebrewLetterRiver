@@ -27,20 +27,20 @@ export default function LearnView() {
   return (
     <div className="space-y-6">
       <header className="space-y-2 px-1">
-        <h2 className="text-2xl font-semibold" style={{ color: '#1F2937' }}>{t('learn.title')}</h2>
-        <p className="text-sm" style={{ color: '#6B7280' }}>{t('learn.intro')}</p>
+        <h2 className="text-2xl font-semibold" style={{ color: '#1F2937' }}>{t('read.title')}</h2>
+        <p className="text-sm" style={{ color: '#6B7280' }}>{t('read.intro')}</p>
       </header>
 
       {readingTexts.length === 0 ? (
         <div className="space-y-3 px-1">
-          <p className="text-sm" style={{ color: '#374151' }}>{t('learn.noTexts')}</p>
-          <p className="text-xs" style={{ color: '#9CA3AF' }}>{t('learn.comingSoon')}</p>
+          <p className="text-sm" style={{ color: '#374151' }}>{t('read.noTexts')}</p>
+          <p className="text-xs" style={{ color: '#9CA3AF' }}>{t('read.comingSoon')}</p>
         </div>
       ) : (
         <div className="space-y-4">
           <div className="px-1">
-            <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{t('learn.readingMode')}</h3>
-            <p className="text-sm" style={{ color: '#6B7280' }}>{t('learn.readingModeDesc')}</p>
+            <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{t('read.starter')}</h3>
+            <p className="text-sm" style={{ color: '#6B7280' }}>{t('read.starterDesc')}</p>
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
