@@ -7,10 +7,8 @@ import ReadingArea from '../components/ReadingArea';
 import { getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
 
 export default function LearnView() {
-  console.log('[LearnView] Component rendering');
   const { t } = useLocalization();
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
-  console.log('[LearnView] Practice language:', practiceLanguageId);
   const { startTutorial, hasCompletedTutorial } = useTutorial();
   const [selectedTextId, setSelectedTextId] = useState(null);
 
@@ -19,18 +17,32 @@ export default function LearnView() {
     if (!hasCompletedTutorial('readIntro')) {
       startTutorial('readIntro');
     }
-  }, [hasCompletedTutorial, startTutorial]); // Added dependencies
+  }, [hasCompletedTutorial, startTutorial]);
 
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
-  console.log('[LearnView] Reading texts loaded:', readingTexts.length, 'texts');
-  console.log('[LearnView] Reading texts:', readingTexts);
 
-  // Group texts by section
-  const sections = [
-    { id: 'starter', titleKey: 'read.starter', descKey: 'read.starterDesc' },
-    { id: 'cafeTalk', titleKey: 'read.cafeTalk', descKey: 'read.cafeTalkDesc' }
-  ];
+  // Group texts by sectionId (pure UI layer)
+  const textsBySection = {};
+  readingTexts.forEach(text => {
+    const section = text.sectionId || 'starter'; // default to starter for backwards compatibility
+    if (!textsBySection[section]) {
+      textsBySection[section] = [];
+    }
+    textsBySection[section].push(text);
+  });
+
+  // Section metadata
+  const sectionMeta = {
+    starter: {
+      titleKey: 'read.starter',
+      descKey: 'read.starterDesc'
+    },
+    cafeTalk: {
+      titleKey: 'read.cafeTalk',
+      descKey: 'read.cafeTalkDesc'
+    }
+  };
 
   // If a text is selected, show the reading area
   if (selectedTextId) {
@@ -57,21 +69,19 @@ export default function LearnView() {
         </div>
       ) : (
         <div className="space-y-8">
-          {sections.map(section => {
-            const sectionTexts = readingTexts.filter(text => text.sectionId === section.id);
-            console.log(`[LearnView] Section "${section.id}": ${sectionTexts.length} texts`);
+          {/* Render each section that has texts */}
+          {Object.keys(textsBySection).map(sectionId => {
+            const sectionTexts = textsBySection[sectionId];
+            const meta = sectionMeta[sectionId];
 
-            if (sectionTexts.length === 0) {
-              console.log(`[LearnView] Skipping section "${section.id}" - no texts`);
-              return null;
-            }
+            // Skip if no metadata (shouldn't happen but defensive)
+            if (!meta) return null;
 
-            console.log(`[LearnView] Rendering section "${section.id}"`);
             return (
-              <div key={section.id} className="space-y-4">
+              <div key={sectionId} className="space-y-4">
                 <div className="px-1">
-                  <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{t(section.titleKey)}</h3>
-                  <p className="text-sm" style={{ color: '#6B7280' }}>{t(section.descKey)}</p>
+                  <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{t(meta.titleKey)}</h3>
+                  <p className="text-sm" style={{ color: '#6B7280' }}>{t(meta.descKey)}</p>
                 </div>
 
                 <div className="grid gap-3 md:grid-cols-2">
