@@ -263,7 +263,7 @@ function Shell() {
       <LanguageOnboardingModal />
       <OfflineIndicator />
       <PWAInstallPrompt />
-      <main className="flex-1">
+      <main className="flex-1 main-content">
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomeView />} />
