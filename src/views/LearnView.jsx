@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useTutorial } from '../context/TutorialContext.jsx';
 import { getReadingTextsForLanguage } from '../data/readingTexts';
 import ReadingArea from '../components/ReadingArea';
 import { getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
@@ -8,7 +9,15 @@ import { getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
 export default function LearnView() {
   const { t } = useLocalization();
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
+  const { startTutorial, completedTutorials } = useTutorial();
   const [selectedTextId, setSelectedTextId] = useState(null);
+
+  // Auto-trigger readIntro tutorial on first visit
+  useEffect(() => {
+    if (!completedTutorials.includes('readIntro')) {
+      startTutorial('readIntro');
+    }
+  }, []); // Empty dependency array to only run once on mount
 
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);

@@ -209,6 +209,18 @@ const TUTORIAL_DEFINITIONS = {
         targetSelector: '.start-game'
       }
     ]
+  },
+
+  // Read screen intro (auto-triggered on first visit)
+  readIntro: {
+    id: 'readIntro',
+    steps: [
+      {
+        id: 'tourRead',
+        translationKey: 'tutorials.tour.tourRead',
+        icon: '📚'
+      }
+    ]
   }
 };
 
