@@ -22,6 +22,12 @@ export default function LearnView() {
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
 
+  // Group texts by section
+  const sections = [
+    { id: 'starter', titleKey: 'read.starter', descKey: 'read.starterDesc' },
+    { id: 'cafeTalk', titleKey: 'read.cafeTalk', descKey: 'read.cafeTalkDesc' }
+  ];
+
   // If a text is selected, show the reading area
   if (selectedTextId) {
     return (
@@ -46,22 +52,32 @@ export default function LearnView() {
           <p className="text-xs" style={{ color: '#9CA3AF' }}>{t('read.comingSoon')}</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          <div className="px-1">
-            <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{t('read.starter')}</h3>
-            <p className="text-sm" style={{ color: '#6B7280' }}>{t('read.starterDesc')}</p>
-          </div>
+        <div className="space-y-8">
+          {sections.map(section => {
+            const sectionTexts = readingTexts.filter(text => text.sectionId === section.id);
 
-          <div className="grid gap-3 md:grid-cols-2">
-            {readingTexts.map((text) => (
-              <ReadingTextCard
-                key={text.id}
-                text={text}
-                appLanguageId={appLanguageId}
-                onSelect={() => setSelectedTextId(text.id)}
-              />
-            ))}
-          </div>
+            if (sectionTexts.length === 0) return null;
+
+            return (
+              <div key={section.id} className="space-y-4">
+                <div className="px-1">
+                  <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{t(section.titleKey)}</h3>
+                  <p className="text-sm" style={{ color: '#6B7280' }}>{t(section.descKey)}</p>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-2">
+                  {sectionTexts.map((text) => (
+                    <ReadingTextCard
+                      key={text.id}
+                      text={text}
+                      appLanguageId={appLanguageId}
+                      onSelect={() => setSelectedTextId(text.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
