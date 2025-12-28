@@ -56,7 +56,9 @@ export default function LearnView() {
           {sections.map(section => {
             const sectionTexts = readingTexts.filter(text => text.sectionId === section.id);
 
-            if (sectionTexts.length === 0) return null;
+            if (sectionTexts.length === 0) {
+              return null;
+            }
 
             return (
               <div key={section.id} className="space-y-4">
