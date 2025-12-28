@@ -1095,9 +1095,9 @@
         "title": "Settings & Accessibility",
         "description": "Customize game speed, fonts, and accessibility options to match your learning style."
       },
-      "tourLearn": {
-        "title": "Learn",
-        "description": "Browse language information and reference materials."
+      "tourRead": {
+        "title": "Read",
+        "description": "Practice translating texts word by word. Select a text, type translations, and press Enter to continue."
       },
       "tourComplete": {
         "title": "Tour Complete!",
