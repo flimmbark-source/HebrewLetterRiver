@@ -21,6 +21,9 @@ export default function LearnView() {
 
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
+  console.log('[LearnView DEBUG] practiceLanguageId:', practiceLanguageId);
+  console.log('[LearnView DEBUG] readingTexts.length:', readingTexts.length);
+  console.log('[LearnView DEBUG] readingTexts:', readingTexts);
 
   // Group texts by sectionId (pure UI layer)
   const textsBySection = {};
@@ -31,6 +34,9 @@ export default function LearnView() {
     }
     textsBySection[section].push(text);
   });
+
+  console.log('[LearnView DEBUG] textsBySection:', textsBySection);
+  console.log('[LearnView DEBUG] Object.keys(textsBySection):', Object.keys(textsBySection));
 
   // Section metadata
   const sectionMeta = {

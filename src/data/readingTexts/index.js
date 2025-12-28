@@ -45,6 +45,10 @@ function addSectionId(texts, sectionId) {
   return texts.map(text => ({ ...text, sectionId }));
 }
 
+function normalizeLanguageId(value) {
+  return typeof value === 'string' ? value.trim().toLowerCase() : value;
+}
+
 /**
  * Cafe Talk texts by language
  */
@@ -107,8 +111,9 @@ export const readingTextsByLanguage = {
  * @returns {Array} Reading texts for that language with sectionId
  */
 export function getReadingTextsForLanguage(practiceLanguage) {
-  const starterTexts = readingTextsByLanguage[practiceLanguage] || [];
-  const cafeTalkTexts = cafeTalkByLanguage[practiceLanguage] || [];
+  const normalizedLanguage = normalizeLanguageId(practiceLanguage);
+  const starterTexts = readingTextsByLanguage[normalizedLanguage] || [];
+  const cafeTalkTexts = cafeTalkByLanguage[normalizedLanguage] || [];
 
   return [
     ...addSectionId(starterTexts, 'starter'),

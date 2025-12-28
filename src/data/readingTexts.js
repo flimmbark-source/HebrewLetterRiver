@@ -1928,8 +1928,13 @@ export const readingTextsByLanguage = {
  * @param {string} practiceLanguage - Language ID
  * @returns {Array} Reading texts for that language
  */
+function normalizeLanguageId(value) {
+  return typeof value === 'string' ? value.trim().toLowerCase() : value;
+}
+
 export function getReadingTextsForLanguage(practiceLanguage) {
-  return readingTextsByLanguage[practiceLanguage] || [];
+  const normalizedLanguage = normalizeLanguageId(practiceLanguage);
+  return readingTextsByLanguage[normalizedLanguage] || [];
 }
 
 /**
