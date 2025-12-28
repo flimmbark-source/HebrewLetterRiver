@@ -972,13 +972,23 @@ body.no-scroll {
   gap: 8px;
   padding: 12px 8px;
   border-radius: 16px;
-  background: linear-gradient(180deg, #f7ddc3 0%, #f0d9ba 100%);
-  border: 2px solid #e5b883;
-  box-shadow:
-    0 2px 0 #d4a574,
-    0 8px 16px rgba(180, 120, 70, 0.15);
+  background: #FFFFFF;
+  border: 2px solid #A7F3D0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   min-width: 105px;
   height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.goal-column::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #E7E748 0%, #7BFF61 100%);
 }
 
 @media (max-width: 640px) {
@@ -1001,12 +1011,9 @@ body.no-scroll {
   width: 95px;
   height: 60px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #fffbf5 0%, #ffd998 100%);
-  border: 2px solid #d4a574;
-  box-shadow:
-    0 2px 0 #c89760,
-    inset 0 2px 4px rgba(255, 255, 255, 0.6),
-    0 8px 20px rgba(180, 120, 70, 0.25);
+  background: linear-gradient(135deg, #FDFCE5 0%, #E7E748 100%);
+  border: 2px solid #E7E748;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1025,9 +1032,8 @@ body.no-scroll {
   font-family: "Baloo 2", system-ui, sans-serif;
   font-size: 19px;
   font-weight: 700;
-  color: #4a2208;
+  color: #064E3B;
   line-height: 1.2;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
   text-align: center;
   word-wrap: break-word;
   overflow-wrap: break-word;
