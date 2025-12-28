@@ -77,7 +77,7 @@ body.no-scroll {
 }
 
 .main-content {
-  background: linear-gradient(135deg, #fffcea 0%, #fcfff2 100%) !important;
+  background: linear-gradient(135deg, #e4fcd3 0%, #d8fef1 100%) !important;
   border-radius: 0;
   padding: 12px;
   box-shadow: none;
@@ -1173,8 +1173,8 @@ body.no-scroll {
   width: 95px;
   height: 60px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #FDFCE5 0%, #E7E748 100%);
-  border: 2px solid #E7E748;
+  background: linear-gradient(135deg, #FDFCE5 0%, #65f4d7 100%);
+  border: 2px solid #48e7d4;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
@@ -1361,7 +1361,7 @@ body.no-scroll {
   inset-inline: 3px;
   bottom: 3px;
   border-radius: 8px;
-  background: linear-gradient(180deg, #A78BFA 0%, #4D96FF 20%, #6BCB77 40%, #FFD93D 60%, #FFA500 80%, #FF6B6B 100%);
+  background: linear-gradient(180deg, #94f494 0%, #7cd07c 50%, #5ad26a 100%);
   transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   height: 20%;
 }
