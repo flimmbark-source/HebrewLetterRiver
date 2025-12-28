@@ -115,7 +115,7 @@ body.no-scroll {
   color: #064E3B;
   font-family: "Nunito", system-ui, sans-serif;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.01em;
   text-transform: none;
   position: relative;
@@ -160,7 +160,7 @@ body.no-scroll {
   color: #064E3B;
   font-family: "Nunito", system-ui, sans-serif;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.01em;
   text-transform: none;
   position: relative;
@@ -371,7 +371,7 @@ body.no-scroll {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   color: #064E3B;
   position: relative;
-  border: 2px solid #A7F3D0;
+  border: none;
 }
 
 @media (min-width: 640px) {
@@ -383,32 +383,32 @@ body.no-scroll {
 
 .hero-title {
   font-family: "Nunito", system-ui, sans-serif;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 500;
   margin: 0 0 6px;
-  color: #059669;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: #064E3B;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 @media (min-width: 640px) {
   .hero-title {
-    font-size: 14px;
+    font-size: 13px;
     margin: 0 0 8px;
   }
 }
 
 .hero-body {
-  font-size: 22px;
+  font-size: 20px;
   margin: 0;
-  font-weight: 800;
+  font-weight: 700;
   color: #064E3B;
   line-height: 1.2;
 }
 
 @media (min-width: 640px) {
   .hero-body {
-    font-size: 26px;
+    font-size: 22px;
   }
 }
 
@@ -479,15 +479,15 @@ body.no-scroll {
 }
 
 .section-link {
-  font-size: 13px;
-  color: #4AC2DD;
-  font-weight: 600;
+  font-size: 12px;
+  color: #065F46;
+  font-weight: 400;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .section-link:hover {
-  color: #3ab0c4;
+  color: #064E3B;
 }
 
 /* Achievements banners */
@@ -523,13 +523,13 @@ body.no-scroll {
 /* Progress cards - colorful compact style */
 .progress-card-small {
   background: linear-gradient(135deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%) !important;
-  border-radius: 8px;
-  padding: 8px 6px;
+  border-radius: 12px;
+  padding: 12px;
   border: 2px solid transparent;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 8px;
   position: relative;
   overflow: hidden;
   min-height: 115px;
@@ -537,9 +537,9 @@ body.no-scroll {
 
 @media (min-width: 640px) {
   .progress-card-small {
-    border-radius: 12px;
-    padding: 12px;
-    gap: 6px;
+    border-radius: 16px;
+    padding: 16px;
+    gap: 12px;
     min-height: auto;
   }
 }
@@ -590,24 +590,24 @@ body.no-scroll {
 }
 
 .progress-label {
-  font-size: 9px;
-  color: #059669;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  line-height: 1.2;
+  font-size: 11px;
+  color: #064E3B;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.3;
 }
 
 @media (min-width: 640px) {
   .progress-label {
-    font-size: 10px;
+    font-size: 13px;
   }
 }
 
 .progress-value {
   font-family: "Nunito", system-ui, sans-serif;
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 20px;
+  font-weight: 700;
   color: #064E3B;
   line-height: 1.1;
 }
@@ -619,15 +619,15 @@ body.no-scroll {
 }
 
 .progress-sub {
-  font-size: 10px;
+  font-size: 11px;
   color: #065F46;
-  font-weight: 500;
-  line-height: 1.3;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 @media (min-width: 640px) {
   .progress-sub {
-    font-size: 11px;
+    font-size: 12px;
   }
 }
 
@@ -655,48 +655,54 @@ body.no-scroll {
 /* Quest card - colorful modern style */
 .quest-card {
   background: linear-gradient(135deg, #E8FFE3 0%, #D1FAE5 50%, #E0FBFD 100%) !important;
-  border-radius: 10px;
-  padding: 4px 10px;
-  border-left: 3px solid #E7E748;
+  border-radius: 12px;
+  padding: 12px;
+  border-left: none;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 12px;
+  margin-bottom: 8px;
   transition: all 0.2s ease;
 }
 
+@media (min-width: 640px) {
+  .quest-card {
+    border-radius: 16px;
+    padding: 16px;
+  }
+}
+
 .quest-card:hover {
-  border-left-color: #7BFF61;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 
 .quest-left {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
 
 .quest-top-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 8px;
 }
 
 .quest-title {
   font-size: 13px;
   color: #064E3B;
-  font-weight: 700;
-  line-height: 1.1;
+  font-weight: 500;
+  line-height: 1.3;
 }
 
 .quest-reward-inline {
-  font-size: 13px;
-  color: #059669;
-  font-weight: 700;
+  font-size: 12px;
+  color: #065F46;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -704,13 +710,13 @@ body.no-scroll {
 
 .quest-reward-inline .star-inline {
   color: #E7E748;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .quest-progress-meta {
   font-size: 12px;
   color: #065F46;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .quest-progress-bar {
