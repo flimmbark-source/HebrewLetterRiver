@@ -4,6 +4,7 @@
  */
 
 import { getReadingTextsForLanguage } from '../data/readingTexts/index.js';
+import { getLanguageCode } from './languageUtils.js';
 
 /**
  * Get all unique word IDs from a section
@@ -56,13 +57,15 @@ export function validateSectionTranslations(sectionId, practiceLanguageId, appLa
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
   const sectionTexts = readingTexts.filter(text => text.sectionId === sectionId);
   const wordIds = getSectionWordIds(sectionId, practiceLanguageId);
+  const langCode = getLanguageCode(appLanguageId);
 
   const errors = [];
 
   wordIds.forEach(wordId => {
     // Check if any text in this section has a translation for this word
     const hasTranslation = sectionTexts.some(text =>
-      text.translations?.[appLanguageId]?.[wordId]?.canonical
+      (text.translations?.[appLanguageId]?.[wordId]?.canonical ||
+        text.translations?.[langCode]?.[wordId]?.canonical)
     );
 
     if (!hasTranslation) {
