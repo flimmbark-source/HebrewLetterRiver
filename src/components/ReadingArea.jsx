@@ -26,7 +26,7 @@ export default function ReadingArea({ textId, onBack }) {
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
 
   // Load reading text
-  const readingText = getReadingTextById(textId);
+  const readingText = getReadingTextById(textId, practiceLanguageId);
 
   // State
   const [viewportWidth, setViewportWidth] = useState(
