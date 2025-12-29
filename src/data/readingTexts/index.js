@@ -83,6 +83,29 @@ if (import.meta.env?.DEV || import.meta.env?.MODE === 'test') {
   }).catch(err => {
     console.error('Failed to load Cafe Talk validator:', err);
   });
+
+  // Validate Section Dictionary in development
+  import('../lib/validateSectionDictionary.js').then(({ validateSectionMeaningKeys }) => {
+    try {
+      const sections = ['starter', 'cafeTalk'];
+      const languages = ['hebrew', 'english', 'spanish', 'arabic', 'mandarin'];
+
+      sections.forEach(sectionId => {
+        languages.forEach(practiceLang => {
+          const errors = validateSectionMeaningKeys(sectionId, practiceLang);
+          if (errors.length > 0) {
+            console.warn(`⚠ Section Dictionary validation warnings for ${sectionId}/${practiceLang}:`, errors);
+          }
+        });
+      });
+
+      console.log('✓ Section Dictionary validation passed');
+    } catch (error) {
+      console.error('✗ Section Dictionary validation failed:', error.message);
+    }
+  }).catch(err => {
+    console.error('Failed to load Section Dictionary validator:', err);
+  });
 }
 
 /**
