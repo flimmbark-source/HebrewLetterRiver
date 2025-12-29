@@ -289,16 +289,17 @@ export default function ReadingArea({ textId, onBack }) {
     }]);
 
     // Store result for results screen
-    const langCode = getLanguageCode(appLanguageId);
-    let gloss = readingText.glosses?.[langCode]?.[currentWord.id]
-                ?? readingText.glosses?.en?.[currentWord.id];
-
-    // If no gloss, try meaningKeys with i18n translation
-    if (!gloss && readingText.meaningKeys?.[currentWord.id]) {
+    // Primary: Use meaningKeys with i18n translation for proper localization
+    let gloss = '—';
+    if (readingText.meaningKeys?.[currentWord.id]) {
       gloss = t(readingText.meaningKeys[currentWord.id]);
+    } else {
+      // Fallback: Use glosses for semantic meaning display
+      const langCode = getLanguageCode(appLanguageId);
+      gloss = readingText.glosses?.[langCode]?.[currentWord.id]
+              ?? readingText.glosses?.en?.[currentWord.id]
+              ?? '—';
     }
-
-    gloss = gloss ?? '—';
 
     setCompletedResults(prev => [...prev, {
       practiceWord: currentWord.text,
@@ -506,15 +507,16 @@ useEffect(() => {
             <span className={`${appFontClass} text-base font-medium text-white`}>
               {(() => {
                 if (!readingText || !currentWord) return '—';
-                // Use glosses for semantic meaning display
+
+                // Primary: Use meaningKeys with i18n translation for proper localization
+                if (readingText.meaningKeys?.[currentWord.id]) {
+                  return t(readingText.meaningKeys[currentWord.id]);
+                }
+
+                // Fallback: Use glosses for semantic meaning display
                 const langCode = getLanguageCode(appLanguageId);
                 const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
                            ?? readingText.glosses?.en?.[currentWord.id];
-
-                // If no gloss, try meaningKeys with i18n translation
-                if (!gloss && readingText.meaningKeys?.[currentWord.id]) {
-                  return t(readingText.meaningKeys[currentWord.id]);
-                }
 
                 return gloss ?? '—';
               })()}
