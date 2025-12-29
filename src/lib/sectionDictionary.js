@@ -5,6 +5,7 @@
 
 import { getReadingTextsForLanguage } from '../data/readingTexts/index.js';
 import { getTextDirection, getFontClass } from './readingUtils.js';
+import { getLanguageCode } from './languageUtils.js';
 
 /**
  * Derive dictionary entries for a section
@@ -44,9 +45,11 @@ export function getSectionDictionary(sectionId, practiceLanguageId, appLanguageI
       // Get practice word text
       const practiceWord = token.text;
 
-      // Get translation canonical form
+      // Get translation canonical form (support both language IDs and locale codes)
       let canonical = '—';
-      const textTranslations = text.translations?.[appLanguageId];
+      const langCode = getLanguageCode(appLanguageId);
+      const textTranslations =
+        text.translations?.[appLanguageId] || text.translations?.[langCode];
       if (textTranslations && textTranslations[wordId]) {
         canonical = textTranslations[wordId].canonical || '—';
       }
