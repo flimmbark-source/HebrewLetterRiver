@@ -4,6 +4,7 @@
  */
 
 import { createReadingText } from '../common/helpers.js';
+import { CAFE_TALK_CONVERSATION_GLUE, buildCafeTalkTranslations } from '../common/cafeTalkTranslations.js';
 
 export const hebrewCafeTalkTexts = [
   // Conversation Glue (25 words)
@@ -93,35 +94,7 @@ export const hebrewCafeTalkTexts = [
       almost: 'reading.meaning.almost',
       quite: 'reading.meaning.quite'
     },
-    translations: {
-      en: {
-        so: { canonical: 'so', variants: ['so', 'az'] },
-        but: { canonical: 'but', variants: ['but', 'aval'] },
-        well: { canonical: 'well', variants: ['well', 'nu'] },
-        actually: { canonical: 'actually', variants: ['actually', 'be\'etsem'] },
-        maybe: { canonical: 'maybe', variants: ['maybe', 'ulai'] },
-        probably: { canonical: 'probably', variants: ['probably', 'knir\'e'] },
-        basically: { canonical: 'basically', variants: ['basically', 'be\'ikaron'] },
-        anyway: { canonical: 'anyway', variants: ['anyway', 'bekhol mikre'] },
-        also: { canonical: 'also', variants: ['also', 'gam'] },
-        too: { canonical: 'too', variants: ['too', 'gam'] },
-        either: { canonical: 'either', variants: ['either', 'o'] },
-        neither: { canonical: 'neither', variants: ['neither'] },
-        however: { canonical: 'however', variants: ['however', 'im zot'] },
-        therefore: { canonical: 'therefore', variants: ['therefore', 'lakhen'] },
-        meanwhile: { canonical: 'meanwhile', variants: ['meanwhile', 'beintayim'] },
-        besides: { canonical: 'besides', variants: ['besides', 'hutz mize'] },
-        instead: { canonical: 'instead', variants: ['instead', 'bimkom'] },
-        otherwise: { canonical: 'otherwise', variants: ['otherwise', 'aheret'] },
-        still: { canonical: 'still', variants: ['still', 'adayin'] },
-        yet: { canonical: 'yet', variants: ['yet', 'adayin'] },
-        just: { canonical: 'just', variants: ['just', 'rak'] },
-        even: { canonical: 'even', variants: ['even', 'afilu'] },
-        already: { canonical: 'already', variants: ['already', 'kvar'] },
-        almost: { canonical: 'almost', variants: ['almost', 'kimat'] },
-        quite: { canonical: 'quite', variants: ['quite', 'dai'] }
-      }
-    }
+    translations: buildCafeTalkTranslations(CAFE_TALK_CONVERSATION_GLUE)
   }),
 
   // Time Sequencing (20 words)

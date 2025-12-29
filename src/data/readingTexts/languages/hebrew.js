@@ -20,6 +20,13 @@ export const hebrewReadingTexts = [
       { type: 'word', text: 'אמת', id: 'emet' },
       { type: 'punct', text: '.' }
     ],
+    meaningKeys: {
+      shalom: 'reading.meaning.shalom',
+      todah: 'reading.meaning.todah',
+      ken: 'reading.meaning.ken',
+      torah: 'reading.meaning.torah',
+      emet: 'reading.meaning.emet'
+    },
     translations: {
       en: {
         shalom: { canonical: 'shalom', variants: ['shalom'] },

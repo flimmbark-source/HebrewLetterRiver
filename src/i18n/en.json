@@ -559,7 +559,12 @@
       "problem": "problem",
       "question": "question",
       "answer": "answer",
-      "idea": "idea"
+      "idea": "idea",
+      "shalom": "hello; peace; goodbye",
+      "todah": "thank you; thanks",
+      "ken": "yes",
+      "torah": "Torah; Jewish law",
+      "emet": "truth"
     }
   },
   "settings": {

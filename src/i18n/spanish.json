@@ -1345,7 +1345,12 @@
       "problem": "problema",
       "question": "pregunta",
       "answer": "respuesta",
-      "idea": "idea"
+      "idea": "idea",
+      "shalom": "hola; paz; adiós",
+      "todah": "gracias",
+      "ken": "sí",
+      "torah": "Torá; ley judía",
+      "emet": "verdad"
     }
   }
 }
