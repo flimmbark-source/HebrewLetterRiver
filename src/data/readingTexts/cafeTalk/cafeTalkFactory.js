@@ -42,14 +42,17 @@ function buildMeaningKeys(wordIds) {
 
 /**
  * Build translations object for a single app language
- * @param {string[]} wordIds - Array of word IDs  
+ * @param {string[]} wordIds - Array of word IDs
  * @param {Object} appLangLexicon - Lexicon for the app language
+ * @param {Object} [transliterations] - Optional: practice language transliterations (overrides appLangLexicon)
  * @returns {Object} Translations object for one language
  */
-function buildTranslationsForLanguage(wordIds, appLangLexicon) {
+function buildTranslationsForLanguage(wordIds, appLangLexicon, transliterations = null) {
   const translations = {};
   wordIds.forEach(wordId => {
-    const canonical = appLangLexicon[wordId];
+    // If transliterations provided, use those (for practice language typing)
+    // Otherwise use the app language lexicon (for meaning-based typing)
+    const canonical = transliterations ? transliterations[wordId] : appLangLexicon[wordId];
     translations[wordId] = {
       canonical,
       variants: [canonical] // Can be extended later with language-specific variants
@@ -66,9 +69,10 @@ function buildTranslationsForLanguage(wordIds, appLangLexicon) {
  * @param {Object} titles - Title translations {en, es, fr, he, ...}
  * @param {Object} subtitles - Subtitle translations {en, es, fr, he, ...}
  * @param {Object} [i18nLexicons] - Optional: lexicons mapped by i18n codes (en, es, fr, etc.) for app language translations
+ * @param {Object} [transliterations] - Optional: practice language transliterations for typing validation
  * @returns {Object} Reading text object
  */
-export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, i18nLexicons = null) {
+export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, i18nLexicons = null, transliterations = null) {
   const category = CAFE_TALK_CATEGORIES[categoryId];
 
   if (!category) {
@@ -79,15 +83,16 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
 
   // Build translations object
   // Translations use i18n language codes (en, es, fr, etc.) NOT internal IDs (english, spanish, etc.)
+  // If transliterations provided, use those instead of i18n lexicons (for transliteration-based practice)
   let translations = {};
   if (i18nLexicons) {
     // Build translations for all app languages using i18n codes
     Object.keys(i18nLexicons).forEach(i18nCode => {
-      translations[i18nCode] = buildTranslationsForLanguage(wordIds, i18nLexicons[i18nCode]);
+      translations[i18nCode] = buildTranslationsForLanguage(wordIds, i18nLexicons[i18nCode], transliterations);
     });
   } else {
     // Fallback: just use practice language lexicon with 'en' key
-    translations['en'] = buildTranslationsForLanguage(wordIds, practiceLexicon);
+    translations['en'] = buildTranslationsForLanguage(wordIds, practiceLexicon, transliterations);
   }
 
   return createReadingText({
@@ -106,9 +111,10 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
  * @param {string} practiceLanguage - Practice language ID
  * @param {Object} practiceLexicon - Lexicon for practice language
  * @param {Object} [i18nLexicons] - Optional: lexicons mapped by i18n codes for all app languages
+ * @param {Object} [transliterations] - Optional: practice language transliterations for typing validation
  * @returns {Array} Array of 7 reading text objects
  */
-export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLexicons = null) {
+export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLexicons = null, transliterations = null) {
   // Define titles and subtitles for each category
   // These are hardcoded multilingual strings (not from lexicons)
   const categoryMetadata = {
@@ -190,6 +196,6 @@ export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLex
   
   return Object.keys(categoryMetadata).map(categoryId => {
     const { titles, subtitles } = categoryMetadata[categoryId];
-    return buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, i18nLexicons);
+    return buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, i18nLexicons, transliterations);
   });
 }
