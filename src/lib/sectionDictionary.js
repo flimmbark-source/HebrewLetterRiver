@@ -57,13 +57,21 @@ export function getSectionDictionary(sectionId, practiceLanguageId, appLanguageI
       if (meaningKey) {
         try {
           meaning = t(meaningKey);
+          // DEBUG: Log first few translations to help diagnose issues
+          if (wordId === 'so' || wordId === 'but' || wordId === 'I') {
+            console.log(`[SectionDict DEBUG] wordId: ${wordId}, meaningKey: ${meaningKey}, t() returned: "${meaning}"`);
+          }
           // If translation key doesn't exist, t() might return the key itself
           if (meaning === meaningKey) {
+            console.warn(`[SectionDict] Meaning key not found in i18n: ${meaningKey}`);
             meaning = '—';
           }
         } catch (e) {
+          console.error(`[SectionDict] Error translating ${meaningKey}:`, e);
           meaning = '—';
         }
+      } else {
+        console.warn(`[SectionDict] No meaningKey for wordId: ${wordId}`);
       }
 
       // Store entry
