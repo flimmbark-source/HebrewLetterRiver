@@ -65,30 +65,31 @@ function buildTranslationsForLanguage(wordIds, appLangLexicon) {
  * @param {Object} practiceLexicon - Lexicon for practice language
  * @param {Object} titles - Title translations {en, es, fr, he, ...}
  * @param {Object} subtitles - Subtitle translations {en, es, fr, he, ...}
- * @param {Object} [appLangLexicons] - Optional: lexicons for all app languages for translations
+ * @param {Object} [i18nLexicons] - Optional: lexicons mapped by i18n codes (en, es, fr, etc.) for app language translations
  * @returns {Object} Reading text object
  */
-export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, appLangLexicons = null) {
+export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, i18nLexicons = null) {
   const category = CAFE_TALK_CATEGORIES[categoryId];
-  
+
   if (!category) {
     throw new Error(`Unknown Cafe Talk category: ${categoryId}`);
   }
-  
+
   const { wordIds } = category;
-  
+
   // Build translations object
-  // If appLangLexicons provided, build for all; otherwise just English as fallback
+  // Translations use i18n language codes (en, es, fr, etc.) NOT internal IDs (english, spanish, etc.)
   let translations = {};
-  if (appLangLexicons) {
-    Object.keys(appLangLexicons).forEach(langId => {
-      translations[langId] = buildTranslationsForLanguage(wordIds, appLangLexicons[langId]);
+  if (i18nLexicons) {
+    // Build translations for all app languages using i18n codes
+    Object.keys(i18nLexicons).forEach(i18nCode => {
+      translations[i18nCode] = buildTranslationsForLanguage(wordIds, i18nLexicons[i18nCode]);
     });
   } else {
-    // Fallback: just use practice language lexicon
-    translations[practiceLanguage] = buildTranslationsForLanguage(wordIds, practiceLexicon);
+    // Fallback: just use practice language lexicon with 'en' key
+    translations['en'] = buildTranslationsForLanguage(wordIds, practiceLexicon);
   }
-  
+
   return createReadingText({
     id: `cafeTalk.${categoryId}`,
     title: titles,
@@ -104,10 +105,10 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
  * Build all 7 Cafe Talk texts for a language
  * @param {string} practiceLanguage - Practice language ID
  * @param {Object} practiceLexicon - Lexicon for practice language
- * @param {Object} [appLangLexicons] - Optional: lexicons for all app languages
+ * @param {Object} [i18nLexicons] - Optional: lexicons mapped by i18n codes for all app languages
  * @returns {Array} Array of 7 reading text objects
  */
-export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, appLangLexicons = null) {
+export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLexicons = null) {
   // Define titles and subtitles for each category
   // These are hardcoded multilingual strings (not from lexicons)
   const categoryMetadata = {
@@ -189,6 +190,6 @@ export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, appLang
   
   return Object.keys(categoryMetadata).map(categoryId => {
     const { titles, subtitles } = categoryMetadata[categoryId];
-    return buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, appLangLexicons);
+    return buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, i18nLexicons);
   });
 }

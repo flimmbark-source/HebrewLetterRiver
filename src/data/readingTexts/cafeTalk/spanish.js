@@ -5,6 +5,11 @@
 
 import { buildAllCafeTalkTexts } from './cafeTalkFactory.js';
 import { cafeTalkLexicon } from './lexicon/spanish.js';
+import { getI18nLexicons } from './allLexicons.js';
+
+// Get all lexicons for building translations across app languages
+const i18nLexicons = getI18nLexicons();
 
 // Build all 7 Cafe Talk texts for Spanish using the lexicon
-export const spanishCafeTalkTexts = buildAllCafeTalkTexts('spanish', cafeTalkLexicon);
+// Pass i18nLexicons so Section Dictionary works for all app languages
+export const spanishCafeTalkTexts = buildAllCafeTalkTexts('spanish', cafeTalkLexicon, i18nLexicons);
