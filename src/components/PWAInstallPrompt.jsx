@@ -5,6 +5,14 @@ import { useEffect, useState } from 'react';
  * Shows a prompt to install the app when the browser supports it
  */
 export default function PWAInstallPrompt() {
+  const INSTALL_PROMPT_ENABLED = false;
+
+  // Temporarily disable the install prompt on mobile while we refine the
+  // experience. The flag makes it easy to re-enable later.
+  if (!INSTALL_PROMPT_ENABLED) {
+    return null;
+  }
+
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showPrompt, setShowPrompt] = useState(false);
 
