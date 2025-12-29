@@ -169,5 +169,6 @@ export default function SectionDictionary({ sectionId, sectionTitle, isOpen, onC
         </div>
       </div>
     </div>
+  </div>
   );
 }
