@@ -10,7 +10,7 @@
  * - Translations exist for required app languages
  */
 
-import { cafeTalkCanonical, getCafeTalkCategoryIds, getCategoryTokenCount } from './cafeTalkCanonical.js';
+import { CAFE_TALK_WORDS, getCafeTalkCategoryIds, getCategoryTokenCount, getEnglishLookup } from './cafeTalkCanonical.js';
 
 // Expected practice languages
 const PRACTICE_LANGUAGES = [
@@ -55,6 +55,7 @@ function hasPlaceholder(value) {
 function validateCafeTalkText(text, language, categoryId) {
   const expectedTokenCount = getCategoryTokenCount(categoryId);
   const errors = [];
+  const englishLookup = getEnglishLookup();
 
   // Check ID format
   if (text.id !== `cafeTalk.${categoryId}`) {
@@ -97,6 +98,14 @@ function validateCafeTalkText(text, language, categoryId) {
       }
       if (hasPlaceholder(token.id)) {
         errors.push(`Token ${idx + 1} has __TODO__ placeholder ID`);
+      }
+
+      // CRITICAL: For non-English languages, ensure tokens are NOT English
+      if (language !== 'english' && token.id && englishLookup[token.id]) {
+        const englishWord = englishLookup[token.id];
+        if (token.text === englishWord) {
+          errors.push(`Token "${token.id}" uses English placeholder "${englishWord}" instead of ${language} translation`);
+        }
       }
     });
   }

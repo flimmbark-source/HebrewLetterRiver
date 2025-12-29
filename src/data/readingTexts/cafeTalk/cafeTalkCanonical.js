@@ -1,253 +1,243 @@
 /**
- * Canonical Cafe Talk Definition
+ * Cafe Talk Canonical Word List
  *
- * This file serves as the single source of truth for Cafe Talk reading texts.
- * It defines the 7 categories, their expected token counts, and concept keys
- * that should be implemented across all practice languages.
+ * This is the single source of truth for all Cafe Talk vocabulary.
+ * Each word has a stable ID and English reference text.
+ * This file is used ONLY for:
+ * - Generating translations via DeepL
+ * - Validation
+ * - Building lexicons
  *
- * Each category contains conversational vocabulary organized by theme:
- * - conversationGlue: Discourse markers and connectors (so, but, well, etc.)
- * - timeSequencing: Time-related words (now, then, after, before, etc.)
- * - peopleWords: Personal pronouns and people references
- * - coreStoryVerbs: Essential action verbs for storytelling
- * - lifeLogistics: Daily life and practical words
- * - reactionsFeelings: Emotional responses and reactions
- * - everydayTopics: Common conversation topics
- *
- * Usage:
- * - Used by validation to ensure completeness
- * - Reference for creating per-language implementations
- * - NOT used for runtime token generation (each language provides actual tokens)
+ * DO NOT import this for runtime token generation in non-English languages.
+ * Use language-specific lexicons instead.
  */
 
-export const cafeTalkCanonical = [
-  {
-    id: 'conversationGlue',
-    titleKey: 'reading.cafeTalk.conversationGlue.title',
-    subtitleKey: 'reading.cafeTalk.conversationGlue.subtitle',
-    tokenCount: 25,
-    concepts: [
-      { conceptId: 'so', meaningKey: 'reading.meaning.so' },
-      { conceptId: 'but', meaningKey: 'reading.meaning.but' },
-      { conceptId: 'well', meaningKey: 'reading.meaning.well' },
-      { conceptId: 'actually', meaningKey: 'reading.meaning.actually' },
-      { conceptId: 'maybe', meaningKey: 'reading.meaning.maybe' },
-      { conceptId: 'probably', meaningKey: 'reading.meaning.probably' },
-      { conceptId: 'basically', meaningKey: 'reading.meaning.basically' },
-      { conceptId: 'anyway', meaningKey: 'reading.meaning.anyway' },
-      { conceptId: 'also', meaningKey: 'reading.meaning.also' },
-      { conceptId: 'too', meaningKey: 'reading.meaning.too' },
-      { conceptId: 'either', meaningKey: 'reading.meaning.either' },
-      { conceptId: 'neither', meaningKey: 'reading.meaning.neither' },
-      { conceptId: 'however', meaningKey: 'reading.meaning.however' },
-      { conceptId: 'therefore', meaningKey: 'reading.meaning.therefore' },
-      { conceptId: 'meanwhile', meaningKey: 'reading.meaning.meanwhile' },
-      { conceptId: 'besides', meaningKey: 'reading.meaning.besides' },
-      { conceptId: 'instead', meaningKey: 'reading.meaning.instead' },
-      { conceptId: 'otherwise', meaningKey: 'reading.meaning.otherwise' },
-      { conceptId: 'still', meaningKey: 'reading.meaning.still' },
-      { conceptId: 'yet', meaningKey: 'reading.meaning.yet' },
-      { conceptId: 'just', meaningKey: 'reading.meaning.just' },
-      { conceptId: 'even', meaningKey: 'reading.meaning.even' },
-      { conceptId: 'already', meaningKey: 'reading.meaning.already' },
-      { conceptId: 'almost', meaningKey: 'reading.meaning.almost' },
-      { conceptId: 'quite', meaningKey: 'reading.meaning.quite' }
-    ]
-  },
-  {
-    id: 'timeSequencing',
-    titleKey: 'reading.cafeTalk.timeSequencing.title',
-    subtitleKey: 'reading.cafeTalk.timeSequencing.subtitle',
-    tokenCount: 20,
-    concepts: [
-      { conceptId: 'now', meaningKey: 'reading.meaning.now' },
-      { conceptId: 'then', meaningKey: 'reading.meaning.then' },
-      { conceptId: 'when', meaningKey: 'reading.meaning.when' },
-      { conceptId: 'before', meaningKey: 'reading.meaning.before' },
-      { conceptId: 'after', meaningKey: 'reading.meaning.after' },
-      { conceptId: 'during', meaningKey: 'reading.meaning.during' },
-      { conceptId: 'while', meaningKey: 'reading.meaning.while' },
-      { conceptId: 'until', meaningKey: 'reading.meaning.until' },
-      { conceptId: 'since', meaningKey: 'reading.meaning.since' },
-      { conceptId: 'today', meaningKey: 'reading.meaning.today' },
-      { conceptId: 'yesterday', meaningKey: 'reading.meaning.yesterday' },
-      { conceptId: 'tomorrow', meaningKey: 'reading.meaning.tomorrow' },
-      { conceptId: 'soon', meaningKey: 'reading.meaning.soon' },
-      { conceptId: 'later', meaningKey: 'reading.meaning.later' },
-      { conceptId: 'early', meaningKey: 'reading.meaning.early' },
-      { conceptId: 'late', meaningKey: 'reading.meaning.late' },
-      { conceptId: 'always', meaningKey: 'reading.meaning.always' },
-      { conceptId: 'never', meaningKey: 'reading.meaning.never' },
-      { conceptId: 'sometimes', meaningKey: 'reading.meaning.sometimes' },
-      { conceptId: 'often', meaningKey: 'reading.meaning.often' }
-    ]
-  },
-  {
-    id: 'peopleWords',
-    titleKey: 'reading.cafeTalk.peopleWords.title',
-    subtitleKey: 'reading.cafeTalk.peopleWords.subtitle',
-    tokenCount: 18,
-    concepts: [
-      { conceptId: 'I', meaningKey: 'reading.meaning.I' },
-      { conceptId: 'you', meaningKey: 'reading.meaning.you' },
-      { conceptId: 'he', meaningKey: 'reading.meaning.he' },
-      { conceptId: 'she', meaningKey: 'reading.meaning.she' },
-      { conceptId: 'we', meaningKey: 'reading.meaning.we' },
-      { conceptId: 'they', meaningKey: 'reading.meaning.they' },
-      { conceptId: 'who', meaningKey: 'reading.meaning.who' },
-      { conceptId: 'someone', meaningKey: 'reading.meaning.someone' },
-      { conceptId: 'everyone', meaningKey: 'reading.meaning.everyone' },
-      { conceptId: 'nobody', meaningKey: 'reading.meaning.nobody' },
-      { conceptId: 'friend', meaningKey: 'reading.meaning.friend' },
-      { conceptId: 'family', meaningKey: 'reading.meaning.family' },
-      { conceptId: 'person', meaningKey: 'reading.meaning.person' },
-      { conceptId: 'people', meaningKey: 'reading.meaning.people' },
-      { conceptId: 'child', meaningKey: 'reading.meaning.child' },
-      { conceptId: 'parent', meaningKey: 'reading.meaning.parent' },
-      { conceptId: 'neighbor', meaningKey: 'reading.meaning.neighbor' },
-      { conceptId: 'stranger', meaningKey: 'reading.meaning.stranger' }
-    ]
-  },
-  {
-    id: 'coreStoryVerbs',
-    titleKey: 'reading.cafeTalk.coreStoryVerbs.title',
-    subtitleKey: 'reading.cafeTalk.coreStoryVerbs.subtitle',
-    tokenCount: 22,
-    concepts: [
-      { conceptId: 'go', meaningKey: 'reading.meaning.go' },
-      { conceptId: 'come', meaningKey: 'reading.meaning.come' },
-      { conceptId: 'see', meaningKey: 'reading.meaning.see' },
-      { conceptId: 'hear', meaningKey: 'reading.meaning.hear' },
-      { conceptId: 'say', meaningKey: 'reading.meaning.say' },
-      { conceptId: 'tell', meaningKey: 'reading.meaning.tell' },
-      { conceptId: 'ask', meaningKey: 'reading.meaning.ask' },
-      { conceptId: 'think', meaningKey: 'reading.meaning.think' },
-      { conceptId: 'know', meaningKey: 'reading.meaning.know' },
-      { conceptId: 'want', meaningKey: 'reading.meaning.want' },
-      { conceptId: 'need', meaningKey: 'reading.meaning.need' },
-      { conceptId: 'like', meaningKey: 'reading.meaning.like' },
-      { conceptId: 'love', meaningKey: 'reading.meaning.love' },
-      { conceptId: 'hate', meaningKey: 'reading.meaning.hate' },
-      { conceptId: 'make', meaningKey: 'reading.meaning.make' },
-      { conceptId: 'do', meaningKey: 'reading.meaning.do' },
-      { conceptId: 'get', meaningKey: 'reading.meaning.get' },
-      { conceptId: 'give', meaningKey: 'reading.meaning.give' },
-      { conceptId: 'take', meaningKey: 'reading.meaning.take' },
-      { conceptId: 'find', meaningKey: 'reading.meaning.find' },
-      { conceptId: 'lose', meaningKey: 'reading.meaning.lose' },
-      { conceptId: 'try', meaningKey: 'reading.meaning.try' }
-    ]
-  },
-  {
-    id: 'lifeLogistics',
-    titleKey: 'reading.cafeTalk.lifeLogistics.title',
-    subtitleKey: 'reading.cafeTalk.lifeLogistics.subtitle',
-    tokenCount: 20,
-    concepts: [
-      { conceptId: 'eat', meaningKey: 'reading.meaning.eat' },
-      { conceptId: 'drink', meaningKey: 'reading.meaning.drink' },
-      { conceptId: 'sleep', meaningKey: 'reading.meaning.sleep' },
-      { conceptId: 'work', meaningKey: 'reading.meaning.work' },
-      { conceptId: 'study', meaningKey: 'reading.meaning.study' },
-      { conceptId: 'home', meaningKey: 'reading.meaning.home' },
-      { conceptId: 'house', meaningKey: 'reading.meaning.house' },
-      { conceptId: 'place', meaningKey: 'reading.meaning.place' },
-      { conceptId: 'time', meaningKey: 'reading.meaning.time' },
-      { conceptId: 'day', meaningKey: 'reading.meaning.day' },
-      { conceptId: 'money', meaningKey: 'reading.meaning.money' },
-      { conceptId: 'buy', meaningKey: 'reading.meaning.buy' },
-      { conceptId: 'pay', meaningKey: 'reading.meaning.pay' },
-      { conceptId: 'help', meaningKey: 'reading.meaning.help' },
-      { conceptId: 'wait', meaningKey: 'reading.meaning.wait' },
-      { conceptId: 'leave', meaningKey: 'reading.meaning.leave' },
-      { conceptId: 'arrive', meaningKey: 'reading.meaning.arrive' },
-      { conceptId: 'start', meaningKey: 'reading.meaning.start' },
-      { conceptId: 'finish', meaningKey: 'reading.meaning.finish' },
-      { conceptId: 'stop', meaningKey: 'reading.meaning.stop' }
-    ]
-  },
-  {
-    id: 'reactionsFeelings',
-    titleKey: 'reading.cafeTalk.reactionsFeelings.title',
-    subtitleKey: 'reading.cafeTalk.reactionsFeelings.subtitle',
-    tokenCount: 20,
-    concepts: [
-      { conceptId: 'happy', meaningKey: 'reading.meaning.happy' },
-      { conceptId: 'sad', meaningKey: 'reading.meaning.sad' },
-      { conceptId: 'angry', meaningKey: 'reading.meaning.angry' },
-      { conceptId: 'scared', meaningKey: 'reading.meaning.scared' },
-      { conceptId: 'surprised', meaningKey: 'reading.meaning.surprised' },
-      { conceptId: 'tired', meaningKey: 'reading.meaning.tired' },
-      { conceptId: 'excited', meaningKey: 'reading.meaning.excited' },
-      { conceptId: 'bored', meaningKey: 'reading.meaning.bored' },
-      { conceptId: 'worried', meaningKey: 'reading.meaning.worried' },
-      { conceptId: 'confused', meaningKey: 'reading.meaning.confused' },
-      { conceptId: 'okay', meaningKey: 'reading.meaning.okay' },
-      { conceptId: 'fine', meaningKey: 'reading.meaning.fine' },
-      { conceptId: 'great', meaningKey: 'reading.meaning.great' },
-      { conceptId: 'bad', meaningKey: 'reading.meaning.bad' },
-      { conceptId: 'terrible', meaningKey: 'reading.meaning.terrible' },
-      { conceptId: 'wonderful', meaningKey: 'reading.meaning.wonderful' },
-      { conceptId: 'nice', meaningKey: 'reading.meaning.nice' },
-      { conceptId: 'beautiful', meaningKey: 'reading.meaning.beautiful' },
-      { conceptId: 'ugly', meaningKey: 'reading.meaning.ugly' },
-      { conceptId: 'strange', meaningKey: 'reading.meaning.strange' }
-    ]
-  },
-  {
-    id: 'everydayTopics',
-    titleKey: 'reading.cafeTalk.everydayTopics.title',
-    subtitleKey: 'reading.cafeTalk.everydayTopics.subtitle',
-    tokenCount: 20,
-    concepts: [
-      { conceptId: 'food', meaningKey: 'reading.meaning.food' },
-      { conceptId: 'water', meaningKey: 'reading.meaning.water' },
-      { conceptId: 'coffee', meaningKey: 'reading.meaning.coffee' },
-      { conceptId: 'weather', meaningKey: 'reading.meaning.weather' },
-      { conceptId: 'book', meaningKey: 'reading.meaning.book' },
-      { conceptId: 'phone', meaningKey: 'reading.meaning.phone' },
-      { conceptId: 'car', meaningKey: 'reading.meaning.car' },
-      { conceptId: 'street', meaningKey: 'reading.meaning.street' },
-      { conceptId: 'city', meaningKey: 'reading.meaning.city' },
-      { conceptId: 'country', meaningKey: 'reading.meaning.country' },
-      { conceptId: 'language', meaningKey: 'reading.meaning.language' },
-      { conceptId: 'word', meaningKey: 'reading.meaning.word' },
-      { conceptId: 'thing', meaningKey: 'reading.meaning.thing' },
-      { conceptId: 'something', meaningKey: 'reading.meaning.something' },
-      { conceptId: 'nothing', meaningKey: 'reading.meaning.nothing' },
-      { conceptId: 'everything', meaningKey: 'reading.meaning.everything' },
-      { conceptId: 'problem', meaningKey: 'reading.meaning.problem' },
-      { conceptId: 'question', meaningKey: 'reading.meaning.question' },
-      { conceptId: 'answer', meaningKey: 'reading.meaning.answer' },
-      { conceptId: 'idea', meaningKey: 'reading.meaning.idea' }
-    ]
-  }
+/**
+ * All Cafe Talk words with stable IDs and English reference text
+ */
+export const CAFE_TALK_WORDS = [
+  // Conversation Glue (25 words)
+  { id: 'so', en: 'so' },
+  { id: 'but', en: 'but' },
+  { id: 'well', en: 'well' },
+  { id: 'actually', en: 'actually' },
+  { id: 'maybe', en: 'maybe' },
+  { id: 'probably', en: 'probably' },
+  { id: 'basically', en: 'basically' },
+  { id: 'anyway', en: 'anyway' },
+  { id: 'also', en: 'also' },
+  { id: 'too', en: 'too' },
+  { id: 'either', en: 'either' },
+  { id: 'neither', en: 'neither' },
+  { id: 'however', en: 'however' },
+  { id: 'therefore', en: 'therefore' },
+  { id: 'meanwhile', en: 'meanwhile' },
+  { id: 'besides', en: 'besides' },
+  { id: 'instead', en: 'instead' },
+  { id: 'otherwise', en: 'otherwise' },
+  { id: 'still', en: 'still' },
+  { id: 'yet', en: 'yet' },
+  { id: 'just', en: 'just' },
+  { id: 'even', en: 'even' },
+  { id: 'already', en: 'already' },
+  { id: 'almost', en: 'almost' },
+  { id: 'quite', en: 'quite' },
+
+  // Time & Sequencing (20 words)
+  { id: 'now', en: 'now' },
+  { id: 'then', en: 'then' },
+  { id: 'when', en: 'when' },
+  { id: 'before', en: 'before' },
+  { id: 'after', en: 'after' },
+  { id: 'during', en: 'during' },
+  { id: 'while', en: 'while' },
+  { id: 'until', en: 'until' },
+  { id: 'since', en: 'since' },
+  { id: 'today', en: 'today' },
+  { id: 'yesterday', en: 'yesterday' },
+  { id: 'tomorrow', en: 'tomorrow' },
+  { id: 'soon', en: 'soon' },
+  { id: 'later', en: 'later' },
+  { id: 'early', en: 'early' },
+  { id: 'late', en: 'late' },
+  { id: 'always', en: 'always' },
+  { id: 'never', en: 'never' },
+  { id: 'sometimes', en: 'sometimes' },
+  { id: 'often', en: 'often' },
+
+  // People Words (18 words)
+  { id: 'I', en: 'I' },
+  { id: 'you', en: 'you' },
+  { id: 'he', en: 'he' },
+  { id: 'she', en: 'she' },
+  { id: 'we', en: 'we' },
+  { id: 'they', en: 'they' },
+  { id: 'who', en: 'who' },
+  { id: 'someone', en: 'someone' },
+  { id: 'everyone', en: 'everyone' },
+  { id: 'nobody', en: 'nobody' },
+  { id: 'friend', en: 'friend' },
+  { id: 'family', en: 'family' },
+  { id: 'person', en: 'person' },
+  { id: 'people', en: 'people' },
+  { id: 'child', en: 'child' },
+  { id: 'parent', en: 'parent' },
+  { id: 'neighbor', en: 'neighbor' },
+  { id: 'stranger', en: 'stranger' },
+
+  // Core Story Verbs (22 words)
+  { id: 'go', en: 'go' },
+  { id: 'come', en: 'come' },
+  { id: 'see', en: 'see' },
+  { id: 'hear', en: 'hear' },
+  { id: 'say', en: 'say' },
+  { id: 'tell', en: 'tell' },
+  { id: 'ask', en: 'ask' },
+  { id: 'think', en: 'think' },
+  { id: 'know', en: 'know' },
+  { id: 'want', en: 'want' },
+  { id: 'need', en: 'need' },
+  { id: 'like', en: 'like' },
+  { id: 'love', en: 'love' },
+  { id: 'hate', en: 'hate' },
+  { id: 'make', en: 'make' },
+  { id: 'do', en: 'do' },
+  { id: 'get', en: 'get' },
+  { id: 'give', en: 'give' },
+  { id: 'take', en: 'take' },
+  { id: 'find', en: 'find' },
+  { id: 'lose', en: 'lose' },
+  { id: 'try', en: 'try' },
+
+  // Life Logistics (20 words)
+  { id: 'eat', en: 'eat' },
+  { id: 'drink', en: 'drink' },
+  { id: 'sleep', en: 'sleep' },
+  { id: 'work', en: 'work' },
+  { id: 'study', en: 'study' },
+  { id: 'home', en: 'home' },
+  { id: 'house', en: 'house' },
+  { id: 'place', en: 'place' },
+  { id: 'time', en: 'time' },
+  { id: 'day', en: 'day' },
+  { id: 'money', en: 'money' },
+  { id: 'buy', en: 'buy' },
+  { id: 'pay', en: 'pay' },
+  { id: 'help', en: 'help' },
+  { id: 'wait', en: 'wait' },
+  { id: 'leave', en: 'leave' },
+  { id: 'arrive', en: 'arrive' },
+  { id: 'start', en: 'start' },
+  { id: 'finish', en: 'finish' },
+  { id: 'stop', en: 'stop' },
+
+  // Reactions & Feelings (20 words)
+  { id: 'happy', en: 'happy' },
+  { id: 'sad', en: 'sad' },
+  { id: 'angry', en: 'angry' },
+  { id: 'scared', en: 'scared' },
+  { id: 'surprised', en: 'surprised' },
+  { id: 'tired', en: 'tired' },
+  { id: 'excited', en: 'excited' },
+  { id: 'bored', en: 'bored' },
+  { id: 'worried', en: 'worried' },
+  { id: 'confused', en: 'confused' },
+  { id: 'okay', en: 'okay' },
+  { id: 'fine', en: 'fine' },
+  { id: 'great', en: 'great' },
+  { id: 'bad', en: 'bad' },
+  { id: 'terrible', en: 'terrible' },
+  { id: 'wonderful', en: 'wonderful' },
+  { id: 'nice', en: 'nice' },
+  { id: 'beautiful', en: 'beautiful' },
+  { id: 'ugly', en: 'ugly' },
+  { id: 'strange', en: 'strange' },
+
+  // Everyday Topics (20 words)
+  { id: 'food', en: 'food' },
+  { id: 'water', en: 'water' },
+  { id: 'coffee', en: 'coffee' },
+  { id: 'weather', en: 'weather' },
+  { id: 'book', en: 'book' },
+  { id: 'phone', en: 'phone' },
+  { id: 'car', en: 'car' },
+  { id: 'street', en: 'street' },
+  { id: 'city', en: 'city' },
+  { id: 'country', en: 'country' },
+  { id: 'language', en: 'language' },
+  { id: 'word', en: 'word' },
+  { id: 'thing', en: 'thing' },
+  { id: 'something', en: 'something' },
+  { id: 'nothing', en: 'nothing' },
+  { id: 'everything', en: 'everything' },
+  { id: 'problem', en: 'problem' },
+  { id: 'question', en: 'question' },
+  { id: 'answer', en: 'answer' },
+  { id: 'idea', en: 'idea' }
 ];
 
 /**
- * Get all Cafe Talk category IDs in order
- * @returns {string[]} Array of category IDs
+ * Cafe Talk categories with word IDs in order
+ */
+export const CAFE_TALK_CATEGORIES = {
+  conversationGlue: {
+    id: 'conversationGlue',
+    wordIds: ['so', 'but', 'well', 'actually', 'maybe', 'probably', 'basically', 'anyway', 'also', 'too', 'either', 'neither', 'however', 'therefore', 'meanwhile', 'besides', 'instead', 'otherwise', 'still', 'yet', 'just', 'even', 'already', 'almost', 'quite']
+  },
+  timeSequencing: {
+    id: 'timeSequencing',
+    wordIds: ['now', 'then', 'when', 'before', 'after', 'during', 'while', 'until', 'since', 'today', 'yesterday', 'tomorrow', 'soon', 'later', 'early', 'late', 'always', 'never', 'sometimes', 'often']
+  },
+  peopleWords: {
+    id: 'peopleWords',
+    wordIds: ['I', 'you', 'he', 'she', 'we', 'they', 'who', 'someone', 'everyone', 'nobody', 'friend', 'family', 'person', 'people', 'child', 'parent', 'neighbor', 'stranger']
+  },
+  coreStoryVerbs: {
+    id: 'coreStoryVerbs',
+    wordIds: ['go', 'come', 'see', 'hear', 'say', 'tell', 'ask', 'think', 'know', 'want', 'need', 'like', 'love', 'hate', 'make', 'do', 'get', 'give', 'take', 'find', 'lose', 'try']
+  },
+  lifeLogistics: {
+    id: 'lifeLogistics',
+    wordIds: ['eat', 'drink', 'sleep', 'work', 'study', 'home', 'house', 'place', 'time', 'day', 'money', 'buy', 'pay', 'help', 'wait', 'leave', 'arrive', 'start', 'finish', 'stop']
+  },
+  reactionsFeelings: {
+    id: 'reactionsFeelings',
+    wordIds: ['happy', 'sad', 'angry', 'scared', 'surprised', 'tired', 'excited', 'bored', 'worried', 'confused', 'okay', 'fine', 'great', 'bad', 'terrible', 'wonderful', 'nice', 'beautiful', 'ugly', 'strange']
+  },
+  everydayTopics: {
+    id: 'everydayTopics',
+    wordIds: ['food', 'water', 'coffee', 'weather', 'book', 'phone', 'car', 'street', 'city', 'country', 'language', 'word', 'thing', 'something', 'nothing', 'everything', 'problem', 'question', 'answer', 'idea']
+  }
+};
+
+/**
+ * Get all category IDs in order
  */
 export function getCafeTalkCategoryIds() {
-  return cafeTalkCanonical.map(cat => cat.id);
+  return Object.keys(CAFE_TALK_CATEGORIES);
 }
 
 /**
- * Get expected token count for a category
- * @param {string} categoryId - Category identifier
- * @returns {number} Expected token count
+ * Get word count for a category
  */
 export function getCategoryTokenCount(categoryId) {
-  const category = cafeTalkCanonical.find(cat => cat.id === categoryId);
-  return category?.tokenCount || 0;
+  const category = CAFE_TALK_CATEGORIES[categoryId];
+  return category ? category.wordIds.length : 0;
 }
 
 /**
- * Get all concept IDs for a category
- * @param {string} categoryId - Category identifier
- * @returns {string[]} Array of concept IDs
+ * Get all word IDs
  */
-export function getCategoryConcepts(categoryId) {
-  const category = cafeTalkCanonical.find(cat => cat.id === categoryId);
-  return category?.concepts.map(c => c.conceptId) || [];
+export function getAllWordIds() {
+  return CAFE_TALK_WORDS.map(w => w.id);
+}
+
+/**
+ * Create a lookup map of word ID to English text
+ */
+export function getEnglishLookup() {
+  return CAFE_TALK_WORDS.reduce((acc, word) => {
+    acc[word.id] = word.en;
+    return acc;
+  }, {});
 }
