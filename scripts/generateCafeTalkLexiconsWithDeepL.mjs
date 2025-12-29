@@ -40,6 +40,12 @@ const SUPPORTED_LANGUAGES = [
   'japanese', 'bengali', 'amharic'
 ];
 
+// Languages to skip (already have proper lexicons with transliterations)
+const SKIP_LANGUAGES = [
+  'english', // Already correct (English words)
+  'hebrew'   // Already has Hebrew words + transliterations
+];
+
 // Map internal language IDs to DeepL target language codes
 const DEEPL_LANGUAGE_MAP = {
   english: 'EN',
