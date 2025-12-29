@@ -394,16 +394,6 @@ useEffect(() => {
       return;
     }
 
-    // Space - commit word
-    const isSpace = key === ' ' || key === 'Space' || key === 'Spacebar' || e.code === 'Space';
-    if (isSpace) {
-      e.preventDefault();
-      const normalized = normalizeForLanguage(typedWord, appLanguageId);
-      if (!normalized) return;
-      gradeAndCommit();
-      return;
-    }
-
     // Enter - also commit word
     if (key === 'Enter') {
       e.preventDefault();
