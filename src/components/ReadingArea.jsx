@@ -119,6 +119,10 @@ export default function ReadingArea({ textId, onBack }) {
     const translationsForLocale = readingText.translations?.[TRANSLATION_KEY_MAP[appLanguageId]];
     const translations = translationsForAppLanguage || translationsForLocale;
 
+    // Always grade against the practice language transliteration so users
+    // type the word pronunciation rather than the meaning translation.
+    const transliterationEntry = readingText.translations?.en?.[currentWord.id];
+
     // DEBUG: Log translation lookup for first word
     if (currentWord.id === 'so' || currentWord.id === 'but' || currentWord.id === 'I') {
       console.log(`[ReadingArea DEBUG] Getting translation for "${currentWord.id}":`, {
@@ -127,15 +131,32 @@ export default function ReadingArea({ textId, onBack }) {
         hasTranslationsForAppLanguage: !!translationsForAppLanguage,
         hasTranslationsForLocale: !!translationsForLocale,
         translations: translations?.[currentWord.id],
+        transliterationEntry,
         fallback: !translations ? currentWord.text : null
       });
     }
 
-    if (!translations) {
+    if (!translations && !transliterationEntry) {
       console.warn(`[ReadingArea] No translations found for appLanguageId=${appLanguageId}, falling back to practice word text`);
       return null;
     }
-    return translations[currentWord.id];
+
+    const baseTranslation = translations?.[currentWord.id];
+
+    // Prefer transliteration canonical/variants when available, but keep all
+    // other variants (including meaning translations) so they remain accepted.
+    if (transliterationEntry) {
+      const translitVariants = transliterationEntry.variants || [transliterationEntry.canonical];
+      const baseVariants = baseTranslation?.variants || (baseTranslation?.canonical ? [baseTranslation.canonical] : []);
+
+      return {
+        ...baseTranslation,
+        canonical: transliterationEntry.canonical,
+        variants: [...new Set([...translitVariants, ...baseVariants])]
+      };
+    }
+
+    return baseTranslation;
   }, [readingText, currentWord, appLanguageId]);
 
   // Center practice track on current word
