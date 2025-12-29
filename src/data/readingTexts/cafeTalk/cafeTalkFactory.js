@@ -42,20 +42,34 @@ function buildMeaningKeys(wordIds) {
 
 /**
  * Build translations object for a single app language
+ *
+ * The canonical value should reflect how the practice language word is
+ * pronounced (a transliteration), not the meaning translation. When
+ * explicit transliterations are provided we use them; otherwise we fall
+ * back to the practice language lexicon so every app language sees the
+ * same pronunciation hints instead of a meaning translation.
+ *
  * @param {string[]} wordIds - Array of word IDs
- * @param {Object} appLangLexicon - Lexicon for the app language
- * @param {Object} [transliterations] - Optional: practice language transliterations (overrides appLangLexicon)
+ * @param {Object} appLangLexicon - Lexicon for the app language (used for variants)
+ * @param {Object} transliterationSource - Source for transliterations (explicit map or practice lexicon)
  * @returns {Object} Translations object for one language
  */
-function buildTranslationsForLanguage(wordIds, appLangLexicon, transliterations = null) {
+function buildTranslationsForLanguage(wordIds, appLangLexicon, transliterationSource) {
   const translations = {};
   wordIds.forEach(wordId => {
-    // If transliterations provided, use those (for practice language typing)
-    // Otherwise use the app language lexicon (for meaning-based typing)
-    const canonical = transliterations ? transliterations[wordId] : appLangLexicon[wordId];
+    // Prefer explicit transliterations; otherwise fall back to the practice lexicon
+    const canonical = transliterationSource[wordId];
+    const variants = [canonical];
+
+    // Add the app language meaning translation as a variant (helps typing validation)
+    const appLangVariant = appLangLexicon[wordId];
+    if (appLangVariant && appLangVariant !== canonical) {
+      variants.push(appLangVariant);
+    }
+
     translations[wordId] = {
       canonical,
-      variants: [canonical] // Can be extended later with language-specific variants
+      variants: [...new Set(variants)] // Can be extended later with language-specific variants
     };
   });
   return translations;
@@ -83,16 +97,17 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
 
   // Build translations object
   // Translations use i18n language codes (en, es, fr, etc.) NOT internal IDs (english, spanish, etc.)
-  // If transliterations provided, use those instead of i18n lexicons (for transliteration-based practice)
+  // If transliterations provided, use those instead of meaning translations so we surface pronunciation hints
+  const transliterationSource = transliterations || practiceLexicon;
   let translations = {};
   if (i18nLexicons) {
     // Build translations for all app languages using i18n codes
     Object.keys(i18nLexicons).forEach(i18nCode => {
-      translations[i18nCode] = buildTranslationsForLanguage(wordIds, i18nLexicons[i18nCode], transliterations);
+      translations[i18nCode] = buildTranslationsForLanguage(wordIds, i18nLexicons[i18nCode], transliterationSource);
     });
   } else {
     // Fallback: just use practice language lexicon with 'en' key
-    translations['en'] = buildTranslationsForLanguage(wordIds, practiceLexicon, transliterations);
+    translations['en'] = buildTranslationsForLanguage(wordIds, practiceLexicon, transliterationSource);
   }
 
   return createReadingText({
