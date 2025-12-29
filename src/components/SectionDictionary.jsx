@@ -73,7 +73,7 @@ export default function SectionDictionary({ sectionId, sectionTitle, isOpen, onC
     >
       <div className="flex min-h-full items-start justify-center">
         <div
-          className="w-full max-w-4xl rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl"
+          className="w-full max-w-4xl -translate-y-6 rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl md:-translate-y-10"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
