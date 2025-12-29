@@ -4,6 +4,7 @@
  */
 
 import { createReadingText } from '../common/helpers.js';
+import { CAFE_TALK_CONVERSATION_GLUE, buildCafeTalkTranslations } from '../common/cafeTalkTranslations.js';
 
 export const englishCafeTalkTexts = [
   // Conversation Glue (25 words)
@@ -77,35 +78,7 @@ export const englishCafeTalkTexts = [
       almost: 'reading.meaning.almost',
       quite: 'reading.meaning.quite'
     },
-    translations: {
-      en: {
-        so: { canonical: 'so', variants: ['so'] },
-        but: { canonical: 'but', variants: ['but'] },
-        well: { canonical: 'well', variants: ['well'] },
-        actually: { canonical: 'actually', variants: ['actually'] },
-        maybe: { canonical: 'maybe', variants: ['maybe', 'perhaps'] },
-        probably: { canonical: 'probably', variants: ['probably'] },
-        basically: { canonical: 'basically', variants: ['basically'] },
-        anyway: { canonical: 'anyway', variants: ['anyway', 'anyhow'] },
-        also: { canonical: 'also', variants: ['also'] },
-        too: { canonical: 'too', variants: ['too'] },
-        either: { canonical: 'either', variants: ['either'] },
-        neither: { canonical: 'neither', variants: ['neither'] },
-        however: { canonical: 'however', variants: ['however'] },
-        therefore: { canonical: 'therefore', variants: ['therefore', 'thus'] },
-        meanwhile: { canonical: 'meanwhile', variants: ['meanwhile'] },
-        besides: { canonical: 'besides', variants: ['besides'] },
-        instead: { canonical: 'instead', variants: ['instead'] },
-        otherwise: { canonical: 'otherwise', variants: ['otherwise'] },
-        still: { canonical: 'still', variants: ['still'] },
-        yet: { canonical: 'yet', variants: ['yet'] },
-        just: { canonical: 'just', variants: ['just'] },
-        even: { canonical: 'even', variants: ['even'] },
-        already: { canonical: 'already', variants: ['already'] },
-        almost: { canonical: 'almost', variants: ['almost'] },
-        quite: { canonical: 'quite', variants: ['quite'] }
-      }
-    }
+    translations: buildCafeTalkTranslations(CAFE_TALK_CONVERSATION_GLUE)
   }),
 
   // Time Sequencing (20 words)
