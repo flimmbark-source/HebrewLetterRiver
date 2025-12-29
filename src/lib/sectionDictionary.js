@@ -4,7 +4,7 @@
  */
 
 import { getReadingTextsForLanguage } from '../data/readingTexts/index.js';
-import { getTextDirection, getFontClass } from './readingUtils.js';
+import { getTextDirection, getFontClass, normalizeForLanguage } from './readingUtils.js';
 import { getLanguageCode, getLocalizedTitle } from './languageUtils.js';
 
 /**
@@ -58,7 +58,9 @@ export function getSectionDictionary(sectionId, practiceLanguageId, appLanguageI
       const textTranslations =
         text.translations?.[appLanguageId] || text.translations?.[langCode];
       if (textTranslations && textTranslations[wordId]) {
-        canonical = textTranslations[wordId].canonical || '—';
+        const rawCanonical = textTranslations[wordId].canonical || '—';
+        // Normalize the canonical form to match what users need to type during grading
+        canonical = rawCanonical === '—' ? '—' : normalizeForLanguage(rawCanonical, appLanguageId);
       }
 
       // Get meaning from i18n

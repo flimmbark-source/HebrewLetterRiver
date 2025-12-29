@@ -721,11 +721,16 @@ useEffect(() => {
           <div className="mt-3 text-sm text-slate-400">
             {t('reading.answer')}:{' '}
             <span className="rounded bg-slate-800 px-2 py-1 font-mono text-slate-300">
-              {getTranslation()?.canonical || '—'}
+              {(() => {
+                const canonical = getTranslation()?.canonical;
+                return canonical && canonical !== '—'
+                  ? normalizeForLanguage(canonical, appLanguageId)
+                  : canonical || '—';
+              })()}
             </span>
             {getTranslation()?.variants && getTranslation().variants.length > 1 && (
               <span className="ml-2">
-                ({t('reading.accepted')}: {getTranslation().variants.join(', ')})
+                ({t('reading.accepted')}: {getTranslation().variants.map(v => normalizeForLanguage(v, appLanguageId)).join(', ')})
               </span>
             )}
           </div>
