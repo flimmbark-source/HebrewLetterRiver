@@ -119,7 +119,22 @@ export default function ReadingArea({ textId, onBack }) {
     const translationsForLocale = readingText.translations?.[TRANSLATION_KEY_MAP[appLanguageId]];
     const translations = translationsForAppLanguage || translationsForLocale;
 
-    if (!translations) return null;
+    // DEBUG: Log translation lookup for first word
+    if (currentWord.id === 'so' || currentWord.id === 'but' || currentWord.id === 'I') {
+      console.log(`[ReadingArea DEBUG] Getting translation for "${currentWord.id}":`, {
+        appLanguageId,
+        locale: TRANSLATION_KEY_MAP[appLanguageId],
+        hasTranslationsForAppLanguage: !!translationsForAppLanguage,
+        hasTranslationsForLocale: !!translationsForLocale,
+        translations: translations?.[currentWord.id],
+        fallback: !translations ? currentWord.text : null
+      });
+    }
+
+    if (!translations) {
+      console.warn(`[ReadingArea] No translations found for appLanguageId=${appLanguageId}, falling back to practice word text`);
+      return null;
+    }
     return translations[currentWord.id];
   }, [readingText, currentWord, appLanguageId]);
 
