@@ -564,7 +564,17 @@
       "todah": "thank you; thanks",
       "ken": "yes",
       "torah": "Torah; Jewish law",
-      "emet": "truth"
+      "emet": "truth",
+      "boker": "morning",
+      "tov": "good",
+      "erev": "evening",
+      "lehitraot": "goodbye; see you",
+      "hello": "hello; hi",
+      "goodbye": "goodbye; bye",
+      "please": "please",
+      "sorry": "sorry; excuse me",
+      "yes": "yes",
+      "no": "no"
     }
   },
   "settings": {

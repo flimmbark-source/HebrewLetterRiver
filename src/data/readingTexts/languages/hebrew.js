@@ -130,6 +130,14 @@ export const hebrewReadingTexts = [
       { type: 'word', text: 'להתראות', id: 'lehitraot' },
       { type: 'punct', text: '.' }
     ],
+    meaningKeys: {
+      shalom: 'reading.meaning.shalom',
+      boker: 'reading.meaning.boker',
+      tov: 'reading.meaning.tov',
+      erev: 'reading.meaning.erev',
+      tov2: 'reading.meaning.tov',
+      lehitraot: 'reading.meaning.lehitraot'
+    },
     translations: {
       en: {
         shalom: { canonical: 'shalom', variants: ['shalom', 'hello', 'peace'] },

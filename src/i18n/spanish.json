@@ -1350,7 +1350,17 @@
       "todah": "gracias",
       "ken": "sí",
       "torah": "Torá; ley judía",
-      "emet": "verdad"
+      "emet": "verdad",
+      "boker": "mañana",
+      "tov": "bueno",
+      "erev": "tarde; noche",
+      "lehitraot": "adiós; hasta luego",
+      "hello": "hola",
+      "goodbye": "adiós",
+      "please": "por favor",
+      "sorry": "lo siento; perdón",
+      "yes": "sí",
+      "no": "no"
     }
   }
 }
