@@ -5,7 +5,7 @@
 
 import { getReadingTextsForLanguage } from '../data/readingTexts/index.js';
 import { getTextDirection, getFontClass } from './readingUtils.js';
-import { getLanguageCode } from './languageUtils.js';
+import { getLanguageCode, getLocalizedTitle } from './languageUtils.js';
 
 /**
  * Derive dictionary entries for a section
@@ -14,7 +14,7 @@ import { getLanguageCode } from './languageUtils.js';
  * @param {string} practiceLanguageId - Practice language ID
  * @param {string} appLanguageId - App language ID (for translations)
  * @param {Function} t - Localization function
- * @returns {Array} Dictionary entries with { wordId, practiceWord, canonical, meaning, direction, fontClass }
+ * @returns {Array} Array of groups: [{ textId, title, entries: [{ wordId, practiceWord, canonical, meaning, direction, fontClass }] }]
  */
 export function getSectionDictionary(sectionId, practiceLanguageId, appLanguageId, t) {
   // Get all reading texts for the practice language
@@ -27,11 +27,17 @@ export function getSectionDictionary(sectionId, practiceLanguageId, appLanguageI
     return [];
   }
 
-  // Collect unique word entries
-  const wordMap = new Map(); // wordId -> entry
+  // Get direction and font for practice language (same for every group)
+  const direction = getTextDirection(practiceLanguageId);
+  const fontClass = getFontClass(practiceLanguageId);
+  const langCode = getLanguageCode(appLanguageId);
 
-  sectionTexts.forEach(text => {
-    if (!text.tokens) return;
+  // Build dictionary groups per reading text (preserves on-screen order)
+  const groups = sectionTexts.map(text => {
+    const seenWordIds = new Set();
+    const entries = [];
+
+    if (!text.tokens) return null;
 
     text.tokens.forEach(token => {
       // Only process word tokens with an ID
@@ -39,15 +45,16 @@ export function getSectionDictionary(sectionId, practiceLanguageId, appLanguageI
 
       const wordId = token.id;
 
-      // Skip if we've already seen this word
-      if (wordMap.has(wordId)) return;
+      // Skip duplicate words within the same reading text
+      if (seenWordIds.has(wordId)) return;
+
+      seenWordIds.add(wordId);
 
       // Get practice word text
       const practiceWord = token.text;
 
       // Get translation canonical form (support both language IDs and locale codes)
       let canonical = '—';
-      const langCode = getLanguageCode(appLanguageId);
       const textTranslations =
         text.translations?.[appLanguageId] || text.translations?.[langCode];
       if (textTranslations && textTranslations[wordId]) {
@@ -77,29 +84,25 @@ export function getSectionDictionary(sectionId, practiceLanguageId, appLanguageI
         console.warn(`[SectionDict] No meaningKey for wordId: ${wordId}`);
       }
 
-      // Store entry
-      wordMap.set(wordId, {
+      entries.push({
         wordId,
         practiceWord,
         canonical,
-        meaning
+        meaning,
+        direction,
+        fontClass
       });
     });
+
+    return {
+      textId: text.id,
+      title: getLocalizedTitle(text, appLanguageId),
+      entries
+    };
   });
 
-  // Convert map to array (maintains insertion order = order of first appearance)
-  const entries = Array.from(wordMap.values());
-
-  // Get direction and font for practice language
-  const direction = getTextDirection(practiceLanguageId);
-  const fontClass = getFontClass(practiceLanguageId);
-
-  // Add direction and font to each entry
-  return entries.map(entry => ({
-    ...entry,
-    direction,
-    fontClass
-  }));
+  // Remove empty or null groups
+  return groups.filter(group => group && group.entries.length > 0);
 }
 
 /**
