@@ -26,7 +26,7 @@ export default function ReadingArea({ textId, onBack }) {
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
 
   // Load reading text
-  const readingText = getReadingTextById(textId);
+  const readingText = getReadingTextById(textId, practiceLanguageId);
 
   // State
   const [viewportWidth, setViewportWidth] = useState(
@@ -119,8 +119,44 @@ export default function ReadingArea({ textId, onBack }) {
     const translationsForLocale = readingText.translations?.[TRANSLATION_KEY_MAP[appLanguageId]];
     const translations = translationsForAppLanguage || translationsForLocale;
 
-    if (!translations) return null;
-    return translations[currentWord.id];
+    // Always grade against the practice language transliteration so users
+    // type the word pronunciation rather than the meaning translation.
+    const transliterationEntry = readingText.translations?.en?.[currentWord.id];
+
+    // DEBUG: Log translation lookup for first word
+    if (currentWord.id === 'so' || currentWord.id === 'but' || currentWord.id === 'I') {
+      console.log(`[ReadingArea DEBUG] Getting translation for "${currentWord.id}":`, {
+        appLanguageId,
+        locale: TRANSLATION_KEY_MAP[appLanguageId],
+        hasTranslationsForAppLanguage: !!translationsForAppLanguage,
+        hasTranslationsForLocale: !!translationsForLocale,
+        translations: translations?.[currentWord.id],
+        transliterationEntry,
+        fallback: !translations ? currentWord.text : null
+      });
+    }
+
+    if (!translations && !transliterationEntry) {
+      console.warn(`[ReadingArea] No translations found for appLanguageId=${appLanguageId}, falling back to practice word text`);
+      return null;
+    }
+
+    const baseTranslation = translations?.[currentWord.id];
+
+    // Prefer transliteration canonical/variants when available, but keep all
+    // other variants (including meaning translations) so they remain accepted.
+    if (transliterationEntry) {
+      const translitVariants = transliterationEntry.variants || [transliterationEntry.canonical];
+      const baseVariants = baseTranslation?.variants || (baseTranslation?.canonical ? [baseTranslation.canonical] : []);
+
+      return {
+        ...baseTranslation,
+        canonical: transliterationEntry.canonical,
+        variants: [...new Set([...translitVariants, ...baseVariants])]
+      };
+    }
+
+    return baseTranslation;
   }, [readingText, currentWord, appLanguageId]);
 
   // Center practice track on current word
@@ -289,16 +325,17 @@ export default function ReadingArea({ textId, onBack }) {
     }]);
 
     // Store result for results screen
-    const langCode = getLanguageCode(appLanguageId);
-    let gloss = readingText.glosses?.[langCode]?.[currentWord.id]
-                ?? readingText.glosses?.en?.[currentWord.id];
-
-    // If no gloss, try meaningKeys with i18n translation
-    if (!gloss && readingText.meaningKeys?.[currentWord.id]) {
+    // Primary: Use meaningKeys with i18n translation for proper localization
+    let gloss = '—';
+    if (readingText.meaningKeys?.[currentWord.id]) {
       gloss = t(readingText.meaningKeys[currentWord.id]);
+    } else {
+      // Fallback: Use glosses for semantic meaning display
+      const langCode = getLanguageCode(appLanguageId);
+      gloss = readingText.glosses?.[langCode]?.[currentWord.id]
+              ?? readingText.glosses?.en?.[currentWord.id]
+              ?? '—';
     }
-
-    gloss = gloss ?? '—';
 
     setCompletedResults(prev => [...prev, {
       practiceWord: currentWord.text,
@@ -375,16 +412,6 @@ useEffect(() => {
     if (key === 'Backspace') {
       e.preventDefault();
       setTypedWord(prev => prev.slice(0, -1));
-      return;
-    }
-
-    // Space - commit word
-    const isSpace = key === ' ' || key === 'Space' || key === 'Spacebar' || e.code === 'Space';
-    if (isSpace) {
-      e.preventDefault();
-      const normalized = normalizeForLanguage(typedWord, appLanguageId);
-      if (!normalized) return;
-      gradeAndCommit();
       return;
     }
 
@@ -506,15 +533,16 @@ useEffect(() => {
             <span className={`${appFontClass} text-base font-medium text-white`}>
               {(() => {
                 if (!readingText || !currentWord) return '—';
-                // Use glosses for semantic meaning display
+
+                // Primary: Use meaningKeys with i18n translation for proper localization
+                if (readingText.meaningKeys?.[currentWord.id]) {
+                  return t(readingText.meaningKeys[currentWord.id]);
+                }
+
+                // Fallback: Use glosses for semantic meaning display
                 const langCode = getLanguageCode(appLanguageId);
                 const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
                            ?? readingText.glosses?.en?.[currentWord.id];
-
-                // If no gloss, try meaningKeys with i18n translation
-                if (!gloss && readingText.meaningKeys?.[currentWord.id]) {
-                  return t(readingText.meaningKeys[currentWord.id]);
-                }
 
                 return gloss ?? '—';
               })()}

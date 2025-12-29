@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 import { useTutorial } from '../context/TutorialContext.jsx';
 import { getReadingTextsForLanguage } from '../data/readingTexts/index.js';
 import ReadingArea from '../components/ReadingArea';
+import SectionDictionary from '../components/SectionDictionary';
 import { getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
 
 export default function LearnView() {
@@ -11,6 +12,7 @@ export default function LearnView() {
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
   const { startTutorial, hasCompletedTutorial } = useTutorial();
   const [selectedTextId, setSelectedTextId] = useState(null);
+  const [dictionarySectionId, setDictionarySectionId] = useState(null);
 
   // Auto-trigger readIntro tutorial on first visit
   useEffect(() => {
@@ -60,6 +62,12 @@ export default function LearnView() {
     );
   }
 
+  // Get section title for dictionary modal
+  const getDictionarySectionTitle = (sectionId) => {
+    const meta = sectionMeta[sectionId];
+    return meta ? t(meta.titleKey) : '';
+  };
+
   // Show reading text selection
   return (
     <div className="space-y-6">
@@ -85,9 +93,19 @@ export default function LearnView() {
 
             return (
               <div key={sectionId} className="space-y-4">
-                <div className="px-1">
-                  <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{t(meta.titleKey)}</h3>
-                  <p className="text-sm" style={{ color: '#6B7280' }}>{t(meta.descKey)}</p>
+                <div className="flex items-start justify-between gap-4 px-1">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{t(meta.titleKey)}</h3>
+                    <p className="text-sm" style={{ color: '#6B7280' }}>{t(meta.descKey)}</p>
+                  </div>
+                  <button
+                    onClick={() => setDictionarySectionId(sectionId)}
+                    className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+                    style={{ marginTop: '2px' }}
+                  >
+                    <span>📖</span>
+                    <span>{t('read.dictionary.button')}</span>
+                  </button>
                 </div>
 
                 <div className="grid gap-3 md:grid-cols-2">
@@ -105,6 +123,14 @@ export default function LearnView() {
           })}
         </div>
       )}
+
+      {/* Section Dictionary Modal */}
+      <SectionDictionary
+        sectionId={dictionarySectionId}
+        sectionTitle={getDictionarySectionTitle(dictionarySectionId)}
+        isOpen={dictionarySectionId !== null}
+        onClose={() => setDictionarySectionId(null)}
+      />
     </div>
   );
 }

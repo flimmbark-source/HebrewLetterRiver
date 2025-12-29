@@ -19,6 +19,13 @@ export const englishReadingTexts = [
       { type: 'word', text: 'good', id: 'good' },
       { type: 'punct', text: '.' }
     ],
+    meaningKeys: {
+      hello: 'reading.meaning.hello',
+      thanks: 'reading.meaning.todah',
+      yes: 'reading.meaning.yes',
+      no: 'reading.meaning.no',
+      good: 'reading.meaning.tov'
+    },
     translations: buildStarterWordTranslations('english', {
       // Custom English-specific variants
       thanks: {

@@ -10,7 +10,7 @@
  * - Translations exist for required app languages
  */
 
-import { cafeTalkCanonical, getCafeTalkCategoryIds, getCategoryTokenCount } from './cafeTalkCanonical.js';
+import { CAFE_TALK_WORDS, getCafeTalkCategoryIds, getCategoryTokenCount, getEnglishLookup } from './cafeTalkCanonical.js';
 
 // Expected practice languages
 const PRACTICE_LANGUAGES = [
@@ -55,6 +55,8 @@ function hasPlaceholder(value) {
 function validateCafeTalkText(text, language, categoryId) {
   const expectedTokenCount = getCategoryTokenCount(categoryId);
   const errors = [];
+  const warnings = [];
+  const englishLookup = getEnglishLookup();
 
   // Check ID format
   if (text.id !== `cafeTalk.${categoryId}`) {
@@ -97,6 +99,15 @@ function validateCafeTalkText(text, language, categoryId) {
       }
       if (hasPlaceholder(token.id)) {
         errors.push(`Token ${idx + 1} has __TODO__ placeholder ID`);
+      }
+
+      // CRITICAL: For non-English languages, ensure tokens are NOT English
+      // This is a WARNING during development until DeepL translations are generated
+      if (language !== 'english' && token.id && englishLookup[token.id]) {
+        const englishWord = englishLookup[token.id];
+        if (token.text === englishWord) {
+          warnings.push(`Token "${token.id}" uses English placeholder "${englishWord}" instead of ${language} translation`);
+        }
       }
     });
   }
@@ -159,7 +170,7 @@ function validateCafeTalkText(text, language, categoryId) {
     });
   }
 
-  return errors;
+  return { errors, warnings };
 }
 
 /**
@@ -168,6 +179,7 @@ function validateCafeTalkText(text, language, categoryId) {
 export function validateCafeTalkForLanguage(cafeTalkTexts, language) {
   const expectedCategoryIds = getCafeTalkCategoryIds();
   const errors = [];
+  const warnings = [];
 
   // Check all 7 categories exist
   if (!Array.isArray(cafeTalkTexts)) {
@@ -187,13 +199,16 @@ export function validateCafeTalkForLanguage(cafeTalkTexts, language) {
       return;
     }
 
-    const textErrors = validateCafeTalkText(text, language, categoryId);
+    const { errors: textErrors, warnings: textWarnings } = validateCafeTalkText(text, language, categoryId);
     textErrors.forEach(error => {
       errors.push(`[${categoryId}] ${error}`);
     });
+    textWarnings.forEach(warning => {
+      warnings.push(`[${categoryId}] ${warning}`);
+    });
   });
 
-  return errors;
+  return { errors, warnings };
 }
 
 /**
@@ -201,7 +216,9 @@ export function validateCafeTalkForLanguage(cafeTalkTexts, language) {
  */
 export function validateAllCafeTalk(cafeTalkByLanguage) {
   const allErrors = {};
+  const allWarnings = {};
   let hasErrors = false;
+  let hasWarnings = false;
 
   PRACTICE_LANGUAGES.forEach(language => {
     const cafeTalkTexts = cafeTalkByLanguage[language];
@@ -212,23 +229,45 @@ export function validateAllCafeTalk(cafeTalkByLanguage) {
       return;
     }
 
-    const errors = validateCafeTalkForLanguage(cafeTalkTexts, language);
+    const { errors, warnings } = validateCafeTalkForLanguage(cafeTalkTexts, language);
 
     if (errors.length > 0) {
       allErrors[language] = errors;
       hasErrors = true;
     }
+
+    if (warnings.length > 0) {
+      allWarnings[language] = warnings;
+      hasWarnings = true;
+    }
   });
 
-  return { hasErrors, errors: allErrors };
+  return { hasErrors, errors: allErrors, hasWarnings, warnings: allWarnings };
 }
 
 /**
  * Run validation and throw on error (for use in dev/test)
  */
 export function assertCafeTalkValid(cafeTalkByLanguage) {
-  const { hasErrors, errors } = validateAllCafeTalk(cafeTalkByLanguage);
+  const { hasErrors, errors, hasWarnings, warnings } = validateAllCafeTalk(cafeTalkByLanguage);
 
+  // Display warnings (but don't throw)
+  if (hasWarnings) {
+    const warningMessages = [];
+    Object.entries(warnings).forEach(([language, langWarnings]) => {
+      warningMessages.push(`\n${language.toUpperCase()}:`);
+      langWarnings.forEach(warning => {
+        warningMessages.push(`  - ${warning}`);
+      });
+    });
+
+    console.warn(
+      `⚠ Cafe Talk validation warnings (English placeholders detected):\n${warningMessages.join('\n')}\n` +
+      `Run scripts/generateCafeTalkLexiconsWithDeepL.mjs to generate proper translations.`
+    );
+  }
+
+  // Only throw on actual errors
   if (hasErrors) {
     const errorMessages = [];
 
