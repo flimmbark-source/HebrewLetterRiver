@@ -341,7 +341,18 @@
     "noTexts": "אין טקסטים זמינים לשפה זו עדיין.",
     "comingSoon": "חזרו בקרוב לתוכן תרגול נוסף!",
     "cafeTalk": "Cafe Talk",
-    "cafeTalkDesc": "Essential conversational vocabulary for everyday communication."
+    "cafeTalkDesc": "Essential conversational vocabulary for everyday communication.",
+    "dictionary": {
+      "button": "מילון",
+      "title": "מילון",
+      "words": "מילים",
+      "search": "חיפוש מילים...",
+      "practiceWord": "מילת תרגול",
+      "translation": "תרגום",
+      "meaning": "משמעות",
+      "noResults": "לא נמצאו מילים התואמות את החיפוש.",
+      "noWords": "אין מילים זמינות בקטע זה."
+    }
   },
   "reading": {
     "textNotFound": "טקסט לא נמצא.",

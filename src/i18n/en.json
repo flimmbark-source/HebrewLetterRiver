@@ -349,7 +349,18 @@
     "cafeTalk": "Cafe Talk",
     "cafeTalkDesc": "Essential conversational vocabulary for everyday communication.",
     "noTexts": "No reading texts available for this language yet.",
-    "comingSoon": "Check back soon for more practice content!"
+    "comingSoon": "Check back soon for more practice content!",
+    "dictionary": {
+      "button": "Dictionary",
+      "title": "Dictionary",
+      "words": "words",
+      "search": "Search words...",
+      "practiceWord": "Practice Word",
+      "translation": "Translation",
+      "meaning": "Meaning",
+      "noResults": "No words match your search.",
+      "noWords": "No words available in this section."
+    }
   },
   "reading": {
     "textNotFound": "Reading text not found.",

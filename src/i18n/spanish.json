@@ -322,7 +322,18 @@
     "intro": "Sumérgete en lecciones seleccionadas para dominar cada letra. ¡Pronto aparecerán aquí nuevos módulos de aprendizaje!",
     "body": "Hasta entonces, siga explorando el río y visítelo periódicamente para disfrutar de sesiones de práctica guiada, consejos de pronunciación y conocimientos culturales.",
     "cafeTalk": "Cafe Talk",
-    "cafeTalkDesc": "Essential conversational vocabulary for everyday communication."
+    "cafeTalkDesc": "Essential conversational vocabulary for everyday communication.",
+    "dictionary": {
+      "button": "Diccionario",
+      "title": "Diccionario",
+      "words": "palabras",
+      "search": "Buscar palabras...",
+      "practiceWord": "Palabra de Práctica",
+      "translation": "Traducción",
+      "meaning": "Significado",
+      "noResults": "No se encontraron palabras que coincidan con tu búsqueda.",
+      "noWords": "No hay palabras disponibles en esta sección."
+    }
   },
   "settings": {
     "title": "Ajustes",
