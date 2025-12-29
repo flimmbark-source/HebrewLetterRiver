@@ -146,17 +146,35 @@ export function getReadingTextsForLanguage(practiceLanguage) {
 
 /**
  * Get a specific reading text by ID
+ * If a practice language is provided, prefer texts from that language.
  * @param {string} textId - Text ID
+ * @param {string} [practiceLanguage] - Optional practice language ID to scope the lookup
  * @returns {Object|null} Reading text object or null
  */
-export function getReadingTextById(textId) {
-  // Search in starter texts
+export function getReadingTextById(textId, practiceLanguage) {
+  const normalizedLanguage = normalizeLanguageId(practiceLanguage);
+
+  // If a practice language is specified, look there first
+  if (normalizedLanguage) {
+    const starterTexts = readingTextsByLanguage[normalizedLanguage];
+    if (starterTexts) {
+      const text = starterTexts.find(t => t.id === textId);
+      if (text) return { ...text, sectionId: 'starter' };
+    }
+
+    const cafeTalkTexts = cafeTalkByLanguage[normalizedLanguage];
+    if (cafeTalkTexts) {
+      const text = cafeTalkTexts.find(t => t.id === textId);
+      if (text) return { ...text, sectionId: 'cafeTalk' };
+    }
+  }
+
+  // Fallback: search across all languages (maintains backward compatibility)
   for (const texts of Object.values(readingTextsByLanguage)) {
     const text = texts.find(t => t.id === textId);
     if (text) return { ...text, sectionId: 'starter' };
   }
 
-  // Search in Cafe Talk texts
   for (const texts of Object.values(cafeTalkByLanguage)) {
     const text = texts.find(t => t.id === textId);
     if (text) return { ...text, sectionId: 'cafeTalk' };
