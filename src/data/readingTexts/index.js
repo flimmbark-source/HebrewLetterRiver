@@ -85,7 +85,7 @@ if (import.meta.env?.DEV || import.meta.env?.MODE === 'test') {
   });
 
   // Validate Section Dictionary in development
-  import('../lib/validateSectionDictionary.js').then(({ validateSectionMeaningKeys }) => {
+  import('../../lib/validateSectionDictionary.js').then(({ validateSectionMeaningKeys }) => {
     try {
       const sections = ['starter', 'cafeTalk'];
       const languages = ['hebrew', 'english', 'spanish', 'arabic', 'mandarin'];
