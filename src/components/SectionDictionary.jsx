@@ -132,9 +132,6 @@ export default function SectionDictionary({ sectionId, sectionTitle, isOpen, onC
                           <th className="p-3 text-left font-semibold text-slate-300">
                             {t('read.dictionary.meaning')}
                           </th>
-                          <th className="p-3 text-center font-semibold text-slate-300">
-                            {t('read.dictionary.transaction') || 'Recent'}
-                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -151,36 +148,33 @@ export default function SectionDictionary({ sectionId, sectionTitle, isOpen, onC
                             </td>
                             {/* Translation */}
                             <td className="p-3">
-                              <span className={`${appFontClass} font-mono text-base text-white`}>
-                                {entry.canonical}
-                              </span>
+                              {entry.ghostSequence ? (
+                                <div className="inline-flex gap-0.5">
+                                  {entry.ghostSequence.map((g, i) => {
+                                    const colorClass = {
+                                      ok: 'text-emerald-400',
+                                      bad: 'text-rose-400',
+                                      miss: 'text-slate-500',
+                                      extra: 'text-yellow-400'
+                                    }[g.cls] || 'text-white';
+                                    return (
+                                      <span key={i} className={`${appFontClass} font-mono text-base ${colorClass}`}>
+                                        {g.char}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              ) : (
+                                <span className={`${appFontClass} font-mono text-base text-white`}>
+                                  {entry.canonical}
+                                </span>
+                              )}
                             </td>
                             {/* Meaning */}
                             <td className="p-3">
                               <span className={`${appFontClass} text-base text-slate-300`}>
                                 {entry.meaning}
                               </span>
-                            </td>
-                            {/* Transaction (Recent Grade) */}
-                            <td className="p-3 text-center">
-                              {entry.gradeColor && (
-                                <div
-                                  className={`mx-auto h-4 w-4 rounded-full ${
-                                    entry.gradeColor === 'ok' ? 'bg-emerald-400' :
-                                    entry.gradeColor === 'bad' ? 'bg-rose-400' :
-                                    entry.gradeColor === 'miss' ? 'bg-slate-500' :
-                                    entry.gradeColor === 'extra' ? 'bg-yellow-400' :
-                                    'bg-slate-600'
-                                  }`}
-                                  title={
-                                    entry.gradeColor === 'ok' ? 'Correct' :
-                                    entry.gradeColor === 'bad' ? 'Incorrect character' :
-                                    entry.gradeColor === 'miss' ? 'Missing character' :
-                                    entry.gradeColor === 'extra' ? 'Extra character' :
-                                    'No attempts'
-                                  }
-                                />
-                              )}
                             </td>
                           </tr>
                         ))}

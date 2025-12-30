@@ -227,7 +227,7 @@ export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLex
     const subtitles = {};
 
     Object.keys(metadata.baseTitle).forEach(lang => {
-      titles[lang] = `${metadata.baseTitle[lang]} - Part ${chunkNumber} (${wordIds.length})`;
+      titles[lang] = `${metadata.baseTitle[lang]} - Part ${chunkNumber}`;
       subtitles[lang] = metadata.baseSubtitle[lang];
     });
 

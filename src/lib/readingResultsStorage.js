@@ -52,7 +52,7 @@ export function saveReadingResults(sectionId, textId, practiceLanguageId, result
 
       const gradeColor = getOverallGradeColor(result.ghostSequence);
 
-      // Store the result with timestamp
+      // Store the result with full ghost sequence and timestamp
       if (!allResults[practiceLanguageId][sectionId][wordId]) {
         allResults[practiceLanguageId][sectionId][wordId] = [];
       }
@@ -60,6 +60,7 @@ export function saveReadingResults(sectionId, textId, practiceLanguageId, result
       allResults[practiceLanguageId][sectionId][wordId].push({
         textId,
         color: gradeColor,
+        ghostSequence: result.ghostSequence, // Store full ghost sequence for rendering
         timestamp: Date.now(),
         isCorrect: gradeColor === 'ok'
       });
@@ -94,14 +95,14 @@ function getAllResults() {
 }
 
 /**
- * Get the most recent grading color for a word
+ * Get the most recent ghost sequence for a word
  *
  * @param {string} practiceLanguageId - Practice language ID
  * @param {string} sectionId - Section identifier
  * @param {string} wordId - Word identifier
- * @returns {string|null} Most recent color class or null if no history
+ * @returns {Array|null} Most recent ghost sequence or null if no history
  */
-export function getWordGradeColor(practiceLanguageId, sectionId, wordId) {
+export function getWordGhostSequence(practiceLanguageId, sectionId, wordId) {
   try {
     const allResults = getAllResults();
     const wordResults = allResults[practiceLanguageId]?.[sectionId]?.[wordId];
@@ -110,10 +111,10 @@ export function getWordGradeColor(practiceLanguageId, sectionId, wordId) {
       return null;
     }
 
-    // Return the most recent result's color
-    return wordResults[wordResults.length - 1].color;
+    // Return the most recent result's ghost sequence
+    return wordResults[wordResults.length - 1].ghostSequence;
   } catch (error) {
-    console.error('Error getting word grade color:', error);
+    console.error('Error getting word ghost sequence:', error);
     return null;
   }
 }

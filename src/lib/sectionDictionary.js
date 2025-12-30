@@ -6,7 +6,7 @@
 import { getReadingTextsForLanguage } from '../data/readingTexts/index.js';
 import { getTextDirection, getFontClass, normalizeForLanguage } from './readingUtils.js';
 import { getLanguageCode, getLocalizedTitle } from './languageUtils.js';
-import { getWordGradeColor } from './readingResultsStorage.js';
+import { getWordGhostSequence } from './readingResultsStorage.js';
 
 /**
  * Derive dictionary entries for a section
@@ -87,8 +87,8 @@ export function getSectionDictionary(sectionId, practiceLanguageId, appLanguageI
         console.warn(`[SectionDict] No meaningKey for wordId: ${wordId}`);
       }
 
-      // Get the most recent grading color for this word
-      const gradeColor = getWordGradeColor(practiceLanguageId, sectionId, wordId);
+      // Get the most recent ghost sequence for this word (for colored rendering)
+      const ghostSequence = getWordGhostSequence(practiceLanguageId, sectionId, wordId);
 
       entries.push({
         wordId,
@@ -97,7 +97,7 @@ export function getSectionDictionary(sectionId, practiceLanguageId, appLanguageI
         meaning,
         direction,
         fontClass,
-        gradeColor
+        ghostSequence
       });
     });
 
