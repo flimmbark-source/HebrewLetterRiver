@@ -148,9 +148,27 @@ export default function SectionDictionary({ sectionId, sectionTitle, isOpen, onC
                             </td>
                             {/* Translation */}
                             <td className="p-3">
-                              <span className={`${appFontClass} font-mono text-base text-white`}>
-                                {entry.canonical}
-                              </span>
+                              {entry.ghostSequence ? (
+                                <div className="inline-flex gap-0.5">
+                                  {entry.ghostSequence.map((g, i) => {
+                                    const colorClass = {
+                                      ok: 'text-emerald-400',
+                                      bad: 'text-rose-400',
+                                      miss: 'text-slate-500',
+                                      extra: 'text-yellow-400'
+                                    }[g.cls] || 'text-white';
+                                    return (
+                                      <span key={i} className={`${appFontClass} font-mono text-base ${colorClass}`}>
+                                        {g.char}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              ) : (
+                                <span className={`${appFontClass} font-mono text-base text-white`}>
+                                  {entry.canonical}
+                                </span>
+                              )}
                             </td>
                             {/* Meaning */}
                             <td className="p-3">

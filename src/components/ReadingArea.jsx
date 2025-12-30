@@ -5,6 +5,7 @@ import { getReadingTextById } from '../data/readingTexts/index.js';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
 import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib/languageUtils';
+import { saveReadingResults } from '../lib/readingResultsStorage';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -338,6 +339,7 @@ export default function ReadingArea({ textId, onBack }) {
     }
 
     setCompletedResults(prev => [...prev, {
+      wordId: currentWord.id,
       practiceWord: currentWord.text,
       typedChars: result.typedChars,
       ghostSequence: result.ghostSequence,
@@ -464,6 +466,18 @@ useEffect(() => {
     onBack?.();
   }, [onBack]);
 
+  // Save results to localStorage when results screen is shown
+  useEffect(() => {
+    if (showResults && completedResults.length > 0 && readingText) {
+      const sectionId = readingText.sectionId;
+      const textId = readingText.id;
+
+      if (sectionId && textId) {
+        saveReadingResults(sectionId, textId, practiceLanguageId, completedResults);
+      }
+    }
+  }, [showResults, completedResults, readingText, practiceLanguageId]);
+
   // Global keydown handler (mirrors the prototype: always listen, refocus hidden input, never gated by mobile detection)
   useEffect(() => {
     const handleDocumentKeydown = (e) => {
@@ -524,12 +538,15 @@ useEffect(() => {
             dir={appDirection}
           >
         {/* HUD */}
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="relative mb-4 flex items-center">
+          {/* Streak - Left */}
           <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm">
             <span className="text-slate-400">{t('reading.streak')}</span>
             <strong className="text-emerald-400">{streak}</strong>
           </div>
-          <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
+
+          {/* Meaning - Centered */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
             <span className={`${appFontClass} text-base font-medium text-white`}>
               {(() => {
                 if (!readingText || !currentWord) return '—';
@@ -568,7 +585,7 @@ useEffect(() => {
                   return (
                       <span
                         key={`punct-${idx}`}
-                        className="text-3xl opacity-40 sm:text-4xl"
+                        className="whitespace-nowrap text-3xl opacity-40 sm:text-4xl"
                         style={{ letterSpacing: '0.4px' }}
                       >
                         {token.text}
@@ -582,7 +599,7 @@ useEffect(() => {
                 return (
                   <span
                     key={token.id || idx}
-                    className={`${practiceFontClass} ${gameFontClass} text-3xl leading-tight transition-opacity sm:text-4xl ${
+                    className={`${practiceFontClass} ${gameFontClass} whitespace-nowrap text-3xl leading-tight transition-opacity sm:text-4xl ${
                       isActive ? 'opacity-100' : 'opacity-50'
                     }`}
                     style={{ letterSpacing: '0.4px', transform: 'translateY(1px)' }}

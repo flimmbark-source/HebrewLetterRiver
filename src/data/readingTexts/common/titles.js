@@ -4,46 +4,46 @@
  */
 
 /**
- * Get "Starter Words (N)" title in all languages
- * @param {number} count - Number of words
+ * Get "Starter Words" title in all languages
+ * @param {number} count - Number of words (unused, kept for backward compatibility)
  * @returns {Object} Title translations
  */
 export function getStarterWordsTitle(count = 5) {
   return {
-    en: `Starter Words (${count})`,
-    es: `Palabras Iniciales (${count})`,
-    fr: `Mots de Base (${count})`,
-    ar: `كلمات أساسية (${toArabicNumeral(count)})`,
-    pt: `Palavras Iniciais (${count})`,
-    ru: `Начальные Слова (${count})`,
-    ja: `基本単語 (${count})`,
-    zh: `基础词汇 (${count})`,
-    hi: `बुनियादी शब्द (${count})`,
-    bn: `প্রাথমিক শব্দ (${toBengaliNumeral(count)})`,
-    am: `መሰረታዊ ቃላት (${count})`,
-    he: `מילים בסיסיות (${count})`
+    en: 'Starter Words',
+    es: 'Palabras Iniciales',
+    fr: 'Mots de Base',
+    ar: 'كلمات أساسية',
+    pt: 'Palavras Iniciais',
+    ru: 'Начальные Слова',
+    ja: '基本単語',
+    zh: '基础词汇',
+    hi: 'बुनियादी शब्द',
+    bn: 'প্রাথমিক শব্দ',
+    am: 'መሰረታዊ ቃላት',
+    he: 'מילים בסיסיות'
   };
 }
 
 /**
- * Get "Greetings (N)" title in all languages
- * @param {number} count - Number of words
+ * Get "Greetings" title in all languages
+ * @param {number} count - Number of words (unused, kept for backward compatibility)
  * @returns {Object} Title translations
  */
 export function getGreetingsTitle(count = 6) {
   return {
-    en: `Greetings (${count})`,
-    es: `Saludos (${count})`,
-    fr: `Salutations (${count})`,
-    ar: `تحيات (${toArabicNumeral(count)})`,
-    pt: `Saudações (${count})`,
-    ru: `Приветствия (${count})`,
-    ja: `挨拶 (${count})`,
-    zh: `问候语 (${count})`,
-    hi: `अभिवादन (${count})`,
-    bn: `শুভেচ্ছা (${toBengaliNumeral(count)})`,
-    am: `ሰላምታዎች (${count})`,
-    he: `ברכות (${count})`
+    en: 'Greetings',
+    es: 'Saludos',
+    fr: 'Salutations',
+    ar: 'تحيات',
+    pt: 'Saudações',
+    ru: 'Приветствия',
+    ja: '挨拶',
+    zh: '问候语',
+    hi: 'अभिवादन',
+    bn: 'শুভেচ্ছা',
+    am: 'ሰላምታዎች',
+    he: 'ברכות'
   };
 }
 

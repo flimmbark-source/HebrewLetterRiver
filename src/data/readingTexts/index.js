@@ -36,13 +36,16 @@ import {
 } from '../readingTexts.js';
 
 /**
- * Add sectionId to texts
+ * Add sectionId to texts if not already present
  * @param {Array} texts - Reading texts
- * @param {string} sectionId - Section identifier
+ * @param {string} defaultSectionId - Default section identifier if text doesn't have one
  * @returns {Array} Texts with sectionId added
  */
-function addSectionId(texts, sectionId) {
-  return texts.map(text => ({ ...text, sectionId }));
+function addSectionId(texts, defaultSectionId) {
+  return texts.map(text => ({
+    ...text,
+    sectionId: text.sectionId || defaultSectionId
+  }));
 }
 
 function normalizeLanguageId(value) {
@@ -159,25 +162,25 @@ export function getReadingTextById(textId, practiceLanguage) {
     const starterTexts = readingTextsByLanguage[normalizedLanguage];
     if (starterTexts) {
       const text = starterTexts.find(t => t.id === textId);
-      if (text) return { ...text, sectionId: 'starter' };
+      if (text) return { ...text, sectionId: text.sectionId || 'starter' };
     }
 
     const cafeTalkTexts = cafeTalkByLanguage[normalizedLanguage];
     if (cafeTalkTexts) {
       const text = cafeTalkTexts.find(t => t.id === textId);
-      if (text) return { ...text, sectionId: 'cafeTalk' };
+      if (text) return { ...text, sectionId: text.sectionId || 'cafeTalk' };
     }
   }
 
   // Fallback: search across all languages (maintains backward compatibility)
   for (const texts of Object.values(readingTextsByLanguage)) {
     const text = texts.find(t => t.id === textId);
-    if (text) return { ...text, sectionId: 'starter' };
+    if (text) return { ...text, sectionId: text.sectionId || 'starter' };
   }
 
   for (const texts of Object.values(cafeTalkByLanguage)) {
     const text = texts.find(t => t.id === textId);
-    if (text) return { ...text, sectionId: 'cafeTalk' };
+    if (text) return { ...text, sectionId: text.sectionId || 'cafeTalk' };
   }
 
   return null;

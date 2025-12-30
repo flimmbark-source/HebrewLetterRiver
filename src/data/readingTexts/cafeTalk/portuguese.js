@@ -12,4 +12,7 @@ const i18nLexicons = getI18nLexicons();
 
 // Build all 7 Cafe Talk texts for Portuguese using the lexicon
 // Pass i18nLexicons so Section Dictionary works for all app languages
-export const portugueseCafeTalkTexts = buildAllCafeTalkTexts('portuguese', cafeTalkLexicon, i18nLexicons);
+// Portuguese uses Latin script, so transliterations are the same as the lexicon
+const cafeTalkTransliterations = cafeTalkLexicon;
+
+export const portugueseCafeTalkTexts = buildAllCafeTalkTexts('portuguese', cafeTalkLexicon, i18nLexicons, cafeTalkTransliterations);

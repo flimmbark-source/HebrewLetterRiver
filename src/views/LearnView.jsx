@@ -10,16 +10,16 @@ import { getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
 export default function LearnView() {
   const { t } = useLocalization();
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
-  const { startTutorial, hasCompletedTutorial } = useTutorial();
+  const { startTutorial, hasCompletedTutorial, currentTutorial } = useTutorial();
   const [selectedTextId, setSelectedTextId] = useState(null);
   const [dictionarySectionId, setDictionarySectionId] = useState(null);
 
   // Auto-trigger readIntro tutorial on first visit
   useEffect(() => {
-    if (!hasCompletedTutorial('readIntro')) {
+    if (!hasCompletedTutorial('readIntro') && !currentTutorial) {
       startTutorial('readIntro');
     }
-  }, [hasCompletedTutorial, startTutorial]);
+  }, [hasCompletedTutorial, startTutorial, currentTutorial]);
 
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
@@ -46,9 +46,53 @@ export default function LearnView() {
       titleKey: 'read.starter',
       descKey: 'read.starterDesc'
     },
+    // Old cafeTalk section (kept for backwards compatibility)
     cafeTalk: {
       titleKey: 'read.cafeTalk',
       descKey: 'read.cafeTalkDesc'
+    },
+    // New Cafe Talk subsections
+    conversationGlue: {
+      titleKey: 'read.conversationGlue',
+      descKey: 'read.conversationGlueDesc',
+      fallbackTitle: 'Conversation Glue',
+      fallbackDesc: 'Essential discourse markers and connectors'
+    },
+    timeSequencing: {
+      titleKey: 'read.timeSequencing',
+      descKey: 'read.timeSequencingDesc',
+      fallbackTitle: 'Time & Sequencing',
+      fallbackDesc: 'Words for expressing when things happen'
+    },
+    peopleWords: {
+      titleKey: 'read.peopleWords',
+      descKey: 'read.peopleWordsDesc',
+      fallbackTitle: 'People Words',
+      fallbackDesc: 'Pronouns and references to people'
+    },
+    coreStoryVerbs: {
+      titleKey: 'read.coreStoryVerbs',
+      descKey: 'read.coreStoryVerbsDesc',
+      fallbackTitle: 'Core Story Verbs',
+      fallbackDesc: 'Essential action verbs for storytelling'
+    },
+    lifeLogistics: {
+      titleKey: 'read.lifeLogistics',
+      descKey: 'read.lifeLogisticsDesc',
+      fallbackTitle: 'Life Logistics',
+      fallbackDesc: 'Daily life and practical words'
+    },
+    reactionsFeelings: {
+      titleKey: 'read.reactionsFeelings',
+      descKey: 'read.reactionsFeelingsDesc',
+      fallbackTitle: 'Reactions & Feelings',
+      fallbackDesc: 'Emotional responses and descriptions'
+    },
+    everydayTopics: {
+      titleKey: 'read.everydayTopics',
+      descKey: 'read.everydayTopicsDesc',
+      fallbackTitle: 'Everyday Topics',
+      fallbackDesc: 'Common conversation topics and things'
     }
   };
 
@@ -65,7 +109,10 @@ export default function LearnView() {
   // Get section title for dictionary modal
   const getDictionarySectionTitle = (sectionId) => {
     const meta = sectionMeta[sectionId];
-    return meta ? t(meta.titleKey) : '';
+    if (!meta) return '';
+    // Try to get translated title, fall back to English if not available
+    const translatedTitle = t(meta.titleKey);
+    return translatedTitle !== meta.titleKey ? translatedTitle : (meta.fallbackTitle || '');
   };
 
   // Show reading text selection
@@ -91,12 +138,22 @@ export default function LearnView() {
             // Skip if no metadata (shouldn't happen but defensive)
             if (!meta) return null;
 
+            // Get translated or fallback title/desc
+            const sectionTitle = (() => {
+              const translated = t(meta.titleKey);
+              return translated !== meta.titleKey ? translated : (meta.fallbackTitle || sectionId);
+            })();
+            const sectionDesc = (() => {
+              const translated = t(meta.descKey);
+              return translated !== meta.descKey ? translated : (meta.fallbackDesc || '');
+            })();
+
             return (
               <div key={sectionId} className="space-y-4">
                 <div className="flex items-start justify-between gap-4 px-1">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{t(meta.titleKey)}</h3>
-                    <p className="text-sm" style={{ color: '#6B7280' }}>{t(meta.descKey)}</p>
+                    <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{sectionTitle}</h3>
+                    <p className="text-sm" style={{ color: '#6B7280' }}>{sectionDesc}</p>
                   </div>
                   <button
                     onClick={() => setDictionarySectionId(sectionId)}

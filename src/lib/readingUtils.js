@@ -26,14 +26,16 @@ const normalizationRules = {
       .toLowerCase()
       .normalize('NFD') // Decompose accented characters
       .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-      .replace(/[^a-z0-9]/g, '') // Keep only alphanumeric
+      .replace(/[^a-z0-9\s]/g, '') // Keep alphanumeric and spaces
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
       .replace(/ch/g, 'kh') // Hebrew ch -> kh
       .replace(/tz/g, 'ts') // Hebrew tz -> ts
       .replace(/aa/g, 'a') // Double vowels -> single
       .replace(/ee/g, 'e')
       .replace(/ii/g, 'i')
       .replace(/oo/g, 'o')
-      .replace(/uu/g, 'u');
+      .replace(/uu/g, 'u')
+      .trim();
   },
 
   // Hebrew script
@@ -41,7 +43,7 @@ const normalizationRules = {
     return str
       .normalize('NFD')
       .replace(/[\u0591-\u05C7]/g, '') // Remove all nikud/cantillation marks
-      .replace(/\s+/g, '')
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
       .trim();
   },
 
@@ -54,7 +56,7 @@ const normalizationRules = {
       .replace(/[ٱأإآ]/g, 'ا') // Normalize alef variants
       .replace(/[ى]/g, 'ي') // Normalize yaa
       .replace(/[ة]/g, 'ه') // Normalize taa marbouta
-      .replace(/\s+/g, '')
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
       .trim();
   },
 
@@ -63,7 +65,8 @@ const normalizationRules = {
     return str
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[^а-яё0-9]/g, '')
+      .replace(/[^а-яё0-9\s]/g, '') // Keep Cyrillic, numbers, and spaces
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
       .trim();
   },
 
@@ -72,7 +75,7 @@ const normalizationRules = {
     return str
       .normalize('NFD')
       .replace(/[\u0900-\u0903\u093A-\u094F\u0951-\u0957\u0962-\u0963]/g, '') // Remove diacritics
-      .replace(/\s+/g, '')
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
       .trim();
   },
 
@@ -80,7 +83,7 @@ const normalizationRules = {
   cjk: (str) => {
     return str
       .normalize('NFD')
-      .replace(/\s+/g, '')
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
       .trim();
   },
 
@@ -89,7 +92,7 @@ const normalizationRules = {
     return str
       .normalize('NFD')
       .replace(/[\u0981-\u0983\u09BC\u09BE-\u09C4\u09C7-\u09C8\u09CB-\u09CD\u09D7]/g, '') // Remove diacritics
-      .replace(/\s+/g, '')
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
       .trim();
   }
 };

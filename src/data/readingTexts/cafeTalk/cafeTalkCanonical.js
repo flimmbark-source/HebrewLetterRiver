@@ -177,36 +177,132 @@ export const CAFE_TALK_WORDS = [
 ];
 
 /**
- * Cafe Talk categories with word IDs in order
+ * Cafe Talk categories with word IDs split into manageable chunks (5-8 words each)
+ * Organized into 7 sections (replacing the single "Cafe Talk" section)
  */
 export const CAFE_TALK_CATEGORIES = {
-  conversationGlue: {
-    id: 'conversationGlue',
-    wordIds: ['so', 'but', 'well', 'actually', 'maybe', 'probably', 'basically', 'anyway', 'also', 'too', 'either', 'neither', 'however', 'therefore', 'meanwhile', 'besides', 'instead', 'otherwise', 'still', 'yet', 'just', 'even', 'already', 'almost', 'quite']
+  // Conversation Glue Section - 25 words split into 4 chunks
+  basicConnectors: {
+    id: 'basicConnectors',
+    sectionId: 'conversationGlue',
+    wordIds: ['so', 'but', 'well', 'actually', 'maybe', 'probably']
   },
-  timeSequencing: {
-    id: 'timeSequencing',
-    wordIds: ['now', 'then', 'when', 'before', 'after', 'during', 'while', 'until', 'since', 'today', 'yesterday', 'tomorrow', 'soon', 'later', 'early', 'late', 'always', 'never', 'sometimes', 'often']
+  discourseMarkers: {
+    id: 'discourseMarkers',
+    sectionId: 'conversationGlue',
+    wordIds: ['basically', 'anyway', 'also', 'too', 'either', 'neither', 'however']
   },
-  peopleWords: {
-    id: 'peopleWords',
-    wordIds: ['I', 'you', 'he', 'she', 'we', 'they', 'who', 'someone', 'everyone', 'nobody', 'friend', 'family', 'person', 'people', 'child', 'parent', 'neighbor', 'stranger']
+  logicalConnectors: {
+    id: 'logicalConnectors',
+    sectionId: 'conversationGlue',
+    wordIds: ['therefore', 'meanwhile', 'besides', 'instead', 'otherwise', 'still']
   },
-  coreStoryVerbs: {
-    id: 'coreStoryVerbs',
-    wordIds: ['go', 'come', 'see', 'hear', 'say', 'tell', 'ask', 'think', 'know', 'want', 'need', 'like', 'love', 'hate', 'make', 'do', 'get', 'give', 'take', 'find', 'lose', 'try']
+  qualifiersModifiers: {
+    id: 'qualifiersModifiers',
+    sectionId: 'conversationGlue',
+    wordIds: ['yet', 'just', 'even', 'already', 'almost', 'quite']
   },
-  lifeLogistics: {
-    id: 'lifeLogistics',
-    wordIds: ['eat', 'drink', 'sleep', 'work', 'study', 'home', 'house', 'place', 'time', 'day', 'money', 'buy', 'pay', 'help', 'wait', 'leave', 'arrive', 'start', 'finish', 'stop']
+
+  // Time & Sequencing Section - 20 words split into 3 chunks
+  presentTransitions: {
+    id: 'presentTransitions',
+    sectionId: 'timeSequencing',
+    wordIds: ['now', 'then', 'when', 'before', 'after', 'during', 'while']
   },
-  reactionsFeelings: {
-    id: 'reactionsFeelings',
-    wordIds: ['happy', 'sad', 'angry', 'scared', 'surprised', 'tired', 'excited', 'bored', 'worried', 'confused', 'okay', 'fine', 'great', 'bad', 'terrible', 'wonderful', 'nice', 'beautiful', 'ugly', 'strange']
+  timeReferences: {
+    id: 'timeReferences',
+    sectionId: 'timeSequencing',
+    wordIds: ['until', 'since', 'today', 'yesterday', 'tomorrow', 'soon']
   },
-  everydayTopics: {
-    id: 'everydayTopics',
-    wordIds: ['food', 'water', 'coffee', 'weather', 'book', 'phone', 'car', 'street', 'city', 'country', 'language', 'word', 'thing', 'something', 'nothing', 'everything', 'problem', 'question', 'answer', 'idea']
+  frequencyTiming: {
+    id: 'frequencyTiming',
+    sectionId: 'timeSequencing',
+    wordIds: ['later', 'early', 'late', 'always', 'never', 'sometimes', 'often']
+  },
+
+  // People Words Section - 18 words split into 3 chunks
+  personalPronouns: {
+    id: 'personalPronouns',
+    sectionId: 'peopleWords',
+    wordIds: ['I', 'you', 'he', 'she', 'we', 'they']
+  },
+  peopleReferences: {
+    id: 'peopleReferences',
+    sectionId: 'peopleWords',
+    wordIds: ['who', 'someone', 'everyone', 'nobody', 'friend', 'family']
+  },
+  socialRoles: {
+    id: 'socialRoles',
+    sectionId: 'peopleWords',
+    wordIds: ['person', 'people', 'child', 'parent', 'neighbor', 'stranger']
+  },
+
+  // Core Story Verbs Section - 22 words split into 3 chunks
+  communicationPerception: {
+    id: 'communicationPerception',
+    sectionId: 'coreStoryVerbs',
+    wordIds: ['go', 'come', 'see', 'hear', 'say', 'tell', 'ask', 'think']
+  },
+  emotionsCreation: {
+    id: 'emotionsCreation',
+    sectionId: 'coreStoryVerbs',
+    wordIds: ['know', 'want', 'need', 'like', 'love', 'hate', 'make']
+  },
+  actionVerbs: {
+    id: 'actionVerbs',
+    sectionId: 'coreStoryVerbs',
+    wordIds: ['do', 'get', 'give', 'take', 'find', 'lose', 'try']
+  },
+
+  // Life Logistics Section - 20 words split into 3 chunks
+  dailyRoutines: {
+    id: 'dailyRoutines',
+    sectionId: 'lifeLogistics',
+    wordIds: ['eat', 'drink', 'sleep', 'work', 'study', 'home', 'house']
+  },
+  timeResources: {
+    id: 'timeResources',
+    sectionId: 'lifeLogistics',
+    wordIds: ['place', 'time', 'day', 'money', 'buy', 'pay']
+  },
+  actionsMovement: {
+    id: 'actionsMovement',
+    sectionId: 'lifeLogistics',
+    wordIds: ['help', 'wait', 'leave', 'arrive', 'start', 'finish', 'stop']
+  },
+
+  // Reactions & Feelings Section - 20 words split into 3 chunks
+  basicEmotions: {
+    id: 'basicEmotions',
+    sectionId: 'reactionsFeelings',
+    wordIds: ['happy', 'sad', 'angry', 'scared', 'surprised', 'tired', 'excited']
+  },
+  statesOfBeing: {
+    id: 'statesOfBeing',
+    sectionId: 'reactionsFeelings',
+    wordIds: ['bored', 'worried', 'confused', 'okay', 'fine', 'great']
+  },
+  descriptions: {
+    id: 'descriptions',
+    sectionId: 'reactionsFeelings',
+    wordIds: ['bad', 'terrible', 'wonderful', 'nice', 'beautiful', 'ugly', 'strange']
+  },
+
+  // Everyday Topics Section - 20 words split into 3 chunks
+  commonObjects: {
+    id: 'commonObjects',
+    sectionId: 'everydayTopics',
+    wordIds: ['food', 'water', 'coffee', 'weather', 'book', 'phone', 'car']
+  },
+  placesConcepts: {
+    id: 'placesConcepts',
+    sectionId: 'everydayTopics',
+    wordIds: ['street', 'city', 'country', 'language', 'word', 'thing']
+  },
+  abstractTerms: {
+    id: 'abstractTerms',
+    sectionId: 'everydayTopics',
+    wordIds: ['something', 'nothing', 'everything', 'problem', 'question', 'answer', 'idea']
   }
 };
 
