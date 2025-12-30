@@ -4,8 +4,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { getReadingTextById } from '../data/readingTexts/index.js';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
-import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib/languageUtils';
+import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLanguageCode, getLocaleForTts } from '../lib/languageUtils';
 import { saveReadingResults } from '../lib/readingResultsStorage';
+import SpeakButton from './SpeakButton';
+import ttsService from '../lib/ttsService';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -108,6 +110,13 @@ export default function ReadingArea({ textId, onBack }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Cleanup TTS on unmount or when leaving reading area
+  useEffect(() => {
+    return () => {
+      ttsService.stop();
+    };
+  }, []);
+
   // Filter out punctuation for word navigation
   const words = readingText?.tokens?.filter(t => t.type === 'word') || [];
   const currentWord = words[wordIndex];
@@ -159,6 +168,13 @@ export default function ReadingArea({ textId, onBack }) {
 
     return baseTranslation;
   }, [readingText, currentWord, appLanguageId]);
+
+  // Get transliteration for TTS (always use English transliteration for pronunciation)
+  const getTransliteration = useCallback(() => {
+    if (!readingText || !currentWord) return '';
+    const transliterationEntry = readingText.translations?.en?.[currentWord.id];
+    return transliterationEntry?.canonical || currentWord.text || '';
+  }, [readingText, currentWord]);
 
   // Center practice track on current word
   const centerPracticeTrack = useCallback((instant = false) => {
@@ -564,6 +580,17 @@ useEffect(() => {
                 return gloss ?? '—';
               })()}
             </span>
+          </div>
+
+          {/* TTS Speak Button - Right */}
+          <div className="absolute right-0">
+            <SpeakButton
+              nativeText={currentWord?.text || ''}
+              nativeLocale={getLocaleForTts(practiceLanguageId)}
+              transliteration={getTransliteration()}
+              variant="icon"
+              disabled={!currentWord}
+            />
           </div>
         </div>
 
