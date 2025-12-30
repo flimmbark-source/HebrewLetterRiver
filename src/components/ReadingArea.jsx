@@ -585,7 +585,7 @@ useEffect(() => {
                   return (
                       <span
                         key={`punct-${idx}`}
-                        className="text-3xl opacity-40 sm:text-4xl"
+                        className="whitespace-nowrap text-3xl opacity-40 sm:text-4xl"
                         style={{ letterSpacing: '0.4px' }}
                       >
                         {token.text}
@@ -599,7 +599,7 @@ useEffect(() => {
                 return (
                   <span
                     key={token.id || idx}
-                    className={`${practiceFontClass} ${gameFontClass} text-3xl leading-tight transition-opacity sm:text-4xl ${
+                    className={`${practiceFontClass} ${gameFontClass} whitespace-nowrap text-3xl leading-tight transition-opacity sm:text-4xl ${
                       isActive ? 'opacity-100' : 'opacity-50'
                     }`}
                     style={{ letterSpacing: '0.4px', transform: 'translateY(1px)' }}
