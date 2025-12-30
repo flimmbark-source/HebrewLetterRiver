@@ -132,6 +132,9 @@ export default function SectionDictionary({ sectionId, sectionTitle, isOpen, onC
                           <th className="p-3 text-left font-semibold text-slate-300">
                             {t('read.dictionary.meaning')}
                           </th>
+                          <th className="p-3 text-center font-semibold text-slate-300">
+                            {t('read.dictionary.transaction') || 'Recent'}
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -157,6 +160,27 @@ export default function SectionDictionary({ sectionId, sectionTitle, isOpen, onC
                               <span className={`${appFontClass} text-base text-slate-300`}>
                                 {entry.meaning}
                               </span>
+                            </td>
+                            {/* Transaction (Recent Grade) */}
+                            <td className="p-3 text-center">
+                              {entry.gradeColor && (
+                                <div
+                                  className={`mx-auto h-4 w-4 rounded-full ${
+                                    entry.gradeColor === 'ok' ? 'bg-emerald-400' :
+                                    entry.gradeColor === 'bad' ? 'bg-rose-400' :
+                                    entry.gradeColor === 'miss' ? 'bg-slate-500' :
+                                    entry.gradeColor === 'extra' ? 'bg-yellow-400' :
+                                    'bg-slate-600'
+                                  }`}
+                                  title={
+                                    entry.gradeColor === 'ok' ? 'Correct' :
+                                    entry.gradeColor === 'bad' ? 'Incorrect character' :
+                                    entry.gradeColor === 'miss' ? 'Missing character' :
+                                    entry.gradeColor === 'extra' ? 'Extra character' :
+                                    'No attempts'
+                                  }
+                                />
+                              )}
                             </td>
                           </tr>
                         ))}

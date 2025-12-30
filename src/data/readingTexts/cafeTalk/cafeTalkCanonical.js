@@ -177,36 +177,153 @@ export const CAFE_TALK_WORDS = [
 ];
 
 /**
- * Cafe Talk categories with word IDs in order
+ * Cafe Talk categories with word IDs split into manageable chunks (5-8 words each)
  */
 export const CAFE_TALK_CATEGORIES = {
-  conversationGlue: {
-    id: 'conversationGlue',
-    wordIds: ['so', 'but', 'well', 'actually', 'maybe', 'probably', 'basically', 'anyway', 'also', 'too', 'either', 'neither', 'however', 'therefore', 'meanwhile', 'besides', 'instead', 'otherwise', 'still', 'yet', 'just', 'even', 'already', 'almost', 'quite']
+  // Conversation Glue - 25 words split into 4 chunks
+  conversationGlue1: {
+    id: 'conversationGlue1',
+    parentCategory: 'conversationGlue',
+    chunkNumber: 1,
+    wordIds: ['so', 'but', 'well', 'actually', 'maybe', 'probably']
   },
-  timeSequencing: {
-    id: 'timeSequencing',
-    wordIds: ['now', 'then', 'when', 'before', 'after', 'during', 'while', 'until', 'since', 'today', 'yesterday', 'tomorrow', 'soon', 'later', 'early', 'late', 'always', 'never', 'sometimes', 'often']
+  conversationGlue2: {
+    id: 'conversationGlue2',
+    parentCategory: 'conversationGlue',
+    chunkNumber: 2,
+    wordIds: ['basically', 'anyway', 'also', 'too', 'either', 'neither', 'however']
   },
-  peopleWords: {
-    id: 'peopleWords',
-    wordIds: ['I', 'you', 'he', 'she', 'we', 'they', 'who', 'someone', 'everyone', 'nobody', 'friend', 'family', 'person', 'people', 'child', 'parent', 'neighbor', 'stranger']
+  conversationGlue3: {
+    id: 'conversationGlue3',
+    parentCategory: 'conversationGlue',
+    chunkNumber: 3,
+    wordIds: ['therefore', 'meanwhile', 'besides', 'instead', 'otherwise', 'still']
   },
-  coreStoryVerbs: {
-    id: 'coreStoryVerbs',
-    wordIds: ['go', 'come', 'see', 'hear', 'say', 'tell', 'ask', 'think', 'know', 'want', 'need', 'like', 'love', 'hate', 'make', 'do', 'get', 'give', 'take', 'find', 'lose', 'try']
+  conversationGlue4: {
+    id: 'conversationGlue4',
+    parentCategory: 'conversationGlue',
+    chunkNumber: 4,
+    wordIds: ['yet', 'just', 'even', 'already', 'almost', 'quite']
   },
-  lifeLogistics: {
-    id: 'lifeLogistics',
-    wordIds: ['eat', 'drink', 'sleep', 'work', 'study', 'home', 'house', 'place', 'time', 'day', 'money', 'buy', 'pay', 'help', 'wait', 'leave', 'arrive', 'start', 'finish', 'stop']
+
+  // Time & Sequencing - 20 words split into 3 chunks
+  timeSequencing1: {
+    id: 'timeSequencing1',
+    parentCategory: 'timeSequencing',
+    chunkNumber: 1,
+    wordIds: ['now', 'then', 'when', 'before', 'after', 'during', 'while']
   },
-  reactionsFeelings: {
-    id: 'reactionsFeelings',
-    wordIds: ['happy', 'sad', 'angry', 'scared', 'surprised', 'tired', 'excited', 'bored', 'worried', 'confused', 'okay', 'fine', 'great', 'bad', 'terrible', 'wonderful', 'nice', 'beautiful', 'ugly', 'strange']
+  timeSequencing2: {
+    id: 'timeSequencing2',
+    parentCategory: 'timeSequencing',
+    chunkNumber: 2,
+    wordIds: ['until', 'since', 'today', 'yesterday', 'tomorrow', 'soon']
   },
-  everydayTopics: {
-    id: 'everydayTopics',
-    wordIds: ['food', 'water', 'coffee', 'weather', 'book', 'phone', 'car', 'street', 'city', 'country', 'language', 'word', 'thing', 'something', 'nothing', 'everything', 'problem', 'question', 'answer', 'idea']
+  timeSequencing3: {
+    id: 'timeSequencing3',
+    parentCategory: 'timeSequencing',
+    chunkNumber: 3,
+    wordIds: ['later', 'early', 'late', 'always', 'never', 'sometimes', 'often']
+  },
+
+  // People Words - 18 words split into 3 chunks
+  peopleWords1: {
+    id: 'peopleWords1',
+    parentCategory: 'peopleWords',
+    chunkNumber: 1,
+    wordIds: ['I', 'you', 'he', 'she', 'we', 'they']
+  },
+  peopleWords2: {
+    id: 'peopleWords2',
+    parentCategory: 'peopleWords',
+    chunkNumber: 2,
+    wordIds: ['who', 'someone', 'everyone', 'nobody', 'friend', 'family']
+  },
+  peopleWords3: {
+    id: 'peopleWords3',
+    parentCategory: 'peopleWords',
+    chunkNumber: 3,
+    wordIds: ['person', 'people', 'child', 'parent', 'neighbor', 'stranger']
+  },
+
+  // Core Story Verbs - 22 words split into 3 chunks
+  coreStoryVerbs1: {
+    id: 'coreStoryVerbs1',
+    parentCategory: 'coreStoryVerbs',
+    chunkNumber: 1,
+    wordIds: ['go', 'come', 'see', 'hear', 'say', 'tell', 'ask', 'think']
+  },
+  coreStoryVerbs2: {
+    id: 'coreStoryVerbs2',
+    parentCategory: 'coreStoryVerbs',
+    chunkNumber: 2,
+    wordIds: ['know', 'want', 'need', 'like', 'love', 'hate', 'make']
+  },
+  coreStoryVerbs3: {
+    id: 'coreStoryVerbs3',
+    parentCategory: 'coreStoryVerbs',
+    chunkNumber: 3,
+    wordIds: ['do', 'get', 'give', 'take', 'find', 'lose', 'try']
+  },
+
+  // Life Logistics - 20 words split into 3 chunks
+  lifeLogistics1: {
+    id: 'lifeLogistics1',
+    parentCategory: 'lifeLogistics',
+    chunkNumber: 1,
+    wordIds: ['eat', 'drink', 'sleep', 'work', 'study', 'home', 'house']
+  },
+  lifeLogistics2: {
+    id: 'lifeLogistics2',
+    parentCategory: 'lifeLogistics',
+    chunkNumber: 2,
+    wordIds: ['place', 'time', 'day', 'money', 'buy', 'pay']
+  },
+  lifeLogistics3: {
+    id: 'lifeLogistics3',
+    parentCategory: 'lifeLogistics',
+    chunkNumber: 3,
+    wordIds: ['help', 'wait', 'leave', 'arrive', 'start', 'finish', 'stop']
+  },
+
+  // Reactions & Feelings - 20 words split into 3 chunks
+  reactionsFeelings1: {
+    id: 'reactionsFeelings1',
+    parentCategory: 'reactionsFeelings',
+    chunkNumber: 1,
+    wordIds: ['happy', 'sad', 'angry', 'scared', 'surprised', 'tired', 'excited']
+  },
+  reactionsFeelings2: {
+    id: 'reactionsFeelings2',
+    parentCategory: 'reactionsFeelings',
+    chunkNumber: 2,
+    wordIds: ['bored', 'worried', 'confused', 'okay', 'fine', 'great']
+  },
+  reactionsFeelings3: {
+    id: 'reactionsFeelings3',
+    parentCategory: 'reactionsFeelings',
+    chunkNumber: 3,
+    wordIds: ['bad', 'terrible', 'wonderful', 'nice', 'beautiful', 'ugly', 'strange']
+  },
+
+  // Everyday Topics - 20 words split into 3 chunks
+  everydayTopics1: {
+    id: 'everydayTopics1',
+    parentCategory: 'everydayTopics',
+    chunkNumber: 1,
+    wordIds: ['food', 'water', 'coffee', 'weather', 'book', 'phone', 'car']
+  },
+  everydayTopics2: {
+    id: 'everydayTopics2',
+    parentCategory: 'everydayTopics',
+    chunkNumber: 2,
+    wordIds: ['street', 'city', 'country', 'language', 'word', 'thing']
+  },
+  everydayTopics3: {
+    id: 'everydayTopics3',
+    parentCategory: 'everydayTopics',
+    chunkNumber: 3,
+    wordIds: ['something', 'nothing', 'everything', 'problem', 'question', 'answer', 'idea']
   }
 };
 

@@ -122,25 +122,25 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
 }
 
 /**
- * Build all 7 Cafe Talk texts for a language
+ * Build all Cafe Talk texts for a language (now with chunks)
  * @param {string} practiceLanguage - Practice language ID
  * @param {Object} practiceLexicon - Lexicon for practice language
  * @param {Object} [i18nLexicons] - Optional: lexicons mapped by i18n codes for all app languages
  * @param {Object} [transliterations] - Optional: practice language transliterations for typing validation
- * @returns {Array} Array of 7 reading text objects
+ * @returns {Array} Array of reading text objects for all chunks
  */
 export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLexicons = null, transliterations = null) {
-  // Define titles and subtitles for each category
+  // Define titles and subtitles for each parent category and chunks
   // These are hardcoded multilingual strings (not from lexicons)
   const categoryMetadata = {
     conversationGlue: {
-      titles: {
-        en: 'Conversation Glue (25)',
-        es: 'Conectores de Conversación (25)',
-        fr: 'Mots de Liaison (25)',
-        he: 'דבק שיחה (25)'
+      baseTitle: {
+        en: 'Conversation Glue',
+        es: 'Conectores de Conversación',
+        fr: 'Mots de Liaison',
+        he: 'דבק שיחה'
       },
-      subtitles: {
+      baseSubtitle: {
         en: 'Essential discourse markers and connectors',
         es: 'Marcadores y conectores esenciales',
         fr: 'Marqueurs et connecteurs essentiels',
@@ -148,69 +148,99 @@ export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLex
       }
     },
     timeSequencing: {
-      titles: {
-        en: 'Time & Sequencing (20)',
-        he: 'זמן ורצף (20)'
+      baseTitle: {
+        en: 'Time & Sequencing',
+        he: 'זמן ורצף'
       },
-      subtitles: {
+      baseSubtitle: {
         en: 'Words for expressing when things happen',
         he: 'מילים לביטוי מתי דברים קורים'
       }
     },
     peopleWords: {
-      titles: {
-        en: 'People Words (18)',
-        he: 'מילות אנשים (18)'
+      baseTitle: {
+        en: 'People Words',
+        he: 'מילות אנשים'
       },
-      subtitles: {
+      baseSubtitle: {
         en: 'Pronouns and references to people',
         he: 'כינויים והתייחסויות לאנשים'
       }
     },
     coreStoryVerbs: {
-      titles: {
-        en: 'Core Story Verbs (22)',
-        he: 'פעלים מרכזיים לסיפור (22)'
+      baseTitle: {
+        en: 'Core Story Verbs',
+        he: 'פעלים מרכזיים לסיפור'
       },
-      subtitles: {
+      baseSubtitle: {
         en: 'Essential action verbs for storytelling',
         he: 'פעלי פעולה חיוניים לסיפור סיפורים'
       }
     },
     lifeLogistics: {
-      titles: {
-        en: 'Life Logistics (20)',
-        he: 'לוגיסטיקה יומיומית (20)'
+      baseTitle: {
+        en: 'Life Logistics',
+        he: 'לוגיסטיקה יומיומית'
       },
-      subtitles: {
+      baseSubtitle: {
         en: 'Daily life and practical words',
         he: 'חיי יום יום ומילים מעשיות'
       }
     },
     reactionsFeelings: {
-      titles: {
-        en: 'Reactions & Feelings (20)',
-        he: 'תגובות ורגשות (20)'
+      baseTitle: {
+        en: 'Reactions & Feelings',
+        he: 'תגובות ורגשות'
       },
-      subtitles: {
+      baseSubtitle: {
         en: 'Emotional responses and descriptions',
         he: 'תגובות רגשיות ותיאורים'
       }
     },
     everydayTopics: {
-      titles: {
-        en: 'Everyday Topics (20)',
-        he: 'נושאים יומיומיים (20)'
+      baseTitle: {
+        en: 'Everyday Topics',
+        he: 'נושאים יומיומיים'
       },
-      subtitles: {
+      baseSubtitle: {
         en: 'Common conversation topics and things',
         he: 'נושאי שיחה נפוצים ודברים'
       }
     }
   };
-  
-  return Object.keys(categoryMetadata).map(categoryId => {
-    const { titles, subtitles } = categoryMetadata[categoryId];
-    return buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, i18nLexicons, transliterations);
+
+  const results = [];
+
+  // Build reading texts for all chunks
+  Object.keys(CAFE_TALK_CATEGORIES).forEach(categoryId => {
+    const category = CAFE_TALK_CATEGORIES[categoryId];
+    const { parentCategory, chunkNumber, wordIds } = category;
+    const metadata = categoryMetadata[parentCategory];
+
+    if (!metadata) {
+      console.warn(`No metadata found for parent category: ${parentCategory}`);
+      return;
+    }
+
+    // Build titles with chunk information
+    const titles = {};
+    const subtitles = {};
+
+    Object.keys(metadata.baseTitle).forEach(lang => {
+      titles[lang] = `${metadata.baseTitle[lang]} - Part ${chunkNumber} (${wordIds.length})`;
+      subtitles[lang] = metadata.baseSubtitle[lang];
+    });
+
+    results.push(buildCafeTalkText(
+      categoryId,
+      practiceLanguage,
+      practiceLexicon,
+      titles,
+      subtitles,
+      i18nLexicons,
+      transliterations
+    ));
   });
+
+  return results;
 }

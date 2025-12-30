@@ -5,6 +5,7 @@ import { getReadingTextById } from '../data/readingTexts/index.js';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
 import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib/languageUtils';
+import { saveReadingResults } from '../lib/readingResultsStorage';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -338,6 +339,7 @@ export default function ReadingArea({ textId, onBack }) {
     }
 
     setCompletedResults(prev => [...prev, {
+      wordId: currentWord.id,
       practiceWord: currentWord.text,
       typedChars: result.typedChars,
       ghostSequence: result.ghostSequence,
@@ -463,6 +465,18 @@ useEffect(() => {
   const handleResultsBack = useCallback(() => {
     onBack?.();
   }, [onBack]);
+
+  // Save results to localStorage when results screen is shown
+  useEffect(() => {
+    if (showResults && completedResults.length > 0 && readingText) {
+      const sectionId = readingText.sectionId;
+      const textId = readingText.id;
+
+      if (sectionId && textId) {
+        saveReadingResults(sectionId, textId, practiceLanguageId, completedResults);
+      }
+    }
+  }, [showResults, completedResults, readingText, practiceLanguageId]);
 
   // Global keydown handler (mirrors the prototype: always listen, refocus hidden input, never gated by mobile detection)
   useEffect(() => {
