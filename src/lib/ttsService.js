@@ -88,26 +88,35 @@ class TtsService {
   pickVoiceForLocale(locale) {
     if (!locale || this.voices.length === 0) return null;
 
-    const localeLower = locale.toLowerCase();
+    // Normalize historic tags (e.g., iw-IL ➜ he-IL)
+    const normalizedLocale = locale.replace(/^iw(-|$)/i, 'he$1');
+    const localeLower = normalizedLocale.toLowerCase();
     const langCode = localeLower.split('-')[0]; // e.g., "he" from "he-IL"
 
-    // Try exact match first (e.g., "he-IL")
-    let voice = this.voices.find(v => v.lang.toLowerCase() === localeLower);
+    // Score and sort voices so we pick the most natural-sounding option
+    const scoredVoices = this.voices
+      .map((voice, index) => {
+        const voiceLang = voice.lang.toLowerCase();
+        const isExact = voiceLang === localeLower;
+        const sharesLang = voiceLang.startsWith(langCode);
+        const isGoogle = /google|chrome os/i.test(voice.name);
 
-    // Try language prefix match (e.g., "he" matches "he-IL" or "he")
-    if (!voice) {
-      voice = this.voices.find(v => v.lang.toLowerCase().startsWith(langCode));
-    }
+        // Higher score = better voice
+        let score = 0;
+        if (isExact) score += 4; // exact locale match
+        else if (sharesLang) score += 3; // same language, different region
 
-    // Prefer local voices over remote when available
-    if (voice && !voice.localService) {
-      const localVoice = this.voices.find(v =>
-        v.lang.toLowerCase().startsWith(langCode) && v.localService
-      );
-      if (localVoice) voice = localVoice;
-    }
+        if (voice.localService) score += 1; // local voices are more reliable offline
+        if (isGoogle) score += 2; // Google/Chrome OS voices sound clearer than eSpeak
 
-    console.log('[TTS] Selected voice for', locale, ':', voice ? `${voice.name} (${voice.lang})` : 'none');
+        // Tie-breaker: keep existing order (stable sort)
+        return { voice, score, index };
+      })
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score || a.index - b.index);
+
+    const voice = scoredVoices.length > 0 ? scoredVoices[0].voice : null;
+    console.log('[TTS] Selected voice for', normalizedLocale, ':', voice ? `${voice.name} (${voice.lang})` : 'none');
     return voice;
   }
 
