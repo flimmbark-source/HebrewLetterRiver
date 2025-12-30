@@ -122,7 +122,8 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
     practiceLanguage,
     tokens: buildTokensFromLexicon(wordIds, practiceLexicon),
     meaningKeys: buildMeaningKeys(wordIds),
-    translations
+    translations,
+    sectionId: sectionPrefix
   });
 }
 
