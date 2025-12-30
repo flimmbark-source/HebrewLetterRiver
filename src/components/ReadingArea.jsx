@@ -8,6 +8,8 @@ import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLangua
 import { saveReadingResults } from '../lib/readingResultsStorage';
 import SpeakButton from './SpeakButton';
 import ttsService from '../lib/ttsService';
+import { getVowelLayout } from '../data/vowelLayouts/hebrewVowelLayouts.js';
+import VowelLayoutTeachingModal from './reading/VowelLayoutTeachingModal.jsx';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -44,6 +46,7 @@ export default function ReadingArea({ textId, onBack }) {
   const [showResults, setShowResults] = useState(false);
   const [completedResults, setCompletedResults] = useState([]);
   const [gameFont, setGameFont] = useState('default');
+  const [teachingLayoutId, setTeachingLayoutId] = useState(null);
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -555,6 +558,21 @@ useEffect(() => {
           >
         {/* HUD */}
         <div className="relative mb-4 flex items-center justify-center gap-3">
+          {/* Vowel Layout Chip - Left (Hebrew only) */}
+          {practiceLanguageId === 'hebrew' && currentWord?.vowelLayoutId && (() => {
+            const layout = getVowelLayout(currentWord.vowelLayoutId);
+            return layout ? (
+              <button
+                onClick={() => setTeachingLayoutId(currentWord.vowelLayoutId)}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-500/50 bg-blue-900/30 text-xl transition-all hover:scale-110 hover:border-blue-400 hover:bg-blue-800/40"
+                aria-label="Vowel layout hint"
+                title="Tap to learn about this vowel pattern"
+              >
+                {layout.chipLabel}
+              </button>
+            ) : null;
+          })()}
+
           {/* Meaning - Centered with more space */}
           <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-6 py-2.5 text-sm max-w-[calc(100%-80px)]">
             <span className={`${appFontClass} text-base font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis`}>
@@ -889,6 +907,34 @@ useEffect(() => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Vowel Layout Teaching Modal */}
+        {teachingLayoutId && (
+          <VowelLayoutTeachingModal
+            isVisible={true}
+            onClose={() => setTeachingLayoutId(null)}
+            layoutId={teachingLayoutId}
+            languageCode="he"
+            examples={(() => {
+              // Generate examples from current pack for this layout
+              if (!readingText?.tokens) return [];
+              return readingText.tokens
+                .filter(t => t.type === 'word' && t.vowelLayoutId === teachingLayoutId)
+                .map(t => {
+                  const transliterationEntry = readingText.translations?.en?.[t.id];
+                  return {
+                    hebrew: t.text,
+                    transliteration: transliterationEntry?.canonical || t.id,
+                    meaning: readingText.meaningKeys?.[t.id]
+                      ? t(readingText.meaningKeys[t.id])
+                      : (readingText.glosses?.[getLanguageCode(appLanguageId)]?.[t.id] ?? t.id)
+                  };
+                });
+            })()}
+            practiceFontClass={practiceFontClass}
+            appFontClass={appFontClass}
+          />
         )}
       </div>
     );

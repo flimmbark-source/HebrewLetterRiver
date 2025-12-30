@@ -12,18 +12,28 @@ import { CAFE_TALK_CATEGORIES } from './cafeTalkCanonical.js';
  * Build tokens array from word IDs and lexicon
  * @param {string[]} wordIds - Array of word IDs in order
  * @param {Object} lexicon - Lexicon mapping word ID to translated text
+ * @param {Object} [vowelLayouts] - Optional: vowel layout IDs for Hebrew words
  * @returns {Array} Token array
  */
-function buildTokensFromLexicon(wordIds, lexicon) {
-  const tokens = wordIds.map(wordId => ({
-    type: 'word',
-    text: lexicon[wordId],
-    id: wordId
-  }));
-  
+function buildTokensFromLexicon(wordIds, lexicon, vowelLayouts = null) {
+  const tokens = wordIds.map(wordId => {
+    const token = {
+      type: 'word',
+      text: lexicon[wordId],
+      id: wordId
+    };
+
+    // Add vowelLayoutId if available (defensive: only if it exists)
+    if (vowelLayouts && vowelLayouts[wordId]) {
+      token.vowelLayoutId = vowelLayouts[wordId];
+    }
+
+    return token;
+  });
+
   // Add punctuation at end
   tokens.push({ type: 'punct', text: '.' });
-  
+
   return tokens;
 }
 
@@ -81,9 +91,10 @@ function buildTranslationsForLanguage(wordIds, appLangLexicon, transliterationSo
  * @param {Object} subtitles - Subtitle translations {en, es, fr, he, ...}
  * @param {Object} [i18nLexicons] - Optional: lexicons mapped by i18n codes (en, es, fr, etc.) for app language translations
  * @param {Object} [transliterations] - Optional: practice language transliterations for typing validation
+ * @param {Object} [vowelLayouts] - Optional: vowel layout IDs for Hebrew words
  * @returns {Object} Reading text object
  */
-export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, i18nLexicons = null, transliterations = null) {
+export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, i18nLexicons = null, transliterations = null, vowelLayouts = null) {
   const category = CAFE_TALK_CATEGORIES[categoryId];
 
   if (!category) {
@@ -125,7 +136,7 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
     title: titles,
     subtitle: subtitles,
     practiceLanguage,
-    tokens: buildTokensFromLexicon(wordIds, practiceLexicon),
+    tokens: buildTokensFromLexicon(wordIds, practiceLexicon, vowelLayouts),
     meaningKeys: buildMeaningKeys(wordIds),
     translations,
     sectionId: sectionPrefix
@@ -138,9 +149,10 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
  * @param {Object} practiceLexicon - Lexicon for practice language
  * @param {Object} [i18nLexicons] - Optional: lexicons mapped by i18n codes for all app languages
  * @param {Object} [transliterations] - Optional: practice language transliterations for typing validation
+ * @param {Object} [vowelLayouts] - Optional: vowel layout IDs for Hebrew words
  * @returns {Array} Array of reading text objects for all chunks
  */
-export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLexicons = null, transliterations = null) {
+export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLexicons = null, transliterations = null, vowelLayouts = null) {
   // Define titles and subtitles for each specific card
   // These are hardcoded multilingual strings (not from lexicons)
   const cardMetadata = {
@@ -839,7 +851,8 @@ export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLex
       metadata.titles,
       metadata.subtitles,
       i18nLexicons,
-      transliterations
+      transliterations,
+      vowelLayouts
     );
 
     results.push(readingText);

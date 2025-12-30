@@ -324,3 +324,21 @@ export const cafeTalkTransliterations = {
   'ugly': 'mechoar',
   'strange': 'muzar'
 };
+
+// Hebrew vowel layout IDs
+// Maps word IDs to their vowel-only pattern categories
+// Used for the vowel layout teaching system
+export const cafeTalkVowelLayouts = {
+  // Conversation Glue (Basic Connectors tagged)
+  'so': 'V1_A',           // az (one "a" vowel)
+  'but': 'V2_A_A',        // aval (two "a" vowels)
+  'well': 'V1_U',         // nu (one "u" vowel)
+  'actually': 'V2_E_E',   // be-etzem (two "e" vowels)
+  'maybe': 'V2_U_AY',     // ulay ("u" then "ay" vowels)
+  'probably': 'V3_A_A_A', // kanarah (three "a" vowels)
+
+  // Additional words can be tagged here as needed
+  // 'basically': 'V4_E_I_A_I',  // be-ikaron
+  // 'also': 'V1_A',             // gam
+  // etc.
+};
