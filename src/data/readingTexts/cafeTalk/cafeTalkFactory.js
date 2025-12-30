@@ -110,8 +110,13 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
     translations['en'] = buildTranslationsForLanguage(wordIds, practiceLexicon, transliterationSource);
   }
 
+  // Extract sectionId if provided in the category object (used by buildAllCafeTalkTexts)
+  // Otherwise default to cafeTalk for backward compatibility
+  const categoryData = CAFE_TALK_CATEGORIES[categoryId];
+  const sectionPrefix = categoryData?.sectionId || 'cafeTalk';
+
   return createReadingText({
-    id: `cafeTalk.${categoryId}`,
+    id: `${sectionPrefix}.${categoryId}`,
     title: titles,
     subtitle: subtitles,
     practiceLanguage,
@@ -122,7 +127,7 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
 }
 
 /**
- * Build all Cafe Talk texts for a language (now with chunks)
+ * Build all Cafe Talk texts for a language (now with descriptive names)
  * @param {string} practiceLanguage - Practice language ID
  * @param {Object} practiceLexicon - Lexicon for practice language
  * @param {Object} [i18nLexicons] - Optional: lexicons mapped by i18n codes for all app languages
@@ -130,116 +135,284 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
  * @returns {Array} Array of reading text objects for all chunks
  */
 export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLexicons = null, transliterations = null) {
-  // Define titles and subtitles for each parent category and chunks
+  // Define titles and subtitles for each specific card
   // These are hardcoded multilingual strings (not from lexicons)
-  const categoryMetadata = {
-    conversationGlue: {
-      baseTitle: {
-        en: 'Conversation Glue',
-        es: 'Conectores de Conversación',
-        fr: 'Mots de Liaison',
-        he: 'דבק שיחה'
+  const cardMetadata = {
+    // Conversation Glue section
+    basicConnectors: {
+      titles: {
+        en: 'Basic Connectors',
+        es: 'Conectores Básicos',
+        fr: 'Connecteurs de Base',
+        he: 'מקשרים בסיסיים'
       },
-      baseSubtitle: {
-        en: 'Essential discourse markers and connectors',
-        es: 'Marcadores y conectores esenciales',
-        fr: 'Marqueurs et connecteurs essentiels',
-        he: 'סמנים וקישורים חיוניים'
+      subtitles: {
+        en: 'Essential words to connect thoughts',
+        es: 'Palabras esenciales para conectar ideas',
+        fr: 'Mots essentiels pour relier les pensées',
+        he: 'מילים חיוניות לחיבור מחשבות'
       }
     },
-    timeSequencing: {
-      baseTitle: {
-        en: 'Time & Sequencing',
-        he: 'זמן ורצף'
+    discourseMarkers: {
+      titles: {
+        en: 'Discourse Markers',
+        es: 'Marcadores Discursivos',
+        fr: 'Marqueurs du Discours',
+        he: 'סמני שיח'
       },
-      baseSubtitle: {
-        en: 'Words for expressing when things happen',
-        he: 'מילים לביטוי מתי דברים קורים'
+      subtitles: {
+        en: 'Words that structure conversations',
+        es: 'Palabras que estructuran conversaciones',
+        fr: 'Mots qui structurent les conversations',
+        he: 'מילים שמבנות שיחות'
       }
     },
-    peopleWords: {
-      baseTitle: {
-        en: 'People Words',
-        he: 'מילות אנשים'
+    logicalConnectors: {
+      titles: {
+        en: 'Logical Connectors',
+        es: 'Conectores Lógicos',
+        fr: 'Connecteurs Logiques',
+        he: 'מקשרים לוגיים'
       },
-      baseSubtitle: {
-        en: 'Pronouns and references to people',
-        he: 'כינויים והתייחסויות לאנשים'
+      subtitles: {
+        en: 'Words showing cause and consequence',
+        es: 'Palabras que muestran causa y consecuencia',
+        fr: 'Mots montrant cause et conséquence',
+        he: 'מילים המראות סיבה ותוצאה'
       }
     },
-    coreStoryVerbs: {
-      baseTitle: {
-        en: 'Core Story Verbs',
-        he: 'פעלים מרכזיים לסיפור'
+    qualifiersModifiers: {
+      titles: {
+        en: 'Qualifiers & Modifiers',
+        es: 'Calificadores y Modificadores',
+        fr: 'Qualificateurs et Modificateurs',
+        he: 'מגדירים ומתאמים'
       },
-      baseSubtitle: {
-        en: 'Essential action verbs for storytelling',
-        he: 'פעלי פעולה חיוניים לסיפור סיפורים'
+      subtitles: {
+        en: 'Words that adjust meaning',
+        es: 'Palabras que ajustan el significado',
+        fr: 'Mots qui ajustent le sens',
+        he: 'מילים המתאימות משמעות'
       }
     },
-    lifeLogistics: {
-      baseTitle: {
-        en: 'Life Logistics',
-        he: 'לוגיסטיקה יומיומית'
+
+    // Time & Sequencing section
+    presentTransitions: {
+      titles: {
+        en: 'Present & Transitions',
+        he: 'הווה ומעברים'
       },
-      baseSubtitle: {
-        en: 'Daily life and practical words',
-        he: 'חיי יום יום ומילים מעשיות'
+      subtitles: {
+        en: 'Current time and sequential words',
+        he: 'זמן נוכחי ומילים רציפות'
       }
     },
-    reactionsFeelings: {
-      baseTitle: {
-        en: 'Reactions & Feelings',
-        he: 'תגובות ורגשות'
+    timeReferences: {
+      titles: {
+        en: 'Time References',
+        he: 'הפניות זמן'
       },
-      baseSubtitle: {
-        en: 'Emotional responses and descriptions',
-        he: 'תגובות רגשיות ותיאורים'
+      subtitles: {
+        en: 'Specific points in time',
+        he: 'נקודות זמן ספציפיות'
       }
     },
-    everydayTopics: {
-      baseTitle: {
-        en: 'Everyday Topics',
-        he: 'נושאים יומיומיים'
+    frequencyTiming: {
+      titles: {
+        en: 'Frequency & Timing',
+        he: 'תדירות ותזמון'
       },
-      baseSubtitle: {
-        en: 'Common conversation topics and things',
-        he: 'נושאי שיחה נפוצים ודברים'
+      subtitles: {
+        en: 'How often things happen',
+        he: 'כמה פעמים דברים קורים'
+      }
+    },
+
+    // People Words section
+    personalPronouns: {
+      titles: {
+        en: 'Personal Pronouns',
+        he: 'כינויי גוף'
+      },
+      subtitles: {
+        en: 'Basic references to people',
+        he: 'התייחסויות בסיסיות לאנשים'
+      }
+    },
+    peopleReferences: {
+      titles: {
+        en: 'People References',
+        he: 'התייחסויות לאנשים'
+      },
+      subtitles: {
+        en: 'General ways to refer to people',
+        he: 'דרכים כלליות להתייחס לאנשים'
+      }
+    },
+    socialRoles: {
+      titles: {
+        en: 'Social Roles',
+        he: 'תפקידים חברתיים'
+      },
+      subtitles: {
+        en: 'Relationships and types of people',
+        he: 'קשרים וסוגי אנשים'
+      }
+    },
+
+    // Core Story Verbs section
+    communicationPerception: {
+      titles: {
+        en: 'Communication & Perception',
+        he: 'תקשורת ותפיסה'
+      },
+      subtitles: {
+        en: 'Verbs for talking and sensing',
+        he: 'פעלים לדיבור וחישה'
+      }
+    },
+    emotionsCreation: {
+      titles: {
+        en: 'Emotions & Creation',
+        he: 'רגשות ויצירה'
+      },
+      subtitles: {
+        en: 'Verbs for feelings and making',
+        he: 'פעלים לרגשות ויצירה'
+      }
+    },
+    actionVerbs: {
+      titles: {
+        en: 'Action Verbs',
+        he: 'פעלי פעולה'
+      },
+      subtitles: {
+        en: 'Essential verbs for doing',
+        he: 'פעלים חיוניים לעשייה'
+      }
+    },
+
+    // Life Logistics section
+    dailyRoutines: {
+      titles: {
+        en: 'Daily Routines',
+        he: 'שגרה יומית'
+      },
+      subtitles: {
+        en: 'Everyday activities and places',
+        he: 'פעילויות ומקומות יומיומיים'
+      }
+    },
+    timeResources: {
+      titles: {
+        en: 'Time & Resources',
+        he: 'זמן ומשאבים'
+      },
+      subtitles: {
+        en: 'Essential concepts for planning',
+        he: 'מושגים חיוניים לתכנון'
+      }
+    },
+    actionsMovement: {
+      titles: {
+        en: 'Actions & Movement',
+        he: 'פעולות ותנועה'
+      },
+      subtitles: {
+        en: 'Verbs for getting things done',
+        he: 'פעלים לביצוע דברים'
+      }
+    },
+
+    // Reactions & Feelings section
+    basicEmotions: {
+      titles: {
+        en: 'Basic Emotions',
+        he: 'רגשות בסיסיים'
+      },
+      subtitles: {
+        en: 'Core emotional states',
+        he: 'מצבים רגשיים מרכזיים'
+      }
+    },
+    statesOfBeing: {
+      titles: {
+        en: 'States of Being',
+        he: 'מצבי הוויה'
+      },
+      subtitles: {
+        en: 'How you feel right now',
+        he: 'איך אתה מרגיש כרגע'
+      }
+    },
+    descriptions: {
+      titles: {
+        en: 'Descriptions',
+        he: 'תיאורים'
+      },
+      subtitles: {
+        en: 'Words to describe people and things',
+        he: 'מילים לתאר אנשים ודברים'
+      }
+    },
+
+    // Everyday Topics section
+    commonObjects: {
+      titles: {
+        en: 'Common Objects',
+        he: 'חפצים נפוצים'
+      },
+      subtitles: {
+        en: 'Things you use every day',
+        he: 'דברים שאתה משתמש בהם כל יום'
+      }
+    },
+    placesConcepts: {
+      titles: {
+        en: 'Places & Concepts',
+        he: 'מקומות ומושגים'
+      },
+      subtitles: {
+        en: 'Locations and ideas',
+        he: 'מיקומים ורעיונות'
+      }
+    },
+    abstractTerms: {
+      titles: {
+        en: 'Abstract Terms',
+        he: 'מונחים מופשטים'
+      },
+      subtitles: {
+        en: 'General concepts and ideas',
+        he: 'מושגים ורעיונות כלליים'
       }
     }
   };
 
   const results = [];
 
-  // Build reading texts for all chunks
+  // Build reading texts for all cards
   Object.keys(CAFE_TALK_CATEGORIES).forEach(categoryId => {
     const category = CAFE_TALK_CATEGORIES[categoryId];
-    const { parentCategory, chunkNumber, wordIds } = category;
-    const metadata = categoryMetadata[parentCategory];
+    const { sectionId, wordIds } = category;
+    const metadata = cardMetadata[categoryId];
 
     if (!metadata) {
-      console.warn(`No metadata found for parent category: ${parentCategory}`);
+      console.warn(`No metadata found for category: ${categoryId}`);
       return;
     }
 
-    // Build titles with chunk information
-    const titles = {};
-    const subtitles = {};
-
-    Object.keys(metadata.baseTitle).forEach(lang => {
-      titles[lang] = `${metadata.baseTitle[lang]} - Part ${chunkNumber}`;
-      subtitles[lang] = metadata.baseSubtitle[lang];
-    });
-
-    results.push(buildCafeTalkText(
+    const readingText = buildCafeTalkText(
       categoryId,
       practiceLanguage,
       practiceLexicon,
-      titles,
-      subtitles,
+      metadata.titles,
+      metadata.subtitles,
       i18nLexicons,
       transliterations
-    ));
+    );
+
+    results.push(readingText);
   });
 
   return results;

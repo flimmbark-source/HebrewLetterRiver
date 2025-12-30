@@ -178,151 +178,130 @@ export const CAFE_TALK_WORDS = [
 
 /**
  * Cafe Talk categories with word IDs split into manageable chunks (5-8 words each)
+ * Each chunk now has a descriptive name and belongs to its own section
  */
 export const CAFE_TALK_CATEGORIES = {
-  // Conversation Glue - 25 words split into 4 chunks
-  conversationGlue1: {
-    id: 'conversationGlue1',
-    parentCategory: 'conversationGlue',
-    chunkNumber: 1,
+  // Conversation Glue Section - 25 words split into 4 chunks
+  basicConnectors: {
+    id: 'basicConnectors',
+    sectionId: 'conversationGlue',
     wordIds: ['so', 'but', 'well', 'actually', 'maybe', 'probably']
   },
-  conversationGlue2: {
-    id: 'conversationGlue2',
-    parentCategory: 'conversationGlue',
-    chunkNumber: 2,
+  discourseMarkers: {
+    id: 'discourseMarkers',
+    sectionId: 'conversationGlue',
     wordIds: ['basically', 'anyway', 'also', 'too', 'either', 'neither', 'however']
   },
-  conversationGlue3: {
-    id: 'conversationGlue3',
-    parentCategory: 'conversationGlue',
-    chunkNumber: 3,
+  logicalConnectors: {
+    id: 'logicalConnectors',
+    sectionId: 'conversationGlue',
     wordIds: ['therefore', 'meanwhile', 'besides', 'instead', 'otherwise', 'still']
   },
-  conversationGlue4: {
-    id: 'conversationGlue4',
-    parentCategory: 'conversationGlue',
-    chunkNumber: 4,
+  qualifiersModifiers: {
+    id: 'qualifiersModifiers',
+    sectionId: 'conversationGlue',
     wordIds: ['yet', 'just', 'even', 'already', 'almost', 'quite']
   },
 
-  // Time & Sequencing - 20 words split into 3 chunks
-  timeSequencing1: {
-    id: 'timeSequencing1',
-    parentCategory: 'timeSequencing',
-    chunkNumber: 1,
+  // Time & Sequencing Section - 20 words split into 3 chunks
+  presentTransitions: {
+    id: 'presentTransitions',
+    sectionId: 'timeSequencing',
     wordIds: ['now', 'then', 'when', 'before', 'after', 'during', 'while']
   },
-  timeSequencing2: {
-    id: 'timeSequencing2',
-    parentCategory: 'timeSequencing',
-    chunkNumber: 2,
+  timeReferences: {
+    id: 'timeReferences',
+    sectionId: 'timeSequencing',
     wordIds: ['until', 'since', 'today', 'yesterday', 'tomorrow', 'soon']
   },
-  timeSequencing3: {
-    id: 'timeSequencing3',
-    parentCategory: 'timeSequencing',
-    chunkNumber: 3,
+  frequencyTiming: {
+    id: 'frequencyTiming',
+    sectionId: 'timeSequencing',
     wordIds: ['later', 'early', 'late', 'always', 'never', 'sometimes', 'often']
   },
 
-  // People Words - 18 words split into 3 chunks
-  peopleWords1: {
-    id: 'peopleWords1',
-    parentCategory: 'peopleWords',
-    chunkNumber: 1,
+  // People Words Section - 18 words split into 3 chunks
+  personalPronouns: {
+    id: 'personalPronouns',
+    sectionId: 'peopleWords',
     wordIds: ['I', 'you', 'he', 'she', 'we', 'they']
   },
-  peopleWords2: {
-    id: 'peopleWords2',
-    parentCategory: 'peopleWords',
-    chunkNumber: 2,
+  peopleReferences: {
+    id: 'peopleReferences',
+    sectionId: 'peopleWords',
     wordIds: ['who', 'someone', 'everyone', 'nobody', 'friend', 'family']
   },
-  peopleWords3: {
-    id: 'peopleWords3',
-    parentCategory: 'peopleWords',
-    chunkNumber: 3,
+  socialRoles: {
+    id: 'socialRoles',
+    sectionId: 'peopleWords',
     wordIds: ['person', 'people', 'child', 'parent', 'neighbor', 'stranger']
   },
 
-  // Core Story Verbs - 22 words split into 3 chunks
-  coreStoryVerbs1: {
-    id: 'coreStoryVerbs1',
-    parentCategory: 'coreStoryVerbs',
-    chunkNumber: 1,
+  // Core Story Verbs Section - 22 words split into 3 chunks
+  communicationPerception: {
+    id: 'communicationPerception',
+    sectionId: 'coreStoryVerbs',
     wordIds: ['go', 'come', 'see', 'hear', 'say', 'tell', 'ask', 'think']
   },
-  coreStoryVerbs2: {
-    id: 'coreStoryVerbs2',
-    parentCategory: 'coreStoryVerbs',
-    chunkNumber: 2,
+  emotionsCreation: {
+    id: 'emotionsCreation',
+    sectionId: 'coreStoryVerbs',
     wordIds: ['know', 'want', 'need', 'like', 'love', 'hate', 'make']
   },
-  coreStoryVerbs3: {
-    id: 'coreStoryVerbs3',
-    parentCategory: 'coreStoryVerbs',
-    chunkNumber: 3,
+  actionVerbs: {
+    id: 'actionVerbs',
+    sectionId: 'coreStoryVerbs',
     wordIds: ['do', 'get', 'give', 'take', 'find', 'lose', 'try']
   },
 
-  // Life Logistics - 20 words split into 3 chunks
-  lifeLogistics1: {
-    id: 'lifeLogistics1',
-    parentCategory: 'lifeLogistics',
-    chunkNumber: 1,
+  // Life Logistics Section - 20 words split into 3 chunks
+  dailyRoutines: {
+    id: 'dailyRoutines',
+    sectionId: 'lifeLogistics',
     wordIds: ['eat', 'drink', 'sleep', 'work', 'study', 'home', 'house']
   },
-  lifeLogistics2: {
-    id: 'lifeLogistics2',
-    parentCategory: 'lifeLogistics',
-    chunkNumber: 2,
+  timeResources: {
+    id: 'timeResources',
+    sectionId: 'lifeLogistics',
     wordIds: ['place', 'time', 'day', 'money', 'buy', 'pay']
   },
-  lifeLogistics3: {
-    id: 'lifeLogistics3',
-    parentCategory: 'lifeLogistics',
-    chunkNumber: 3,
+  actionsMovement: {
+    id: 'actionsMovement',
+    sectionId: 'lifeLogistics',
     wordIds: ['help', 'wait', 'leave', 'arrive', 'start', 'finish', 'stop']
   },
 
-  // Reactions & Feelings - 20 words split into 3 chunks
-  reactionsFeelings1: {
-    id: 'reactionsFeelings1',
-    parentCategory: 'reactionsFeelings',
-    chunkNumber: 1,
+  // Reactions & Feelings Section - 20 words split into 3 chunks
+  basicEmotions: {
+    id: 'basicEmotions',
+    sectionId: 'reactionsFeelings',
     wordIds: ['happy', 'sad', 'angry', 'scared', 'surprised', 'tired', 'excited']
   },
-  reactionsFeelings2: {
-    id: 'reactionsFeelings2',
-    parentCategory: 'reactionsFeelings',
-    chunkNumber: 2,
+  statesOfBeing: {
+    id: 'statesOfBeing',
+    sectionId: 'reactionsFeelings',
     wordIds: ['bored', 'worried', 'confused', 'okay', 'fine', 'great']
   },
-  reactionsFeelings3: {
-    id: 'reactionsFeelings3',
-    parentCategory: 'reactionsFeelings',
-    chunkNumber: 3,
+  descriptions: {
+    id: 'descriptions',
+    sectionId: 'reactionsFeelings',
     wordIds: ['bad', 'terrible', 'wonderful', 'nice', 'beautiful', 'ugly', 'strange']
   },
 
-  // Everyday Topics - 20 words split into 3 chunks
-  everydayTopics1: {
-    id: 'everydayTopics1',
-    parentCategory: 'everydayTopics',
-    chunkNumber: 1,
+  // Everyday Topics Section - 20 words split into 3 chunks
+  commonObjects: {
+    id: 'commonObjects',
+    sectionId: 'everydayTopics',
     wordIds: ['food', 'water', 'coffee', 'weather', 'book', 'phone', 'car']
   },
-  everydayTopics2: {
-    id: 'everydayTopics2',
-    parentCategory: 'everydayTopics',
-    chunkNumber: 2,
+  placesConcepts: {
+    id: 'placesConcepts',
+    sectionId: 'everydayTopics',
     wordIds: ['street', 'city', 'country', 'language', 'word', 'thing']
   },
-  everydayTopics3: {
-    id: 'everydayTopics3',
-    parentCategory: 'everydayTopics',
-    chunkNumber: 3,
+  abstractTerms: {
+    id: 'abstractTerms',
+    sectionId: 'everydayTopics',
     wordIds: ['something', 'nothing', 'everything', 'problem', 'question', 'answer', 'idea']
   }
 };
