@@ -4,8 +4,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { getReadingTextById } from '../data/readingTexts/index.js';
 import { getTextDirection, getFontClass, normalizeForLanguage } from '../lib/readingUtils';
 import { gradeWithGhostSequence, calculateWordBoxWidth } from '../lib/readingGrader';
-import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib/languageUtils';
+import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLanguageCode, getLocaleForTts } from '../lib/languageUtils';
 import { saveReadingResults } from '../lib/readingResultsStorage';
+import SpeakButton from './SpeakButton';
+import ttsService from '../lib/ttsService';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -108,6 +110,13 @@ export default function ReadingArea({ textId, onBack }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Cleanup TTS on unmount or when leaving reading area
+  useEffect(() => {
+    return () => {
+      ttsService.stop();
+    };
+  }, []);
+
   // Filter out punctuation for word navigation
   const words = readingText?.tokens?.filter(t => t.type === 'word') || [];
   const currentWord = words[wordIndex];
@@ -159,6 +168,13 @@ export default function ReadingArea({ textId, onBack }) {
 
     return baseTranslation;
   }, [readingText, currentWord, appLanguageId]);
+
+  // Get transliteration for TTS (always use English transliteration for pronunciation)
+  const getTransliteration = useCallback(() => {
+    if (!readingText || !currentWord) return '';
+    const transliterationEntry = readingText.translations?.en?.[currentWord.id];
+    return transliterationEntry?.canonical || currentWord.text || '';
+  }, [readingText, currentWord]);
 
   // Center practice track on current word
   const centerPracticeTrack = useCallback((instant = false) => {
@@ -538,16 +554,10 @@ useEffect(() => {
             dir={appDirection}
           >
         {/* HUD */}
-        <div className="relative mb-4 flex items-center">
-          {/* Streak - Left */}
-          <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm">
-            <span className="text-slate-400">{t('reading.streak')}</span>
-            <strong className="text-emerald-400">{streak}</strong>
-          </div>
-
-          {/* Meaning - Centered */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
-            <span className={`${appFontClass} text-base font-medium text-white`}>
+        <div className="relative mb-4 flex items-center justify-center gap-3">
+          {/* Meaning - Centered with more space */}
+          <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-6 py-2.5 text-sm max-w-[calc(100%-80px)]">
+            <span className={`${appFontClass} text-base font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis`}>
               {(() => {
                 if (!readingText || !currentWord) return '—';
 
@@ -564,6 +574,17 @@ useEffect(() => {
                 return gloss ?? '—';
               })()}
             </span>
+          </div>
+
+          {/* TTS Speak Button - Right */}
+          <div className="absolute right-0">
+            <SpeakButton
+              nativeText={currentWord?.text || ''}
+              nativeLocale={getLocaleForTts(practiceLanguageId)}
+              transliteration={getTransliteration()}
+              variant="icon"
+              disabled={!currentWord}
+            />
           </div>
         </div>
 

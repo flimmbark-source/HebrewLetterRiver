@@ -73,3 +73,31 @@ export function getFormattedLanguageName(option, t) {
   const translatedName = t(`languageNames.${option.id}`);
   return formatLanguageName(nativeName, translatedName);
 }
+
+/**
+ * Map language IDs to BCP 47 locale codes for TTS
+ * Used for speech synthesis voice selection
+ */
+export const LOCALE_MAP = {
+  english: 'en-US',
+  hebrew: 'he-IL',
+  spanish: 'es-ES',
+  french: 'fr-FR',
+  arabic: 'ar-SA',
+  portuguese: 'pt-BR',
+  russian: 'ru-RU',
+  hindi: 'hi-IN',
+  japanese: 'ja-JP',
+  mandarin: 'zh-CN',
+  bengali: 'bn-IN',
+  amharic: 'am-ET'
+};
+
+/**
+ * Get BCP 47 locale code for a language ID
+ * @param {string} languageId - Full language ID (e.g., 'hebrew', 'spanish')
+ * @returns {string} BCP 47 locale code (e.g., 'he-IL', 'es-ES')
+ */
+export function getLocaleForTts(languageId) {
+  return LOCALE_MAP[languageId] || 'en-US';
+}
