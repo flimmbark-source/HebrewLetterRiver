@@ -10,16 +10,16 @@ import { getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
 export default function LearnView() {
   const { t } = useLocalization();
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
-  const { startTutorial, hasCompletedTutorial } = useTutorial();
+  const { startTutorial, hasCompletedTutorial, currentTutorial } = useTutorial();
   const [selectedTextId, setSelectedTextId] = useState(null);
   const [dictionarySectionId, setDictionarySectionId] = useState(null);
 
   // Auto-trigger readIntro tutorial on first visit
   useEffect(() => {
-    if (!hasCompletedTutorial('readIntro')) {
+    if (!hasCompletedTutorial('readIntro') && !currentTutorial) {
       startTutorial('readIntro');
     }
-  }, [hasCompletedTutorial, startTutorial]);
+  }, [hasCompletedTutorial, startTutorial, currentTutorial]);
 
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
