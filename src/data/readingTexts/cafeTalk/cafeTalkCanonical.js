@@ -178,7 +178,7 @@ export const CAFE_TALK_WORDS = [
 
 /**
  * Cafe Talk categories with word IDs split into manageable chunks (5-8 words each)
- * Each chunk now has a descriptive name and belongs to its own section
+ * Organized into 7 sections (replacing the single "Cafe Talk" section)
  */
 export const CAFE_TALK_CATEGORIES = {
   // Conversation Glue Section - 25 words split into 4 chunks
