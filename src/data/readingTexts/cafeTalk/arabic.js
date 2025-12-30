@@ -5,11 +5,14 @@
 
 import { buildAllCafeTalkTexts } from './cafeTalkFactory.js';
 import { cafeTalkLexicon } from './lexicon/arabic.js';
+import { cafeTalkLexicon as englishLexicon } from './lexicon/english.js';
 import { getI18nLexicons } from './allLexicons.js';
 
 // Get all lexicons for building translations across app languages
 const i18nLexicons = getI18nLexicons();
 
-// Build all 7 Cafe Talk texts for Arabic using the lexicon
-// Pass i18nLexicons so Section Dictionary works for all app languages
-export const arabicCafeTalkTexts = buildAllCafeTalkTexts('arabic', cafeTalkLexicon, i18nLexicons);
+// Use English words as transliterations for typing (e.g., 'so' for لذلك)
+const cafeTalkTransliterations = englishLexicon;
+
+// Build all Cafe Talk texts for Arabic
+export const arabicCafeTalkTexts = buildAllCafeTalkTexts('arabic', cafeTalkLexicon, i18nLexicons, cafeTalkTransliterations);

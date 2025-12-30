@@ -43,41 +43,25 @@ function buildMeaningKeys(wordIds) {
 /**
  * Build translations object for a single app language
  *
- * The canonical value should reflect what users type during practice.
- * When explicit transliterations are provided, use those for canonical.
- * Otherwise, use the app language meaning as canonical so the dictionary
- * translation column shows meaningful text instead of the practice word.
+ * The canonical value is the transliteration (what users type).
+ * Transliterations must be provided for all practice languages.
  *
  * @param {string[]} wordIds - Array of word IDs
- * @param {Object} appLangLexicon - Lexicon for the app language
- * @param {Object} transliterationSource - Source for transliterations (if explicit, otherwise practice lexicon)
- * @param {boolean} hasExplicitTransliterations - Whether transliterations were explicitly provided
+ * @param {Object} appLangLexicon - Lexicon for the app language (used for variants)
+ * @param {Object} transliterationSource - Transliterations for typing
  * @returns {Object} Translations object for one language
  */
-function buildTranslationsForLanguage(wordIds, appLangLexicon, transliterationSource, hasExplicitTransliterations = false) {
+function buildTranslationsForLanguage(wordIds, appLangLexicon, transliterationSource) {
   const translations = {};
   wordIds.forEach(wordId => {
-    const appLangMeaning = appLangLexicon[wordId];
-
-    // If explicit transliterations exist, use them for typing
-    // Otherwise use app language meaning for dictionary display
-    const canonical = hasExplicitTransliterations
-      ? transliterationSource[wordId]
-      : appLangMeaning;
-
+    // Canonical is always the transliteration (what users type)
+    const canonical = transliterationSource[wordId];
     const variants = [canonical];
 
-    // Add the app language meaning as a variant if different
-    if (appLangMeaning && appLangMeaning !== canonical) {
-      variants.push(appLangMeaning);
-    }
-
-    // If using transliterations, also add transliteration as variant
-    if (hasExplicitTransliterations) {
-      const transliteration = transliterationSource[wordId];
-      if (transliteration && transliteration !== canonical) {
-        variants.push(transliteration);
-      }
+    // Add the app language meaning translation as a variant (helps typing validation)
+    const appLangVariant = appLangLexicon[wordId];
+    if (appLangVariant && appLangVariant !== canonical) {
+      variants.push(appLangVariant);
     }
 
     translations[wordId] = {
@@ -110,8 +94,7 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
 
   // Build translations object
   // Translations use i18n language codes (en, es, fr, etc.) NOT internal IDs (english, spanish, etc.)
-  // If transliterations provided, use those for typing; otherwise use app language meanings
-  const hasExplicitTransliterations = !!transliterations;
+  // Transliterations are required for all practice languages
   const transliterationSource = transliterations || practiceLexicon;
   let translations = {};
   if (i18nLexicons) {
@@ -120,8 +103,7 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
       translations[i18nCode] = buildTranslationsForLanguage(
         wordIds,
         i18nLexicons[i18nCode],
-        transliterationSource,
-        hasExplicitTransliterations
+        transliterationSource
       );
     });
   } else {
@@ -129,8 +111,7 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
     translations['en'] = buildTranslationsForLanguage(
       wordIds,
       practiceLexicon,
-      transliterationSource,
-      hasExplicitTransliterations
+      transliterationSource
     );
   }
 

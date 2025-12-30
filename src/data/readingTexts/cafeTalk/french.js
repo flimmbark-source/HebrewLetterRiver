@@ -12,4 +12,7 @@ const i18nLexicons = getI18nLexicons();
 
 // Build all 7 Cafe Talk texts for French using the lexicon
 // Pass i18nLexicons so Section Dictionary works for all app languages
-export const frenchCafeTalkTexts = buildAllCafeTalkTexts('french', cafeTalkLexicon, i18nLexicons);
+// French uses Latin script, so transliterations are the same as the lexicon
+const cafeTalkTransliterations = cafeTalkLexicon;
+
+export const frenchCafeTalkTexts = buildAllCafeTalkTexts('french', cafeTalkLexicon, i18nLexicons, cafeTalkTransliterations);
