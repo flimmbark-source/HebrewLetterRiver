@@ -239,15 +239,15 @@ export default function LearnView() {
         const examplesMap = {};
         layoutIdsInPack.forEach(layoutId => {
           examplesMap[layoutId] = text.tokens
-            .filter(t => t.type === 'word' && t.vowelLayoutId === layoutId)
-            .map(t => {
-              const transliterationEntry = text.translations?.en?.[t.id];
+            .filter(token => token.type === 'word' && token.vowelLayoutId === layoutId)
+            .map(token => {
+              const transliterationEntry = text.translations?.en?.[token.id];
               return {
-                hebrew: t.text,
-                transliteration: transliterationEntry?.canonical || t.id,
-                meaning: text.meaningKeys?.[t.id]
-                  ? t(text.meaningKeys[t.id])
-                  : (text.glosses?.[getLanguageCode(appLanguageId)]?.[t.id] ?? t.id)
+                hebrew: token.text,
+                transliteration: transliterationEntry?.canonical || token.id,
+                meaning: text.meaningKeys?.[token.id]
+                  ? t(text.meaningKeys[token.id])
+                  : (text.glosses?.[getLanguageCode(appLanguageId)]?.[token.id] ?? token.id)
               };
             });
         });

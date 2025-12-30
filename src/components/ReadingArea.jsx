@@ -920,15 +920,15 @@ useEffect(() => {
               // Generate examples from current pack for this layout
               if (!readingText?.tokens) return [];
               return readingText.tokens
-                .filter(t => t.type === 'word' && t.vowelLayoutId === teachingLayoutId)
-                .map(t => {
-                  const transliterationEntry = readingText.translations?.en?.[t.id];
+                .filter(token => token.type === 'word' && token.vowelLayoutId === teachingLayoutId)
+                .map(token => {
+                  const transliterationEntry = readingText.translations?.en?.[token.id];
                   return {
-                    hebrew: t.text,
-                    transliteration: transliterationEntry?.canonical || t.id,
-                    meaning: readingText.meaningKeys?.[t.id]
-                      ? t(readingText.meaningKeys[t.id])
-                      : (readingText.glosses?.[getLanguageCode(appLanguageId)]?.[t.id] ?? t.id)
+                    hebrew: token.text,
+                    transliteration: transliterationEntry?.canonical || token.id,
+                    meaning: readingText.meaningKeys?.[token.id]
+                      ? t(readingText.meaningKeys[token.id])
+                      : (readingText.glosses?.[getLanguageCode(appLanguageId)]?.[token.id] ?? token.id)
                   };
                 });
             })()}
