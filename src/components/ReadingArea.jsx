@@ -538,11 +538,8 @@ useEffect(() => {
             dir={appDirection}
           >
         {/* HUD */}
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm">
-            <span className="text-slate-400">{t('reading.streak')}</span>
-            <strong className="text-emerald-400">{streak}</strong>
-          </div>
+        <div className="mb-4 flex flex-col items-center gap-3">
+          {/* Meaning - Top Center */}
           <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm">
             <span className={`${appFontClass} text-base font-medium text-white`}>
               {(() => {
@@ -561,6 +558,12 @@ useEffect(() => {
                 return gloss ?? '—';
               })()}
             </span>
+          </div>
+
+          {/* Streak - Below Meaning */}
+          <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm">
+            <span className="text-slate-400">{t('reading.streak')}</span>
+            <strong className="text-emerald-400">{streak}</strong>
           </div>
         </div>
 
