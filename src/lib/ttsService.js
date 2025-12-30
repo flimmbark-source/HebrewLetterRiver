@@ -156,8 +156,18 @@ class TtsService {
       console.log('[TTS] After refresh:', this.voices.length, 'voices');
     }
 
-    // Stop any current speech
+    // Stop any current speech and ensure synth is ready
     this.stop();
+
+    // CRITICAL FIX: Some browsers leave the synth in a paused state
+    // We must call resume() before speak() to ensure it actually plays
+    if (this.synth.paused) {
+      console.log('[TTS] Synth was paused, resuming...');
+      this.synth.resume();
+    }
+
+    // Small delay to ensure synth is ready (fixes Chrome/Safari issues)
+    await new Promise(resolve => setTimeout(resolve, 50));
 
     // Determine what to speak and which voice to use
     let textToSpeak = nativeText;
@@ -241,14 +251,29 @@ class TtsService {
 
     // Speak
     console.log('[TTS] Calling synth.speak()...');
-    this.synth.speak(utterance);
+    try {
+      this.synth.speak(utterance);
 
-    // Check if speaking started
-    setTimeout(() => {
-      if (!this.isSpeaking) {
-        console.warn('[TTS] Speech did not start after 100ms. synth.speaking:', this.synth.speaking, 'synth.pending:', this.synth.pending);
-      }
-    }, 100);
+      // Force resume immediately after speak (critical for some browsers)
+      // This is a known workaround for Chrome/Safari TTS bugs
+      setTimeout(() => {
+        if (this.synth.paused) {
+          console.log('[TTS] Synth paused after speak(), forcing resume...');
+          this.synth.resume();
+        }
+      }, 10);
+
+      // Check if speaking started
+      setTimeout(() => {
+        if (!this.isSpeaking) {
+          console.warn('[TTS] Speech did not start after 100ms. synth.speaking:', this.synth.speaking, 'synth.pending:', this.synth.pending);
+          console.warn('[TTS] Attempting force resume...');
+          this.synth.resume();
+        }
+      }, 100);
+    } catch (error) {
+      console.error('[TTS] Exception calling synth.speak():', error);
+    }
   }
 
   /**
@@ -257,8 +282,11 @@ class TtsService {
   stop() {
     if (!this.synth) return;
 
+    // Always cancel to clear the queue, even if we think nothing is playing
+    // This is critical for preventing stuck states
+    this.synth.cancel();
+
     if (this.isSpeaking) {
-      this.synth.cancel();
       this.isSpeaking = false;
       this.currentUtterance = null;
       this.notifyListeners('cancel');
