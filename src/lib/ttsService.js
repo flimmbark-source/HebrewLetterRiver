@@ -80,6 +80,14 @@ class TtsService {
     return this.voices;
   }
 
+  normalizeLocaleTag(tag) {
+    if (!tag) return '';
+    return tag
+      // Normalize legacy Hebrew tag used by Chrome/Android (iw-IL ➜ he-IL)
+      .replace(/^iw(\b|[-_])/i, 'he$1')
+      .toLowerCase();
+  }
+
   /**
    * Pick the best voice for a given locale
    * @param {string} locale - BCP 47 language tag (e.g., "he-IL", "es-ES", "en-US")
@@ -88,18 +96,18 @@ class TtsService {
   pickVoiceForLocale(locale) {
     if (!locale || this.voices.length === 0) return null;
 
-    // Normalize historic tags (e.g., iw-IL ➜ he-IL)
-    const normalizedLocale = locale.replace(/^iw(-|$)/i, 'he$1');
-    const localeLower = normalizedLocale.toLowerCase();
-    const langCode = localeLower.split('-')[0]; // e.g., "he" from "he-IL"
+    const normalizedLocale = this.normalizeLocaleTag(locale);
+    const langCode = normalizedLocale.split('-')[0]; // e.g., "he" from "he-IL"
 
     // Score and sort voices so we pick the most natural-sounding option
     const scoredVoices = this.voices
       .map((voice, index) => {
-        const voiceLang = voice.lang.toLowerCase();
-        const isExact = voiceLang === localeLower;
-        const sharesLang = voiceLang.startsWith(langCode);
+        const voiceLang = this.normalizeLocaleTag(voice.lang);
+        const voiceLangCode = voiceLang.split('-')[0];
+        const isExact = voiceLang === normalizedLocale;
+        const sharesLang = voiceLangCode === langCode;
         const isGoogle = /google|chrome os/i.test(voice.name);
+        const isEspeak = /espeak/i.test(voice.name);
 
         // Higher score = better voice
         let score = 0;
@@ -108,6 +116,7 @@ class TtsService {
 
         if (voice.localService) score += 1; // local voices are more reliable offline
         if (isGoogle) score += 2; // Google/Chrome OS voices sound clearer than eSpeak
+        if (isEspeak) score -= 2; // deprioritize eSpeak voices which are often robotic/quiet
 
         // Tie-breaker: keep existing order (stable sort)
         return { voice, score, index };
@@ -228,10 +237,30 @@ class TtsService {
 
     let utteranceStarted = false;
     let utteranceEnded = false;
+    let utteranceStartTime = null;
+    let fallbackAttempted = false;
+
+    const attemptEnglishFallback = () => {
+      if (fallbackAttempted || !transliteration) return;
+      fallbackAttempted = true;
+
+      const normalizedTranslit = this.normalizeTranslit(transliteration);
+      const fallbackVoice = this.pickVoiceForLocale('en-US') || this.pickVoiceForLocale('en');
+      const fallbackLocale = fallbackVoice ? fallbackVoice.lang : 'en-US';
+
+      console.warn('[TTS] Primary voice was silent/unsupported, retrying with English voice');
+      this.speakSmart({
+        nativeText: normalizedTranslit,
+        nativeLocale: fallbackLocale,
+        transliteration: normalizedTranslit,
+        mode,
+      });
+    };
 
     // Event handlers
     utterance.onstart = () => {
       utteranceStarted = true;
+      utteranceStartTime = performance.now();
       this.isSpeaking = true;
       this.currentUtterance = utterance;
       this.notifyListeners('start');
@@ -244,6 +273,14 @@ class TtsService {
       this.currentUtterance = null;
       this.notifyListeners('end');
       console.log('[TTS] ✓ Finished speaking');
+
+      if (utteranceStartTime) {
+        const elapsed = performance.now() - utteranceStartTime;
+        if (elapsed < 120) {
+          console.warn('[TTS] Speech ended too quickly (', Math.round(elapsed), 'ms ), treating as silent playback');
+          attemptEnglishFallback();
+        }
+      }
     };
 
     utterance.onerror = (event) => {
@@ -252,6 +289,11 @@ class TtsService {
       this.isSpeaking = false;
       this.currentUtterance = null;
       this.notifyListeners('error', event.error);
+
+      // If the language/voice is unsupported, retry in English with transliteration
+      if (event.error === 'language-unavailable' || event.error === 'voice-unavailable') {
+        attemptEnglishFallback();
+      }
     };
 
     utterance.onpause = () => {
