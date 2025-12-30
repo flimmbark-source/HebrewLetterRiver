@@ -80,6 +80,14 @@ class TtsService {
     return this.voices;
   }
 
+  normalizeLocaleTag(tag) {
+    if (!tag) return '';
+    return tag
+      // Normalize legacy Hebrew tag used by Chrome/Android (iw-IL ➜ he-IL)
+      .replace(/^iw(\b|[-_])/i, 'he$1')
+      .toLowerCase();
+  }
+
   /**
    * Pick the best voice for a given locale
    * @param {string} locale - BCP 47 language tag (e.g., "he-IL", "es-ES", "en-US")
@@ -88,26 +96,36 @@ class TtsService {
   pickVoiceForLocale(locale) {
     if (!locale || this.voices.length === 0) return null;
 
-    const localeLower = locale.toLowerCase();
-    const langCode = localeLower.split('-')[0]; // e.g., "he" from "he-IL"
+    const normalizedLocale = this.normalizeLocaleTag(locale);
+    const langCode = normalizedLocale.split('-')[0]; // e.g., "he" from "he-IL"
 
-    // Try exact match first (e.g., "he-IL")
-    let voice = this.voices.find(v => v.lang.toLowerCase() === localeLower);
+    // Score and sort voices so we pick the most natural-sounding option
+    const scoredVoices = this.voices
+      .map((voice, index) => {
+        const voiceLang = this.normalizeLocaleTag(voice.lang);
+        const voiceLangCode = voiceLang.split('-')[0];
+        const isExact = voiceLang === normalizedLocale;
+        const sharesLang = voiceLangCode === langCode;
+        const isGoogle = /google|chrome os/i.test(voice.name);
+        const isEspeak = /espeak/i.test(voice.name);
 
-    // Try language prefix match (e.g., "he" matches "he-IL" or "he")
-    if (!voice) {
-      voice = this.voices.find(v => v.lang.toLowerCase().startsWith(langCode));
-    }
+        // Higher score = better voice
+        let score = 0;
+        if (isExact) score += 4; // exact locale match
+        else if (sharesLang) score += 3; // same language, different region
 
-    // Prefer local voices over remote when available
-    if (voice && !voice.localService) {
-      const localVoice = this.voices.find(v =>
-        v.lang.toLowerCase().startsWith(langCode) && v.localService
-      );
-      if (localVoice) voice = localVoice;
-    }
+        if (voice.localService) score += 1; // local voices are more reliable offline
+        if (isGoogle) score += 2; // Google/Chrome OS voices sound clearer than eSpeak
+        if (isEspeak) score -= 2; // deprioritize eSpeak voices which are often robotic/quiet
 
-    console.log('[TTS] Selected voice for', locale, ':', voice ? `${voice.name} (${voice.lang})` : 'none');
+        // Tie-breaker: keep existing order (stable sort)
+        return { voice, score, index };
+      })
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score || a.index - b.index);
+
+    const voice = scoredVoices.length > 0 ? scoredVoices[0].voice : null;
+    console.log('[TTS] Selected voice for', normalizedLocale, ':', voice ? `${voice.name} (${voice.lang})` : 'none');
     return voice;
   }
 
@@ -217,8 +235,32 @@ class TtsService {
 
     console.log('[TTS] Utterance created - rate:', utterance.rate, 'pitch:', utterance.pitch, 'volume:', utterance.volume, 'lang:', utterance.lang);
 
+    let utteranceStarted = false;
+    let utteranceEnded = false;
+    let utteranceStartTime = null;
+    let fallbackAttempted = false;
+
+    const attemptEnglishFallback = () => {
+      if (fallbackAttempted || !transliteration) return;
+      fallbackAttempted = true;
+
+      const normalizedTranslit = this.normalizeTranslit(transliteration);
+      const fallbackVoice = this.pickVoiceForLocale('en-US') || this.pickVoiceForLocale('en');
+      const fallbackLocale = fallbackVoice ? fallbackVoice.lang : 'en-US';
+
+      console.warn('[TTS] Primary voice was silent/unsupported, retrying with English voice');
+      this.speakSmart({
+        nativeText: normalizedTranslit,
+        nativeLocale: fallbackLocale,
+        transliteration: normalizedTranslit,
+        mode,
+      });
+    };
+
     // Event handlers
     utterance.onstart = () => {
+      utteranceStarted = true;
+      utteranceStartTime = performance.now();
       this.isSpeaking = true;
       this.currentUtterance = utterance;
       this.notifyListeners('start');
@@ -226,17 +268,32 @@ class TtsService {
     };
 
     utterance.onend = () => {
+      utteranceEnded = true;
       this.isSpeaking = false;
       this.currentUtterance = null;
       this.notifyListeners('end');
       console.log('[TTS] ✓ Finished speaking');
+
+      if (utteranceStartTime) {
+        const elapsed = performance.now() - utteranceStartTime;
+        if (elapsed < 120) {
+          console.warn('[TTS] Speech ended too quickly (', Math.round(elapsed), 'ms ), treating as silent playback');
+          attemptEnglishFallback();
+        }
+      }
     };
 
     utterance.onerror = (event) => {
+      utteranceEnded = true;
       console.error('[TTS] ✗ Error:', event.error, event);
       this.isSpeaking = false;
       this.currentUtterance = null;
       this.notifyListeners('error', event.error);
+
+      // If the language/voice is unsupported, retry in English with transliteration
+      if (event.error === 'language-unavailable' || event.error === 'voice-unavailable') {
+        attemptEnglishFallback();
+      }
     };
 
     utterance.onpause = () => {
@@ -265,7 +322,10 @@ class TtsService {
 
       // Check if speaking started
       setTimeout(() => {
-        if (!this.isSpeaking) {
+        const speakingOrPending = this.synth.speaking || this.synth.pending;
+
+        // Avoid false alarms for very short utterances that may finish quickly
+        if (!utteranceStarted && !utteranceEnded && !speakingOrPending) {
           console.warn('[TTS] Speech did not start after 100ms. synth.speaking:', this.synth.speaking, 'synth.pending:', this.synth.pending);
           console.warn('[TTS] Attempting force resume...');
           this.synth.resume();
