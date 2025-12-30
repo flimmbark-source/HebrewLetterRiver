@@ -43,33 +43,46 @@ function buildMeaningKeys(wordIds) {
 /**
  * Build translations object for a single app language
  *
- * The canonical value should reflect how the practice language word is
- * pronounced (a transliteration), not the meaning translation. When
- * explicit transliterations are provided we use them; otherwise we fall
- * back to the practice language lexicon so every app language sees the
- * same pronunciation hints instead of a meaning translation.
+ * The canonical value should reflect what users type during practice.
+ * When explicit transliterations are provided, use those for canonical.
+ * Otherwise, use the app language meaning as canonical so the dictionary
+ * translation column shows meaningful text instead of the practice word.
  *
  * @param {string[]} wordIds - Array of word IDs
- * @param {Object} appLangLexicon - Lexicon for the app language (used for variants)
- * @param {Object} transliterationSource - Source for transliterations (explicit map or practice lexicon)
+ * @param {Object} appLangLexicon - Lexicon for the app language
+ * @param {Object} transliterationSource - Source for transliterations (if explicit, otherwise practice lexicon)
+ * @param {boolean} hasExplicitTransliterations - Whether transliterations were explicitly provided
  * @returns {Object} Translations object for one language
  */
-function buildTranslationsForLanguage(wordIds, appLangLexicon, transliterationSource) {
+function buildTranslationsForLanguage(wordIds, appLangLexicon, transliterationSource, hasExplicitTransliterations = false) {
   const translations = {};
   wordIds.forEach(wordId => {
-    // Prefer explicit transliterations; otherwise fall back to the practice lexicon
-    const canonical = transliterationSource[wordId];
+    const appLangMeaning = appLangLexicon[wordId];
+
+    // If explicit transliterations exist, use them for typing
+    // Otherwise use app language meaning for dictionary display
+    const canonical = hasExplicitTransliterations
+      ? transliterationSource[wordId]
+      : appLangMeaning;
+
     const variants = [canonical];
 
-    // Add the app language meaning translation as a variant (helps typing validation)
-    const appLangVariant = appLangLexicon[wordId];
-    if (appLangVariant && appLangVariant !== canonical) {
-      variants.push(appLangVariant);
+    // Add the app language meaning as a variant if different
+    if (appLangMeaning && appLangMeaning !== canonical) {
+      variants.push(appLangMeaning);
+    }
+
+    // If using transliterations, also add transliteration as variant
+    if (hasExplicitTransliterations) {
+      const transliteration = transliterationSource[wordId];
+      if (transliteration && transliteration !== canonical) {
+        variants.push(transliteration);
+      }
     }
 
     translations[wordId] = {
       canonical,
-      variants: [...new Set(variants)] // Can be extended later with language-specific variants
+      variants: [...new Set(variants)]
     };
   });
   return translations;
@@ -97,17 +110,28 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
 
   // Build translations object
   // Translations use i18n language codes (en, es, fr, etc.) NOT internal IDs (english, spanish, etc.)
-  // If transliterations provided, use those instead of meaning translations so we surface pronunciation hints
+  // If transliterations provided, use those for typing; otherwise use app language meanings
+  const hasExplicitTransliterations = !!transliterations;
   const transliterationSource = transliterations || practiceLexicon;
   let translations = {};
   if (i18nLexicons) {
     // Build translations for all app languages using i18n codes
     Object.keys(i18nLexicons).forEach(i18nCode => {
-      translations[i18nCode] = buildTranslationsForLanguage(wordIds, i18nLexicons[i18nCode], transliterationSource);
+      translations[i18nCode] = buildTranslationsForLanguage(
+        wordIds,
+        i18nLexicons[i18nCode],
+        transliterationSource,
+        hasExplicitTransliterations
+      );
     });
   } else {
     // Fallback: just use practice language lexicon with 'en' key
-    translations['en'] = buildTranslationsForLanguage(wordIds, practiceLexicon, transliterationSource);
+    translations['en'] = buildTranslationsForLanguage(
+      wordIds,
+      practiceLexicon,
+      transliterationSource,
+      hasExplicitTransliterations
+    );
   }
 
   // Extract sectionId if provided in the category object (used by buildAllCafeTalkTexts)
