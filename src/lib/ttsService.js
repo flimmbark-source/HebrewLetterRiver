@@ -217,8 +217,12 @@ class TtsService {
 
     console.log('[TTS] Utterance created - rate:', utterance.rate, 'pitch:', utterance.pitch, 'volume:', utterance.volume, 'lang:', utterance.lang);
 
+    let utteranceStarted = false;
+    let utteranceEnded = false;
+
     // Event handlers
     utterance.onstart = () => {
+      utteranceStarted = true;
       this.isSpeaking = true;
       this.currentUtterance = utterance;
       this.notifyListeners('start');
@@ -226,6 +230,7 @@ class TtsService {
     };
 
     utterance.onend = () => {
+      utteranceEnded = true;
       this.isSpeaking = false;
       this.currentUtterance = null;
       this.notifyListeners('end');
@@ -233,6 +238,7 @@ class TtsService {
     };
 
     utterance.onerror = (event) => {
+      utteranceEnded = true;
       console.error('[TTS] ✗ Error:', event.error, event);
       this.isSpeaking = false;
       this.currentUtterance = null;
@@ -265,7 +271,10 @@ class TtsService {
 
       // Check if speaking started
       setTimeout(() => {
-        if (!this.isSpeaking) {
+        const speakingOrPending = this.synth.speaking || this.synth.pending;
+
+        // Avoid false alarms for very short utterances that may finish quickly
+        if (!utteranceStarted && !utteranceEnded && !speakingOrPending) {
           console.warn('[TTS] Speech did not start after 100ms. synth.speaking:', this.synth.speaking, 'synth.pending:', this.synth.pending);
           console.warn('[TTS] Attempting force resume...');
           this.synth.resume();
