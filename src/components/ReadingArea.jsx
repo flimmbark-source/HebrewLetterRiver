@@ -8,6 +8,11 @@ import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLangua
 import { saveReadingResults } from '../lib/readingResultsStorage';
 import SpeakButton from './SpeakButton';
 import ttsService from '../lib/ttsService';
+import { VowelPatternChip } from './VowelPatternChip';
+import { PatternTeachingModal } from './PatternTeachingModal';
+import { PackPatternsModal } from './PackPatternsModal';
+import { basicConnectorsVowelPatterns, getPatternsForPack, getPatternById } from '../data/vowelPatterns/hebrewBasicConnectorsPatterns';
+import { isPatternLearned, markPatternAsLearned, hasSeenPackIntro, markPackIntroAsShown } from '../lib/storage';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -44,6 +49,11 @@ export default function ReadingArea({ textId, onBack }) {
   const [showResults, setShowResults] = useState(false);
   const [completedResults, setCompletedResults] = useState([]);
   const [gameFont, setGameFont] = useState('default');
+
+  // Vowel pattern modal state
+  const [showPatternTeachingModal, setShowPatternTeachingModal] = useState(false);
+  const [showPackPatternsModal, setShowPackPatternsModal] = useState(false);
+  const [selectedPatternId, setSelectedPatternId] = useState(null);
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -116,6 +126,28 @@ export default function ReadingArea({ textId, onBack }) {
       ttsService.stop();
     };
   }, []);
+
+  // Show pack patterns intro modal if this is the first time viewing this pack
+  // Only for Hebrew packs with vowel patterns
+  useEffect(() => {
+    if (!readingText || !textId || practiceLanguageId !== 'hebrew') return;
+
+    // Check if this is the Basic Connectors pack (or other packs with vowel patterns)
+    const hasVowelPatterns = textId.includes('basicConnectors');
+
+    if (!hasVowelPatterns) return;
+
+    // Check if user has seen the pack intro
+    if (!hasSeenPackIntro(practiceLanguageId, textId)) {
+      // Small delay to let the reading area render first
+      const timer = setTimeout(() => {
+        setShowPackPatternsModal(true);
+        markPackIntroAsShown(practiceLanguageId, textId);
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [readingText, textId, practiceLanguageId]);
 
   // Filter out punctuation for word navigation
   const words = readingText?.tokens?.filter(t => t.type === 'word') || [];
@@ -576,6 +608,27 @@ useEffect(() => {
             </span>
           </div>
 
+          {/* Vowel Pattern Chip - Only for Hebrew words with patterns */}
+          {practiceLanguageId === 'hebrew' && currentWord && (() => {
+            const patternId = basicConnectorsVowelPatterns[currentWord.id];
+            if (!patternId) return null;
+
+            const pattern = getPatternById(patternId);
+            if (!pattern) return null;
+
+            return (
+              <VowelPatternChip
+                patternId={patternId}
+                chipLabel={pattern.chipLabel}
+                isLearned={isPatternLearned(practiceLanguageId, patternId)}
+                onClick={() => {
+                  setSelectedPatternId(patternId);
+                  setShowPatternTeachingModal(true);
+                }}
+              />
+            );
+          })()}
+
           {/* TTS Speak Button - Right */}
           <div className="absolute right-0">
             <SpeakButton
@@ -890,6 +943,37 @@ useEffect(() => {
             </div>
           </div>
         )}
+
+        {/* Pattern Teaching Modal */}
+        <PatternTeachingModal
+          isOpen={showPatternTeachingModal}
+          patternId={selectedPatternId}
+          readingText={readingText}
+          practiceLanguageId={practiceLanguageId}
+          appLanguageId={appLanguageId}
+          onGotIt={() => {
+            if (selectedPatternId) {
+              markPatternAsLearned(practiceLanguageId, selectedPatternId);
+            }
+          }}
+          onClose={() => {
+            setShowPatternTeachingModal(false);
+            setSelectedPatternId(null);
+          }}
+        />
+
+        {/* Pack Patterns Intro Modal */}
+        <PackPatternsModal
+          isOpen={showPackPatternsModal}
+          packName="Basic Connectors"
+          patterns={getPatternsForPack(words.map(w => w.id))}
+          onPatternClick={(patternId) => {
+            setSelectedPatternId(patternId);
+            setShowPackPatternsModal(false);
+            setShowPatternTeachingModal(true);
+          }}
+          onClose={() => setShowPackPatternsModal(false)}
+        />
       </div>
     );
   }
