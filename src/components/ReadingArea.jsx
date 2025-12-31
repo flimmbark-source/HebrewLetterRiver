@@ -558,54 +558,58 @@ useEffect(() => {
             onTouchStart={focusHiddenInput}
             dir={appDirection}
           >
-        {/* HUD */}
-        <div className="relative mb-4 flex items-center justify-center gap-3">
-          {/* Vowel Layout Icon - Left (Hebrew only) */}
-          {practiceLanguageId === 'hebrew' && currentWord && (() => {
-            // Derive layout from current word's transliteration
-            const transliteration = getTransliteration();
-            const layoutInfo = deriveLayoutFromTransliteration(transliteration);
+        {/* HUD - Three column grid layout */}
+        <div className="mb-4 grid grid-cols-3 items-center gap-3">
+          {/* Left: Vowel Layout Icon (Hebrew only) */}
+          <div className="flex justify-start">
+            {practiceLanguageId === 'hebrew' && currentWord && (() => {
+              // Derive layout from current word's transliteration
+              const transliteration = getTransliteration();
+              const layoutInfo = deriveLayoutFromTransliteration(transliteration);
 
-            if (!layoutInfo) return null;
+              if (!layoutInfo) return null;
 
-            // Check if learned
-            const isLearned = isLayoutLearned('he', layoutInfo.id);
+              // Check if learned
+              const isLearned = isLayoutLearned('he', layoutInfo.id);
 
-            return (
-              <VowelLayoutIcon
-                transliteration={transliteration}
-                size={40}
-                showNewDot={!isLearned}
-                onClick={() => setTeachingTransliteration(transliteration)}
-                accessibilityLabel="Vowel layout hint"
-                className="cursor-pointer transition-all hover:scale-110"
-              />
-            );
-          })()}
-
-          {/* Meaning - Centered with more space */}
-          <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-6 py-2.5 text-sm max-w-[calc(100%-80px)]">
-            <span className={`${appFontClass} text-base font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis`}>
-              {(() => {
-                if (!readingText || !currentWord) return '—';
-
-                // Primary: Use meaningKeys with i18n translation for proper localization
-                if (readingText.meaningKeys?.[currentWord.id]) {
-                  return t(readingText.meaningKeys[currentWord.id]);
-                }
-
-                // Fallback: Use glosses for semantic meaning display
-                const langCode = getLanguageCode(appLanguageId);
-                const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
-                           ?? readingText.glosses?.en?.[currentWord.id];
-
-                return gloss ?? '—';
-              })()}
-            </span>
+              return (
+                <VowelLayoutIcon
+                  transliteration={transliteration}
+                  size={40}
+                  showNewDot={!isLearned}
+                  onClick={() => setTeachingTransliteration(transliteration)}
+                  accessibilityLabel="Vowel layout hint"
+                  className="cursor-pointer transition-all hover:scale-110"
+                />
+              );
+            })()}
           </div>
 
-          {/* TTS Speak Button - Right */}
-          <div className="absolute right-0">
+          {/* Center: Meaning - Truly centered */}
+          <div className="flex justify-center">
+            <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-6 py-2.5 text-sm">
+              <span className={`${appFontClass} text-base font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis`}>
+                {(() => {
+                  if (!readingText || !currentWord) return '—';
+
+                  // Primary: Use meaningKeys with i18n translation for proper localization
+                  if (readingText.meaningKeys?.[currentWord.id]) {
+                    return t(readingText.meaningKeys[currentWord.id]);
+                  }
+
+                  // Fallback: Use glosses for semantic meaning display
+                  const langCode = getLanguageCode(appLanguageId);
+                  const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
+                             ?? readingText.glosses?.en?.[currentWord.id];
+
+                  return gloss ?? '—';
+                })()}
+              </span>
+            </div>
+          </div>
+
+          {/* Right: TTS Speak Button */}
+          <div className="flex justify-end">
             <SpeakButton
               nativeText={currentWord?.text || ''}
               nativeLocale={getLocaleForTts(practiceLanguageId)}
