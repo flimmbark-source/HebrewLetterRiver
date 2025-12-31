@@ -158,7 +158,7 @@ function CircleIcon({ center, radius, color }) {
   return <circle cx={center} cy={center} r={radius} fill={color} />;
 }
 
-// Diamond icon (2 beats - split into left/right halves)
+// Diamond icon (2 beats - CLOCKWISE: top half, then bottom half)
 function DiamondIcon({ center, size, colors, segments }) {
   const halfDiag = size / 2;
 
@@ -172,17 +172,17 @@ function DiamondIcon({ center, size, colors, segments }) {
     );
   }
 
-  // Two halves: left and right
+  // CLOCKWISE from top: top half (12 o'clock), bottom half (6 o'clock)
   return (
     <g>
-      {/* Left half */}
+      {/* Top half - colors[0] */}
       <path
-        d={`M ${center},${center - halfDiag} L ${center - halfDiag},${center} L ${center},${center + halfDiag} L ${center},${center} Z`}
+        d={`M ${center},${center - halfDiag} L ${center + halfDiag},${center} L ${center - halfDiag},${center} Z`}
         fill={colors[0]}
       />
-      {/* Right half */}
+      {/* Bottom half - colors[1] */}
       <path
-        d={`M ${center},${center - halfDiag} L ${center},${center} L ${center},${center + halfDiag} L ${center + halfDiag},${center} Z`}
+        d={`M ${center - halfDiag},${center} L ${center + halfDiag},${center} L ${center},${center + halfDiag} Z`}
         fill={colors[1] || colors[0]}
       />
     </g>
@@ -201,7 +201,7 @@ function DiamondStroke({ center, size }) {
   );
 }
 
-// Triangle icon (3 beats - split into 3 wedges from center)
+// Triangle icon (3 beats - CLOCKWISE: top, bottom-right, bottom-left)
 function TriangleIcon({ center, size, colors, segments }) {
   const height = (size * Math.sqrt(3)) / 2;
   const top = center - height * 0.6;
@@ -218,22 +218,22 @@ function TriangleIcon({ center, size, colors, segments }) {
     );
   }
 
-  // Three wedges emanating from center
+  // CLOCKWISE from top: top wedge (12 o'clock), bottom-right wedge (4 o'clock), bottom-left wedge (8 o'clock)
   return (
     <g>
-      {/* Top wedge */}
+      {/* Top wedge - colors[0] */}
       <path
         d={`M ${center},${top} L ${right},${bottom} L ${center},${center} Z`}
         fill={colors[0]}
       />
-      {/* Bottom-left wedge */}
+      {/* Bottom-right wedge - colors[1] */}
       <path
-        d={`M ${left},${bottom} L ${center},${center} L ${center},${top} Z`}
+        d={`M ${center},${center} L ${right},${bottom} L ${left},${bottom} Z`}
         fill={colors[1] || colors[0]}
       />
-      {/* Bottom-right wedge */}
+      {/* Bottom-left wedge - colors[2] */}
       <path
-        d={`M ${center},${center} L ${left},${bottom} L ${right},${bottom} Z`}
+        d={`M ${left},${bottom} L ${center},${center} L ${center},${top} Z`}
         fill={colors[2] || colors[0]}
       />
     </g>
@@ -257,7 +257,7 @@ function TriangleStroke({ center, size }) {
   );
 }
 
-// Square icon (4 beats - split into 4 quadrants)
+// Square icon (4 beats - CLOCKWISE: top-left, top-right, bottom-right, bottom-left)
 function SquareIcon({ center, size, colors, segments }) {
   const half = size / 2;
   const left = center - half;
@@ -278,26 +278,26 @@ function SquareIcon({ center, size, colors, segments }) {
   }
 
   if (segments === 2) {
-    // Two halves: left and right
+    // Two halves: top and bottom (CLOCKWISE)
     return (
       <g>
-        <rect x={left} y={top} width={half} height={size} fill={colors[0]} />
-        <rect x={center} y={top} width={half} height={size} fill={colors[1] || colors[0]} />
+        <rect x={left} y={top} width={size} height={half} fill={colors[0]} />
+        <rect x={left} y={center} width={size} height={half} fill={colors[1] || colors[0]} />
       </g>
     );
   }
 
-  // Four quadrants
+  // CLOCKWISE from top-left: top-left (10:30), top-right (1:30), bottom-right (4:30), bottom-left (7:30)
   return (
     <g>
-      {/* Top-left */}
+      {/* Top-left - colors[0] */}
       <rect x={left} y={top} width={half} height={half} fill={colors[0]} />
-      {/* Top-right */}
+      {/* Top-right - colors[1] */}
       <rect x={center} y={top} width={half} height={half} fill={colors[1] || colors[0]} />
-      {/* Bottom-left */}
-      <rect x={left} y={center} width={half} height={half} fill={colors[2] || colors[0]} />
-      {/* Bottom-right */}
-      <rect x={center} y={center} width={half} height={half} fill={colors[3] || colors[0]} />
+      {/* Bottom-right - colors[2] */}
+      <rect x={center} y={center} width={half} height={half} fill={colors[2] || colors[0]} />
+      {/* Bottom-left - colors[3] */}
+      <rect x={left} y={center} width={half} height={half} fill={colors[3] || colors[0]} />
     </g>
   );
 }
