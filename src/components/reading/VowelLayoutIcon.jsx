@@ -222,55 +222,59 @@ function DiamondStroke({ center, size }) {
   );
 }
 
-// Triangle icon (3 beats - CLOCKWISE: top, bottom-right, bottom-left)
+// Triangle icon (3 beats - CLOCKWISE from 12 o'clock)
 function TriangleIcon({ center, size, colors, segments }) {
-  const height = (size * Math.sqrt(3)) / 2;
-  const top = center - height * 0.6;
-  const bottom = center + height * 0.4;
-  const left = center - size / 2;
-  const right = center + size / 2;
+  const radius = size / 2;
 
-  if (segments === 1) {
-    return (
-      <path
-        d={`M ${center},${top} L ${right},${bottom} L ${left},${bottom} Z`}
-        fill={colors[0]}
-      />
-    );
+  // Calculate triangle points (pointy-top orientation)
+  // Offset by 60° (half of 120°) to center first wedge at 12 o'clock
+  const points = [];
+  for (let i = 0; i < 3; i++) {
+    const angle = (Math.PI / 180) * (90 + 60 - i * 120); // Start at 150°, go clockwise by 120°
+    const x = center + radius * Math.cos(angle);
+    const y = center - radius * Math.sin(angle);
+    points.push({ x, y });
   }
 
-  // CLOCKWISE from top: top wedge (12 o'clock), bottom-right wedge (4 o'clock), bottom-left wedge (8 o'clock)
+  if (segments === 1) {
+    const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')} Z`;
+    return <path d={pathData} fill={colors[0]} />;
+  }
+
+  // CLOCKWISE from 12 o'clock: 3 wedges emanating from center
   return (
     <g>
-      {/* Top wedge - colors[0] */}
-      <path
-        d={`M ${center},${top} L ${right},${bottom} L ${center},${center} Z`}
-        fill={colors[0]}
-      />
-      {/* Bottom-right wedge - colors[1] */}
-      <path
-        d={`M ${center},${center} L ${right},${bottom} L ${left},${bottom} Z`}
-        fill={colors[1] || colors[0]}
-      />
-      {/* Bottom-left wedge - colors[2] */}
-      <path
-        d={`M ${left},${bottom} L ${center},${center} L ${center},${top} Z`}
-        fill={colors[2] || colors[0]}
-      />
+      {points.map((point, i) => {
+        if (i >= segments) return null;
+        const nextPoint = points[(i + 1) % 3];
+        return (
+          <path
+            key={i}
+            d={`M ${center},${center} L ${point.x},${point.y} L ${nextPoint.x},${nextPoint.y} Z`}
+            fill={colors[i] || colors[0]}
+          />
+        );
+      })}
     </g>
   );
 }
 
 function TriangleStroke({ center, size }) {
-  const height = (size * Math.sqrt(3)) / 2;
-  const top = center - height * 0.6;
-  const bottom = center + height * 0.4;
-  const left = center - size / 2;
-  const right = center + size / 2;
+  const radius = size / 2;
+
+  const points = [];
+  for (let i = 0; i < 3; i++) {
+    const angle = (Math.PI / 180) * (90 + 60 - i * 120);
+    const x = center + radius * Math.cos(angle);
+    const y = center - radius * Math.sin(angle);
+    points.push({ x, y });
+  }
+
+  const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')} Z`;
 
   return (
     <path
-      d={`M ${center},${top} L ${right},${bottom} L ${left},${bottom} Z`}
+      d={pathData}
       fill="none"
       stroke="#64748B"
       strokeWidth={3}
@@ -278,59 +282,59 @@ function TriangleStroke({ center, size }) {
   );
 }
 
-// Square icon (4 beats - CLOCKWISE: top-left, top-right, bottom-right, bottom-left)
+// Square icon (4 beats - CLOCKWISE from 12 o'clock)
 function SquareIcon({ center, size, colors, segments }) {
-  const half = size / 2;
-  const left = center - half;
-  const right = center + half;
-  const top = center - half;
-  const bottom = center + half;
+  const radius = size / 2;
+
+  // Calculate square points (diamond orientation - point at top)
+  // Offset by 45° (half of 90°) to center first wedge at 12 o'clock
+  const points = [];
+  for (let i = 0; i < 4; i++) {
+    const angle = (Math.PI / 180) * (90 + 45 - i * 90); // Start at 135°, go clockwise by 90°
+    const x = center + radius * Math.cos(angle);
+    const y = center - radius * Math.sin(angle);
+    points.push({ x, y });
+  }
 
   if (segments === 1) {
-    return (
-      <rect
-        x={left}
-        y={top}
-        width={size}
-        height={size}
-        fill={colors[0]}
-      />
-    );
+    const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')} Z`;
+    return <path d={pathData} fill={colors[0]} />;
   }
 
-  if (segments === 2) {
-    // Two halves: top and bottom (CLOCKWISE)
-    return (
-      <g>
-        <rect x={left} y={top} width={size} height={half} fill={colors[0]} />
-        <rect x={left} y={center} width={size} height={half} fill={colors[1] || colors[0]} />
-      </g>
-    );
-  }
-
-  // CLOCKWISE from top-left: top-left (10:30), top-right (1:30), bottom-right (4:30), bottom-left (7:30)
+  // CLOCKWISE from 12 o'clock: 4 wedges emanating from center
   return (
     <g>
-      {/* Top-left - colors[0] */}
-      <rect x={left} y={top} width={half} height={half} fill={colors[0]} />
-      {/* Top-right - colors[1] */}
-      <rect x={center} y={top} width={half} height={half} fill={colors[1] || colors[0]} />
-      {/* Bottom-right - colors[2] */}
-      <rect x={center} y={center} width={half} height={half} fill={colors[2] || colors[0]} />
-      {/* Bottom-left - colors[3] */}
-      <rect x={left} y={center} width={half} height={half} fill={colors[3] || colors[0]} />
+      {points.map((point, i) => {
+        if (i >= segments) return null;
+        const nextPoint = points[(i + 1) % 4];
+        return (
+          <path
+            key={i}
+            d={`M ${center},${center} L ${point.x},${point.y} L ${nextPoint.x},${nextPoint.y} Z`}
+            fill={colors[i] || colors[0]}
+          />
+        );
+      })}
     </g>
   );
 }
 
 function SquareStroke({ center, size }) {
-  const half = size / 2;
+  const radius = size / 2;
+
+  const points = [];
+  for (let i = 0; i < 4; i++) {
+    const angle = (Math.PI / 180) * (90 + 45 - i * 90);
+    const x = center + radius * Math.cos(angle);
+    const y = center - radius * Math.sin(angle);
+    points.push({ x, y });
+  }
+
+  const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')} Z`;
+
   return (
-    <rect
-      x={center - half}
-      y={center - half}
-      width={size}
-      height={size}
+    <path
+      d={pathData}
       fill="none"
       stroke="#64748B"
       strokeWidth={3}
@@ -338,15 +342,15 @@ function SquareStroke({ center, size }) {
   );
 }
 
-// Hexagon icon (5-6 beats - CLOCKWISE: top, top-right, bottom-right, bottom, bottom-left, top-left)
+// Hexagon icon (5-6 beats - CLOCKWISE from 12 o'clock)
 function HexagonIcon({ center, size, colors, segments }) {
   const radius = size / 2;
 
   // Calculate hexagon points (pointy-top orientation)
-  // Starting from top and going clockwise
+  // Offset by 30° (half of 60°) to center first wedge at 12 o'clock
   const points = [];
   for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 180) * (90 - i * 60); // Start at top (90°), go clockwise
+    const angle = (Math.PI / 180) * (90 + 30 - i * 60); // Start at 120°, go clockwise by 60°
     const x = center + radius * Math.cos(angle);
     const y = center - radius * Math.sin(angle);
     points.push({ x, y });
@@ -381,10 +385,9 @@ function HexagonIcon({ center, size, colors, segments }) {
 function HexagonStroke({ center, size }) {
   const radius = size / 2;
 
-  // Calculate hexagon points (pointy-top orientation)
   const points = [];
   for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 180) * (90 - i * 60); // Start at top (90°), go clockwise
+    const angle = (Math.PI / 180) * (90 + 30 - i * 60);
     const x = center + radius * Math.cos(angle);
     const y = center - radius * Math.sin(angle);
     points.push({ x, y });
@@ -402,14 +405,15 @@ function HexagonStroke({ center, size }) {
   );
 }
 
-// Heptagon icon (7 beats - CLOCKWISE from top: 7 wedges)
+// Heptagon icon (7 beats - CLOCKWISE from 12 o'clock)
 function HeptagonIcon({ center, size, colors, segments }) {
   const radius = size / 2;
 
   // Calculate heptagon points (7 sides, pointy-top)
+  // Offset by 180/7° to center first wedge at 12 o'clock
   const points = [];
   for (let i = 0; i < 7; i++) {
-    const angle = (Math.PI / 180) * (90 - i * (360 / 7)); // Start at top, go clockwise
+    const angle = (Math.PI / 180) * (90 + 180/7 - i * (360 / 7)); // Start offset, go clockwise
     const x = center + radius * Math.cos(angle);
     const y = center - radius * Math.sin(angle);
     points.push({ x, y });
@@ -443,7 +447,7 @@ function HeptagonStroke({ center, size }) {
 
   const points = [];
   for (let i = 0; i < 7; i++) {
-    const angle = (Math.PI / 180) * (90 - i * (360 / 7));
+    const angle = (Math.PI / 180) * (90 + 180/7 - i * (360 / 7));
     const x = center + radius * Math.cos(angle);
     const y = center - radius * Math.sin(angle);
     points.push({ x, y });
@@ -461,14 +465,15 @@ function HeptagonStroke({ center, size }) {
   );
 }
 
-// Octagon icon (8 beats - CLOCKWISE from top: 8 wedges)
+// Octagon icon (8 beats - CLOCKWISE from 12 o'clock)
 function OctagonIcon({ center, size, colors, segments }) {
   const radius = size / 2;
 
   // Calculate octagon points (8 sides, pointy-top)
+  // Offset by 22.5° (half of 45°) to center first wedge at 12 o'clock
   const points = [];
   for (let i = 0; i < 8; i++) {
-    const angle = (Math.PI / 180) * (90 - i * 45); // Start at top, go clockwise (360/8 = 45°)
+    const angle = (Math.PI / 180) * (90 + 22.5 - i * 45); // Start at 112.5°, go clockwise by 45°
     const x = center + radius * Math.cos(angle);
     const y = center - radius * Math.sin(angle);
     points.push({ x, y });
@@ -502,7 +507,7 @@ function OctagonStroke({ center, size }) {
 
   const points = [];
   for (let i = 0; i < 8; i++) {
-    const angle = (Math.PI / 180) * (90 - i * 45);
+    const angle = (Math.PI / 180) * (90 + 22.5 - i * 45);
     const x = center + radius * Math.cos(angle);
     const y = center - radius * Math.sin(angle);
     points.push({ x, y });
