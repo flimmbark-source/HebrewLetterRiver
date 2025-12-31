@@ -8,6 +8,7 @@ import SectionDictionary from '../components/SectionDictionary';
 import { getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib/languageUtils';
 import { getFontClass } from '../lib/readingUtils';
 import PackVowelLayoutsIntroModal from '../components/reading/PackVowelLayoutsIntroModal.jsx';
+import VowelLayoutSystemModal from '../components/reading/VowelLayoutSystemModal.jsx';
 import { hasShownPackIntro, getLearnedLayouts } from '../lib/vowelLayoutProgress.js';
 import { deriveLayoutFromTransliteration } from '../lib/vowelLayoutDerivation.js';
 
@@ -18,6 +19,7 @@ export default function LearnView() {
   const [selectedTextId, setSelectedTextId] = useState(null);
   const [dictionarySectionId, setDictionarySectionId] = useState(null);
   const [packIntroTextId, setPackIntroTextId] = useState(null);
+  const [showSystemModal, setShowSystemModal] = useState(false);
 
   // Auto-trigger readIntro tutorial on first visit
   useEffect(() => {
@@ -146,7 +148,18 @@ export default function LearnView() {
   return (
     <div className="space-y-6">
       <header className="space-y-2 px-1">
-        <h2 className="text-2xl font-semibold" style={{ color: '#1F2937' }}>{t('read.title')}</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-semibold" style={{ color: '#1F2937' }}>{t('read.title')}</h2>
+          {practiceLanguageId === 'hebrew' && (
+            <button
+              onClick={() => setShowSystemModal(true)}
+              className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full border border-slate-400 bg-slate-100 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200 hover:border-slate-500 hover:text-slate-800"
+              title="Learn about vowel patterns"
+            >
+              ?
+            </button>
+          )}
+        </div>
         <p className="text-sm" style={{ color: '#6B7280' }}>{t('read.intro')}</p>
       </header>
 
@@ -267,6 +280,13 @@ export default function LearnView() {
           />
         );
       })()}
+
+      {/* Vowel Layout System Modal (general explanation) */}
+      <VowelLayoutSystemModal
+        isVisible={showSystemModal}
+        onClose={() => setShowSystemModal(false)}
+        appFontClass={getFontClass(appLanguageId)}
+      />
     </div>
   );
 }

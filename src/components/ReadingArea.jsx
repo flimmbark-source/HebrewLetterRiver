@@ -820,20 +820,9 @@ useEffect(() => {
       {/* Header */}
         <section className="w-full max-w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div>
-              <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-slate-400 sm:text-base">{subtitle}</p>
-            </div>
-            {practiceLanguageId === 'hebrew' && (
-              <button
-                onClick={() => setShowSystemModal(true)}
-                className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-full border border-slate-600 bg-slate-800 text-sm font-bold text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
-                title="Learn about vowel patterns"
-              >
-                ?
-              </button>
-            )}
+          <div>
+            <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400 sm:text-base">{subtitle}</p>
           </div>
           <div className="flex flex-wrap gap-2 sm:flex-nowrap">
             <button
