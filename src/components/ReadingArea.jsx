@@ -8,6 +8,10 @@ import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLangua
 import { saveReadingResults } from '../lib/readingResultsStorage';
 import SpeakButton from './SpeakButton';
 import ttsService from '../lib/ttsService';
+import { deriveLayoutFromTransliteration } from '../lib/vowelLayoutDerivation.js';
+import { VowelLayoutIcon } from './reading/VowelLayoutIcon.jsx';
+import VowelLayoutTeachingModal from './reading/VowelLayoutTeachingModal.jsx';
+import { isLayoutLearned } from '../lib/vowelLayoutProgress.js';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -44,6 +48,7 @@ export default function ReadingArea({ textId, onBack }) {
   const [showResults, setShowResults] = useState(false);
   const [completedResults, setCompletedResults] = useState([]);
   const [gameFont, setGameFont] = useState('default');
+  const [teachingTransliteration, setTeachingTransliteration] = useState(null);
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -553,31 +558,58 @@ useEffect(() => {
             onTouchStart={focusHiddenInput}
             dir={appDirection}
           >
-        {/* HUD */}
-        <div className="relative mb-4 flex items-center justify-center gap-3">
-          {/* Meaning - Centered with more space */}
-          <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-6 py-2.5 text-sm max-w-[calc(100%-80px)]">
-            <span className={`${appFontClass} text-base font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis`}>
-              {(() => {
-                if (!readingText || !currentWord) return '—';
+        {/* HUD - Three column grid layout */}
+        <div className="mb-4 grid grid-cols-3 items-center gap-3">
+          {/* Left: Vowel Layout Icon (Hebrew only) */}
+          <div className="flex justify-start">
+            {practiceLanguageId === 'hebrew' && currentWord && (() => {
+              // Derive layout from current word's transliteration
+              const transliteration = getTransliteration();
+              const layoutInfo = deriveLayoutFromTransliteration(transliteration);
 
-                // Primary: Use meaningKeys with i18n translation for proper localization
-                if (readingText.meaningKeys?.[currentWord.id]) {
-                  return t(readingText.meaningKeys[currentWord.id]);
-                }
+              if (!layoutInfo) return null;
 
-                // Fallback: Use glosses for semantic meaning display
-                const langCode = getLanguageCode(appLanguageId);
-                const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
-                           ?? readingText.glosses?.en?.[currentWord.id];
+              // Check if learned
+              const isLearned = isLayoutLearned('he', layoutInfo.id);
 
-                return gloss ?? '—';
-              })()}
-            </span>
+              return (
+                <VowelLayoutIcon
+                  transliteration={transliteration}
+                  size={40}
+                  showNewDot={!isLearned}
+                  onClick={() => setTeachingTransliteration(transliteration)}
+                  accessibilityLabel="Vowel layout hint"
+                  className="cursor-pointer transition-all hover:scale-110"
+                />
+              );
+            })()}
           </div>
 
-          {/* TTS Speak Button - Right */}
-          <div className="absolute right-0">
+          {/* Center: Meaning - Truly centered */}
+          <div className="flex justify-center">
+            <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-6 py-2.5 text-sm">
+              <span className={`${appFontClass} text-base font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis`}>
+                {(() => {
+                  if (!readingText || !currentWord) return '—';
+
+                  // Primary: Use meaningKeys with i18n translation for proper localization
+                  if (readingText.meaningKeys?.[currentWord.id]) {
+                    return t(readingText.meaningKeys[currentWord.id]);
+                  }
+
+                  // Fallback: Use glosses for semantic meaning display
+                  const langCode = getLanguageCode(appLanguageId);
+                  const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
+                             ?? readingText.glosses?.en?.[currentWord.id];
+
+                  return gloss ?? '—';
+                })()}
+              </span>
+            </div>
+          </div>
+
+          {/* Right: TTS Speak Button */}
+          <div className="flex justify-end">
             <SpeakButton
               nativeText={currentWord?.text || ''}
               nativeLocale={getLocaleForTts(practiceLanguageId)}
@@ -889,6 +921,46 @@ useEffect(() => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Vowel Layout Teaching Modal */}
+        {teachingTransliteration && (
+          <VowelLayoutTeachingModal
+            isVisible={true}
+            onClose={() => setTeachingTransliteration(null)}
+            transliteration={teachingTransliteration}
+            languageCode="he"
+            examples={(() => {
+              // Generate examples from current pack for this layout
+              if (!readingText?.tokens) return [];
+
+              // Derive layout for the current teaching transliteration
+              const currentLayout = deriveLayoutFromTransliteration(teachingTransliteration);
+              if (!currentLayout) return [];
+
+              // Find all words with matching layout
+              return readingText.tokens
+                .filter(token => {
+                  if (token.type !== 'word') return false;
+                  const tokenTranslit = readingText.translations?.en?.[token.id]?.canonical;
+                  if (!tokenTranslit) return false;
+                  const tokenLayout = deriveLayoutFromTransliteration(tokenTranslit);
+                  return tokenLayout && tokenLayout.id === currentLayout.id;
+                })
+                .map(token => {
+                  const transliterationEntry = readingText.translations?.en?.[token.id];
+                  return {
+                    hebrew: token.text,
+                    transliteration: transliterationEntry?.canonical || token.id,
+                    meaning: readingText.meaningKeys?.[token.id]
+                      ? t(readingText.meaningKeys[token.id])
+                      : (readingText.glosses?.[getLanguageCode(appLanguageId)]?.[token.id] ?? token.id)
+                  };
+                });
+            })()}
+            practiceFontClass={practiceFontClass}
+            appFontClass={appFontClass}
+          />
         )}
       </div>
     );

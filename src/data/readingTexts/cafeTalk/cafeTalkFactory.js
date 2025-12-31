@@ -12,18 +12,28 @@ import { CAFE_TALK_CATEGORIES } from './cafeTalkCanonical.js';
  * Build tokens array from word IDs and lexicon
  * @param {string[]} wordIds - Array of word IDs in order
  * @param {Object} lexicon - Lexicon mapping word ID to translated text
+ * @param {Object} [vowelLayouts] - Optional: vowel layout IDs for Hebrew words
  * @returns {Array} Token array
  */
-function buildTokensFromLexicon(wordIds, lexicon) {
-  const tokens = wordIds.map(wordId => ({
-    type: 'word',
-    text: lexicon[wordId],
-    id: wordId
-  }));
-  
+function buildTokensFromLexicon(wordIds, lexicon, vowelLayouts = null) {
+  const tokens = wordIds.map(wordId => {
+    const token = {
+      type: 'word',
+      text: lexicon[wordId],
+      id: wordId
+    };
+
+    // Add vowelLayoutId if available (defensive: only if it exists)
+    if (vowelLayouts && vowelLayouts[wordId]) {
+      token.vowelLayoutId = vowelLayouts[wordId];
+    }
+
+    return token;
+  });
+
   // Add punctuation at end
   tokens.push({ type: 'punct', text: '.' });
-  
+
   return tokens;
 }
 
@@ -81,9 +91,10 @@ function buildTranslationsForLanguage(wordIds, appLangLexicon, transliterationSo
  * @param {Object} subtitles - Subtitle translations {en, es, fr, he, ...}
  * @param {Object} [i18nLexicons] - Optional: lexicons mapped by i18n codes (en, es, fr, etc.) for app language translations
  * @param {Object} [transliterations] - Optional: practice language transliterations for typing validation
+ * @param {Object} [vowelLayouts] - Optional: vowel layout IDs for Hebrew words
  * @returns {Object} Reading text object
  */
-export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, i18nLexicons = null, transliterations = null) {
+export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon, titles, subtitles, i18nLexicons = null, transliterations = null, vowelLayouts = null) {
   const category = CAFE_TALK_CATEGORIES[categoryId];
 
   if (!category) {
@@ -125,7 +136,7 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
     title: titles,
     subtitle: subtitles,
     practiceLanguage,
-    tokens: buildTokensFromLexicon(wordIds, practiceLexicon),
+    tokens: buildTokensFromLexicon(wordIds, practiceLexicon, vowelLayouts),
     meaningKeys: buildMeaningKeys(wordIds),
     translations,
     sectionId: sectionPrefix
@@ -138,9 +149,10 @@ export function buildCafeTalkText(categoryId, practiceLanguage, practiceLexicon,
  * @param {Object} practiceLexicon - Lexicon for practice language
  * @param {Object} [i18nLexicons] - Optional: lexicons mapped by i18n codes for all app languages
  * @param {Object} [transliterations] - Optional: practice language transliterations for typing validation
+ * @param {Object} [vowelLayouts] - Optional: vowel layout IDs for Hebrew words
  * @returns {Array} Array of reading text objects for all chunks
  */
-export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLexicons = null, transliterations = null) {
+export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLexicons = null, transliterations = null, vowelLayouts = null) {
   // Define titles and subtitles for each specific card
   // These are hardcoded multilingual strings (not from lexicons)
   const cardMetadata = {
@@ -816,6 +828,38 @@ export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLex
         am: 'አጠቃላይ ፅንሰ-ሀሳቦች እና ሀሳቦች',
         he: 'מושגים ורעיונות כלליים'
       }
+    },
+
+    // Vowel Layout Practice section
+    vowelLayoutBootcamp: {
+      titles: {
+        en: 'Vowel Layout Bootcamp',
+        es: 'Bootcamp de Patrones Vocálicos',
+        fr: 'Bootcamp des Modèles de Voyelles',
+        ar: 'معسكر تدريب أنماط حروف العلة',
+        pt: 'Bootcamp de Padrões Vocálicos',
+        ru: 'Тренировка гласных паттернов',
+        ja: '母音パターンブートキャンプ',
+        zh: '元音模式训练营',
+        hi: 'स्वर पैटर्न प्रशिक्षण शिविर',
+        bn: 'স্বরবর্ণ প্যাটার্ন বুটক্যাম্প',
+        am: 'የድምፀ ቃላት ስርዓት ስልጠና',
+        he: 'מחנה אימון תבניות תנועות'
+      },
+      subtitles: {
+        en: 'Practice 3 vowel patterns with repetition',
+        es: 'Practica 3 patrones vocálicos con repetición',
+        fr: 'Pratiquez 3 modèles de voyelles avec répétition',
+        ar: 'تدرب على 3 أنماط من حروف العلة بالتكرار',
+        pt: 'Pratique 3 padrões vocálicos com repetição',
+        ru: 'Практикуйте 3 паттерна гласных с повторением',
+        ja: '3つの母音パターンを繰り返し練習',
+        zh: '重复练习3种元音模式',
+        hi: '3 स्वर पैटर्न को दोहराव के साथ अभ्यास करें',
+        bn: 'পুনরাবৃত্তি সহ 3টি স্বর প্যাটার্ন অনুশীলন করুন',
+        am: '3 የድምፀ ቃላት ስርዓቶችን በድግግሞሽ ይለማመዱ',
+        he: 'תרגל 3 תבניות תנועות עם חזרות'
+      }
     }
   };
 
@@ -839,7 +883,8 @@ export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLex
       metadata.titles,
       metadata.subtitles,
       i18nLexicons,
-      transliterations
+      transliterations,
+      vowelLayouts
     );
 
     results.push(readingText);

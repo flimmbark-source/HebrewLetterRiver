@@ -5,6 +5,8 @@
  * This lexicon contains proper Hebrew translations for all 145 Cafe Talk words.
  */
 
+import { deriveLayoutFromTransliteration } from '../../../../lib/vowelLayoutDerivation.js';
+
 // Hebrew word texts (for practice tokens)
 export const cafeTalkLexicon = {
   // Conversation Glue (25)
@@ -324,3 +326,24 @@ export const cafeTalkTransliterations = {
   'ugly': 'mechoar',
   'strange': 'muzar'
 };
+
+/**
+ * Hebrew vowel layout IDs - Auto-generated from transliterations
+ *
+ * This modular system automatically derives vowel layout IDs for all words
+ * from their canonical transliterations using the vowel derivation algorithm.
+ *
+ * Benefits:
+ * - Single source of truth: transliterations
+ * - Automatic coverage: all words get layouts
+ * - Maintainable: new words automatically included
+ * - DRY: reuses existing derivation logic
+ */
+export const cafeTalkVowelLayouts = Object.keys(cafeTalkTransliterations).reduce((layouts, wordId) => {
+  const transliteration = cafeTalkTransliterations[wordId];
+  const layoutInfo = deriveLayoutFromTransliteration(transliteration);
+  if (layoutInfo) {
+    layouts[wordId] = layoutInfo.id;
+  }
+  return layouts;
+}, {});

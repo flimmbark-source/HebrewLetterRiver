@@ -178,9 +178,21 @@ export const CAFE_TALK_WORDS = [
 
 /**
  * Cafe Talk categories with word IDs split into manageable chunks (5-8 words each)
- * Organized into 7 sections (replacing the single "Cafe Talk" section)
+ * Organized into 8 sections (replacing the single "Cafe Talk" section)
  */
 export const CAFE_TALK_CATEGORIES = {
+  // Vowel Layout Practice Section - Test card with 3 layouts (18 words)
+  // Words are interleaved across layouts for mixed practice
+  vowelLayoutBootcamp: {
+    id: 'vowelLayoutBootcamp',
+    sectionId: 'vowelLayoutPractice',
+    wordIds: [
+      'however', 'so', 'but', 'instead', 'also', 'now',
+      'see', 'too', 'tomorrow', 'ask', 'just', 'you',
+      'want', 'already', 'person', 'hate', 'then', 'language'
+    ]
+  },
+
   // Conversation Glue Section - 25 words split into 4 chunks
   basicConnectors: {
     id: 'basicConnectors',

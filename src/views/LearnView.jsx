@@ -5,7 +5,11 @@ import { useTutorial } from '../context/TutorialContext.jsx';
 import { getReadingTextsForLanguage } from '../data/readingTexts/index.js';
 import ReadingArea from '../components/ReadingArea';
 import SectionDictionary from '../components/SectionDictionary';
-import { getLocalizedTitle, getLocalizedSubtitle } from '../lib/languageUtils';
+import { getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib/languageUtils';
+import { getFontClass } from '../lib/readingUtils';
+import PackVowelLayoutsIntroModal from '../components/reading/PackVowelLayoutsIntroModal.jsx';
+import { hasShownPackIntro, getLearnedLayouts } from '../lib/vowelLayoutProgress.js';
+import { deriveLayoutFromTransliteration } from '../lib/vowelLayoutDerivation.js';
 
 export default function LearnView() {
   const { t } = useLocalization();
@@ -13,6 +17,7 @@ export default function LearnView() {
   const { startTutorial, hasCompletedTutorial, currentTutorial } = useTutorial();
   const [selectedTextId, setSelectedTextId] = useState(null);
   const [dictionarySectionId, setDictionarySectionId] = useState(null);
+  const [packIntroTextId, setPackIntroTextId] = useState(null);
 
   // Auto-trigger readIntro tutorial on first visit
   useEffect(() => {
@@ -23,6 +28,40 @@ export default function LearnView() {
 
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
+
+  // Handle pack selection - show intro modal first for Hebrew packs if needed
+  const handlePackSelect = (textId) => {
+    const text = readingTexts.find(t => t.id === textId);
+
+    // Only show intro for Hebrew packs with derivable vowel layouts
+    if (practiceLanguageId === 'hebrew' && text) {
+      // Check if any tokens have derivable layouts
+      const hasVowelLayouts = text.tokens.some(token => {
+        if (token.type !== 'word') return false;
+        const translit = text.translations?.en?.[token.id]?.canonical;
+        if (!translit) return false;
+        const layout = deriveLayoutFromTransliteration(translit);
+        return layout !== null;
+      });
+
+      if (hasVowelLayouts && !hasShownPackIntro(textId)) {
+        // Show intro modal first
+        setPackIntroTextId(textId);
+        return;
+      }
+    }
+
+    // Otherwise, go straight to practice
+    setSelectedTextId(textId);
+  };
+
+  // Handle starting practice from intro modal
+  const handleStartFromIntro = () => {
+    if (packIntroTextId) {
+      setSelectedTextId(packIntroTextId);
+      setPackIntroTextId(null);
+    }
+  };
   console.log('[LearnView DEBUG] practiceLanguageId:', practiceLanguageId);
   console.log('[LearnView DEBUG] readingTexts.length:', readingTexts.length);
   console.log('[LearnView DEBUG] readingTexts:', readingTexts);
@@ -50,6 +89,13 @@ export default function LearnView() {
     cafeTalk: {
       titleKey: 'read.cafeTalk',
       descKey: 'read.cafeTalkDesc'
+    },
+    // Vowel Layout Practice section (appears after Starter, before Cafe Talk subsections)
+    vowelLayoutPractice: {
+      titleKey: 'read.vowelLayoutPractice',
+      descKey: 'read.vowelLayoutPracticeDesc',
+      fallbackTitle: 'Vowel Layout Practice',
+      fallbackDesc: 'Focused practice on vowel patterns'
     },
     // New Cafe Talk subsections
     conversationGlue: {
@@ -171,7 +217,7 @@ export default function LearnView() {
                       key={text.id}
                       text={text}
                       appLanguageId={appLanguageId}
-                      onSelect={() => setSelectedTextId(text.id)}
+                      onSelect={() => handlePackSelect(text.id)}
                     />
                   ))}
                 </div>
@@ -188,6 +234,58 @@ export default function LearnView() {
         isOpen={dictionarySectionId !== null}
         onClose={() => setDictionarySectionId(null)}
       />
+
+      {/* Pack Vowel Layouts Intro Modal (Hebrew only) */}
+      {packIntroTextId && (() => {
+        const text = readingTexts.find(t => t.id === packIntroTextId);
+        if (!text) return null;
+
+        // Derive unique layout IDs from tokens
+        const layoutsMap = new Map();
+        text.tokens.forEach(token => {
+          if (token.type !== 'word') return;
+          const translit = text.translations?.en?.[token.id]?.canonical;
+          if (!translit) return;
+          const layout = deriveLayoutFromTransliteration(translit);
+          if (layout) {
+            if (!layoutsMap.has(layout.id)) {
+              layoutsMap.set(layout.id, []);
+            }
+            layoutsMap.get(layout.id).push({
+              hebrew: token.text,
+              transliteration: translit,
+              meaning: text.meaningKeys?.[token.id]
+                ? t(text.meaningKeys[token.id])
+                : (text.glosses?.[getLanguageCode(appLanguageId)]?.[token.id] ?? token.id)
+            });
+          }
+        });
+
+        const layoutIdsInPack = Array.from(layoutsMap.keys());
+
+        // Get learned layouts for Hebrew
+        const learnedLayouts = getLearnedLayouts('he');
+
+        // Build examples map (layoutId -> examples array)
+        const examplesMap = {};
+        layoutsMap.forEach((examples, layoutId) => {
+          examplesMap[layoutId] = examples;
+        });
+
+        return (
+          <PackVowelLayoutsIntroModal
+            isVisible={true}
+            onStart={handleStartFromIntro}
+            packId={packIntroTextId}
+            packTitle={getLocalizedTitle(text, appLanguageId)}
+            layoutIdsInPack={layoutIdsInPack}
+            learnedLayouts={learnedLayouts}
+            examples={examplesMap}
+            practiceFontClass={getFontClass(practiceLanguageId)}
+            appFontClass={getFontClass(appLanguageId)}
+          />
+        );
+      })()}
     </div>
   );
 }
