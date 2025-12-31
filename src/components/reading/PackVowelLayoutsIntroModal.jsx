@@ -68,7 +68,7 @@ export function PackVowelLayoutsIntroModal({
           {/* Header */}
           <div className="mb-6 text-center">
             <h2 className={`${appFontClass} mb-2 text-2xl font-bold text-white`}>
-              Vowel Layouts in this Pack
+              Vowel Patterns
             </h2>
             {packTitle && (
               <p className={`${appFontClass} text-base text-slate-400`}>
@@ -76,7 +76,7 @@ export function PackVowelLayoutsIntroModal({
               </p>
             )}
             <p className={`${appFontClass} mt-3 text-sm text-slate-300`}>
-              These icons show which vowel patterns to use. Tap an icon to learn more.
+              Tap an icon to learn its vowel pattern.
             </p>
           </div>
 

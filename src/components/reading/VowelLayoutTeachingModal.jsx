@@ -122,16 +122,15 @@ export function VowelLayoutTeachingModal({
         {/* Rules Section */}
         <div className="mb-6">
           <h3 className={`${appFontClass} mb-3 text-lg font-semibold text-white`}>
-            How it works:
+            Vowel sounds:
           </h3>
-          <ul className="space-y-2">
+          <ul className="space-y-1">
             {teachingContent.rules.map((rule, idx) => (
               <li
                 key={idx}
-                className={`${appFontClass} flex items-start gap-2 text-slate-200`}
+                className={`${appFontClass} text-base text-slate-200`}
               >
-                <span className="mt-1 text-blue-400">•</span>
-                <span>{rule}</span>
+                {rule}
               </li>
             ))}
           </ul>

@@ -178,45 +178,26 @@ export function generateTeachingContent(vowelTokens, beatCount) {
   const sequenceDesc = getVowelSequenceDescription(vowelTokens);
 
   // Generate title
-  const title = `${beatCount}-Beat Pattern: ${sequenceDesc}`;
+  const title = `${sequenceDesc} Pattern`;
 
   // Generate explanation
-  let explanation;
-  if (beatCount === 1) {
-    explanation = `This word has one vowel sound: ${vowelTokens[0]}.`;
-  } else {
-    explanation = `This word has ${beatCount} vowel sounds in sequence: ${sequenceDesc}.`;
-  }
+  const explanation = `${beatCount} vowel ${beatCount === 1 ? 'sound' : 'sounds'}: ${sequenceDesc}`;
 
-  // Generate rules
-  const rules = [
-    `Follow the vowel sequence: ${sequenceDesc}`,
-    `Total beats: ${beatCount}`,
-    `Each beat represents one vowel sound in the transliteration`
-  ];
+  // Generate simple rules
+  const rules = [];
 
-  // Add specific vowel hints
-  const vowelHints = [];
   vowelTokens.forEach((token, idx) => {
     const position = idx + 1;
-    if (token === 'A') {
-      vowelHints.push(`Beat ${position}: "a" sound (like "father")`);
-    } else if (token === 'E') {
-      vowelHints.push(`Beat ${position}: "e" sound (like "bet")`);
-    } else if (token === 'I') {
-      vowelHints.push(`Beat ${position}: "i" sound (like "machine")`);
-    } else if (token === 'O') {
-      vowelHints.push(`Beat ${position}: "o" sound (like "go")`);
-    } else if (token === 'U') {
-      vowelHints.push(`Beat ${position}: "u" sound (like "food")`);
-    } else if (token === 'Y') {
-      vowelHints.push(`Beat ${position}: "y" sound (like "my")`);
-    }
+    const soundMap = {
+      A: '"a" (ah)',
+      E: '"e" (eh)',
+      I: '"i" (ee)',
+      O: '"o" (oh)',
+      U: '"u" (oo)',
+      Y: '"y" (eye)'
+    };
+    rules.push(`${position}. ${soundMap[token] || token}`);
   });
-
-  if (vowelHints.length > 0) {
-    rules.push(...vowelHints);
-  }
 
   return {
     title,
