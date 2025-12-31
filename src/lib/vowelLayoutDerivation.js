@@ -142,19 +142,24 @@ export function generateIconSpec(vowelTokens, beatCount) {
     shape = 'triangle';
   } else if (beatCount === 4) {
     shape = 'square';
-  } else if (beatCount === 5) {
-    shape = 'hexagon';
-  } else if (beatCount === 6) {
-    shape = 'hexagon';
-    showBadge = true;
+  } else if (beatCount === 5 || beatCount === 6) {
+    shape = 'hexagon'; // 6 sides for 5-6 beats
+  } else if (beatCount === 7) {
+    shape = 'heptagon'; // 7 sides for 7 beats
+  } else if (beatCount === 8) {
+    shape = 'octagon'; // 8 sides for 8 beats
   } else {
-    // More than 6 beats: use hexagon with badge
-    shape = 'hexagon';
+    // More than 8 beats: use octagon with badge
+    shape = 'octagon';
     showBadge = true;
   }
 
   // Map vowel tokens to colors (limit to max shape segments)
-  const maxSegments = shape === 'hexagon' ? 6 : 4;
+  const maxSegments =
+    shape === 'hexagon' ? 6 :
+    shape === 'heptagon' ? 7 :
+    shape === 'octagon' ? 8 :
+    4;
   const colors = vowelTokens.slice(0, maxSegments).map(token => VOWEL_COLORS[token]);
 
   return {

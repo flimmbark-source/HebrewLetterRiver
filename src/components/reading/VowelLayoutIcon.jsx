@@ -106,7 +106,15 @@ export function VowelLayoutIcon({
           <HexagonIcon center={center} size={72} colors={colors} segments={segments} />
         )}
 
-        {/* Badge for >6 beats */}
+        {shape === 'heptagon' && (
+          <HeptagonIcon center={center} size={72} colors={colors} segments={segments} />
+        )}
+
+        {shape === 'octagon' && (
+          <OctagonIcon center={center} size={72} colors={colors} segments={segments} />
+        )}
+
+        {/* Badge for >8 beats */}
         {showBadge && (
           <g>
             <circle cx={85} cy={15} r={12} fill="#3B82F6" stroke="#fff" strokeWidth={2} />
@@ -138,6 +146,12 @@ export function VowelLayoutIcon({
         )}
         {shape === 'hexagon' && (
           <HexagonStroke center={center} size={72} />
+        )}
+        {shape === 'heptagon' && (
+          <HeptagonStroke center={center} size={72} />
+        )}
+        {shape === 'octagon' && (
+          <OctagonStroke center={center} size={72} />
         )}
       </svg>
 
@@ -371,6 +385,124 @@ function HexagonStroke({ center, size }) {
   const points = [];
   for (let i = 0; i < 6; i++) {
     const angle = (Math.PI / 180) * (90 - i * 60); // Start at top (90°), go clockwise
+    const x = center + radius * Math.cos(angle);
+    const y = center - radius * Math.sin(angle);
+    points.push({ x, y });
+  }
+
+  const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')} Z`;
+
+  return (
+    <path
+      d={pathData}
+      fill="none"
+      stroke="#64748B"
+      strokeWidth={3}
+    />
+  );
+}
+
+// Heptagon icon (7 beats - CLOCKWISE from top: 7 wedges)
+function HeptagonIcon({ center, size, colors, segments }) {
+  const radius = size / 2;
+
+  // Calculate heptagon points (7 sides, pointy-top)
+  const points = [];
+  for (let i = 0; i < 7; i++) {
+    const angle = (Math.PI / 180) * (90 - i * (360 / 7)); // Start at top, go clockwise
+    const x = center + radius * Math.cos(angle);
+    const y = center - radius * Math.sin(angle);
+    points.push({ x, y });
+  }
+
+  if (segments === 1) {
+    const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')} Z`;
+    return <path d={pathData} fill={colors[0]} />;
+  }
+
+  // CLOCKWISE from top: 7 wedges emanating from center
+  return (
+    <g>
+      {points.map((point, i) => {
+        if (i >= segments) return null;
+        const nextPoint = points[(i + 1) % 7];
+        return (
+          <path
+            key={i}
+            d={`M ${center},${center} L ${point.x},${point.y} L ${nextPoint.x},${nextPoint.y} Z`}
+            fill={colors[i] || colors[0]}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+function HeptagonStroke({ center, size }) {
+  const radius = size / 2;
+
+  const points = [];
+  for (let i = 0; i < 7; i++) {
+    const angle = (Math.PI / 180) * (90 - i * (360 / 7));
+    const x = center + radius * Math.cos(angle);
+    const y = center - radius * Math.sin(angle);
+    points.push({ x, y });
+  }
+
+  const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')} Z`;
+
+  return (
+    <path
+      d={pathData}
+      fill="none"
+      stroke="#64748B"
+      strokeWidth={3}
+    />
+  );
+}
+
+// Octagon icon (8 beats - CLOCKWISE from top: 8 wedges)
+function OctagonIcon({ center, size, colors, segments }) {
+  const radius = size / 2;
+
+  // Calculate octagon points (8 sides, pointy-top)
+  const points = [];
+  for (let i = 0; i < 8; i++) {
+    const angle = (Math.PI / 180) * (90 - i * 45); // Start at top, go clockwise (360/8 = 45°)
+    const x = center + radius * Math.cos(angle);
+    const y = center - radius * Math.sin(angle);
+    points.push({ x, y });
+  }
+
+  if (segments === 1) {
+    const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')} Z`;
+    return <path d={pathData} fill={colors[0]} />;
+  }
+
+  // CLOCKWISE from top: 8 wedges emanating from center
+  return (
+    <g>
+      {points.map((point, i) => {
+        if (i >= segments) return null;
+        const nextPoint = points[(i + 1) % 8];
+        return (
+          <path
+            key={i}
+            d={`M ${center},${center} L ${point.x},${point.y} L ${nextPoint.x},${nextPoint.y} Z`}
+            fill={colors[i] || colors[0]}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+function OctagonStroke({ center, size }) {
+  const radius = size / 2;
+
+  const points = [];
+  for (let i = 0; i < 8; i++) {
+    const angle = (Math.PI / 180) * (90 - i * 45);
     const x = center + radius * Math.cos(angle);
     const y = center - radius * Math.sin(angle);
     points.push({ x, y });
