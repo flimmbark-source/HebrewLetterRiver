@@ -69,7 +69,8 @@ export function VowelLayoutSystemModal({
             </h3>
             <p className={`${appFontClass} text-base text-slate-300 leading-relaxed`}>
               Hebrew words follow vowel patterns. These colorful icons help you visualize and
-              learn the vowel sequence in each word. Each icon appears next to the Hebrew text
+              learn the vowel sequence in each word. They are read clockwise, starting at the
+              top of each shape at 12 o'clock. Each icon appears next to the Hebrew text
               while you practice reading.
             </p>
           </section>
