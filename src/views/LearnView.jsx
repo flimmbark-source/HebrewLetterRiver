@@ -90,6 +90,13 @@ export default function LearnView() {
       titleKey: 'read.cafeTalk',
       descKey: 'read.cafeTalkDesc'
     },
+    // Vowel Layout Practice section (appears after Starter, before Cafe Talk subsections)
+    vowelLayoutPractice: {
+      titleKey: 'read.vowelLayoutPractice',
+      descKey: 'read.vowelLayoutPracticeDesc',
+      fallbackTitle: 'Vowel Layout Practice',
+      fallbackDesc: 'Focused practice on vowel patterns'
+    },
     // New Cafe Talk subsections
     conversationGlue: {
       titleKey: 'read.conversationGlue',
@@ -132,12 +139,6 @@ export default function LearnView() {
       descKey: 'read.everydayTopicsDesc',
       fallbackTitle: 'Everyday Topics',
       fallbackDesc: 'Common conversation topics and things'
-    },
-    vowelLayoutPractice: {
-      titleKey: 'read.vowelLayoutPractice',
-      descKey: 'read.vowelLayoutPracticeDesc',
-      fallbackTitle: 'Vowel Layout Practice',
-      fallbackDesc: 'Focused practice on vowel patterns'
     }
   };
 

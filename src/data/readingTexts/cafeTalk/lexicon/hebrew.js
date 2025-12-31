@@ -5,6 +5,8 @@
  * This lexicon contains proper Hebrew translations for all 145 Cafe Talk words.
  */
 
+import { deriveLayoutFromTransliteration } from '../../../../lib/vowelLayoutDerivation.js';
+
 // Hebrew word texts (for practice tokens)
 export const cafeTalkLexicon = {
   // Conversation Glue (25)
@@ -325,20 +327,23 @@ export const cafeTalkTransliterations = {
   'strange': 'muzar'
 };
 
-// Hebrew vowel layout IDs
-// Maps word IDs to their vowel-only pattern categories
-// Used for the vowel layout teaching system
-export const cafeTalkVowelLayouts = {
-  // Conversation Glue (Basic Connectors tagged)
-  'so': 'V1_A',           // az (one "a" vowel)
-  'but': 'V2_A_A',        // aval (two "a" vowels)
-  'well': 'V1_U',         // nu (one "u" vowel)
-  'actually': 'V2_E_E',   // be-etzem (two "e" vowels)
-  'maybe': 'V2_U_AY',     // ulay ("u" then "ay" vowels)
-  'probably': 'V3_A_A_A', // kanarah (three "a" vowels)
-
-  // Additional words can be tagged here as needed
-  // 'basically': 'V4_E_I_A_I',  // be-ikaron
-  // 'also': 'V1_A',             // gam
-  // etc.
-};
+/**
+ * Hebrew vowel layout IDs - Auto-generated from transliterations
+ *
+ * This modular system automatically derives vowel layout IDs for all words
+ * from their canonical transliterations using the vowel derivation algorithm.
+ *
+ * Benefits:
+ * - Single source of truth: transliterations
+ * - Automatic coverage: all words get layouts
+ * - Maintainable: new words automatically included
+ * - DRY: reuses existing derivation logic
+ */
+export const cafeTalkVowelLayouts = Object.keys(cafeTalkTransliterations).reduce((layouts, wordId) => {
+  const transliteration = cafeTalkTransliterations[wordId];
+  const layoutInfo = deriveLayoutFromTransliteration(transliteration);
+  if (layoutInfo) {
+    layouts[wordId] = layoutInfo.id;
+  }
+  return layouts;
+}, {});
