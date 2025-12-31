@@ -91,7 +91,7 @@ export function VowelLayoutIcon({
         )}
 
         {shape === 'diamond' && (
-          <DiamondIcon center={center} size={80} colors={colors} segments={segments} />
+          <DiamondIcon center={center} size={70} colors={colors} segments={segments} />
         )}
 
         {shape === 'triangle' && (
@@ -124,7 +124,7 @@ export function VowelLayoutIcon({
           <circle cx={center} cy={center} r={45} fill="none" stroke="#64748B" strokeWidth={3} />
         )}
         {shape === 'diamond' && (
-          <DiamondStroke center={center} size={80} />
+          <DiamondStroke center={center} size={70} />
         )}
         {shape === 'triangle' && (
           <TriangleStroke center={center} size={80} />
@@ -177,12 +177,12 @@ function DiamondIcon({ center, size, colors, segments }) {
     <g>
       {/* Left half */}
       <path
-        d={`M ${center},${center - halfDiag} L ${center},${center} L ${center - halfDiag},${center} L ${center},${center + halfDiag} Z`}
+        d={`M ${center},${center - halfDiag} L ${center - halfDiag},${center} L ${center},${center + halfDiag} L ${center},${center} Z`}
         fill={colors[0]}
       />
       {/* Right half */}
       <path
-        d={`M ${center},${center - halfDiag} L ${center + halfDiag},${center} L ${center},${center + halfDiag} L ${center},${center} Z`}
+        d={`M ${center},${center - halfDiag} L ${center},${center} L ${center},${center + halfDiag} L ${center + halfDiag},${center} Z`}
         fill={colors[1] || colors[0]}
       />
     </g>
