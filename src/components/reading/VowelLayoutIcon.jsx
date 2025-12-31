@@ -102,7 +102,11 @@ export function VowelLayoutIcon({
           <SquareIcon center={center} size={70} colors={colors} segments={segments} />
         )}
 
-        {/* Badge for >4 beats */}
+        {shape === 'hexagon' && (
+          <HexagonIcon center={center} size={72} colors={colors} segments={segments} />
+        )}
+
+        {/* Badge for >6 beats */}
         {showBadge && (
           <g>
             <circle cx={85} cy={15} r={12} fill="#3B82F6" stroke="#fff" strokeWidth={2} />
@@ -131,6 +135,9 @@ export function VowelLayoutIcon({
         )}
         {shape === 'square' && (
           <SquareStroke center={center} size={70} />
+        )}
+        {shape === 'hexagon' && (
+          <HexagonStroke center={center} size={72} />
         )}
       </svg>
 
@@ -310,6 +317,70 @@ function SquareStroke({ center, size }) {
       y={center - half}
       width={size}
       height={size}
+      fill="none"
+      stroke="#64748B"
+      strokeWidth={3}
+    />
+  );
+}
+
+// Hexagon icon (5-6 beats - CLOCKWISE: top, top-right, bottom-right, bottom, bottom-left, top-left)
+function HexagonIcon({ center, size, colors, segments }) {
+  const radius = size / 2;
+
+  // Calculate hexagon points (pointy-top orientation)
+  // Starting from top and going clockwise
+  const points = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI / 180) * (90 - i * 60); // Start at top (90°), go clockwise
+    const x = center + radius * Math.cos(angle);
+    const y = center - radius * Math.sin(angle);
+    points.push({ x, y });
+  }
+
+  if (segments === 1) {
+    // Solid fill
+    const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')} Z`;
+    return <path d={pathData} fill={colors[0]} />;
+  }
+
+  // CLOCKWISE from top: 6 wedges emanating from center
+  return (
+    <g>
+      {points.map((point, i) => {
+        if (i >= segments) return null;
+
+        const nextPoint = points[(i + 1) % 6];
+
+        return (
+          <path
+            key={i}
+            d={`M ${center},${center} L ${point.x},${point.y} L ${nextPoint.x},${nextPoint.y} Z`}
+            fill={colors[i] || colors[0]}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+function HexagonStroke({ center, size }) {
+  const radius = size / 2;
+
+  // Calculate hexagon points (pointy-top orientation)
+  const points = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI / 180) * (90 - i * 60); // Start at top (90°), go clockwise
+    const x = center + radius * Math.cos(angle);
+    const y = center - radius * Math.sin(angle);
+    points.push({ x, y });
+  }
+
+  const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')} Z`;
+
+  return (
+    <path
+      d={pathData}
       fill="none"
       stroke="#64748B"
       strokeWidth={3}

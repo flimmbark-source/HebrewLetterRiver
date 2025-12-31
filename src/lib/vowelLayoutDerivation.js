@@ -19,14 +19,15 @@ export const VOWEL_TOKENS = {
 
 /**
  * Vowel color mapping for icon visualization
+ * Using high-contrast, colorblind-friendly palette
  */
 export const VOWEL_COLORS = {
-  A: '#EF4444', // Red
-  E: '#F97316', // Orange
-  I: '#3B82F6', // Blue
-  O: '#10B981', // Green
-  U: '#EAB308', // Yellow
-  Y: '#A855F7'  // Purple
+  A: '#CC3311', // Red
+  E: '#EE7733', // Orange
+  I: '#0077BB', // Blue
+  O: '#009988', // Teal/Green
+  U: '#F0E442', // Yellow
+  Y: '#EE3377'  // Magenta/Purple
 };
 
 /**
@@ -141,19 +142,25 @@ export function generateIconSpec(vowelTokens, beatCount) {
     shape = 'triangle';
   } else if (beatCount === 4) {
     shape = 'square';
+  } else if (beatCount === 5) {
+    shape = 'hexagon';
+  } else if (beatCount === 6) {
+    shape = 'hexagon';
+    showBadge = true;
   } else {
-    // More than 4 beats: use square with badge
-    shape = 'square';
+    // More than 6 beats: use hexagon with badge
+    shape = 'hexagon';
     showBadge = true;
   }
 
-  // Map vowel tokens to colors (limit to first 4 for visualization)
-  const colors = vowelTokens.slice(0, 4).map(token => VOWEL_COLORS[token]);
+  // Map vowel tokens to colors (limit to max shape segments)
+  const maxSegments = shape === 'hexagon' ? 6 : 4;
+  const colors = vowelTokens.slice(0, maxSegments).map(token => VOWEL_COLORS[token]);
 
   return {
     shape,
     colors,
-    segments: Math.min(beatCount, 4),
+    segments: Math.min(beatCount, maxSegments),
     showBadge,
     fullBeatCount: beatCount
   };
