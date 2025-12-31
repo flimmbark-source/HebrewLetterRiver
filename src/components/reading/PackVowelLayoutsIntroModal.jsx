@@ -96,12 +96,12 @@ export function PackVowelLayoutsIntroModal({
                   <button
                     key={layoutId}
                     onClick={() => handleLayoutClick(layoutId)}
-                    className="group relative flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-600 bg-slate-800 p-6 transition-all hover:scale-105 hover:border-blue-500 hover:bg-slate-750"
+                    className="group relative flex flex-col items-center justify-center gap-2 rounded-2xl border border-slate-600 bg-slate-800 p-4 transition-all hover:scale-105 hover:border-blue-500 hover:bg-slate-750"
                   >
                     {/* Icon */}
                     <VowelLayoutIcon
                       layoutId={layoutId}
-                      size={60}
+                      size={40}
                       showNewDot={showNewDot}
                     />
 
