@@ -308,17 +308,17 @@ function SquareIcon({ center, size, colors, segments }) {
     );
   }
 
-  // CLOCKWISE from top-left: top-left (10:30), top-right (1:30), bottom-right (4:30), bottom-left (7:30)
+  // CLOCKWISE from 12 o'clock (top-right): top-right (1:30), bottom-right (4:30), bottom-left (7:30), top-left (10:30)
   return (
     <g>
-      {/* Top-left - colors[0] */}
-      <rect x={left} y={top} width={half} height={half} fill={colors[0]} />
-      {/* Top-right - colors[1] */}
-      <rect x={center} y={top} width={half} height={half} fill={colors[1] || colors[0]} />
-      {/* Bottom-right - colors[2] */}
-      <rect x={center} y={center} width={half} height={half} fill={colors[2] || colors[0]} />
-      {/* Bottom-left - colors[3] */}
-      <rect x={left} y={center} width={half} height={half} fill={colors[3] || colors[0]} />
+      {/* Top-right - colors[0] - starts at 12 o'clock */}
+      <rect x={center} y={top} width={half} height={half} fill={colors[0]} />
+      {/* Bottom-right - colors[1] */}
+      <rect x={center} y={center} width={half} height={half} fill={colors[1] || colors[0]} />
+      {/* Bottom-left - colors[2] */}
+      <rect x={left} y={center} width={half} height={half} fill={colors[2] || colors[0]} />
+      {/* Top-left - colors[3] */}
+      <rect x={left} y={top} width={half} height={half} fill={colors[3] || colors[0]} />
     </g>
   );
 }
