@@ -29,29 +29,10 @@ export default function LearnView() {
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
 
-  // Handle pack selection - show intro modal first for Hebrew packs if needed
+  // Handle pack selection - go straight to practice
+  // Note: Pack-specific vowel layout intro modal disabled in favor of global system modal in ReadingArea
   const handlePackSelect = (textId) => {
-    const text = readingTexts.find(t => t.id === textId);
-
-    // Only show intro for Hebrew packs with derivable vowel layouts
-    if (practiceLanguageId === 'hebrew' && text) {
-      // Check if any tokens have derivable layouts
-      const hasVowelLayouts = text.tokens.some(token => {
-        if (token.type !== 'word') return false;
-        const translit = text.translations?.en?.[token.id]?.canonical;
-        if (!translit) return false;
-        const layout = deriveLayoutFromTransliteration(translit);
-        return layout !== null;
-      });
-
-      if (hasVowelLayouts && !hasShownPackIntro(textId)) {
-        // Show intro modal first
-        setPackIntroTextId(textId);
-        return;
-      }
-    }
-
-    // Otherwise, go straight to practice
+    // Go straight to practice (no pack intro modal)
     setSelectedTextId(textId);
   };
 

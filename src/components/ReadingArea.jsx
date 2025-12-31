@@ -11,7 +11,8 @@ import ttsService from '../lib/ttsService';
 import { deriveLayoutFromTransliteration } from '../lib/vowelLayoutDerivation.js';
 import { VowelLayoutIcon } from './reading/VowelLayoutIcon.jsx';
 import VowelLayoutTeachingModal from './reading/VowelLayoutTeachingModal.jsx';
-import { isLayoutLearned } from '../lib/vowelLayoutProgress.js';
+import VowelLayoutSystemModal from './reading/VowelLayoutSystemModal.jsx';
+import { isLayoutLearned, hasShownSystemIntro, setShownSystemIntro } from '../lib/vowelLayoutProgress.js';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -49,6 +50,7 @@ export default function ReadingArea({ textId, onBack }) {
   const [completedResults, setCompletedResults] = useState([]);
   const [gameFont, setGameFont] = useState('default');
   const [teachingTransliteration, setTeachingTransliteration] = useState(null);
+  const [showSystemModal, setShowSystemModal] = useState(false);
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -105,6 +107,14 @@ export default function ReadingArea({ textId, onBack }) {
     window.addEventListener('gameSettingsChanged', loadGameFont);
     return () => window.removeEventListener('gameSettingsChanged', loadGameFont);
   }, []);
+
+  // Show vowel layout system modal on first entry (Hebrew only, global)
+  useEffect(() => {
+    if (practiceLanguageId === 'hebrew' && !hasShownSystemIntro()) {
+      setShowSystemModal(true);
+      setShownSystemIntro();
+    }
+  }, [practiceLanguageId]);
 
   // Track viewport width to clamp container sizing on very small screens
   useEffect(() => {
@@ -810,9 +820,20 @@ useEffect(() => {
       {/* Header */}
         <section className="w-full max-w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-slate-400 sm:text-base">{subtitle}</p>
+          <div className="flex items-center gap-3">
+            <div>
+              <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-slate-400 sm:text-base">{subtitle}</p>
+            </div>
+            {practiceLanguageId === 'hebrew' && (
+              <button
+                onClick={() => setShowSystemModal(true)}
+                className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-full border border-slate-600 bg-slate-800 text-sm font-bold text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
+                title="Learn about vowel patterns"
+              >
+                ?
+              </button>
+            )}
           </div>
           <div className="flex flex-wrap gap-2 sm:flex-nowrap">
             <button
@@ -922,6 +943,13 @@ useEffect(() => {
             </div>
           </div>
         )}
+
+        {/* Vowel Layout System Modal (general explanation) */}
+        <VowelLayoutSystemModal
+          isVisible={showSystemModal}
+          onClose={() => setShowSystemModal(false)}
+          appFontClass={appFontClass}
+        />
 
         {/* Vowel Layout Teaching Modal */}
         {teachingTransliteration && (
