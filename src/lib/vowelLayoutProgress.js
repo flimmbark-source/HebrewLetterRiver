@@ -4,6 +4,7 @@
  * Manages persistence for:
  * 1. Learned vowel layouts per language (Hebrew)
  * 2. Pack intro modal shown status per pack
+ * 3. Global system intro modal shown status (once ever)
  *
  * Uses localStorage via the storage module.
  */
@@ -13,6 +14,7 @@ import { loadState, saveState } from './storage.js';
 // Storage keys
 const LEARNED_LAYOUTS_KEY = 'learnedVowelLayouts';
 const PACK_INTRO_SHOWN_KEY = 'vowelLayoutPackIntroShown';
+const SYSTEM_INTRO_SHOWN_KEY = 'vowelLayoutSystemIntroShown';
 
 /**
  * Get all learned vowel layouts for a language
@@ -98,4 +100,27 @@ export function resetLearnedLayouts(languageCode) {
  */
 export function resetPackIntros() {
   saveState(PACK_INTRO_SHOWN_KEY, {});
+}
+
+/**
+ * Check if the global vowel layout system intro modal has been shown
+ * @returns {boolean} True if system intro was shown
+ */
+export function hasShownSystemIntro() {
+  const shown = loadState(SYSTEM_INTRO_SHOWN_KEY, false);
+  return !!shown;
+}
+
+/**
+ * Mark the global vowel layout system intro modal as shown
+ */
+export function setShownSystemIntro() {
+  saveState(SYSTEM_INTRO_SHOWN_KEY, true);
+}
+
+/**
+ * Reset system intro shown status (for testing/debugging)
+ */
+export function resetSystemIntro() {
+  saveState(SYSTEM_INTRO_SHOWN_KEY, false);
 }
