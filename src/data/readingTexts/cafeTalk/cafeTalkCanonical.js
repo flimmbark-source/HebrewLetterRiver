@@ -303,6 +303,20 @@ export const CAFE_TALK_CATEGORIES = {
     id: 'abstractTerms',
     sectionId: 'everydayTopics',
     wordIds: ['something', 'nothing', 'everything', 'problem', 'question', 'answer', 'idea']
+  },
+
+  // Vowel Layout Practice Section - Test card with 3 layouts (18 words)
+  vowelLayoutBootcamp: {
+    id: 'vowelLayoutBootcamp',
+    sectionId: 'vowelLayoutPractice',
+    wordIds: [
+      // VL_2_I-O layout (6 words)
+      'however', 'instead', 'see', 'ask', 'want', 'hate',
+      // VL_1_A layout (6 words)
+      'so', 'also', 'too', 'just', 'already', 'then',
+      // VL_2_A-A layout (6 words)
+      'but', 'now', 'tomorrow', 'you', 'person', 'language'
+    ]
   }
 };
 

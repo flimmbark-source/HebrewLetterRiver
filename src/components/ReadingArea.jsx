@@ -8,8 +8,10 @@ import { TRANSLATION_KEY_MAP, getLocalizedTitle, getLocalizedSubtitle, getLangua
 import { saveReadingResults } from '../lib/readingResultsStorage';
 import SpeakButton from './SpeakButton';
 import ttsService from '../lib/ttsService';
-import { getVowelLayout } from '../data/vowelLayouts/hebrewVowelLayouts.js';
+import { deriveLayoutFromTransliteration } from '../lib/vowelLayoutDerivation.js';
+import { VowelLayoutIcon } from './reading/VowelLayoutIcon.jsx';
 import VowelLayoutTeachingModal from './reading/VowelLayoutTeachingModal.jsx';
+import { isLayoutLearned } from '../lib/vowelLayoutProgress.js';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -46,7 +48,7 @@ export default function ReadingArea({ textId, onBack }) {
   const [showResults, setShowResults] = useState(false);
   const [completedResults, setCompletedResults] = useState([]);
   const [gameFont, setGameFont] = useState('default');
-  const [teachingLayoutId, setTeachingLayoutId] = useState(null);
+  const [teachingTransliteration, setTeachingTransliteration] = useState(null);
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -558,19 +560,27 @@ useEffect(() => {
           >
         {/* HUD */}
         <div className="relative mb-4 flex items-center justify-center gap-3">
-          {/* Vowel Layout Chip - Left (Hebrew only) */}
-          {practiceLanguageId === 'hebrew' && currentWord?.vowelLayoutId && (() => {
-            const layout = getVowelLayout(currentWord.vowelLayoutId);
-            return layout ? (
-              <button
-                onClick={() => setTeachingLayoutId(currentWord.vowelLayoutId)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-500/50 bg-blue-900/30 text-xl transition-all hover:scale-110 hover:border-blue-400 hover:bg-blue-800/40"
-                aria-label="Vowel layout hint"
-                title="Tap to learn about this vowel pattern"
-              >
-                {layout.chipLabel}
-              </button>
-            ) : null;
+          {/* Vowel Layout Icon - Left (Hebrew only) */}
+          {practiceLanguageId === 'hebrew' && currentWord && (() => {
+            // Derive layout from current word's transliteration
+            const transliteration = getTransliteration();
+            const layoutInfo = deriveLayoutFromTransliteration(transliteration);
+
+            if (!layoutInfo) return null;
+
+            // Check if learned
+            const isLearned = isLayoutLearned('he', layoutInfo.id);
+
+            return (
+              <VowelLayoutIcon
+                transliteration={transliteration}
+                size={40}
+                showNewDot={!isLearned}
+                onClick={() => setTeachingTransliteration(transliteration)}
+                accessibilityLabel="Vowel layout hint"
+                className="cursor-pointer transition-all hover:scale-110"
+              />
+            );
           })()}
 
           {/* Meaning - Centered with more space */}
@@ -910,17 +920,29 @@ useEffect(() => {
         )}
 
         {/* Vowel Layout Teaching Modal */}
-        {teachingLayoutId && (
+        {teachingTransliteration && (
           <VowelLayoutTeachingModal
             isVisible={true}
-            onClose={() => setTeachingLayoutId(null)}
-            layoutId={teachingLayoutId}
+            onClose={() => setTeachingTransliteration(null)}
+            transliteration={teachingTransliteration}
             languageCode="he"
             examples={(() => {
               // Generate examples from current pack for this layout
               if (!readingText?.tokens) return [];
+
+              // Derive layout for the current teaching transliteration
+              const currentLayout = deriveLayoutFromTransliteration(teachingTransliteration);
+              if (!currentLayout) return [];
+
+              // Find all words with matching layout
               return readingText.tokens
-                .filter(token => token.type === 'word' && token.vowelLayoutId === teachingLayoutId)
+                .filter(token => {
+                  if (token.type !== 'word') return false;
+                  const tokenTranslit = readingText.translations?.en?.[token.id]?.canonical;
+                  if (!tokenTranslit) return false;
+                  const tokenLayout = deriveLayoutFromTransliteration(tokenTranslit);
+                  return tokenLayout && tokenLayout.id === currentLayout.id;
+                })
                 .map(token => {
                   const transliterationEntry = readingText.translations?.en?.[token.id];
                   return {

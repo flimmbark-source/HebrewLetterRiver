@@ -3,39 +3,66 @@
  *
  * Shows detailed teaching content for a specific Hebrew vowel layout.
  * Displays:
- * - Layout title and explanation
- * - Rules/guidelines
+ * - Layout icon (large)
+ * - Vowel sequence with colored dots
+ * - Explanation and rules
  * - Examples from the current pack
  * - Got it / Close buttons
  */
 
 import React from 'react';
-import { getVowelLayout } from '../../data/vowelLayouts/hebrewVowelLayouts.js';
+import { VowelLayoutIcon } from './VowelLayoutIcon.jsx';
+import {
+  deriveLayoutFromTransliteration,
+  generateTeachingContent,
+  getVowelSequenceDescription,
+  VOWEL_COLORS
+} from '../../lib/vowelLayoutDerivation.js';
 import { setLearnedLayout } from '../../lib/vowelLayoutProgress.js';
 
 export function VowelLayoutTeachingModal({
   isVisible,
   onClose,
   layoutId,
+  transliteration,
   languageCode = 'he',
   examples = [],
   practiceFontClass = '',
   appFontClass = ''
 }) {
-  if (!isVisible || !layoutId) {
+  if (!isVisible) {
     return null;
   }
 
-  // Get layout definition (defensive: check if exists)
-  const layout = getVowelLayout(layoutId);
-  if (!layout) {
-    console.warn(`VowelLayoutTeachingModal: layout not found: ${layoutId}`);
+  // Derive layout info
+  let layoutInfo;
+  if (transliteration) {
+    layoutInfo = deriveLayoutFromTransliteration(transliteration);
+  } else if (layoutId) {
+    // Parse layoutId to extract info
+    const parts = layoutId.split('_');
+    if (parts.length >= 3) {
+      const vowelTokens = parts.slice(2).join('_').split('-');
+      layoutInfo = {
+        id: layoutId,
+        vowelTokens,
+        beatCount: vowelTokens.length
+      };
+    }
+  }
+
+  if (!layoutInfo) {
+    console.warn(`VowelLayoutTeachingModal: invalid layout info`);
     return null;
   }
+
+  const { vowelTokens, beatCount } = layoutInfo;
+  const teachingContent = generateTeachingContent(vowelTokens, beatCount);
+  const vowelSequence = getVowelSequenceDescription(vowelTokens);
 
   // Handle "Got it" - marks layout as learned and closes
   const handleGotIt = () => {
-    setLearnedLayout(languageCode, layoutId);
+    setLearnedLayout(languageCode, layoutId || deriveLayoutFromTransliteration(transliteration).id);
     onClose();
   };
 
@@ -52,16 +79,43 @@ export function VowelLayoutTeachingModal({
       onClick={handleBackdropClick}
     >
       <div className="w-full max-w-2xl rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
-        {/* Header */}
-        <div className="mb-6 text-center">
-          <div className="mb-2 text-5xl" aria-hidden="true">
-            {layout.chipLabel}
-          </div>
+        {/* Header with large icon */}
+        <div className="mb-6 flex flex-col items-center text-center">
+          <VowelLayoutIcon
+            layoutId={layoutId}
+            transliteration={transliteration}
+            size={80}
+            className="mb-4"
+          />
+
           <h2 className={`${appFontClass} text-2xl font-bold text-white`}>
-            {layout.title}
+            {teachingContent.title}
           </h2>
-          <p className={`${appFontClass} mt-2 text-base text-slate-300`}>
-            {layout.explanation}
+
+          {/* Vowel sequence with colored dots */}
+          <div className="mt-3 flex items-center gap-2">
+            <span className={`${appFontClass} text-sm text-slate-400`}>Vowel sequence:</span>
+            <div className="flex items-center gap-2">
+              {vowelTokens.map((token, idx) => (
+                <React.Fragment key={idx}>
+                  {idx > 0 && <span className="text-slate-500">→</span>}
+                  <div className="flex flex-col items-center gap-1">
+                    <div
+                      className="h-4 w-4 rounded-full ring-2 ring-slate-600"
+                      style={{ backgroundColor: VOWEL_COLORS[token] }}
+                      title={`${token} vowel`}
+                    />
+                    <span className={`${appFontClass} text-xs font-bold text-white`}>
+                      {token}
+                    </span>
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+
+          <p className={`${appFontClass} mt-3 text-base text-slate-300`}>
+            {teachingContent.explanation}
           </p>
         </div>
 
@@ -71,7 +125,7 @@ export function VowelLayoutTeachingModal({
             How it works:
           </h3>
           <ul className="space-y-2">
-            {layout.rules.map((rule, idx) => (
+            {teachingContent.rules.map((rule, idx) => (
               <li
                 key={idx}
                 className={`${appFontClass} flex items-start gap-2 text-slate-200`}

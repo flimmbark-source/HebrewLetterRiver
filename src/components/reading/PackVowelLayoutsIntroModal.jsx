@@ -2,12 +2,13 @@
  * Pack Vowel Layouts Intro Modal
  *
  * Shown on first pack open (per pack), displays all unique vowel layouts
- * that appear in the pack. Users can tap each layout glyph to learn about it,
+ * that appear in the pack as icons. Users can tap each icon to learn about it,
  * or tap "Start" to begin practice.
  */
 
 import React, { useState } from 'react';
-import { getVowelLayout } from '../../data/vowelLayouts/hebrewVowelLayouts.js';
+import { VowelLayoutIcon } from './VowelLayoutIcon.jsx';
+import { deriveLayoutFromTransliteration } from '../../lib/vowelLayoutDerivation.js';
 import { setShownPackIntro } from '../../lib/vowelLayoutProgress.js';
 import VowelLayoutTeachingModal from './VowelLayoutTeachingModal.jsx';
 
@@ -28,8 +29,8 @@ export function PackVowelLayoutsIntroModal({
     return null;
   }
 
-  // Filter out invalid layout IDs (defensive)
-  const validLayoutIds = layoutIdsInPack.filter(id => getVowelLayout(id));
+  // Filter out any invalid layout IDs (defensive)
+  const validLayoutIds = layoutIdsInPack.filter(id => id && id.startsWith('VL_'));
 
   // Handle "Start" button - mark intro as shown and begin practice
   const handleStart = () => {
@@ -75,7 +76,7 @@ export function PackVowelLayoutsIntroModal({
               </p>
             )}
             <p className={`${appFontClass} mt-3 text-sm text-slate-300`}>
-              These chips help you know which vowel pattern to use. Tap a chip to learn more.
+              These icons show which vowel patterns to use. Tap an icon to learn more.
             </p>
           </div>
 
@@ -83,33 +84,41 @@ export function PackVowelLayoutsIntroModal({
           {validLayoutIds.length > 0 ? (
             <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
               {validLayoutIds.map((layoutId) => {
-                const layout = getVowelLayout(layoutId);
                 const isLearned = learnedLayouts[layoutId];
+                const showNewDot = !isLearned;
+
+                // Parse layout ID to get vowel tokens for display
+                const parts = layoutId.split('_');
+                const beatCount = parts.length >= 2 ? parts[1] : '?';
+                const vowelSequence = parts.length >= 3 ? parts.slice(2).join('_').split('-').join(' → ') : '';
 
                 return (
                   <button
                     key={layoutId}
                     onClick={() => handleLayoutClick(layoutId)}
-                    className="group relative flex flex-col items-center justify-center gap-2 rounded-2xl border border-slate-600 bg-slate-800 p-6 transition-all hover:scale-105 hover:border-blue-500 hover:bg-slate-750"
+                    className="group relative flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-600 bg-slate-800 p-6 transition-all hover:scale-105 hover:border-blue-500 hover:bg-slate-750"
                   >
-                    {/* Chip Glyph */}
-                    <div className="text-4xl" aria-label={`Vowel layout: ${layout.chipLabel}`}>
-                      {layout.chipLabel}
+                    {/* Icon */}
+                    <VowelLayoutIcon
+                      layoutId={layoutId}
+                      size={60}
+                      showNewDot={showNewDot}
+                    />
+
+                    {/* Layout Info */}
+                    <div className="text-center">
+                      <div className={`${appFontClass} text-sm font-semibold text-slate-300 group-hover:text-white`}>
+                        {beatCount} {beatCount === '1' ? 'Beat' : 'Beats'}
+                      </div>
+                      <div className={`${appFontClass} text-xs text-slate-400`}>
+                        {vowelSequence}
+                      </div>
                     </div>
 
-                    {/* Layout Title (without chip) */}
-                    <div className={`${appFontClass} text-sm text-slate-300 group-hover:text-white`}>
-                      {layout.title.replace(layout.chipLabel, '').trim()}
-                    </div>
-
-                    {/* NEW/Learned indicator */}
-                    {isLearned ? (
-                      <div className="absolute right-2 top-2 h-2 w-2 rounded-full bg-green-500" title="Learned" />
-                    ) : (
-                      <div
-                        className={`${appFontClass} absolute right-2 top-2 rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white`}
-                      >
-                        NEW
+                    {/* Learned indicator (subtle checkmark) */}
+                    {isLearned && (
+                      <div className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-xs text-white">
+                        ✓
                       </div>
                     )}
                   </button>
@@ -134,7 +143,7 @@ export function PackVowelLayoutsIntroModal({
         </div>
       </div>
 
-      {/* Teaching Modal (opened when user taps a layout chip) */}
+      {/* Teaching Modal (opened when user taps a layout icon) */}
       {teachingLayoutId && (
         <VowelLayoutTeachingModal
           isVisible={true}

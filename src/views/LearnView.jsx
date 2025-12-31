@@ -9,6 +9,7 @@ import { getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib
 import { getFontClass } from '../lib/readingUtils';
 import PackVowelLayoutsIntroModal from '../components/reading/PackVowelLayoutsIntroModal.jsx';
 import { hasShownPackIntro, getLearnedLayouts } from '../lib/vowelLayoutProgress.js';
+import { deriveLayoutFromTransliteration } from '../lib/vowelLayoutDerivation.js';
 
 export default function LearnView() {
   const { t } = useLocalization();
@@ -32,9 +33,16 @@ export default function LearnView() {
   const handlePackSelect = (textId) => {
     const text = readingTexts.find(t => t.id === textId);
 
-    // Only show intro for Hebrew packs with vowel layouts
+    // Only show intro for Hebrew packs with derivable vowel layouts
     if (practiceLanguageId === 'hebrew' && text) {
-      const hasVowelLayouts = text.tokens.some(t => t.vowelLayoutId);
+      // Check if any tokens have derivable layouts
+      const hasVowelLayouts = text.tokens.some(token => {
+        if (token.type !== 'word') return false;
+        const translit = text.translations?.en?.[token.id]?.canonical;
+        if (!translit) return false;
+        const layout = deriveLayoutFromTransliteration(translit);
+        return layout !== null;
+      });
 
       if (hasVowelLayouts && !hasShownPackIntro(textId)) {
         // Show intro modal first
@@ -124,6 +132,12 @@ export default function LearnView() {
       descKey: 'read.everydayTopicsDesc',
       fallbackTitle: 'Everyday Topics',
       fallbackDesc: 'Common conversation topics and things'
+    },
+    vowelLayoutPractice: {
+      titleKey: 'read.vowelLayoutPractice',
+      descKey: 'read.vowelLayoutPracticeDesc',
+      fallbackTitle: 'Vowel Layout Practice',
+      fallbackDesc: 'Focused practice on vowel patterns'
     }
   };
 
@@ -225,31 +239,36 @@ export default function LearnView() {
         const text = readingTexts.find(t => t.id === packIntroTextId);
         if (!text) return null;
 
-        // Extract unique layout IDs from tokens
-        const layoutIdsInPack = [...new Set(
-          text.tokens
-            .filter(t => t.type === 'word' && t.vowelLayoutId)
-            .map(t => t.vowelLayoutId)
-        )];
+        // Derive unique layout IDs from tokens
+        const layoutsMap = new Map();
+        text.tokens.forEach(token => {
+          if (token.type !== 'word') return;
+          const translit = text.translations?.en?.[token.id]?.canonical;
+          if (!translit) return;
+          const layout = deriveLayoutFromTransliteration(translit);
+          if (layout) {
+            if (!layoutsMap.has(layout.id)) {
+              layoutsMap.set(layout.id, []);
+            }
+            layoutsMap.get(layout.id).push({
+              hebrew: token.text,
+              transliteration: translit,
+              meaning: text.meaningKeys?.[token.id]
+                ? t(text.meaningKeys[token.id])
+                : (text.glosses?.[getLanguageCode(appLanguageId)]?.[token.id] ?? token.id)
+            });
+          }
+        });
+
+        const layoutIdsInPack = Array.from(layoutsMap.keys());
 
         // Get learned layouts for Hebrew
         const learnedLayouts = getLearnedLayouts('he');
 
         // Build examples map (layoutId -> examples array)
         const examplesMap = {};
-        layoutIdsInPack.forEach(layoutId => {
-          examplesMap[layoutId] = text.tokens
-            .filter(token => token.type === 'word' && token.vowelLayoutId === layoutId)
-            .map(token => {
-              const transliterationEntry = text.translations?.en?.[token.id];
-              return {
-                hebrew: token.text,
-                transliteration: transliterationEntry?.canonical || token.id,
-                meaning: text.meaningKeys?.[token.id]
-                  ? t(text.meaningKeys[token.id])
-                  : (text.glosses?.[getLanguageCode(appLanguageId)]?.[token.id] ?? token.id)
-              };
-            });
+        layoutsMap.forEach((examples, layoutId) => {
+          examplesMap[layoutId] = examples;
         });
 
         return (

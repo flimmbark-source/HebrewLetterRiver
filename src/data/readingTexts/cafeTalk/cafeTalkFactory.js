@@ -828,6 +828,38 @@ export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLex
         am: 'አጠቃላይ ፅንሰ-ሀሳቦች እና ሀሳቦች',
         he: 'מושגים ורעיונות כלליים'
       }
+    },
+
+    // Vowel Layout Practice section
+    vowelLayoutBootcamp: {
+      titles: {
+        en: 'Vowel Layout Bootcamp',
+        es: 'Bootcamp de Patrones Vocálicos',
+        fr: 'Bootcamp des Modèles de Voyelles',
+        ar: 'معسكر تدريب أنماط حروف العلة',
+        pt: 'Bootcamp de Padrões Vocálicos',
+        ru: 'Тренировка гласных паттернов',
+        ja: '母音パターンブートキャンプ',
+        zh: '元音模式训练营',
+        hi: 'स्वर पैटर्न प्रशिक्षण शिविर',
+        bn: 'স্বরবর্ণ প্যাটার্ন বুটক্যাম্প',
+        am: 'የድምፀ ቃላት ስርዓት ስልጠና',
+        he: 'מחנה אימון תבניות תנועות'
+      },
+      subtitles: {
+        en: 'Practice 3 vowel patterns with repetition',
+        es: 'Practica 3 patrones vocálicos con repetición',
+        fr: 'Pratiquez 3 modèles de voyelles avec répétition',
+        ar: 'تدرب على 3 أنماط من حروف العلة بالتكرار',
+        pt: 'Pratique 3 padrões vocálicos com repetição',
+        ru: 'Практикуйте 3 паттерна гласных с повторением',
+        ja: '3つの母音パターンを繰り返し練習',
+        zh: '重复练习3种元音模式',
+        hi: '3 स्वर पैटर्न को दोहराव के साथ अभ्यास करें',
+        bn: 'পুনরাবৃত্তি সহ 3টি স্বর প্যাটার্ন অনুশীলন করুন',
+        am: '3 የድምፀ ቃላት ስርዓቶችን በድግግሞሽ ይለማመዱ',
+        he: 'תרגל 3 תבניות תנועות עם חזרות'
+      }
     }
   };
 

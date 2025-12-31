@@ -1,0 +1,272 @@
+/**
+ * Vowel Layout Derivation System
+ *
+ * Automatically derives vowel layout information from canonical transliterations.
+ * Extracts vowel sequences, generates layout IDs, and creates icon specifications.
+ */
+
+/**
+ * Vowel token definitions
+ */
+export const VOWEL_TOKENS = {
+  A: 'A',
+  E: 'E',
+  I: 'I',
+  O: 'O',
+  U: 'U',
+  Y: 'Y'
+};
+
+/**
+ * Vowel color mapping for icon visualization
+ */
+export const VOWEL_COLORS = {
+  A: '#EF4444', // Red
+  E: '#F97316', // Orange
+  I: '#3B82F6', // Blue
+  O: '#10B981', // Green
+  U: '#EAB308', // Yellow
+  Y: '#A855F7'  // Purple
+};
+
+/**
+ * Extract vowel tokens from a transliteration string
+ * @param {string} transliteration - Canonical transliteration (e.g., "aval", "ulay")
+ * @returns {string[]} Array of vowel tokens (e.g., ['A', 'A'], ['U', 'A', 'Y'])
+ */
+export function extractVowelTokens(transliteration) {
+  if (!transliteration) return [];
+
+  // Normalize: lowercase, remove spaces/hyphens/apostrophes
+  const normalized = transliteration
+    .toLowerCase()
+    .replace(/[\s\-']/g, '');
+
+  const vowelTokens = [];
+  let i = 0;
+
+  while (i < normalized.length) {
+    // Check for diphthongs first (two-character patterns)
+    const twoChar = normalized.substring(i, i + 2);
+
+    if (twoChar === 'ay') {
+      vowelTokens.push(VOWEL_TOKENS.A, VOWEL_TOKENS.Y);
+      i += 2;
+    } else if (twoChar === 'ey') {
+      vowelTokens.push(VOWEL_TOKENS.E, VOWEL_TOKENS.Y);
+      i += 2;
+    } else if (twoChar === 'oy') {
+      vowelTokens.push(VOWEL_TOKENS.O, VOWEL_TOKENS.Y);
+      i += 2;
+    } else {
+      // Check for single vowels
+      const char = normalized[i];
+
+      if (char === 'a') {
+        vowelTokens.push(VOWEL_TOKENS.A);
+      } else if (char === 'e') {
+        vowelTokens.push(VOWEL_TOKENS.E);
+      } else if (char === 'i') {
+        vowelTokens.push(VOWEL_TOKENS.I);
+      } else if (char === 'o') {
+        vowelTokens.push(VOWEL_TOKENS.O);
+      } else if (char === 'u') {
+        vowelTokens.push(VOWEL_TOKENS.U);
+      }
+      // Y is only recognized as part of diphthongs, not standalone
+
+      i += 1;
+    }
+  }
+
+  return vowelTokens;
+}
+
+/**
+ * Generate a vowel layout ID from vowel tokens
+ * @param {string[]} vowelTokens - Array of vowel tokens
+ * @returns {string} Layout ID (e.g., "VL_2_A-A", "VL_3_U-A-Y")
+ */
+export function generateLayoutId(vowelTokens) {
+  if (!vowelTokens || vowelTokens.length === 0) {
+    return null;
+  }
+
+  const beatCount = vowelTokens.length;
+  const layoutKey = vowelTokens.join('-');
+
+  return `VL_${beatCount}_${layoutKey}`;
+}
+
+/**
+ * Derive complete layout info from transliteration
+ * @param {string} transliteration - Canonical transliteration
+ * @returns {Object|null} Layout info with id, vowelTokens, beatCount, iconSpec
+ */
+export function deriveLayoutFromTransliteration(transliteration) {
+  const vowelTokens = extractVowelTokens(transliteration);
+
+  if (vowelTokens.length === 0) {
+    return null;
+  }
+
+  const layoutId = generateLayoutId(vowelTokens);
+  const beatCount = vowelTokens.length;
+  const iconSpec = generateIconSpec(vowelTokens, beatCount);
+
+  return {
+    id: layoutId,
+    vowelTokens,
+    beatCount,
+    iconSpec
+  };
+}
+
+/**
+ * Generate icon specification from vowel tokens
+ * @param {string[]} vowelTokens - Array of vowel tokens
+ * @param {number} beatCount - Number of beats
+ * @returns {Object} Icon spec with shape, colors, segments
+ */
+export function generateIconSpec(vowelTokens, beatCount) {
+  // Determine shape based on beat count
+  let shape;
+  let showBadge = false;
+
+  if (beatCount === 1) {
+    shape = 'circle';
+  } else if (beatCount === 2) {
+    shape = 'diamond';
+  } else if (beatCount === 3) {
+    shape = 'triangle';
+  } else if (beatCount === 4) {
+    shape = 'square';
+  } else {
+    // More than 4 beats: use square with badge
+    shape = 'square';
+    showBadge = true;
+  }
+
+  // Map vowel tokens to colors (limit to first 4 for visualization)
+  const colors = vowelTokens.slice(0, 4).map(token => VOWEL_COLORS[token]);
+
+  return {
+    shape,
+    colors,
+    segments: Math.min(beatCount, 4),
+    showBadge,
+    fullBeatCount: beatCount
+  };
+}
+
+/**
+ * Generate human-readable vowel sequence description
+ * @param {string[]} vowelTokens - Array of vowel tokens
+ * @returns {string} Description (e.g., "A → A", "U → A → Y")
+ */
+export function getVowelSequenceDescription(vowelTokens) {
+  return vowelTokens.join(' → ');
+}
+
+/**
+ * Generate teaching text for a vowel layout
+ * @param {string[]} vowelTokens - Array of vowel tokens
+ * @param {number} beatCount - Number of beats
+ * @returns {Object} Teaching content with title, explanation, rules
+ */
+export function generateTeachingContent(vowelTokens, beatCount) {
+  const sequenceDesc = getVowelSequenceDescription(vowelTokens);
+
+  // Generate title
+  const title = `${beatCount}-Beat Pattern: ${sequenceDesc}`;
+
+  // Generate explanation
+  let explanation;
+  if (beatCount === 1) {
+    explanation = `This word has one vowel sound: ${vowelTokens[0]}.`;
+  } else {
+    explanation = `This word has ${beatCount} vowel sounds in sequence: ${sequenceDesc}.`;
+  }
+
+  // Generate rules
+  const rules = [
+    `Follow the vowel sequence: ${sequenceDesc}`,
+    `Total beats: ${beatCount}`,
+    `Each beat represents one vowel sound in the transliteration`
+  ];
+
+  // Add specific vowel hints
+  const vowelHints = [];
+  vowelTokens.forEach((token, idx) => {
+    const position = idx + 1;
+    if (token === 'A') {
+      vowelHints.push(`Beat ${position}: "a" sound (like "father")`);
+    } else if (token === 'E') {
+      vowelHints.push(`Beat ${position}: "e" sound (like "bet")`);
+    } else if (token === 'I') {
+      vowelHints.push(`Beat ${position}: "i" sound (like "machine")`);
+    } else if (token === 'O') {
+      vowelHints.push(`Beat ${position}: "o" sound (like "go")`);
+    } else if (token === 'U') {
+      vowelHints.push(`Beat ${position}: "u" sound (like "food")`);
+    } else if (token === 'Y') {
+      vowelHints.push(`Beat ${position}: "y" sound (like "my")`);
+    }
+  });
+
+  if (vowelHints.length > 0) {
+    rules.push(...vowelHints);
+  }
+
+  return {
+    title,
+    explanation,
+    rules
+  };
+}
+
+/**
+ * Batch derive layouts for multiple words
+ * @param {Array} words - Array of {id, transliteration} objects
+ * @returns {Object} Map of wordId -> layoutId
+ */
+export function deriveLayoutsForWords(words) {
+  const layoutMap = {};
+
+  words.forEach(word => {
+    if (word.transliteration) {
+      const layout = deriveLayoutFromTransliteration(word.transliteration);
+      if (layout) {
+        layoutMap[word.id] = layout.id;
+      }
+    }
+  });
+
+  return layoutMap;
+}
+
+/**
+ * Group words by vowel layout
+ * @param {Array} words - Array of {id, transliteration, ...} objects
+ * @returns {Object} Map of layoutId -> array of words
+ */
+export function groupWordsByLayout(words) {
+  const groups = {};
+
+  words.forEach(word => {
+    if (word.transliteration) {
+      const layout = deriveLayoutFromTransliteration(word.transliteration);
+      if (layout) {
+        if (!groups[layout.id]) {
+          groups[layout.id] = {
+            layoutInfo: layout,
+            words: []
+          };
+        }
+        groups[layout.id].words.push(word);
+      }
+    }
+  });
+
+  return groups;
+}
