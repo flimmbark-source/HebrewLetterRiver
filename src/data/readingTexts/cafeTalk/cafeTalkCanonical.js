@@ -306,16 +306,14 @@ export const CAFE_TALK_CATEGORIES = {
   },
 
   // Vowel Layout Practice Section - Test card with 3 layouts (18 words)
+  // Words are interleaved across layouts for mixed practice
   vowelLayoutBootcamp: {
     id: 'vowelLayoutBootcamp',
     sectionId: 'vowelLayoutPractice',
     wordIds: [
-      // VL_2_I-O layout (6 words)
-      'however', 'instead', 'see', 'ask', 'want', 'hate',
-      // VL_1_A layout (6 words)
-      'so', 'also', 'too', 'just', 'already', 'then',
-      // VL_2_A-A layout (6 words)
-      'but', 'now', 'tomorrow', 'you', 'person', 'language'
+      'however', 'so', 'but', 'instead', 'also', 'now',
+      'see', 'too', 'tomorrow', 'ask', 'just', 'you',
+      'want', 'already', 'person', 'hate', 'then', 'language'
     ]
   }
 };

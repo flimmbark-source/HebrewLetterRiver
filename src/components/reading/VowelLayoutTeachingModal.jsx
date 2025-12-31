@@ -5,8 +5,7 @@
  * Displays:
  * - Layout icon (large)
  * - Vowel sequence with colored dots
- * - Explanation and rules
- * - Examples from the current pack
+ * - Vowel sounds
  * - Got it / Close buttons
  */
 
@@ -113,10 +112,6 @@ export function VowelLayoutTeachingModal({
               ))}
             </div>
           </div>
-
-          <p className={`${appFontClass} mt-3 text-base text-slate-300`}>
-            {teachingContent.explanation}
-          </p>
         </div>
 
         {/* Rules Section */}
@@ -135,34 +130,6 @@ export function VowelLayoutTeachingModal({
             ))}
           </ul>
         </div>
-
-        {/* Examples Section */}
-        {examples.length > 0 && (
-          <div className="mb-6">
-            <h3 className={`${appFontClass} mb-3 text-lg font-semibold text-white`}>
-              Examples from this pack:
-            </h3>
-            <div className="space-y-2 rounded-2xl border border-slate-700 bg-slate-800/50 p-4">
-              {examples.slice(0, 5).map((example, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-wrap items-center gap-3 border-b border-slate-700/50 pb-2 last:border-0 last:pb-0"
-                >
-                  <span className={`${practiceFontClass} text-xl text-white`}>
-                    {example.hebrew}
-                  </span>
-                  <span className="text-slate-500">→</span>
-                  <span className={`${appFontClass} font-mono text-base text-blue-300`}>
-                    {example.transliteration}
-                  </span>
-                  <span className={`${appFontClass} text-sm text-slate-400`}>
-                    ({example.meaning})
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Buttons */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
