@@ -90,10 +90,9 @@ export function VowelLayoutIcon({
            <CircleIcon center={center} radius={45} color={colors[0]} />
          )}
  
-         {shape === 'diamond' && (
-
-          <DiamondIcon center={center} size={90} colors={colors} segments={segments} />
-         )}
+        {shape === 'diamond' && (
+          <DiamondIcon center={center} size={70} colors={colors} segments={segments} />
+        )}
  
          {shape === 'triangle' && (
            <TriangleIcon center={center} size={80} colors={colors} segments={segments} />
@@ -137,7 +136,7 @@ export function VowelLayoutIcon({
            <circle cx={center} cy={center} r={45} fill="none" stroke="#64748B" strokeWidth={3} />
          )}
          {shape === 'diamond' && (
-          <DiamondStroke center={center} size={90} />
+           <DiamondStroke center={center} size={70} />
          )}
          {shape === 'triangle' && (
            <TriangleStroke center={center} size={80} />
@@ -182,14 +181,13 @@ export function VowelLayoutIcon({
  
  // Diamond icon (2 beats - CLOCKWISE: top half, then bottom half)
  function DiamondIcon({ center, size, colors, segments }) {
-  const verticalHalf = size / 2;
-  const horizontalHalf = verticalHalf / 2; // Squish width to half of height
+  const half = size / 2;
  
    if (segments === 1) {
      // Solid fill
      return (
        <path
-        d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} L ${center - horizontalHalf},${center} Z`}
+        d={`M ${center},${center - half} L ${center + half},${center} L ${center},${center + half} L ${center - half},${center} Z`}
          fill={colors[0]}
        />
      );
@@ -200,12 +198,12 @@ export function VowelLayoutIcon({
      <g>
        {/* Top half - colors[0] */}
        <path
-        d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center - horizontalHalf},${center} Z`}
+        d={`M ${center},${center - half} L ${center + half},${center} L ${center - half},${center} Z`}
          fill={colors[0]}
        />
        {/* Bottom half - colors[1] */}
        <path
-        d={`M ${center - horizontalHalf},${center} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} Z`}
+        d={`M ${center - half},${center} L ${center + half},${center} L ${center},${center + half} Z`}
          fill={colors[1] || colors[0]}
        />
      </g>
@@ -213,14 +211,13 @@ export function VowelLayoutIcon({
  }
  
  function DiamondStroke({ center, size }) {
-  const verticalHalf = size / 2;
-  const horizontalHalf = verticalHalf / 2;
-   return (
-     <path
-      d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} L ${center - horizontalHalf},${center} Z`}
-       fill="none"
-       stroke="#64748B"
-       strokeWidth={3}
+  const half = size / 2;
+  return (
+    <path
+      d={`M ${center},${center - half} L ${center + half},${center} L ${center},${center + half} L ${center - half},${center} Z`}
+      fill="none"
+      stroke="#64748B"
+      strokeWidth={3}
      />
    );
  }
