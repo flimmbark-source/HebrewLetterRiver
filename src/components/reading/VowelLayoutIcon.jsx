@@ -91,7 +91,7 @@ export function VowelLayoutIcon({
         )}
 
         {shape === 'diamond' && (
-          <DiamondIcon center={center} size={70} colors={colors} segments={segments} />
+          <DiamondIcon center={center} size={90} colors={colors} segments={segments} />
         )}
 
         {shape === 'triangle' && (
@@ -136,7 +136,7 @@ export function VowelLayoutIcon({
           <circle cx={center} cy={center} r={45} fill="none" stroke="#64748B" strokeWidth={3} />
         )}
         {shape === 'diamond' && (
-          <DiamondStroke center={center} size={70} />
+          <DiamondStroke center={center} size={90} />
         )}
         {shape === 'triangle' && (
           <TriangleStroke center={center} size={80} />
