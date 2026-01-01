@@ -181,13 +181,14 @@ function CircleIcon({ center, radius, color }) {
 
 // Diamond icon (2 beats - CLOCKWISE: top half, then bottom half)
 function DiamondIcon({ center, size, colors, segments }) {
-  const halfDiag = size / 2;
+  const verticalHalf = size / 2;
+  const horizontalHalf = verticalHalf / 2; // Squish width to half of height
 
   if (segments === 1) {
     // Solid fill
     return (
       <path
-        d={`M ${center},${center - halfDiag} L ${center + halfDiag},${center} L ${center},${center + halfDiag} L ${center - halfDiag},${center} Z`}
+        d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} L ${center - horizontalHalf},${center} Z`}
         fill={colors[0]}
       />
     );
@@ -198,12 +199,12 @@ function DiamondIcon({ center, size, colors, segments }) {
     <g>
       {/* Top half - colors[0] */}
       <path
-        d={`M ${center},${center - halfDiag} L ${center + halfDiag},${center} L ${center - halfDiag},${center} Z`}
+        d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center - horizontalHalf},${center} Z`}
         fill={colors[0]}
       />
       {/* Bottom half - colors[1] */}
       <path
-        d={`M ${center - halfDiag},${center} L ${center + halfDiag},${center} L ${center},${center + halfDiag} Z`}
+        d={`M ${center - horizontalHalf},${center} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} Z`}
         fill={colors[1] || colors[0]}
       />
     </g>
@@ -211,10 +212,11 @@ function DiamondIcon({ center, size, colors, segments }) {
 }
 
 function DiamondStroke({ center, size }) {
-  const halfDiag = size / 2;
+  const verticalHalf = size / 2;
+  const horizontalHalf = verticalHalf / 2;
   return (
     <path
-      d={`M ${center},${center - halfDiag} L ${center + halfDiag},${center} L ${center},${center + halfDiag} L ${center - halfDiag},${center} Z`}
+      d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} L ${center - horizontalHalf},${center} Z`}
       fill="none"
       stroke="#64748B"
       strokeWidth={3}
