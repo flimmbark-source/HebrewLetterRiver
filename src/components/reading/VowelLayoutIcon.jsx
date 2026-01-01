@@ -67,181 +67,189 @@ export function VowelLayoutIcon({
   const { iconSpec } = layoutInfo;
   const { shape, colors, segments, showBadge } = iconSpec;
 
-  const viewBoxSize = 100;
-  const center = viewBoxSize / 2;
-
-  return (
-    <div
-      className={`vowel-layout-icon relative inline-block ${className}`}
-      style={{ width: size, height: size }}
-      onClick={onClick}
-      role={onClick ? 'button' : undefined}
-      aria-label={accessibilityLabel || `Vowel layout: ${layoutInfo.vowelTokens.join('-')}`}
-      tabIndex={onClick ? 0 : undefined}
-    >
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* Render shape with segmented fills */}
-        {shape === 'circle' && (
-          <CircleIcon center={center} radius={45} color={colors[0]} />
-        )}
-
-        {shape === 'diamond' && (
-          <DiamondIcon center={center} size={90} colors={colors} segments={segments} />
-        )}
-
-        {shape === 'triangle' && (
-          <TriangleIcon center={center} size={80} colors={colors} segments={segments} />
-        )}
-
-        {shape === 'square' && (
-          <SquareIcon center={center} size={70} colors={colors} segments={segments} />
-        )}
-
-        {shape === 'hexagon' && (
-          <HexagonIcon center={center} size={72} colors={colors} segments={segments} />
-        )}
-
-        {shape === 'heptagon' && (
-          <HeptagonIcon center={center} size={72} colors={colors} segments={segments} />
-        )}
-
-        {shape === 'octagon' && (
-          <OctagonIcon center={center} size={72} colors={colors} segments={segments} />
-        )}
-
-        {/* Badge for >8 beats */}
-        {showBadge && (
-          <g>
-            <circle cx={85} cy={15} r={12} fill="#3B82F6" stroke="#fff" strokeWidth={2} />
-            <text
-              x={85}
-              y={20}
-              textAnchor="middle"
-              fontSize={14}
-              fontWeight="bold"
-              fill="#fff"
-            >
-              +
-            </text>
-          </g>
-        )}
-
-        {/* Border stroke */}
-        {shape === 'circle' && (
-          <circle cx={center} cy={center} r={45} fill="none" stroke="#64748B" strokeWidth={3} />
-        )}
-        {shape === 'diamond' && (
-          <DiamondStroke center={center} size={90} />
-        )}
-        {shape === 'triangle' && (
-          <TriangleStroke center={center} size={80} />
-        )}
-        {shape === 'square' && (
-          <SquareStroke center={center} size={70} />
-        )}
-        {shape === 'hexagon' && (
-          <HexagonStroke center={center} size={72} />
-        )}
-        {shape === 'heptagon' && (
-          <HeptagonStroke center={center} size={72} />
-        )}
-        {shape === 'octagon' && (
-          <OctagonStroke center={center} size={72} />
-        )}
-      </svg>
-
-      {/* NEW dot indicator */}
-      {showNewDot && (
-        <div
-          className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-blue-500 ring-2 ring-white"
-          title="New layout"
-        />
-      )}
-    </div>
-  );
-}
-
-// Helper to determine shape from beat count
-function getShapeForBeatCount(beatCount) {
-  if (beatCount === 1) return 'circle';
-  if (beatCount === 2) return 'diamond';
-  if (beatCount === 3) return 'triangle';
-  return 'square'; // 4 or more
-}
-
-// Circle icon (1 beat - solid fill)
-function CircleIcon({ center, radius, color }) {
-  return <circle cx={center} cy={center} r={radius} fill={color} />;
-}
-
-// Diamond icon (2 beats - CLOCKWISE: top half, then bottom half)
-function DiamondIcon({ center, size, colors, segments }) {
-  const verticalHalf = size / 2;
-  const horizontalHalf = verticalHalf / 2; // Squish width to half of height
-
-  if (segments === 1) {
-    // Solid fill
-    return (
-      <path
-        d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} L ${center - horizontalHalf},${center} Z`}
-        fill={colors[0]}
-      />
-    );
-  }
-
-  // CLOCKWISE from top: top half (12 o'clock), bottom half (6 o'clock)
-  return (
-    <g>
-      {/* Top half - colors[0] */}
-      <path
-        d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center - horizontalHalf},${center} Z`}
-        fill={colors[0]}
-      />
-      {/* Bottom half - colors[1] */}
-      <path
-        d={`M ${center - horizontalHalf},${center} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} Z`}
-        fill={colors[1] || colors[0]}
-      />
-    </g>
-  );
-}
-
-function DiamondStroke({ center, size }) {
-  const verticalHalf = size / 2;
-  const horizontalHalf = verticalHalf / 2;
-  return (
-    <path
-      d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} L ${center - horizontalHalf},${center} Z`}
-      fill="none"
-      stroke="#64748B"
-      strokeWidth={3}
-    />
-  );
-}
-
-// Triangle icon (3 beats - CLOCKWISE: top, bottom-right, bottom-left)
-function TriangleIcon({ center, size, colors, segments }) {
-  const height = (size * Math.sqrt(3)) / 2;
-  const top = center - height * 0.6;
-  const bottom = center + height * 0.4;
-  const left = center - size / 2;
-  const right = center + size / 2;
-
-  if (segments === 1) {
-    return (
-      <path
-        d={`M ${center},${top} L ${right},${bottom} L ${left},${bottom} Z`}
-        fill={colors[0]}
-      />
-    );
-  }
-
-  // CLOCKWISE from top: top wedge (12 o'clock), bottom-right wedge (4 o'clock), bottom-left wedge (8 o'clock)
+   const viewBoxSize = 100;
+   const center = viewBoxSize / 2;
+ 
+   return (
+     <div
+       className={`vowel-layout-icon relative inline-block ${className}`}
+       style={{ width: size, height: size }}
+       onClick={onClick}
+       role={onClick ? 'button' : undefined}
+       aria-label={accessibilityLabel || `Vowel layout: ${layoutInfo.vowelTokens.join('-')}`}
+       tabIndex={onClick ? 0 : undefined}
+     >
+       <svg
+         width={size}
+         height={size}
+         viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
+         xmlns="http://www.w3.org/2000/svg"
+       >
+         {/* Render shape with segmented fills */}
+         {shape === 'circle' && (
+           <CircleIcon center={center} radius={45} color={colors[0]} />
+         )}
+ 
+         {shape === 'diamond' && (
+-          <DiamondIcon center={center} size={70} colors={colors} segments={segments} />
++          <DiamondIcon center={center} size={90} colors={colors} segments={segments} />
+         )}
+ 
+         {shape === 'triangle' && (
+           <TriangleIcon center={center} size={80} colors={colors} segments={segments} />
+         )}
+ 
+         {shape === 'square' && (
+           <SquareIcon center={center} size={70} colors={colors} segments={segments} />
+         )}
+ 
+         {shape === 'hexagon' && (
+           <HexagonIcon center={center} size={72} colors={colors} segments={segments} />
+         )}
+ 
+         {shape === 'heptagon' && (
+           <HeptagonIcon center={center} size={72} colors={colors} segments={segments} />
+         )}
+ 
+         {shape === 'octagon' && (
+           <OctagonIcon center={center} size={72} colors={colors} segments={segments} />
+         )}
+ 
+         {/* Badge for >8 beats */}
+         {showBadge && (
+           <g>
+             <circle cx={85} cy={15} r={12} fill="#3B82F6" stroke="#fff" strokeWidth={2} />
+             <text
+               x={85}
+               y={20}
+               textAnchor="middle"
+               fontSize={14}
+               fontWeight="bold"
+               fill="#fff"
+             >
+               +
+             </text>
+           </g>
+         )}
+ 
+         {/* Border stroke */}
+         {shape === 'circle' && (
+           <circle cx={center} cy={center} r={45} fill="none" stroke="#64748B" strokeWidth={3} />
+         )}
+         {shape === 'diamond' && (
+-          <DiamondStroke center={center} size={70} />
++          <DiamondStroke center={center} size={90} />
+         )}
+         {shape === 'triangle' && (
+           <TriangleStroke center={center} size={80} />
+         )}
+         {shape === 'square' && (
+           <SquareStroke center={center} size={70} />
+         )}
+         {shape === 'hexagon' && (
+           <HexagonStroke center={center} size={72} />
+         )}
+         {shape === 'heptagon' && (
+           <HeptagonStroke center={center} size={72} />
+         )}
+         {shape === 'octagon' && (
+           <OctagonStroke center={center} size={72} />
+         )}
+       </svg>
+ 
+       {/* NEW dot indicator */}
+       {showNewDot && (
+         <div
+           className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-blue-500 ring-2 ring-white"
+           title="New layout"
+         />
+       )}
+     </div>
+   );
+ }
+ 
+ // Helper to determine shape from beat count
+ function getShapeForBeatCount(beatCount) {
+   if (beatCount === 1) return 'circle';
+   if (beatCount === 2) return 'diamond';
+   if (beatCount === 3) return 'triangle';
+   return 'square'; // 4 or more
+ }
+ 
+ // Circle icon (1 beat - solid fill)
+ function CircleIcon({ center, radius, color }) {
+   return <circle cx={center} cy={center} r={radius} fill={color} />;
+ }
+ 
+ // Diamond icon (2 beats - CLOCKWISE: top half, then bottom half)
+ function DiamondIcon({ center, size, colors, segments }) {
+-  const halfDiag = size / 2;
++  const verticalHalf = size / 2;
++  const horizontalHalf = verticalHalf / 2; // Squish width to half of height
+ 
+   if (segments === 1) {
+     // Solid fill
+     return (
+       <path
+-        d={`M ${center},${center - halfDiag} L ${center + halfDiag},${center} L ${center},${center + halfDiag} L ${center - halfDiag},${center} Z`}
++        d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} L ${center - horizontalHalf},${center} Z`}
+         fill={colors[0]}
+       />
+     );
+   }
+ 
+   // CLOCKWISE from top: top half (12 o'clock), bottom half (6 o'clock)
+   return (
+     <g>
+       {/* Top half - colors[0] */}
+       <path
+-        d={`M ${center},${center - halfDiag} L ${center + halfDiag},${center} L ${center - halfDiag},${center} Z`}
++        d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center - horizontalHalf},${center} Z`}
+         fill={colors[0]}
+       />
+       {/* Bottom half - colors[1] */}
+       <path
+-        d={`M ${center - halfDiag},${center} L ${center + halfDiag},${center} L ${center},${center + halfDiag} Z`}
++        d={`M ${center - horizontalHalf},${center} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} Z`}
+         fill={colors[1] || colors[0]}
+       />
+     </g>
+   );
+ }
+ 
+ function DiamondStroke({ center, size }) {
+-  const halfDiag = size / 2;
++  const verticalHalf = size / 2;
++  const horizontalHalf = verticalHalf / 2;
+   return (
+     <path
+-      d={`M ${center},${center - halfDiag} L ${center + halfDiag},${center} L ${center},${center + halfDiag} L ${center - halfDiag},${center} Z`}
++      d={`M ${center},${center - verticalHalf} L ${center + horizontalHalf},${center} L ${center},${center + verticalHalf} L ${center - horizontalHalf},${center} Z`}
+       fill="none"
+       stroke="#64748B"
+       strokeWidth={3}
+     />
+   );
+ }
+ 
+ // Triangle icon (3 beats - CLOCKWISE: top, bottom-right, bottom-left)
+ function TriangleIcon({ center, size, colors, segments }) {
+   const height = (size * Math.sqrt(3)) / 2;
+   const top = center - height * 0.6;
+   const bottom = center + height * 0.4;
+   const left = center - size / 2;
+   const right = center + size / 2;
+ 
+   if (segments === 1) {
+     return (
+       <path
+         d={`M ${center},${top} L ${right},${bottom} L ${left},${bottom} Z`}
+         fill={colors[0]}
+       />
+     );
+   }
+ 
+   // CLOCKWISE from top: top wedge (12 o'clock), bottom-right wedge (4 o'clock), bottom-left wedge (8 o'clock)
   return (
     <g>
       {/* Top wedge - colors[0] */}
