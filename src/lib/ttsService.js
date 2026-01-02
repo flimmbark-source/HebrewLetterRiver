@@ -344,6 +344,20 @@ class TtsService {
   stop() {
     if (!this.synth) return;
 
+    // Clean up old utterance event handlers to prevent interference
+    if (this.currentUtterance) {
+      this.currentUtterance.onstart = null;
+      this.currentUtterance.onend = null;
+      this.currentUtterance.onerror = null;
+      this.currentUtterance.onpause = null;
+      this.currentUtterance.onresume = null;
+    }
+
+    // On Android Chrome, pause() before cancel() is more reliable
+    if (this.synth.speaking || this.synth.pending) {
+      this.synth.pause();
+    }
+
     // Always cancel to clear the queue, even if we think nothing is playing
     // This is critical for preventing stuck states
     this.synth.cancel();
