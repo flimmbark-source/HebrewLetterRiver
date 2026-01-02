@@ -184,8 +184,9 @@ class TtsService {
       this.synth.resume();
     }
 
-    // Small delay to ensure synth is ready (fixes Chrome/Safari issues)
-    await new Promise(resolve => setTimeout(resolve, 50));
+    // NOTE: Removed the 50ms delay that was here because it breaks the user gesture
+    // chain on mobile browsers. The delay was for Chrome/Safari, but mobile audio
+    // requires synchronous execution from the user gesture event.
 
     // Determine what to speak and which voice to use
     let textToSpeak = nativeText;
