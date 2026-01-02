@@ -25,11 +25,12 @@ class TtsService {
   /**
    * Initialize the TTS engine and load available voices
    * On mobile, always reinitialize to prevent suspended state after first playback
+   * Returns synchronously after first initialization to preserve user gesture chain
    */
-  async initTts() {
+  initTts() {
     if (!('speechSynthesis' in window)) {
       console.warn('[TTS] Speech Synthesis API not supported in this browser');
-      return;
+      return Promise.resolve();
     }
 
     // On mobile, always get a fresh synth reference to avoid suspended state
@@ -40,11 +41,18 @@ class TtsService {
 
     // Load voices only on first initialization to avoid breaking gesture chain
     if (needsVoiceLoad) {
-      await this.loadVoices();
+      const loadPromise = this.loadVoices();
+      loadPromise.then(() => {
+        this.isInitialized = true;
+        console.log('[TTS] Initialized with', this.voices.length, 'voices');
+      });
+      return loadPromise;
     }
 
+    // On subsequent calls, return synchronously (no await, no async break)
     this.isInitialized = true;
-    console.log('[TTS] Initialized with', this.voices.length, 'voices');
+    console.log('[TTS] Reinitialized synth reference (voices already cached)');
+    return Promise.resolve();
   }
 
   /**
