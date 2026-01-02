@@ -28,9 +28,7 @@ export default function SpeakButton({
   disabled = false,
 }) {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [wasLongPress, setWasLongPress] = useState(false);
-  const touchHandledRef = useRef(false);
-  const longPressTimerRef = useRef(null);
+  const lastInteractionRef = useRef(0);
 
   // Subscribe to TTS events
   useEffect(() => {
@@ -54,23 +52,8 @@ export default function SpeakButton({
     };
   }, []);
 
-  // Handle click - speak the word
-  const handleClick = useCallback((e) => {
-    // Don't trigger if this was a long press (already handled)
-    if (wasLongPress) {
-      setWasLongPress(false);
-      return;
-    }
-
-    // Skip if we just handled this via touch event (avoid double-trigger from synthetic click)
-    if (touchHandledRef.current) {
-      touchHandledRef.current = false;
-      return;
-    }
-
-    // Only stop propagation, don't prevent default to preserve user gesture
-    e.stopPropagation();
-
+  // Simple speak function
+  const speak = useCallback(() => {
     if (disabled || !nativeText) return;
 
     ttsService.speakSmart({
@@ -79,51 +62,24 @@ export default function SpeakButton({
       transliteration,
       mode: 'word',
     });
-  }, [nativeText, nativeLocale, transliteration, disabled, wasLongPress]);
+  }, [nativeText, nativeLocale, transliteration, disabled]);
 
-  // Handle long press start
-  const handlePressStart = useCallback((e) => {
-    if (disabled) return;
+  // Handle touch events (mobile)
+  const handleTouch = useCallback((e) => {
+    lastInteractionRef.current = Date.now();
+    speak();
+  }, [speak]);
 
-    const timer = setTimeout(() => {
-      // Long press triggered - speak sentence if available
-      if (sentenceNativeText || sentenceTransliteration) {
-        setWasLongPress(true);
-        ttsService.speakSmart({
-          nativeText: sentenceNativeText || nativeText,
-          nativeLocale,
-          transliteration: sentenceTransliteration || transliteration,
-          mode: 'sentence',
-        });
-      }
-      longPressTimerRef.current = null;
-    }, 500); // 500ms long press threshold
-
-    longPressTimerRef.current = timer;
-  }, [sentenceNativeText, sentenceTransliteration, nativeText, nativeLocale, transliteration, disabled]);
-
-  // Handle long press cancel
-  const handlePressEnd = useCallback((e) => {
-    if (longPressTimerRef.current) {
-      // Timer still active means it was a short press (< 500ms)
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-
-      // For touch events, trigger speech directly (required for mobile user gesture)
-      if (e && e.type && e.type.startsWith('touch')) {
-        if (!disabled && nativeText) {
-          touchHandledRef.current = true;
-          ttsService.speakSmart({
-            nativeText,
-            nativeLocale,
-            transliteration,
-            mode: 'word',
-          });
-        }
-      }
-      // For mouse events, let the click handler deal with it
+  // Handle click events (desktop, or as fallback)
+  const handleClick = useCallback((e) => {
+    // If we just handled a touch event, skip the synthetic click
+    if (Date.now() - lastInteractionRef.current < 500) {
+      return;
     }
-  }, [disabled, nativeText, nativeLocale, transliteration]);
+
+    e.stopPropagation();
+    speak();
+  }, [speak]);
 
   // Button styles
   const baseStyles = `
@@ -147,12 +103,7 @@ export default function SpeakButton({
   return (
     <button
       onClick={handleClick}
-      onMouseDown={handlePressStart}
-      onMouseUp={handlePressEnd}
-      onMouseLeave={handlePressEnd}
-      onTouchStart={handlePressStart}
-      onTouchEnd={handlePressEnd}
-      onTouchCancel={handlePressEnd}
+      onTouchEnd={handleTouch}
       disabled={disabled}
       className={`${baseStyles} ${sizeStyles} ${speakingStyles} ${className}`}
       style={{
@@ -161,7 +112,7 @@ export default function SpeakButton({
         minHeight: '40px',
       }}
       aria-label={variant === 'icon' ? 'Speak text' : undefined}
-      title={sentenceNativeText || sentenceTransliteration ? 'Click: speak word, Long press: speak sentence' : 'Speak word'}
+      title="Speak word"
     >
       {/* Speaker Icon */}
       <span className={`text-lg ${isSpeaking ? 'animate-pulse' : ''}`}>
