@@ -157,20 +157,19 @@ class TtsService {
 
   /**
    * Smart speak: tries native voice first, falls back to English transliteration
+   * IMPORTANT: This must be synchronous to preserve user gesture chain on mobile
    * @param {Object} params
    * @param {string} params.nativeText - Text in target language script
    * @param {string} params.nativeLocale - BCP 47 locale (e.g., "he-IL")
    * @param {string} params.transliteration - Romanized pronunciation
    * @param {string} [params.mode] - "word" | "sentence" (affects rate)
-   * @returns {Promise<void>}
    */
-  async speakSmart({ nativeText, nativeLocale, transliteration, mode = 'word' }) {
+  speakSmart({ nativeText, nativeLocale, transliteration, mode = 'word' }) {
     console.log('[TTS] speakSmart called with:', { nativeText, nativeLocale, transliteration, mode });
 
-    await this.initTts();
-
-    if (!this.synth) {
-      console.warn('[TTS] Speech synthesis not available');
+    // No await here! Must be synchronous for mobile user gesture
+    if (!this.isInitialized || !this.synth) {
+      console.warn('[TTS] Not initialized - call initTts() first from a user gesture');
       return;
     }
 
@@ -184,19 +183,12 @@ class TtsService {
     // Stop any current speech and ensure synth is ready
     this.stop();
 
-    // CRITICAL FIX: Android Chrome can get stuck in a bad state after first utterance
-    // Always call resume() on mobile, not just when paused
+    // On mobile, always resume to prevent stuck state
     if (this.isMobile()) {
-      console.log('[TTS] Mobile detected - forcing resume to prevent stuck state');
       this.synth.resume();
     } else if (this.synth.paused) {
-      console.log('[TTS] Synth was paused, resuming...');
       this.synth.resume();
     }
-
-    // NOTE: Removed the 50ms delay that was here because it breaks the user gesture
-    // chain on mobile browsers. The delay was for Chrome/Safari, but mobile audio
-    // requires synchronous execution from the user gesture event.
 
     // Determine what to speak and which voice to use
     let textToSpeak = nativeText;
@@ -353,14 +345,12 @@ class TtsService {
       this.currentUtterance.onresume = null;
     }
 
-    // On Android Chrome, pause() before cancel() is more reliable
+    // Only cancel if actually speaking or pending
+    // On iOS, calling cancel() when nothing is queued can interfere with next speak()
+    // Also, avoid pause() on mobile - it can permanently stick the engine
     if (this.synth.speaking || this.synth.pending) {
-      this.synth.pause();
+      this.synth.cancel();
     }
-
-    // Always cancel to clear the queue, even if we think nothing is playing
-    // This is critical for preventing stuck states
-    this.synth.cancel();
 
     if (this.isSpeaking) {
       this.isSpeaking = false;
