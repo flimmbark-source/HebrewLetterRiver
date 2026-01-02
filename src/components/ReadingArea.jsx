@@ -125,13 +125,6 @@ export default function ReadingArea({ textId, onBack }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Initialize TTS service early to avoid async delays during user gesture
-  useEffect(() => {
-    ttsService.initTts().catch(err => {
-      console.error('[ReadingArea] Failed to initialize TTS:', err);
-    });
-  }, []);
-
   // Cleanup TTS on unmount or when leaving reading area
   useEffect(() => {
     return () => {

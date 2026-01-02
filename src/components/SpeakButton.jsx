@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ttsService from '../lib/ttsService';
 
 /**
  * SpeakButton Component
  *
  * A button that triggers text-to-speech for the current word or sentence.
- * Automatically handles voice selection and fallback to transliteration.
+ * Uses HTML5 Audio with Google Translate TTS for reliable mobile playback.
  *
  * Props:
  * @param {string} nativeText - Text in native script (e.g., "שלום")
@@ -28,7 +28,6 @@ export default function SpeakButton({
   disabled = false,
 }) {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const lastInteractionRef = useRef(0);
 
   // Subscribe to TTS events
   useEffect(() => {
@@ -52,31 +51,9 @@ export default function SpeakButton({
     };
   }, []);
 
-  // Resume audio context when returning to the tab/app so queued presses don't
-  // get ignored after a background suspension.
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        ttsService.resetPlaybackSlot();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
-
   // Simple speak function
   const speak = useCallback(() => {
     if (disabled || !nativeText) return;
-
-    // Fire-and-forget initialization so speakSmart remains synchronous
-    // with the user gesture (required on many mobile browsers).
-    ttsService.initTts();
-
-    // Some mobile browsers require an explicit resume before each utterance
-    // once the engine has been suspended, otherwise subsequent taps are
-    // ignored after the first successful playback.
-    ttsService.resume();
 
     ttsService.speakSmart({
       nativeText,
@@ -86,19 +63,8 @@ export default function SpeakButton({
     });
   }, [nativeText, nativeLocale, transliteration, disabled]);
 
-  // Handle touch events (mobile)
-  const handleTouch = useCallback((e) => {
-    lastInteractionRef.current = Date.now();
-    speak();
-  }, [speak]);
-
-  // Handle click events (desktop, or as fallback)
+  // Handle click events
   const handleClick = useCallback((e) => {
-    // If we just handled a touch event, skip the synthetic click
-    if (Date.now() - lastInteractionRef.current < 500) {
-      return;
-    }
-
     e.stopPropagation();
     speak();
   }, [speak]);
@@ -125,7 +91,6 @@ export default function SpeakButton({
   return (
     <button
       onClick={handleClick}
-      onTouchEnd={handleTouch}
       disabled={disabled}
       className={`${baseStyles} ${sizeStyles} ${speakingStyles} ${className}`}
       style={{
