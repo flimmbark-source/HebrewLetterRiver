@@ -180,14 +180,14 @@ class TtsService {
       console.log('[TTS] After refresh:', this.voices.length, 'voices');
     }
 
-    // Stop any current speech and ensure synth is ready
-    this.stop();
-
-    // On mobile, always resume to prevent stuck state
-    if (this.isMobile()) {
-      this.synth.resume();
-    } else if (this.synth.paused) {
-      this.synth.resume();
+    // On mobile: Don't call stop() or cancel() - Android Chrome breaks if we do
+    // Just let utterances replace naturally
+    // On desktop: Cancel existing speech
+    if (!this.isMobile()) {
+      this.stop();
+      if (this.synth.paused) {
+        this.synth.resume();
+      }
     }
 
     // Determine what to speak and which voice to use
