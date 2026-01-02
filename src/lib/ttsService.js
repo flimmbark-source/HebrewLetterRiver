@@ -184,9 +184,12 @@ class TtsService {
     // Stop any current speech and ensure synth is ready
     this.stop();
 
-    // CRITICAL FIX: Some browsers leave the synth in a paused state
-    // We must call resume() before speak() to ensure it actually plays
-    if (this.synth.paused) {
+    // CRITICAL FIX: Android Chrome can get stuck in a bad state after first utterance
+    // Always call resume() on mobile, not just when paused
+    if (this.isMobile()) {
+      console.log('[TTS] Mobile detected - forcing resume to prevent stuck state');
+      this.synth.resume();
+    } else if (this.synth.paused) {
       console.log('[TTS] Synth was paused, resuming...');
       this.synth.resume();
     }
