@@ -16,6 +16,13 @@ class TtsService {
   }
 
   /**
+   * Detect if we're on a mobile device
+   */
+  isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  /**
    * Initialize the TTS engine and load available voices
    */
   async initTts() {
@@ -192,7 +199,18 @@ class TtsService {
     let textToSpeak = nativeText;
     let voice = null;
 
-    if (nativeLocale) {
+    // On mobile, prefer English transliteration for Hebrew (and other languages with broken mobile voices)
+    // This avoids the silent playback → fallback issue where the fallback happens outside user gesture
+    const shouldUseEnglishOnMobile = this.isMobile() &&
+                                     transliteration &&
+                                     (nativeLocale?.startsWith('he') || nativeLocale?.startsWith('iw'));
+
+    if (shouldUseEnglishOnMobile) {
+      console.log('[TTS] Mobile detected with Hebrew - using English transliteration to avoid broken native voice');
+      textToSpeak = this.normalizeTranslit(transliteration);
+      voice = this.pickVoiceForLocale('en-US') || this.pickVoiceForLocale('en');
+      console.log('[TTS] English voice for mobile:', voice ? `${voice.name} (${voice.lang})` : 'not found');
+    } else if (nativeLocale) {
       voice = this.pickVoiceForLocale(nativeLocale);
       console.log('[TTS] Voice for', nativeLocale, ':', voice ? `${voice.name} (${voice.lang})` : 'not found');
     }
