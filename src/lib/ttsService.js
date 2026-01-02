@@ -9,6 +9,7 @@ class TtsService {
   constructor() {
     this.synth = null;
     this.voices = [];
+    this.voiceLoadPromise = null;
     this.isInitialized = false;
     this.isSpeaking = false;
     this.currentUtterance = null;
@@ -33,26 +34,23 @@ class TtsService {
       return Promise.resolve();
     }
 
-    // On mobile, always get a fresh synth reference to avoid suspended state
-    // But only load voices once (they don't change between calls)
-    const needsVoiceLoad = !this.isInitialized;
-
     this.synth = window.speechSynthesis;
-
-    // Load voices only on first initialization to avoid breaking gesture chain
-    if (needsVoiceLoad) {
-      const loadPromise = this.loadVoices();
-      loadPromise.then(() => {
-        this.isInitialized = true;
+    // Start loading voices once, but mark initialized immediately so callers
+    // can synchronously invoke speakSmart() within the same user gesture.
+    if (!this.voiceLoadPromise) {
+      this.voiceLoadPromise = this.loadVoices().then(() => {
         console.log('[TTS] Initialized with', this.voices.length, 'voices');
       });
-      return loadPromise;
     }
 
-    // On subsequent calls, return synchronously (no await, no async break)
-    this.isInitialized = true;
-    console.log('[TTS] Reinitialized synth reference (voices already cached)');
-    return Promise.resolve();
+    if (!this.isInitialized) {
+      this.isInitialized = true;
+      console.log('[TTS] Initialized synth reference (voices loading in background)');
+    } else {
+      console.log('[TTS] Reinitialized synth reference (voices already cached)');
+    }
+
+    return this.voiceLoadPromise || Promise.resolve();
   }
 
   /**

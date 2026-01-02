@@ -53,13 +53,12 @@ export default function SpeakButton({
   }, []);
 
   // Simple speak function
-  const speak = useCallback(async () => {
+  const speak = useCallback(() => {
     if (disabled || !nativeText) return;
 
-    // Ensure TTS is initialized from the user gesture itself. On mobile,
-    // initializing outside the gesture (e.g., in an effect) can leave the
-    // speech engine suspended after the first playback.
-    await ttsService.initTts();
+    // Fire-and-forget initialization so speakSmart remains synchronous
+    // with the user gesture (required on many mobile browsers).
+    ttsService.initTts();
 
     // Some mobile browsers require an explicit resume before each utterance
     // once the engine has been suspended, otherwise subsequent taps are
