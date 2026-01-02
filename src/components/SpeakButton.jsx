@@ -56,14 +56,11 @@ export default function SpeakButton({
   const speak = useCallback(() => {
     if (disabled || !nativeText) return;
 
-    // Always refresh the synth reference (cheap/no-op on desktop).
-    // On mobile this prevents the synth from becoming stuck after the first playback.
-    ttsService.initTts().catch((err) => console.error('[SpeakButton] Failed to init TTS', err));
-
-    // If voices are not ready yet, the init call will kick off loading
-    // and we should avoid speaking during this gesture to preserve the
-    // user-gesture chain on mobile browsers.
+    // If voices are not ready yet, start initialization in the background.
+    // We intentionally skip speaking during this gesture to avoid breaking
+    // the user-gesture chain on mobile browsers.
     if (!ttsService.getIsInitialized()) {
+      ttsService.initTts().catch((err) => console.error('[SpeakButton] Failed to init TTS', err));
       return;
     }
 
