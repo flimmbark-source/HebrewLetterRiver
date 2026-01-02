@@ -24,9 +24,12 @@ class TtsService {
 
   /**
    * Initialize the TTS engine and load available voices
+   * On mobile, always reinitialize to prevent suspended state after first playback
    */
   async initTts() {
-    if (this.isInitialized) return;
+    // On mobile, always get a fresh synth reference to avoid suspended state
+    // On desktop, only initialize once
+    if (this.isInitialized && !this.isMobile()) return;
 
     if (!('speechSynthesis' in window)) {
       console.warn('[TTS] Speech Synthesis API not supported in this browser');
