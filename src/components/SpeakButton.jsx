@@ -29,6 +29,7 @@ export default function SpeakButton({
 }) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState(null);
+  const [wasLongPress, setWasLongPress] = useState(false);
 
   // Subscribe to TTS events
   useEffect(() => {
@@ -54,7 +55,13 @@ export default function SpeakButton({
 
   // Handle click - speak the word
   const handleClick = useCallback((e) => {
-    e.preventDefault();
+    // Don't trigger if this was a long press (already handled)
+    if (wasLongPress) {
+      setWasLongPress(false);
+      return;
+    }
+
+    // Only stop propagation, don't prevent default to preserve user gesture
     e.stopPropagation();
 
     if (disabled || !nativeText) return;
@@ -65,20 +72,16 @@ export default function SpeakButton({
       transliteration,
       mode: 'word',
     });
-  }, [nativeText, nativeLocale, transliteration, disabled]);
+  }, [nativeText, nativeLocale, transliteration, disabled, wasLongPress]);
 
   // Handle long press start
   const handlePressStart = useCallback((e) => {
     if (disabled) return;
 
-    // Prevent default to avoid issues with synthetic clicks on mobile
-    if (e.type === 'touchstart') {
-      e.preventDefault();
-    }
-
     const timer = setTimeout(() => {
       // Long press triggered - speak sentence if available
       if (sentenceNativeText || sentenceTransliteration) {
+        setWasLongPress(true);
         ttsService.speakSmart({
           nativeText: sentenceNativeText || nativeText,
           nativeLocale,
@@ -92,30 +95,15 @@ export default function SpeakButton({
     setLongPressTimer(timer);
   }, [sentenceNativeText, sentenceTransliteration, nativeText, nativeLocale, transliteration, disabled]);
 
-  // Handle long press cancel / touch end
-  const handlePressEnd = useCallback((e) => {
+  // Handle long press cancel
+  const handlePressEnd = useCallback(() => {
     if (longPressTimer) {
       // Timer still active means it was a short press (< 500ms)
-      // Clear timer and trigger short press action (speak word)
+      // Clear timer - the click event will handle speaking
       clearTimeout(longPressTimer);
       setLongPressTimer(null);
-
-      // On touch events, handle the short press here directly
-      if (e.type.startsWith('touch')) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (!disabled && nativeText) {
-          ttsService.speakSmart({
-            nativeText,
-            nativeLocale,
-            transliteration,
-            mode: 'word',
-          });
-        }
-      }
     }
-  }, [longPressTimer, nativeText, nativeLocale, transliteration, disabled]);
+  }, [longPressTimer]);
 
   // Button styles
   const baseStyles = `
