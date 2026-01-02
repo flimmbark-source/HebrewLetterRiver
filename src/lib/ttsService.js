@@ -27,19 +27,21 @@ class TtsService {
    * On mobile, always reinitialize to prevent suspended state after first playback
    */
   async initTts() {
-    // On mobile, always get a fresh synth reference to avoid suspended state
-    // On desktop, only initialize once
-    if (this.isInitialized && !this.isMobile()) return;
-
     if (!('speechSynthesis' in window)) {
       console.warn('[TTS] Speech Synthesis API not supported in this browser');
       return;
     }
 
+    // On mobile, always get a fresh synth reference to avoid suspended state
+    // But only load voices once (they don't change between calls)
+    const needsVoiceLoad = !this.isInitialized;
+
     this.synth = window.speechSynthesis;
 
-    // Load voices (may require async on some browsers)
-    await this.loadVoices();
+    // Load voices only on first initialization to avoid breaking gesture chain
+    if (needsVoiceLoad) {
+      await this.loadVoices();
+    }
 
     this.isInitialized = true;
     console.log('[TTS] Initialized with', this.voices.length, 'voices');
