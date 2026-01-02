@@ -52,6 +52,19 @@ export default function SpeakButton({
     };
   }, []);
 
+  // Resume audio context when returning to the tab/app so queued presses don't
+  // get ignored after a background suspension.
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        ttsService.resetPlaybackSlot();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   // Simple speak function
   const speak = useCallback(() => {
     if (disabled || !nativeText) return;
