@@ -1,272 +1,242 @@
 /**
- * TTS Service using HTML5 Audio with fetch-based audio loading
+ * TTS Service using Web Speech API with improved mobile reliability
  *
- * Provides text-to-speech functionality that works reliably on mobile devices,
- * especially Android where Web Speech API has playback issues with repeated button presses.
- *
- * This implementation fetches audio data as blobs and plays them through HTML5 Audio elements.
+ * This implementation uses a simpler, more reliable approach for mobile:
+ * - Always creates fresh utterances
+ * - Minimal state management to avoid corruption
+ * - Delays between utterances to let the engine reset
+ * - No aggressive recovery logic that can make things worse
  */
 
 class TtsService {
   constructor() {
-    this.currentAudio = null;
+    this.synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
+    this.currentUtterance = null;
     this.listeners = new Set();
     this.isSpeaking = false;
-    this.audioBlobCache = new Map(); // Cache audio blobs to avoid repeated requests
+    this.lastSpeakTime = 0;
   }
 
   /**
-   * Initialize the TTS service (compatibility method, not needed for this implementation)
+   * Initialize the TTS service
    */
   initTts() {
-    // HTML5 Audio doesn't require initialization, but keep for API compatibility
+    if (!this.synth) {
+      console.warn('[TTS] Speech Synthesis not available');
+      return Promise.resolve();
+    }
     return Promise.resolve();
   }
 
   /**
-   * Convert locale to language code
-   * @param {string} locale - BCP 47 locale (e.g., "he-IL", "es-ES")
-   * @returns {string} - Language code (e.g., "he", "es")
+   * Detect if we're on a mobile device
    */
-  localeToLangCode(locale) {
-    if (!locale) return 'en';
-
-    // Extract language code from locale
-    const langCode = locale.toLowerCase().split('-')[0];
-
-    // Map any special cases
-    const langMap = {
-      'iw': 'he', // Legacy Hebrew code
-    };
-
-    return langMap[langCode] || langCode;
+  isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   }
 
   /**
-   * Generate Google Translate TTS URL
-   * @param {string} text - Text to speak
-   * @param {string} langCode - Language code (e.g., "he", "en", "es")
-   * @returns {string} - Google Translate TTS URL
+   * Stop any current speech and clean up
    */
-  generateTtsUrl(text, langCode) {
-    if (!text) return null;
+  stop() {
+    if (!this.synth) return;
 
-    const encodedText = encodeURIComponent(text);
+    // Only cancel if actually speaking to avoid interfering with the engine
+    if (this.synth.speaking || this.synth.pending) {
+      this.synth.cancel();
+    }
 
-    // Google Translate TTS URL format
-    return `https://translate.google.com/translate_tts?ie=UTF-8&client=gtx&tl=${langCode}&q=${encodedText}&textlen=${text.length}`;
+    if (this.isSpeaking) {
+      this.isSpeaking = false;
+      this.notifyListeners('cancel');
+    }
+
+    this.currentUtterance = null;
   }
 
   /**
    * Normalize transliteration for better pronunciation
-   * @param {string} text - Transliterated text
-   * @returns {string} - Normalized text
    */
   normalizeTranslit(text) {
     if (!text) return '';
-
     return text
       .trim()
-      // Remove apostrophes (e.g., "sha'alu" -> "shaalu")
       .replace(/'/g, '')
-      // Turn hyphens into spaces for better pronunciation
       .replace(/-/g, ' ')
-      // Collapse multiple spaces
       .replace(/\s+/g, ' ')
       .trim();
   }
 
   /**
-   * Fetch audio data as a blob
-   * @param {string} url - Audio URL
-   * @returns {Promise<Blob>}
+   * Get the best voice for a locale
    */
-  async fetchAudioBlob(url) {
-    try {
-      const response = await fetch(url);
+  pickVoiceForLocale(locale) {
+    if (!this.synth || !locale) return null;
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+    const voices = this.synth.getVoices();
+    const normalizedLocale = locale.toLowerCase().replace(/^iw(\b|[-_])/i, 'he$1');
+    const langCode = normalizedLocale.split('-')[0];
 
-      const blob = await response.blob();
-      return blob;
-    } catch (error) {
-      console.error('[TTS] Failed to fetch audio:', error);
-      throw error;
-    }
+    // Score and sort voices
+    const scored = voices
+      .map((voice, index) => {
+        const voiceLang = voice.lang.toLowerCase().replace(/^iw(\b|[-_])/i, 'he$1');
+        const voiceLangCode = voiceLang.split('-')[0];
+
+        let score = 0;
+        if (voiceLang === normalizedLocale) score += 10;
+        else if (voiceLangCode === langCode) score += 5;
+
+        if (voice.localService) score += 2;
+        if (/google/i.test(voice.name)) score += 3;
+        if (/espeak/i.test(voice.name)) score -= 5;
+
+        return { voice, score, index };
+      })
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score || a.index - b.index);
+
+    return scored.length > 0 ? scored[0].voice : null;
   }
 
   /**
-   * Create and configure an audio element
-   * @param {Blob} blob - Audio blob
-   * @returns {HTMLAudioElement}
-   */
-  createAudioElement(blob) {
-    const audio = new Audio();
-
-    // Create object URL from blob
-    const objectUrl = URL.createObjectURL(blob);
-    audio.src = objectUrl;
-
-    // Set attributes for better mobile compatibility
-    audio.preload = 'auto';
-
-    // Clean up object URL when audio is done to prevent memory leaks
-    audio.addEventListener('ended', () => {
-      URL.revokeObjectURL(objectUrl);
-    }, { once: true });
-
-    return audio;
-  }
-
-  /**
-   * Smart speak: tries native voice first, falls back to English transliteration
-   * @param {Object} params
-   * @param {string} params.nativeText - Text in target language script
-   * @param {string} params.nativeLocale - BCP 47 locale (e.g., "he-IL")
-   * @param {string} params.transliteration - Romanized pronunciation
-   * @param {string} [params.mode] - "word" | "sentence" (kept for API compatibility)
+   * Smart speak: tries native voice, falls back to transliteration
    */
   async speakSmart({ nativeText, nativeLocale, transliteration, mode = 'word' }) {
-    console.log('[TTS] speakSmart called with:', { nativeText, nativeLocale, transliteration, mode });
+    console.log('[TTS] speakSmart called:', { nativeText, nativeLocale, transliteration });
 
-    // Stop any currently playing audio
+    if (!this.synth) {
+      console.warn('[TTS] Speech synthesis not available');
+      return;
+    }
+
+    // On mobile, enforce a minimum delay between utterances to let engine reset
+    const now = Date.now();
+    const timeSinceLastSpeak = now - this.lastSpeakTime;
+    const minDelay = this.isMobile() ? 300 : 100;
+
+    if (timeSinceLastSpeak < minDelay) {
+      const waitTime = minDelay - timeSinceLastSpeak;
+      console.log(`[TTS] Waiting ${waitTime}ms before speaking...`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+
+    // Stop any current speech
     this.stop();
 
-    // Determine what to speak and in which language
+    // Determine what to speak
     let textToSpeak = nativeText;
-    let langCode = this.localeToLangCode(nativeLocale);
+    let locale = nativeLocale;
 
-    // If no native text or it's a placeholder, use transliteration
     if (!textToSpeak || textToSpeak === '—') {
       if (transliteration) {
         textToSpeak = this.normalizeTranslit(transliteration);
-        langCode = 'en';
+        locale = 'en-US';
       } else {
         console.warn('[TTS] No text to speak');
         return;
       }
     }
 
-    console.log('[TTS] Speaking:', textToSpeak, 'in language:', langCode);
+    console.log('[TTS] Will speak:', textToSpeak, 'in locale:', locale);
 
-    // Check cache first
-    const cacheKey = `${langCode}:${textToSpeak}`;
-    let audioBlob;
+    // Get voices (they might not be loaded yet)
+    let voices = this.synth.getVoices();
 
-    try {
-      if (this.audioBlobCache.has(cacheKey)) {
-        audioBlob = this.audioBlobCache.get(cacheKey);
-        console.log('[TTS] Using cached blob');
-      } else {
-        console.log('[TTS] Fetching new audio...');
-        const url = this.generateTtsUrl(textToSpeak, langCode);
-
-        if (!url) {
-          console.warn('[TTS] Failed to generate audio URL');
-          return;
-        }
-
-        audioBlob = await this.fetchAudioBlob(url);
-        this.audioBlobCache.set(cacheKey, audioBlob);
-        console.log('[TTS] Audio fetched and cached');
-      }
-    } catch (error) {
-      console.error('[TTS] Error fetching audio:', error);
-
-      // Try fallback to English transliteration if we haven't already
-      if (langCode !== 'en' && transliteration) {
-        console.log('[TTS] Trying fallback to English transliteration');
-        return this.speakSmart({
-          nativeText: this.normalizeTranslit(transliteration),
-          nativeLocale: 'en-US',
-          transliteration: transliteration,
-          mode: mode
-        });
-      }
-
-      this.notifyListeners('error', error);
-      return;
+    // If no voices, wait for them to load
+    if (voices.length === 0) {
+      console.log('[TTS] Waiting for voices to load...');
+      await new Promise((resolve) => {
+        const timeout = setTimeout(resolve, 1000);
+        this.synth.addEventListener('voiceschanged', () => {
+          clearTimeout(timeout);
+          resolve();
+        }, { once: true });
+      });
+      voices = this.synth.getVoices();
     }
 
-    // Create new audio element from blob
-    const audio = this.createAudioElement(audioBlob);
-    this.currentAudio = audio;
+    // Pick the best voice
+    const voice = this.pickVoiceForLocale(locale);
+    console.log('[TTS] Selected voice:', voice ? `${voice.name} (${voice.lang})` : 'default');
 
-    // Set up event listeners
-    audio.addEventListener('play', () => {
+    // Create a fresh utterance
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
+    } else {
+      utterance.lang = locale;
+    }
+
+    utterance.rate = mode === 'sentence' ? 0.9 : 0.85;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    // Track state
+    this.currentUtterance = utterance;
+    let started = false;
+    let ended = false;
+
+    // Set up event handlers
+    utterance.onstart = () => {
+      started = true;
       this.isSpeaking = true;
       this.notifyListeners('start');
-      console.log('[TTS] ✓ Playback started');
-    });
+      console.log('[TTS] ✓ Started speaking');
+    };
 
-    audio.addEventListener('ended', () => {
+    utterance.onend = () => {
+      ended = true;
       this.isSpeaking = false;
+      this.currentUtterance = null;
       this.notifyListeners('end');
-      console.log('[TTS] ✓ Playback ended');
+      console.log('[TTS] ✓ Finished speaking');
+    };
 
-      // Clean up
-      if (this.currentAudio === audio) {
-        this.currentAudio = null;
-      }
-    });
-
-    audio.addEventListener('error', (e) => {
-      console.error('[TTS] ✗ Audio playback error:', e);
+    utterance.onerror = (event) => {
+      ended = true;
       this.isSpeaking = false;
-      this.notifyListeners('error', e);
+      this.currentUtterance = null;
+      console.error('[TTS] ✗ Error:', event.error);
+      this.notifyListeners('error', event.error);
 
-      // Clean up
-      if (this.currentAudio === audio) {
-        this.currentAudio = null;
+      // Try English fallback if appropriate
+      if (event.error === 'language-unavailable' && locale !== 'en-US' && transliteration) {
+        console.log('[TTS] Trying English fallback...');
+        setTimeout(() => {
+          this.speakSmart({
+            nativeText: this.normalizeTranslit(transliteration),
+            nativeLocale: 'en-US',
+            transliteration,
+            mode
+          });
+        }, 100);
       }
-    });
+    };
 
-    audio.addEventListener('pause', () => {
-      console.log('[TTS] Paused');
-      this.notifyListeners('pause');
-    });
+    // Speak the utterance
+    console.log('[TTS] Calling synth.speak()...');
+    this.synth.speak(utterance);
+    this.lastSpeakTime = Date.now();
 
-    // Load and play the audio
-    audio.load();
-
-    try {
-      await audio.play();
-      console.log('[TTS] Play started successfully');
-    } catch (error) {
-      console.error('[TTS] Play failed:', error);
-      this.isSpeaking = false;
-      this.notifyListeners('error', error);
-    }
-  }
-
-  /**
-   * Stop current speech
-   */
-  stop() {
-    if (this.currentAudio) {
-      try {
-        this.currentAudio.pause();
-        this.currentAudio.currentTime = 0;
-        this.currentAudio = null;
-      } catch (error) {
-        console.error('[TTS] Error stopping audio:', error);
-      }
-
-      if (this.isSpeaking) {
+    // Safety timeout: if speaking didn't start after 2 seconds, assume it failed
+    setTimeout(() => {
+      if (!started && !ended) {
+        console.warn('[TTS] Speech did not start within 2 seconds');
         this.isSpeaking = false;
-        this.notifyListeners('cancel');
+        this.notifyListeners('error', 'timeout');
       }
-    }
+    }, 2000);
   }
 
   /**
    * Pause current speech
    */
   pause() {
-    if (this.currentAudio && this.isSpeaking) {
-      this.currentAudio.pause();
+    if (this.synth && this.isSpeaking) {
+      this.synth.pause();
     }
   }
 
@@ -274,18 +244,16 @@ class TtsService {
    * Resume paused speech
    */
   resume() {
-    if (this.currentAudio && !this.isSpeaking) {
-      this.currentAudio.play().catch(error => {
-        console.error('[TTS] Resume failed:', error);
-      });
+    if (this.synth && this.synth.paused) {
+      this.synth.resume();
     }
   }
 
   /**
-   * Reset playback slot (compatibility method for old API)
+   * Reset playback slot (compatibility)
    */
   resetPlaybackSlot() {
-    // Not needed for HTML5 Audio, but keep for API compatibility
+    // Not needed in this simpler implementation
   }
 
   /**
@@ -297,7 +265,6 @@ class TtsService {
 
   /**
    * Add event listener
-   * @param {Function} callback - Called with (eventType, data)
    */
   addListener(callback) {
     this.listeners.add(callback);
@@ -305,7 +272,7 @@ class TtsService {
   }
 
   /**
-   * Notify all listeners of an event
+   * Notify all listeners
    */
   notifyListeners(eventType, data) {
     this.listeners.forEach(callback => {
@@ -318,26 +285,16 @@ class TtsService {
   }
 
   /**
-   * Cleanup and reset
+   * Cleanup
    */
   cleanup() {
     this.stop();
     this.listeners.clear();
-    this.audioBlobCache.clear();
-  }
-
-  /**
-   * Clear the audio cache (useful if memory becomes an issue)
-   */
-  clearCache() {
-    this.audioBlobCache.clear();
-    console.log('[TTS] Cache cleared');
   }
 }
 
-// Export singleton instance
+// Export singleton
 const ttsService = new TtsService();
 export default ttsService;
 
-// Export class for testing
 export { TtsService };
