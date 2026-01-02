@@ -61,7 +61,7 @@ export default function SpeakButton({
       return;
     }
 
-    e.preventDefault();
+    // Only stop propagation, don't prevent default to preserve user gesture
     e.stopPropagation();
 
     if (disabled || !nativeText) return;
