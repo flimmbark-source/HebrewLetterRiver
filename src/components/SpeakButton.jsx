@@ -28,9 +28,9 @@ export default function SpeakButton({
   disabled = false,
 }) {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [longPressTimer, setLongPressTimer] = useState(null);
   const [wasLongPress, setWasLongPress] = useState(false);
   const touchHandledRef = useRef(false);
+  const longPressTimerRef = useRef(null);
 
   // Subscribe to TTS events
   useEffect(() => {
@@ -96,18 +96,18 @@ export default function SpeakButton({
           mode: 'sentence',
         });
       }
-      setLongPressTimer(null);
+      longPressTimerRef.current = null;
     }, 500); // 500ms long press threshold
 
-    setLongPressTimer(timer);
+    longPressTimerRef.current = timer;
   }, [sentenceNativeText, sentenceTransliteration, nativeText, nativeLocale, transliteration, disabled]);
 
   // Handle long press cancel
   const handlePressEnd = useCallback((e) => {
-    if (longPressTimer) {
+    if (longPressTimerRef.current) {
       // Timer still active means it was a short press (< 500ms)
-      clearTimeout(longPressTimer);
-      setLongPressTimer(null);
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
 
       // For touch events, trigger speech directly (required for mobile user gesture)
       if (e && e.type && e.type.startsWith('touch')) {
@@ -123,7 +123,7 @@ export default function SpeakButton({
       }
       // For mouse events, let the click handler deal with it
     }
-  }, [longPressTimer, disabled, nativeText, nativeLocale, transliteration]);
+  }, [disabled, nativeText, nativeLocale, transliteration]);
 
   // Button styles
   const baseStyles = `
