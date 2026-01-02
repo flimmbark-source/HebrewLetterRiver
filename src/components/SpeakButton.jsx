@@ -71,6 +71,11 @@ export default function SpeakButton({
   const handlePressStart = useCallback((e) => {
     if (disabled) return;
 
+    // Prevent default to avoid issues with synthetic clicks on mobile
+    if (e.type === 'touchstart') {
+      e.preventDefault();
+    }
+
     const timer = setTimeout(() => {
       // Long press triggered - speak sentence if available
       if (sentenceNativeText || sentenceTransliteration) {
@@ -81,18 +86,36 @@ export default function SpeakButton({
           mode: 'sentence',
         });
       }
+      setLongPressTimer(null);
     }, 500); // 500ms long press threshold
 
     setLongPressTimer(timer);
   }, [sentenceNativeText, sentenceTransliteration, nativeText, nativeLocale, transliteration, disabled]);
 
-  // Handle long press cancel
-  const handlePressEnd = useCallback(() => {
+  // Handle long press cancel / touch end
+  const handlePressEnd = useCallback((e) => {
     if (longPressTimer) {
+      // Timer still active means it was a short press (< 500ms)
+      // Clear timer and trigger short press action (speak word)
       clearTimeout(longPressTimer);
       setLongPressTimer(null);
+
+      // On touch events, handle the short press here directly
+      if (e.type.startsWith('touch')) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!disabled && nativeText) {
+          ttsService.speakSmart({
+            nativeText,
+            nativeLocale,
+            transliteration,
+            mode: 'word',
+          });
+        }
+      }
     }
-  }, [longPressTimer]);
+  }, [longPressTimer, nativeText, nativeLocale, transliteration, disabled]);
 
   // Button styles
   const baseStyles = `
