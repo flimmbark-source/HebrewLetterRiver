@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import ttsService from '../lib/ttsService';
 
 /**
@@ -30,6 +30,7 @@ export default function SpeakButton({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState(null);
   const [wasLongPress, setWasLongPress] = useState(false);
+  const touchHandledRef = useRef(false);
 
   // Subscribe to TTS events
   useEffect(() => {
@@ -58,6 +59,12 @@ export default function SpeakButton({
     // Don't trigger if this was a long press (already handled)
     if (wasLongPress) {
       setWasLongPress(false);
+      return;
+    }
+
+    // Skip if we just handled this via touch event (avoid double-trigger from synthetic click)
+    if (touchHandledRef.current) {
+      touchHandledRef.current = false;
       return;
     }
 
@@ -96,14 +103,27 @@ export default function SpeakButton({
   }, [sentenceNativeText, sentenceTransliteration, nativeText, nativeLocale, transliteration, disabled]);
 
   // Handle long press cancel
-  const handlePressEnd = useCallback(() => {
+  const handlePressEnd = useCallback((e) => {
     if (longPressTimer) {
       // Timer still active means it was a short press (< 500ms)
-      // Clear timer - the click event will handle speaking
       clearTimeout(longPressTimer);
       setLongPressTimer(null);
+
+      // For touch events, trigger speech directly (required for mobile user gesture)
+      if (e && e.type && e.type.startsWith('touch')) {
+        if (!disabled && nativeText) {
+          touchHandledRef.current = true;
+          ttsService.speakSmart({
+            nativeText,
+            nativeLocale,
+            transliteration,
+            mode: 'word',
+          });
+        }
+      }
+      // For mouse events, let the click handler deal with it
     }
-  }, [longPressTimer]);
+  }, [longPressTimer, disabled, nativeText, nativeLocale, transliteration]);
 
   // Button styles
   const baseStyles = `
