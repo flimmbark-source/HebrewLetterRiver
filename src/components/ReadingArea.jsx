@@ -568,8 +568,8 @@ useEffect(() => {
             onTouchStart={focusHiddenInput}
             dir={appDirection}
           >
-        {/* HUD - Three column grid layout */}
-        <div className="mb-4 grid grid-cols-3 items-center gap-3">
+        {/* HUD - Two column grid layout */}
+        <div className="mb-4 grid grid-cols-2 items-center gap-3">
           {/* Left: Vowel Layout Icon (Hebrew only) */}
           <div className="flex justify-start">
             {practiceLanguageId === 'hebrew' && currentWord && (() => {
@@ -595,29 +595,6 @@ useEffect(() => {
             })()}
           </div>
 
-          {/* Center: Meaning - Truly centered */}
-          <div className="flex justify-center">
-            <div className="flex items-center gap-3 rounded-full border border-slate-700 bg-slate-800/50 px-6 py-2.5 text-sm">
-              <span className={`${appFontClass} text-base font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis`}>
-                {(() => {
-                  if (!readingText || !currentWord) return '—';
-
-                  // Primary: Use meaningKeys with i18n translation for proper localization
-                  if (readingText.meaningKeys?.[currentWord.id]) {
-                    return t(readingText.meaningKeys[currentWord.id]);
-                  }
-
-                  // Fallback: Use glosses for semantic meaning display
-                  const langCode = getLanguageCode(appLanguageId);
-                  const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
-                             ?? readingText.glosses?.en?.[currentWord.id];
-
-                  return gloss ?? '—';
-                })()}
-              </span>
-            </div>
-          </div>
-
           {/* Right: TTS Speak Button */}
           <div className="flex justify-end">
             <SpeakButton
@@ -634,9 +611,31 @@ useEffect(() => {
             <div className="mb-3 w-full max-w-full overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-800/90 to-slate-900/90 shadow-lg">
             <div
               ref={practiceViewportRef}
-              className="relative flex w-full min-w-0 items-center overflow-hidden px-2 py-3 sm:px-4 sm:py-6"
+              className="relative flex flex-col w-full min-w-0 items-center overflow-hidden px-2 py-3 sm:px-4 sm:py-6 gap-2"
               style={{ minHeight: '72px' }}
             >
+              {/* Meaning container - transparent, positioned above reading word */}
+              <div className="flex items-center justify-center pointer-events-none">
+                <span className={`${appFontClass} text-base font-medium text-white/90 whitespace-nowrap`}>
+                  {(() => {
+                    if (!readingText || !currentWord) return '—';
+
+                    // Primary: Use meaningKeys with i18n translation for proper localization
+                    if (readingText.meaningKeys?.[currentWord.id]) {
+                      return t(readingText.meaningKeys[currentWord.id]);
+                    }
+
+                    // Fallback: Use glosses for semantic meaning display
+                    const langCode = getLanguageCode(appLanguageId);
+                    const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
+                               ?? readingText.glosses?.en?.[currentWord.id];
+
+                    return gloss ?? '—';
+                  })()}
+                </span>
+              </div>
+              {/* Reading words track */}
+              <div className="relative flex w-full min-w-0 items-center overflow-hidden">
               <div
                 ref={practiceTrackRef}
                 className="inline-flex items-center gap-4 sm:gap-6 transition-transform duration-[260ms] ease-out"
@@ -673,6 +672,7 @@ useEffect(() => {
                 );
               })}
             </div>
+              </div>
           </div>
         </div>
 
