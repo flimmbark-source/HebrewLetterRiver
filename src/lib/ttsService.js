@@ -14,6 +14,12 @@ class TtsService {
     this.isSpeaking = false;
     this.currentUtterance = null;
     this.listeners = new Set();
+    this.lastUtteranceStart = null;
+    this.lastUtteranceEnd = null;
+    this.primingAudioSrc =
+      // 50ms silent WAV used to rearm media pipelines without re-downloading assets
+      'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
+    this.visibilityHandlerAttached = false;
   }
 
   /**
@@ -50,7 +56,86 @@ class TtsService {
       console.log('[TTS] Reinitialized synth reference (voices already cached)');
     }
 
+    if (!this.visibilityHandlerAttached) {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && this.synth) {
+          // Some browsers suspend audio pipelines while hidden; proactively resume
+          try {
+            this.synth.resume();
+          } catch (error) {
+            console.warn('[TTS] Failed to resume synth on visibility change', error);
+          }
+        }
+      });
+      this.visibilityHandlerAttached = true;
+    }
+
     return this.voiceLoadPromise || Promise.resolve();
+  }
+
+  /**
+   * Some mobile browsers leave the speech engine in a suspended/paused state
+   * after the first utterance. Detect that state and force a cancel+resume
+   * cycle so subsequent presses continue to work.
+   */
+  recoverIfSuspended() {
+    if (!this.synth) return;
+
+    const queueInactive = !this.synth.speaking && !this.synth.pending;
+    const synthPaused = this.synth.paused;
+    const longSinceStart =
+      this.lastUtteranceStart && performance.now() - this.lastUtteranceStart > 1500;
+    const stalled = queueInactive && longSinceStart && !this.isSpeaking;
+
+    if ((queueInactive && synthPaused) || stalled) {
+      console.warn('[TTS] Synth appears suspended/stalled, forcing cancel+resume');
+      this.synth.cancel();
+      this.synth.resume();
+
+      // Refresh the cached voice list because iOS can drop voices after resume
+      this.voices = this.synth.getVoices();
+    }
+  }
+
+  /**
+   * Some mobile engines only reliably play after a full cancel+resume cycle
+   * regardless of current state. Use this before each mobile playback.
+   */
+  hardResetForMobile() {
+    if (!this.synth || !this.isMobile()) return;
+
+    console.warn('[TTS] Applying hard mobile synth reset');
+    try {
+      this.synth.cancel();
+      this.synth.resume();
+      // Refresh voice cache because Safari can drop voices after cancel
+      this.voices = this.synth.getVoices();
+    } catch (error) {
+      console.error('[TTS] Failed to hard reset synth:', error);
+    }
+  }
+
+  /**
+   * On iOS/WKWebView, media pipelines can dead-end after a single play. Use a
+   * tiny silent audio clip to re-arm the browser's media stack on every tap.
+   * This mirrors the load() + play() reset pattern recommended for <audio>.
+   */
+  primeHtmlAudioPipeline() {
+    try {
+      const primingAudio = new Audio(this.primingAudioSrc);
+      primingAudio.preload = 'auto';
+      // load() ensures currentTime resets to 0 even on strict mobile browsers
+      primingAudio.load();
+      const playPromise = primingAudio.play();
+      if (playPromise?.catch) {
+        playPromise.catch((err) => {
+          // NotAllowedError is expected if the user gesture isn't trusted
+          console.warn('[TTS] Priming audio play blocked', err?.name || err);
+        });
+      }
+    } catch (error) {
+      console.warn('[TTS] Failed to prime audio pipeline', error);
+    }
   }
 
   /**
@@ -184,6 +269,10 @@ class TtsService {
       return;
     }
 
+    // Prime the browser's media pipeline so repeated taps don't leave the
+    // audio element or WebKit media layer stuck at EOF.
+    this.primeHtmlAudioPipeline();
+
     // Refresh voices if empty (some browsers need this)
     if (this.voices.length === 0) {
       console.log('[TTS] No voices loaded, refreshing...');
@@ -191,6 +280,14 @@ class TtsService {
       console.log('[TTS] After refresh:', this.voices.length, 'voices');
     }
 
+    // Mobile engines frequently become suspended after the first playback; recover proactively
+    if (this.isMobile()) {
+      // Run a full reset before stop() so the engine is in a clean state
+      this.hardResetForMobile();
+      this.recoverIfSuspended();
+    }
+
+    // Mobile engines frequently become suspended after the first playback; recover proactively
     // Stop any current speech and ensure synth is ready
     this.stop();
 
@@ -266,6 +363,7 @@ class TtsService {
     utterance.onstart = () => {
       utteranceStarted = true;
       utteranceStartTime = performance.now();
+      this.lastUtteranceStart = utteranceStartTime;
       this.isSpeaking = true;
       this.currentUtterance = utterance;
       this.notifyListeners('start');
@@ -274,6 +372,7 @@ class TtsService {
 
     utterance.onend = () => {
       utteranceEnded = true;
+      this.lastUtteranceEnd = performance.now();
       this.isSpeaking = false;
       this.currentUtterance = null;
       this.notifyListeners('end');

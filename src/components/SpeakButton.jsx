@@ -75,6 +75,9 @@ export default function SpeakButton({
 
   // Handle touch events (mobile)
   const handleTouch = useCallback((e) => {
+    // Prevent the subsequent synthetic click from firing and canceling playback
+    e.preventDefault();
+    e.stopPropagation();
     lastInteractionRef.current = Date.now();
     speak();
   }, [speak]);

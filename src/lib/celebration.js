@@ -2,24 +2,46 @@ import confetti from 'canvas-confetti';
 
 let audioContext;
 
+function ensureAudioContext() {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+
+    if (!audioContext || audioContext.state === 'closed') {
+      audioContext = new Ctx();
+    }
+
+    // If the tab/app was backgrounded, audio can be suspended; resume in response to the user gesture
+    if (audioContext.state === 'suspended') {
+      audioContext.resume().catch((err) => {
+        console.warn('audioContext resume blocked', err);
+      });
+    }
+
+    return audioContext;
+  } catch (err) {
+    console.warn('audioContext init error', err);
+    return null;
+  }
+}
+
 function playTone() {
   if (typeof window === 'undefined') return;
   try {
-    if (!audioContext) {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      audioContext = Ctx ? new Ctx() : null;
-    }
-    if (!audioContext) return;
-    const now = audioContext.currentTime;
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
+    const ctx = ensureAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
     oscillator.type = 'triangle';
     oscillator.frequency.setValueAtTime(880, now);
     gain.gain.setValueAtTime(0.0001, now);
     gain.gain.exponentialRampToValueAtTime(0.3, now + 0.02);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
     oscillator.connect(gain);
-    gain.connect(audioContext.destination);
+    gain.connect(ctx.destination);
     oscillator.start(now);
     oscillator.stop(now + 0.45);
   } catch (err) {
