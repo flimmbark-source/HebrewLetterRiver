@@ -36,6 +36,9 @@ class TtsService {
       return Promise.resolve();
     }
 
+    // Always grab a fresh handle to the speechSynthesis instance. On iOS/WKWebView
+    // the global instance can enter a stuck state after the first playback and
+    // needs to be re-read from window before being resumed.
     this.synth = window.speechSynthesis;
     // Start loading voices once, but mark initialized immediately so callers
     // can synchronously invoke speakSmart() within the same user gesture.
@@ -76,6 +79,29 @@ class TtsService {
 
       // Refresh the cached voice list because iOS can drop voices after resume
       this.voices = this.synth.getVoices();
+    }
+  }
+
+  /**
+   * Force the speech engine back to a playable state.
+   * Mobile Safari/WKWebView often leaves the engine paused at the end of a
+   * phrase, which makes subsequent play() calls no-op. Clearing the queue and
+   * calling resume() mirrors the "reload before play" pattern used for
+   * <audio> elements, without re-downloading assets.
+   */
+  resetPlaybackSlot() {
+    if (!this.synth) return;
+
+    try {
+      this.synth.cancel();
+      this.synth.resume();
+    } catch (err) {
+      console.warn('[TTS] Failed to reset playback slot', err);
+    }
+
+    const refreshedVoices = this.synth.getVoices();
+    if (refreshedVoices.length > 0) {
+      this.voices = refreshedVoices;
     }
   }
 
@@ -217,6 +243,10 @@ class TtsService {
       console.log('[TTS] After refresh:', this.voices.length, 'voices');
     }
 
+    // Proactively reset the playback slot so repeated taps always start from the
+    // beginning, similar to calling audio.load() on an <audio> element.
+    this.resetPlaybackSlot();
+
     // Mobile engines frequently become suspended after the first playback; recover proactively
     if (this.isMobile()) {
       this.recoverIfSuspended();
@@ -311,6 +341,10 @@ class TtsService {
       this.currentUtterance = null;
       this.notifyListeners('end');
       console.log('[TTS] ✓ Finished speaking');
+
+      // WKWebView and some Android vendors leave the engine paused after the
+      // utterance finishes. Clear and resume so the next tap starts instantly.
+      this.resetPlaybackSlot();
 
       if (utteranceStartTime) {
         const elapsed = performance.now() - utteranceStartTime;
