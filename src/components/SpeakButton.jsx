@@ -53,16 +53,13 @@ export default function SpeakButton({
   }, []);
 
   // Simple speak function
-  const speak = useCallback(() => {
+  const speak = useCallback(async () => {
     if (disabled || !nativeText) return;
 
-    // If voices are not ready yet, start initialization in the background.
-    // We intentionally skip speaking during this gesture to avoid breaking
-    // the user-gesture chain on mobile browsers.
-    if (!ttsService.getIsInitialized()) {
-      ttsService.initTts().catch((err) => console.error('[SpeakButton] Failed to init TTS', err));
-      return;
-    }
+    // Ensure TTS is initialized from the user gesture itself. On mobile,
+    // initializing outside the gesture (e.g., in an effect) can leave the
+    // speech engine suspended after the first playback.
+    await ttsService.initTts();
 
     // Some mobile browsers require an explicit resume before each utterance
     // once the engine has been suspended, otherwise subsequent taps are

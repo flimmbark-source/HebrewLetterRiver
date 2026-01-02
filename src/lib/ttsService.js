@@ -10,7 +10,6 @@ class TtsService {
     this.synth = null;
     this.voices = [];
     this.isInitialized = false;
-    this.initPromise = null;
     this.isSpeaking = false;
     this.currentUtterance = null;
     this.listeners = new Set();
@@ -36,32 +35,24 @@ class TtsService {
 
     // On mobile, always get a fresh synth reference to avoid suspended state
     // But only load voices once (they don't change between calls)
+    const needsVoiceLoad = !this.isInitialized;
+
     this.synth = window.speechSynthesis;
 
-    // If initialization already finished, keep calls synchronous to preserve
-    // user gesture chains.
-    if (this.isInitialized) {
-      console.log('[TTS] Reinitialized synth reference (voices already cached)');
-      return Promise.resolve();
-    }
-
-    // If an initialization is already in flight (e.g., kicked off on mount),
-    // reuse that promise so callers don't spawn multiple voice loads.
-    if (this.initPromise) {
-      return this.initPromise;
-    }
-
-    // First-time initialization: load voices asynchronously once.
-    this.initPromise = this.loadVoices()
-      .then(() => {
+    // Load voices only on first initialization to avoid breaking gesture chain
+    if (needsVoiceLoad) {
+      const loadPromise = this.loadVoices();
+      loadPromise.then(() => {
         this.isInitialized = true;
         console.log('[TTS] Initialized with', this.voices.length, 'voices');
-      })
-      .finally(() => {
-        this.initPromise = null;
       });
+      return loadPromise;
+    }
 
-    return this.initPromise;
+    // On subsequent calls, return synchronously (no await, no async break)
+    this.isInitialized = true;
+    console.log('[TTS] Reinitialized synth reference (voices already cached)');
+    return Promise.resolve();
   }
 
   /**
@@ -402,13 +393,6 @@ class TtsService {
    */
   getIsSpeaking() {
     return this.isSpeaking;
-  }
-
-  /**
-   * Check if voices have been loaded and synth is ready
-   */
-  getIsInitialized() {
-    return this.isInitialized;
   }
 
   /**
