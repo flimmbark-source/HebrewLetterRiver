@@ -14,7 +14,6 @@ class TtsService {
     this.isSpeaking = false;
     this.currentUtterance = null;
     this.listeners = new Set();
-    this.lastSpeakStartTime = 0;
   }
 
   /**
@@ -185,36 +184,6 @@ class TtsService {
       return;
     }
 
-    const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
-
-    const synthAppearsSuspended = this.synth
-      && !this.synth.speaking
-      && !this.synth.pending
-      && this.synth.paused;
-
-    const synthLikelyStale = this.lastSpeakStartTime
-      && now - this.lastSpeakStartTime > 8000
-      && this.synth
-      && !this.synth.speaking
-      && !this.synth.pending;
-
-    if (synthAppearsSuspended || synthLikelyStale) {
-      console.warn('[TTS] Synth appears suspended/stale; refreshing engine');
-
-      try {
-        this.synth.cancel();
-      } catch (error) {
-        console.warn('[TTS] Failed to cancel suspended synth:', error);
-      }
-
-      // Refresh engine and voices within the same gesture
-      this.initTts();
-
-      if (this.synth) {
-        this.synth.resume();
-      }
-    }
-
     // Refresh voices if empty (some browsers need this)
     if (this.voices.length === 0) {
       console.log('[TTS] No voices loaded, refreshing...');
@@ -297,7 +266,6 @@ class TtsService {
     utterance.onstart = () => {
       utteranceStarted = true;
       utteranceStartTime = performance.now();
-      this.lastSpeakStartTime = utteranceStartTime;
       this.isSpeaking = true;
       this.currentUtterance = utterance;
       this.notifyListeners('start');

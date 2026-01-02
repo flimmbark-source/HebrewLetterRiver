@@ -29,7 +29,6 @@ export default function SpeakButton({
 }) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const lastInteractionRef = useRef(0);
-  const speakLockRef = useRef(0);
 
   // Subscribe to TTS events
   useEffect(() => {
@@ -57,13 +56,6 @@ export default function SpeakButton({
   const speak = useCallback(() => {
     if (disabled || !nativeText) return;
 
-    const now = Date.now();
-    if (now - speakLockRef.current < 200) {
-      return;
-    }
-
-    speakLockRef.current = now;
-
     // Fire-and-forget initialization so speakSmart remains synchronous
     // with the user gesture (required on many mobile browsers).
     ttsService.initTts();
@@ -83,8 +75,6 @@ export default function SpeakButton({
 
   // Handle touch events (mobile)
   const handleTouch = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
     lastInteractionRef.current = Date.now();
     speak();
   }, [speak]);
