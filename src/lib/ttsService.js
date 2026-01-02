@@ -1,11 +1,10 @@
 /**
- * TTS Service using HTML5 Audio with Google Translate TTS
+ * TTS Service using HTML5 Audio with fetch-based audio loading
  *
  * Provides text-to-speech functionality that works reliably on mobile devices,
  * especially Android where Web Speech API has playback issues with repeated button presses.
  *
- * This implementation uses HTML5 Audio elements with Google Translate's TTS API,
- * which is much more reliable for mobile playback.
+ * This implementation fetches audio data as blobs and plays them through HTML5 Audio elements.
  */
 
 class TtsService {
@@ -13,7 +12,7 @@ class TtsService {
     this.currentAudio = null;
     this.listeners = new Set();
     this.isSpeaking = false;
-    this.audioCache = new Map(); // Cache audio URLs to avoid repeated requests
+    this.audioBlobCache = new Map(); // Cache audio blobs to avoid repeated requests
   }
 
   /**
@@ -25,9 +24,9 @@ class TtsService {
   }
 
   /**
-   * Convert locale to Google Translate language code
+   * Convert locale to language code
    * @param {string} locale - BCP 47 locale (e.g., "he-IL", "es-ES")
-   * @returns {string} - Google Translate language code (e.g., "he", "es")
+   * @returns {string} - Language code (e.g., "he", "es")
    */
   localeToLangCode(locale) {
     if (!locale) return 'en';
@@ -55,8 +54,7 @@ class TtsService {
     const encodedText = encodeURIComponent(text);
 
     // Google Translate TTS URL format
-    // Using 'tw-ob' client which is more reliable than 'gtx'
-    return `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${langCode}&q=${encodedText}`;
+    return `https://translate.google.com/translate_tts?ie=UTF-8&client=gtx&tl=${langCode}&q=${encodedText}&textlen=${text.length}`;
   }
 
   /**
@@ -79,19 +77,45 @@ class TtsService {
   }
 
   /**
+   * Fetch audio data as a blob
+   * @param {string} url - Audio URL
+   * @returns {Promise<Blob>}
+   */
+  async fetchAudioBlob(url) {
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      return blob;
+    } catch (error) {
+      console.error('[TTS] Failed to fetch audio:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Create and configure an audio element
-   * @param {string} url - Audio source URL
+   * @param {Blob} blob - Audio blob
    * @returns {HTMLAudioElement}
    */
-  createAudioElement(url) {
+  createAudioElement(blob) {
     const audio = new Audio();
+
+    // Create object URL from blob
+    const objectUrl = URL.createObjectURL(blob);
+    audio.src = objectUrl;
 
     // Set attributes for better mobile compatibility
     audio.preload = 'auto';
-    audio.crossOrigin = 'anonymous'; // Required for CORS
 
-    // Set the source
-    audio.src = url;
+    // Clean up object URL when audio is done to prevent memory leaks
+    audio.addEventListener('ended', () => {
+      URL.revokeObjectURL(objectUrl);
+    }, { once: true });
 
     return audio;
   }
@@ -104,7 +128,7 @@ class TtsService {
    * @param {string} params.transliteration - Romanized pronunciation
    * @param {string} [params.mode] - "word" | "sentence" (kept for API compatibility)
    */
-  speakSmart({ nativeText, nativeLocale, transliteration, mode = 'word' }) {
+  async speakSmart({ nativeText, nativeLocale, transliteration, mode = 'word' }) {
     console.log('[TTS] speakSmart called with:', { nativeText, nativeLocale, transliteration, mode });
 
     // Stop any currently playing audio
@@ -129,24 +153,45 @@ class TtsService {
 
     // Check cache first
     const cacheKey = `${langCode}:${textToSpeak}`;
-    let audioUrl;
+    let audioBlob;
 
-    if (this.audioCache.has(cacheKey)) {
-      audioUrl = this.audioCache.get(cacheKey);
-      console.log('[TTS] Using cached URL');
-    } else {
-      audioUrl = this.generateTtsUrl(textToSpeak, langCode);
-      this.audioCache.set(cacheKey, audioUrl);
-      console.log('[TTS] Generated new URL');
-    }
+    try {
+      if (this.audioBlobCache.has(cacheKey)) {
+        audioBlob = this.audioBlobCache.get(cacheKey);
+        console.log('[TTS] Using cached blob');
+      } else {
+        console.log('[TTS] Fetching new audio...');
+        const url = this.generateTtsUrl(textToSpeak, langCode);
 
-    if (!audioUrl) {
-      console.warn('[TTS] Failed to generate audio URL');
+        if (!url) {
+          console.warn('[TTS] Failed to generate audio URL');
+          return;
+        }
+
+        audioBlob = await this.fetchAudioBlob(url);
+        this.audioBlobCache.set(cacheKey, audioBlob);
+        console.log('[TTS] Audio fetched and cached');
+      }
+    } catch (error) {
+      console.error('[TTS] Error fetching audio:', error);
+
+      // Try fallback to English transliteration if we haven't already
+      if (langCode !== 'en' && transliteration) {
+        console.log('[TTS] Trying fallback to English transliteration');
+        return this.speakSmart({
+          nativeText: this.normalizeTranslit(transliteration),
+          nativeLocale: 'en-US',
+          transliteration: transliteration,
+          mode: mode
+        });
+      }
+
+      this.notifyListeners('error', error);
       return;
     }
 
-    // Create new audio element
-    const audio = this.createAudioElement(audioUrl);
+    // Create new audio element from blob
+    const audio = this.createAudioElement(audioBlob);
     this.currentAudio = audio;
 
     // Set up event listeners
@@ -168,20 +213,9 @@ class TtsService {
     });
 
     audio.addEventListener('error', (e) => {
-      console.error('[TTS] ✗ Audio error:', e);
+      console.error('[TTS] ✗ Audio playback error:', e);
       this.isSpeaking = false;
       this.notifyListeners('error', e);
-
-      // Try fallback to English transliteration if we haven't already
-      if (langCode !== 'en' && transliteration) {
-        console.log('[TTS] Trying fallback to English transliteration');
-        this.speakSmart({
-          nativeText: this.normalizeTranslit(transliteration),
-          nativeLocale: 'en-US',
-          transliteration: transliteration,
-          mode: mode
-        });
-      }
 
       // Clean up
       if (this.currentAudio === audio) {
@@ -195,21 +229,15 @@ class TtsService {
     });
 
     // Load and play the audio
-    // On mobile, we need to load() first, then play() to ensure reliable playback
     audio.load();
 
-    const playPromise = audio.play();
-
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          console.log('[TTS] Play promise resolved successfully');
-        })
-        .catch(error => {
-          console.error('[TTS] Play promise rejected:', error);
-          this.isSpeaking = false;
-          this.notifyListeners('error', error);
-        });
+    try {
+      await audio.play();
+      console.log('[TTS] Play started successfully');
+    } catch (error) {
+      console.error('[TTS] Play failed:', error);
+      this.isSpeaking = false;
+      this.notifyListeners('error', error);
     }
   }
 
@@ -247,13 +275,9 @@ class TtsService {
    */
   resume() {
     if (this.currentAudio && !this.isSpeaking) {
-      const playPromise = this.currentAudio.play();
-
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.error('[TTS] Resume failed:', error);
-        });
-      }
+      this.currentAudio.play().catch(error => {
+        console.error('[TTS] Resume failed:', error);
+      });
     }
   }
 
@@ -299,14 +323,14 @@ class TtsService {
   cleanup() {
     this.stop();
     this.listeners.clear();
-    this.audioCache.clear();
+    this.audioBlobCache.clear();
   }
 
   /**
    * Clear the audio cache (useful if memory becomes an issue)
    */
   clearCache() {
-    this.audioCache.clear();
+    this.audioBlobCache.clear();
     console.log('[TTS] Cache cleared');
   }
 }
