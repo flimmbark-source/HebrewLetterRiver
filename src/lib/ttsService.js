@@ -14,6 +14,8 @@ class TtsService {
     this.isSpeaking = false;
     this.currentUtterance = null;
     this.listeners = new Set();
+    this.lastUtteranceStart = null;
+    this.lastUtteranceEnd = null;
   }
 
   /**
@@ -51,6 +53,30 @@ class TtsService {
     }
 
     return this.voiceLoadPromise || Promise.resolve();
+  }
+
+  /**
+   * Some mobile browsers leave the speech engine in a suspended/paused state
+   * after the first utterance. Detect that state and force a cancel+resume
+   * cycle so subsequent presses continue to work.
+   */
+  recoverIfSuspended() {
+    if (!this.synth) return;
+
+    const queueInactive = !this.synth.speaking && !this.synth.pending;
+    const synthPaused = this.synth.paused;
+    const longSinceStart =
+      this.lastUtteranceStart && performance.now() - this.lastUtteranceStart > 1500;
+    const stalled = queueInactive && longSinceStart && !this.isSpeaking;
+
+    if ((queueInactive && synthPaused) || stalled) {
+      console.warn('[TTS] Synth appears suspended/stalled, forcing cancel+resume');
+      this.synth.cancel();
+      this.synth.resume();
+
+      // Refresh the cached voice list because iOS can drop voices after resume
+      this.voices = this.synth.getVoices();
+    }
   }
 
   /**
@@ -191,6 +217,11 @@ class TtsService {
       console.log('[TTS] After refresh:', this.voices.length, 'voices');
     }
 
+    // Mobile engines frequently become suspended after the first playback; recover proactively
+    if (this.isMobile()) {
+      this.recoverIfSuspended();
+    }
+
     // Stop any current speech and ensure synth is ready
     this.stop();
 
@@ -266,6 +297,7 @@ class TtsService {
     utterance.onstart = () => {
       utteranceStarted = true;
       utteranceStartTime = performance.now();
+      this.lastUtteranceStart = utteranceStartTime;
       this.isSpeaking = true;
       this.currentUtterance = utterance;
       this.notifyListeners('start');
@@ -274,6 +306,7 @@ class TtsService {
 
     utterance.onend = () => {
       utteranceEnded = true;
+      this.lastUtteranceEnd = performance.now();
       this.isSpeaking = false;
       this.currentUtterance = null;
       this.notifyListeners('end');
