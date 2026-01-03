@@ -472,9 +472,17 @@ useEffect(() => {
       return;
     }
 
-    // For regular character input (letters, numbers, apostrophes, etc.),
-    // let the browser handle it naturally via onChange.
-    // This ensures all characters work, including special chars like apostrophes.
+    // Regular character input - must handle here because document listener
+    // calls this function and returns, preventing event from reaching input
+    // Accept letters, numbers, spaces, apostrophes, hyphens, etc.
+    const isPrintable = key.length === 1 || key === "'" || key === '-' || key === ' ';
+    const isModified = e.ctrlKey || e.metaKey || e.altKey;
+
+    if (isPrintable && !isModified) {
+      e.preventDefault();
+      console.log('[ReadingArea] Key pressed:', key, 'Length:', key.length, 'CharCode:', key.charCodeAt(0));
+      setTypedWord(prev => prev + key);
+    }
   }, [isGrading, typedWord, appLanguageId, gradeAndCommit]);
 
   // Handle keyboard input (for desktop)
