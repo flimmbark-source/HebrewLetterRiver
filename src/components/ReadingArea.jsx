@@ -795,6 +795,7 @@ useEffect(() => {
   autoCorrect="off"
   spellCheck={false}
   inputMode="text"
+  pattern="[a-zA-Z0-9\s'\-]*"
   dir={appDirection}
   // Position off-screen but keep real size for mobile keyboard
   className={`${appFontClass} fixed`}
