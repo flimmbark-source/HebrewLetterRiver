@@ -472,12 +472,9 @@ useEffect(() => {
       return;
     }
 
-    // Regular character input (including apostrophes, hyphens, etc.)
-    // Allow printable characters, including special chars like ' and -
-    if (key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      e.preventDefault();
-      setTypedWord(prev => prev + key);
-    }
+    // For regular character input (letters, numbers, apostrophes, etc.),
+    // let the browser handle it naturally via onChange.
+    // This ensures all characters work, including special chars like apostrophes.
   }, [isGrading, typedWord, appLanguageId, gradeAndCommit]);
 
   // Handle keyboard input (for desktop)
