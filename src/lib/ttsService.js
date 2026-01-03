@@ -177,9 +177,11 @@ class TtsService {
       console.log('[TTS] Voices not loaded yet, using default');
     }
 
-    // Pick the best voice
-    const voice = this.pickVoiceForLocale(locale, synth);
-    console.log('[TTS] Selected voice:', voice ? `${voice.name} (${voice.lang})` : 'default');
+    // SKIP voice selection - always use browser default
+    // On Android, selecting a specific voice can break subsequent playback
+    // Just set the lang attribute and let the browser choose
+    console.log('[TTS] Using default voice for locale:', locale);
+    const voice = null;
 
     // Create a fresh utterance
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
