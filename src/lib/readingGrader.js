@@ -237,7 +237,7 @@ export function gradeWithGhostSequence(typed, wordDef, practiceLanguageId, appLa
     return {
       ...grading,
       ghostSequence: [],
-      typedChars: getGraphemeClusters(normalizeForLanguage(typed, appLanguageId))
+      typedChars: getGraphemeClusters(typed) // Show original typed chars (with apostrophes)
     };
   }
 
@@ -248,7 +248,8 @@ export function gradeWithGhostSequence(typed, wordDef, practiceLanguageId, appLa
     appLanguageId
   );
 
-  const typedChars = getGraphemeClusters(normalizeForLanguage(typed, appLanguageId));
+  // Show what user actually typed (including apostrophes), not normalized version
+  const typedChars = getGraphemeClusters(typed);
 
   return {
     ...grading,
