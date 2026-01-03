@@ -19,15 +19,15 @@ export const VOWEL_TOKENS = {
 
 /**
  * Vowel color mapping for icon visualization
- * Using high-contrast, colorblind-friendly palette
+ * Using mnemonic color associations (Apple, Emerald, Ice, Orange, Umbrella, Yolk)
  */
 export const VOWEL_COLORS = {
-  A: '#CC3311', // Red
-  E: '#EE7733', // Orange
-  I: '#0077BB', // Blue
-  O: '#009988', // Teal/Green
-  U: '#F0E442', // Yellow
-  Y: '#EE3377'  // Magenta/Purple
+  A: '#E74C3C', // Red (Apple)
+  E: '#22C55E', // Green (Emerald)
+  I: '#60A5FA', // Light Blue (Ice)
+  O: '#F97316', // Orange (Orange)
+  U: '#A855F7', // Purple (Umbrella)
+  Y: '#FACC15'  // Yellow (Yolk)
 };
 
 /**

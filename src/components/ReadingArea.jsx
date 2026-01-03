@@ -472,9 +472,15 @@ useEffect(() => {
       return;
     }
 
-    // Regular character input
-    if (key.length === 1) {
+    // Regular character input - must handle here because document listener
+    // calls this function and returns, preventing event from reaching input
+    // Accept letters, numbers, spaces, apostrophes, hyphens, etc.
+    const isPrintable = key.length === 1 || key === "'" || key === '-' || key === ' ';
+    const isModified = e.ctrlKey || e.metaKey || e.altKey;
+
+    if (isPrintable && !isModified) {
       e.preventDefault();
+      console.log('[ReadingArea] Key pressed:', key, 'Length:', key.length, 'CharCode:', key.charCodeAt(0));
       setTypedWord(prev => prev + key);
     }
   }, [isGrading, typedWord, appLanguageId, gradeAndCommit]);
@@ -566,7 +572,9 @@ useEffect(() => {
   const title = getLocalizedTitle(readingText, appLanguageId);
   const subtitle = getLocalizedSubtitle(readingText, appLanguageId);
 
-  const activeChars = normalizeForLanguage(typedWord, appLanguageId).split('');
+  // Don't normalize display - show what user actually typed (including apostrophes)
+  // Normalization only happens during grading, not display
+  const activeChars = typedWord.split('');
   const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
   const containerMaxWidth = Math.max(Math.min(viewportWidth - 24, 1280), 320);
   const responsiveContainerStyle = { maxWidth: `${containerMaxWidth}px` };

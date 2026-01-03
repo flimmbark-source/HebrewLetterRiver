@@ -98,6 +98,10 @@ export function buildGhostSequence(typed, expected, practiceLanguageId, appLangu
   const typedNorm = normalizeForLanguage(typed, appLanguageId);
   const expectedNorm = normalizeForLanguage(expected, appLanguageId);
 
+  // If answer is correct (normalized versions match), use original typed chars
+  // This preserves apostrophes and other special chars in the ghost display
+  const isCorrect = typedNorm === expectedNorm;
+
   const {
     typedChars,
     expectedChars,
@@ -105,6 +109,18 @@ export function buildGhostSequence(typed, expected, practiceLanguageId, appLangu
     matches,
     skipOptionalVowels
   } = mapTypedToExpected(typedNorm, expectedNorm, practiceLanguageId, appLanguageId);
+
+  // Get original typed characters (with apostrophes) for display
+  const originalTypedChars = getGraphemeClusters(typed);
+
+  // If answer is correct, mirror the typed word exactly (preserving apostrophes)
+  if (isCorrect) {
+    return originalTypedChars.map(char => ({
+      char: char,
+      cls: 'ok',
+      phase: 'typed'
+    }));
+  }
 
   // Track which expected characters have been matched
   const matchedExpected = new Set();
@@ -237,7 +253,7 @@ export function gradeWithGhostSequence(typed, wordDef, practiceLanguageId, appLa
     return {
       ...grading,
       ghostSequence: [],
-      typedChars: getGraphemeClusters(normalizeForLanguage(typed, appLanguageId))
+      typedChars: getGraphemeClusters(typed) // Show original typed chars (with apostrophes)
     };
   }
 
@@ -248,7 +264,8 @@ export function gradeWithGhostSequence(typed, wordDef, practiceLanguageId, appLa
     appLanguageId
   );
 
-  const typedChars = getGraphemeClusters(normalizeForLanguage(typed, appLanguageId));
+  // Show what user actually typed (including apostrophes), not normalized version
+  const typedChars = getGraphemeClusters(typed);
 
   return {
     ...grading,

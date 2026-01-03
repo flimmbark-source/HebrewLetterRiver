@@ -30,11 +30,8 @@ const normalizationRules = {
       .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
       .replace(/ch/g, 'kh') // Hebrew ch -> kh
       .replace(/tz/g, 'ts') // Hebrew tz -> ts
-      .replace(/aa/g, 'a') // Double vowels -> single
-      .replace(/ee/g, 'e')
-      .replace(/ii/g, 'i')
-      .replace(/oo/g, 'o')
-      .replace(/uu/g, 'u')
+      // Note: Double vowels (aa, ee, etc.) are NOT collapsed
+      // They represent syllable breaks in Hebrew (ayin/aleph letters)
       .trim();
   },
 
