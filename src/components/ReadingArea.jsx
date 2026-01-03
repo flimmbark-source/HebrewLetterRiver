@@ -572,7 +572,9 @@ useEffect(() => {
   const title = getLocalizedTitle(readingText, appLanguageId);
   const subtitle = getLocalizedSubtitle(readingText, appLanguageId);
 
-  const activeChars = normalizeForLanguage(typedWord, appLanguageId).split('');
+  // Don't normalize display - show what user actually typed (including apostrophes)
+  // Normalization only happens during grading, not display
+  const activeChars = typedWord.split('');
   const activeWordWidth = Math.min(Math.max(activeChars.length + 1, 2), MAX_WORD_BOX_CH);
   const containerMaxWidth = Math.max(Math.min(viewportWidth - 24, 1280), 320);
   const responsiveContainerStyle = { maxWidth: `${containerMaxWidth}px` };
