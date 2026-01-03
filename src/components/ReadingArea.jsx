@@ -472,8 +472,9 @@ useEffect(() => {
       return;
     }
 
-    // Regular character input
-    if (key.length === 1) {
+    // Regular character input (including apostrophes, hyphens, etc.)
+    // Allow printable characters, including special chars like ' and -
+    if (key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
       e.preventDefault();
       setTypedWord(prev => prev + key);
     }
@@ -795,7 +796,6 @@ useEffect(() => {
   autoCorrect="off"
   spellCheck={false}
   inputMode="text"
-  pattern="[a-zA-Z0-9\s'\-]*"
   dir={appDirection}
   // Position off-screen but keep real size for mobile keyboard
   className={`${appFontClass} fixed`}
