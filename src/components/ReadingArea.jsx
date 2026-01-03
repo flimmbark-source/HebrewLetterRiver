@@ -125,6 +125,21 @@ export default function ReadingArea({ textId, onBack }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Resume TTS engine when page becomes visible (Issue #7)
+  // Mobile browsers suspend audio contexts when page is backgrounded
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('[ReadingArea] Page visible, ensuring TTS is ready');
+        // Resume the speech engine in case it was suspended
+        ttsService.resume();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   // Cleanup TTS on unmount or when leaving reading area
   useEffect(() => {
     return () => {
