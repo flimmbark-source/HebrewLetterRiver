@@ -140,6 +140,19 @@ class TtsService {
     // This is like calling audio.load() - it ensures a clean slate
     synth.cancel();
 
+    // Resume the engine in case it's suspended (issue #7)
+    // On Android, the speech engine enters a paused state after first playback
+    // and subsequent speak() calls are silently ignored unless we resume first
+    if (synth.paused) {
+      console.log('[TTS] Engine is paused, calling resume()');
+      synth.resume();
+    } else {
+      // Even if not paused, calling resume() can wake a suspended engine
+      // This is similar to calling audioContext.resume() for Web Audio
+      synth.resume();
+      console.log('[TTS] Called resume() to wake any suspended state');
+    }
+
     // Clear our state
     this.isSpeaking = false;
     this.currentUtterance = null;
