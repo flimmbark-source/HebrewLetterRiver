@@ -10,7 +10,6 @@
 
 class TtsService {
   constructor() {
-    this.synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
     this.currentUtterance = null;
     this.listeners = new Set();
     this.isSpeaking = false;
@@ -18,10 +17,19 @@ class TtsService {
   }
 
   /**
+   * Get a fresh reference to speechSynthesis
+   * Like creating a new Audio() object - prevents stuck state on mobile
+   */
+  getSynth() {
+    return typeof window !== 'undefined' ? window.speechSynthesis : null;
+  }
+
+  /**
    * Initialize the TTS service
    */
   initTts() {
-    if (!this.synth) {
+    const synth = this.getSynth();
+    if (!synth) {
       console.warn('[TTS] Speech Synthesis not available');
       return Promise.resolve();
     }
@@ -39,11 +47,12 @@ class TtsService {
    * Stop any current speech and clean up
    */
   stop() {
-    if (!this.synth) return;
+    const synth = this.getSynth();
+    if (!synth) return;
 
     // Only cancel if actually speaking to avoid interfering with the engine
-    if (this.synth.speaking || this.synth.pending) {
-      this.synth.cancel();
+    if (synth.speaking || synth.pending) {
+      synth.cancel();
     }
 
     if (this.isSpeaking) {
@@ -70,10 +79,10 @@ class TtsService {
   /**
    * Get the best voice for a locale
    */
-  pickVoiceForLocale(locale) {
-    if (!this.synth || !locale) return null;
+  pickVoiceForLocale(locale, synth) {
+    if (!synth || !locale) return null;
 
-    const voices = this.synth.getVoices();
+    const voices = synth.getVoices();
     const normalizedLocale = locale.toLowerCase().replace(/^iw(\b|[-_])/i, 'he$1');
     const langCode = normalizedLocale.split('-')[0];
 
@@ -101,28 +110,39 @@ class TtsService {
 
   /**
    * Smart speak: tries native voice, falls back to transliteration
+   * MUST be synchronous to preserve user gesture on mobile
    */
-  async speakSmart({ nativeText, nativeLocale, transliteration, mode = 'word' }) {
+  speakSmart({ nativeText, nativeLocale, transliteration, mode = 'word' }) {
     console.log('[TTS] speakSmart called:', { nativeText, nativeLocale, transliteration });
 
-    if (!this.synth) {
+    // Get a FRESH reference to speechSynthesis each time (issue #3)
+    // Like creating new Audio() object - prevents stuck state on mobile
+    const synth = this.getSynth();
+
+    if (!synth) {
       console.warn('[TTS] Speech synthesis not available');
       return;
     }
 
     // On mobile, enforce a minimum delay between utterances to let engine reset
+    // Return early if too soon (don't use await - it breaks user gesture!)
     const now = Date.now();
     const timeSinceLastSpeak = now - this.lastSpeakTime;
     const minDelay = this.isMobile() ? 300 : 100;
 
     if (timeSinceLastSpeak < minDelay) {
       const waitTime = minDelay - timeSinceLastSpeak;
-      console.log(`[TTS] Waiting ${waitTime}ms before speaking...`);
-      await new Promise(resolve => setTimeout(resolve, waitTime));
+      console.log(`[TTS] Ignoring click - too soon (wait ${waitTime}ms more)`);
+      return; // Don't wait, just ignore the click
     }
 
-    // Stop any current speech
-    this.stop();
+    // Always cancel before speaking to reset the engine (issue #1)
+    // This is like calling audio.load() - it ensures a clean slate
+    synth.cancel();
+
+    // Clear our state
+    this.isSpeaking = false;
+    this.currentUtterance = null;
 
     // Determine what to speak
     let textToSpeak = nativeText;
@@ -140,24 +160,16 @@ class TtsService {
 
     console.log('[TTS] Will speak:', textToSpeak, 'in locale:', locale);
 
-    // Get voices (they might not be loaded yet)
-    let voices = this.synth.getVoices();
+    // Get voices - if not loaded yet, use default voice
+    // We can't wait for voices without breaking the user gesture
+    const voices = synth.getVoices();
 
-    // If no voices, wait for them to load
     if (voices.length === 0) {
-      console.log('[TTS] Waiting for voices to load...');
-      await new Promise((resolve) => {
-        const timeout = setTimeout(resolve, 1000);
-        this.synth.addEventListener('voiceschanged', () => {
-          clearTimeout(timeout);
-          resolve();
-        }, { once: true });
-      });
-      voices = this.synth.getVoices();
+      console.log('[TTS] Voices not loaded yet, using default');
     }
 
     // Pick the best voice
-    const voice = this.pickVoiceForLocale(locale);
+    const voice = this.pickVoiceForLocale(locale, synth);
     console.log('[TTS] Selected voice:', voice ? `${voice.name} (${voice.lang})` : 'default');
 
     // Create a fresh utterance
@@ -218,7 +230,7 @@ class TtsService {
 
     // Speak the utterance
     console.log('[TTS] Calling synth.speak()...');
-    this.synth.speak(utterance);
+    synth.speak(utterance);
     this.lastSpeakTime = Date.now();
 
     // Safety timeout: if speaking didn't start after 2 seconds, assume it failed
@@ -235,8 +247,9 @@ class TtsService {
    * Pause current speech
    */
   pause() {
-    if (this.synth && this.isSpeaking) {
-      this.synth.pause();
+    const synth = this.getSynth();
+    if (synth && this.isSpeaking) {
+      synth.pause();
     }
   }
 
@@ -244,8 +257,9 @@ class TtsService {
    * Resume paused speech
    */
   resume() {
-    if (this.synth && this.synth.paused) {
-      this.synth.resume();
+    const synth = this.getSynth();
+    if (synth && synth.paused) {
+      synth.resume();
     }
   }
 
