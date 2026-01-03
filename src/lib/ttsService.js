@@ -101,8 +101,9 @@ class TtsService {
 
   /**
    * Smart speak: tries native voice, falls back to transliteration
+   * MUST be synchronous to preserve user gesture on mobile
    */
-  async speakSmart({ nativeText, nativeLocale, transliteration, mode = 'word' }) {
+  speakSmart({ nativeText, nativeLocale, transliteration, mode = 'word' }) {
     console.log('[TTS] speakSmart called:', { nativeText, nativeLocale, transliteration });
 
     if (!this.synth) {
@@ -111,18 +112,26 @@ class TtsService {
     }
 
     // On mobile, enforce a minimum delay between utterances to let engine reset
+    // Return early if too soon (don't use await - it breaks user gesture!)
     const now = Date.now();
     const timeSinceLastSpeak = now - this.lastSpeakTime;
     const minDelay = this.isMobile() ? 300 : 100;
 
     if (timeSinceLastSpeak < minDelay) {
       const waitTime = minDelay - timeSinceLastSpeak;
-      console.log(`[TTS] Waiting ${waitTime}ms before speaking...`);
-      await new Promise(resolve => setTimeout(resolve, waitTime));
+      console.log(`[TTS] Ignoring click - too soon (wait ${waitTime}ms more)`);
+      return; // Don't wait, just ignore the click
     }
 
-    // Stop any current speech
-    this.stop();
+    // Always cancel before speaking to reset the engine (issue #1)
+    // This is like calling audio.load() - it ensures a clean slate
+    if (this.synth) {
+      this.synth.cancel();
+    }
+
+    // Clear our state
+    this.isSpeaking = false;
+    this.currentUtterance = null;
 
     // Determine what to speak
     let textToSpeak = nativeText;
@@ -140,20 +149,12 @@ class TtsService {
 
     console.log('[TTS] Will speak:', textToSpeak, 'in locale:', locale);
 
-    // Get voices (they might not be loaded yet)
-    let voices = this.synth.getVoices();
+    // Get voices - if not loaded yet, use default voice
+    // We can't wait for voices without breaking the user gesture
+    const voices = this.synth.getVoices();
 
-    // If no voices, wait for them to load
     if (voices.length === 0) {
-      console.log('[TTS] Waiting for voices to load...');
-      await new Promise((resolve) => {
-        const timeout = setTimeout(resolve, 1000);
-        this.synth.addEventListener('voiceschanged', () => {
-          clearTimeout(timeout);
-          resolve();
-        }, { once: true });
-      });
-      voices = this.synth.getVoices();
+      console.log('[TTS] Voices not loaded yet, using default');
     }
 
     // Pick the best voice
