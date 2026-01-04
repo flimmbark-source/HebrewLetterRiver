@@ -161,8 +161,14 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
     };
   }, []);
 
-  // Filter out punctuation for word navigation
-  const words = readingText?.tokens?.filter(t => t.type === 'word') || [];
+  // Choose which tokens to render: use sentenceTokens in translation mode when available
+  const translationSentenceTokens = readingText?.sentenceTokens?.[0] || [];
+  const practiceTokens = readingText?.tokens || [];
+  const isUsingSentenceTokens = currentMode === 'translation' && translationSentenceTokens.length > 0;
+  const activeTokens = isUsingSentenceTokens ? translationSentenceTokens : practiceTokens;
+
+  // Filter out punctuation and ignore filler words without IDs for grading/navigation
+  const words = activeTokens?.filter(t => t.type === 'word' && t.id) || [];
   const currentWord = words[wordIndex];
 
   // Get translation for current word
@@ -367,7 +373,15 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
     return words.map(word => {
       const entry = translations[word.id];
       const canonical = entry?.canonical || (entry?.variants?.[0]) || word.text;
-      return normalizeForLanguage(canonical, appLanguageId);
+      const variants = entry?.variants?.length ? entry.variants : [canonical];
+      const normalizedVariants = [...new Set(variants.map(v => normalizeForLanguage(v, appLanguageId)))];
+
+      return {
+        practiceWord: word.text,
+        canonical,
+        variants,
+        normalizedVariants
+      };
     });
   }, [appLanguageId, readingText, words]);
 
@@ -376,22 +390,33 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
 
     const expectedWords = getExpectedTranslationWords();
     if (expectedWords.length === 0) return;
-    const typedWords = translationInput.trim().split(/\s+/).filter(Boolean);
 
-    const gradedResults = expectedWords.map((expected, idx) => {
-      const typed = typedWords[idx] || '';
+    const typedWordsRaw = translationInput.trim().split(/\s+/).filter(Boolean);
+    const typedWordsNormalized = typedWordsRaw.map(word => normalizeForLanguage(word, appLanguageId));
+
+    // Allow flexible word order by matching any expected word against the pool of typed words
+    const availableTyped = typedWordsNormalized.map((norm, idx) => ({
+      normalized: norm,
+      raw: typedWordsRaw[idx]
+    }));
+
+    const gradedResults = expectedWords.map(expected => {
+      const matchIndex = availableTyped.findIndex(entry => expected.normalizedVariants.includes(entry.normalized));
+      const matched = matchIndex >= 0 ? availableTyped.splice(matchIndex, 1)[0] : null;
+      const typedValue = matched?.raw || '';
+
       const result = gradeWithGhostSequence(
-        typed,
-        { canonical: expected, variants: [expected] },
+        typedValue,
+        { canonical: expected.canonical, variants: expected.variants },
         appLanguageId,
         appLanguageId
       );
 
       return {
-        practiceWord: words[idx]?.text || '',
+        practiceWord: expected.practiceWord || '',
         typedChars: result.typedChars,
         ghostSequence: result.ghostSequence,
-        gloss: expected,
+        gloss: expected.canonical,
         isCorrect: result.isCorrect
       };
     });
@@ -761,7 +786,7 @@ useEffect(() => {
                 style={{ willChange: 'transform' }}
                 dir={practiceDirection}
               >
-              {readingText.tokens.map((token, idx) => {
+              {activeTokens.map((token, idx) => {
                 if (token.type === 'punct') {
                   return (
                       <span

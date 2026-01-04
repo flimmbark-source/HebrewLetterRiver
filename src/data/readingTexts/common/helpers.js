@@ -68,13 +68,14 @@ function buildWordTranslation(appLang, wordId, canonical, custom) {
  * @param {string} [config.sectionId] - Optional section identifier
  * @returns {Object} Complete reading text object
  */
-export function createReadingText({ id, title, subtitle, practiceLanguage, tokens, meaningKeys, translations, sectionId }) {
+export function createReadingText({ id, title, subtitle, practiceLanguage, tokens, sentenceTokens, meaningKeys, translations, sectionId }) {
   return {
     id,
     title,
     subtitle,
     practiceLanguage,
     tokens,
+    sentenceTokens,
     meaningKeys,
     translations,
     sectionId

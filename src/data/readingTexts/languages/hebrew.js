@@ -20,6 +20,28 @@ export const hebrewReadingTexts = [
       { type: 'word', text: 'אמת', id: 'emet' },
       { type: 'punct', text: '.' }
     ],
+    sentenceTokens: [
+      [
+        { type: 'word', text: 'שלום', id: 'shalom' },
+        { type: 'punct', text: ',' },
+        { type: 'word', text: 'תודה', id: 'todah' },
+        { type: 'word', text: 'על' },
+        { type: 'word', text: 'התורה', id: 'torah' },
+        { type: 'word', text: 'והאמת', id: 'emet' },
+        { type: 'punct', text: ',' },
+        { type: 'word', text: 'כן', id: 'ken' },
+        { type: 'punct', text: '?' }
+      ],
+      [
+        { type: 'word', text: 'התורה', id: 'torah' },
+        { type: 'word', text: 'היא' },
+        { type: 'word', text: 'אמת', id: 'emet' },
+        { type: 'punct', text: ',' },
+        { type: 'word', text: 'שלום', id: 'shalom' },
+        { type: 'word', text: 'ותודה', id: 'todah' },
+        { type: 'punct', text: '.' }
+      ]
+    ],
     meaningKeys: {
       shalom: 'reading.meaning.shalom',
       todah: 'reading.meaning.todah',
@@ -129,6 +151,26 @@ export const hebrewReadingTexts = [
       { type: 'word', text: 'טוב', id: 'tov2' },
       { type: 'word', text: 'להתראות', id: 'lehitraot' },
       { type: 'punct', text: '.' }
+    ],
+    sentenceTokens: [
+      [
+        { type: 'word', text: 'שלום', id: 'shalom' },
+        { type: 'punct', text: ',' },
+        { type: 'word', text: 'בוקר', id: 'boker' },
+        { type: 'word', text: 'טוב', id: 'tov' },
+        { type: 'word', text: 'ולהתראות', id: 'lehitraot' },
+        { type: 'word', text: 'אחר', },
+        { type: 'word', text: 'כך', },
+        { type: 'punct', text: '.' }
+      ],
+      [
+        { type: 'word', text: 'ערב', id: 'erev' },
+        { type: 'word', text: 'טוב', id: 'tov2' },
+        { type: 'punct', text: ',' },
+        { type: 'word', text: 'שלום', id: 'shalom' },
+        { type: 'word', text: 'ולהתראות', id: 'lehitraot' },
+        { type: 'punct', text: '!' }
+      ]
     ],
     meaningKeys: {
       shalom: 'reading.meaning.shalom',
