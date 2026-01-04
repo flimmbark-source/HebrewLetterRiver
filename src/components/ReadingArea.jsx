@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, Fragment } from 'react';
+import { useState, useEffect, useRef, useCallback, Fragment, useMemo } from 'react';
 import { useLocalization } from '../context/LocalizationContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getReadingTextById } from '../data/readingTexts/index.js';
@@ -58,6 +58,16 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
   const [teachingTransliteration, setTeachingTransliteration] = useState(null);
   const [showSystemModal, setShowSystemModal] = useState(false);
   const [completedWordIds, setCompletedWordIds] = useState(new Set());
+
+  const tokens = useMemo(() => {
+    if (!readingText) return [];
+
+    if ((currentMode === 'reading' || currentMode === 'translation') && readingText.sentenceTokens?.length) {
+      return readingText.sentenceTokens;
+    }
+
+    return readingText.tokens || [];
+  }, [readingText, currentMode]);
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -162,7 +172,7 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
   }, []);
 
   // Filter out punctuation for word navigation
-  const words = readingText?.tokens?.filter(t => t.type === 'word') || [];
+  const words = tokens.filter(t => t.type === 'word');
   const currentWord = words[wordIndex];
 
   // Get translation for current word
@@ -761,7 +771,7 @@ useEffect(() => {
                 style={{ willChange: 'transform' }}
                 dir={practiceDirection}
               >
-              {readingText.tokens.map((token, idx) => {
+              {tokens.map((token, idx) => {
                 if (token.type === 'punct') {
                   return (
                       <span
@@ -1164,14 +1174,14 @@ useEffect(() => {
             languageCode="he"
             examples={(() => {
               // Generate examples from current pack for this layout
-              if (!readingText?.tokens) return [];
+              if (!tokens) return [];
 
               // Derive layout for the current teaching transliteration
               const currentLayout = deriveLayoutFromTransliteration(teachingTransliteration);
               if (!currentLayout) return [];
 
               // Find all words with matching layout
-              return readingText.tokens
+              return tokens
                 .filter(token => {
                   if (token.type !== 'word') return false;
                   const tokenTranslit = readingText.translations?.en?.[token.id]?.canonical;

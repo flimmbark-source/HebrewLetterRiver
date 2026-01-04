@@ -20,6 +20,16 @@ export const hebrewReadingTexts = [
       { type: 'word', text: 'אמת', id: 'emet' },
       { type: 'punct', text: '.' }
     ],
+    sentenceTokens: [
+      { type: 'word', text: 'שלום', id: 'shalom' },
+      { type: 'word', text: 'תודה', id: 'todah' },
+      { type: 'punct', text: '.' },
+      { type: 'word', text: 'כן', id: 'ken' },
+      { type: 'punct', text: ',' },
+      { type: 'word', text: 'תורה', id: 'torah' },
+      { type: 'word', text: 'אמת', id: 'emet' },
+      { type: 'punct', text: '.' }
+    ],
     meaningKeys: {
       shalom: 'reading.meaning.shalom',
       todah: 'reading.meaning.todah',
@@ -125,6 +135,16 @@ export const hebrewReadingTexts = [
       { type: 'word', text: 'שלום', id: 'shalom' },
       { type: 'word', text: 'בוקר', id: 'boker' },
       { type: 'word', text: 'טוב', id: 'tov' },
+      { type: 'word', text: 'ערב', id: 'erev' },
+      { type: 'word', text: 'טוב', id: 'tov2' },
+      { type: 'word', text: 'להתראות', id: 'lehitraot' },
+      { type: 'punct', text: '.' }
+    ],
+    sentenceTokens: [
+      { type: 'word', text: 'שלום', id: 'shalom' },
+      { type: 'word', text: 'בוקר', id: 'boker' },
+      { type: 'word', text: 'טוב', id: 'tov' },
+      { type: 'punct', text: ',' },
       { type: 'word', text: 'ערב', id: 'erev' },
       { type: 'word', text: 'טוב', id: 'tov2' },
       { type: 'word', text: 'להתראות', id: 'lehitraot' },

@@ -63,18 +63,20 @@ function buildWordTranslation(appLang, wordId, canonical, custom) {
  * @param {Object} config.subtitle - Subtitle translations for all languages
  * @param {string} config.practiceLanguage - Language being practiced
  * @param {Array} config.tokens - Array of word/punctuation tokens
+ * @param {Array} [config.sentenceTokens] - Optional tokens for sentence-based modes (reading/translation)
  * @param {Object} config.meaningKeys - Mapping from word ID to i18n meaning key
  * @param {Object} config.translations - Translations for all words in all app languages
  * @param {string} [config.sectionId] - Optional section identifier
  * @returns {Object} Complete reading text object
  */
-export function createReadingText({ id, title, subtitle, practiceLanguage, tokens, meaningKeys, translations, sectionId }) {
+export function createReadingText({ id, title, subtitle, practiceLanguage, tokens, sentenceTokens, meaningKeys, translations, sectionId }) {
   return {
     id,
     title,
     subtitle,
     practiceLanguage,
     tokens,
+    sentenceTokens,
     meaningKeys,
     translations,
     sectionId
