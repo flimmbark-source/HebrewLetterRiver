@@ -13,6 +13,7 @@ import { VowelLayoutIcon } from './reading/VowelLayoutIcon.jsx';
 import VowelLayoutTeachingModal from './reading/VowelLayoutTeachingModal.jsx';
 import VowelLayoutSystemModal from './reading/VowelLayoutSystemModal.jsx';
 import { isLayoutLearned, hasShownSystemIntro, setShownSystemIntro } from '../lib/vowelLayoutProgress.js';
+import { getWordEmoji } from '../lib/wordEmojiMapper.js';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -27,9 +28,10 @@ const MAX_WORD_BOX_CH = 18;
  *
  * Props:
  * - textId: ID of the reading text to display
+ * - mode: Practice mode - 'learn' (words visible) or 'practice' (words hidden with emoji)
  * - onBack: Callback when user exits reading area
  */
-export default function ReadingArea({ textId, onBack }) {
+export default function ReadingArea({ textId, mode = 'learn', onBack }) {
   const { t } = useLocalization();
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
 
@@ -51,6 +53,7 @@ export default function ReadingArea({ textId, onBack }) {
   const [gameFont, setGameFont] = useState('default');
   const [teachingTransliteration, setTeachingTransliteration] = useState(null);
   const [showSystemModal, setShowSystemModal] = useState(false);
+  const [completedWordIds, setCompletedWordIds] = useState(new Set());
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -351,6 +354,10 @@ export default function ReadingArea({ textId, onBack }) {
     // Update streak
     if (result.isCorrect) {
       setStreak(prev => prev + 1);
+      // In practice mode, mark word as completed to reveal it
+      if (mode === 'practice') {
+        setCompletedWordIds(prev => new Set([...prev, currentWord.id]));
+      }
     } else {
       setStreak(0);
     }
@@ -680,7 +687,59 @@ useEffect(() => {
 
                 const wordIdx = words.findIndex(w => w.id === token.id);
                 const isActive = wordIdx === wordIndex;
+                const isCompleted = completedWordIds.has(token.id);
 
+                // In practice mode, handle word visibility differently
+                if (mode === 'practice') {
+                  // Show emoji for active word
+                  if (isActive) {
+                    // Get emoji for current word
+                    const meaning = readingText.meaningKeys?.[token.id]
+                      ? t(readingText.meaningKeys[token.id])
+                      : '';
+                    const translation = readingText.translations?.[appLanguageId]?.[token.id]?.canonical || '';
+                    const emoji = getWordEmoji(token.id, meaning, translation);
+
+                    return (
+                      <span
+                        key={token.id || idx}
+                        className="whitespace-nowrap text-6xl leading-tight transition-opacity sm:text-7xl opacity-100"
+                        style={{ transform: 'translateY(1px)' }}
+                        data-active={isActive}
+                      >
+                        {emoji}
+                      </span>
+                    );
+                  }
+
+                  // Show completed words
+                  if (isCompleted) {
+                    return (
+                      <span
+                        key={token.id || idx}
+                        className={`${practiceFontClass} ${gameFontClass} whitespace-nowrap text-3xl leading-tight transition-opacity sm:text-4xl opacity-50`}
+                        style={{ letterSpacing: '0.4px', transform: 'translateY(1px)' }}
+                        data-active={false}
+                      >
+                        {token.text}
+                      </span>
+                    );
+                  }
+
+                  // Hide uncompleted, inactive words
+                  return (
+                    <span
+                      key={token.id || idx}
+                      className="whitespace-nowrap text-3xl leading-tight sm:text-4xl opacity-0"
+                      style={{ letterSpacing: '0.4px', transform: 'translateY(1px)' }}
+                      data-active={false}
+                    >
+                      {token.text}
+                    </span>
+                  );
+                }
+
+                // Learn mode - show all words normally
                 return (
                   <span
                     key={token.id || idx}

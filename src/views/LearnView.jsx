@@ -9,6 +9,7 @@ import { getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib
 import { getFontClass } from '../lib/readingUtils';
 import PackVowelLayoutsIntroModal from '../components/reading/PackVowelLayoutsIntroModal.jsx';
 import VowelLayoutSystemModal from '../components/reading/VowelLayoutSystemModal.jsx';
+import ModeSelectModal from '../components/reading/ModeSelectModal.jsx';
 import { hasShownPackIntro, getLearnedLayouts } from '../lib/vowelLayoutProgress.js';
 import { deriveLayoutFromTransliteration } from '../lib/vowelLayoutDerivation.js';
 
@@ -17,6 +18,8 @@ export default function LearnView() {
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
   const { startTutorial, hasCompletedTutorial, currentTutorial } = useTutorial();
   const [selectedTextId, setSelectedTextId] = useState(null);
+  const [selectedMode, setSelectedMode] = useState(null);
+  const [pendingTextId, setPendingTextId] = useState(null);
   const [dictionarySectionId, setDictionarySectionId] = useState(null);
   const [packIntroTextId, setPackIntroTextId] = useState(null);
   const [showSystemModal, setShowSystemModal] = useState(false);
@@ -31,11 +34,21 @@ export default function LearnView() {
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
 
-  // Handle pack selection - go straight to practice
-  // Note: Pack-specific vowel layout intro modal disabled in favor of global system modal in ReadingArea
+  // Handle pack selection - show mode select modal
   const handlePackSelect = (textId) => {
-    // Go straight to practice (no pack intro modal)
-    setSelectedTextId(textId);
+    setPendingTextId(textId);
+  };
+
+  // Handle mode selection from modal
+  const handleModeSelect = (mode) => {
+    setSelectedMode(mode);
+    setSelectedTextId(pendingTextId);
+    setPendingTextId(null);
+  };
+
+  // Handle closing mode select modal
+  const handleModeSelectClose = () => {
+    setPendingTextId(null);
   };
 
   // Handle starting practice from intro modal
@@ -125,12 +138,18 @@ export default function LearnView() {
     }
   };
 
-  // If a text is selected, show the reading area
+  // If a text is selected, show the reading area with the selected mode
   if (selectedTextId) {
+    const handleBack = () => {
+      setSelectedTextId(null);
+      setSelectedMode(null);
+    };
+
     return (
       <ReadingArea
         textId={selectedTextId}
-        onBack={() => setSelectedTextId(null)}
+        mode={selectedMode}
+        onBack={handleBack}
       />
     );
   }
@@ -285,6 +304,14 @@ export default function LearnView() {
       <VowelLayoutSystemModal
         isVisible={showSystemModal}
         onClose={() => setShowSystemModal(false)}
+        appFontClass={getFontClass(appLanguageId)}
+      />
+
+      {/* Mode Select Modal */}
+      <ModeSelectModal
+        isVisible={pendingTextId !== null}
+        onSelectMode={handleModeSelect}
+        onClose={handleModeSelectClose}
         appFontClass={getFontClass(appLanguageId)}
       />
     </div>
