@@ -9,7 +9,6 @@ import { getLocalizedTitle, getLocalizedSubtitle, getLanguageCode } from '../lib
 import { getFontClass } from '../lib/readingUtils';
 import PackVowelLayoutsIntroModal from '../components/reading/PackVowelLayoutsIntroModal.jsx';
 import VowelLayoutSystemModal from '../components/reading/VowelLayoutSystemModal.jsx';
-import ModeSelectModal from '../components/reading/ModeSelectModal.jsx';
 import { hasShownPackIntro, getLearnedLayouts } from '../lib/vowelLayoutProgress.js';
 import { deriveLayoutFromTransliteration } from '../lib/vowelLayoutDerivation.js';
 
@@ -18,8 +17,7 @@ export default function LearnView() {
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
   const { startTutorial, hasCompletedTutorial, currentTutorial } = useTutorial();
   const [selectedTextId, setSelectedTextId] = useState(null);
-  const [selectedMode, setSelectedMode] = useState(null);
-  const [pendingTextId, setPendingTextId] = useState(null);
+  const [selectedMode, setSelectedMode] = useState('learn'); // Default to 'learn' mode
   const [dictionarySectionId, setDictionarySectionId] = useState(null);
   const [packIntroTextId, setPackIntroTextId] = useState(null);
   const [showSystemModal, setShowSystemModal] = useState(false);
@@ -34,21 +32,9 @@ export default function LearnView() {
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
 
-  // Handle pack selection - show mode select modal
+  // Handle pack selection - go directly to reading area with current mode
   const handlePackSelect = (textId) => {
-    setPendingTextId(textId);
-  };
-
-  // Handle mode selection from modal
-  const handleModeSelect = (mode) => {
-    setSelectedMode(mode);
-    setSelectedTextId(pendingTextId);
-    setPendingTextId(null);
-  };
-
-  // Handle closing mode select modal
-  const handleModeSelectClose = () => {
-    setPendingTextId(null);
+    setSelectedTextId(textId);
   };
 
   // Handle starting practice from intro modal
@@ -167,17 +153,43 @@ export default function LearnView() {
   return (
     <div className="space-y-6">
       <header className="space-y-2 px-1">
-        <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-semibold" style={{ color: '#1F2937' }}>{t('read.title')}</h2>
-          {practiceLanguageId === 'hebrew' && (
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-semibold" style={{ color: '#1F2937' }}>{t('read.title')}</h2>
+            {practiceLanguageId === 'hebrew' && (
+              <button
+                onClick={() => setShowSystemModal(true)}
+                className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full border border-slate-400 bg-slate-100 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200 hover:border-slate-500 hover:text-slate-800"
+                title="Learn about vowel patterns"
+              >
+                ?
+              </button>
+            )}
+          </div>
+
+          {/* Mode Toggle Switch */}
+          <div className="flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 p-1">
             <button
-              onClick={() => setShowSystemModal(true)}
-              className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full border border-slate-400 bg-slate-100 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200 hover:border-slate-500 hover:text-slate-800"
-              title="Learn about vowel patterns"
+              onClick={() => setSelectedMode('learn')}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                selectedMode === 'learn'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-800'
+              }`}
             >
-              ?
+              📚 Learn Vocab
             </button>
-          )}
+            <button
+              onClick={() => setSelectedMode('practice')}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                selectedMode === 'practice'
+                  ? 'bg-purple-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-800'
+              }`}
+            >
+              🎯 Vocab Practice
+            </button>
+          </div>
         </div>
         <p className="text-sm" style={{ color: '#6B7280' }}>{t('read.intro')}</p>
       </header>
@@ -304,14 +316,6 @@ export default function LearnView() {
       <VowelLayoutSystemModal
         isVisible={showSystemModal}
         onClose={() => setShowSystemModal(false)}
-        appFontClass={getFontClass(appLanguageId)}
-      />
-
-      {/* Mode Select Modal */}
-      <ModeSelectModal
-        isVisible={pendingTextId !== null}
-        onSelectMode={handleModeSelect}
-        onClose={handleModeSelectClose}
         appFontClass={getFontClass(appLanguageId)}
       />
     </div>
