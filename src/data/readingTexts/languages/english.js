@@ -19,6 +19,18 @@ export const englishReadingTexts = [
       { type: 'word', text: 'good', id: 'good' },
       { type: 'punct', text: '.' }
     ],
+    sentenceTokens: [
+      { type: 'word', text: 'hello', id: 'hello' },
+      { type: 'punct', text: ',' },
+      { type: 'word', text: 'yes', id: 'yes' },
+      { type: 'punct', text: ',' },
+      { type: 'word', text: 'good', id: 'good' },
+      { type: 'punct', text: '.' },
+      { type: 'word', text: 'no', id: 'no' },
+      { type: 'punct', text: ',' },
+      { type: 'word', text: 'thanks', id: 'thanks' },
+      { type: 'punct', text: '.' }
+    ],
     meaningKeys: {
       hello: 'reading.meaning.hello',
       thanks: 'reading.meaning.todah',
