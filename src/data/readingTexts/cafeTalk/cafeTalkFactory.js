@@ -830,35 +830,99 @@ export function buildAllCafeTalkTexts(practiceLanguage, practiceLexicon, i18nLex
       }
     },
 
-    // Vowel Layout Practice section
-    vowelLayoutBootcamp: {
+    // Vowel Layout Practice section - Phase 1
+    vowelLayoutPhase1: {
       titles: {
-        en: 'Vowel Layout Bootcamp',
-        es: 'Bootcamp de Patrones Vocálicos',
-        fr: 'Bootcamp des Modèles de Voyelles',
-        ar: 'معسكر تدريب أنماط حروف العلة',
-        pt: 'Bootcamp de Padrões Vocálicos',
-        ru: 'Тренировка гласных паттернов',
-        ja: '母音パターンブートキャンプ',
-        zh: '元音模式训练营',
-        hi: 'स्वर पैटर्न प्रशिक्षण शिविर',
-        bn: 'স্বরবর্ণ প্যাটার্ন বুটক্যাম্প',
-        am: 'የድምፀ ቃላት ስርዓት ስልጠና',
-        he: 'מחנה אימון תבניות תנועות'
+        en: 'Phase 1: Single Syllables',
+        es: 'Fase 1: Sílabas Simples',
+        fr: 'Phase 1 : Syllabes Simples',
+        ar: 'المرحلة 1: مقاطع مفردة',
+        pt: 'Fase 1: Sílabas Simples',
+        ru: 'Фаза 1: Односложные',
+        ja: 'フェーズ1：単音節',
+        zh: '第1阶段：单音节',
+        hi: 'चरण 1: एकल अक्षर',
+        bn: 'পর্যায় 1: একক সিলেবল',
+        am: 'ደረጃ 1: ነጠላ ድምፀ ቃላት',
+        he: 'שלב 1: הברות בודדות'
       },
       subtitles: {
-        en: 'Practice 3 vowel patterns with repetition',
-        es: 'Practica 3 patrones vocálicos con repetición',
-        fr: 'Pratiquez 3 modèles de voyelles avec répétition',
-        ar: 'تدرب على 3 أنماط من حروف العلة بالتكرار',
-        pt: 'Pratique 3 padrões vocálicos com repetição',
-        ru: 'Практикуйте 3 паттерна гласных с повторением',
-        ja: '3つの母音パターンを繰り返し練習',
-        zh: '重复练习3种元音模式',
-        hi: '3 स्वर पैटर्न को दोहराव के साथ अभ्यास करें',
-        bn: 'পুনরাবৃত্তি সহ 3টি স্বর প্যাটার্ন অনুশীলন করুন',
-        am: '3 የድምፀ ቃላት ስርዓቶችን በድግግሞሽ ይለማመዱ',
-        he: 'תרגל 3 תבניות תנועות עם חזרות'
+        en: 'Master the A sound (VL_1_A)',
+        es: 'Domina el sonido A (VL_1_A)',
+        fr: 'Maîtrisez le son A (VL_1_A)',
+        ar: 'أتقن صوت A (VL_1_A)',
+        pt: 'Domine o som A (VL_1_A)',
+        ru: 'Освойте звук A (VL_1_A)',
+        ja: 'A音をマスター (VL_1_A)',
+        zh: '掌握A音 (VL_1_A)',
+        hi: 'A ध्वनि में महारत हासिल करें (VL_1_A)',
+        bn: 'A শব্দে দক্ষতা অর্জন করুন (VL_1_A)',
+        am: 'የ A ድምፅን ይለማመዱ (VL_1_A)',
+        he: 'שלוט בצליל A (VL_1_A)'
+      }
+    },
+
+    // Vowel Layout Practice section - Phase 2
+    vowelLayoutPhase2: {
+      titles: {
+        en: 'Phase 2: Double A Pattern',
+        es: 'Fase 2: Patrón A Doble',
+        fr: 'Phase 2 : Modèle A Double',
+        ar: 'المرحلة 2: نمط A المزدوج',
+        pt: 'Fase 2: Padrão A Duplo',
+        ru: 'Фаза 2: Двойной паттерн A',
+        ja: 'フェーズ2：ダブルAパターン',
+        zh: '第2阶段：双A模式',
+        hi: 'चरण 2: दोहरा A पैटर्न',
+        bn: 'পর্যায় 2: ডবল A প্যাটার্ন',
+        am: 'ደረጃ 2: ድርብ A ስርዓት',
+        he: 'שלב 2: תבנית A כפולה'
+      },
+      subtitles: {
+        en: 'Practice A-A rhythm (VL_2_A-A)',
+        es: 'Practica el ritmo A-A (VL_2_A-A)',
+        fr: 'Pratiquez le rythme A-A (VL_2_A-A)',
+        ar: 'تدرب على إيقاع A-A (VL_2_A-A)',
+        pt: 'Pratique o ritmo A-A (VL_2_A-A)',
+        ru: 'Практикуйте ритм A-A (VL_2_A-A)',
+        ja: 'A-Aリズムを練習 (VL_2_A-A)',
+        zh: '练习A-A节奏 (VL_2_A-A)',
+        hi: 'A-A लय का अभ्यास करें (VL_2_A-A)',
+        bn: 'A-A ছন্দ অনুশীলন করুন (VL_2_A-A)',
+        am: 'A-A ምት ይለማመዱ (VL_2_A-A)',
+        he: 'תרגל קצב A-A (VL_2_A-A)'
+      }
+    },
+
+    // Vowel Layout Practice section - Phase 3
+    vowelLayoutPhase3: {
+      titles: {
+        en: 'Phase 3: I-O Combination',
+        es: 'Fase 3: Combinación I-O',
+        fr: 'Phase 3 : Combinaison I-O',
+        ar: 'المرحلة 3: تركيبة I-O',
+        pt: 'Fase 3: Combinação I-O',
+        ru: 'Фаза 3: Комбинация I-O',
+        ja: 'フェーズ3：I-O組み合わせ',
+        zh: '第3阶段：I-O组合',
+        hi: 'चरण 3: I-O संयोजन',
+        bn: 'পর্যায় 3: I-O সমন্বয়',
+        am: 'ደረጃ 3: I-O ጥምረት',
+        he: 'שלב 3: שילוב I-O'
+      },
+      subtitles: {
+        en: 'Learn the I-O pattern (VL_2_I-O)',
+        es: 'Aprende el patrón I-O (VL_2_I-O)',
+        fr: 'Apprenez le modèle I-O (VL_2_I-O)',
+        ar: 'تعلم نمط I-O (VL_2_I-O)',
+        pt: 'Aprenda o padrão I-O (VL_2_I-O)',
+        ru: 'Изучите паттерн I-O (VL_2_I-O)',
+        ja: 'I-Oパターンを学ぶ (VL_2_I-O)',
+        zh: '学习I-O模式 (VL_2_I-O)',
+        hi: 'I-O पैटर्न सीखें (VL_2_I-O)',
+        bn: 'I-O প্যাটার্ন শিখুন (VL_2_I-O)',
+        am: 'I-O ስርዓትን ይማሩ (VL_2_I-O)',
+        he: 'למד את תבנית I-O (VL_2_I-O)'
       }
     }
   };

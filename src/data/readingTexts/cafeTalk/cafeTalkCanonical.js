@@ -181,16 +181,26 @@ export const CAFE_TALK_WORDS = [
  * Organized into 8 sections (replacing the single "Cafe Talk" section)
  */
 export const CAFE_TALK_CATEGORIES = {
-  // Vowel Layout Practice Section - Test card with 3 layouts (18 words)
-  // Words are interleaved across layouts for mixed practice
-  vowelLayoutBootcamp: {
-    id: 'vowelLayoutBootcamp',
+  // Vowel Layout Practice Section - Split into 3 phases (18 words total)
+  // Phase 1: Single syllable A sound (VL_1_A) - 6 words
+  vowelLayoutPhase1: {
+    id: 'vowelLayoutPhase1',
     sectionId: 'vowelLayoutPractice',
-    wordIds: [
-      'however', 'so', 'but', 'instead', 'also', 'now',
-      'see', 'too', 'tomorrow', 'ask', 'just', 'you',
-      'want', 'already', 'person', 'hate', 'then', 'language'
-    ]
+    wordIds: ['so', 'also', 'too', 'just', 'already', 'then']
+  },
+
+  // Phase 2: Two syllable A-A pattern (VL_2_A-A) - 6 words
+  vowelLayoutPhase2: {
+    id: 'vowelLayoutPhase2',
+    sectionId: 'vowelLayoutPractice',
+    wordIds: ['but', 'now', 'tomorrow', 'you', 'person', 'language']
+  },
+
+  // Phase 3: Two syllable I-O pattern (VL_2_I-O) - 6 words
+  vowelLayoutPhase3: {
+    id: 'vowelLayoutPhase3',
+    sectionId: 'vowelLayoutPractice',
+    wordIds: ['however', 'instead', 'see', 'ask', 'want', 'hate']
   },
 
   // Conversation Glue Section - 25 words split into 4 chunks
