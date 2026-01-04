@@ -128,7 +128,6 @@ export default function LearnView() {
   if (selectedTextId) {
     const handleBack = () => {
       setSelectedTextId(null);
-      setSelectedMode(null);
     };
 
     return (
@@ -167,28 +166,34 @@ export default function LearnView() {
             )}
           </div>
 
-          {/* Mode Toggle Switch */}
-          <div className="flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 p-1">
-            <button
-              onClick={() => setSelectedMode('learn')}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                selectedMode === 'learn'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-800'
-              }`}
-            >
-              📚 Learn Vocab
-            </button>
-            <button
-              onClick={() => setSelectedMode('practice')}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                selectedMode === 'practice'
-                  ? 'bg-purple-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-800'
-              }`}
-            >
-              🎯 Vocab Practice
-            </button>
+          {/* Mode Toggle Buttons with status */}
+          <div className="flex items-center gap-3 rounded-full border border-slate-300 bg-slate-50 px-2 py-1">
+            {[
+              { id: 'learn', label: '📚 Learn', colorClass: 'bg-blue-600' },
+              { id: 'practice', label: '🎯 Practice', colorClass: 'bg-purple-600' },
+              { id: 'reading', label: '📖 Reading', colorClass: 'bg-emerald-600' },
+              { id: 'translation', label: '🌐 Translation', colorClass: 'bg-amber-500' }
+            ].map(mode => {
+              const isActive = selectedMode === mode.id;
+              const activeClass = isActive
+                ? `${mode.colorClass} text-white shadow-sm`
+                : 'bg-white text-slate-700 hover:bg-slate-100';
+
+              return (
+                <button
+                  key={mode.id}
+                  onClick={() => setSelectedMode(mode.id)}
+                  className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${activeClass}`}
+                >
+                  {mode.label}
+                </button>
+              );
+            })}
+
+            <div className="flex items-center gap-1 rounded-md bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">
+              <span className="text-slate-500">Mode:</span>
+              <span>{selectedMode ? selectedMode.charAt(0).toUpperCase() + selectedMode.slice(1) : '—'}</span>
+            </div>
           </div>
         </div>
         <p className="text-sm" style={{ color: '#6B7280' }}>{t('read.intro')}</p>

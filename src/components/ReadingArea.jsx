@@ -28,7 +28,8 @@ const MAX_WORD_BOX_CH = 18;
  *
  * Props:
  * - textId: ID of the reading text to display
- * - mode: Practice mode - 'learn' (words visible) or 'practice' (words hidden with emoji)
+ * - mode: Practice mode - 'learn' (words visible), 'practice' (words hidden with emoji),
+ *   'reading' (sentence typing before translation), or 'translation' (full sentence translation)
  * - onBack: Callback when user exits reading area
  */
 export default function ReadingArea({ textId, mode = 'learn', onBack }) {
@@ -42,6 +43,7 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
   const [viewportWidth, setViewportWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1024
   );
+  const [currentMode, setCurrentMode] = useState(mode || 'learn');
   const [wordIndex, setWordIndex] = useState(0);
   const [typedWord, setTypedWord] = useState('');
   const [committedWords, setCommittedWords] = useState([]);
@@ -50,6 +52,8 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
   const [showAnswer, setShowAnswer] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [completedResults, setCompletedResults] = useState([]);
+  const [translationResults, setTranslationResults] = useState([]);
+  const [translationInput, setTranslationInput] = useState('');
   const [gameFont, setGameFont] = useState('default');
   const [teachingTransliteration, setTeachingTransliteration] = useState(null);
   const [showSystemModal, setShowSystemModal] = useState(false);
@@ -62,6 +66,7 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
   const typedViewportRef = useRef(null);
   const ghostTrackRef = useRef(null);
   const inputRef = useRef(null);
+  const translationInputRef = useRef(null);
 
   // Get practice and app language directions
   const practiceDirection = getTextDirection(practiceLanguageId);
@@ -127,6 +132,12 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    if (currentMode === 'translation' && translationInputRef.current) {
+      translationInputRef.current.focus();
+    }
+  }, [currentMode]);
 
   // Resume TTS engine when page becomes visible (Issue #7)
   // Mobile browsers suspend audio contexts when page is backgrounded
@@ -327,6 +338,69 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
     } catch {}
   }, []);
 
+  const startTranslationPhase = useCallback(() => {
+    setCurrentMode('translation');
+    setTranslationInput('');
+    setTranslationResults([]);
+    setShowResults(false);
+    setTypedWord('');
+    setCommittedWords([]);
+    setCompletedResults([]);
+    setWordIndex(0);
+    setCompletedWordIds(new Set());
+    setShowAnswer(false);
+    setIsGrading(false);
+
+    setTimeout(() => {
+      if (translationInputRef.current) {
+        translationInputRef.current.focus();
+      }
+    }, 50);
+  }, []);
+
+  const getExpectedTranslationWords = useCallback(() => {
+    if (!readingText) return [];
+    const translationsForAppLanguage = readingText.translations?.[appLanguageId];
+    const translationsForLocale = readingText.translations?.[TRANSLATION_KEY_MAP[appLanguageId]];
+    const translations = translationsForAppLanguage || translationsForLocale || readingText.translations?.en || {};
+
+    return words.map(word => {
+      const entry = translations[word.id];
+      const canonical = entry?.canonical || (entry?.variants?.[0]) || word.text;
+      return normalizeForLanguage(canonical, appLanguageId);
+    });
+  }, [appLanguageId, readingText, words]);
+
+  const handleTranslationSubmit = useCallback(() => {
+    if (!readingText) return;
+
+    const expectedWords = getExpectedTranslationWords();
+    if (expectedWords.length === 0) return;
+    const typedWords = translationInput.trim().split(/\s+/).filter(Boolean);
+
+    const gradedResults = expectedWords.map((expected, idx) => {
+      const typed = typedWords[idx] || '';
+      const result = gradeWithGhostSequence(
+        typed,
+        { canonical: expected, variants: [expected] },
+        appLanguageId,
+        appLanguageId
+      );
+
+      return {
+        practiceWord: words[idx]?.text || '',
+        typedChars: result.typedChars,
+        ghostSequence: result.ghostSequence,
+        gloss: expected,
+        isCorrect: result.isCorrect
+      };
+    });
+
+    setCompletedResults(gradedResults);
+    setTranslationResults(gradedResults);
+    setShowResults(true);
+  }, [appLanguageId, getExpectedTranslationWords, readingText, translationInput, words]);
+
   // Grade and commit the current word (defined first so other callbacks can reference it)
   const gradeAndCommit = useCallback(() => {
     console.log('[DEBUG] gradeAndCommit called, isGrading:', isGrading, 'currentWord:', currentWord);
@@ -355,7 +429,7 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
     if (result.isCorrect) {
       setStreak(prev => prev + 1);
       // In practice mode, mark word as completed to reveal it
-      if (mode === 'practice') {
+      if (currentMode === 'practice') {
         setCompletedWordIds(prev => new Set([...prev, currentWord.id]));
       }
     } else {
@@ -409,9 +483,12 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
     // Advance to next word immediately (before ghost animation)
     const nextIndex = wordIndex + 1;
     if (nextIndex >= words.length) {
-      // Show results screen instead of looping
       setTimeout(() => {
-        setShowResults(true);
+        if (currentMode === 'reading') {
+          startTranslationPhase();
+        } else {
+          setShowResults(true);
+        }
       }, revealDuration + 200);
     } else {
       setWordIndex(nextIndex);
@@ -421,11 +498,11 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
       // Don't need to refocus - input should stay focused (just changes from readOnly to editable)
     }, revealDuration);
 
-  }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId]);
+  }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId, currentMode, startTranslationPhase]);
 
   // Handle input change (for mobile typing)
   const handleInputChange = useCallback((e) => {
-    if (isGrading) return;
+    if (isGrading || currentMode === 'translation') return;
 
     const v = e.target.value;
     setTypedWord(v);
@@ -439,23 +516,25 @@ export default function ReadingArea({ textId, mode = 'learn', onBack }) {
         el.setSelectionRange(len, len);
       } catch {}
     });
-  }, [isGrading]);
+  }, [isGrading, currentMode]);
 
   // Focus input on mount and when grading ends
   useEffect(() => {
+    if (currentMode === 'translation') return;
     if (!isGrading && inputRef.current) {
       // Small delay to ensure DOM is ready
       setTimeout(() => {
         focusHiddenInput();
       }, 100);
     }
-  }, [isGrading, focusHiddenInput]);
+  }, [isGrading, focusHiddenInput, currentMode]);
 
   // Re-apply scroll-preventing focus whenever the active word changes
 useEffect(() => {
+  if (currentMode === 'translation') return;
   if (showResults) return;
   if (!isGrading) requestAnimationFrame(focusHiddenInput);
-}, [wordIndex, isGrading, showResults, focusHiddenInput]);
+}, [wordIndex, isGrading, showResults, focusHiddenInput, currentMode]);
 
   // Shared keyboard handler for both focused input and document listener (desktop)
   const processKeyDown = useCallback((e) => {
@@ -490,7 +569,7 @@ useEffect(() => {
       console.log('[ReadingArea] Key pressed:', key, 'Length:', key.length, 'CharCode:', key.charCodeAt(0));
       setTypedWord(prev => prev + key);
     }
-  }, [isGrading, typedWord, appLanguageId, gradeAndCommit]);
+  }, [isGrading, typedWord, appLanguageId, gradeAndCommit, currentMode]);
 
   // Handle keyboard input (for desktop)
   const handleKeyDown = useCallback((e) => {
@@ -506,6 +585,14 @@ useEffect(() => {
 
   // Handle Try Again from results screen
   const handleTryAgain = useCallback(() => {
+    if (currentMode === 'translation') {
+      setShowResults(false);
+      setCompletedResults([]);
+      setTranslationResults([]);
+      setTranslationInput('');
+      setTimeout(() => translationInputRef.current?.focus(), 50);
+      return;
+    }
     setShowResults(false);
     setCompletedResults([]);
     setWordIndex(0);
@@ -518,7 +605,7 @@ useEffect(() => {
       centerPracticeTrack(true);
       centerOutputTrack(true);
     }, 50);
-  }, [centerPracticeTrack, centerOutputTrack]);
+  }, [centerPracticeTrack, centerOutputTrack, currentMode, translationInputRef]);
 
   // Handle Back from results screen
   const handleResultsBack = useCallback(() => {
@@ -606,64 +693,66 @@ useEffect(() => {
               style={{ minHeight: '72px' }}
             >
               {/* Controls row - transparent, positioned above reading word */}
-              <div className="w-full grid grid-cols-3 items-center gap-3 px-2">
-                {/* Left: Vowel Layout Icon (Hebrew only) */}
-                <div className="flex justify-start">
-                  {practiceLanguageId === 'hebrew' && currentWord && (() => {
-                    // Derive layout from current word's transliteration
-                    const transliteration = getTransliteration();
-                    const layoutInfo = deriveLayoutFromTransliteration(transliteration);
+              {currentMode !== 'translation' && (
+                <div className="w-full grid grid-cols-3 items-center gap-3 px-2">
+                  {/* Left: Vowel Layout Icon (Hebrew only) */}
+                  <div className="flex justify-start">
+                    {practiceLanguageId === 'hebrew' && currentWord && (() => {
+                      // Derive layout from current word's transliteration
+                      const transliteration = getTransliteration();
+                      const layoutInfo = deriveLayoutFromTransliteration(transliteration);
 
-                    if (!layoutInfo) return null;
+                      if (!layoutInfo) return null;
 
-                    // Check if learned
-                    const isLearned = isLayoutLearned('he', layoutInfo.id);
+                      // Check if learned
+                      const isLearned = isLayoutLearned('he', layoutInfo.id);
 
-                    return (
-                      <VowelLayoutIcon
-                        transliteration={transliteration}
-                        size={40}
-                        showNewDot={!isLearned}
-                        onClick={() => setTeachingTransliteration(transliteration)}
-                        accessibilityLabel="Vowel layout hint"
-                        className="cursor-pointer transition-all hover:scale-110 pointer-events-auto"
-                      />
-                    );
-                  })()}
-                </div>
-
-                {/* Center: Meaning */}
-                <div className="flex items-center justify-center pointer-events-none">
-                  <span className={`${appFontClass} text-base font-medium text-white/90 whitespace-nowrap`}>
-                    {(() => {
-                      if (!readingText || !currentWord) return '—';
-
-                      // Primary: Use meaningKeys with i18n translation for proper localization
-                      if (readingText.meaningKeys?.[currentWord.id]) {
-                        return t(readingText.meaningKeys[currentWord.id]);
-                      }
-
-                      // Fallback: Use glosses for semantic meaning display
-                      const langCode = getLanguageCode(appLanguageId);
-                      const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
-                                 ?? readingText.glosses?.en?.[currentWord.id];
-
-                      return gloss ?? '—';
+                      return (
+                        <VowelLayoutIcon
+                          transliteration={transliteration}
+                          size={40}
+                          showNewDot={!isLearned}
+                          onClick={() => setTeachingTransliteration(transliteration)}
+                          accessibilityLabel="Vowel layout hint"
+                          className="cursor-pointer transition-all hover:scale-110 pointer-events-auto"
+                        />
+                      );
                     })()}
-                  </span>
-                </div>
+                  </div>
 
-                {/* Right: TTS Speak Button */}
-                <div className="flex justify-end pointer-events-auto">
-                  <SpeakButton
-                    nativeText={currentWord?.text || ''}
-                    nativeLocale={getLocaleForTts(practiceLanguageId)}
-                    transliteration={getTransliteration()}
-                    variant="icon"
-                    disabled={!currentWord}
-                  />
+                  {/* Center: Meaning */}
+                  <div className="flex items-center justify-center pointer-events-none">
+                    <span className={`${appFontClass} text-base font-medium text-white/90 whitespace-nowrap`}>
+                      {(() => {
+                        if (!readingText || !currentWord) return '—';
+
+                        // Primary: Use meaningKeys with i18n translation for proper localization
+                        if (readingText.meaningKeys?.[currentWord.id]) {
+                          return t(readingText.meaningKeys[currentWord.id]);
+                        }
+
+                        // Fallback: Use glosses for semantic meaning display
+                        const langCode = getLanguageCode(appLanguageId);
+                        const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
+                                   ?? readingText.glosses?.en?.[currentWord.id];
+
+                        return gloss ?? '—';
+                      })()}
+                    </span>
+                  </div>
+
+                  {/* Right: TTS Speak Button */}
+                  <div className="flex justify-end pointer-events-auto">
+                    <SpeakButton
+                      nativeText={currentWord?.text || ''}
+                      nativeLocale={getLocaleForTts(practiceLanguageId)}
+                      transliteration={getTransliteration()}
+                      variant="icon"
+                      disabled={!currentWord}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
               {/* Reading words track */}
               <div className="relative flex w-full min-w-0 items-center overflow-hidden">
               <div
@@ -686,11 +775,11 @@ useEffect(() => {
                 }
 
                 const wordIdx = words.findIndex(w => w.id === token.id);
-                const isActive = wordIdx === wordIndex;
+                const isActive = currentMode === 'translation' ? false : wordIdx === wordIndex;
                 const isCompleted = completedWordIds.has(token.id);
 
                 // In practice mode, handle word visibility differently
-                if (mode === 'practice') {
+                if (currentMode === 'practice') {
                   // Show emoji for active word
                   if (isActive) {
                     // Get emoji for current word
@@ -759,143 +848,185 @@ useEffect(() => {
         </div>
 
         {/* Output Track */}
-          <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
-          <div className="p-3 sm:p-4">
-            <div
-              ref={typedViewportRef}
-              className="w-full min-w-0 overflow-hidden"
-            >
-              {/* Typed Row */}
-              <div className="flex min-w-0 items-end whitespace-nowrap" dir={appDirection}>
-                <div
-                  ref={typedTrackRef}
-                  className="inline-flex items-end transition-transform duration-[260ms] ease-out"
-                  style={{ willChange: 'transform' }}
-                >
-                  {committedWords.map((word, idx) => (
-                    <Fragment key={`typed-frag-${idx}`}>
-                      {word.type === 'gap' ? (
-                        <span
-                          className="inline-block"
-                          style={{ width: `${word.width}ch` }}
-                        >
-                          {' '}
-                        </span>
-                      ) : (
-                        <WordBox
-                          chars={word.typed}
-                          width={word.width}
-                          fontClass={appFontClass}
-                          direction={appDirection}
-                        />
-                      )}
-                      {idx < committedWords.length - 1 && <WordGap />}
-                    </Fragment>
-                  ))}
-                  {committedWords.length > 0 && <WordGap width={WORD_GAP_WITH_PADDING_CH} />}
-                  {/* Active typing box */}
-                  <ActiveWordBox
-                    chars={activeChars}
-                    fontClass={appFontClass}
-                    showCaret={!isGrading}
-                    width={activeWordWidth}
-                    direction={appDirection}
-                  />
-                </div>
+        {currentMode === 'translation' ? (
+          <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-amber-600/70 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
+            <div className="space-y-4 p-4">
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-semibold text-amber-200">Translate this sentence</p>
+                <p className="text-xs text-slate-300">Type the full sentence in {getLanguageCode(appLanguageId).toUpperCase()} and press Enter.</p>
               </div>
-
-              {/* Ghost Row */}
-              <div className="mt-1 flex items-end whitespace-nowrap" dir={appDirection}>
-                <div
-                  ref={ghostTrackRef}
-                  className="inline-flex items-end transition-transform duration-[260ms] ease-out"
-                  style={{ willChange: 'transform' }}
+              <textarea
+                ref={translationInputRef}
+                value={translationInput}
+                onChange={e => setTranslationInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleTranslationSubmit();
+                  }
+                }}
+                rows={3}
+                className={`${appFontClass} w-full rounded-xl border border-amber-700/70 bg-slate-900/70 p-3 text-base text-white shadow-inner outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/40`}
+                placeholder="Enter your translation here"
+              />
+              {translationResults.length > 0 && (
+                <div className="rounded-xl border border-amber-800/50 bg-slate-900/70 p-3 text-sm text-slate-100">
+                  <p className="font-semibold">Translation check</p>
+                  <p className="text-amber-200">Correct words: {translationResults.filter(r => r.isCorrect).length}/{translationResults.length}</p>
+                </div>
+              )}
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={handleTranslationSubmit}
+                  className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-900 shadow transition hover:bg-amber-400"
                 >
-                  {committedWords.map((word, idx) => (
-                    <Fragment key={`ghost-frag-${idx}`}>
-                      {word.type === 'gap' ? (
-                        <span
-                          className="inline-block"
-                          style={{ width: `${word.width}ch` }}
-                        >
+                  Submit Translation
+                </button>
+                <span className="text-xs text-slate-300">Press Shift+Enter for a new line.</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
+              <div className="p-3 sm:p-4">
+                <div
+                  ref={typedViewportRef}
+                  className="w-full min-w-0 overflow-hidden"
+                >
+                  {/* Typed Row */}
+                  <div className="flex min-w-0 items-end whitespace-nowrap" dir={appDirection}>
+                    <div
+                      ref={typedTrackRef}
+                      className="inline-flex items-end transition-transform duration-[260ms] ease-out"
+                      style={{ willChange: 'transform' }}
+                    >
+                      {committedWords.map((word, idx) => (
+                        <Fragment key={`typed-frag-${idx}`}>
+                          {word.type === 'gap' ? (
+                            <span
+                              className="inline-block"
+                              style={{ width: `${word.width}ch` }}
+                            >
+                              {' '}
+                            </span>
+                          ) : (
+                            <WordBox
+                              chars={word.typed}
+                              width={word.width}
+                              fontClass={appFontClass}
+                              direction={appDirection}
+                            />
+                          )}
+                          {idx < committedWords.length - 1 && <WordGap />}
+                        </Fragment>
+                      ))}
+                      {committedWords.length > 0 && <WordGap width={WORD_GAP_WITH_PADDING_CH} />}
+                      {/* Active typing box */}
+                      <ActiveWordBox
+                        chars={activeChars}
+                        fontClass={appFontClass}
+                        showCaret={!isGrading}
+                        width={activeWordWidth}
+                        direction={appDirection}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Ghost Row */}
+                  <div className="mt-1 flex items-end whitespace-nowrap" dir={appDirection}>
+                    <div
+                      ref={ghostTrackRef}
+                      className="inline-flex items-end transition-transform duration-[260ms] ease-out"
+                      style={{ willChange: 'transform' }}
+                    >
+                      {committedWords.map((word, idx) => (
+                        <Fragment key={`ghost-frag-${idx}`}>
+                          {word.type === 'gap' ? (
+                            <span
+                              className="inline-block"
+                              style={{ width: `${word.width}ch` }}
+                            >
+                              {' '}
+                            </span>
+                          ) : (
+                            <GhostWordBox
+                              ghost={word.ghost}
+                              width={word.width}
+                              fontClass={appFontClass}
+                              delay={idx === committedWords.length - 1 ? 0 : -1}
+                              direction={appDirection}
+                            />
+                          )}
+                          {idx < committedWords.length - 1 && <WordGap />}
+                        </Fragment>
+                      ))}
+                      {committedWords.length > 0 && <WordGap width={WORD_GAP_WITH_PADDING_CH} />}
+                      {/* Active ghost box (empty) */}
+                      <div
+                        className="box-border inline-block align-bottom"
+                        style={{ width: `${activeWordWidth}ch`, maxWidth: `${MAX_WORD_BOX_CH}ch`, paddingInline: 0 }}
+                        data-active="true"
+                      >
+                        <span className="inline-block min-w-[1ch] text-center font-mono text-2xl leading-none">
                           {' '}
                         </span>
-                      ) : (
-                        <GhostWordBox
-                          ghost={word.ghost}
-                          width={word.width}
-                          fontClass={appFontClass}
-                          delay={idx === committedWords.length - 1 ? 0 : -1}
-                          direction={appDirection}
-                        />
-                      )}
-                      {idx < committedWords.length - 1 && <WordGap />}
-                    </Fragment>
-                  ))}
-                  {committedWords.length > 0 && <WordGap width={WORD_GAP_WITH_PADDING_CH} />}
-                  {/* Active ghost box (empty) */}
-                  <div
-                    className="box-border inline-block align-bottom"
-                    style={{ width: `${activeWordWidth}ch`, maxWidth: `${MAX_WORD_BOX_CH}ch`, paddingInline: 0 }}
-                    data-active="true"
-                  >
-                    <span className="inline-block min-w-[1ch] text-center font-mono text-2xl leading-none">
-                      {' '}
-                    </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Invisible but focusable input for all viewports */}
-        <input
-  ref={inputRef}
-  type="text"
-  value={typedWord}
-  onChange={handleInputChange}
-  onKeyDown={handleKeyDown}
-  aria-label={t('reading.typeHere')}
-  autoComplete="off"
-  autoCapitalize="off"
-  autoCorrect="off"
-  spellCheck={false}
-  inputMode="text"
-  dir={appDirection}
-  // Position off-screen but keep real size for mobile keyboard
-  className={`${appFontClass} fixed`}
-  style={{
-    // Position way off screen but keep normal input size
-    left: '-9999px',
-    top: '0',
-    width: '100px',
-    height: '40px',
-    opacity: 0,
-    // Explicit direction for mobile browsers
-    direction: appDirection,
-    // Prevents "visual reversal" issues with bidirectional text
-    unicodeBidi: 'plaintext',
-  }}
-/>
-        {/* Answer Display */}
-        {showAnswer && (
-          <div className="mt-3 text-sm text-slate-400">
-            {t('reading.answer')}:{' '}
-            <span className="rounded bg-slate-800 px-2 py-1 font-mono text-slate-300">
-              {(() => {
-                const canonical = getTranslation()?.canonical;
-                return canonical && canonical !== '—'
-                  ? normalizeForLanguage(canonical, appLanguageId)
-                  : canonical || '—';
-              })()}
-            </span>
-            {getTranslation()?.variants && getTranslation().variants.length > 1 && (
-              <span className="ml-2">
-                ({t('reading.accepted')}: {getTranslation().variants.map(v => normalizeForLanguage(v, appLanguageId)).join(', ')})
-              </span>
+            {/* Invisible but focusable input for all viewports */}
+            <input
+              ref={inputRef}
+              type="text"
+              value={typedWord}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              aria-label={t('reading.typeHere')}
+              autoComplete="off"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+              inputMode="text"
+              dir={appDirection}
+              // Position off-screen but keep real size for mobile keyboard
+              className={`${appFontClass} fixed`}
+              style={{
+                // Position way off screen but keep normal input size
+                left: '-9999px',
+                top: '0',
+                width: '100px',
+                height: '40px',
+                opacity: 0,
+                // Explicit direction for mobile browsers
+                direction: appDirection,
+                // Prevents "visual reversal" issues with bidirectional text
+                unicodeBidi: 'plaintext',
+              }}
+            />
+            {/* Answer Display */}
+            {showAnswer && (
+              <div className="mt-3 text-sm text-slate-400">
+                {t('reading.answer')}:{' '}
+                <span className="rounded bg-slate-800 px-2 py-1 font-mono text-slate-300">
+                  {(() => {
+                    const canonical = getTranslation()?.canonical;
+                    return canonical && canonical !== '—'
+                      ? normalizeForLanguage(canonical, appLanguageId)
+                      : canonical || '—';
+                  })()}
+                </span>
+                {getTranslation()?.variants && getTranslation().variants.length > 1 && (
+                  <span className="ml-2">
+                    ({t('reading.accepted')}: {getTranslation().variants.map(v => normalizeForLanguage(v, appLanguageId)).join(', ')})
+                  </span>
+                )}
+              </div>
             )}
-          </div>
+          </>
         )}
         </section>
 
@@ -913,12 +1044,14 @@ useEffect(() => {
             >
               {t('reading.back')}
             </button>
-            <button
-              onClick={() => setShowAnswer(!showAnswer)}
-              className="rounded-lg border border-slate-700 bg-transparent px-4 py-2 text-sm font-medium hover:bg-slate-800"
-            >
-              {showAnswer ? t('reading.hideAnswer') : t('reading.showAnswer')}
-            </button>
+            {currentMode !== 'translation' && (
+              <button
+                onClick={() => setShowAnswer(!showAnswer)}
+                className="rounded-lg border border-slate-700 bg-transparent px-4 py-2 text-sm font-medium hover:bg-slate-800"
+              >
+                {showAnswer ? t('reading.hideAnswer') : t('reading.showAnswer')}
+              </button>
+            )}
           </div>
         </div>
       </section>
