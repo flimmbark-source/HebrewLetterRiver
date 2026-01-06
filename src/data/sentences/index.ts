@@ -81,7 +81,67 @@ const baseWordIdLookup: Record<string, string> = {
   לסיים: 'finish',
   מסיימים: 'finish',
   ללכת: 'go',
-  הולך: 'go'
+  הולך: 'go',
+  להכיר: 'meet',
+  מאיפה: 'where-from',
+  חדש: 'new',
+  שבאת: 'you-came',
+  לך: 'to-you',
+  שאתה: 'that-you',
+  כאן: 'here',
+  איתנו: 'with-us',
+  חדשה: 'new-f',
+  יחד: 'together',
+  איך: 'how',
+  שלך: 'yours',
+  קצרה: 'short',
+  על: 'about',
+  זה: 'this',
+  שמי: 'my-name',
+  אוהב: 'love',
+  עם: 'with',
+  חברים: 'friends',
+  שלנו: 'ours',
+  מלא: 'full',
+  במשפחה: 'in-family',
+  וחברים: 'and-friends',
+  אוהבים: 'like',
+  לשבת: 'sit',
+  לדבר: 'speak',
+  שקט: 'quiet',
+  לנו: 'to-us',
+  קטן: 'small',
+  בחדר: 'in-room',
+  שלו: 'his',
+  במטבח: 'in-kitchen',
+  גר: 'live',
+  ליד: 'near',
+  חם: 'warm',
+  קרים: 'cold-pl',
+  אוהבת: 'love-f',
+  במסעדה: 'restaurant',
+  טעים: 'tasty',
+  מאוד: 'very',
+  לחם: 'bread',
+  טרי: 'fresh',
+  המשפחה: 'the-family',
+  מבשל: 'cook',
+  עוד: 'more',
+  בבקשה: 'please',
+  מזמינים: 'order',
+  נוסף: 'another',
+  ארוחת: 'meal-of',
+  הרבה: 'a-lot',
+  בתחנה: 'at-station',
+  כדי: 'in-order-to',
+  לנוח: 'rest',
+  פגישה: 'meeting',
+  בדיוק: 'exactly',
+  אחרי: 'after',
+  עשר: 'ten',
+  דקות: 'minutes',
+  מדי: 'too',
+  שעה: 'hour'
 };
 
 function attachWordIds(
@@ -118,55 +178,55 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
   'Greetings & Introductions': [
     createSentence({
       id: 'greetings-1',
-      hebrew: 'שלום אני דני',
-      english: 'Hello, I am Dani.',
+      hebrew: 'שלום, אני דני, שמח להכיר.',
+      english: "Hi, I'm Dani, nice to meet you.",
       theme: 'Greetings & Introductions',
       difficulty: 1,
       grammarPoints: ['greeting', 'simple present']
     }),
     createSentence({
       id: 'greetings-2',
-      hebrew: 'שלום, אתה חבר כאן',
-      english: 'Hello, are you a friend here?',
+      hebrew: 'מאיפה אתה? אני חדש בעיר.',
+      english: 'Where are you from? I am new in the city.',
       theme: 'Greetings & Introductions',
       difficulty: 1,
       grammarPoints: ['greeting', 'yes-no question']
     }),
     createSentence({
       id: 'greetings-3',
-      hebrew: 'שלום תודה אתה כאן',
-      english: 'Hello, thanks, you are here.',
+      hebrew: 'תודה שבאת היום, חיכינו לך.',
+      english: 'Thanks for coming today, we were waiting for you.',
       theme: 'Greetings & Introductions',
       difficulty: 1,
       grammarPoints: ['gratitude', 'present tense linking']
     }),
     createSentence({
       id: 'greetings-4',
-      hebrew: 'אני שמח לפגוש אותך היום',
-      english: 'I am happy to meet you today.',
+      hebrew: 'אני שמח שאתה כאן איתנו.',
+      english: "I'm happy you're here with us.",
       theme: 'Greetings & Introductions',
       difficulty: 2,
-      grammarPoints: ['present tense', 'infinitive complement']
+      grammarPoints: ['present tense', 'present progressive nuance']
     }),
     createSentence({
       id: 'greetings-5',
-      hebrew: 'אנחנו מדברים שפה חדשה היום',
-      english: 'We speak a new language today.',
+      hebrew: 'אנחנו לומדים שפה חדשה יחד.',
+      english: 'We are learning a new language together.',
       theme: 'Greetings & Introductions',
       difficulty: 2,
       grammarPoints: ['plural subject', 'present progressive nuance']
     }),
     createSentence({
       id: 'greetings-6',
-      hebrew: 'אתה בא לעיר היום',
-      english: 'You are coming to the city today.',
+      hebrew: 'איך היום שלך?',
+      english: 'How is your day today?',
       theme: 'Greetings & Introductions',
       difficulty: 2,
-      grammarPoints: ['motion verb', 'time adverb']
+      grammarPoints: ['questions', 'time adverb']
     }),
     createSentence({
       id: 'greetings-7',
-      hebrew: 'אני רוצה לשאול שאלה קצרה',
+      hebrew: 'אני רוצה לשאול שאלה קצרה.',
       english: 'I want to ask a quick question.',
       theme: 'Greetings & Introductions',
       difficulty: 3,
@@ -174,24 +234,24 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
     }),
     createSentence({
       id: 'greetings-8',
-      hebrew: 'תודה על התשובה הטובה',
-      english: 'Thanks for the good answer.',
+      hebrew: 'תודה על התשובה, זה עוזר.',
+      english: 'Thanks for the answer, it helps.',
       theme: 'Greetings & Introductions',
       difficulty: 2,
       grammarPoints: ['prepositions', 'noun modifiers']
     }),
     createSentence({
       id: 'greetings-9',
-      hebrew: 'היום יש לנו רעיון נהדר',
-      english: 'Today we have a great idea.',
+      hebrew: 'היום יש לנו רעיון טוב להתחיל.',
+      english: 'Today we have a good idea to get started.',
       theme: 'Greetings & Introductions',
       difficulty: 2,
       grammarPoints: ['possession', 'adjectives']
     }),
     createSentence({
       id: 'greetings-10',
-      hebrew: 'שמי אורי ואני אוהב ללמוד שפה',
-      english: 'My name is Ori and I love to study a language.',
+      hebrew: 'שמי אורי ואני אוהב ללמוד שפה עם חברים.',
+      english: 'My name is Ori and I love to study the language with friends.',
       theme: 'Greetings & Introductions',
       difficulty: 3,
       grammarPoints: ['coordination', 'infinitive phrase']
@@ -200,63 +260,63 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
   'At Home': [
     createSentence({
       id: 'home-1',
-      hebrew: 'הבית שלנו מלא משפחה',
-      english: 'Our home is full of family.',
+      hebrew: 'הבית שלנו מלא במשפחה וחברים.',
+      english: 'Our home is full of family and friends.',
       theme: 'At Home',
       difficulty: 2,
       grammarPoints: ['possession', 'adjectives']
     }),
     createSentence({
       id: 'home-2',
-      hebrew: 'אנחנו אוהבים לשבת בסלון',
-      english: 'We like to sit in the living room.',
+      hebrew: 'אנחנו אוהבים לשבת בבית ולדבר.',
+      english: 'We like to sit at home and talk.',
       theme: 'At Home',
       difficulty: 2,
       grammarPoints: ['verb + infinitive', 'prepositions']
     }),
     createSentence({
       id: 'home-3',
-      hebrew: 'אני צריך בית שקט',
-      english: 'I need a quiet home.',
+      hebrew: 'אני צריך בית שקט בערב.',
+      english: 'I need a quiet home in the evening.',
       theme: 'At Home',
       difficulty: 1,
       grammarPoints: ['need statements', 'adjectives']
     }),
     createSentence({
       id: 'home-4',
-      hebrew: 'שכן עוזר לנו כל יום',
-      english: 'A neighbor helps us every day.',
+      hebrew: 'שכן עוזר לנו כל יום בבית.',
+      english: 'A neighbor helps us every day at home.',
       theme: 'At Home',
       difficulty: 2,
       grammarPoints: ['present tense', 'frequency adverb']
     }),
     createSentence({
       id: 'home-5',
-      hebrew: 'היום אנחנו לומדים בבית',
-      english: 'Today we study at home.',
+      hebrew: 'היום אנחנו לומדים בבית יחד.',
+      english: 'Today we study at home together.',
       theme: 'At Home',
       difficulty: 2,
       grammarPoints: ['time adverb', 'location preposition']
     }),
     createSentence({
       id: 'home-6',
-      hebrew: 'יש לי רעיון לסדר את הבית',
-      english: 'I have an idea to organize the home.',
+      hebrew: 'יש לי רעיון קטן לבית שלנו.',
+      english: 'I have a small idea for our home.',
       theme: 'At Home',
       difficulty: 3,
       grammarPoints: ['possession', 'infinitive purpose']
     }),
     createSentence({
       id: 'home-7',
-      hebrew: 'הילד קורא ספר בחדר',
-      english: 'The child reads a book in the room.',
+      hebrew: 'הילד קורא ספר בחדר שלו.',
+      english: 'The child reads a book in his room.',
       theme: 'At Home',
       difficulty: 2,
       grammarPoints: ['present tense', 'location phrases']
     }),
     createSentence({
       id: 'home-8',
-      hebrew: 'יש לנו מים וקפה במטבח',
+      hebrew: 'יש לנו מים וקפה במטבח.',
       english: 'We have water and coffee in the kitchen.',
       theme: 'At Home',
       difficulty: 1,
@@ -264,8 +324,8 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
     }),
     createSentence({
       id: 'home-9',
-      hebrew: 'אני רוצה זמן שקט בבוקר',
-      english: 'I want quiet time in the morning.',
+      hebrew: 'אני רוצה זמן שקט בבוקר עם קפה.',
+      english: 'I want a quiet time in the morning with coffee.',
       theme: 'At Home',
       difficulty: 2,
       grammarPoints: ['time phrases', 'adjectives']
@@ -282,16 +342,16 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
   'Food & Eating': [
     createSentence({
       id: 'food-1',
-      hebrew: 'אני רוצה לאכול אוכל חם',
-      english: 'I want to eat warm food.',
+      hebrew: 'אני רוצה לאכול אוכל חם עכשיו.',
+      english: 'I want to eat warm food right now.',
       theme: 'Food & Eating',
       difficulty: 1,
       grammarPoints: ['verb + infinitive', 'adjectives']
     }),
     createSentence({
       id: 'food-2',
-      hebrew: 'אנחנו שותים מים קרים',
-      english: 'We drink cold water.',
+      hebrew: 'אנחנו שותים מים קרים יחד.',
+      english: 'We drink cold water together.',
       theme: 'Food & Eating',
       difficulty: 1,
       grammarPoints: ['plural subject', 'adjectives']
@@ -306,7 +366,7 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
     }),
     createSentence({
       id: 'food-4',
-      hebrew: 'האוכל במסעדה טעים מאוד',
+      hebrew: 'האוכל במסעדה טעים מאוד.',
       english: 'The food at the restaurant is very tasty.',
       theme: 'Food & Eating',
       difficulty: 3,
@@ -314,7 +374,7 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
     }),
     createSentence({
       id: 'food-5',
-      hebrew: 'אנחנו קונים לחם חדש היום',
+      hebrew: 'אנחנו קונים לחם טרי היום.',
       english: 'We are buying fresh bread today.',
       theme: 'Food & Eating',
       difficulty: 2,
@@ -330,7 +390,7 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
     }),
     createSentence({
       id: 'food-7',
-      hebrew: 'הוא מבשל בבית עם המשפחה',
+      hebrew: 'הוא מבשל בבית עם המשפחה.',
       english: 'He cooks at home with the family.',
       theme: 'Food & Eating',
       difficulty: 2,
@@ -346,8 +406,8 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
     }),
     createSentence({
       id: 'food-9',
-      hebrew: 'הם מזמינים קפה נוסף',
-      english: 'They order another coffee.',
+      hebrew: 'הם מזמינים קפה נוסף כל ערב.',
+      english: 'They order another coffee every evening.',
       theme: 'Food & Eating',
       difficulty: 3,
       grammarPoints: ['present tense', 'quantifiers']
@@ -364,40 +424,40 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
   'Numbers & Time': [
     createSentence({
       id: 'time-1',
-      hebrew: 'היום יום טוב',
-      english: 'Today is a good day.',
+      hebrew: 'היום יום טוב ושקט.',
+      english: 'Today is a good and quiet day.',
       theme: 'Numbers & Time',
       difficulty: 1,
       grammarPoints: ['copula', 'adjectives']
     }),
     createSentence({
       id: 'time-2',
-      hebrew: 'מחר אנחנו באים לעיר',
-      english: 'Tomorrow we are coming to the city.',
+      hebrew: 'מחר אנחנו באים לעיר מוקדם.',
+      english: 'Tomorrow we are coming to the city early.',
       theme: 'Numbers & Time',
       difficulty: 2,
       grammarPoints: ['future reference', 'motion verb']
     }),
     createSentence({
       id: 'time-3',
-      hebrew: 'אתמול חיכינו הרבה זמן',
-      english: 'Yesterday we waited a long time.',
+      hebrew: 'אתמול חיכינו הרבה זמן בתחנה.',
+      english: 'Yesterday we waited a long time at the station.',
       theme: 'Numbers & Time',
       difficulty: 2,
       grammarPoints: ['past reference', 'time duration']
     }),
     createSentence({
       id: 'time-4',
-      hebrew: 'עכשיו אני הולך לבית',
-      english: 'Now I am going home.',
+      hebrew: 'עכשיו אני הולך לבית כדי לנוח.',
+      english: 'Now I am going home to rest.',
       theme: 'Numbers & Time',
       difficulty: 2,
       grammarPoints: ['present progressive', 'direction']
     }),
     createSentence({
       id: 'time-5',
-      hebrew: 'אנחנו מגיעים מוקדם בבוקר',
-      english: 'We arrive early in the morning.',
+      hebrew: 'אנחנו מגיעים מוקדם בבוקר לפגישה.',
+      english: 'We arrive early in the morning for a meeting.',
       theme: 'Numbers & Time',
       difficulty: 2,
       grammarPoints: ['time phrases', 'motion verbs']
@@ -412,8 +472,8 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
     }),
     createSentence({
       id: 'time-7',
-      hebrew: 'אנחנו מסיימים מאוחר בערב',
-      english: 'We finish late in the evening.',
+      hebrew: 'אנחנו מסיימים מאוחר בערב אחרי הספר.',
+      english: 'We finish late in the evening after the book.',
       theme: 'Numbers & Time',
       difficulty: 2,
       grammarPoints: ['time phrases', 'adverbs']
@@ -428,16 +488,16 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
     }),
     createSentence({
       id: 'time-9',
-      hebrew: 'לפעמים הזמן קצר מדי',
-      english: 'Sometimes the time is too short.',
+      hebrew: 'לפעמים הזמן קצר מדי לקרוא ספר.',
+      english: 'Sometimes time is too short to read a book.',
       theme: 'Numbers & Time',
       difficulty: 2,
       grammarPoints: ['frequency adverb', 'adjectives']
     }),
     createSentence({
       id: 'time-10',
-      hebrew: 'תמיד יש לנו שעה לקרוא ספר',
-      english: 'We always have an hour to read a book.',
+      hebrew: 'תמיד יש לנו שעה לקרוא ספר יחד.',
+      english: 'We always have an hour to read a book together.',
       theme: 'Numbers & Time',
       difficulty: 3,
       grammarPoints: ['frequency adverb', 'infinitive purpose']
