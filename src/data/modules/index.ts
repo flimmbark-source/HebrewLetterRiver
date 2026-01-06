@@ -1,30 +1,9 @@
-import type { LearningModule, VocabItem, GrammarPattern } from '../../types/modules';
+import type { LearningModule, GrammarPattern } from '../../types/modules';
 
 /**
  * Module 1: Greetings & Introductions
  * Foundation module teaching basic greetings, introductions, and simple present tense
  */
-const module1Vocab: VocabItem[] = [
-  { id: 'shalom', hebrew: 'שלום', meaning: 'hello, peace', partOfSpeech: 'greeting' },
-  { id: 'todah', hebrew: 'תודה', meaning: 'thank you', partOfSpeech: 'interjection' },
-  { id: 'I', hebrew: 'אני', meaning: 'I', partOfSpeech: 'pronoun' },
-  { id: 'you', hebrew: 'אתה/את', meaning: 'you (m/f)', partOfSpeech: 'pronoun' },
-  { id: 'we', hebrew: 'אנחנו', meaning: 'we', partOfSpeech: 'pronoun' },
-  { id: 'happy', hebrew: 'שמח', meaning: 'happy', partOfSpeech: 'adjective' },
-  { id: 'new-f', hebrew: 'חדשה', meaning: 'new (f)', partOfSpeech: 'adjective' },
-  { id: 'language', hebrew: 'שפה', meaning: 'language', partOfSpeech: 'noun' },
-  { id: 'question', hebrew: 'שאלה', meaning: 'question', partOfSpeech: 'noun' },
-  { id: 'answer', hebrew: 'תשובה', meaning: 'answer', partOfSpeech: 'noun' },
-  { id: 'idea', hebrew: 'רעיון', meaning: 'idea', partOfSpeech: 'noun' },
-  { id: 'today', hebrew: 'היום', meaning: 'today', partOfSpeech: 'adverb' },
-  { id: 'here', hebrew: 'כאן', meaning: 'here', partOfSpeech: 'adverb' },
-  { id: 'together', hebrew: 'יחד', meaning: 'together', partOfSpeech: 'adverb' },
-  { id: 'want', hebrew: 'רוצה', meaning: 'want', partOfSpeech: 'verb' },
-  { id: 'study', hebrew: 'לומדים', meaning: 'study, learn', partOfSpeech: 'verb' },
-  { id: 'ask', hebrew: 'לשאול', meaning: 'to ask', partOfSpeech: 'verb' },
-  { id: 'help', hebrew: 'עוזר', meaning: 'helps', partOfSpeech: 'verb' },
-  { id: 'start', hebrew: 'להתחיל', meaning: 'to start', partOfSpeech: 'verb' },
-];
 
 const module1Grammar: GrammarPattern[] = [
   {
@@ -71,7 +50,7 @@ const module1: LearningModule = {
   title: 'Greetings & Introductions',
   description: 'Learn basic greetings, how to introduce yourself, and simple present tense',
   order: 1,
-  vocab: module1Vocab,
+  vocabTextId: 'module-1-vocab',
   grammar: module1Grammar,
   sentenceIds: [
     'greetings-1',
@@ -91,30 +70,6 @@ const module1: LearningModule = {
  * Module 2: At Home
  * Building on Module 1, teaches home-related vocabulary and location phrases
  */
-const module2Vocab: VocabItem[] = [
-  { id: 'home', hebrew: 'בית', meaning: 'home, house', partOfSpeech: 'noun' },
-  { id: 'family', hebrew: 'משפחה', meaning: 'family', partOfSpeech: 'noun' },
-  { id: 'friend', hebrew: 'חבר', meaning: 'friend', partOfSpeech: 'noun' },
-  { id: 'friends', hebrew: 'חברים', meaning: 'friends', partOfSpeech: 'noun' },
-  { id: 'neighbor', hebrew: 'שכן', meaning: 'neighbor', partOfSpeech: 'noun' },
-  { id: 'child', hebrew: 'ילד', meaning: 'child', partOfSpeech: 'noun' },
-  { id: 'book', hebrew: 'ספר', meaning: 'book', partOfSpeech: 'noun' },
-  { id: 'water', hebrew: 'מים', meaning: 'water', partOfSpeech: 'noun' },
-  { id: 'coffee', hebrew: 'קפה', meaning: 'coffee', partOfSpeech: 'noun' },
-  { id: 'quiet', hebrew: 'שקט', meaning: 'quiet', partOfSpeech: 'adjective' },
-  { id: 'small', hebrew: 'קטן', meaning: 'small', partOfSpeech: 'adjective' },
-  { id: 'full', hebrew: 'מלא', meaning: 'full', partOfSpeech: 'adjective' },
-  { id: 'erev', hebrew: 'ערב', meaning: 'evening', partOfSpeech: 'noun' },
-  { id: 'boker', hebrew: 'בוקר', meaning: 'morning', partOfSpeech: 'noun' },
-  { id: 'day', hebrew: 'יום', meaning: 'day', partOfSpeech: 'noun' },
-  { id: 'time', hebrew: 'זמן', meaning: 'time', partOfSpeech: 'noun' },
-  { id: 'like', hebrew: 'אוהבים', meaning: 'like, love', partOfSpeech: 'verb' },
-  { id: 'sit', hebrew: 'לשבת', meaning: 'to sit', partOfSpeech: 'verb' },
-  { id: 'speak', hebrew: 'לדבר', meaning: 'to speak, talk', partOfSpeech: 'verb' },
-  { id: 'need', hebrew: 'צריך', meaning: 'need', partOfSpeech: 'verb' },
-  { id: 'read', hebrew: 'קורא', meaning: 'read', partOfSpeech: 'verb' },
-  { id: 'live', hebrew: 'גר', meaning: 'live, reside', partOfSpeech: 'verb' },
-];
 
 const module2Grammar: GrammarPattern[] = [
   {
@@ -162,7 +117,7 @@ const module2: LearningModule = {
   title: 'At Home',
   description: 'Learn vocabulary about home, family, and daily life at home',
   order: 2,
-  vocab: module2Vocab,
+  vocabTextId: 'module-2-vocab',
   grammar: module2Grammar,
   sentenceIds: [
     'home-1',
@@ -183,26 +138,6 @@ const module2: LearningModule = {
  * Module 3: Food & Eating
  * Teaches food vocabulary and dining-related verbs
  */
-const module3Vocab: VocabItem[] = [
-  { id: 'food', hebrew: 'אוכל', meaning: 'food', partOfSpeech: 'noun' },
-  { id: 'bread', hebrew: 'לחם', meaning: 'bread', partOfSpeech: 'noun' },
-  { id: 'restaurant', hebrew: 'מסעדה', meaning: 'restaurant', partOfSpeech: 'noun' },
-  { id: 'meal-of', hebrew: 'ארוחת', meaning: 'meal of', partOfSpeech: 'noun' },
-  { id: 'warm', hebrew: 'חם', meaning: 'warm, hot', partOfSpeech: 'adjective' },
-  { id: 'cold-pl', hebrew: 'קרים', meaning: 'cold (plural)', partOfSpeech: 'adjective' },
-  { id: 'tasty', hebrew: 'טעים', meaning: 'tasty', partOfSpeech: 'adjective' },
-  { id: 'fresh', hebrew: 'טרי', meaning: 'fresh', partOfSpeech: 'adjective' },
-  { id: 'now', hebrew: 'עכשיו', meaning: 'now, right now', partOfSpeech: 'adverb' },
-  { id: 'very', hebrew: 'מאוד', meaning: 'very', partOfSpeech: 'adverb' },
-  { id: 'more', hebrew: 'עוד', meaning: 'more, another', partOfSpeech: 'adverb' },
-  { id: 'please', hebrew: 'בבקשה', meaning: 'please', partOfSpeech: 'interjection' },
-  { id: 'eat', hebrew: 'לאכול', meaning: 'to eat', partOfSpeech: 'verb' },
-  { id: 'drink', hebrew: 'לשתות', meaning: 'to drink', partOfSpeech: 'verb' },
-  { id: 'buy', hebrew: 'קונים', meaning: 'buy', partOfSpeech: 'verb' },
-  { id: 'pay', hebrew: 'משלם', meaning: 'pay', partOfSpeech: 'verb' },
-  { id: 'cook', hebrew: 'מבשל', meaning: 'cook', partOfSpeech: 'verb' },
-  { id: 'order', hebrew: 'מזמינים', meaning: 'order', partOfSpeech: 'verb' },
-];
 
 const module3Grammar: GrammarPattern[] = [
   {
@@ -248,7 +183,7 @@ const module3: LearningModule = {
   title: 'Food & Eating',
   description: 'Learn vocabulary for food, dining, and expressing preferences',
   order: 3,
-  vocab: module3Vocab,
+  vocabTextId: 'module-3-vocab',
   grammar: module3Grammar,
   sentenceIds: [
     'food-1',
@@ -269,25 +204,6 @@ const module3: LearningModule = {
  * Module 4: Numbers & Time
  * Teaches time expressions and basic numbers
  */
-const module4Vocab: VocabItem[] = [
-  { id: 'tomorrow', hebrew: 'מחר', meaning: 'tomorrow', partOfSpeech: 'adverb' },
-  { id: 'yesterday', hebrew: 'אתמול', meaning: 'yesterday', partOfSpeech: 'adverb' },
-  { id: 'early', hebrew: 'מוקדם', meaning: 'early', partOfSpeech: 'adverb' },
-  { id: 'late', hebrew: 'מאוחר', meaning: 'late', partOfSpeech: 'adverb' },
-  { id: 'always', hebrew: 'תמיד', meaning: 'always', partOfSpeech: 'adverb' },
-  { id: 'sometimes', hebrew: 'לפעמים', meaning: 'sometimes', partOfSpeech: 'adverb' },
-  { id: 'tov', hebrew: 'טוב', meaning: 'good', partOfSpeech: 'adjective' },
-  { id: 'city', hebrew: 'עיר', meaning: 'city', partOfSpeech: 'noun' },
-  { id: 'meeting', hebrew: 'פגישה', meaning: 'meeting', partOfSpeech: 'noun' },
-  { id: 'hour', hebrew: 'שעה', meaning: 'hour, o\'clock', partOfSpeech: 'noun' },
-  { id: 'minutes', hebrew: 'דקות', meaning: 'minutes', partOfSpeech: 'noun' },
-  { id: 'come', hebrew: 'באים', meaning: 'come', partOfSpeech: 'verb' },
-  { id: 'arrive', hebrew: 'מגיעים', meaning: 'arrive', partOfSpeech: 'verb' },
-  { id: 'wait', hebrew: 'מחכה', meaning: 'wait', partOfSpeech: 'verb' },
-  { id: 'go', hebrew: 'הולך', meaning: 'go', partOfSpeech: 'verb' },
-  { id: 'finish', hebrew: 'מסיימים', meaning: 'finish', partOfSpeech: 'verb' },
-  { id: 'rest', hebrew: 'לנוח', meaning: 'to rest', partOfSpeech: 'verb' },
-];
 
 const module4Grammar: GrammarPattern[] = [
   {
@@ -335,7 +251,7 @@ const module4: LearningModule = {
   title: 'Numbers & Time',
   description: 'Learn to talk about time, schedules, and when things happen',
   order: 4,
-  vocab: module4Vocab,
+  vocabTextId: 'module-4-vocab',
   grammar: module4Grammar,
   sentenceIds: [
     'time-1',

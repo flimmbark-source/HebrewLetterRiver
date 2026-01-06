@@ -21,6 +21,9 @@ import { japaneseCafeTalkTexts } from './cafeTalk/japanese.js';
 import { bengaliCafeTalkTexts } from './cafeTalk/bengali.js';
 import { amharicCafeTalkTexts } from './cafeTalk/amharic.js';
 
+// Import Module Vocabulary texts
+import { moduleVocabTexts } from './modules/moduleVocab.js';
+
 // Temporarily import from old file for languages not yet migrated
 import {
   arabicReadingTexts,
@@ -141,9 +144,13 @@ export function getReadingTextsForLanguage(practiceLanguage) {
   const starterTexts = readingTextsByLanguage[normalizedLanguage] || [];
   const cafeTalkTexts = cafeTalkByLanguage[normalizedLanguage] || [];
 
+  // Add module vocab texts for Hebrew
+  const moduleTexts = normalizedLanguage === 'hebrew' ? moduleVocabTexts : [];
+
   return [
     ...addSectionId(starterTexts, 'starter'),
-    ...addSectionId(cafeTalkTexts, 'cafeTalk')
+    ...addSectionId(cafeTalkTexts, 'cafeTalk'),
+    ...addSectionId(moduleTexts, 'modules')
   ];
 }
 

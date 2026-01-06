@@ -35,7 +35,7 @@ export interface LearningModule {
   order: number; // for sequencing in the learning path
 
   // Content
-  vocab: VocabItem[];
+  vocabTextId: string; // ID of reading text for vocab practice
   grammar: GrammarPattern[];
   sentenceIds: string[]; // references to sentences in the sentence data
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Lock, Check, BookOpen, Languages, MessageSquare } from 'lucide-react';
-import VocabCard from './VocabCard';
+import ReadingArea from './ReadingArea';
 import GrammarCard from './GrammarCard';
 import SentencePracticeArea from './SentencePracticeArea';
 import {
@@ -24,7 +24,6 @@ import { getThemeStats } from '../lib/sentenceProgressStorage';
  */
 export default function ModuleCard({ module, isLocked, onModuleComplete }) {
   const [activeSection, setActiveSection] = useState(null); // 'vocab', 'grammar', or 'sentences'
-  const [currentVocabIndex, setCurrentVocabIndex] = useState(0);
   const [currentGrammarIndex, setCurrentGrammarIndex] = useState(0);
   const [progress, setProgress] = useState(null);
   const [completionPercentage, setCompletionPercentage] = useState(0);
@@ -44,16 +43,11 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
     module.sentenceIds.includes(s.id)
   );
 
-  const handleVocabComplete = (vocabId) => {
-    const nextIndex = currentVocabIndex + 1;
-    if (nextIndex >= module.vocab.length) {
-      // All vocab practiced
-      markVocabPracticed(module.id);
-      setActiveSection(null);
-      updateProgress();
-    } else {
-      setCurrentVocabIndex(nextIndex);
-    }
+  const handleVocabComplete = () => {
+    // Mark vocab as practiced when ReadingArea practice is complete
+    markVocabPracticed(module.id);
+    setActiveSection(null);
+    updateProgress();
   };
 
   const handleGrammarComplete = (grammarId) => {
@@ -86,7 +80,6 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
   };
 
   const handleStartVocab = () => {
-    setCurrentVocabIndex(0);
     setActiveSection('vocab');
   };
 
@@ -131,23 +124,10 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
   // Render active practice session
   if (activeSection === 'vocab') {
     return (
-      <div className="w-full space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold">
-            {module.title} - Vocabulary
-          </h3>
-          <Button onClick={handleBack} variant="outline">
-            Back to Module
-          </Button>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          Word {currentVocabIndex + 1} of {module.vocab.length}
-        </p>
-        <VocabCard
-          vocab={module.vocab[currentVocabIndex]}
-          onComplete={handleVocabComplete}
-        />
-      </div>
+      <ReadingArea
+        textId={module.vocabTextId}
+        onBack={handleVocabComplete}
+      />
     );
   }
 
@@ -220,7 +200,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                 )}
               </div>
               <p className="text-sm text-muted-foreground">
-                {module.vocab.length} words to learn
+                Practice vocabulary words
               </p>
               <Button
                 onClick={handleStartVocab}
