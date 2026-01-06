@@ -16,28 +16,72 @@ function normalizeWord(word) {
     .trim();
 }
 
+function tokenizeSentence(sentence) {
+  return sentence
+    .split(/\s+/)
+    .map(normalizeWord)
+    .filter(Boolean);
+}
+
+function longestCommonSubsequenceLength(a, b) {
+  const dp = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+
+  for (let i = 1; i <= a.length; i += 1) {
+    for (let j = 1; j <= b.length; j += 1) {
+      if (a[i - 1] === b[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1] + 1;
+      } else {
+        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+      }
+    }
+  }
+
+  return dp[a.length][b.length];
+}
+
 function evaluateTranslation(correctSentence, response) {
   const expectedWords = correctSentence.split(/\s+/);
-  const userWords = response.trim().split(/\s+/).filter(Boolean);
+  const expectedTokens = tokenizeSentence(correctSentence);
+  const userTokens = tokenizeSentence(response);
 
-  const evaluations = expectedWords.map((word, idx) => {
-    const expected = normalizeWord(word);
-    const provided = normalizeWord(userWords[idx] ?? '');
-    return {
-      word,
-      isMatch: expected.length > 0 && expected === provided
-    };
+  const tokenCounts = expectedTokens.reduce((acc, token) => {
+    acc[token] = (acc[token] || 0) + 1;
+    return acc;
+  }, {});
+
+  let matchedCount = 0;
+  const remainingCounts = { ...tokenCounts };
+
+  userTokens.forEach((token) => {
+    if (remainingCounts[token] > 0) {
+      matchedCount += 1;
+      remainingCounts[token] -= 1;
+    }
   });
 
-  const correctCount = evaluations.filter((entry) => entry.isMatch).length;
-  const score = expectedWords.length > 0 ? correctCount / expectedWords.length : 0;
-  const status = score === 1 ? 'correct' : score >= 0.5 ? 'partial' : 'incorrect';
+  const contentScore = expectedTokens.length > 0 ? matchedCount / expectedTokens.length : 0;
+  const orderScore = expectedTokens.length > 0
+    ? longestCommonSubsequenceLength(expectedTokens, userTokens) / expectedTokens.length
+    : 0;
+
+  const blendedScore = (contentScore * 0.7) + (orderScore * 0.3);
+  const status = blendedScore >= 0.85 ? 'correct' : blendedScore >= 0.55 ? 'partial' : 'incorrect';
+
+  const tempCounts = { ...tokenCounts };
+  const evaluations = expectedWords.map((word) => {
+    const token = normalizeWord(word);
+    const isMatch = tempCounts[token] > 0;
+    if (isMatch) {
+      tempCounts[token] -= 1;
+    }
+    return { word, isMatch };
+  });
 
   return {
     evaluations,
     status,
-    correctCount,
-    total: expectedWords.length
+    correctCount: matchedCount,
+    total: expectedTokens.length
   };
 }
 
