@@ -35,7 +35,7 @@ export interface LearningModule {
   order: number; // for sequencing in the learning path
 
   // Content
-  vocabTextId: string; // ID of reading text for vocab practice
+  vocabTextIds: string[]; // IDs of reading texts for vocab practice (can have multiple sections)
   grammarTextId: string; // ID of reading text for grammar practice
   sentenceIds: string[]; // references to sentences in the sentence data
 
@@ -48,10 +48,11 @@ export interface LearningModule {
  */
 export interface ModuleProgress {
   moduleId: string;
-  vocabPracticed: boolean; // has user practiced vocab cards
+  vocabSectionsPracticed: string[]; // IDs of vocab sections that have been practiced
   grammarPracticed: boolean; // has user practiced grammar cards
   sentencesCompleted: number; // how many sentences completed successfully
   totalSentences: number; // total sentences in module
+  totalVocabSections: number; // total number of vocab sections in module
   isCompleted: boolean; // all requirements met
   unlockedAt?: string; // when module was unlocked
   completedAt?: string; // when module was completed

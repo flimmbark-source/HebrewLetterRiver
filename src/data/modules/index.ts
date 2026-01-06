@@ -9,7 +9,7 @@ const module1: LearningModule = {
   title: 'Greetings & Introductions',
   description: 'Learn basic greetings, how to introduce yourself, and simple present tense',
   order: 1,
-  vocabTextId: 'module-1-vocab',
+  vocabTextIds: ['module-1-vocab-1', 'module-1-vocab-2', 'module-1-vocab-3'],
   grammarTextId: 'module-1-grammar',
   sentenceIds: [
     'greetings-1',
@@ -34,7 +34,7 @@ const module2: LearningModule = {
   title: 'At Home',
   description: 'Learn vocabulary about home, family, and daily life at home',
   order: 2,
-  vocabTextId: 'module-2-vocab',
+  vocabTextIds: ['module-2-vocab'],
   grammarTextId: 'module-2-grammar',
   sentenceIds: [
     'home-1',
@@ -60,7 +60,7 @@ const module3: LearningModule = {
   title: 'Food & Eating',
   description: 'Learn vocabulary for food, dining, and expressing preferences',
   order: 3,
-  vocabTextId: 'module-3-vocab',
+  vocabTextIds: ['module-3-vocab'],
   grammarTextId: 'module-3-grammar',
   sentenceIds: [
     'food-1',
@@ -86,7 +86,7 @@ const module4: LearningModule = {
   title: 'Numbers & Time',
   description: 'Learn to talk about time, schedules, and when things happen',
   order: 4,
-  vocabTextId: 'module-4-vocab',
+  vocabTextIds: ['module-4-vocab'],
   grammarTextId: 'module-4-grammar',
   sentenceIds: [
     'time-1',

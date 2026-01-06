@@ -4,9 +4,10 @@ import { Button } from './ui/button';
 import { Lock, Check, BookOpen, Languages, MessageSquare } from 'lucide-react';
 import ReadingArea from './ReadingArea';
 import SentencePracticeArea from './SentencePracticeArea';
+import ModuleDictionaryModal from './ModuleDictionaryModal';
 import {
   getModuleProgress,
-  markVocabPracticed,
+  markVocabSectionPracticed,
   markGrammarPracticed,
   getModuleCompletionPercentage,
   autoUnlockNextModule,
@@ -22,28 +23,33 @@ import { getThemeStats } from '../lib/sentenceProgressStorage';
  *         Sentences (bottom, full width)
  */
 export default function ModuleCard({ module, isLocked, onModuleComplete }) {
-  const [activeSection, setActiveSection] = useState(null); // 'vocab', 'grammar', or 'sentences'
+  const [activeSection, setActiveSection] = useState(null); // 'grammar', 'sentences', or a vocab text ID
   const [progress, setProgress] = useState(null);
   const [completionPercentage, setCompletionPercentage] = useState(0);
+  const [showDictionary, setShowDictionary] = useState(false);
 
   // Load progress on mount and ensure module is initialized
   useEffect(() => {
     let moduleProgress = getModuleProgress(module.id);
     if (!moduleProgress) {
-      moduleProgress = initializeModuleProgress(module.id, module.sentenceIds.length);
+      moduleProgress = initializeModuleProgress(
+        module.id,
+        module.sentenceIds.length,
+        module.vocabTextIds.length
+      );
     }
     setProgress(moduleProgress);
     setCompletionPercentage(getModuleCompletionPercentage(module.id));
-  }, [module.id, module.sentenceIds.length]);
+  }, [module.id, module.sentenceIds.length, module.vocabTextIds.length]);
 
   // Get sentences for this module
   const moduleSentences = allSentences.filter(s =>
     module.sentenceIds.includes(s.id)
   );
 
-  const handleVocabComplete = () => {
-    // Mark vocab as practiced when ReadingArea practice is complete
-    markVocabPracticed(module.id);
+  const handleVocabSectionComplete = (vocabTextId) => {
+    // Mark vocab section as practiced when ReadingArea practice is complete
+    markVocabSectionPracticed(module.id, vocabTextId);
     setActiveSection(null);
     updateProgress();
   };
@@ -70,10 +76,6 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
         onModuleComplete(module.id);
       }
     }
-  };
-
-  const handleStartVocab = () => {
-    setActiveSection('vocab');
   };
 
   const handleStartGrammar = () => {
@@ -113,12 +115,12 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
     );
   }
 
-  // Render active practice session
-  if (activeSection === 'vocab') {
+  // Render active vocab section
+  if (activeSection && module.vocabTextIds.includes(activeSection)) {
     return (
       <ReadingArea
-        textId={module.vocabTextId}
-        onBack={handleVocabComplete}
+        textId={activeSection}
+        onBack={() => handleVocabSectionComplete(activeSection)}
       />
     );
   }
@@ -149,7 +151,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
     <Card className="w-full">
       <CardHeader>
         <div className="flex items-start justify-between">
-          <div>
+          <div className="flex-1">
             <CardTitle className="flex items-center gap-2">
               <span>{module.title}</span>
               {progress?.isCompleted && (
@@ -160,21 +162,30 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
               {module.description}
             </p>
           </div>
-          <div className="text-sm font-semibold text-primary">
-            {completionPercentage}% Complete
+          <div className="flex flex-col items-end gap-2">
+            <div className="text-sm font-semibold text-primary">
+              {completionPercentage}% Complete
+            </div>
+            <Button
+              onClick={() => setShowDictionary(true)}
+              variant="outline"
+              className="text-xs px-3 py-1 h-auto"
+            >
+              <BookOpen className="h-3 w-3 mr-1" />
+              Dictionary
+            </Button>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Vocab and Grammar Side by Side */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Vocabulary Section */}
-            <div className="border rounded-lg p-4 space-y-3">
+          {/* Vocabulary Sections */}
+          {module.vocabTextIds.map((vocabTextId, index) => (
+            <div key={vocabTextId} className="border rounded-lg p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-blue-600" />
-                <h4 className="font-semibold">Vocabulary</h4>
-                {progress?.vocabPracticed && (
+                <h4 className="font-semibold">Vocabulary Part {index + 1}</h4>
+                {progress?.vocabSectionsPracticed?.includes(vocabTextId) && (
                   <Check className="h-4 w-4 text-green-600" />
                 )}
               </div>
@@ -182,34 +193,34 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                 Practice vocabulary words
               </p>
               <Button
-                onClick={handleStartVocab}
+                onClick={() => setActiveSection(vocabTextId)}
                 className="w-full"
-                variant={progress?.vocabPracticed ? "outline" : "default"}
+                variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
               >
-                {progress?.vocabPracticed ? 'Review Vocab' : 'Start Vocab'}
+                {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Review' : 'Start Practice'}
               </Button>
             </div>
+          ))}
 
-            {/* Grammar Section */}
-            <div className="border rounded-lg p-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <Languages className="h-5 w-5 text-purple-600" />
-                <h4 className="font-semibold">Grammar</h4>
-                {progress?.grammarPracticed && (
-                  <Check className="h-4 w-4 text-green-600" />
-                )}
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Practice grammar patterns
-              </p>
-              <Button
-                onClick={handleStartGrammar}
-                className="w-full"
-                variant={progress?.grammarPracticed ? "outline" : "default"}
-              >
-                {progress?.grammarPracticed ? 'Review Grammar' : 'Start Grammar'}
-              </Button>
+          {/* Grammar Section */}
+          <div className="border rounded-lg p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Languages className="h-5 w-5 text-purple-600" />
+              <h4 className="font-semibold">Grammar</h4>
+              {progress?.grammarPracticed && (
+                <Check className="h-4 w-4 text-green-600" />
+              )}
             </div>
+            <p className="text-sm text-muted-foreground">
+              Practice grammar patterns
+            </p>
+            <Button
+              onClick={handleStartGrammar}
+              className="w-full"
+              variant={progress?.grammarPracticed ? "outline" : "default"}
+            >
+              {progress?.grammarPracticed ? 'Review Grammar' : 'Start Grammar'}
+            </Button>
           </div>
 
           {/* Sentence Practice Section (Full Width Below) */}
@@ -240,6 +251,13 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
           </div>
         </div>
       </CardContent>
+
+      {/* Dictionary Modal */}
+      <ModuleDictionaryModal
+        module={module}
+        isOpen={showDictionary}
+        onClose={() => setShowDictionary(false)}
+      />
     </Card>
   );
 }

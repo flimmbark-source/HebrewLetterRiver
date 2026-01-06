@@ -6,21 +6,18 @@
 import { createReadingText } from '../common/helpers.js';
 
 /**
- * Module 1: Greetings & Introductions Vocabulary
+ * Module 1: Greetings & Introductions Vocabulary - Section 1
+ * Basic greetings and pronouns
  */
-export const module1VocabText = createReadingText({
-  id: 'module-1-vocab',
+export const module1Vocab1Text = createReadingText({
+  id: 'module-1-vocab-1',
   title: {
-    en: 'Module 1 Vocabulary',
-    he: 'אוצר מילים מודול 1',
-    es: 'Vocabulario Módulo 1',
-    fr: 'Vocabulaire Module 1'
+    en: 'Vocabulary Part 1',
+    he: 'אוצר מילים חלק 1'
   },
   subtitle: {
-    en: 'Greetings & Introductions',
-    he: 'ברכות והיכרות',
-    es: 'Saludos e Introducciones',
-    fr: 'Salutations et Présentations'
+    en: 'Basic Greetings & Pronouns',
+    he: 'ברכות וכינויים בסיסיים'
   },
   practiceLanguage: 'hebrew',
   sectionId: 'modules',
@@ -31,20 +28,7 @@ export const module1VocabText = createReadingText({
     { type: 'word', text: 'אתה', id: 'you-m' },
     { type: 'word', text: 'את', id: 'you-f' },
     { type: 'word', text: 'אנחנו', id: 'we' },
-    { type: 'word', text: 'שמח', id: 'happy' },
-    { type: 'word', text: 'חדשה', id: 'new-f' },
-    { type: 'word', text: 'שפה', id: 'language' },
-    { type: 'word', text: 'שאלה', id: 'question' },
-    { type: 'word', text: 'תשובה', id: 'answer' },
-    { type: 'word', text: 'רעיון', id: 'idea' },
-    { type: 'word', text: 'היום', id: 'today' },
-    { type: 'word', text: 'כאן', id: 'here' },
-    { type: 'word', text: 'יחד', id: 'together' },
-    { type: 'word', text: 'רוצה', id: 'want' },
-    { type: 'word', text: 'לומדים', id: 'study' },
-    { type: 'word', text: 'לשאול', id: 'ask' },
-    { type: 'word', text: 'עוזר', id: 'help' },
-    { type: 'word', text: 'להתחיל', id: 'start' }
+    { type: 'word', text: 'שמח', id: 'happy' }
   ],
   glosses: {
     en: {
@@ -54,20 +38,7 @@ export const module1VocabText = createReadingText({
       'you-m': 'you (masculine)',
       'you-f': 'you (feminine)',
       we: 'we',
-      happy: 'happy',
-      'new-f': 'new (feminine)',
-      language: 'language',
-      question: 'question',
-      answer: 'answer',
-      idea: 'idea',
-      today: 'today',
-      here: 'here',
-      together: 'together',
-      want: 'want',
-      study: 'study, learn',
-      ask: 'to ask',
-      help: 'helps',
-      start: 'to start'
+      happy: 'happy'
     }
   },
   translations: {
@@ -78,14 +49,96 @@ export const module1VocabText = createReadingText({
       'you-m': { canonical: 'atah', variants: ['atah', 'ata'] },
       'you-f': { canonical: 'at', variants: ['at'] },
       we: { canonical: 'anachnu', variants: ['anachnu', 'anakhnu'] },
-      happy: { canonical: 'sameach', variants: ['sameach', 'same\'ach'] },
+      happy: { canonical: 'sameach', variants: ['sameach', 'same\'ach'] }
+    }
+  }
+});
+
+/**
+ * Module 1: Greetings & Introductions Vocabulary - Section 2
+ * Nouns and descriptive words
+ */
+export const module1Vocab2Text = createReadingText({
+  id: 'module-1-vocab-2',
+  title: {
+    en: 'Vocabulary Part 2',
+    he: 'אוצר מילים חלק 2'
+  },
+  subtitle: {
+    en: 'Nouns & Descriptions',
+    he: 'שמות עצם ותיאורים'
+  },
+  practiceLanguage: 'hebrew',
+  sectionId: 'modules',
+  tokens: [
+    { type: 'word', text: 'חדשה', id: 'new-f' },
+    { type: 'word', text: 'שפה', id: 'language' },
+    { type: 'word', text: 'שאלה', id: 'question' },
+    { type: 'word', text: 'תשובה', id: 'answer' },
+    { type: 'word', text: 'רעיון', id: 'idea' },
+    { type: 'word', text: 'היום', id: 'today' },
+    { type: 'word', text: 'כאן', id: 'here' }
+  ],
+  glosses: {
+    en: {
+      'new-f': 'new (feminine)',
+      language: 'language',
+      question: 'question',
+      answer: 'answer',
+      idea: 'idea',
+      today: 'today',
+      here: 'here'
+    }
+  },
+  translations: {
+    en: {
       'new-f': { canonical: 'chadashah', variants: ['chadashah', 'hadasha'] },
       language: { canonical: 'safah', variants: ['safah', 'safa'] },
       question: { canonical: 'she\'elah', variants: ['she\'elah', 'sheelah', 'shayla'] },
       answer: { canonical: 'teshuvah', variants: ['teshuvah', 'teshuva'] },
       idea: { canonical: 'ra\'ayon', variants: ['ra\'ayon', 'rayon'] },
       today: { canonical: 'hayom', variants: ['hayom', 'ha-yom'] },
-      here: { canonical: 'kan', variants: ['kan'] },
+      here: { canonical: 'kan', variants: ['kan'] }
+    }
+  }
+});
+
+/**
+ * Module 1: Greetings & Introductions Vocabulary - Section 3
+ * Action words and verbs
+ */
+export const module1Vocab3Text = createReadingText({
+  id: 'module-1-vocab-3',
+  title: {
+    en: 'Vocabulary Part 3',
+    he: 'אוצר מילים חלק 3'
+  },
+  subtitle: {
+    en: 'Actions & Verbs',
+    he: 'פעולות ופעלים'
+  },
+  practiceLanguage: 'hebrew',
+  sectionId: 'modules',
+  tokens: [
+    { type: 'word', text: 'יחד', id: 'together' },
+    { type: 'word', text: 'רוצה', id: 'want' },
+    { type: 'word', text: 'לומדים', id: 'study' },
+    { type: 'word', text: 'לשאול', id: 'ask' },
+    { type: 'word', text: 'עוזר', id: 'help' },
+    { type: 'word', text: 'להתחיל', id: 'start' }
+  ],
+  glosses: {
+    en: {
+      together: 'together',
+      want: 'want',
+      study: 'study, learn',
+      ask: 'to ask',
+      help: 'helps',
+      start: 'to start'
+    }
+  },
+  translations: {
+    en: {
       together: { canonical: 'yachad', variants: ['yachad', 'ya\'had'] },
       want: { canonical: 'rotseh', variants: ['rotseh', 'rotzeh'] },
       study: { canonical: 'lomdim', variants: ['lomdim', 'lom\'dim'] },
@@ -349,7 +402,9 @@ export const module4VocabText = createReadingText({
 });
 
 export const moduleVocabTexts = [
-  module1VocabText,
+  module1Vocab1Text,
+  module1Vocab2Text,
+  module1Vocab3Text,
   module2VocabText,
   module3VocabText,
   module4VocabText

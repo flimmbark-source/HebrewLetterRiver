@@ -37,7 +37,7 @@ export function getModuleProgress(moduleId: string): ModuleProgress | null {
 /**
  * Initialize progress for a module if it doesn't exist
  */
-export function initializeModuleProgress(moduleId: string, totalSentences: number): ModuleProgress {
+export function initializeModuleProgress(moduleId: string, totalSentences: number, totalVocabSections: number = 1): ModuleProgress {
   const existing = getModuleProgress(moduleId);
   if (existing) {
     return existing;
@@ -45,10 +45,11 @@ export function initializeModuleProgress(moduleId: string, totalSentences: numbe
 
   const newProgress: ModuleProgress = {
     moduleId,
-    vocabPracticed: false,
+    vocabSectionsPracticed: [],
     grammarPracticed: false,
     sentencesCompleted: 0,
     totalSentences,
+    totalVocabSections,
     isCompleted: false,
     unlockedAt: new Date().toISOString(),
   };
@@ -61,14 +62,14 @@ export function initializeModuleProgress(moduleId: string, totalSentences: numbe
 }
 
 /**
- * Mark vocab as practiced for a module
+ * Mark a vocab section as practiced for a module
  */
-export function markVocabPracticed(moduleId: string): void {
+export function markVocabSectionPracticed(moduleId: string, vocabTextId: string): void {
   const allProgress = getAllProgress();
   const progress = allProgress[moduleId];
 
-  if (progress) {
-    progress.vocabPracticed = true;
+  if (progress && !progress.vocabSectionsPracticed.includes(vocabTextId)) {
+    progress.vocabSectionsPracticed.push(vocabTextId);
     checkAndMarkCompleted(progress);
     saveAllProgress(allProgress);
   }
@@ -124,8 +125,10 @@ export function syncSentenceCompletion(moduleId: string, completedCount: number)
  * Check if module meets completion criteria and mark as completed
  */
 function checkAndMarkCompleted(progress: ModuleProgress): void {
+  const allVocabCompleted = progress.vocabSectionsPracticed.length >= progress.totalVocabSections;
+
   if (
-    progress.vocabPracticed &&
+    allVocabCompleted &&
     progress.grammarPracticed &&
     progress.sentencesCompleted >= progress.totalSentences &&
     !progress.isCompleted
@@ -179,7 +182,11 @@ export function autoUnlockNextModule(completedModuleId: string): void {
     // Initialize progress for the newly unlocked module
     const existingProgress = getModuleProgress(nextModule.id);
     if (!existingProgress) {
-      initializeModuleProgress(nextModule.id, nextModule.sentenceIds.length);
+      initializeModuleProgress(
+        nextModule.id,
+        nextModule.sentenceIds.length,
+        nextModule.vocabTextIds.length
+      );
     }
   }
 }
@@ -192,9 +199,11 @@ export function getModuleCompletionPercentage(moduleId: string): number {
   if (!progress) return 0;
 
   let completed = 0;
-  let total = 3; // vocab, grammar, sentences
+  let total = progress.totalVocabSections + 2; // all vocab sections + grammar + sentences
 
-  if (progress.vocabPracticed) completed++;
+  // Count completed vocab sections
+  completed += progress.vocabSectionsPracticed.length;
+
   if (progress.grammarPracticed) completed++;
   if (progress.sentencesCompleted >= progress.totalSentences) completed++;
 
@@ -216,7 +225,11 @@ export function initializeFirstModule(): void {
   if (firstModule) {
     const existingProgress = getModuleProgress(firstModule.id);
     if (!existingProgress) {
-      initializeModuleProgress(firstModule.id, firstModule.sentenceIds.length);
+      initializeModuleProgress(
+        firstModule.id,
+        firstModule.sentenceIds.length,
+        firstModule.vocabTextIds.length
+      );
     }
   }
 }
