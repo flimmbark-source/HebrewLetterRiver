@@ -52,6 +52,9 @@ export const module1GrammarText = createReadingText({
     { type: 'punct', text: '.' },
     { type: 'word', text: 'רעיון', id: 'rayon-grammar' },
     { type: 'word', text: 'להתחיל', id: 'lehatchil-grammar' },
+    { type: 'word', text: 'עוזר', id: 'ozer-grammar' },
+    { type: 'punct', text: '.' },
+    { type: 'word', text: 'רוצה', id: 'rotseh-grammar-4' },
     { type: 'word', text: 'יחד', id: 'yachad-grammar-2' },
     { type: 'punct', text: '!' },
     { type: 'word', text: 'תודה', id: 'todah-grammar' },
@@ -300,7 +303,9 @@ export const module4GrammarText = createReadingText({
 });
 
 export const moduleGrammarTexts = [
-  module1GrammarText,
+  module1Grammar1Text,
+  module1Grammar2Text,
+  module1Grammar3Text,
   module2GrammarText,
   module3GrammarText,
   module4GrammarText
