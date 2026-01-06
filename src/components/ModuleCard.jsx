@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Lock, Check, BookOpen, Languages, MessageSquare } from 'lucide-react';
 import ReadingArea from './ReadingArea';
-import GrammarCard from './GrammarCard';
 import SentencePracticeArea from './SentencePracticeArea';
 import {
   getModuleProgress,
@@ -24,7 +23,6 @@ import { getThemeStats } from '../lib/sentenceProgressStorage';
  */
 export default function ModuleCard({ module, isLocked, onModuleComplete }) {
   const [activeSection, setActiveSection] = useState(null); // 'vocab', 'grammar', or 'sentences'
-  const [currentGrammarIndex, setCurrentGrammarIndex] = useState(0);
   const [progress, setProgress] = useState(null);
   const [completionPercentage, setCompletionPercentage] = useState(0);
 
@@ -50,16 +48,11 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
     updateProgress();
   };
 
-  const handleGrammarComplete = (grammarId) => {
-    const nextIndex = currentGrammarIndex + 1;
-    if (nextIndex >= module.grammar.length) {
-      // All grammar practiced
-      markGrammarPracticed(module.id);
-      setActiveSection(null);
-      updateProgress();
-    } else {
-      setCurrentGrammarIndex(nextIndex);
-    }
+  const handleGrammarComplete = () => {
+    // Mark grammar as practiced when ReadingArea practice is complete
+    markGrammarPracticed(module.id);
+    setActiveSection(null);
+    updateProgress();
   };
 
   const handleSentenceComplete = () => {
@@ -84,7 +77,6 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
   };
 
   const handleStartGrammar = () => {
-    setCurrentGrammarIndex(0);
     setActiveSection('grammar');
   };
 
@@ -133,23 +125,10 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
 
   if (activeSection === 'grammar') {
     return (
-      <div className="w-full space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold">
-            {module.title} - Grammar
-          </h3>
-          <Button onClick={handleBack} variant="outline">
-            Back to Module
-          </Button>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          Pattern {currentGrammarIndex + 1} of {module.grammar.length}
-        </p>
-        <GrammarCard
-          grammar={module.grammar[currentGrammarIndex]}
-          onComplete={handleGrammarComplete}
-        />
-      </div>
+      <ReadingArea
+        textId={module.grammarTextId}
+        onBack={handleGrammarComplete}
+      />
     );
   }
 
@@ -221,7 +200,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                 )}
               </div>
               <p className="text-sm text-muted-foreground">
-                {module.grammar.length} patterns to learn
+                Practice grammar patterns
               </p>
               <Button
                 onClick={handleStartGrammar}

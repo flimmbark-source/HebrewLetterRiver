@@ -36,7 +36,7 @@ export interface LearningModule {
 
   // Content
   vocabTextId: string; // ID of reading text for vocab practice
-  grammar: GrammarPattern[];
+  grammarTextId: string; // ID of reading text for grammar practice
   sentenceIds: string[]; // references to sentences in the sentence data
 
   // Progression
