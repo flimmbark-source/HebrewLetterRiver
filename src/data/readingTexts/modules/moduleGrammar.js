@@ -128,6 +128,13 @@ export const module1GrammarText = createReadingText({
   }
 });
 
+// Backwards compatibility for any code that still expects the old
+// per-card grammar exports from Module 1. Map the removed names to the
+// unified text so stale references won't throw at runtime.
+export const module1Grammar1Text = module1GrammarText;
+export const module1Grammar2Text = module1GrammarText;
+export const module1Grammar3Text = module1GrammarText;
+
 /**
  * Module 2: At Home Grammar
  */
