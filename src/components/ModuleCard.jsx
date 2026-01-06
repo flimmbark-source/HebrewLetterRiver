@@ -27,6 +27,8 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
   const [progress, setProgress] = useState(null);
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [showDictionary, setShowDictionary] = useState(false);
+  const [selectedGrammarTextId, setSelectedGrammarTextId] = useState(module.grammarTextId);
+  const hasPerVocabGrammar = module.grammarTextIds?.length === module.vocabTextIds.length;
 
   // Load progress on mount and ensure module is initialized
   useEffect(() => {
@@ -40,7 +42,8 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
     }
     setProgress(moduleProgress);
     setCompletionPercentage(getModuleCompletionPercentage(module.id));
-  }, [module.id, module.sentenceIds.length, module.vocabTextIds.length]);
+    setSelectedGrammarTextId(module.grammarTextIds?.[0] || module.grammarTextId);
+  }, [module.id, module.sentenceIds.length, module.vocabTextIds.length, module.grammarTextId, module.grammarTextIds]);
 
   // Get sentences for this module
   const moduleSentences = allSentences.filter(s =>
@@ -78,7 +81,8 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
     }
   };
 
-  const handleStartGrammar = () => {
+  const handleStartGrammar = (grammarTextId) => {
+    setSelectedGrammarTextId(grammarTextId || module.grammarTextId);
     setActiveSection('grammar');
   };
 
@@ -128,7 +132,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
   if (activeSection === 'grammar') {
     return (
       <ReadingArea
-        textId={module.grammarTextId}
+        textId={selectedGrammarTextId || module.grammarTextId}
         onBack={handleGrammarComplete}
       />
     );
@@ -180,49 +184,101 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
       <CardContent>
         <div className="space-y-4">
           {/* Vocabulary Sections */}
-          {module.vocabTextIds.map((vocabTextId, index) => (
-            <div key={vocabTextId} className="grid gap-3 md:grid-cols-2">
-              <div className="border rounded-lg p-4 space-y-3">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-blue-600" />
-                  <h4 className="font-semibold">Vocabulary Part {index + 1}</h4>
-                  {progress?.vocabSectionsPracticed?.includes(vocabTextId) && (
-                    <Check className="h-4 w-4 text-green-600" />
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Practice vocabulary words
-                </p>
-                <Button
-                  onClick={() => setActiveSection(vocabTextId)}
-                  className="w-full"
-                  variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
-                >
-                  {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Review' : 'Start Practice'}
-                </Button>
-              </div>
+          {module.vocabTextIds.map((vocabTextId, index) => {
+            const grammarTextId = module.grammarTextIds?.[index] || module.grammarTextId;
 
-              <div className="border rounded-lg p-4 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Languages className="h-5 w-5 text-purple-600" />
-                  <h4 className="font-semibold">Grammar for Vocab Part {index + 1}</h4>
-                  {progress?.grammarPracticed && (
-                    <Check className="h-4 w-4 text-green-600" />
-                  )}
+            if (hasPerVocabGrammar) {
+              return (
+                <div key={vocabTextId} className="grid gap-3 md:grid-cols-2">
+                  <div className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-5 w-5 text-blue-600" />
+                      <h4 className="font-semibold">Vocabulary Part {index + 1}</h4>
+                      {progress?.vocabSectionsPracticed?.includes(vocabTextId) && (
+                        <Check className="h-4 w-4 text-green-600" />
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Practice vocabulary words
+                    </p>
+                    <Button
+                      onClick={() => setActiveSection(vocabTextId)}
+                      className="w-full"
+                      variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
+                    >
+                      {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Review' : 'Start Practice'}
+                    </Button>
+                  </div>
+
+                  <div className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Languages className="h-5 w-5 text-purple-600" />
+                      <h4 className="font-semibold">Grammar for Vocab Part {index + 1}</h4>
+                      {progress?.grammarPracticed && (
+                        <Check className="h-4 w-4 text-green-600" />
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Practice grammar with vocabulary words
+                    </p>
+                    <Button
+                      onClick={() => handleStartGrammar(grammarTextId)}
+                      className="w-full"
+                      variant={progress?.grammarPracticed ? "outline" : "default"}
+                    >
+                      {progress?.grammarPracticed ? 'Review Grammar' : 'Start Grammar'}
+                    </Button>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Uses repeated words from Vocabulary Part {index + 1} with this module's grammar pieces
-                </p>
-                <Button
-                  onClick={handleStartGrammar}
-                  className="w-full"
-                  variant={progress?.grammarPracticed ? "outline" : "default"}
-                >
-                  {progress?.grammarPracticed ? 'Review Grammar' : 'Start Grammar'}
-                </Button>
+              );
+            }
+
+            return (
+              <div key={vocabTextId} className="grid gap-3 md:grid-cols-1">
+                <div className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-blue-600" />
+                    <h4 className="font-semibold">Vocabulary Part {index + 1}</h4>
+                    {progress?.vocabSectionsPracticed?.includes(vocabTextId) && (
+                      <Check className="h-4 w-4 text-green-600" />
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Practice vocabulary words
+                  </p>
+                  <Button
+                    onClick={() => setActiveSection(vocabTextId)}
+                    className="w-full"
+                    variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
+                  >
+                    {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Review' : 'Start Practice'}
+                  </Button>
+                </div>
               </div>
+            );
+          })}
+
+          {!hasPerVocabGrammar && module.grammarTextId && (
+            <div className="border rounded-lg p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Languages className="h-5 w-5 text-purple-600" />
+                <h4 className="font-semibold">Grammar</h4>
+                {progress?.grammarPracticed && (
+                  <Check className="h-4 w-4 text-green-600" />
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Practice grammar with vocabulary words
+              </p>
+              <Button
+                onClick={() => handleStartGrammar(module.grammarTextId)}
+                className="w-full"
+                variant={progress?.grammarPracticed ? "outline" : "default"}
+              >
+                {progress?.grammarPracticed ? 'Review Grammar' : 'Start Grammar'}
+              </Button>
             </div>
-          ))}
+          )}
 
           {/* Sentence Practice Section (Full Width Below) */}
           <div className="border rounded-lg p-4 space-y-3">

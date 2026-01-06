@@ -39,23 +39,29 @@ export default function ModuleDictionaryModal({ module, isOpen, onClose }) {
 
   // Collect all words from grammar
   const grammarWords = [];
-  const grammarText = getReadingTextById(module.grammarTextId, 'hebrew');
-  if (grammarText && grammarText.tokens) {
-    grammarText.tokens.forEach(token => {
-      if (token.type === 'word') {
-        const transliteration = grammarText.translations?.en?.[token.id]?.canonical || token.id;
-        const langCode = getLanguageCode(appLanguageId);
-        const meaning = grammarText.glosses?.[langCode]?.[token.id] || grammarText.glosses?.en?.[token.id] || '—';
+  const grammarTextIds = module.grammarTextIds?.length
+    ? module.grammarTextIds
+    : [module.grammarTextId];
 
-        grammarWords.push({
-          hebrew: token.text,
-          transliteration,
-          meaning,
-          id: token.id
-        });
-      }
-    });
-  }
+  grammarTextIds.forEach(grammarTextId => {
+    const grammarText = getReadingTextById(grammarTextId, 'hebrew');
+    if (grammarText && grammarText.tokens) {
+      grammarText.tokens.forEach(token => {
+        if (token.type === 'word') {
+          const transliteration = grammarText.translations?.en?.[token.id]?.canonical || token.id;
+          const langCode = getLanguageCode(appLanguageId);
+          const meaning = grammarText.glosses?.[langCode]?.[token.id] || grammarText.glosses?.en?.[token.id] || '—';
+
+          grammarWords.push({
+            hebrew: token.text,
+            transliteration,
+            meaning,
+            id: token.id
+          });
+        }
+      });
+    }
+  });
 
   return (
     <div
