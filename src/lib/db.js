@@ -6,7 +6,7 @@
 import { openDB } from 'idb';
 
 const DB_NAME = 'HebrewLetterRiver';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 // Store names
 export const STORES = {
@@ -16,7 +16,8 @@ export const STORES = {
   STREAKS: 'streaks',
   GAME_SETTINGS: 'gameSettings',
   PREFERENCES: 'preferences',
-  OFFLINE_QUEUE: 'offlineQueue'
+  OFFLINE_QUEUE: 'offlineQueue',
+  SRS_PROGRESS: 'srsProgress'
 };
 
 /**
@@ -72,6 +73,16 @@ export async function initDB() {
             });
             queueStore.createIndex('timestamp', 'timestamp', { unique: false });
             queueStore.createIndex('processed', 'processed', { unique: false });
+          }
+        }
+
+        // Version 2: Add SRS (Spaced Repetition System) support
+        if (oldVersion < 2) {
+          // SRS Progress store: keyed by languageId
+          if (!db.objectStoreNames.contains(STORES.SRS_PROGRESS)) {
+            const srsStore = db.createObjectStore(STORES.SRS_PROGRESS, { keyPath: 'languageId' });
+            srsStore.createIndex('lastUpdated', 'lastUpdated', { unique: false });
+            srsStore.createIndex('lastReviewDate', 'lastReviewDate', { unique: false });
           }
         }
       }
@@ -268,6 +279,82 @@ export const Preferences = {
 
   async save(preferences) {
     return await dbPut(STORES.PREFERENCES, { key: 'default', ...preferences });
+  }
+};
+
+/**
+ * SRS Progress operations
+ */
+export const SRSProgress = {
+  async get(languageId) {
+    const data = await dbGet(STORES.SRS_PROGRESS, languageId);
+    return data || null;
+  },
+
+  async save(languageId, srsData) {
+    const data = {
+      languageId,
+      ...srsData,
+      lastUpdated: Date.now()
+    };
+    return await dbPut(STORES.SRS_PROGRESS, data);
+  },
+
+  async getAll() {
+    return await dbGetAll(STORES.SRS_PROGRESS);
+  },
+
+  /**
+   * Update a single item within the SRS progress
+   * @param {string} languageId - Language identifier
+   * @param {'letters' | 'vocabulary' | 'grammar'} itemType - Type of item
+   * @param {string} itemId - Item identifier
+   * @param {Object} itemData - SRS item data
+   */
+  async updateItem(languageId, itemType, itemId, itemData) {
+    const progress = await this.get(languageId) || {
+      letters: {},
+      vocabulary: {},
+      grammar: {},
+      settings: {},
+      statistics: {},
+      lastReviewDate: 0
+    };
+
+    // Update the specific item
+    if (!progress[itemType]) {
+      progress[itemType] = {};
+    }
+    progress[itemType][itemId] = itemData;
+
+    // Update lastReviewDate if this was a review
+    if (itemData.lastReviewDate > progress.lastReviewDate) {
+      progress.lastReviewDate = itemData.lastReviewDate;
+    }
+
+    return await this.save(languageId, progress);
+  },
+
+  /**
+   * Get items due for review
+   * @param {string} languageId - Language identifier
+   * @param {number} limit - Maximum items to return
+   */
+  async getDueItems(languageId, limit = 20) {
+    const progress = await this.get(languageId);
+    if (!progress) return [];
+
+    const now = Date.now();
+    const allItems = [
+      ...Object.values(progress.letters || {}),
+      ...Object.values(progress.vocabulary || {}),
+      ...Object.values(progress.grammar || {})
+    ];
+
+    return allItems
+      .filter(item => item.dueDate <= now)
+      .sort((a, b) => a.dueDate - b.dueDate)
+      .slice(0, limit);
   }
 };
 

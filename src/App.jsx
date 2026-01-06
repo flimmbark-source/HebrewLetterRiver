@@ -7,6 +7,7 @@ import SettingsView from './views/SettingsView.jsx';
 import DailyView from './views/DailyView.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import { ProgressProvider } from './context/ProgressContext.jsx';
+import { SRSProvider } from './context/SRSContext.jsx';
 import { GameProvider, useGame } from './context/GameContext.jsx';
 import { LocalizationProvider, useLocalization } from './context/LocalizationContext.jsx';
 import { LanguageProvider, useLanguage } from './context/LanguageContext.jsx';
@@ -325,11 +326,13 @@ export default function App() {
           <LocalizationProvider>
             <ToastProvider>
               <ProgressProvider>
-                <TutorialProvider>
-                  <GameProvider>
-                    <Shell />
-                  </GameProvider>
-                </TutorialProvider>
+                <SRSProvider>
+                  <TutorialProvider>
+                    <GameProvider>
+                      <Shell />
+                    </GameProvider>
+                  </TutorialProvider>
+                </SRSProvider>
               </ProgressProvider>
             </ToastProvider>
           </LocalizationProvider>
