@@ -9,6 +9,38 @@ import {
 } from '../lib/sentenceProgressStorage.ts';
 import WordHelperModal from './WordHelperModal.jsx';
 
+function normalizeWord(word) {
+  return word
+    .toLowerCase()
+    .replace(/[.,!?;:'"()\[\]]/g, '')
+    .trim();
+}
+
+function evaluateTranslation(correctSentence, response) {
+  const expectedWords = correctSentence.split(/\s+/);
+  const userWords = response.trim().split(/\s+/).filter(Boolean);
+
+  const evaluations = expectedWords.map((word, idx) => {
+    const expected = normalizeWord(word);
+    const provided = normalizeWord(userWords[idx] ?? '');
+    return {
+      word,
+      isMatch: expected.length > 0 && expected === provided
+    };
+  });
+
+  const correctCount = evaluations.filter((entry) => entry.isMatch).length;
+  const score = expectedWords.length > 0 ? correctCount / expectedWords.length : 0;
+  const status = score === 1 ? 'correct' : score >= 0.5 ? 'partial' : 'incorrect';
+
+  return {
+    evaluations,
+    status,
+    correctCount,
+    total: expectedWords.length
+  };
+}
+
 function SentenceWordSpan({ word, onClick }) {
   return (
     <button
@@ -68,8 +100,9 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(() => getNextSentenceIndex(theme, sentences));
   const [userResponse, setUserResponse] = useState('');
-  const [grade, setGrade] = useState(null);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [evaluation, setEvaluation] = useState(null);
+  const [responses, setResponses] = useState([]);
+  const [showResultsScreen, setShowResultsScreen] = useState(false);
   const [selectedWord, setSelectedWord] = useState(null);
   const [hintText, setHintText] = useState('');
   const [listeningMode, setListeningMode] = useState(() => {
@@ -82,6 +115,8 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
   useEffect(() => {
     const nextIndex = getNextSentenceIndex(theme, sentences);
     setCurrentIndex(nextIndex);
+    setResponses([]);
+    setShowResultsScreen(false);
   }, [theme, sentences]);
 
   const currentSentence = useMemo(
@@ -91,8 +126,7 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
 
   useEffect(() => {
     setUserResponse('');
-    setGrade(null);
-    setShowAnswer(false);
+    setEvaluation(null);
     setSelectedWord(null);
     setHintText('');
     setAudioAttempted(false);
@@ -102,20 +136,128 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
     localStorage.setItem('sentenceListeningMode', String(listeningMode));
   }, [listeningMode]);
 
-  const handleGrade = (result) => {
+  const progress = currentSentence
+    ? getSentenceProgress(currentSentence.theme, currentSentence.id)
+    : null;
+
+  const handleGrade = () => {
     if (!currentSentence) return;
-    setGrade(result);
-    recordSentenceResult(currentSentence.theme, currentSentence.id, result);
+    const nextEvaluation = evaluateTranslation(currentSentence.english, userResponse);
+    setEvaluation(nextEvaluation);
+    recordSentenceResult(currentSentence.theme, currentSentence.id, nextEvaluation.status);
+    setResponses((prev) => {
+      const filtered = prev.filter((entry) => entry.sentenceId !== currentSentence.id);
+      return [
+        ...filtered,
+        {
+          sentenceId: currentSentence.id,
+          sentenceIndex: currentIndex,
+          userResponse: userResponse.trim(),
+          result: nextEvaluation.status,
+          correctSentence: currentSentence.english
+        }
+      ];
+    });
   };
 
   const handleNext = () => {
-    const nextIndex = (currentIndex + 1) % sentences.length;
+    if (currentIndex === sentences.length - 1) {
+      setShowResultsScreen(true);
+      return;
+    }
+    const nextIndex = currentIndex + 1;
     setCurrentIndex(nextIndex);
   };
 
-  const handleWordBankClick = (token) => {
-    setUserResponse((prev) => (prev ? `${prev} ${token}` : token));
+  const handleRestart = () => {
+    setResponses([]);
+    setShowResultsScreen(false);
+    setCurrentIndex(0);
   };
+
+  if (showResultsScreen) {
+    const sortedResponses = [...responses].sort((a, b) => a.sentenceIndex - b.sentenceIndex);
+    const correctCount = sortedResponses.filter((entry) => entry.result === 'correct').length;
+    const partialCount = sortedResponses.filter((entry) => entry.result === 'partial').length;
+    const incorrectCount = sortedResponses.filter((entry) => entry.result === 'incorrect').length;
+
+    return (
+      <div className="space-y-4 p-4">
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={onExit}
+            className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            {t('reading.back')}
+          </button>
+          <button
+            type="button"
+            onClick={handleRestart}
+            className="rounded-md bg-slate-800 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-slate-700"
+          >
+            {t('read.sentence.restartCard', 'Restart card')}
+          </button>
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-slate-800">
+            {t('read.sentence.resultsTitle', 'Sentence practice results')}
+          </h3>
+          <p className="text-sm text-slate-600">
+            {t('read.sentence.resultsSummary', 'You finished this card! Here is how you did.')}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-2 text-xs font-semibold">
+          <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
+            {t('read.sentence.grade.correct')}: {correctCount}
+          </span>
+          <span className="rounded-full bg-amber-100 px-3 py-1 text-amber-800">
+            {t('read.sentence.grade.partial')}: {partialCount}
+          </span>
+          <span className="rounded-full bg-rose-100 px-3 py-1 text-rose-800">
+            {t('read.sentence.grade.incorrect')}: {incorrectCount}
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          {sortedResponses.map((entry) => (
+            <div
+              key={entry.sentenceId}
+              className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-800">
+                  {t('read.sentence.translationPrompt')} #{entry.sentenceIndex + 1}
+                </p>
+                <span
+                  className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                    entry.result === 'correct'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : entry.result === 'partial'
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-rose-100 text-rose-800'
+                  }`}
+                >
+                  {t(`read.sentence.grade.${entry.result}`)}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-slate-600">
+                <span className="font-semibold text-slate-700">{t('reading.answer')}:</span> {entry.correctSentence}
+              </p>
+              <p className="text-xs text-slate-600">
+                <span className="font-semibold text-slate-700">
+                  {t('read.sentence.yourAnswerLabel', 'Your answer')}:
+                </span>{' '}
+                {entry.userResponse || t('read.sentence.noResponse', 'No response')}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (!currentSentence) {
     return (
@@ -133,8 +275,9 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
   }
 
   const isGuided = currentSentence.difficulty <= 2;
-  const wordBank = isGuided ? currentSentence.english.split(/\s+/) : [];
-  const progress = getSentenceProgress(currentSentence.theme, currentSentence.id);
+  const isGraded = Boolean(evaluation);
+  const primaryAction = isGraded ? handleNext : handleGrade;
+  const primaryLabel = isGraded ? t('read.sentence.next') : t('read.sentence.gradeAction', 'Grade');
 
   return (
     <div className="space-y-4 p-4">
@@ -195,77 +338,73 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
           </div>
         )}
         {isGuided ? (
-          <div className="space-y-3">
-            <div className="flex flex-wrap gap-2">
-              {wordBank.map((token, idx) => (
-                <button
-                  key={`${token}-${idx}`}
-                  type="button"
-                  className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-800 hover:bg-slate-200"
-                  onClick={() => handleWordBankClick(token)}
-                >
-                  {token}
-                </button>
-              ))}
-            </div>
-            <input
-              type="text"
-              value={userResponse}
-              onChange={(e) => setUserResponse(e.target.value)}
-              placeholder={t('read.sentence.guidedPlaceholder')}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-amber-400 focus:outline-none"
-            />
-          </div>
+          <input
+            type="text"
+            value={userResponse}
+            onChange={(e) => setUserResponse(e.target.value)}
+            disabled={isGraded}
+            placeholder={t('read.sentence.guidedPlaceholder')}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-amber-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-50"
+          />
         ) : (
           <textarea
             value={userResponse}
             onChange={(e) => setUserResponse(e.target.value)}
+            disabled={isGraded}
             placeholder={t('read.sentence.freeResponsePlaceholder')}
             rows={3}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-amber-400 focus:outline-none"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-amber-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-50"
           />
         )}
       </div>
 
+      {evaluation && (
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-800">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="font-semibold">{t('reading.answer')}:</p>
+            <span
+              className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                evaluation.status === 'correct'
+                  ? 'bg-emerald-100 text-emerald-800'
+                  : evaluation.status === 'partial'
+                    ? 'bg-amber-100 text-amber-800'
+                    : 'bg-rose-100 text-rose-800'
+              }`}
+            >
+              {t(`read.sentence.grade.${evaluation.status}`)}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2 text-base leading-relaxed">
+            {evaluation.evaluations.map((entry, idx) => (
+              <span
+                key={`evaluation-${idx}`}
+                className={`rounded-md px-2 py-1 font-medium ${
+                  entry.isMatch ? 'bg-emerald-50 text-emerald-800' : 'bg-rose-50 text-rose-800'
+                }`}
+              >
+                {entry.word}
+              </span>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-slate-600">
+            <span className="font-semibold text-slate-700">{t('read.sentence.yourAnswerLabel', 'Your answer')}:</span>{' '}
+            {userResponse || t('read.sentence.noResponse', 'No response')}
+          </p>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
-          onClick={() => setShowAnswer((prev) => !prev)}
-          className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100"
-        >
-          {showAnswer ? t('reading.hideAnswer') : t('reading.showAnswer')}
-        </button>
-        <div className="flex items-center gap-2">
-          {['correct', 'partial', 'incorrect'].map((result) => (
-            <button
-              key={result}
-              type="button"
-              onClick={() => handleGrade(result)}
-              className={`rounded-md px-3 py-2 text-sm font-medium shadow-sm transition-colors ${
-                grade === result
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-white text-slate-800 hover:bg-slate-50'
-              }`}
-            >
-              {t(`read.sentence.grade.${result}`)}
-            </button>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={handleNext}
+          onClick={primaryAction}
           className="ml-auto rounded-md bg-slate-800 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-slate-700"
         >
-          {t('read.sentence.next')}
+          {primaryLabel}
         </button>
+        {!isGraded && (
+          <p className="text-xs text-slate-500">{t('read.sentence.gradeHint', 'Type your translation, then tap Grade')}</p>
+        )}
       </div>
-
-      {showAnswer && (
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-800">
-          <p className="font-semibold">{t('reading.answer')}:</p>
-          <p>{currentSentence.english}</p>
-        </div>
-      )}
 
       <WordHelperModal
         word={selectedWord}
