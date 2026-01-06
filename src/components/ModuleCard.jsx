@@ -211,7 +211,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Uses repeated words from Vocabulary Part {index + 1} with this module's grammar pieces
+                  Practice grammar with vocabulary words
                 </p>
                 <Button
                   onClick={handleStartGrammar}
