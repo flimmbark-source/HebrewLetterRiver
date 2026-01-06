@@ -13,6 +13,7 @@ import { VowelLayoutIcon } from './reading/VowelLayoutIcon.jsx';
 import VowelLayoutTeachingModal from './reading/VowelLayoutTeachingModal.jsx';
 import VowelLayoutSystemModal from './reading/VowelLayoutSystemModal.jsx';
 import { isLayoutLearned, hasShownSystemIntro, setShownSystemIntro } from '../lib/vowelLayoutProgress.js';
+import WordHelperModal from './WordHelperModal.jsx';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -51,6 +52,8 @@ export default function ReadingArea({ textId, onBack }) {
   const [gameFont, setGameFont] = useState('default');
   const [teachingTransliteration, setTeachingTransliteration] = useState(null);
   const [showSystemModal, setShowSystemModal] = useState(false);
+  const [helperWord, setHelperWord] = useState(null);
+  const [helperHint, setHelperHint] = useState('');
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -146,6 +149,11 @@ export default function ReadingArea({ textId, onBack }) {
       ttsService.stop();
     };
   }, []);
+
+  // Clear helper hint when moving to a different word
+  useEffect(() => {
+    setHelperHint('');
+  }, [wordIndex]);
 
   // Filter out punctuation for word navigation
   const words = readingText?.tokens?.filter(t => t.type === 'word') || [];
@@ -646,8 +654,22 @@ useEffect(() => {
                   </span>
                 </div>
 
-                {/* Right: TTS Speak Button */}
-                <div className="flex justify-end pointer-events-auto">
+                {/* Right: Helper + TTS */}
+                <div className="flex items-center justify-end gap-2 pointer-events-auto">
+                  <button
+                    type="button"
+                    disabled={!currentWord}
+                    onClick={() =>
+                      setHelperWord(
+                        currentWord
+                          ? { hebrew: currentWord.text, wordId: currentWord.id, surface: currentWord.text }
+                          : null
+                      )
+                    }
+                    className="rounded-full border border-slate-600 bg-slate-800 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700 disabled:opacity-50"
+                  >
+                    {t('read.sentence.wordHelper')}
+                  </button>
                   <SpeakButton
                     nativeText={currentWord?.text || ''}
                     nativeLocale={getLocaleForTts(practiceLanguageId)}
@@ -657,6 +679,9 @@ useEffect(() => {
                   />
                 </div>
               </div>
+              {helperHint && (
+                <div className="w-full px-2 text-left text-xs text-amber-200">{helperHint}</div>
+              )}
               {/* Reading words track */}
               <div className="relative flex w-full min-w-0 items-center overflow-hidden">
               <div
@@ -961,6 +986,15 @@ useEffect(() => {
           isVisible={showSystemModal}
           onClose={() => setShowSystemModal(false)}
           appFontClass={appFontClass}
+        />
+
+        <WordHelperModal
+          word={helperWord}
+          practiceLanguageId={practiceLanguageId}
+          appLanguageId={appLanguageId}
+          onUseHint={setHelperHint}
+          onClose={() => setHelperWord(null)}
+          t={t}
         />
 
         {/* Vowel Layout Teaching Modal */}

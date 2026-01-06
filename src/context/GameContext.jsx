@@ -12,6 +12,8 @@ import { setupGame } from '../game/game.js';
 import { useLocalization } from './LocalizationContext.jsx';
 import { useTutorial } from './TutorialContext.jsx';
 import { ErrorBoundary } from '../ErrorBoundary.jsx';
+import { on } from '../lib/eventBus.js';
+import PostGameReview from '../components/PostGameReview.jsx';
 
 const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
 
@@ -19,6 +21,8 @@ export function GameProvider({ children }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isGameRunning, setIsGameRunning] = useState(false);
   const [options, setOptions] = useState(null);
+  const [sessionData, setSessionData] = useState(null);
+  const [showPostGameReview, setShowPostGameReview] = useState(false);
   const containerRef = useRef(null);
   const gameApiRef = useRef(null);
   const [hasMounted, setHasMounted] = useState(false);
@@ -104,8 +108,14 @@ export function GameProvider({ children }) {
     if (!gameApiRef.current) {
       gameApiRef.current = setupGame({
         onReturnToMenu: () => {
-          setIsVisible(false);
-          setIsGameRunning(false);
+          // If we have session data, show post-game review instead of closing immediately
+          if (sessionData) {
+            setShowPostGameReview(true);
+            setIsGameRunning(false);
+          } else {
+            setIsVisible(false);
+            setIsGameRunning(false);
+          }
         },
         onGameStart: () => {
           setIsGameRunning(true);
@@ -128,7 +138,7 @@ export function GameProvider({ children }) {
       shouldAutostartRef.current = false; // Clear flag after using it
       requestAnimationFrame(() => api.startGame());
     }
-  }, [isVisible, options, languagePack, t, dictionary, interfaceLanguagePack.id]);
+  }, [isVisible, options, languagePack, t, dictionary, interfaceLanguagePack.id, sessionData]);
 
   // Start pending tutorial when game becomes visible
   useEffect(() => {
@@ -140,6 +150,18 @@ export function GameProvider({ children }) {
       return () => clearTimeout(timer);
     }
   }, [isVisible, pendingTutorial, startPendingTutorial]);
+
+  // Listen for game session complete to show post-game review
+  useEffect(() => {
+    const offSessionComplete = on('game:session-complete', (payload) => {
+      // Store session data for post-game review
+      setSessionData(payload);
+    });
+
+    return () => {
+      offSessionComplete();
+    };
+  }, []);
 
   // Restore game modal if gameSetup tutorial is active (e.g., after page refresh)
   useEffect(() => {
@@ -177,6 +199,8 @@ export function GameProvider({ children }) {
     shouldAutostartRef.current = false;
     setIsVisible(false);
     setIsGameRunning(false);
+    setShowPostGameReview(false);
+    setSessionData(null);
   }, []);
 
   const contextValue = useMemo(
@@ -231,6 +255,34 @@ export function GameProvider({ children }) {
                 </div>
               </div>
             </div>,
+            document.body,
+          )
+        : null}
+      {hasMounted && showPostGameReview && sessionData
+        ? createPortal(
+            <PostGameReview
+              sessionData={sessionData}
+              onPlayAgain={() => {
+                // Reset states and restart game
+                setShowPostGameReview(false);
+                setSessionData(null);
+                if (gameApiRef.current) {
+                  gameApiRef.current.resetToSetupScreen();
+                  gameApiRef.current.startGame();
+                  setIsGameRunning(true);
+                }
+              }}
+              onHome={() => {
+                // Close everything and go home
+                setShowPostGameReview(false);
+                setSessionData(null);
+                setIsVisible(false);
+                setIsGameRunning(false);
+                if (gameApiRef.current) {
+                  gameApiRef.current.resetToSetupScreen();
+                }
+              }}
+            />,
             document.body,
           )
         : null}

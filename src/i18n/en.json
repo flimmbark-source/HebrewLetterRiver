@@ -350,6 +350,11 @@
     "cafeTalkDesc": "Essential conversational vocabulary for everyday communication.",
     "noTexts": "No reading texts available for this language yet.",
     "comingSoon": "Check back soon for more practice content!",
+    "sentencesIntro": "Practice full sentences by tapping words for help, then try translating.",
+    "mode": {
+      "vocab": "Practice Vocab",
+      "sentences": "Sentences"
+    },
     "dictionary": {
       "button": "Dictionary",
       "title": "Dictionary",
@@ -360,6 +365,53 @@
       "meaning": "Meaning",
       "noResults": "No words match your search.",
       "noWords": "No words available in this section."
+    },
+    "sentence": {
+      "wordHelper": "Word Helper",
+      "dictionary": "Dictionary entry",
+      "dictionaryTab": "Dictionary",
+      "noDictionary": "No dictionary entry found yet.",
+      "grammarTab": "Grammar",
+      "grammarPlaceholder": "Grammar breakdown",
+      "grammarOriginal": "Original",
+      "grammarSegments": "Segments",
+      "grammarMeaning": "Combined meaning",
+      "grammarMeaningFallback": "Meaning hints coming soon",
+      "grammarComingSoon": "Detailed grammar notes coming soon.",
+      "grammarPrefixes": "Prefixes",
+      "grammarBase": "Base",
+      "grammarSuffixes": "Suffixes",
+      "grammarNotes": "Notes",
+      "grammarConfidence": "Confidence",
+      "grammarBaseMissing": "Base form not found yet",
+      "grammarFallback": "No morphology hints yet.",
+      "useHint": "Use as hint",
+      "noSentence": "No sentence available yet.",
+      "difficulty": "Tier {{level}}",
+      "lastResult": "Last: {{result}}",
+      "listeningMode": "Listening first",
+      "listeningPending": "Audio will play first when available. For now, tap to reveal the text.",
+      "showText": "Show text",
+      "translationPrompt": "Translate this sentence",
+      "guidedPlaceholder": "Build your translation...",
+      "freeResponsePlaceholder": "Type your translation...",
+      "gradeAction": "Grade",
+      "grade": {
+        "correct": "Correct",
+        "partial": "Partial",
+        "incorrect": "Incorrect"
+      },
+      "gradeHint": "Type your translation, then tap Grade",
+      "next": "Next",
+      "resultsTitle": "Sentence practice results",
+      "resultsSummary": "You finished this card! Here is how you did.",
+      "restartCard": "Restart card",
+      "yourAnswerLabel": "Your answer",
+      "noResponse": "No response",
+      "card": {
+        "progress": "practiced",
+        "callToAction": "Open sentence practice"
+      }
     }
   },
   "reading": {
