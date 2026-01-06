@@ -5,11 +5,10 @@ import { SRSProgress } from '../lib/db.js';
 import {
   defaultSRSSettings,
   createSRSItem,
-  calculateNextReview,
-  getDueItems,
   calculateStatistics,
   isDue
 } from '../lib/srsTypes.js';
+import { SRSEngine, GRADE, MATURITY } from '../lib/SRSEngine.js';
 import { emit } from '../lib/eventBus.js';
 
 const SRSContext = createContext(null);
@@ -45,6 +44,16 @@ export function SRSProvider({ children }) {
   const hydratedLanguageRef = useRef(languageId);
   const isInitialHydrationRef = useRef(true);
   const [isHydrationComplete, setIsHydrationComplete] = useState(false);
+
+  // Create SRS engine instance
+  const engine = useMemo(() => new SRSEngine({
+    minEaseFactor: 1.3,
+    initialEaseFactor: 2.5,
+    easyBonus: 1.3,
+    hardInterval: 1.2,
+    maxReviewsPerDay: 200,
+    maxNewPerDay: 20
+  }), []);
 
   /**
    * Load SRS progress from IndexedDB
@@ -169,8 +178,8 @@ export function SRSProvider({ children }) {
         return prev;
       }
 
-      // Calculate next review using SM-2 algorithm
-      updatedItem = calculateNextReview(currentItem, grade);
+      // Calculate next review using SRSEngine
+      updatedItem = engine.processReview(currentItem, grade);
 
       const updated = {
         ...prev,
@@ -192,6 +201,7 @@ export function SRSProvider({ children }) {
         timeSpent,
         newInterval: updatedItem.interval,
         nextDueDate: updatedItem.dueDate,
+        maturity: engine.getMaturity(updatedItem),
         languageId
       });
 
@@ -199,7 +209,7 @@ export function SRSProvider({ children }) {
     });
 
     return updatedItem;
-  }, [languageId]);
+  }, [languageId, engine]);
 
   /**
    * Get items that are due for review
@@ -208,16 +218,32 @@ export function SRSProvider({ children }) {
    * @returns {Array} Due items
    */
   const getDueItemsForType = useCallback((itemType = 'all', limit = 20) => {
-    if (itemType === 'all') {
-      return getDueItems({
-        ...progress.letters,
-        ...progress.vocabulary,
-        ...progress.grammar
-      }, limit);
-    }
+    const allItems = itemType === 'all'
+      ? [...Object.values(progress.letters), ...Object.values(progress.vocabulary), ...Object.values(progress.grammar)]
+      : Object.values(progress[itemType] || {});
 
-    return getDueItems(progress[itemType] || {}, limit);
-  }, [progress]);
+    return engine.getDailyQueue(allItems, { maxReviews: limit, includeNew: false }).queue;
+  }, [progress, engine]);
+
+  /**
+   * Get daily review queue with intelligent sorting and statistics
+   * @param {Object} options - Queue options
+   * @returns {Object} Queue with items, statistics, and overflow indicator
+   */
+  const getDailyQueue = useCallback((options = {}) => {
+    const allItems = [
+      ...Object.values(progress.letters),
+      ...Object.values(progress.vocabulary),
+      ...Object.values(progress.grammar)
+    ];
+
+    return engine.getDailyQueue(allItems, {
+      maxReviews: progress.settings?.reviewsPerDay || 200,
+      maxNew: progress.settings?.newCardsPerDay || 20,
+      includeNew: options.includeNew !== undefined ? options.includeNew : false,
+      ...options
+    });
+  }, [progress, engine]);
 
   /**
    * Get new items that haven't been reviewed yet
@@ -343,22 +369,73 @@ export function SRSProvider({ children }) {
     }
   }, [languageId]);
 
+  /**
+   * Get item statistics from the engine
+   * @param {string} itemId - Item identifier
+   * @param {'letter' | 'vocabulary' | 'grammar'} itemType - Type of item
+   * @returns {Object|null} Item statistics
+   */
+  const getItemStats = useCallback((itemId, itemType) => {
+    const item = progress[itemType]?.[itemId];
+    return item ? engine.getItemStats(item) : null;
+  }, [progress, engine]);
+
+  /**
+   * Get maturity level of an item
+   * @param {string} itemId - Item identifier
+   * @param {'letter' | 'vocabulary' | 'grammar'} itemType - Type of item
+   * @returns {string|null} Maturity level (new, learning, young, mature)
+   */
+  const getItemMaturity = useCallback((itemId, itemType) => {
+    const item = progress[itemType]?.[itemId];
+    return item ? engine.getMaturity(item) : null;
+  }, [progress, engine]);
+
+  /**
+   * Get forecast for upcoming reviews
+   * @param {number} days - Number of days to forecast
+   * @returns {Array} Forecast by day
+   */
+  const getForecast = useCallback((days = 7) => {
+    const allItems = [
+      ...Object.values(progress.letters),
+      ...Object.values(progress.vocabulary),
+      ...Object.values(progress.grammar)
+    ];
+    return engine.getForecast(allItems, days);
+  }, [progress, engine]);
+
   const value = useMemo(
     () => ({
+      // State
       progress,
       isLoading,
+      statistics: progress.statistics,
+      settings: progress.settings,
+
+      // Core operations
       addItem,
       reviewItem,
-      getDueItems: getDueItemsForType,
-      getNewItems,
       updateSettings,
       resetItem,
       removeItem,
-      isItemDue,
-      getItem,
       resetProgress,
-      statistics: progress.statistics,
-      settings: progress.settings
+
+      // Query operations
+      getDueItems: getDueItemsForType,
+      getDailyQueue,
+      getNewItems,
+      getItem,
+      isItemDue,
+
+      // Statistics and analysis
+      getItemStats,
+      getItemMaturity,
+      getForecast,
+
+      // Constants from engine
+      GRADE,
+      MATURITY
     }),
     [
       progress,
@@ -366,12 +443,16 @@ export function SRSProvider({ children }) {
       addItem,
       reviewItem,
       getDueItemsForType,
+      getDailyQueue,
       getNewItems,
       updateSettings,
       resetItem,
       removeItem,
       isItemDue,
       getItem,
+      getItemStats,
+      getItemMaturity,
+      getForecast,
       resetProgress
     ]
   );

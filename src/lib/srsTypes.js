@@ -3,6 +3,8 @@
  * Based on the SM-2 algorithm for optimal learning intervals
  */
 
+import { defaultEngine } from './SRSEngine.js';
+
 /**
  * @typedef {Object} SRSItem
  * @property {string} itemId - Unique identifier for the item (e.g., letter ID, word ID)
@@ -104,46 +106,14 @@ export function createSRSItem(itemId, itemType) {
 
 /**
  * Calculate next review using SM-2 algorithm
+ * @deprecated Use SRSEngine.processReview() instead for full SM-2 implementation
  * @param {SRSItem} item - Current SRS item
  * @param {number} grade - Quality of recall (0-5)
  * @returns {SRSItem} Updated SRS item
  */
 export function calculateNextReview(item, grade) {
-  const now = Date.now();
-  const updated = { ...item };
-
-  // Update recent grades (keep last 5)
-  updated.recentGrades = [...(item.recentGrades || []), grade].slice(-5);
-  updated.lastReviewDate = now;
-  updated.reviewCount += 1;
-
-  // Grade < 3 is a lapse (incorrect answer)
-  if (grade < 3) {
-    updated.lapseCount += 1;
-    updated.interval = 0; // Reset to beginning
-    updated.dueDate = now; // Due immediately
-  } else {
-    // Update ease factor based on grade
-    const efDelta = 0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02);
-    updated.easeFactor = Math.max(1.3, item.easeFactor + efDelta);
-
-    // Calculate new interval
-    if (item.interval === 0) {
-      // First successful review
-      updated.interval = 1;
-    } else if (item.interval === 1) {
-      // Second successful review
-      updated.interval = 6;
-    } else {
-      // Subsequent reviews
-      updated.interval = Math.round(item.interval * updated.easeFactor);
-    }
-
-    // Set due date
-    updated.dueDate = now + updated.interval * 24 * 60 * 60 * 1000;
-  }
-
-  return updated;
+  // Use the SRSEngine for consistent algorithm implementation
+  return defaultEngine.processReview(item, grade);
 }
 
 /**
