@@ -303,9 +303,7 @@ export const module4GrammarText = createReadingText({
 });
 
 export const moduleGrammarTexts = [
-  module1Grammar1Text,
-  module1Grammar2Text,
-  module1Grammar3Text,
+  module1GrammarText,
   module2GrammarText,
   module3GrammarText,
   module4GrammarText
