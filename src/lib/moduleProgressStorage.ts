@@ -4,6 +4,36 @@ import { learningModules } from '../data/modules';
 const STORAGE_KEY = 'hebrewLetterRiver_moduleProgress';
 
 /**
+ * Migrate old progress data to new schema
+ */
+function migrateProgressData(progress: any): ModuleProgress {
+  // If old schema (vocabPracticed boolean), migrate to new schema
+  if ('vocabPracticed' in progress && !('vocabSectionsPracticed' in progress)) {
+    const module = learningModules.find(m => m.id === progress.moduleId);
+    return {
+      ...progress,
+      vocabSectionsPracticed: progress.vocabPracticed
+        ? (module?.vocabTextIds || [module?.vocabTextIds?.[0] || 'module-1-vocab']).slice(0, 1)
+        : [],
+      totalVocabSections: module?.vocabTextIds?.length || 1,
+    };
+  }
+
+  // Ensure totalVocabSections exists
+  if (!progress.totalVocabSections) {
+    const module = learningModules.find(m => m.id === progress.moduleId);
+    progress.totalVocabSections = module?.vocabTextIds?.length || 1;
+  }
+
+  // Ensure vocabSectionsPracticed is an array
+  if (!progress.vocabSectionsPracticed) {
+    progress.vocabSectionsPracticed = [];
+  }
+
+  return progress;
+}
+
+/**
  * Get all module progress from localStorage
  */
 function getAllProgress(): Record<string, ModuleProgress> {
@@ -12,7 +42,13 @@ function getAllProgress(): Record<string, ModuleProgress> {
     return {};
   }
   try {
-    return JSON.parse(stored);
+    const parsed = JSON.parse(stored);
+    // Migrate old data
+    const migrated: Record<string, ModuleProgress> = {};
+    for (const key in parsed) {
+      migrated[key] = migrateProgressData(parsed[key]);
+    }
+    return migrated;
   } catch (e) {
     console.error('Failed to parse module progress:', e);
     return {};
@@ -125,7 +161,11 @@ export function syncSentenceCompletion(moduleId: string, completedCount: number)
  * Check if module meets completion criteria and mark as completed
  */
 function checkAndMarkCompleted(progress: ModuleProgress): void {
-  const allVocabCompleted = progress.vocabSectionsPracticed.length >= progress.totalVocabSections;
+  // Handle old progress data
+  const totalVocabSections = progress.totalVocabSections || 1;
+  const vocabSectionsPracticed = progress.vocabSectionsPracticed || [];
+
+  const allVocabCompleted = vocabSectionsPracticed.length >= totalVocabSections;
 
   if (
     allVocabCompleted &&
@@ -198,11 +238,15 @@ export function getModuleCompletionPercentage(moduleId: string): number {
   const progress = getModuleProgress(moduleId);
   if (!progress) return 0;
 
+  // Handle old progress data that doesn't have totalVocabSections
+  const totalVocabSections = progress.totalVocabSections || 1;
+  const vocabSectionsPracticed = progress.vocabSectionsPracticed || [];
+
   let completed = 0;
-  let total = progress.totalVocabSections + 2; // all vocab sections + grammar + sentences
+  let total = totalVocabSections + 2; // all vocab sections + grammar + sentences
 
   // Count completed vocab sections
-  completed += progress.vocabSectionsPracticed.length;
+  completed += vocabSectionsPracticed.length;
 
   if (progress.grammarPracticed) completed++;
   if (progress.sentencesCompleted >= progress.totalSentences) completed++;
