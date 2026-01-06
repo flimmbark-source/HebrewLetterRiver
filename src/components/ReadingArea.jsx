@@ -654,22 +654,8 @@ useEffect(() => {
                   </span>
                 </div>
 
-                {/* Right: Helper + TTS */}
-                <div className="flex items-center justify-end gap-2 pointer-events-auto">
-                  <button
-                    type="button"
-                    disabled={!currentWord}
-                    onClick={() =>
-                      setHelperWord(
-                        currentWord
-                          ? { hebrew: currentWord.text, wordId: currentWord.id, surface: currentWord.text }
-                          : null
-                      )
-                    }
-                    className="rounded-full border border-slate-600 bg-slate-800 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700 disabled:opacity-50"
-                  >
-                    {t('read.sentence.wordHelper')}
-                  </button>
+                {/* Right: TTS */}
+                <div className="flex items-center justify-end pointer-events-auto">
                   <SpeakButton
                     nativeText={currentWord?.text || ''}
                     nativeLocale={getLocaleForTts(practiceLanguageId)}
@@ -710,10 +696,21 @@ useEffect(() => {
                   <span
                     key={token.id || idx}
                     className={`${practiceFontClass} ${gameFontClass} whitespace-nowrap text-3xl leading-tight transition-opacity sm:text-4xl ${
-                      isActive ? 'opacity-100' : 'opacity-50'
+                      isActive ? 'opacity-100 cursor-pointer hover:scale-105 transition-transform' : 'opacity-50'
                     }`}
-                    style={{ letterSpacing: '0.4px', transform: 'translateY(1px)' }}
+                    style={{
+                      letterSpacing: '0.4px',
+                      transform: 'translateY(1px)',
+                      pointerEvents: isActive ? 'auto' : 'none'
+                    }}
                     data-active={isActive}
+                    onClick={isActive ? () => {
+                      setHelperWord({
+                        hebrew: token.text,
+                        wordId: token.id,
+                        surface: token.text
+                      });
+                    } : undefined}
                   >
                     {token.text}
                   </span>
