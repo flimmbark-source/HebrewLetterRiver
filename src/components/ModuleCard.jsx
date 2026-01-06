@@ -181,47 +181,48 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
         <div className="space-y-4">
           {/* Vocabulary Sections */}
           {module.vocabTextIds.map((vocabTextId, index) => (
-            <div key={vocabTextId} className="border rounded-lg p-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-blue-600" />
-                <h4 className="font-semibold">Vocabulary Part {index + 1}</h4>
-                {progress?.vocabSectionsPracticed?.includes(vocabTextId) && (
-                  <Check className="h-4 w-4 text-green-600" />
-                )}
+            <div key={vocabTextId} className="grid gap-3 md:grid-cols-2">
+              <div className="border rounded-lg p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-blue-600" />
+                  <h4 className="font-semibold">Vocabulary Part {index + 1}</h4>
+                  {progress?.vocabSectionsPracticed?.includes(vocabTextId) && (
+                    <Check className="h-4 w-4 text-green-600" />
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Practice vocabulary words
+                </p>
+                <Button
+                  onClick={() => setActiveSection(vocabTextId)}
+                  className="w-full"
+                  variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
+                >
+                  {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Review' : 'Start Practice'}
+                </Button>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Practice vocabulary words
-              </p>
-              <Button
-                onClick={() => setActiveSection(vocabTextId)}
-                className="w-full"
-                variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
-              >
-                {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Review' : 'Start Practice'}
-              </Button>
+
+              <div className="border rounded-lg p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Languages className="h-5 w-5 text-purple-600" />
+                  <h4 className="font-semibold">Grammar for Vocab Part {index + 1}</h4>
+                  {progress?.grammarPracticed && (
+                    <Check className="h-4 w-4 text-green-600" />
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Uses repeated words from Vocabulary Part {index + 1} with this module's grammar pieces
+                </p>
+                <Button
+                  onClick={handleStartGrammar}
+                  className="w-full"
+                  variant={progress?.grammarPracticed ? "outline" : "default"}
+                >
+                  {progress?.grammarPracticed ? 'Review Grammar' : 'Start Grammar'}
+                </Button>
+              </div>
             </div>
           ))}
-
-          {/* Grammar Section */}
-          <div className="border rounded-lg p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <Languages className="h-5 w-5 text-purple-600" />
-              <h4 className="font-semibold">Grammar</h4>
-              {progress?.grammarPracticed && (
-                <Check className="h-4 w-4 text-green-600" />
-              )}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Practice grammar patterns
-            </p>
-            <Button
-              onClick={handleStartGrammar}
-              className="w-full"
-              variant={progress?.grammarPracticed ? "outline" : "default"}
-            >
-              {progress?.grammarPracticed ? 'Review Grammar' : 'Start Grammar'}
-            </Button>
-          </div>
 
           {/* Sentence Practice Section (Full Width Below) */}
           <div className="border rounded-lg p-4 space-y-3">
