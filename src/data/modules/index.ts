@@ -10,7 +10,8 @@ const module1: LearningModule = {
   description: 'Learn basic greetings, how to introduce yourself, and simple present tense',
   order: 1,
   vocabTextIds: ['module-1-vocab-1', 'module-1-vocab-2', 'module-1-vocab-3'],
-  grammarTextId: 'module-1-grammar',
+  grammarTextId: 'module-1-grammar-1',
+  grammarTextIds: ['module-1-grammar-1', 'module-1-grammar-2', 'module-1-grammar-3'],
   sentenceIds: [
     'greetings-1',
     'greetings-2',

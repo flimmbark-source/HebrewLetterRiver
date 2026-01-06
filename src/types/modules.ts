@@ -36,7 +36,8 @@ export interface LearningModule {
 
   // Content
   vocabTextIds: string[]; // IDs of reading texts for vocab practice (can have multiple sections)
-  grammarTextId: string; // ID of reading text for grammar practice
+  grammarTextId: string; // ID of reading text for grammar practice (fallback)
+  grammarTextIds?: string[]; // Optional IDs of grammar texts aligned to each vocab section
   sentenceIds: string[]; // references to sentences in the sentence data
 
   // Progression
