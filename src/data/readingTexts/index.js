@@ -180,6 +180,12 @@ export function getReadingTextById(textId, practiceLanguage) {
       const text = cafeTalkTexts.find(t => t.id === textId);
       if (text) return { ...text, sectionId: text.sectionId || 'cafeTalk' };
     }
+
+    // Search module texts for Hebrew
+    if (normalizedLanguage === 'hebrew') {
+      const moduleText = [...moduleVocabTexts, ...moduleGrammarTexts].find(t => t.id === textId);
+      if (moduleText) return { ...moduleText, sectionId: moduleText.sectionId || 'modules' };
+    }
   }
 
   // Fallback: search across all languages (maintains backward compatibility)
@@ -192,6 +198,10 @@ export function getReadingTextById(textId, practiceLanguage) {
     const text = texts.find(t => t.id === textId);
     if (text) return { ...text, sectionId: text.sectionId || 'cafeTalk' };
   }
+
+  // Fallback: search module texts
+  const moduleText = [...moduleVocabTexts, ...moduleGrammarTexts].find(t => t.id === textId);
+  if (moduleText) return { ...moduleText, sectionId: moduleText.sectionId || 'modules' };
 
   return null;
 }
