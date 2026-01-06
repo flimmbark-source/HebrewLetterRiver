@@ -395,12 +395,19 @@
       "translationPrompt": "Translate this sentence",
       "guidedPlaceholder": "Build your translation...",
       "freeResponsePlaceholder": "Type your translation...",
+      "gradeAction": "Grade",
       "grade": {
         "correct": "Correct",
         "partial": "Partial",
         "incorrect": "Incorrect"
       },
-      "next": "Next sentence",
+      "gradeHint": "Type your translation, then tap Grade",
+      "next": "Next",
+      "resultsTitle": "Sentence practice results",
+      "resultsSummary": "You finished this card! Here is how you did.",
+      "restartCard": "Restart card",
+      "yourAnswerLabel": "Your answer",
+      "noResponse": "No response",
       "card": {
         "progress": "practiced",
         "callToAction": "Open sentence practice"
