@@ -9,7 +9,7 @@ import {
   isDue
 } from '../lib/srsTypes.js';
 import { SRSEngine, GRADE, MATURITY } from '../lib/SRSEngine.js';
-import { emit } from '../lib/eventBus.js';
+import { emit, on } from '../lib/eventBus.js';
 
 const SRSContext = createContext(null);
 
@@ -127,6 +127,39 @@ export function SRSProvider({ children }) {
 
     saveProgress();
   }, [progress, languageId, isHydrationComplete, isLoading]);
+
+  // Integrate with game: Track letter performance from game sessions
+  useEffect(() => {
+    if (!isHydrationComplete) return;
+
+    const offLetterResult = on('game:letter-result', (payload) => {
+      const { itemId, correct, mode, languageId: eventLanguageId } = payload || {};
+
+      // Only track if it's for the current language
+      if (!itemId || eventLanguageId !== languageId) return;
+
+      // Check if item exists in SRS
+      const existingItem = progress.letters?.[itemId];
+
+      if (existingItem) {
+        // Map game result to SRS grade:
+        // - Correct: Grade 3 (GOOD) - correct with some effort
+        // - Incorrect: Grade 0 (AGAIN) - failed recall
+        const grade = correct ? GRADE.GOOD : GRADE.AGAIN;
+
+        // Review the item
+        reviewItem(itemId, 'letter', grade, 0);
+      } else if (correct) {
+        // Add new item to SRS on first correct match
+        // We only add on correct matches to ensure the user has seen and learned it
+        addItem(itemId, 'letter');
+      }
+    });
+
+    return () => {
+      offLetterResult();
+    };
+  }, [progress, languageId, isHydrationComplete, addItem, reviewItem]);
 
   /**
    * Add a new item to the SRS system
