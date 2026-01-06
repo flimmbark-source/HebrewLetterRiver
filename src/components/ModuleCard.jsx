@@ -27,6 +27,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
   const [progress, setProgress] = useState(null);
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [showDictionary, setShowDictionary] = useState(false);
+  const [selectedGrammarTextId, setSelectedGrammarTextId] = useState(module.grammarTextId);
 
   // Load progress on mount and ensure module is initialized
   useEffect(() => {
@@ -40,7 +41,8 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
     }
     setProgress(moduleProgress);
     setCompletionPercentage(getModuleCompletionPercentage(module.id));
-  }, [module.id, module.sentenceIds.length, module.vocabTextIds.length]);
+    setSelectedGrammarTextId(module.grammarTextIds?.[0] || module.grammarTextId);
+  }, [module.id, module.sentenceIds.length, module.vocabTextIds.length, module.grammarTextId, module.grammarTextIds]);
 
   // Get sentences for this module
   const moduleSentences = allSentences.filter(s =>
@@ -78,7 +80,8 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
     }
   };
 
-  const handleStartGrammar = () => {
+  const handleStartGrammar = (grammarTextId) => {
+    setSelectedGrammarTextId(grammarTextId || module.grammarTextId);
     setActiveSection('grammar');
   };
 
@@ -128,7 +131,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
   if (activeSection === 'grammar') {
     return (
       <ReadingArea
-        textId={module.grammarTextId}
+        textId={selectedGrammarTextId || module.grammarTextId}
         onBack={handleGrammarComplete}
       />
     );
@@ -180,7 +183,10 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
       <CardContent>
         <div className="space-y-4">
           {/* Vocabulary Sections */}
-          {module.vocabTextIds.map((vocabTextId, index) => (
+          {module.vocabTextIds.map((vocabTextId, index) => {
+            const grammarTextId = module.grammarTextIds?.[index] || module.grammarTextId;
+
+            return (
             <div key={vocabTextId} className="grid gap-3 md:grid-cols-2">
               <div className="border rounded-lg p-4 space-y-3">
                 <div className="flex items-center gap-2">
@@ -214,7 +220,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                   Practice grammar with vocabulary words
                 </p>
                 <Button
-                  onClick={handleStartGrammar}
+                  onClick={() => handleStartGrammar(grammarTextId)}
                   className="w-full"
                   variant={progress?.grammarPracticed ? "outline" : "default"}
                 >
@@ -222,7 +228,8 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                 </Button>
               </div>
             </div>
-          ))}
+            );
+          })}
 
           {/* Sentence Practice Section (Full Width Below) */}
           <div className="border rounded-lg p-4 space-y-3">
