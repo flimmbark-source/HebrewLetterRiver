@@ -547,6 +547,11 @@ export default function ReadingArea({ textId, onBack }) {
   const handleInputChange = useCallback((e) => {
     if (isGrading) return;
 
+    // If in review mode, navigate back to current word when typing starts
+    if (isReviewMode) {
+      setViewingWordIndex(null);
+    }
+
     const v = e.target.value;
     setTypedWord(v);
 
@@ -559,7 +564,7 @@ export default function ReadingArea({ textId, onBack }) {
         el.setSelectionRange(len, len);
       } catch {}
     });
-  }, [isGrading]);
+  }, [isGrading, isReviewMode]);
 
   // Focus input on mount and when grading ends
   useEffect(() => {
@@ -586,6 +591,10 @@ useEffect(() => {
     // Backspace - delete last character
     if (key === 'Backspace') {
       e.preventDefault();
+      // If in review mode, navigate back to current word when typing starts
+      if (isReviewMode) {
+        setViewingWordIndex(null);
+      }
       setTypedWord(prev => prev.slice(0, -1));
       return;
     }
@@ -607,10 +616,14 @@ useEffect(() => {
 
     if (isPrintable && !isModified) {
       e.preventDefault();
+      // If in review mode, navigate back to current word when typing starts
+      if (isReviewMode) {
+        setViewingWordIndex(null);
+      }
       console.log('[ReadingArea] Key pressed:', key, 'Length:', key.length, 'CharCode:', key.charCodeAt(0));
       setTypedWord(prev => prev + key);
     }
-  }, [isGrading, typedWord, appLanguageId, gradeAndCommit]);
+  }, [isGrading, isReviewMode, typedWord, appLanguageId, gradeAndCommit]);
 
   // Handle keyboard input (for desktop)
   const handleKeyDown = useCallback((e) => {
