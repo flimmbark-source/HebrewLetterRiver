@@ -606,7 +606,7 @@ useEffect(() => {
             dir={appDirection}
           >
         {/* Practice Track */}
-            <div className="mb-3 w-full max-w-full overflow-hidden rounded-2xl border-2 border-[#A7F3D0] shadow-lg" style={{ background: 'linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%)' }}>
+            <div className="mb-3 w-full max-w-full overflow-hidden rounded-2xl border-2 border-[#A7F3D0] shadow-lg" style={{ background: '#FFFFFF' }}>
             <div
               ref={practiceViewportRef}
               className="relative flex flex-col w-full min-w-0 items-center overflow-hidden px-2 py-3 sm:px-4 sm:py-6 gap-2"
@@ -916,7 +916,7 @@ useEffect(() => {
               {/* Results Table */}
               <div className="mb-6 max-h-[60vh] overflow-y-auto rounded-2xl border-2 border-[#A7F3D0]" style={{ background: '#FFFFFF' }}>
                 <table className="w-full">
-                  <thead className="sticky top-0 text-sm" style={{ background: 'linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%)' }}>
+                  <thead className="sticky top-0 text-sm" style={{ background: '#F0FFF4' }}>
                     <tr className="border-b-2 border-[#A7F3D0]">
                       <th className="p-3 text-left font-semibold" style={{ color: '#064E3B' }}>
                         {t('reading.results.practiceWord')}
