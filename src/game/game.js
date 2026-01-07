@@ -2503,13 +2503,22 @@ accessibilityBtn?.addEventListener('click', () => {
 
   startButton?.addEventListener('click', () => {
     if (isRestartMode) {
-      gameOverView.classList.add('hidden');
-      setupView.classList.remove('hidden');
-      accessibilityView.classList.add('hidden');
-      startButton.textContent = t('game.controls.start');
-      isRestartMode = false;
-      setupExitButton?.classList.remove('hidden');
-      updateModalSubtitle();
+      // In vocab mode, restart the game directly without showing setup screen
+      if (isVocabMode) {
+        gameOverView.classList.add('hidden');
+        modal.classList.add('hidden');
+        isRestartMode = false;
+        startGame();
+      } else {
+        // For regular mode, show setup screen to allow mode selection
+        gameOverView.classList.add('hidden');
+        setupView.classList.remove('hidden');
+        accessibilityView.classList.add('hidden');
+        startButton.textContent = t('game.controls.start');
+        isRestartMode = false;
+        setupExitButton?.classList.remove('hidden');
+        updateModalSubtitle();
+      }
     } else {
       // Validate that at least one mode is selected
       if (selectedModeIds.size === 0) {
