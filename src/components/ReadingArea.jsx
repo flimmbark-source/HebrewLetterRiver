@@ -363,8 +363,11 @@ export default function ReadingArea({ textId, onBack }) {
   useEffect(() => {
     if (viewingWordIndex !== null) {
       centerPracticeTrack(false, viewingWordIndex);
+    } else {
+      // When exiting review mode (viewingWordIndex becomes null), recenter on current word
+      centerPracticeTrack(false, wordIndex);
     }
-  }, [viewingWordIndex, centerPracticeTrack]);
+  }, [viewingWordIndex, wordIndex, centerPracticeTrack]);
 
   // Re-center output when typing
   useEffect(() => {
