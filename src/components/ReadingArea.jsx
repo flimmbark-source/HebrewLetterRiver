@@ -850,14 +850,15 @@ useEffect(() => {
                     data-active={isActive}
                     data-word-index={wordIdx}
                     onClick={isAvailableForSwipe ? () => {
-                      if (isActive) {
+                      if (isActive && !isReviewMode) {
+                        // Only open helper modal if we're already viewing this word
                         setHelperWord({
                           hebrew: token.text,
                           wordId: token.id,
                           surface: token.text
                         });
                       } else {
-                        // Navigate to this word
+                        // Navigate to this word (or back to current if in review mode)
                         setViewingWordIndex(wordIdx === wordIndex ? null : wordIdx);
                       }
                     } : undefined}
