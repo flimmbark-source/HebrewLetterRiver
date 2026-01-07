@@ -23,7 +23,7 @@ import { getReadingTextById } from '../data/readingTexts/index.js';
  * Layout: Vocab (left) | Grammar (right)
  *         Sentences (bottom, full width)
  */
-export default function ModuleCard({ module, isLocked, onModuleComplete }) {
+export default function ModuleCard({ module, isLocked, onModuleComplete, onPracticeChange }) {
   const vocabTextIds = module.vocabTextIds || [];
   const grammarTextIds = module.grammarTextIds || [];
   const [activeSection, setActiveSection] = useState(null); // 'grammar', 'sentences', or a vocab text ID
@@ -54,6 +54,13 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
     module.grammarTextId,
     module.grammarTextIds?.join(','),
   ]);
+
+  // Notify parent when practice mode changes
+  useEffect(() => {
+    if (onPracticeChange) {
+      onPracticeChange(module.id, activeSection);
+    }
+  }, [activeSection, module.id, onPracticeChange]);
 
   // Get sentences for this module
   const moduleSentences = allSentences.filter(s =>
