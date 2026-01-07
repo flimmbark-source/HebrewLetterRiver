@@ -195,27 +195,33 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
         <div className="space-y-4">
           <div className="grid gap-3 md:grid-cols-2">
             <div className="space-y-3">
-              {vocabTextIds.map((vocabTextId, index) => (
-                <div key={vocabTextId} className="border rounded-lg p-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5 text-blue-600" />
-                    <h4 className="font-semibold">Vocabulary Part {index + 1}</h4>
-                    {progress?.vocabSectionsPracticed?.includes(vocabTextId) && (
-                      <Check className="h-4 w-4 text-green-600" />
-                    )}
+              {vocabTextIds.map((vocabTextId, index) => {
+                const vocabText = getReadingTextById(vocabTextId, 'hebrew');
+                const vocabTitle = vocabText?.title?.en || `Vocabulary Part ${index + 1}`;
+                const vocabSubtitle = vocabText?.subtitle?.en || 'Practice vocabulary words';
+
+                return (
+                  <div key={vocabTextId} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-5 w-5 text-blue-600" />
+                      <h4 className="font-semibold">{vocabTitle}</h4>
+                      {progress?.vocabSectionsPracticed?.includes(vocabTextId) && (
+                        <Check className="h-4 w-4 text-green-600" />
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {vocabSubtitle}
+                    </p>
+                    <Button
+                      onClick={() => setActiveSection(vocabTextId)}
+                      className="w-full"
+                      variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
+                    >
+                      {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Review' : 'Start Practice'}
+                    </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Practice vocabulary words
-                  </p>
-                  <Button
-                    onClick={() => setActiveSection(vocabTextId)}
-                    className="w-full"
-                    variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
-                  >
-                    {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Review' : 'Start Practice'}
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="space-y-3">
