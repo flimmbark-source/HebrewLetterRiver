@@ -42,6 +42,7 @@ export default function ReadingArea({ textId, onBack }) {
     typeof window !== 'undefined' ? window.innerWidth : 1024
   );
   const [wordIndex, setWordIndex] = useState(0);
+  const [viewingWordIndex, setViewingWordIndex] = useState(null); // null means viewing current word
   const [typedWord, setTypedWord] = useState('');
   const [committedWords, setCommittedWords] = useState([]);
   const [streak, setStreak] = useState(0);
@@ -150,14 +151,19 @@ export default function ReadingArea({ textId, onBack }) {
     };
   }, []);
 
-  // Clear helper hint when moving to a different word
+  // Clear helper hint and reset viewing mode when moving to a different word
   useEffect(() => {
     setHelperHint('');
+    setViewingWordIndex(null);
   }, [wordIndex]);
 
   // Filter out punctuation for word navigation
   const words = readingText?.tokens?.filter(t => t.type === 'word') || [];
   const currentWord = words[wordIndex];
+  // Viewing word is the word being displayed (for swipe navigation)
+  const effectiveViewingIndex = viewingWordIndex !== null ? viewingWordIndex : wordIndex;
+  const viewingWord = words[effectiveViewingIndex];
+  const isReviewMode = viewingWordIndex !== null && viewingWordIndex !== wordIndex;
 
   // Get translation for current word
   const getTranslation = useCallback(() => {
@@ -214,23 +220,66 @@ export default function ReadingArea({ textId, onBack }) {
     return transliterationEntry?.canonical || currentWord.text || '';
   }, [readingText, currentWord]);
 
-  // Center practice track on current word
-  const centerPracticeTrack = useCallback((instant = false) => {
+  // Get translation for viewing word (used for display during swipe navigation)
+  const getViewingTranslation = useCallback(() => {
+    if (!readingText || !viewingWord) return null;
+
+    const translationsForAppLanguage = readingText.translations?.[appLanguageId];
+    const translationsForLocale = readingText.translations?.[TRANSLATION_KEY_MAP[appLanguageId]];
+    const translations = translationsForAppLanguage || translationsForLocale;
+
+    const transliterationEntry = readingText.translations?.en?.[viewingWord.id];
+
+    if (!translations && !transliterationEntry) {
+      return null;
+    }
+
+    const baseTranslation = translations?.[viewingWord.id];
+
+    if (transliterationEntry) {
+      const translitVariants = transliterationEntry.variants || [transliterationEntry.canonical];
+      const baseVariants = baseTranslation?.variants || (baseTranslation?.canonical ? [baseTranslation.canonical] : []);
+
+      return {
+        ...baseTranslation,
+        canonical: transliterationEntry.canonical,
+        variants: [...new Set([...translitVariants, ...baseVariants])]
+      };
+    }
+
+    return baseTranslation;
+  }, [readingText, viewingWord, appLanguageId]);
+
+  // Get transliteration for viewing word (for TTS during swipe navigation)
+  const getViewingTransliteration = useCallback(() => {
+    if (!readingText || !viewingWord) return '';
+    const transliterationEntry = readingText.translations?.en?.[viewingWord.id];
+    return transliterationEntry?.canonical || viewingWord.text || '';
+  }, [readingText, viewingWord]);
+
+  // Center practice track on current word (or viewing word during swipe)
+  const centerPracticeTrack = useCallback((instant = false, targetIndex = null) => {
     if (!practiceTrackRef.current || !practiceViewportRef.current) return;
 
     const track = practiceTrackRef.current;
     const viewport = practiceViewportRef.current;
 
-    // Find the active word element
-    const activeWord = track.querySelector('[data-active="true"]');
-    if (!activeWord) return;
+    // If targetIndex is specified, find that word, otherwise find the active word
+    let targetWord;
+    if (targetIndex !== null) {
+      targetWord = track.querySelector(`[data-word-index="${targetIndex}"]`);
+    } else {
+      targetWord = track.querySelector('[data-active="true"]');
+    }
+
+    if (!targetWord) return;
 
     if (instant) {
       track.style.transition = 'none';
     }
 
     const viewportRect = viewport.getBoundingClientRect();
-    const wordRect = activeWord.getBoundingClientRect();
+    const wordRect = targetWord.getBoundingClientRect();
 
     const viewportCenter = viewportRect.left + viewportRect.width / 2;
     const wordCenter = wordRect.left + wordRect.width / 2;
@@ -310,6 +359,16 @@ export default function ReadingArea({ textId, onBack }) {
     centerPracticeTrack(false);
   }, [wordIndex, centerPracticeTrack]);
 
+  // Re-center when viewing word index changes (swipe navigation)
+  useEffect(() => {
+    if (viewingWordIndex !== null) {
+      centerPracticeTrack(false, viewingWordIndex);
+    } else {
+      // When exiting review mode (viewingWordIndex becomes null), recenter on current word
+      centerPracticeTrack(false, wordIndex);
+    }
+  }, [viewingWordIndex, wordIndex, centerPracticeTrack]);
+
   // Re-center output when typing
   useEffect(() => {
     centerOutputTrack(false);
@@ -331,6 +390,66 @@ export default function ReadingArea({ textId, onBack }) {
       el.setSelectionRange(end, end);
     } catch {}
   }, []);
+
+  // Swipe gesture detection for word navigation
+  const swipeStartX = useRef(null);
+  const swipeStartY = useRef(null);
+  const isDragging = useRef(false);
+
+  const handleSwipeStart = useCallback((e) => {
+    const touch = e.touches?.[0] || e;
+    swipeStartX.current = touch.clientX;
+    swipeStartY.current = touch.clientY;
+    isDragging.current = false;
+  }, []);
+
+  const handleSwipeMove = useCallback((e) => {
+    if (swipeStartX.current === null) return;
+
+    const touch = e.touches?.[0] || e;
+    const deltaX = touch.clientX - swipeStartX.current;
+    const deltaY = touch.clientY - swipeStartY.current;
+
+    // Only trigger if horizontal swipe is more significant than vertical
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
+      isDragging.current = true;
+      e.preventDefault();
+    }
+  }, []);
+
+  const handleSwipeEnd = useCallback((e) => {
+    if (swipeStartX.current === null || !isDragging.current) {
+      swipeStartX.current = null;
+      swipeStartY.current = null;
+      isDragging.current = false;
+      return;
+    }
+
+    const touch = e.changedTouches?.[0] || e;
+    const deltaX = touch.clientX - swipeStartX.current;
+    const deltaY = touch.clientY - swipeStartY.current;
+
+    // Check if horizontal swipe
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+      const currentViewingIndex = viewingWordIndex !== null ? viewingWordIndex : wordIndex;
+
+      if (deltaX > 0) {
+        // Swipe right - go to previous word
+        const newIndex = Math.max(0, currentViewingIndex - 1);
+        if (newIndex <= wordIndex) {
+          setViewingWordIndex(newIndex === wordIndex ? null : newIndex);
+        }
+      } else {
+        // Swipe left - go to next word (but not beyond current word being answered)
+        const newIndex = Math.min(wordIndex, currentViewingIndex + 1);
+        setViewingWordIndex(newIndex === wordIndex ? null : newIndex);
+      }
+    }
+
+    swipeStartX.current = null;
+    swipeStartY.current = null;
+    isDragging.current = false;
+  }, [viewingWordIndex, wordIndex]);
 
   // Grade and commit the current word (defined first so other callbacks can reference it)
   const gradeAndCommit = useCallback(() => {
@@ -428,6 +547,11 @@ export default function ReadingArea({ textId, onBack }) {
   const handleInputChange = useCallback((e) => {
     if (isGrading) return;
 
+    // If in review mode, navigate back to current word when typing starts
+    if (isReviewMode) {
+      setViewingWordIndex(null);
+    }
+
     const v = e.target.value;
     setTypedWord(v);
 
@@ -440,7 +564,7 @@ export default function ReadingArea({ textId, onBack }) {
         el.setSelectionRange(len, len);
       } catch {}
     });
-  }, [isGrading]);
+  }, [isGrading, isReviewMode]);
 
   // Focus input on mount and when grading ends
   useEffect(() => {
@@ -467,6 +591,10 @@ useEffect(() => {
     // Backspace - delete last character
     if (key === 'Backspace') {
       e.preventDefault();
+      // If in review mode, navigate back to current word when typing starts
+      if (isReviewMode) {
+        setViewingWordIndex(null);
+      }
       setTypedWord(prev => prev.slice(0, -1));
       return;
     }
@@ -488,10 +616,14 @@ useEffect(() => {
 
     if (isPrintable && !isModified) {
       e.preventDefault();
+      // If in review mode, navigate back to current word when typing starts
+      if (isReviewMode) {
+        setViewingWordIndex(null);
+      }
       console.log('[ReadingArea] Key pressed:', key, 'Length:', key.length, 'CharCode:', key.charCodeAt(0));
       setTypedWord(prev => prev + key);
     }
-  }, [isGrading, typedWord, appLanguageId, gradeAndCommit]);
+  }, [isGrading, isReviewMode, typedWord, appLanguageId, gradeAndCommit]);
 
   // Handle keyboard input (for desktop)
   const handleKeyDown = useCallback((e) => {
@@ -510,6 +642,7 @@ useEffect(() => {
     setShowResults(false);
     setCompletedResults([]);
     setWordIndex(0);
+    setViewingWordIndex(null);
     setTypedWord('');
     setCommittedWords([]);
     setStreak(0);
@@ -606,13 +739,29 @@ useEffect(() => {
               className="relative flex flex-col w-full min-w-0 items-center overflow-hidden px-2 py-3 sm:px-4 sm:py-6 gap-2"
               style={{ minHeight: '72px' }}
             >
+              {/* Review mode indicator */}
+              {isReviewMode && (
+                <div className="w-full flex items-center justify-center px-2">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-cyan-500/20 px-3 py-1 border border-cyan-400/30">
+                    <svg className="w-4 h-4 text-cyan-300" fill="none" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                    <span className="text-xs font-medium text-cyan-300">
+                      Reviewing previous word
+                    </span>
+                    <svg className="w-4 h-4 text-cyan-300" fill="none" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </div>
+                </div>
+              )}
               {/* Controls row - transparent, positioned above reading word */}
               <div className="w-full grid grid-cols-3 items-center gap-3 px-2">
                 {/* Left: Vowel Layout Icon (Hebrew only) */}
                 <div className="flex justify-start">
-                  {practiceLanguageId === 'hebrew' && currentWord && (() => {
-                    // Derive layout from current word's transliteration
-                    const transliteration = getTransliteration();
+                  {practiceLanguageId === 'hebrew' && viewingWord && (() => {
+                    // Derive layout from viewing word's transliteration
+                    const transliteration = getViewingTransliteration();
                     const layoutInfo = deriveLayoutFromTransliteration(transliteration);
 
                     if (!layoutInfo) return null;
@@ -635,19 +784,19 @@ useEffect(() => {
 
                 {/* Center: Meaning */}
                 <div className="flex items-center justify-center pointer-events-none">
-                  <span className={`${appFontClass} text-base font-medium text-white/90 whitespace-nowrap`}>
+                  <span className={`${appFontClass} text-base font-medium ${isReviewMode ? 'text-cyan-300' : 'text-white/90'} whitespace-nowrap`}>
                     {(() => {
-                      if (!readingText || !currentWord) return '—';
+                      if (!readingText || !viewingWord) return '—';
 
                       // Primary: Use meaningKeys with i18n translation for proper localization
-                      if (readingText.meaningKeys?.[currentWord.id]) {
-                        return t(readingText.meaningKeys[currentWord.id]);
+                      if (readingText.meaningKeys?.[viewingWord.id]) {
+                        return t(readingText.meaningKeys[viewingWord.id]);
                       }
 
                       // Fallback: Use glosses for semantic meaning display
                       const langCode = getLanguageCode(appLanguageId);
-                      const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
-                                 ?? readingText.glosses?.en?.[currentWord.id];
+                      const gloss = readingText.glosses?.[langCode]?.[viewingWord.id]
+                                 ?? readingText.glosses?.en?.[viewingWord.id];
 
                       return gloss ?? '—';
                     })()}
@@ -657,11 +806,11 @@ useEffect(() => {
                 {/* Right: TTS */}
                 <div className="flex items-center justify-end pointer-events-auto">
                   <SpeakButton
-                    nativeText={currentWord?.text || ''}
+                    nativeText={viewingWord?.text || ''}
                     nativeLocale={getLocaleForTts(practiceLanguageId)}
-                    transliteration={getTransliteration()}
+                    transliteration={getViewingTransliteration()}
                     variant="icon"
-                    disabled={!currentWord}
+                    disabled={!viewingWord}
                   />
                 </div>
               </div>
@@ -669,7 +818,15 @@ useEffect(() => {
                 <div className="w-full px-2 text-left text-xs text-amber-200">{helperHint}</div>
               )}
               {/* Reading words track */}
-              <div className="relative flex w-full min-w-0 items-center overflow-hidden">
+              <div
+                className="relative flex w-full min-w-0 items-center overflow-hidden"
+                onTouchStart={handleSwipeStart}
+                onTouchMove={handleSwipeMove}
+                onTouchEnd={handleSwipeEnd}
+                onMouseDown={handleSwipeStart}
+                onMouseMove={handleSwipeMove}
+                onMouseUp={handleSwipeEnd}
+              >
               <div
                 ref={practiceTrackRef}
                 className="inline-flex items-center gap-4 sm:gap-6 transition-transform duration-[260ms] ease-out"
@@ -691,25 +848,35 @@ useEffect(() => {
 
                 const wordIdx = words.findIndex(w => w.id === token.id);
                 const isActive = wordIdx === wordIndex;
+                const isViewing = wordIdx === effectiveViewingIndex;
+                const isAvailableForSwipe = wordIdx <= wordIndex;
 
                 return (
                   <span
                     key={token.id || idx}
-                    className={`${practiceFontClass} ${gameFontClass} whitespace-nowrap text-3xl leading-tight transition-opacity sm:text-4xl ${
-                      isActive ? 'opacity-100 cursor-pointer hover:scale-105 transition-transform' : 'opacity-50'
+                    className={`${practiceFontClass} ${gameFontClass} whitespace-nowrap text-3xl leading-tight transition-all sm:text-4xl ${
+                      isViewing ? 'opacity-100 cursor-pointer hover:scale-105' :
+                      isAvailableForSwipe ? 'opacity-50 cursor-pointer' : 'opacity-30'
                     }`}
                     style={{
                       letterSpacing: '0.4px',
                       transform: 'translateY(1px)',
-                      pointerEvents: isActive ? 'auto' : 'none'
+                      pointerEvents: isViewing || isAvailableForSwipe ? 'auto' : 'none'
                     }}
                     data-active={isActive}
-                    onClick={isActive ? () => {
-                      setHelperWord({
-                        hebrew: token.text,
-                        wordId: token.id,
-                        surface: token.text
-                      });
+                    data-word-index={wordIdx}
+                    onClick={isAvailableForSwipe ? () => {
+                      if (isActive && !isReviewMode) {
+                        // Only open helper modal if we're already viewing this word
+                        setHelperWord({
+                          hebrew: token.text,
+                          wordId: token.id,
+                          surface: token.text
+                        });
+                      } else {
+                        // Navigate to this word (or back to current if in review mode)
+                        setViewingWordIndex(wordIdx === wordIndex ? null : wordIdx);
+                      }
                     } : undefined}
                   >
                     {token.text}
