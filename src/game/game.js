@@ -117,6 +117,13 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     if (!result || result === key) return fallback;
     return result;
   };
+
+  // Vocab mode tracking variables (must be declared before vocabData check)
+  let isVocabMode = false;
+  let vocabCaughtInRound = new Set();
+  let hadPerfectRound = false;
+  let totalVocabCount = 0;
+
   let practiceModes = (activeLanguage.practiceModes ?? []).map((mode) => ({ ...mode }));
   const modeItems = { ...(activeLanguage.modeItems ?? {}) };
   const baseItems = activeLanguage.items ?? [];
@@ -1032,11 +1039,6 @@ function startClickMode(itemEl, payload) {
   let currentCatchStreak = 0;
   let bestWaveCatch = 0;
   let totalWins = 0;
-  // Vocab mode specific tracking
-  let isVocabMode = false;
-  let vocabCaughtInRound = new Set(); // Track which vocab items were caught in current round
-  let hadPerfectRound = false; // Track if all vocab was caught in a round
-  let totalVocabCount = 0; // Total number of vocab items
   const initialLives = 3;
   const learnPhaseDuration = 2500;
   const levelUpThreshold = 50;
