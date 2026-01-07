@@ -17,6 +17,8 @@ import {
 import { allSentences } from '../data/sentences';
 import { getThemeStats } from '../lib/sentenceProgressStorage';
 import { getReadingTextById } from '../data/readingTexts/index.js';
+import { useLanguage } from '../context/LanguageContext';
+import { getCardProgress, isCardComplete } from '../lib/cardProgressHelper';
 import { useGame } from '../context/GameContext.jsx';
 
 /**
@@ -24,7 +26,8 @@ import { useGame } from '../context/GameContext.jsx';
  * Layout: Vocab (left) | Grammar (right)
  *         Sentences (bottom, full width)
  */
-export default function ModuleCard({ module, isLocked, onModuleComplete }) {
+export default function ModuleCard({ module, isLocked, onModuleComplete, onPracticeChange }) {
+  const { languageId: practiceLanguageId } = useLanguage();
   const vocabTextIds = module.vocabTextIds || [];
   const grammarTextIds = module.grammarTextIds || [];
   const [activeSection, setActiveSection] = useState(null); // 'grammar', 'sentences', or a vocab text ID
@@ -32,6 +35,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [showDictionary, setShowDictionary] = useState(false);
   const [selectedGrammarTextId, setSelectedGrammarTextId] = useState(module.grammarTextId);
+  const [cardProgressMap, setCardProgressMap] = useState({}); // Track progress for each card
   const [expandedVocabId, setExpandedVocabId] = useState(null); // Track which vocab section has options expanded
   const { openGame } = useGame();
   const hasPerVocabGrammar =
@@ -57,6 +61,35 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
     module.grammarTextId,
     module.grammarTextIds?.join(','),
   ]);
+
+  // Calculate progress for all vocab and grammar cards
+  useEffect(() => {
+    const newProgressMap = {};
+
+    // Calculate progress for vocab cards
+    vocabTextIds.forEach(vocabTextId => {
+      newProgressMap[vocabTextId] = getCardProgress(vocabTextId, practiceLanguageId);
+    });
+
+    // Calculate progress for grammar cards
+    grammarTextIds.forEach(grammarTextId => {
+      newProgressMap[grammarTextId] = getCardProgress(grammarTextId, practiceLanguageId);
+    });
+
+    // Also calculate for single grammar text if it exists
+    if (module.grammarTextId) {
+      newProgressMap[module.grammarTextId] = getCardProgress(module.grammarTextId, practiceLanguageId);
+    }
+
+    setCardProgressMap(newProgressMap);
+  }, [vocabTextIds, grammarTextIds, module.grammarTextId, practiceLanguageId, activeSection]);
+
+  // Notify parent when practice mode changes
+  useEffect(() => {
+    if (onPracticeChange) {
+      onPracticeChange(module.id, activeSection);
+    }
+  }, [activeSection, module.id, onPracticeChange]);
 
   // Get sentences for this module
   const moduleSentences = allSentences.filter(s =>
@@ -233,18 +266,34 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                 const vocabTitle = vocabText?.title?.en || `Vocabulary Part ${index + 1}`;
                 const vocabSubtitle = vocabText?.subtitle?.en || 'Practice vocabulary words';
 
+                const cardProgress = cardProgressMap[vocabTextId] || { correct: 0, total: 0 };
+                const isComplete = isCardComplete(vocabTextId, practiceLanguageId);
+
                 return (
-                  <div key={vocabTextId} className="border rounded-lg p-4 space-y-3">
+                  <div key={vocabTextId} className="border rounded-lg p-4 space-y-3 relative">
                     <div className="flex items-center gap-2">
                       <BookOpen className="h-5 w-5 text-blue-600" />
                       <h4 className="font-semibold">{vocabTitle}</h4>
-                      {progress?.vocabSectionsPracticed?.includes(vocabTextId) && (
+                      {isComplete && (
                         <Check className="h-4 w-4 text-green-600" />
                       )}
                     </div>
+                    {/* Progress counter in top right */}
+                    {cardProgress.total > 0 && (
+                      <div className="absolute top-4 right-4 text-xs font-semibold text-green-600">
+                        {cardProgress.correct}/{cardProgress.total}
+                      </div>
+                    )}
                     <p className="text-sm text-muted-foreground">
                       {vocabSubtitle}
                     </p>
+                    <Button
+                      onClick={() => setActiveSection(vocabTextId)}
+                      className="w-full"
+                      variant={isComplete ? "outline" : "default"}
+                    >
+                      {isComplete ? 'Practice' : 'Start Practice'}
+                    </Button>
                     {expandedVocabId === vocabTextId ? (
                       <div className="space-y-2">
                         <Button
@@ -289,49 +338,69 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                     const grammarTitle = grammarText?.title?.en || `Grammar Part ${index + 1}`;
                     const grammarSubtitle = grammarText?.subtitle?.en || 'Practice grammar with vocabulary words';
 
+                    const cardProgress = cardProgressMap[grammarTextId] || { correct: 0, total: 0 };
+                    const isComplete = isCardComplete(grammarTextId, practiceLanguageId);
+
                     return (
-                      <div key={grammarTextId} className="border rounded-lg p-4 space-y-3">
+                      <div key={grammarTextId} className="border rounded-lg p-4 space-y-3 relative">
                         <div className="flex items-center gap-2">
                           <Languages className="h-5 w-5 text-purple-600" />
                           <h4 className="font-semibold">{grammarTitle}</h4>
-                          {progress?.grammarPracticed && (
+                          {isComplete && (
                             <Check className="h-4 w-4 text-green-600" />
                           )}
                         </div>
+                        {/* Progress counter in top right */}
+                        {cardProgress.total > 0 && (
+                          <div className="absolute top-4 right-4 text-xs font-semibold text-green-600">
+                            {cardProgress.correct}/{cardProgress.total}
+                          </div>
+                        )}
                         <p className="text-sm text-muted-foreground">
                           {grammarSubtitle}
                         </p>
                         <Button
                           onClick={() => handleStartGrammar(grammarTextId)}
                           className="w-full"
-                          variant={progress?.grammarPracticed ? "outline" : "default"}
+                          variant={isComplete ? "outline" : "default"}
                         >
-                          {progress?.grammarPracticed ? 'Practice' : 'Start Grammar'}
+                          {isComplete ? 'Practice' : 'Start Grammar'}
                         </Button>
                       </div>
                     );
                   })
-                : module.grammarTextId && (
-                    <div className="border rounded-lg p-4 space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Languages className="h-5 w-5 text-purple-600" />
-                        <h4 className="font-semibold">Grammar</h4>
-                        {progress?.grammarPracticed && (
-                          <Check className="h-4 w-4 text-green-600" />
+                : module.grammarTextId && (() => {
+                    const cardProgress = cardProgressMap[module.grammarTextId] || { correct: 0, total: 0 };
+                    const isComplete = isCardComplete(module.grammarTextId, practiceLanguageId);
+
+                    return (
+                      <div className="border rounded-lg p-4 space-y-3 relative">
+                        <div className="flex items-center gap-2">
+                          <Languages className="h-5 w-5 text-purple-600" />
+                          <h4 className="font-semibold">Grammar</h4>
+                          {isComplete && (
+                            <Check className="h-4 w-4 text-green-600" />
+                          )}
+                        </div>
+                        {/* Progress counter in top right */}
+                        {cardProgress.total > 0 && (
+                          <div className="absolute top-4 right-4 text-xs font-semibold text-green-600">
+                            {cardProgress.correct}/{cardProgress.total}
+                          </div>
                         )}
+                        <p className="text-sm text-muted-foreground">
+                          Practice grammar with vocabulary words
+                        </p>
+                        <Button
+                          onClick={() => handleStartGrammar(module.grammarTextId)}
+                          className="w-full"
+                          variant={isComplete ? "outline" : "default"}
+                        >
+                          {isComplete ? 'Practice' : 'Start Grammar'}
+                        </Button>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        Practice grammar with vocabulary words
-                      </p>
-                      <Button
-                        onClick={() => handleStartGrammar(module.grammarTextId)}
-                        className="w-full"
-                        variant={progress?.grammarPracticed ? "outline" : "default"}
-                      >
-                        {progress?.grammarPracticed ? 'Practice' : 'Start Grammar'}
-                      </Button>
-                    </div>
-                  )}
+                    );
+                  })()}
             </div>
           </div>
 

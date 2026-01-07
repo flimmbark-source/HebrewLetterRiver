@@ -29,6 +29,7 @@ export default function LearnView() {
   const [packIntroTextId, setPackIntroTextId] = useState(null);
   const [showSystemModal, setShowSystemModal] = useState(false);
   const [moduleRefreshKey, setModuleRefreshKey] = useState(0);
+  const [activePractice, setActivePractice] = useState(null); // { moduleId, type, data }
 
   // Auto-trigger readIntro tutorial on first visit
   useEffect(() => {
@@ -49,6 +50,15 @@ export default function LearnView() {
   const handleModuleComplete = () => {
     // Refresh modules to show newly unlocked ones
     setModuleRefreshKey(prev => prev + 1);
+  };
+
+  // Handle practice mode changes
+  const handlePracticeChange = (moduleId, activeSection) => {
+    if (activeSection) {
+      setActivePractice({ moduleId, activeSection });
+    } else {
+      setActivePractice(null);
+    }
   };
 
   // Get reading texts for current practice language
@@ -171,36 +181,44 @@ export default function LearnView() {
   // Show learning path with modules
   return (
     <div className="space-y-6">
-      <header className="space-y-2 px-1">
-        <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-semibold text-slate-800">
-            Learning Path
-          </h2>
-          {practiceLanguageId === 'hebrew' && (
-            <button
-              onClick={() => setShowSystemModal(true)}
-              className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full border border-slate-400 bg-slate-100 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200 hover:border-slate-500 hover:text-slate-800"
-              title="Learn about vowel patterns"
-            >
-              ?
-            </button>
-          )}
-        </div>
-        <p className="text-sm text-slate-600">
-          Follow the modules below to learn Hebrew step by step. Complete vocab, grammar, and sentences in each module to unlock the next.
-        </p>
-      </header>
+      {/* Only show header when not in practice mode */}
+      {!activePractice && (
+        <header className="space-y-2 px-1">
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-semibold text-slate-800">
+              Learning Path
+            </h2>
+            {practiceLanguageId === 'hebrew' && (
+              <button
+                onClick={() => setShowSystemModal(true)}
+                className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full border border-slate-400 bg-slate-100 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200 hover:border-slate-500 hover:text-slate-800"
+                title="Learn about vowel patterns"
+              >
+                ?
+              </button>
+            )}
+          </div>
+          <p className="text-sm text-slate-600">
+            Follow the modules below to learn Hebrew step by step. Complete vocab, grammar, and sentences in each module to unlock the next.
+          </p>
+        </header>
+      )}
 
       {/* Learning Path - Modules in Sequential Order */}
       <div className="space-y-6" key={moduleRefreshKey}>
         {modules.map((module) => {
           const unlocked = isModuleUnlocked(module.id);
+          // Only render active module when in practice mode, or all modules otherwise
+          if (activePractice && module.id !== activePractice.moduleId) {
+            return null;
+          }
           return (
             <ModuleCard
               key={module.id}
               module={module}
               isLocked={!unlocked}
               onModuleComplete={handleModuleComplete}
+              onPracticeChange={handlePracticeChange}
             />
           );
         })}
