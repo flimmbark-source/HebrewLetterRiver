@@ -2119,6 +2119,34 @@ function startClickMode(itemEl, payload) {
         showBucketInfo(choice);
       });
 
+      // Add left-click handler for desktop (only if not in click mode or no drag)
+      // This will be overridden by setupClickModeBuckets if click mode is enabled
+      let clickStartTime = 0;
+      let didDrag = false;
+
+      box.addEventListener('mousedown', () => {
+        clickStartTime = Date.now();
+        didDrag = false;
+      });
+
+      box.addEventListener('mousemove', () => {
+        if (clickStartTime > 0) {
+          didDrag = true;
+        }
+      });
+
+      box.addEventListener('click', (e) => {
+        // Only show info if this wasn't a drag operation and click mode isn't handling it
+        const clickDuration = Date.now() - clickStartTime;
+        if (!didDrag && clickDuration < 300 && !clickModeEnabled) {
+          e.preventDefault();
+          e.stopPropagation();
+          showBucketInfo(choice);
+        }
+        clickStartTime = 0;
+        didDrag = false;
+      });
+
       // Add long-press handler for mobile devices
       let longPressTimer = null;
       let longPressTriggered = false;
