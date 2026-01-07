@@ -17,6 +17,7 @@ import {
 import { allSentences } from '../data/sentences';
 import { getThemeStats } from '../lib/sentenceProgressStorage';
 import { getReadingTextById } from '../data/readingTexts/index.js';
+import { useGame } from '../context/GameContext.jsx';
 
 /**
  * ModuleCard - Displays a learning module with vocab, grammar, and sentences
@@ -31,6 +32,8 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [showDictionary, setShowDictionary] = useState(false);
   const [selectedGrammarTextId, setSelectedGrammarTextId] = useState(module.grammarTextId);
+  const [expandedVocabId, setExpandedVocabId] = useState(null); // Track which vocab section has options expanded
+  const { openGame } = useGame();
   const hasPerVocabGrammar =
     grammarTextIds.length > 0 && grammarTextIds.length === vocabTextIds.length;
 
@@ -108,6 +111,36 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
       updateProgress();
     }
     setActiveSection(null);
+  };
+
+  const handlePlayGame = (vocabTextId) => {
+    const vocabText = getReadingTextById(vocabTextId, 'hebrew');
+    if (!vocabText) {
+      console.error('Vocab text not found:', vocabTextId);
+      return;
+    }
+
+    // Prepare vocab data for the game
+    const vocabData = {
+      textId: vocabTextId,
+      title: vocabText.title?.en || 'Vocabulary Practice',
+      subtitle: vocabText.subtitle?.en || 'Match words with their emojis',
+      words: vocabText.tokens
+        .filter(token => token.type === 'word')
+        .map(token => ({
+          id: token.id,
+          text: token.text,
+          gloss: vocabText.glosses?.en?.[token.id] || token.id
+        })),
+      emojis: vocabText.emojis || {}
+    };
+
+    // Open the game with vocab mode
+    openGame({
+      mode: 'vocab',
+      vocabData,
+      autostart: true
+    });
   };
 
   // Render locked state
@@ -212,13 +245,32 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                     <p className="text-sm text-muted-foreground">
                       {vocabSubtitle}
                     </p>
-                    <Button
-                      onClick={() => setActiveSection(vocabTextId)}
-                      className="w-full"
-                      variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
-                    >
-                      {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Practice' : 'Start Practice'}
-                    </Button>
+                    {expandedVocabId === vocabTextId ? (
+                      <div className="space-y-2">
+                        <Button
+                          onClick={() => setActiveSection(vocabTextId)}
+                          className="w-full"
+                          variant="default"
+                        >
+                          Reading
+                        </Button>
+                        <Button
+                          onClick={() => handlePlayGame(vocabTextId)}
+                          className="w-full"
+                          variant="outline"
+                        >
+                          Play Game
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={() => setExpandedVocabId(vocabTextId)}
+                        className="w-full"
+                        variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
+                      >
+                        {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Practice' : 'Start Practice'}
+                      </Button>
+                    )}
                   </div>
                 );
               })}

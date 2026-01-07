@@ -43,7 +43,7 @@ function clearAllTimers() {
 // Store the current app language ID for Association Mode (module-level variable)
 let activeAppLanguageId = 'en';
 
-export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary, appLanguageId = 'en' } = {}) {
+export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary, appLanguageId = 'en', vocabData = null } = {}) {
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
   const livesContainer = document.getElementById('lives-container');
@@ -184,6 +184,33 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
 
   if (!modeItems.letters && baseItems.length) {
     modeItems.letters = baseItems.map((item) => ({ ...item }));
+  }
+
+  // Add vocab mode if vocab data is provided
+  if (vocabData) {
+    const vocabMode = {
+      id: 'vocab',
+      label: vocabData.title || 'Vocabulary Practice',
+      description: vocabData.subtitle || 'Match words with their emojis',
+      type: 'vocab',
+      noun: 'word'
+    };
+    practiceModes.push(vocabMode);
+
+    // Create vocab items from the vocab data
+    const vocabItems = vocabData.words.map((word) => ({
+      id: word.id,
+      symbol: word.text,
+      sound: word.text, // Use Hebrew text as sound
+      name: word.gloss || word.id,
+      emoji: vocabData.emojis[word.id],
+      sourceMode: 'vocab'
+    }));
+    modeItems.vocab = vocabItems;
+
+    // Set vocab mode tracking
+    isVocabMode = true;
+    totalVocabCount = vocabItems.length;
   }
 
   const modeNounMap = practiceModes.reduce((acc, mode) => {
@@ -921,6 +948,10 @@ function startClickMode(itemEl, payload) {
         if (improvedStreak) {
           updateStreakStat(true);
         }
+        // Track vocab item catches for perfect round detection
+        if (isVocabMode && droppedItemId) {
+          vocabCaughtInRound.add(droppedItemId);
+        }
       }
       // Hide the letter immediately after correct drop
       item.element.style.display = 'none';
@@ -1001,6 +1032,11 @@ function startClickMode(itemEl, payload) {
   let currentCatchStreak = 0;
   let bestWaveCatch = 0;
   let totalWins = 0;
+  // Vocab mode specific tracking
+  let isVocabMode = false;
+  let vocabCaughtInRound = new Set(); // Track which vocab items were caught in current round
+  let hadPerfectRound = false; // Track if all vocab was caught in a round
+  let totalVocabCount = 0; // Total number of vocab items
   const initialLives = 3;
   const learnPhaseDuration = 2500;
   const levelUpThreshold = 50;
@@ -1213,6 +1249,10 @@ function startClickMode(itemEl, payload) {
     waveCorrectCount = 0;
     forcedStartItem = null; // Clear any forced start item
     recentSpawnPositions = []; // Clear spawn position tracking
+
+    // Reset vocab mode tracking
+    vocabCaughtInRound.clear();
+    hadPerfectRound = false;
 
     // Clear any active items from previous sessions
     activeItems.forEach((item) => item.element.remove());
@@ -1437,11 +1477,25 @@ function startClickMode(itemEl, payload) {
     // Check if player has reached the goal level
     const winThreshold = goalValue + 1;
 
-    if (level >= winThreshold) {
+    // For vocab mode: win after completing a level following a perfect round
+    if (isVocabMode && hadPerfectRound) {
+      totalWins++;
+      hasReachedGoal = true;
+      // Don't show win screen yet - wait for all items to be cleared
+    } else if (!isVocabMode && level >= winThreshold) {
       totalWins++;
       hasReachedGoal = true;
       // Don't show win screen yet - wait for all letters to be cleared
       // Win screen will be triggered in onItemHandled when activeItems.size === 0
+    }
+
+    // Check for perfect round in vocab mode
+    if (isVocabMode && vocabCaughtInRound.size === totalVocabCount) {
+      hadPerfectRound = true;
+    }
+    // Reset vocab tracking for next round
+    if (isVocabMode) {
+      vocabCaughtInRound.clear();
     }
 
     const levelUpText = t('game.status.levelUp');
@@ -2313,6 +2367,10 @@ accessibilityBtn?.addEventListener('click', () => {
         totalCatchStreak = Math.max(totalCatchStreak, currentCatchStreak);
         if (improvedStreak) {
           updateStreakStat(true);
+        }
+        // Track vocab item catches for perfect round detection
+        if (isVocabMode && droppedItemId) {
+          vocabCaughtInRound.add(droppedItemId);
         }
       }
       // Hide the letter immediately after correct drop

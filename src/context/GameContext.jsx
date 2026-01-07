@@ -127,6 +127,7 @@ export function GameProvider({ children }) {
         translate: t,
         dictionary,
         appLanguageId: interfaceLanguagePack.id,
+        vocabData: options?.vocabData || null,
       });
     }
     const api = gameApiRef.current;

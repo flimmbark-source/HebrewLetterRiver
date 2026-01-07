@@ -51,6 +51,15 @@ export const module1Vocab1Text = createReadingText({
       we: { canonical: 'anachnu', variants: ['anachnu', 'anakhnu'] },
       happy: { canonical: 'sameach', variants: ['sameach', 'same\'ach'] }
     }
+  },
+  emojis: {
+    shalom: '👋',
+    todah: '🙏',
+    I: '🙋',
+    'you-m': '👤',
+    'you-f': '👤',
+    we: '👥',
+    happy: '😊'
   }
 });
 
@@ -100,6 +109,15 @@ export const module1Vocab2Text = createReadingText({
       today: { canonical: 'hayom', variants: ['hayom', 'ha-yom'] },
       here: { canonical: 'kan', variants: ['kan'] }
     }
+  },
+  emojis: {
+    'new-f': '✨',
+    language: '🗣️',
+    question: '❓',
+    answer: '💡',
+    idea: '💭',
+    today: '📅',
+    here: '📍'
   }
 });
 
@@ -146,6 +164,14 @@ export const module1Vocab3Text = createReadingText({
       help: { canonical: 'ozer', variants: ['ozer', '\'ozer'] },
       start: { canonical: 'lehatchil', variants: ['lehatchil', 'lehat\'hil'] }
     }
+  },
+  emojis: {
+    together: '🤝',
+    want: '🙏',
+    study: '📚',
+    ask: '🙋',
+    help: '🤲',
+    start: '🚀'
   }
 });
 
@@ -239,6 +265,30 @@ export const module2VocabText = createReadingText({
       read: { canonical: 'koreh', variants: ['koreh', 'kore'] },
       live: { canonical: 'gar', variants: ['gar'] }
     }
+  },
+  emojis: {
+    home: '🏠',
+    family: '👨‍👩‍👧‍👦',
+    friend: '👫',
+    friends: '👥',
+    neighbor: '🏘️',
+    child: '👶',
+    book: '📖',
+    water: '💧',
+    coffee: '☕',
+    quiet: '🤫',
+    small: '🔹',
+    full: '🈵',
+    erev: '🌆',
+    boker: '🌅',
+    day: '☀️',
+    time: '⏰',
+    like: '❤️',
+    sit: '🪑',
+    speak: '💬',
+    need: '🙏',
+    read: '📚',
+    live: '🏡'
   }
 });
 
@@ -320,6 +370,26 @@ export const module3VocabText = createReadingText({
       cook: { canonical: 'mevashel', variants: ['mevashel'] },
       order: { canonical: 'mazminim', variants: ['mazminim'] }
     }
+  },
+  emojis: {
+    food: '🍽️',
+    bread: '🍞',
+    restaurant: '🍴',
+    'meal-of': '🍱',
+    warm: '🔥',
+    'cold-pl': '🧊',
+    tasty: '😋',
+    fresh: '🌿',
+    now: '⏱️',
+    very: '⭐',
+    more: '➕',
+    please: '🙏',
+    eat: '🍴',
+    drink: '🥤',
+    buy: '🛒',
+    pay: '💳',
+    cook: '👨‍🍳',
+    order: '📝'
   }
 });
 
@@ -398,6 +468,25 @@ export const module4VocabText = createReadingText({
       finish: { canonical: 'mesayemim', variants: ['mesayemim', 'mesaymim'] },
       rest: { canonical: 'lanuach', variants: ['lanuach', 'la-nuach'] }
     }
+  },
+  emojis: {
+    tomorrow: '🌅',
+    yesterday: '🌄',
+    early: '🌅',
+    late: '🌙',
+    always: '♾️',
+    sometimes: '🔀',
+    tov: '👍',
+    city: '🏙️',
+    meeting: '🤝',
+    hour: '⏰',
+    minutes: '⏱️',
+    come: '👋',
+    arrive: '📍',
+    wait: '⏳',
+    go: '🚶',
+    finish: '✅',
+    rest: '😴'
   }
 });
 
