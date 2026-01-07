@@ -102,6 +102,13 @@ export function GameProvider({ children }) {
     gameApiRef.current = null;
   }, [languagePack.id, interfaceLanguagePack.id]);
 
+  // Clear game API when vocab data is present to force fresh setup with vocab mode
+  useEffect(() => {
+    if (options?.vocabData && gameApiRef.current) {
+      gameApiRef.current = null;
+    }
+  }, [options?.vocabData]);
+
   useEffect(() => {
     if (!isVisible) return;
     if (!containerRef.current) return;
@@ -127,6 +134,7 @@ export function GameProvider({ children }) {
         translate: t,
         dictionary,
         appLanguageId: interfaceLanguagePack.id,
+        vocabData: options?.vocabData || null,
       });
     }
     const api = gameApiRef.current;
@@ -201,6 +209,8 @@ export function GameProvider({ children }) {
     setIsGameRunning(false);
     setShowPostGameReview(false);
     setSessionData(null);
+    setOptions(null); // Clear options to prevent stale vocab data
+    gameApiRef.current = null; // Clear game API to force fresh setup next time
   }, []);
 
   const contextValue = useMemo(

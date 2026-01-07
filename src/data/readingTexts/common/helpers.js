@@ -66,10 +66,11 @@ function buildWordTranslation(appLang, wordId, canonical, custom) {
  * @param {Object} config.meaningKeys - Mapping from word ID to i18n meaning key
  * @param {Object} config.glosses - Semantic meanings/glosses for all words in all languages
  * @param {Object} config.translations - Translations for all words in all app languages
+ * @param {Object} [config.emojis] - Emoji associations for words (wordId -> emoji)
  * @param {string} [config.sectionId] - Optional section identifier
  * @returns {Object} Complete reading text object
  */
-export function createReadingText({ id, title, subtitle, practiceLanguage, tokens, meaningKeys, glosses, translations, sectionId }) {
+export function createReadingText({ id, title, subtitle, practiceLanguage, tokens, meaningKeys, glosses, translations, emojis, sectionId }) {
   return {
     id,
     title,
@@ -79,6 +80,7 @@ export function createReadingText({ id, title, subtitle, practiceLanguage, token
     meaningKeys,
     glosses,
     translations,
+    emojis,
     sectionId
   };
 }

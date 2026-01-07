@@ -43,7 +43,7 @@ function clearAllTimers() {
 // Store the current app language ID for Association Mode (module-level variable)
 let activeAppLanguageId = 'en';
 
-export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary, appLanguageId = 'en' } = {}) {
+export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePack, translate, dictionary, appLanguageId = 'en', vocabData = null } = {}) {
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
   const livesContainer = document.getElementById('lives-container');
@@ -117,6 +117,13 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     if (!result || result === key) return fallback;
     return result;
   };
+
+  // Vocab mode tracking variables (must be declared before vocabData check)
+  let isVocabMode = false;
+  let vocabCaughtInRound = new Set();
+  let hadPerfectRound = false;
+  let totalVocabCount = 0;
+
   let practiceModes = (activeLanguage.practiceModes ?? []).map((mode) => ({ ...mode }));
   const modeItems = { ...(activeLanguage.modeItems ?? {}) };
   const baseItems = activeLanguage.items ?? [];
@@ -186,13 +193,45 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     modeItems.letters = baseItems.map((item) => ({ ...item }));
   }
 
+  // Track selected mode IDs (multi-select) - declare early so vocab mode can use it
+  let selectedModeIds = new Set();
+
+  // Add vocab mode if vocab data is provided
+  if (vocabData) {
+    const vocabMode = {
+      id: 'vocab',
+      label: vocabData.title || 'Vocabulary Practice',
+      description: vocabData.subtitle || 'Match words with their emojis',
+      type: 'vocab',
+      noun: 'word'
+    };
+    practiceModes.push(vocabMode);
+
+    // Create vocab items from the vocab data
+    const vocabItems = vocabData.words.map((word) => ({
+      id: word.id,
+      symbol: word.text,
+      sound: vocabData.emojis[word.id] || word.text, // Use emoji as sound for association mode, fallback to Hebrew text
+      name: word.gloss || word.id,
+      transliteration: word.transliteration,
+      emoji: vocabData.emojis[word.id],
+      sourceMode: 'vocab'
+    }));
+    modeItems.vocab = vocabItems;
+
+    // Set vocab mode tracking
+    isVocabMode = true;
+    totalVocabCount = vocabItems.length;
+
+    // IMPORTANT: Auto-select vocab mode
+    selectedModeIds.clear();
+    selectedModeIds.add('vocab');
+  }
+
   const modeNounMap = practiceModes.reduce((acc, mode) => {
     acc[mode.id] = mode.noun ?? nounFallback;
     return acc;
   }, {});
-
-  // Track selected mode IDs (multi-select)
-  let selectedModeIds = new Set();
 
   function renderPracticeModes() {
     if (!modeOptionsContainer) return;
@@ -353,8 +392,13 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   }
 
   function exitFromWin() {
-    resetToSetupScreen();
-    onReturnToMenu?.();
+    // For vocab mode, skip setup screen and go directly back to module card
+    if (isVocabMode) {
+      onReturnToMenu?.();
+    } else {
+      resetToSetupScreen();
+      onReturnToMenu?.();
+    }
   }
 
   if ('serviceWorker' in navigator) {
@@ -921,6 +965,10 @@ function startClickMode(itemEl, payload) {
         if (improvedStreak) {
           updateStreakStat(true);
         }
+        // Track vocab item catches for perfect round detection
+        if (isVocabMode && droppedItemId) {
+          vocabCaughtInRound.add(droppedItemId);
+        }
       }
       // Hide the letter immediately after correct drop
       item.element.style.display = 'none';
@@ -1214,6 +1262,10 @@ function startClickMode(itemEl, payload) {
     forcedStartItem = null; // Clear any forced start item
     recentSpawnPositions = []; // Clear spawn position tracking
 
+    // Reset vocab mode tracking
+    vocabCaughtInRound.clear();
+    hadPerfectRound = false;
+
     // Clear any active items from previous sessions
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
@@ -1437,11 +1489,25 @@ function startClickMode(itemEl, payload) {
     // Check if player has reached the goal level
     const winThreshold = goalValue + 1;
 
-    if (level >= winThreshold) {
+    // For vocab mode: win after completing a level following a perfect round
+    if (isVocabMode && hadPerfectRound) {
+      totalWins++;
+      hasReachedGoal = true;
+      // Don't show win screen yet - wait for all items to be cleared
+    } else if (!isVocabMode && level >= winThreshold) {
       totalWins++;
       hasReachedGoal = true;
       // Don't show win screen yet - wait for all letters to be cleared
       // Win screen will be triggered in onItemHandled when activeItems.size === 0
+    }
+
+    // Check for perfect round in vocab mode
+    if (isVocabMode && vocabCaughtInRound.size === totalVocabCount) {
+      hadPerfectRound = true;
+    }
+    // Reset vocab tracking for next round
+    if (isVocabMode) {
+      vocabCaughtInRound.clear();
     }
 
     const levelUpText = t('game.status.levelUp');
@@ -1655,10 +1721,18 @@ function startClickMode(itemEl, payload) {
           const callback1 = () => {
             if (!gameActive || isPaused || currentRound.id !== roundId) return;
             learnLetterEl.textContent = itemData.symbol;
-            const transliteration = itemData.transliteration ?? itemData.name ?? '';
+            const transliteration = itemData.transliteration ?? itemData.id ?? '';
             const pronunciation = getDisplayLabel(itemData);
-            learnName.textContent = transliteration;
-            learnSound.textContent = pronunciation ? t('game.summary.soundLabel', { sound: pronunciation }) : '';
+            
+            // For vocab items, show English translation in name and transliteration in sound
+            // For regular items, show transliteration in name and "Sound: [pronunciation]" in sound
+            if (itemData.sourceMode === 'vocab') {
+              learnName.textContent = itemData.name; // English translation
+              learnSound.textContent = transliteration; // transliteration
+            } else {
+              learnName.textContent = transliteration;
+              learnSound.textContent = pronunciation ? t('game.summary.soundLabel', { sound: pronunciation }) : '';
+            }
             learnOverlay.classList.add('visible');
             startItemDrop(itemData, roundId);
           };
@@ -1989,8 +2063,14 @@ function startClickMode(itemEl, payload) {
 
       box.dataset.labelText = labelText;
 
-      // Check if association mode is enabled and we have an emoji for this sound
-      if (associationModeEnabled && displayLabel) {
+      // Check if this is a vocab item with an emoji
+      if (choice.emoji) {
+        // Display emoji for vocab mode
+        box.innerHTML = `<div class="flex flex-col items-center justify-center gap-1">
+          <span class="text-4xl" role="img" aria-label="${choice.name || labelText}">${choice.emoji}</span>
+        </div>`;
+      } else if (associationModeEnabled && displayLabel) {
+        // Check if association mode is enabled and we have an emoji for this sound
         const association = getAssociation(displayLabel, activeAppLanguageId);
         if (association) {
           // Display emoji with optional word label <span class="text-xs text-arcade-text-muted">${association.word}</span>
@@ -2005,8 +2085,8 @@ function startClickMode(itemEl, payload) {
         box.textContent = labelText;
       }
       box.dataset.itemId = choice.id;
-      // Store the sound for matching - allows multiple letters with same sound
-      box.dataset.sound = displayLabel;
+      // Store the sound for matching - for vocab items, use emoji to allow multiple words with same emoji
+      box.dataset.sound = choice.emoji || displayLabel;
       box.className = 'catcher-box bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium text-arcade-text-main font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-arcade-panel-border shadow-arcade-sm';
       const ariaLabel = getCharacterAriaLabel(choice);
       if (ariaLabel) box.setAttribute('aria-label', ariaLabel);
@@ -2314,6 +2394,10 @@ accessibilityBtn?.addEventListener('click', () => {
         if (improvedStreak) {
           updateStreakStat(true);
         }
+        // Track vocab item catches for perfect round detection
+        if (isVocabMode && droppedItemId) {
+          vocabCaughtInRound.add(droppedItemId);
+        }
       }
       // Hide the letter immediately after correct drop
       item.element.style.display = 'none';
@@ -2373,8 +2457,13 @@ accessibilityBtn?.addEventListener('click', () => {
   refreshDropZones();
 
   const handleReturnToMenu = () => {
-    resetToSetupScreen();
-    onReturnToMenu?.();
+    // For vocab mode, skip setup screen and go directly back to module card
+    if (isVocabMode) {
+      onReturnToMenu?.();
+    } else {
+      resetToSetupScreen();
+      onReturnToMenu?.();
+    }
   };
 
   let isPaused = false;
