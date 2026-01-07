@@ -675,11 +675,11 @@ useEffect(() => {
                 <div className="w-full px-2 text-left text-xs" style={{ color: '#b07737' }}>{helperHint}</div>
               )}
               {/* Reading words track */}
-              <div className="relative flex w-full min-w-0 items-center overflow-hidden">
+              <div className="relative flex w-full min-w-0 items-baseline overflow-hidden">
               <div
                 ref={practiceTrackRef}
-                className="inline-flex items-center gap-4 sm:gap-6 transition-transform duration-[260ms] ease-out"
-                style={{ willChange: 'transform' }}
+                className="inline-flex items-baseline transition-transform duration-[260ms] ease-out"
+                style={{ willChange: 'transform', gap: '0.5em' }}
                 dir={practiceDirection}
               >
               {readingText.tokens.map((token, idx) => {
@@ -687,8 +687,12 @@ useEffect(() => {
                   return (
                       <span
                         key={`punct-${idx}`}
-                        className="whitespace-nowrap text-3xl opacity-40 sm:text-4xl"
-                        style={{ letterSpacing: '0.4px', color: '#064E3B' }}
+                        className="whitespace-nowrap text-3xl opacity-50 sm:text-4xl"
+                        style={{
+                          color: '#064E3B',
+                          marginInlineStart: token.text === '.' || token.text === '!' || token.text === '?' || token.text === ',' ? '-0.3em' : '0',
+                          marginInlineEnd: '0.15em'
+                        }}
                       >
                         {token.text}
                       </span>
@@ -705,8 +709,7 @@ useEffect(() => {
                       isActive ? 'opacity-100 cursor-pointer hover:scale-105 transition-transform' : 'opacity-50'
                     }`}
                     style={{
-                      letterSpacing: '0.4px',
-                      transform: 'translateY(1px)',
+                      letterSpacing: '0.05em',
                       pointerEvents: isActive ? 'auto' : 'none',
                       color: '#064E3B'
                     }}
