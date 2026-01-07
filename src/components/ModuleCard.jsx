@@ -163,7 +163,8 @@ export default function ModuleCard({ module, isLocked, onModuleComplete, onPract
         .map(token => ({
           id: token.id,
           text: token.text,
-          gloss: vocabText.glosses?.en?.[token.id] || token.id
+          gloss: vocabText.glosses?.en?.[token.id] || token.id,
+          transliteration: vocabText.translations?.en?.[token.id]?.canonical || token.id
         })),
       emojis: vocabText.emojis || {}
     };

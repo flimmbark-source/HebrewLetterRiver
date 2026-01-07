@@ -213,6 +213,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
       symbol: word.text,
       sound: word.text, // Use Hebrew text as sound
       name: word.gloss || word.id,
+      transliteration: word.transliteration,
       emoji: vocabData.emojis[word.id],
       sourceMode: 'vocab'
     }));
