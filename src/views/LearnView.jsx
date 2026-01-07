@@ -173,7 +173,7 @@ export default function LearnView() {
     <div className="space-y-6">
       <header className="space-y-2 px-1">
         <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-semibold" style={{ color: '#1F2937' }}>
+          <h2 className="text-2xl font-semibold text-slate-800">
             Learning Path
           </h2>
           {practiceLanguageId === 'hebrew' && (
@@ -186,7 +186,7 @@ export default function LearnView() {
             </button>
           )}
         </div>
-        <p className="text-sm" style={{ color: '#6B7280' }}>
+        <p className="text-sm text-slate-600">
           Follow the modules below to learn Hebrew step by step. Complete vocab, grammar, and sentences in each module to unlock the next.
         </p>
       </header>
@@ -263,38 +263,19 @@ function ReadingTextCard({ text, appLanguageId, onSelect }) {
 
   return (
     <article
-      className="cursor-pointer transition-all"
-      style={{
-        background: 'linear-gradient(135deg, #fffcea 0%, #fcfff2 100%)',
-        borderRadius: '12px',
-        padding: '12px',
-        border: '1px solid #E5E7EB',
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -2px rgba(0, 0, 0, 0.1)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)';
-      }}
+      className="cursor-pointer rounded-xl border border-slate-200 bg-gradient-to-br from-amber-50 to-emerald-50 p-3 shadow-sm transition-all hover:shadow-md"
       onClick={onSelect}
     >
       <div className="mb-2 flex items-start justify-between gap-2">
-        <h4 className="text-lg font-semibold" style={{ color: '#064E3B' }}>
+        <h4 className="text-lg font-semibold text-emerald-900">
           {title}
         </h4>
-        <span
-          className="rounded-full px-2 py-0.5 text-xs font-medium"
-          style={{
-            background: '#F9FAFB',
-            color: '#6B7280',
-          }}
-        >
+        <span className="rounded-full bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-600">
           {wordCount} words
         </span>
       </div>
-      <p className="text-sm" style={{ color: '#6B7280' }}>{subtitle}</p>
-      <div className="mt-3 flex items-center gap-2 text-xs font-medium" style={{ color: '#059669' }}>
+      <p className="text-sm text-slate-600">{subtitle}</p>
+      <div className="mt-3 flex items-center gap-2 text-xs font-medium text-emerald-600">
         <span>Start Reading</span>
         <span>→</span>
       </div>

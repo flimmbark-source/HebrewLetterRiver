@@ -81,8 +81,14 @@ export default function WordHelperModal({
   const { entry, breakdown } = insight || {};
 
   return (
-    <div className="fixed inset-0 z-30 flex items-end bg-black/40">
-      <div className="w-full rounded-t-2xl bg-white p-5 shadow-xl">
+    <div
+      className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-2xl rounded-2xl bg-white p-5 shadow-xl max-h-[85vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="mb-3 flex items-center justify-between">
           <div>
             <p className="text-sm text-slate-500">{t('read.sentence.wordHelper')}</p>
