@@ -287,13 +287,6 @@ export default function ModuleCard({ module, isLocked, onModuleComplete, onPract
                     <p className="text-sm text-muted-foreground">
                       {vocabSubtitle}
                     </p>
-                    <Button
-                      onClick={() => setActiveSection(vocabTextId)}
-                      className="w-full"
-                      variant={isComplete ? "outline" : "default"}
-                    >
-                      {isComplete ? 'Practice' : 'Start Practice'}
-                    </Button>
                     {expandedVocabId === vocabTextId ? (
                       <div className="space-y-2">
                         <Button
