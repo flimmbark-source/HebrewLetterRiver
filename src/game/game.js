@@ -1724,13 +1724,13 @@ function startClickMode(itemEl, payload) {
             const pronunciation = getDisplayLabel(itemData);
             
             // For vocab items, show English translation in name and transliteration in sound
-            // For regular items, show transliteration in both
+            // For regular items, show transliteration in name and "Sound: [pronunciation]" in sound
             if (itemData.sourceMode === 'vocab') {
               learnName.textContent = itemData.name; // English translation
               learnSound.textContent = transliteration; // transliteration
             } else {
               learnName.textContent = transliteration;
-              learnSound.textContent = transliteration;
+              learnSound.textContent = pronunciation ? t('game.summary.soundLabel', { sound: pronunciation }) : '';
             }
             learnOverlay.classList.add('visible');
             startItemDrop(itemData, roundId);
