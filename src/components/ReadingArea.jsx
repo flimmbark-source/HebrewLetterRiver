@@ -691,8 +691,10 @@ useEffect(() => {
                         style={{
                           color: '#064E3B',
                           marginInlineStart: token.text === '.' || token.text === '!' || token.text === '?' || token.text === ',' ? '-0.3em' : '0',
-                          marginInlineEnd: '0.15em'
+                          marginInlineEnd: '0.15em',
+                          unicodeBidi: 'plaintext'
                         }}
+                        dir={practiceDirection}
                       >
                         {token.text}
                       </span>
