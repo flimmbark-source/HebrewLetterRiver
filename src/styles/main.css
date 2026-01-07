@@ -2714,6 +2714,17 @@ body.no-scroll {
   transform: translate(-50%, 0);
   opacity: 1;
 }
+#bucket-info-overlay {
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  transform: translate(-50%, -50%) scale(0.8);
+  opacity: 0;
+  pointer-events: none;
+}
+#bucket-info-overlay.visible {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
 @keyframes pop-correct {
   50% {
     background: #10b981;

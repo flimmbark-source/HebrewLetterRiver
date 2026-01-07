@@ -538,6 +538,49 @@ function GameCanvas({ fontClass, loadedSettings }) {
               />
             </div>
           </div>
+
+          {/* Bucket Info Overlay */}
+          <div
+            id="bucket-info-overlay"
+            className="absolute left-1/2 top-1/2 z-30 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3 rounded-2xl px-8 py-6 shadow-2xl"
+            style={{
+              border: '3px solid rgba(235, 179, 105, 0.95)',
+              background:
+                'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%)',
+              boxShadow:
+                '0 4px 0 rgba(214, 140, 64, 1), 0 8px 20px rgba(214, 140, 64, 0.7)',
+              minWidth: '300px',
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div
+                id="bucket-info-symbol"
+                className={`text-7xl font-bold ${fontClass}`}
+                style={{ color: '#ff9247' }}
+              />
+              <div className="flex flex-col text-left">
+                <div
+                  id="bucket-info-name"
+                  className="text-2xl font-semibold"
+                  style={{ color: '#4a2208' }}
+                />
+                <div
+                  id="bucket-info-sound"
+                  className="text-lg"
+                  style={{ color: '#6c3b14' }}
+                />
+              </div>
+            </div>
+            <button
+              id="bucket-info-close"
+              className="mt-2 rounded-lg bg-gradient-to-b from-orange-400 to-orange-500 px-6 py-2 font-semibold text-white shadow-md transition-all hover:from-orange-500 hover:to-orange-600"
+              style={{
+                boxShadow: '0 2px 0 rgba(214, 140, 64, 1)',
+              }}
+            >
+              Close
+            </button>
+          </div>
         </div>
 
         <div
