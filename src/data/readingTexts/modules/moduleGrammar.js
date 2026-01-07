@@ -13,12 +13,12 @@ import { createReadingText } from '../common/helpers.js';
 export const module1Grammar1Text = createReadingText({
   id: 'module-1-grammar-1',
   title: {
-    en: 'Grammar Part 1',
-    he: 'דקדוק חלק 1'
-  },
-  subtitle: {
     en: 'Pronoun + Adjective Agreement',
     he: 'הסכמה בין כינוי לתואר'
+  },
+  subtitle: {
+    en: 'Gender & number matching',
+    he: 'התאמת מגדר ומספר'
   },
   practiceLanguage: 'hebrew',
   sectionId: 'modules',
@@ -86,12 +86,12 @@ export const module1Grammar1Text = createReadingText({
 export const module1Grammar2Text = createReadingText({
   id: 'module-1-grammar-2',
   title: {
-    en: 'Grammar Part 2',
-    he: 'דקדוק חלק 2'
-  },
-  subtitle: {
     en: 'Definite Article & Time',
     he: 'יידוע וזמן'
+  },
+  subtitle: {
+    en: 'Using "the" and time expressions',
+    he: 'שימוש ב"ה" הידיעה וביטויי זמן'
   },
   practiceLanguage: 'hebrew',
   sectionId: 'modules',
@@ -152,12 +152,12 @@ export const module1Grammar2Text = createReadingText({
 export const module1Grammar3Text = createReadingText({
   id: 'module-1-grammar-3',
   title: {
-    en: 'Grammar Part 3',
-    he: 'דקדוק חלק 3'
-  },
-  subtitle: {
     en: 'Verbs & Infinitives',
     he: 'פעלים ושם הפועל'
+  },
+  subtitle: {
+    en: 'Present tense and infinitive forms',
+    he: 'הווה ושם הפועל'
   },
   practiceLanguage: 'hebrew',
   sectionId: 'modules',

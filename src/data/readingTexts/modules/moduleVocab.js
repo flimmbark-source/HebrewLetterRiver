@@ -12,12 +12,12 @@ import { createReadingText } from '../common/helpers.js';
 export const module1Vocab1Text = createReadingText({
   id: 'module-1-vocab-1',
   title: {
-    en: 'Vocabulary Part 1',
-    he: 'אוצר מילים חלק 1'
-  },
-  subtitle: {
     en: 'Basic Greetings & Pronouns',
     he: 'ברכות וכינויים בסיסיים'
+  },
+  subtitle: {
+    en: 'Essential words for introductions',
+    he: 'מילים חיוניות להצגות'
   },
   practiceLanguage: 'hebrew',
   sectionId: 'modules',
@@ -61,12 +61,12 @@ export const module1Vocab1Text = createReadingText({
 export const module1Vocab2Text = createReadingText({
   id: 'module-1-vocab-2',
   title: {
-    en: 'Vocabulary Part 2',
-    he: 'אוצר מילים חלק 2'
-  },
-  subtitle: {
     en: 'Nouns & Descriptions',
     he: 'שמות עצם ותיאורים'
+  },
+  subtitle: {
+    en: 'Building your word collection',
+    he: 'בניית אוסף המילים שלך'
   },
   practiceLanguage: 'hebrew',
   sectionId: 'modules',
@@ -110,12 +110,12 @@ export const module1Vocab2Text = createReadingText({
 export const module1Vocab3Text = createReadingText({
   id: 'module-1-vocab-3',
   title: {
-    en: 'Vocabulary Part 3',
-    he: 'אוצר מילים חלק 3'
-  },
-  subtitle: {
     en: 'Actions & Verbs',
     he: 'פעולות ופעלים'
+  },
+  subtitle: {
+    en: 'Express what you want to do',
+    he: 'הבע מה אתה רוצה לעשות'
   },
   practiceLanguage: 'hebrew',
   sectionId: 'modules',
