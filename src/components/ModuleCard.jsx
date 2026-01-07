@@ -290,14 +290,20 @@ export default function ModuleCard({ module, isLocked, onModuleComplete, onPract
                     {expandedVocabId === vocabTextId ? (
                       <div className="space-y-2">
                         <Button
-                          onClick={() => setActiveSection(vocabTextId)}
+                          onClick={() => {
+                            setActiveSection(vocabTextId);
+                            setExpandedVocabId(null);
+                          }}
                           className="w-full"
                           variant="default"
                         >
                           Reading
                         </Button>
                         <Button
-                          onClick={() => handlePlayGame(vocabTextId)}
+                          onClick={() => {
+                            handlePlayGame(vocabTextId);
+                            setExpandedVocabId(null);
+                          }}
                           className="w-full"
                           variant="outline"
                         >
