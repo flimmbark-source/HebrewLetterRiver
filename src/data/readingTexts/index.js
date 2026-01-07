@@ -21,6 +21,10 @@ import { japaneseCafeTalkTexts } from './cafeTalk/japanese.js';
 import { bengaliCafeTalkTexts } from './cafeTalk/bengali.js';
 import { amharicCafeTalkTexts } from './cafeTalk/amharic.js';
 
+// Import Module Vocabulary and Grammar texts
+import { moduleVocabTexts } from './modules/moduleVocab.js';
+import { moduleGrammarTexts } from './modules/moduleGrammar.js';
+
 // Temporarily import from old file for languages not yet migrated
 import {
   arabicReadingTexts,
@@ -141,9 +145,15 @@ export function getReadingTextsForLanguage(practiceLanguage) {
   const starterTexts = readingTextsByLanguage[normalizedLanguage] || [];
   const cafeTalkTexts = cafeTalkByLanguage[normalizedLanguage] || [];
 
+  // Add module vocab and grammar texts for Hebrew
+  const moduleTexts = normalizedLanguage === 'hebrew'
+    ? [...moduleVocabTexts, ...moduleGrammarTexts]
+    : [];
+
   return [
     ...addSectionId(starterTexts, 'starter'),
-    ...addSectionId(cafeTalkTexts, 'cafeTalk')
+    ...addSectionId(cafeTalkTexts, 'cafeTalk'),
+    ...addSectionId(moduleTexts, 'modules')
   ];
 }
 
@@ -170,6 +180,12 @@ export function getReadingTextById(textId, practiceLanguage) {
       const text = cafeTalkTexts.find(t => t.id === textId);
       if (text) return { ...text, sectionId: text.sectionId || 'cafeTalk' };
     }
+
+    // Search module texts for Hebrew
+    if (normalizedLanguage === 'hebrew') {
+      const moduleText = [...moduleVocabTexts, ...moduleGrammarTexts].find(t => t.id === textId);
+      if (moduleText) return { ...moduleText, sectionId: moduleText.sectionId || 'modules' };
+    }
   }
 
   // Fallback: search across all languages (maintains backward compatibility)
@@ -182,6 +198,10 @@ export function getReadingTextById(textId, practiceLanguage) {
     const text = texts.find(t => t.id === textId);
     if (text) return { ...text, sectionId: text.sectionId || 'cafeTalk' };
   }
+
+  // Fallback: search module texts
+  const moduleText = [...moduleVocabTexts, ...moduleGrammarTexts].find(t => t.id === textId);
+  if (moduleText) return { ...moduleText, sectionId: moduleText.sectionId || 'modules' };
 
   return null;
 }

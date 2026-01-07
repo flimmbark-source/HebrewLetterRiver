@@ -15,20 +15,20 @@ import { hasShownPackIntro, getLearnedLayouts } from '../lib/vowelLayoutProgress
 import { deriveLayoutFromTransliteration } from '../lib/vowelLayoutDerivation.js';
 import SentencePracticeArea from '../components/SentencePracticeArea.jsx';
 import { getThemeStats } from '../lib/sentenceProgressStorage.ts';
+import ModuleCard from '../components/ModuleCard.jsx';
+import { getModulesInOrder } from '../data/modules/index.ts';
+import { isModuleUnlocked, initializeFirstModule } from '../lib/moduleProgressStorage.ts';
 
 export default function LearnView() {
   const { t } = useLocalization();
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
   const { startTutorial, hasCompletedTutorial, currentTutorial } = useTutorial();
   const [selectedTextId, setSelectedTextId] = useState(null);
-  const [readingMode, setReadingMode] = useState(() => {
-    if (typeof window === 'undefined') return 'vocab';
-    return localStorage.getItem('readingModePreference') || 'vocab';
-  });
   const [selectedSentenceTheme, setSelectedSentenceTheme] = useState(null);
   const [dictionarySectionId, setDictionarySectionId] = useState(null);
   const [packIntroTextId, setPackIntroTextId] = useState(null);
   const [showSystemModal, setShowSystemModal] = useState(false);
+  const [moduleRefreshKey, setModuleRefreshKey] = useState(0);
 
   // Auto-trigger readIntro tutorial on first visit
   useEffect(() => {
@@ -37,19 +37,19 @@ export default function LearnView() {
     }
   }, [hasCompletedTutorial, startTutorial, currentTutorial]);
 
+  // Initialize first module for new users
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('readingModePreference', readingMode);
-    }
-  }, [readingMode]);
+    initializeFirstModule();
+  }, []);
 
-  useEffect(() => {
-    if (readingMode === 'sentences') {
-      setSelectedTextId(null);
-    } else {
-      setSelectedSentenceTheme(null);
-    }
-  }, [readingMode]);
+  // Get all modules in order
+  const modules = getModulesInOrder();
+
+  // Handle module completion
+  const handleModuleComplete = () => {
+    // Refresh modules to show newly unlocked ones
+    setModuleRefreshKey(prev => prev + 1);
+  };
 
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
@@ -148,19 +148,9 @@ export default function LearnView() {
     }
   };
 
-  if (readingMode === 'sentences' && selectedSentenceTheme) {
-    const themeSentences = sentencesByTheme[selectedSentenceTheme] || [];
-    return (
-      <SentencePracticeArea
-        theme={selectedSentenceTheme}
-        sentences={themeSentences}
-        onExit={() => setSelectedSentenceTheme(null)}
-      />
-    );
-  }
-
-  // If a text is selected, show the reading area
-  if (readingMode === 'vocab' && selectedTextId) {
+  // Note: Old vocab texts are kept for backwards compatibility but hidden in new module layout
+  // If a text is selected from old sections, show the reading area
+  if (selectedTextId) {
     return (
       <ReadingArea
         textId={selectedTextId}
@@ -178,180 +168,43 @@ export default function LearnView() {
     return translatedTitle !== meta.titleKey ? translatedTitle : (meta.fallbackTitle || '');
   };
 
-  // Show reading text selection
+  // Show learning path with modules
   return (
     <div className="space-y-6">
       <header className="space-y-2 px-1">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-semibold" style={{ color: '#1F2937' }}>{t('read.title')}</h2>
-            {practiceLanguageId === 'hebrew' && (
-              <button
-                onClick={() => setShowSystemModal(true)}
-                className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full border border-slate-400 bg-slate-100 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200 hover:border-slate-500 hover:text-slate-800"
-                title="Learn about vowel patterns"
-              >
-                ?
-              </button>
-            )}
-          </div>
-          <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1 text-xs font-semibold text-slate-700">
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-semibold" style={{ color: '#1F2937' }}>
+            Learning Path
+          </h2>
+          {practiceLanguageId === 'hebrew' && (
             <button
-              type="button"
-              onClick={() => setReadingMode('vocab')}
-              className={`rounded-full px-3 py-1 transition-colors ${readingMode === 'vocab' ? 'bg-white shadow-sm' : ''}`}
+              onClick={() => setShowSystemModal(true)}
+              className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full border border-slate-400 bg-slate-100 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200 hover:border-slate-500 hover:text-slate-800"
+              title="Learn about vowel patterns"
             >
-              {t('read.mode.vocab')}
+              ?
             </button>
-            <button
-              type="button"
-              onClick={() => setReadingMode('sentences')}
-              className={`rounded-full px-3 py-1 transition-colors ${readingMode === 'sentences' ? 'bg-white shadow-sm' : ''}`}
-            >
-              {t('read.mode.sentences')}
-            </button>
-          </div>
+          )}
         </div>
         <p className="text-sm" style={{ color: '#6B7280' }}>
-          {readingMode === 'sentences' ? t('read.sentencesIntro') : t('read.intro')}
+          Follow the modules below to learn Hebrew step by step. Complete vocab, grammar, and sentences in each module to unlock the next.
         </p>
       </header>
 
-      {readingMode === 'sentences' ? (
-        <div className="space-y-6">
-          <div className="grid gap-3 md:grid-cols-2">
-            {Object.entries(sentencesByTheme).map(([theme, sentences]) => (
-              <SentenceThemeCard
-                key={theme}
-                theme={theme}
-                sentences={sentences}
-                t={t}
-                onSelect={() => setSelectedSentenceTheme(theme)}
-              />
-            ))}
-          </div>
-        </div>
-      ) : readingTexts.length === 0 ? (
-        <div className="space-y-3 px-1">
-          <p className="text-sm" style={{ color: '#374151' }}>{t('read.noTexts')}</p>
-          <p className="text-xs" style={{ color: '#9CA3AF' }}>{t('read.comingSoon')}</p>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {/* Render each section that has texts */}
-          {Object.keys(textsBySection).map(sectionId => {
-            const sectionTexts = textsBySection[sectionId];
-            const meta = sectionMeta[sectionId];
-
-            // Skip if no metadata (shouldn't happen but defensive)
-            if (!meta) return null;
-
-            // Get translated or fallback title/desc
-            const sectionTitle = (() => {
-              const translated = t(meta.titleKey);
-              return translated !== meta.titleKey ? translated : (meta.fallbackTitle || sectionId);
-            })();
-            const sectionDesc = (() => {
-              const translated = t(meta.descKey);
-              return translated !== meta.descKey ? translated : (meta.fallbackDesc || '');
-            })();
-
-            return (
-              <div key={sectionId} className="space-y-4">
-                <div className="flex items-start justify-between gap-4 px-1">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>{sectionTitle}</h3>
-                    <p className="text-sm" style={{ color: '#6B7280' }}>{sectionDesc}</p>
-                  </div>
-                  <button
-                    onClick={() => setDictionarySectionId(sectionId)}
-                    className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
-                    style={{ marginTop: '2px' }}
-                  >
-                    <span>📖</span>
-                    <span>{t('read.dictionary.button')}</span>
-                  </button>
-                </div>
-
-                <div className="grid gap-3 md:grid-cols-2">
-                  {sectionTexts.map((text) => (
-                    <ReadingTextCard
-                      key={text.id}
-                      text={text}
-                      appLanguageId={appLanguageId}
-                      onSelect={() => handlePackSelect(text.id)}
-                    />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {readingMode === 'vocab' && (
-        <>
-          {/* Section Dictionary Modal */}
-          <SectionDictionary
-            sectionId={dictionarySectionId}
-            sectionTitle={getDictionarySectionTitle(dictionarySectionId)}
-            isOpen={dictionarySectionId !== null}
-            onClose={() => setDictionarySectionId(null)}
-          />
-
-          {/* Pack Vowel Layouts Intro Modal (Hebrew only) */}
-          {packIntroTextId && (() => {
-            const text = readingTexts.find(t => t.id === packIntroTextId);
-            if (!text) return null;
-
-            // Derive unique layout IDs from tokens
-            const layoutsMap = new Map();
-            text.tokens.forEach(token => {
-              if (token.type !== 'word') return;
-              const translit = text.translations?.en?.[token.id]?.canonical;
-              if (!translit) return;
-              const layout = deriveLayoutFromTransliteration(translit);
-              if (layout) {
-                if (!layoutsMap.has(layout.id)) {
-                  layoutsMap.set(layout.id, []);
-                }
-                layoutsMap.get(layout.id).push({
-                  hebrew: token.text,
-                  transliteration: translit,
-                  meaning: text.meaningKeys?.[token.id]
-                    ? t(text.meaningKeys[token.id])
-                    : (text.glosses?.[getLanguageCode(appLanguageId)]?.[token.id] ?? token.id)
-                });
-              }
-            });
-
-            const layoutIdsInPack = Array.from(layoutsMap.keys());
-
-            // Get learned layouts for Hebrew
-            const learnedLayouts = getLearnedLayouts('he');
-
-            // Build examples map (layoutId -> examples array)
-            const examplesMap = {};
-            layoutsMap.forEach((examples, layoutId) => {
-              examplesMap[layoutId] = examples;
-            });
-
-            return (
-              <PackVowelLayoutsIntroModal
-                isVisible={true}
-                onStart={handleStartFromIntro}
-                packId={packIntroTextId}
-                packTitle={getLocalizedTitle(text, appLanguageId)}
-                layoutIdsInPack={layoutIdsInPack}
-                learnedLayouts={learnedLayouts}
-                examples={examplesMap}
-                practiceFontClass={getFontClass(practiceLanguageId)}
-                appFontClass={getFontClass(appLanguageId)}
-              />
-            );
-          })()}
-        </>
-      )}
+      {/* Learning Path - Modules in Sequential Order */}
+      <div className="space-y-6" key={moduleRefreshKey}>
+        {modules.map((module) => {
+          const unlocked = isModuleUnlocked(module.id);
+          return (
+            <ModuleCard
+              key={module.id}
+              module={module}
+              isLocked={!unlocked}
+              onModuleComplete={handleModuleComplete}
+            />
+          );
+        })}
+      </div>
 
       {/* Vowel Layout System Modal (general explanation) */}
       <VowelLayoutSystemModal
