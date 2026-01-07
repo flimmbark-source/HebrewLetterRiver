@@ -16,6 +16,7 @@ import {
 } from '../lib/moduleProgressStorage';
 import { allSentences } from '../data/sentences';
 import { getThemeStats } from '../lib/sentenceProgressStorage';
+import { getReadingTextById } from '../data/readingTexts/index.js';
 
 /**
  * ModuleCard - Displays a learning module with vocab, grammar, and sentences
@@ -226,17 +227,21 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                       return null;
                     }
 
+                    const grammarText = getReadingTextById(grammarTextId, 'hebrew');
+                    const grammarTitle = grammarText?.title?.en || `Grammar Part ${index + 1}`;
+                    const grammarSubtitle = grammarText?.subtitle?.en || 'Practice grammar with vocabulary words';
+
                     return (
                       <div key={grammarTextId} className="border rounded-lg p-4 space-y-3">
                         <div className="flex items-center gap-2">
                           <Languages className="h-5 w-5 text-purple-600" />
-                          <h4 className="font-semibold">Grammar for Vocab Part {index + 1}</h4>
+                          <h4 className="font-semibold">{grammarTitle}</h4>
                           {progress?.grammarPracticed && (
                             <Check className="h-4 w-4 text-green-600" />
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Practice grammar with vocabulary words
+                          {grammarSubtitle}
                         </p>
                         <Button
                           onClick={() => handleStartGrammar(grammarTextId)}
