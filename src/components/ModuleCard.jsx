@@ -217,7 +217,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                       className="w-full"
                       variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
                     >
-                      {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Review' : 'Start Practice'}
+                      {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Practice' : 'Start Practice'}
                     </Button>
                   </div>
                 );
@@ -254,7 +254,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                           className="w-full"
                           variant={progress?.grammarPracticed ? "outline" : "default"}
                         >
-                          {progress?.grammarPracticed ? 'Review Grammar' : 'Start Grammar'}
+                          {progress?.grammarPracticed ? 'Practice' : 'Start Grammar'}
                         </Button>
                       </div>
                     );
@@ -276,7 +276,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
                         className="w-full"
                         variant={progress?.grammarPracticed ? "outline" : "default"}
                       >
-                        {progress?.grammarPracticed ? 'Review Grammar' : 'Start Grammar'}
+                        {progress?.grammarPracticed ? 'Practice' : 'Start Grammar'}
                       </Button>
                     </div>
                   )}
@@ -305,7 +305,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete }) {
               }
             >
               {progress && progress.sentencesCompleted >= progress.totalSentences
-                ? 'Review Sentences'
+                ? 'Practice'
                 : 'Start Reading'}
             </Button>
           </div>
