@@ -1720,10 +1720,18 @@ function startClickMode(itemEl, payload) {
           const callback1 = () => {
             if (!gameActive || isPaused || currentRound.id !== roundId) return;
             learnLetterEl.textContent = itemData.symbol;
-            const transliteration = itemData.transliteration ?? itemData.name ?? '';
+            const transliteration = itemData.transliteration ?? itemData.id ?? '';
             const pronunciation = getDisplayLabel(itemData);
-            learnName.textContent = transliteration;
-            learnSound.textContent = pronunciation ? t('game.summary.soundLabel', { sound: pronunciation }) : '';
+            
+            // For vocab items, show English translation in name and transliteration in sound
+            // For regular items, show transliteration in both
+            if (itemData.sourceMode === 'vocab') {
+              learnName.textContent = itemData.name; // English translation
+              learnSound.textContent = transliteration; // transliteration
+            } else {
+              learnName.textContent = transliteration;
+              learnSound.textContent = transliteration;
+            }
             learnOverlay.classList.add('visible');
             startItemDrop(itemData, roundId);
           };
