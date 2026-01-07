@@ -211,7 +211,7 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     const vocabItems = vocabData.words.map((word) => ({
       id: word.id,
       symbol: word.text,
-      sound: word.text, // Use Hebrew text as sound
+      sound: vocabData.emojis[word.id] || word.text, // Use emoji as sound for association mode, fallback to Hebrew text
       name: word.gloss || word.id,
       transliteration: word.transliteration,
       emoji: vocabData.emojis[word.id],
@@ -2085,8 +2085,8 @@ function startClickMode(itemEl, payload) {
         box.textContent = labelText;
       }
       box.dataset.itemId = choice.id;
-      // Store the sound for matching - allows multiple letters with same sound
-      box.dataset.sound = displayLabel;
+      // Store the sound for matching - for vocab items, use emoji to allow multiple words with same emoji
+      box.dataset.sound = choice.emoji || displayLabel;
       box.className = 'catcher-box bg-gradient-to-b from-arcade-panel-light to-arcade-panel-medium text-arcade-text-main font-bold py-5 sm:py-6 px-2 rounded-lg text-2xl transition-all border-2 border-arcade-panel-border shadow-arcade-sm';
       const ariaLabel = getCharacterAriaLabel(choice);
       if (ariaLabel) box.setAttribute('aria-label', ariaLabel);
