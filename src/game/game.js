@@ -391,8 +391,13 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   }
 
   function exitFromWin() {
-    resetToSetupScreen();
-    onReturnToMenu?.();
+    // For vocab mode, skip setup screen and go directly back to module card
+    if (isVocabMode) {
+      onReturnToMenu?.();
+    } else {
+      resetToSetupScreen();
+      onReturnToMenu?.();
+    }
   }
 
   if ('serviceWorker' in navigator) {
@@ -2443,8 +2448,13 @@ accessibilityBtn?.addEventListener('click', () => {
   refreshDropZones();
 
   const handleReturnToMenu = () => {
-    resetToSetupScreen();
-    onReturnToMenu?.();
+    // For vocab mode, skip setup screen and go directly back to module card
+    if (isVocabMode) {
+      onReturnToMenu?.();
+    } else {
+      resetToSetupScreen();
+      onReturnToMenu?.();
+    }
   };
 
   let isPaused = false;
