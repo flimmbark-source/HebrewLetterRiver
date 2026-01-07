@@ -7,18 +7,18 @@
 import { createReadingText } from '../common/helpers.js';
 
 /**
- * Module 1: Greetings & Introductions Grammar
- * Single grammar card covering all module grammar with vocab words
+ * Module 1: Greetings & Introductions Grammar - Part 1
+ * Focus: Pronoun + Adjective Agreement (Gender & Number)
  */
-export const module1GrammarText = createReadingText({
+export const module1Grammar1Text = createReadingText({
   id: 'module-1-grammar-1',
   title: {
-    en: 'Module 1 Grammar — Greetings & Introductions',
-    he: 'דקדוק מודול 1 — ברכות והיכרות'
+    en: 'Grammar Part 1',
+    he: 'דקדוק חלק 1'
   },
   subtitle: {
-    en: 'Practice grammar with vocabulary words',
-    he: 'תרגל דקדוק עם מילות אוצר מילים'
+    en: 'Pronoun + Adjective Agreement',
+    he: 'הסכמה בין כינוי לתואר'
   },
   practiceLanguage: 'hebrew',
   sectionId: 'modules',
@@ -35,7 +35,6 @@ export const module1GrammarText = createReadingText({
     { type: 'punct', text: '—' },
     { type: 'word', text: 'אתה', id: 'atah-question' },
     { type: 'word', text: 'שמח', id: 'sameach-question' },
-    { type: 'word', text: 'היום', id: 'hayom-question' },
     { type: 'punct', text: '?' },
     { type: 'word', text: 'שמח', id: 'sameach-base' },
     { type: 'punct', text: '—' },
@@ -44,54 +43,22 @@ export const module1GrammarText = createReadingText({
     { type: 'word', text: 'שמחים', id: 'smechim' },
     { type: 'punct', text: '/' },
     { type: 'word', text: 'שמחות', id: 'smechot' },
-    { type: 'punct', text: '.' },
-    { type: 'word', text: 'לומד', id: 'lomed' },
-    { type: 'punct', text: '/' },
-    { type: 'word', text: 'לומדים', id: 'lomdim' },
-    { type: 'punct', text: '—' },
-    { type: 'word', text: 'רוצה', id: 'rotze-lilmod' },
-    { type: 'word', text: 'ללמוד', id: 'lilmod' },
-    { type: 'punct', text: '.' },
-    { type: 'word', text: 'רוצה', id: 'rotze-ask' },
-    { type: 'punct', text: '—' },
-    { type: 'word', text: 'רוצה', id: 'rotze-ask-verb' },
-    { type: 'word', text: 'לשאול', id: 'lishol' },
-    { type: 'punct', text: '.' },
-    { type: 'word', text: 'תשובה', id: 'teshuvah-base' },
-    { type: 'punct', text: '—' },
-    { type: 'word', text: 'התשובה', id: 'hateshuvah' },
-    { type: 'punct', text: '.' },
-    { type: 'word', text: 'היום', id: 'hayom-base' },
-    { type: 'punct', text: '/' },
-    { type: 'word', text: 'עכשיו', id: 'achshav' },
     { type: 'punct', text: '.' }
   ],
   glosses: {
     en: {
       'ani-base': 'I (base)',
-      'ani-masc': 'I (masculine adjective)',
+      'ani-masc': 'I (masc. adj.)',
       'sameach-masc': 'happy (m.)',
-      'ani-fem': 'I (feminine adjective)',
+      'ani-fem': 'I (fem. adj.)',
       'smecha': 'happy (f.)',
       'atah-base': 'you (m. base)',
-      'atah-question': 'you (question)',
+      'atah-question': 'you (m.)',
       'sameach-question': 'happy (m.)',
-      'hayom-question': 'today',
-      'sameach-base': 'happy (m. singular)',
-      'smecha-base': 'happy (f. singular)',
-      'smechim': 'happy (m. plural)',
-      'smechot': 'happy (f. plural)',
-      'lomed': 'learns (m. sg.)',
-      'lomdim': 'learn (plural)',
-      'rotze-lilmod': 'want to learn',
-      'lilmod': 'to learn (inf.)',
-      'rotze-ask': 'want (base)',
-      'rotze-ask-verb': 'want to ask',
-      'lishol': 'to ask (inf.)',
-      'teshuvah-base': 'answer (base)',
-      'hateshuvah': 'the answer (definite)',
-      'hayom-base': 'today',
-      'achshav': 'now'
+      'sameach-base': 'happy (m. sg.)',
+      'smecha-base': 'happy (f. sg.)',
+      'smechim': 'happy (m. pl.)',
+      'smechot': 'happy (f. pl.)'
     }
   },
   translations: {
@@ -104,32 +71,152 @@ export const module1GrammarText = createReadingText({
       'atah-base': { canonical: 'atah', variants: ['atah', 'ata'] },
       'atah-question': { canonical: 'atah', variants: ['atah', 'ata'] },
       'sameach-question': { canonical: 'sameach', variants: ['sameach', "same'ach"] },
-      'hayom-question': { canonical: 'hayom', variants: ['hayom', 'ha-yom'] },
       'sameach-base': { canonical: 'sameach', variants: ['sameach', "same'ach"] },
       'smecha-base': { canonical: 'smecha', variants: ['smecha', "s'mecha"] },
       'smechim': { canonical: 'smechim', variants: ['smechim', "smech\'im"] },
-      'smechot': { canonical: 'smechot', variants: ['smechot', 'smechot'] },
-      'lomed': { canonical: 'lomed', variants: ['lomed'] },
-      'lomdim': { canonical: 'lomdim', variants: ['lomdim', "lom'dim"] },
-      'rotze-lilmod': { canonical: 'rotze', variants: ['rotze', 'rotseh', 'rotzeh'] },
-      'lilmod': { canonical: 'lilmod', variants: ['lilmod'] },
-      'rotze-ask': { canonical: 'rotze', variants: ['rotze', 'rotseh', 'rotzeh'] },
-      'rotze-ask-verb': { canonical: 'rotze', variants: ['rotze', 'rotseh', 'rotzeh'] },
-      'lishol': { canonical: "lish'ol", variants: ["lish'ol", 'lishol'] },
-      'teshuvah-base': { canonical: 'teshuvah', variants: ['teshuvah', 'teshuva'] },
-      'hateshuvah': { canonical: 'ha-teshuvah', variants: ['ha-teshuvah', 'hateshuva'] },
-      'hayom-base': { canonical: 'hayom', variants: ['hayom', 'ha-yom'] },
-      'achshav': { canonical: 'achshav', variants: ['achshav'] }
+      'smechot': { canonical: 'smechot', variants: ['smechot'] }
     }
   }
 });
 
-// Backwards compatibility for any code that still expects the old
-// per-card grammar exports from Module 1. Map the removed names to the
-// unified text so stale references won't throw at runtime.
-export const module1Grammar1Text = module1GrammarText;
-export const module1Grammar2Text = module1GrammarText;
-export const module1Grammar3Text = module1GrammarText;
+/**
+ * Module 1: Greetings & Introductions Grammar - Part 2
+ * Focus: Definite Article & Time Expressions
+ */
+export const module1Grammar2Text = createReadingText({
+  id: 'module-1-grammar-2',
+  title: {
+    en: 'Grammar Part 2',
+    he: 'דקדוק חלק 2'
+  },
+  subtitle: {
+    en: 'Definite Article & Time',
+    he: 'יידוע וזמן'
+  },
+  practiceLanguage: 'hebrew',
+  sectionId: 'modules',
+  tokens: [
+    { type: 'word', text: 'תשובה', id: 'teshuvah-base' },
+    { type: 'punct', text: '—' },
+    { type: 'word', text: 'התשובה', id: 'hateshuvah' },
+    { type: 'punct', text: '.' },
+    { type: 'word', text: 'שאלה', id: 'sheelah-base' },
+    { type: 'punct', text: '—' },
+    { type: 'word', text: 'השאלה', id: 'hasheelah' },
+    { type: 'punct', text: '.' },
+    { type: 'word', text: 'היום', id: 'hayom-base' },
+    { type: 'punct', text: '/' },
+    { type: 'word', text: 'עכשיו', id: 'achshav' },
+    { type: 'punct', text: '.' },
+    { type: 'word', text: 'כאן', id: 'kan-here' },
+    { type: 'punct', text: '—' },
+    { type: 'word', text: 'אני', id: 'ani-here' },
+    { type: 'word', text: 'כאן', id: 'kan-statement' },
+    { type: 'word', text: 'היום', id: 'hayom-statement' },
+    { type: 'punct', text: '.' }
+  ],
+  glosses: {
+    en: {
+      'teshuvah-base': 'answer',
+      'hateshuvah': 'the answer',
+      'sheelah-base': 'question',
+      'hasheelah': 'the question',
+      'hayom-base': 'today',
+      'achshav': 'now',
+      'kan-here': 'here (base)',
+      'ani-here': 'I',
+      'kan-statement': 'here',
+      'hayom-statement': 'today'
+    }
+  },
+  translations: {
+    en: {
+      'teshuvah-base': { canonical: 'teshuvah', variants: ['teshuvah', 'teshuva'] },
+      'hateshuvah': { canonical: 'ha-teshuvah', variants: ['ha-teshuvah', 'hateshuva'] },
+      'sheelah-base': { canonical: "she'elah", variants: ["she'elah", 'sheelah', 'shayla'] },
+      'hasheelah': { canonical: "ha-she'elah", variants: ["ha-she'elah", 'hasheelah'] },
+      'hayom-base': { canonical: 'hayom', variants: ['hayom', 'ha-yom'] },
+      'achshav': { canonical: 'achshav', variants: ['achshav'] },
+      'kan-here': { canonical: 'kan', variants: ['kan'] },
+      'ani-here': { canonical: 'ani', variants: ['ani'] },
+      'kan-statement': { canonical: 'kan', variants: ['kan'] },
+      'hayom-statement': { canonical: 'hayom', variants: ['hayom', 'ha-yom'] }
+    }
+  }
+});
+
+/**
+ * Module 1: Greetings & Introductions Grammar - Part 3
+ * Focus: Present Tense Verbs & Infinitive Constructions
+ */
+export const module1Grammar3Text = createReadingText({
+  id: 'module-1-grammar-3',
+  title: {
+    en: 'Grammar Part 3',
+    he: 'דקדוק חלק 3'
+  },
+  subtitle: {
+    en: 'Verbs & Infinitives',
+    he: 'פעלים ושם הפועל'
+  },
+  practiceLanguage: 'hebrew',
+  sectionId: 'modules',
+  tokens: [
+    { type: 'word', text: 'לומד', id: 'lomed' },
+    { type: 'punct', text: '/' },
+    { type: 'word', text: 'לומדים', id: 'lomdim' },
+    { type: 'punct', text: '—' },
+    { type: 'word', text: 'אני', id: 'ani-study' },
+    { type: 'word', text: 'לומד', id: 'lomed-statement' },
+    { type: 'punct', text: '.' },
+    { type: 'word', text: 'רוצה', id: 'rotze-base' },
+    { type: 'punct', text: '—' },
+    { type: 'word', text: 'רוצה', id: 'rotze-lilmod' },
+    { type: 'word', text: 'ללמוד', id: 'lilmod' },
+    { type: 'punct', text: '.' },
+    { type: 'word', text: 'לשאול', id: 'lishol-base' },
+    { type: 'punct', text: '—' },
+    { type: 'word', text: 'רוצה', id: 'rotze-ask' },
+    { type: 'word', text: 'לשאול', id: 'lishol' },
+    { type: 'punct', text: '.' },
+    { type: 'word', text: 'עוזר', id: 'ozer' },
+    { type: 'punct', text: '/' },
+    { type: 'word', text: 'להתחיל', id: 'lehatchil' },
+    { type: 'punct', text: '.' }
+  ],
+  glosses: {
+    en: {
+      'lomed': 'learns (m. sg.)',
+      'lomdim': 'learn (pl.)',
+      'ani-study': 'I',
+      'lomed-statement': 'learn',
+      'rotze-base': 'want (base)',
+      'rotze-lilmod': 'want',
+      'lilmod': 'to learn (inf.)',
+      'lishol-base': 'to ask (base)',
+      'rotze-ask': 'want',
+      'lishol': 'to ask (inf.)',
+      'ozer': 'helps',
+      'lehatchil': 'to start (inf.)'
+    }
+  },
+  translations: {
+    en: {
+      'lomed': { canonical: 'lomed', variants: ['lomed'] },
+      'lomdim': { canonical: 'lomdim', variants: ['lomdim', "lom'dim"] },
+      'ani-study': { canonical: 'ani', variants: ['ani'] },
+      'lomed-statement': { canonical: 'lomed', variants: ['lomed'] },
+      'rotze-base': { canonical: 'rotze', variants: ['rotze', 'rotseh', 'rotzeh'] },
+      'rotze-lilmod': { canonical: 'rotze', variants: ['rotze', 'rotseh', 'rotzeh'] },
+      'lilmod': { canonical: 'lilmod', variants: ['lilmod'] },
+      'lishol-base': { canonical: "lish'ol", variants: ["lish'ol", 'lishol'] },
+      'rotze-ask': { canonical: 'rotze', variants: ['rotze', 'rotseh', 'rotzeh'] },
+      'lishol': { canonical: "lish'ol", variants: ["lish'ol", 'lishol'] },
+      'ozer': { canonical: 'ozer', variants: ['ozer', "'ozer"] },
+      'lehatchil': { canonical: 'lehatchil', variants: ['lehatchil', "lehat'hil"] }
+    }
+  }
+});
 
 /**
  * Module 2: At Home Grammar
