@@ -565,11 +565,16 @@ useEffect(() => {
 
   if (!readingText) {
     return (
-      <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-slate-200">
+      <div className="rounded-3xl border-2 border-[#A7F3D0] p-6" style={{ background: 'linear-gradient(135deg, #fffcea 0%, #fcfff2 100%)', color: '#4a2208' }}>
         <p>{t('reading.textNotFound')}</p>
         <button
           onClick={onBack}
-          className="mt-4 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 hover:bg-slate-700"
+          className="mt-4 rounded-lg border-2 px-4 py-2 transition-all"
+          style={{
+            borderColor: '#A7F3D0',
+            background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+            color: '#FFFFFF'
+          }}
         >
           {t('reading.back')}
         </button>
@@ -594,13 +599,14 @@ useEffect(() => {
       >
         {/* Reading Area */}
           <section
-            className="relative w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6"
+            className="relative w-full max-w-full min-w-0 overflow-hidden rounded-3xl border-2 border-[#A7F3D0] p-3 shadow-lg sm:p-6"
+            style={{ background: 'linear-gradient(135deg, #fffcea 0%, #fcfff2 100%)' }}
             onClick={focusHiddenInput}
             onTouchStart={focusHiddenInput}
             dir={appDirection}
           >
         {/* Practice Track */}
-            <div className="mb-3 w-full max-w-full overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-800/90 to-slate-900/90 shadow-lg">
+            <div className="mb-3 w-full max-w-full overflow-hidden rounded-2xl border-2 border-[#A7F3D0] shadow-lg" style={{ background: 'linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%)' }}>
             <div
               ref={practiceViewportRef}
               className="relative flex flex-col w-full min-w-0 items-center overflow-hidden px-2 py-3 sm:px-4 sm:py-6 gap-2"
@@ -635,7 +641,7 @@ useEffect(() => {
 
                 {/* Center: Meaning */}
                 <div className="flex items-center justify-center pointer-events-none">
-                  <span className={`${appFontClass} text-base font-medium text-white/90 whitespace-nowrap`}>
+                  <span className={`${appFontClass} text-base font-medium whitespace-nowrap`} style={{ color: '#064E3B' }}>
                     {(() => {
                       if (!readingText || !currentWord) return '—';
 
@@ -666,7 +672,7 @@ useEffect(() => {
                 </div>
               </div>
               {helperHint && (
-                <div className="w-full px-2 text-left text-xs text-amber-200">{helperHint}</div>
+                <div className="w-full px-2 text-left text-xs" style={{ color: '#b07737' }}>{helperHint}</div>
               )}
               {/* Reading words track */}
               <div className="relative flex w-full min-w-0 items-center overflow-hidden">
@@ -682,7 +688,7 @@ useEffect(() => {
                       <span
                         key={`punct-${idx}`}
                         className="whitespace-nowrap text-3xl opacity-40 sm:text-4xl"
-                        style={{ letterSpacing: '0.4px' }}
+                        style={{ letterSpacing: '0.4px', color: '#064E3B' }}
                       >
                         {token.text}
                       </span>
@@ -701,7 +707,8 @@ useEffect(() => {
                     style={{
                       letterSpacing: '0.4px',
                       transform: 'translateY(1px)',
-                      pointerEvents: isActive ? 'auto' : 'none'
+                      pointerEvents: isActive ? 'auto' : 'none',
+                      color: '#064E3B'
                     }}
                     data-active={isActive}
                     onClick={isActive ? () => {
@@ -722,7 +729,7 @@ useEffect(() => {
         </div>
 
         {/* Output Track */}
-          <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
+          <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border-2 border-[#A7F3D0] shadow-lg" style={{ background: '#FFFFFF' }}>
           <div className="p-3 sm:p-4">
             <div
               ref={typedViewportRef}
@@ -843,9 +850,9 @@ useEffect(() => {
 />
         {/* Answer Display */}
         {showAnswer && (
-          <div className="mt-3 text-sm text-slate-400">
+          <div className="mt-3 text-sm" style={{ color: '#6c3b14' }}>
             {t('reading.answer')}:{' '}
-            <span className="rounded bg-slate-800 px-2 py-1 font-mono text-slate-300">
+            <span className="rounded px-2 py-1 font-mono" style={{ background: '#F0FFF4', color: '#064E3B' }}>
               {(() => {
                 const canonical = getTranslation()?.canonical;
                 return canonical && canonical !== '—'
@@ -863,22 +870,33 @@ useEffect(() => {
         </section>
 
       {/* Header */}
-        <section className="w-full max-w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 p-3 text-slate-200 shadow-lg shadow-slate-950/40 sm:p-6">
+        <section className="w-full max-w-full overflow-hidden rounded-3xl border-2 border-[#A7F3D0] p-3 shadow-lg sm:p-6" style={{ background: 'linear-gradient(135deg, #fffcea 0%, #fcfff2 100%)' }}>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-slate-400 sm:text-base">{subtitle}</p>
+            <h2 className="text-xl font-semibold sm:text-2xl" style={{ color: '#4a2208' }}>{title}</h2>
+            <p className="mt-2 text-sm leading-relaxed sm:text-base" style={{ color: '#6c3b14' }}>{subtitle}</p>
           </div>
           <div className="flex flex-wrap gap-2 sm:flex-nowrap">
             <button
               onClick={onBack}
-              className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium hover:bg-slate-700"
+              className="rounded-lg border-2 px-4 py-2 text-sm font-medium transition-all"
+              style={{
+                borderColor: '#A7F3D0',
+                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                color: '#FFFFFF',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
             >
               {t('reading.back')}
             </button>
             <button
               onClick={() => setShowAnswer(!showAnswer)}
-              className="rounded-lg border border-slate-700 bg-transparent px-4 py-2 text-sm font-medium hover:bg-slate-800"
+              className="rounded-lg border-2 px-4 py-2 text-sm font-medium transition-all"
+              style={{
+                borderColor: '#A7F3D0',
+                background: '#FFFFFF',
+                color: '#064E3B'
+              }}
             >
               {showAnswer ? t('reading.hideAnswer') : t('reading.showAnswer')}
             </button>
@@ -888,44 +906,44 @@ useEffect(() => {
 
         {/* Results Modal */}
         {showResults && (
-          <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 p-4 pt-15">
-            <div className="w-full max-w-4xl rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
+          <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-15" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
+            <div className="w-full max-w-4xl rounded-3xl border-2 border-[#A7F3D0] p-6 shadow-2xl" style={{ background: 'linear-gradient(135deg, #fffcea 0%, #fcfff2 100%)' }}>
               {/* Title */}
-              <h2 className="mb-6 text-center text-2xl font-bold text-white">
+              <h2 className="mb-6 text-center text-2xl font-bold" style={{ color: '#4a2208' }}>
                 {t('reading.results.title')}
               </h2>
 
               {/* Results Table */}
-              <div className="mb-6 max-h-[60vh] overflow-y-auto rounded-2xl border border-slate-700 bg-slate-800/50">
+              <div className="mb-6 max-h-[60vh] overflow-y-auto rounded-2xl border-2 border-[#A7F3D0]" style={{ background: '#FFFFFF' }}>
                 <table className="w-full">
-                  <thead className="sticky top-0 bg-slate-800 text-sm">
-                    <tr className="border-b border-slate-700">
-                      <th className="p-3 text-left font-semibold text-slate-300">
+                  <thead className="sticky top-0 text-sm" style={{ background: 'linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%)' }}>
+                    <tr className="border-b-2 border-[#A7F3D0]">
+                      <th className="p-3 text-left font-semibold" style={{ color: '#064E3B' }}>
                         {t('reading.results.practiceWord')}
                       </th>
-                      <th className="p-3 text-left font-semibold text-slate-300">
+                      <th className="p-3 text-left font-semibold" style={{ color: '#064E3B' }}>
                         {t('reading.results.yourAnswer')}
                       </th>
-                      <th className="p-3 text-left font-semibold text-slate-300">
+                      <th className="p-3 text-left font-semibold" style={{ color: '#064E3B' }}>
                         {t('reading.results.translation')}
                       </th>
-                      <th className="p-3 text-left font-semibold text-slate-300">
+                      <th className="p-3 text-left font-semibold" style={{ color: '#064E3B' }}>
                         {t('reading.results.meaning')}
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {completedResults.map((result, idx) => (
-                      <tr key={idx} className="border-b border-slate-700/50 last:border-0">
+                      <tr key={idx} className="border-b last:border-0" style={{ borderColor: 'rgba(167, 243, 208, 0.3)' }}>
                         {/* Practice Word */}
                         <td className="p-3">
-                          <span className={`${practiceFontClass} ${gameFontClass} text-xl text-white`}>
+                          <span className={`${practiceFontClass} ${gameFontClass} text-xl`} style={{ color: '#064E3B' }}>
                             {result.practiceWord}
                           </span>
                         </td>
                         {/* Your Answer (raw typed text) */}
                         <td className="p-3">
-                          <span className={`${appFontClass} font-mono text-base text-white`}>
+                          <span className={`${appFontClass} font-mono text-base`} style={{ color: '#064E3B' }}>
                             {result.typedChars.join('')}
                           </span>
                         </td>
@@ -949,7 +967,7 @@ useEffect(() => {
                         </td>
                         {/* Meaning */}
                         <td className="p-3">
-                          <span className={`${appFontClass} text-base text-slate-300`}>
+                          <span className={`${appFontClass} text-base`} style={{ color: '#6c3b14' }}>
                             {result.gloss}
                           </span>
                         </td>
@@ -963,13 +981,23 @@ useEffect(() => {
               <div className="flex justify-center gap-4">
                 <button
                   onClick={handleTryAgain}
-                  className="rounded-lg border border-orange-600 bg-orange-500 px-6 py-3 font-semibold text-white transition-colors hover:bg-orange-600"
+                  className="rounded-full px-6 py-3 font-bold text-white transition-all shadow-lg"
+                  style={{
+                    background: 'radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%)',
+                    boxShadow: '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)',
+                    color: '#4a1a06'
+                  }}
                 >
                   {t('reading.results.tryAgain')}
                 </button>
                 <button
                   onClick={handleResultsBack}
-                  className="rounded-lg border border-emerald-600 bg-emerald-500 px-6 py-3 font-semibold text-white transition-colors hover:bg-emerald-600"
+                  className="rounded-full px-6 py-3 font-bold text-white transition-all shadow-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                    boxShadow: '0 4px 0 #047857, 0 7px 12px rgba(4, 120, 87, 0.7)',
+                    color: '#FFFFFF'
+                  }}
                 >
                   {t('reading.results.back')}
                 </button>
@@ -1048,7 +1076,8 @@ function WordBox({ chars, width, fontClass, direction }) {
         {chars.map((char, i) => (
           <span
             key={i}
-            className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none text-white`}
+            className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none`}
+            style={{ color: '#064E3B' }}
           >
             {char}
           </span>
@@ -1072,13 +1101,14 @@ function ActiveWordBox({ chars, fontClass, showCaret, width, direction }) {
         {chars.map((char, i) => (
           <span
             key={i}
-            className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none text-white`}
+            className={`${fontClass} inline-block min-w-[1ch] text-center font-mono text-2xl leading-none`}
+            style={{ color: '#064E3B' }}
           >
             {char}
           </span>
         ))}
         {showCaret && (
-          <span className="inline-block min-w-[1ch] animate-pulse text-center font-mono text-2xl leading-none text-orange-400">
+          <span className="inline-block min-w-[1ch] animate-pulse text-center font-mono text-2xl leading-none" style={{ color: '#ff7a3b' }}>
             |
           </span>
         )}
