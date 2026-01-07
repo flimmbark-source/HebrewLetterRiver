@@ -193,6 +193,9 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     modeItems.letters = baseItems.map((item) => ({ ...item }));
   }
 
+  // Track selected mode IDs (multi-select) - declare early so vocab mode can use it
+  let selectedModeIds = new Set();
+
   // Add vocab mode if vocab data is provided
   if (vocabData) {
     const vocabMode = {
@@ -218,15 +221,16 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     // Set vocab mode tracking
     isVocabMode = true;
     totalVocabCount = vocabItems.length;
+
+    // IMPORTANT: Auto-select vocab mode
+    selectedModeIds.clear();
+    selectedModeIds.add('vocab');
   }
 
   const modeNounMap = practiceModes.reduce((acc, mode) => {
     acc[mode.id] = mode.noun ?? nounFallback;
     return acc;
   }, {});
-
-  // Track selected mode IDs (multi-select)
-  let selectedModeIds = new Set();
 
   function renderPracticeModes() {
     if (!modeOptionsContainer) return;
@@ -2045,8 +2049,14 @@ function startClickMode(itemEl, payload) {
 
       box.dataset.labelText = labelText;
 
-      // Check if association mode is enabled and we have an emoji for this sound
-      if (associationModeEnabled && displayLabel) {
+      // Check if this is a vocab item with an emoji
+      if (choice.emoji) {
+        // Display emoji for vocab mode
+        box.innerHTML = `<div class="flex flex-col items-center justify-center gap-1">
+          <span class="text-4xl" role="img" aria-label="${choice.name || labelText}">${choice.emoji}</span>
+        </div>`;
+      } else if (associationModeEnabled && displayLabel) {
+        // Check if association mode is enabled and we have an emoji for this sound
         const association = getAssociation(displayLabel, activeAppLanguageId);
         if (association) {
           // Display emoji with optional word label <span class="text-xs text-arcade-text-muted">${association.word}</span>
