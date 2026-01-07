@@ -55,6 +55,11 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
   const learnLetterEl = document.getElementById('learn-letter');
   const learnName = document.getElementById('learn-name');
   const learnSound = document.getElementById('learn-sound');
+  const bucketInfoOverlay = document.getElementById('bucket-info-overlay');
+  const bucketInfoSymbol = document.getElementById('bucket-info-symbol');
+  const bucketInfoName = document.getElementById('bucket-info-name');
+  const bucketInfoSound = document.getElementById('bucket-info-sound');
+  const bucketInfoClose = document.getElementById('bucket-info-close');
   const ghostEl = document.getElementById('correct-answer-ghost');
   const modalSubtitle = document.getElementById('modal-subtitle');
   const setupView = document.getElementById('setup-view');
@@ -839,7 +844,16 @@ function startClickMode(itemEl, payload) {
 
       // Add new click handler
       const clickHandler = (e) => {
-        if (!selectedLetter) return;
+        // If no letter is selected, show bucket info instead
+        if (!selectedLetter) {
+          if (bucket._choiceData) {
+            e.preventDefault();
+            e.stopPropagation();
+            showBucketInfo(bucket._choiceData);
+          }
+          return;
+        }
+
         e.preventDefault();
         e.stopPropagation();
 
@@ -1152,6 +1166,7 @@ function startClickMode(itemEl, payload) {
     refreshDropZones();
     clearPendingBucketLayout();
     learnOverlay.classList.remove('visible');
+    hideBucketInfo();
     ghostEl.classList.remove('ghost-rise');
     summaryTooltip.classList.add('hidden');
     if (dragGhost) {
@@ -1320,6 +1335,7 @@ function startClickMode(itemEl, payload) {
     modal.classList.add('hidden');
     accessibilityView?.classList.add('hidden');
     learnOverlay.classList.remove('visible');
+    hideBucketInfo();
 
     activeItems.forEach((item) => item.element.remove());
     activeItems.clear();
@@ -2096,6 +2112,80 @@ function startClickMode(itemEl, payload) {
       });
       box.addEventListener('dragleave', () => box.classList.remove('drag-over'));
       box.addEventListener('drop', handleDrop);
+
+      // Add bucket info handler - right-click to show info
+      box.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showBucketInfo(choice);
+      });
+
+      // Add left-click handler for desktop (only if not in click mode or no drag)
+      // This will be overridden by setupClickModeBuckets if click mode is enabled
+      let clickStartTime = 0;
+      let didDrag = false;
+
+      box.addEventListener('mousedown', () => {
+        clickStartTime = Date.now();
+        didDrag = false;
+      });
+
+      box.addEventListener('mousemove', () => {
+        if (clickStartTime > 0) {
+          didDrag = true;
+        }
+      });
+
+      box.addEventListener('click', (e) => {
+        // Only show info if this wasn't a drag operation and click mode isn't handling it
+        const clickDuration = Date.now() - clickStartTime;
+        if (!didDrag && clickDuration < 300 && !clickModeEnabled) {
+          e.preventDefault();
+          e.stopPropagation();
+          showBucketInfo(choice);
+        }
+        clickStartTime = 0;
+        didDrag = false;
+      });
+
+      // Add long-press handler for mobile devices
+      let longPressTimer = null;
+      let longPressTriggered = false;
+
+      box.addEventListener('touchstart', (e) => {
+        longPressTriggered = false;
+        longPressTimer = setTimeout(() => {
+          longPressTriggered = true;
+          showBucketInfo(choice);
+          // Provide haptic feedback if available
+          if (navigator.vibrate) {
+            navigator.vibrate(50);
+          }
+        }, 500); // 500ms long press
+      }, { passive: true });
+
+      box.addEventListener('touchend', (e) => {
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+        // If long press was triggered, prevent the default click behavior
+        if (longPressTriggered) {
+          e.preventDefault();
+          longPressTriggered = false;
+        }
+      });
+
+      box.addEventListener('touchmove', () => {
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+        longPressTriggered = false;
+      });
+
+      // Store choice data on the box element for later reference
+      box._choiceData = choice;
+
       choicesContainer.appendChild(box);
     });
     activeBucketCount = finalChoices.length;
@@ -2112,6 +2202,78 @@ function startClickMode(itemEl, payload) {
     if (typeof window !== 'undefined') {
       window.setTimeout(() => scheduleBucketLayoutUpdate(), 150);
     }
+  }
+
+  // Show bucket info overlay when bucket is clicked
+  function showBucketInfo(choice) {
+    if (!bucketInfoOverlay) return;
+
+    const displaySymbol = getDisplaySymbol(choice);
+    const displayLabel = getDisplayLabel(choice);
+
+    // Check if this is a vocab item with an emoji
+    if (choice.emoji) {
+      // Display emoji for vocab mode
+      bucketInfoSymbol.innerHTML = `<span class="text-7xl" role="img" aria-label="${choice.name || displayLabel}">${choice.emoji}</span>`;
+      bucketInfoSymbol.style.color = '';
+      bucketInfoName.textContent = choice.name || displayLabel; // English translation
+      bucketInfoSound.textContent = choice.transliteration || choice.symbol; // Transliteration or Hebrew word
+    } else if (associationModeEnabled && displayLabel) {
+      // Check if association mode is enabled and we have an emoji for this sound
+      const association = getAssociation(displayLabel, activeAppLanguageId);
+      if (association) {
+        // Display emoji with word
+        bucketInfoSymbol.innerHTML = `<span class="text-7xl" role="img" aria-label="${association.alt}">${association.emoji}</span>`;
+        bucketInfoSymbol.style.color = '';
+        bucketInfoName.textContent = association.word;
+        bucketInfoSound.textContent = t('game.summary.soundLabel', { sound: displayLabel });
+      } else {
+        // Fallback to text if no association found
+        bucketInfoSymbol.textContent = displaySymbol || displayLabel;
+        bucketInfoSymbol.style.color = '#ff9247';
+        bucketInfoName.textContent = choice.transliteration || displayLabel;
+        bucketInfoSound.textContent = displayLabel ? t('game.summary.soundLabel', { sound: displayLabel }) : '';
+      }
+    } else {
+      // Regular mode - display letter/symbol
+      bucketInfoSymbol.textContent = displaySymbol || displayLabel;
+      bucketInfoSymbol.style.color = '#ff9247';
+      const isFinalForm = choice.isFinalForm || choice.id.startsWith('final-');
+      const isVowel = choice.type === 'vowel';
+      const labelText = isFinalForm
+        ? `[${displayLabel || displaySymbol}]`
+        : isVowel
+          ? displayLabel
+          : (displayLabel || displaySymbol);
+      bucketInfoName.textContent = choice.transliteration || labelText;
+      bucketInfoSound.textContent = displayLabel ? t('game.summary.soundLabel', { sound: displayLabel }) : '';
+    }
+
+    bucketInfoOverlay.classList.add('visible');
+  }
+
+  // Hide bucket info overlay
+  function hideBucketInfo() {
+    if (!bucketInfoOverlay) return;
+    bucketInfoOverlay.classList.remove('visible');
+  }
+
+  // Setup bucket info close button
+  if (bucketInfoClose) {
+    bucketInfoClose.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      hideBucketInfo();
+    });
+  }
+
+  // Close bucket info when clicking outside
+  if (bucketInfoOverlay) {
+    bucketInfoOverlay.addEventListener('click', (e) => {
+      if (e.target === bucketInfoOverlay) {
+        hideBucketInfo();
+      }
+    });
   }
 
   // Helper to sync settings to localStorage
@@ -2341,13 +2503,22 @@ accessibilityBtn?.addEventListener('click', () => {
 
   startButton?.addEventListener('click', () => {
     if (isRestartMode) {
-      gameOverView.classList.add('hidden');
-      setupView.classList.remove('hidden');
-      accessibilityView.classList.add('hidden');
-      startButton.textContent = t('game.controls.start');
-      isRestartMode = false;
-      setupExitButton?.classList.remove('hidden');
-      updateModalSubtitle();
+      // In vocab mode, restart the game directly without showing setup screen
+      if (isVocabMode) {
+        gameOverView.classList.add('hidden');
+        modal.classList.add('hidden');
+        isRestartMode = false;
+        startGame();
+      } else {
+        // For regular mode, show setup screen to allow mode selection
+        gameOverView.classList.add('hidden');
+        setupView.classList.remove('hidden');
+        accessibilityView.classList.add('hidden');
+        startButton.textContent = t('game.controls.start');
+        isRestartMode = false;
+        setupExitButton?.classList.remove('hidden');
+        updateModalSubtitle();
+      }
     } else {
       // Validate that at least one mode is selected
       if (selectedModeIds.size === 0) {
