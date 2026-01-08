@@ -831,7 +831,7 @@ useEffect(() => {
               )}
               {/* Reading words track */}
               <div
-                className="relative flex w-full min-w-0 items-center overflow-hidden"
+                className={`relative flex w-full min-w-0 items-center overflow-hidden ${isSentenceMode ? 'justify-center' : ''}`}
                 onTouchStart={!isSentenceMode ? handleSwipeStart : undefined}
                 onTouchMove={!isSentenceMode ? handleSwipeMove : undefined}
                 onTouchEnd={!isSentenceMode ? handleSwipeEnd : undefined}
