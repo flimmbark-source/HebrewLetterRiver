@@ -60,6 +60,75 @@ function normalizeLanguageId(value) {
 }
 
 /**
+ * Word dictionary for sentence words
+ * Maps wordId to { meaning, transliteration, variants }
+ */
+const wordDictionary = {
+  // Greetings & basic words
+  'shalom': { meaning: 'hello, peace', transliteration: 'shalom', variants: ['shalom', 'hello'] },
+  'todah': { meaning: 'thank you', transliteration: 'todah', variants: ['todah', 'toda'] },
+
+  // Pronouns
+  'I': { meaning: 'I', transliteration: 'ani', variants: ['ani'] },
+  'you': { meaning: 'you', transliteration: 'atah', variants: ['atah', 'ata', 'at'] },
+  'you-m': { meaning: 'you (m)', transliteration: 'atah', variants: ['atah', 'ata'] },
+  'you-f': { meaning: 'you (f)', transliteration: 'at', variants: ['at'] },
+  'he': { meaning: 'he', transliteration: 'hu', variants: ['hu'] },
+  'she': { meaning: 'she', transliteration: 'hi', variants: ['hi'] },
+  'we': { meaning: 'we', transliteration: 'anachnu', variants: ['anachnu', 'anakhnu'] },
+  'they': { meaning: 'they', transliteration: 'hem', variants: ['hem'] },
+
+  // Common verbs & adjectives
+  'happy': { meaning: 'happy', transliteration: 'sameach', variants: ['sameach', 'same\'ach'] },
+  'new': { meaning: 'new', transliteration: 'chadash', variants: ['chadash', 'hadash'] },
+  'new-f': { meaning: 'new (f)', transliteration: 'chadasha', variants: ['chadasha', 'hadasha'] },
+  'good': { meaning: 'good', transliteration: 'tov', variants: ['tov'] },
+  'great': { meaning: 'great', transliteration: 'nehedar', variants: ['nehedar'] },
+
+  // Nouns
+  'friend': { meaning: 'friend', transliteration: 'chaver', variants: ['chaver', 'haver'] },
+  'family': { meaning: 'family', transliteration: 'mishpacha', variants: ['mishpacha'] },
+  'neighbor': { meaning: 'neighbor', transliteration: 'shachen', variants: ['shachen', 'shaken'] },
+  'child': { meaning: 'child', transliteration: 'yeled', variants: ['yeled'] },
+  'language': { meaning: 'language', transliteration: 'safa', variants: ['safa', 'safah'] },
+  'word': { meaning: 'word', transliteration: 'mila', variants: ['mila', 'milah'] },
+  'home': { meaning: 'home', transliteration: 'bayit', variants: ['bayit', 'bait'] },
+  'idea': { meaning: 'idea', transliteration: 'rayon', variants: ['rayon', 'ra\'ayon'] },
+  'question': { meaning: 'question', transliteration: 'she\'ela', variants: ['she\'ela', 'sheela'] },
+  'answer': { meaning: 'answer', transliteration: 'tshuva', variants: ['tshuva', 'teshuva'] },
+  'book': { meaning: 'book', transliteration: 'sefer', variants: ['sefer'] },
+  'food': { meaning: 'food', transliteration: 'ochel', variants: ['ochel'] },
+  'water': { meaning: 'water', transliteration: 'mayim', variants: ['mayim'] },
+  'coffee': { meaning: 'coffee', transliteration: 'cafe', variants: ['cafe', 'kafe'] },
+  'city': { meaning: 'city', transliteration: 'ir', variants: ['ir'] },
+
+  // Time words
+  'today': { meaning: 'today', transliteration: 'hayom', variants: ['hayom', 'ha-yom'] },
+  'tomorrow': { meaning: 'tomorrow', transliteration: 'machar', variants: ['machar'] },
+  'yesterday': { meaning: 'yesterday', transliteration: 'etmol', variants: ['etmol'] },
+  'now': { meaning: 'now', transliteration: 'achshav', variants: ['achshav', 'akhshav'] },
+  'time': { meaning: 'time', transliteration: 'zman', variants: ['zman'] },
+  'day': { meaning: 'day', transliteration: 'yom', variants: ['yom'] },
+  'boker': { meaning: 'morning', transliteration: 'boker', variants: ['boker'] },
+  'erev': { meaning: 'evening', transliteration: 'erev', variants: ['erev'] },
+  'early': { meaning: 'early', transliteration: 'mukdam', variants: ['mukdam'] },
+  'late': { meaning: 'late', transliteration: 'meuchar', variants: ['meuchar', 'me\'uchar'] },
+  'always': { meaning: 'always', transliteration: 'tamid', variants: ['tamid'] },
+  'sometimes': { meaning: 'sometimes', transliteration: 'lifamim', variants: ['lifamim', 'lif\'amim'] },
+
+  // Other common words
+  'yes': { meaning: 'yes', transliteration: 'ken', variants: ['ken'] },
+  'no': { meaning: 'no', transliteration: 'lo', variants: ['lo'] },
+  'here': { meaning: 'here', transliteration: 'kan', variants: ['kan'] },
+  'there': { meaning: 'there', transliteration: 'sham', variants: ['sham'] },
+  'with': { meaning: 'with', transliteration: 'im', variants: ['im'] },
+  'in': { meaning: 'in', transliteration: 'be', variants: ['be', 'b'] },
+  'to': { meaning: 'to', transliteration: 'le', variants: ['le', 'l'] },
+  'from': { meaning: 'from', transliteration: 'me', variants: ['me', 'm'] },
+  'on': { meaning: 'on', transliteration: 'al', variants: ['al'] },
+};
+
+/**
  * Convert a sentence object to a reading text format
  * @param {Object} sentence - Sentence object
  * @returns {Object} Reading text format
@@ -67,6 +136,8 @@ function normalizeLanguageId(value) {
 function convertSentenceToReadingText(sentence) {
   // Convert sentence words to tokens
   const tokens = [];
+  const translations = { en: {} };
+  const glosses = { en: {} };
   let lastEnd = -1;
 
   sentence.words.forEach((word, idx) => {
@@ -78,12 +149,36 @@ function convertSentenceToReadingText(sentence) {
       }
     }
 
+    // Use wordId if available, otherwise generate one
+    const wordId = word.wordId || `word-${idx}`;
+
     // Add word token
     tokens.push({
       type: 'word',
       text: word.surface || word.hebrew,
-      id: word.wordId || `word-${idx}`
+      id: wordId
     });
+
+    // Add translation (transliteration for pronunciation) and gloss (meaning)
+    if (wordId) {
+      const dictEntry = wordDictionary[wordId];
+
+      if (dictEntry) {
+        // Use dictionary data if available
+        translations.en[wordId] = {
+          canonical: dictEntry.transliteration,
+          variants: dictEntry.variants
+        };
+        glosses.en[wordId] = dictEntry.meaning;
+      } else {
+        // Fallback: use wordId as both transliteration and meaning
+        translations.en[wordId] = {
+          canonical: wordId,
+          variants: [wordId]
+        };
+        glosses.en[wordId] = wordId.charAt(0).toUpperCase() + wordId.slice(1);
+      }
+    }
 
     lastEnd = word.end;
   });
@@ -100,17 +195,17 @@ function convertSentenceToReadingText(sentence) {
   return {
     id: `sentence-${sentence.id}`,
     title: {
-      en: `Sentence: ${sentence.english}`
+      en: sentence.english
     },
     subtitle: {
-      en: `Difficulty ${sentence.difficulty}`
+      en: `Difficulty ${sentence.difficulty} · ${sentence.theme}`
     },
     practiceLanguage: 'hebrew',
     sectionId: 'sentences',
     tokens,
-    translations: {},
-    glosses: {},
-    meaningKeys: {}
+    translations,
+    glosses,
+    meaningKeys: {} // Could add i18n keys later
   };
 }
 
