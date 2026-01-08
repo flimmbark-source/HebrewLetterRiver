@@ -25,6 +25,9 @@ import { amharicCafeTalkTexts } from './cafeTalk/amharic.js';
 import { moduleVocabTexts } from './modules/moduleVocab.js';
 import { moduleGrammarTexts } from './modules/moduleGrammar.js';
 
+// Import sentences for conversion
+import { allSentences } from '../sentences/index.ts';
+
 // Temporarily import from old file for languages not yet migrated
 import {
   arabicReadingTexts,
@@ -54,6 +57,61 @@ function addSectionId(texts, defaultSectionId) {
 
 function normalizeLanguageId(value) {
   return typeof value === 'string' ? value.trim().toLowerCase() : value;
+}
+
+/**
+ * Convert a sentence object to a reading text format
+ * @param {Object} sentence - Sentence object
+ * @returns {Object} Reading text format
+ */
+function convertSentenceToReadingText(sentence) {
+  // Convert sentence words to tokens
+  const tokens = [];
+  let lastEnd = -1;
+
+  sentence.words.forEach((word, idx) => {
+    // Add punctuation/gaps between words
+    if (word.start > lastEnd + 1) {
+      const gapText = sentence.hebrew.slice(lastEnd + 1, word.start);
+      if (gapText.trim()) {
+        tokens.push({ type: 'punct', text: gapText });
+      }
+    }
+
+    // Add word token
+    tokens.push({
+      type: 'word',
+      text: word.surface || word.hebrew,
+      id: word.wordId || `word-${idx}`
+    });
+
+    lastEnd = word.end;
+  });
+
+  // Add trailing punctuation if any
+  if (lastEnd < sentence.hebrew.length - 1) {
+    const trailing = sentence.hebrew.slice(lastEnd + 1);
+    if (trailing.trim()) {
+      tokens.push({ type: 'punct', text: trailing });
+    }
+  }
+
+  // Create reading text object
+  return {
+    id: `sentence-${sentence.id}`,
+    title: {
+      en: `Sentence: ${sentence.english}`
+    },
+    subtitle: {
+      en: `Difficulty ${sentence.difficulty}`
+    },
+    practiceLanguage: 'hebrew',
+    sectionId: 'sentences',
+    tokens,
+    translations: {},
+    glosses: {},
+    meaningKeys: {}
+  };
 }
 
 /**
@@ -166,6 +224,15 @@ export function getReadingTextsForLanguage(practiceLanguage) {
  */
 export function getReadingTextById(textId, practiceLanguage) {
   const normalizedLanguage = normalizeLanguageId(practiceLanguage);
+
+  // Handle sentence IDs (e.g., "sentence-greetings-1")
+  if (textId.startsWith('sentence-')) {
+    const sentenceId = textId.replace('sentence-', '');
+    const sentence = allSentences.find(s => s.id === sentenceId);
+    if (sentence) {
+      return convertSentenceToReadingText(sentence);
+    }
+  }
 
   // If a practice language is specified, look there first
   if (normalizedLanguage) {
