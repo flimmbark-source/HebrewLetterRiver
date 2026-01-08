@@ -371,7 +371,7 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
       )}
 
       {(!listeningMode || audioAttempted) && (
-        <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white to-amber-50 shadow-sm">
+        <div className="w-full overflow-hidden rounded-xl border-2 border-blue-500 bg-gradient-to-br from-white to-amber-50 shadow-lg">
           <div
             ref={sentenceViewportRef}
             className="relative flex w-full min-w-0 items-center overflow-x-auto overflow-y-hidden px-4 py-4"
