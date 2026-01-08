@@ -722,8 +722,12 @@ useEffect(() => {
     );
   }
 
-  const title = getLocalizedTitle(readingText, appLanguageId);
-  const subtitle = getLocalizedSubtitle(readingText, appLanguageId);
+  const title = isSentenceMode
+    ? t('read.sentenceReadingTitle', 'Sentence Reading')
+    : getLocalizedTitle(readingText, appLanguageId);
+  const subtitle = isSentenceMode
+    ? t('read.sentencesIntro')
+    : getLocalizedSubtitle(readingText, appLanguageId);
 
   // Don't normalize display - show what user actually typed (including apostrophes)
   // Normalization only happens during grading, not display
@@ -922,9 +926,8 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Output Track - Hidden in sentence mode */}
-        {!isSentenceMode && (
-          <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
+        {/* Output Track */}
+        <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
           <div className="p-3 sm:p-4">
             <div
               ref={typedViewportRef}
@@ -1013,10 +1016,8 @@ useEffect(() => {
             </div>
           </div>
         </div>
-        )}
 
-        {/* Invisible but focusable input for all viewports - Hidden in sentence mode */}
-        {!isSentenceMode && (
+        {/* Invisible but focusable input for all viewports */}
         <input
   ref={inputRef}
   type="text"
@@ -1045,10 +1046,9 @@ useEffect(() => {
     unicodeBidi: 'plaintext',
   }}
 />
-        )}
 
-        {/* Answer Display - Hidden in sentence mode */}
-        {!isSentenceMode && showAnswer && (
+        {/* Answer Display */}
+        {showAnswer && (
           <div className="mt-3 text-sm text-slate-400">
             {t('reading.answer')}:{' '}
             <span className="rounded bg-slate-800 px-2 py-1 font-mono text-slate-300">
