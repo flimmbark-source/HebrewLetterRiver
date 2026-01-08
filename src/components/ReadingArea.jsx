@@ -850,7 +850,7 @@ useEffect(() => {
                   return (
                       <span
                         key={`punct-${idx}`}
-                        className={`whitespace-nowrap opacity-40 ${isSentenceMode ? 'text-xs' : 'text-3xl sm:text-4xl'}`}
+                        className={`whitespace-nowrap opacity-40 ${isSentenceMode ? 'text-base' : 'text-3xl sm:text-4xl'}`}
                         style={{ letterSpacing: '0.4px' }}
                       >
                         {token.text}
@@ -867,7 +867,7 @@ useEffect(() => {
                   <span
                     key={token.id || idx}
                     className={`${practiceFontClass} ${gameFontClass} whitespace-nowrap leading-tight transition-all ${
-                      isSentenceMode ? 'text-xs' : 'text-3xl sm:text-4xl'
+                      isSentenceMode ? 'text-base' : 'text-3xl sm:text-4xl'
                     } ${
                       isSentenceMode
                         ? isViewing
