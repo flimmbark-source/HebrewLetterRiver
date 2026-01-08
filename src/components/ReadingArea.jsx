@@ -46,7 +46,7 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
     typeof window !== 'undefined' ? window.innerWidth : 1024
   );
   const [wordIndex, setWordIndex] = useState(0);
-  const [viewingWordIndex, setViewingWordIndex] = useState(null); // null means viewing current word
+  const [viewingWordIndex, setViewingWordIndex] = useState(isSentenceMode ? 0 : null); // In sentence mode, start with first word selected
   const [typedWord, setTypedWord] = useState('');
   const [committedWords, setCommittedWords] = useState([]);
   const [streak, setStreak] = useState(0);
@@ -751,8 +751,8 @@ useEffect(() => {
               className={`relative flex flex-col w-full min-w-0 items-center ${isSentenceMode ? 'overflow-x-auto overflow-y-hidden' : 'overflow-hidden'} px-2 py-3 sm:px-4 sm:py-6 gap-2`}
               style={{ minHeight: '72px' }}
             >
-              {/* Review mode indicator */}
-              {isReviewMode && (
+              {/* Review mode indicator - only in word practice mode */}
+              {!isSentenceMode && isReviewMode && (
                 <div className="w-full flex items-center justify-center px-2">
                   <div className="inline-flex items-center gap-2 rounded-full bg-cyan-500/20 px-3 py-1 border border-cyan-400/30">
                     <svg className="w-4 h-4 text-cyan-300" fill="none" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24">
@@ -869,9 +869,15 @@ useEffect(() => {
                     className={`${practiceFontClass} ${gameFontClass} whitespace-nowrap leading-tight transition-all ${
                       isSentenceMode ? 'text-lg sm:text-xl' : 'text-3xl sm:text-4xl'
                     } ${
-                      isSentenceMode ? 'opacity-100 cursor-pointer hover:scale-105 hover:text-amber-300' :
-                      isViewing ? 'opacity-100 cursor-pointer hover:scale-105' :
-                      isAvailableForSwipe ? 'opacity-50 cursor-pointer' : 'opacity-30'
+                      isSentenceMode
+                        ? isViewing
+                          ? 'opacity-100 cursor-pointer text-amber-400 font-bold scale-110'
+                          : 'opacity-70 cursor-pointer hover:opacity-90 hover:scale-105'
+                        : isViewing
+                          ? 'opacity-100 cursor-pointer hover:scale-105'
+                          : isAvailableForSwipe
+                            ? 'opacity-50 cursor-pointer'
+                            : 'opacity-30'
                     }`}
                     style={{
                       letterSpacing: '0.4px',
@@ -881,15 +887,28 @@ useEffect(() => {
                     data-active={isActive}
                     data-word-index={wordIdx}
                     onClick={isAvailableForSwipe ? () => {
-                      if (isSentenceMode || (isActive && !isReviewMode)) {
-                        // In sentence mode or when already viewing this word, open helper modal
+                      if (isSentenceMode) {
+                        // In sentence mode: first click selects, second click opens modal
+                        if (isViewing) {
+                          // Already viewing this word, open helper modal
+                          setHelperWord({
+                            hebrew: token.text,
+                            wordId: token.id,
+                            surface: token.text
+                          });
+                        } else {
+                          // Not viewing yet, select this word
+                          setViewingWordIndex(wordIdx);
+                        }
+                      } else if (isActive && !isReviewMode) {
+                        // Word practice mode: open helper modal when already viewing
                         setHelperWord({
                           hebrew: token.text,
                           wordId: token.id,
                           surface: token.text
                         });
                       } else {
-                        // Navigate to this word (or back to current if in review mode)
+                        // Word practice mode: navigate to this word (or back to current if in review mode)
                         setViewingWordIndex(wordIdx === wordIndex ? null : wordIdx);
                       }
                     } : undefined}
