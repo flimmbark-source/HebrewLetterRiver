@@ -841,7 +841,7 @@ useEffect(() => {
               >
               <div
                 ref={practiceTrackRef}
-                className={`inline-flex items-center ${isSentenceMode ? 'gap-0.5 sm:gap-1' : 'gap-4 sm:gap-6'} ${isSentenceMode ? '' : 'transition-transform duration-[260ms] ease-out'}`}
+                className={`inline-flex items-center ${isSentenceMode ? 'gap-0.5' : 'gap-4 sm:gap-6'} ${isSentenceMode ? '' : 'transition-transform duration-[260ms] ease-out'}`}
                 style={isSentenceMode ? undefined : { willChange: 'transform' }}
                 dir={practiceDirection}
               >
@@ -850,7 +850,7 @@ useEffect(() => {
                   return (
                       <span
                         key={`punct-${idx}`}
-                        className={`whitespace-nowrap opacity-40 ${isSentenceMode ? 'text-sm sm:text-base' : 'text-3xl sm:text-4xl'}`}
+                        className={`whitespace-nowrap opacity-40 ${isSentenceMode ? 'text-xs' : 'text-3xl sm:text-4xl'}`}
                         style={{ letterSpacing: '0.4px' }}
                       >
                         {token.text}
@@ -867,7 +867,7 @@ useEffect(() => {
                   <span
                     key={token.id || idx}
                     className={`${practiceFontClass} ${gameFontClass} whitespace-nowrap leading-tight transition-all ${
-                      isSentenceMode ? 'text-sm sm:text-base' : 'text-3xl sm:text-4xl'
+                      isSentenceMode ? 'text-xs' : 'text-3xl sm:text-4xl'
                     } ${
                       isSentenceMode
                         ? isViewing
