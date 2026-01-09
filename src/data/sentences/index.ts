@@ -13,6 +13,9 @@ const baseWordIdLookup: Record<string, string> = {
   היא: 'she',
   אנחנו: 'we',
   הם: 'they',
+
+  // Names
+  דני: 'Dani',
   חבר: 'friend',
   משפחה: 'family',
   שכן: 'neighbor',
