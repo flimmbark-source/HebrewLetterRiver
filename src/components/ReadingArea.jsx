@@ -178,8 +178,8 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
     const translationsForLocale = readingText.translations?.[TRANSLATION_KEY_MAP[appLanguageId]];
     const translations = translationsForAppLanguage || translationsForLocale;
 
-    // Always grade against the practice language transliteration so users
-    // type the word pronunciation rather than the meaning translation.
+    // In word practice mode: grade against transliteration (pronunciation)
+    // In sentence mode: grade against translation (meaning)
     const transliterationEntry = readingText.translations?.en?.[currentWord.id];
 
     // DEBUG: Log translation lookup for first word
@@ -202,8 +202,13 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
 
     const baseTranslation = translations?.[currentWord.id];
 
-    // Prefer transliteration canonical/variants when available, but keep all
-    // other variants (including meaning translations) so they remain accepted.
+    // In sentence mode, only use meaning translations (not transliterations)
+    if (isSentenceMode) {
+      return baseTranslation;
+    }
+
+    // In word practice mode, prefer transliteration canonical/variants when available,
+    // but keep all other variants (including meaning translations) so they remain accepted.
     if (transliterationEntry) {
       const translitVariants = transliterationEntry.variants || [transliterationEntry.canonical];
       const baseVariants = baseTranslation?.variants || (baseTranslation?.canonical ? [baseTranslation.canonical] : []);
@@ -216,7 +221,7 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
     }
 
     return baseTranslation;
-  }, [readingText, currentWord, appLanguageId]);
+  }, [readingText, currentWord, appLanguageId, isSentenceMode]);
 
   // Get transliteration for TTS (always use English transliteration for pronunciation)
   const getTransliteration = useCallback(() => {
@@ -241,6 +246,12 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
 
     const baseTranslation = translations?.[viewingWord.id];
 
+    // In sentence mode, only use meaning translations (not transliterations)
+    if (isSentenceMode) {
+      return baseTranslation;
+    }
+
+    // In word practice mode, prefer transliteration canonical/variants when available
     if (transliterationEntry) {
       const translitVariants = transliterationEntry.variants || [transliterationEntry.canonical];
       const baseVariants = baseTranslation?.variants || (baseTranslation?.canonical ? [baseTranslation.canonical] : []);
@@ -253,7 +264,7 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
     }
 
     return baseTranslation;
-  }, [readingText, viewingWord, appLanguageId]);
+  }, [readingText, viewingWord, appLanguageId, isSentenceMode]);
 
   // Get transliteration for viewing word (for TTS during swipe navigation)
   const getViewingTransliteration = useCallback(() => {
