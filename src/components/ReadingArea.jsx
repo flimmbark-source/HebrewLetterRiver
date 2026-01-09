@@ -202,8 +202,23 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
 
     const baseTranslation = translations?.[currentWord.id];
 
-    // In sentence mode, only use meaning translations (not transliterations)
+    // In sentence mode, use glosses (meanings) instead of translations (transliterations)
     if (isSentenceMode) {
+      // Get gloss from glosses object
+      const langCode = getLanguageCode(appLanguageId);
+      const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
+                 ?? readingText.glosses?.en?.[currentWord.id];
+
+      if (gloss) {
+        // Parse gloss to get variants (glosses can be like "hello, peace" or just "I")
+        const glossVariants = gloss.split(',').map(v => v.trim());
+        return {
+          canonical: glossVariants[0],
+          variants: glossVariants
+        };
+      }
+
+      // Fallback to base translation if no gloss available
       return baseTranslation;
     }
 
@@ -246,8 +261,23 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
 
     const baseTranslation = translations?.[viewingWord.id];
 
-    // In sentence mode, only use meaning translations (not transliterations)
+    // In sentence mode, use glosses (meanings) instead of translations (transliterations)
     if (isSentenceMode) {
+      // Get gloss from glosses object
+      const langCode = getLanguageCode(appLanguageId);
+      const gloss = readingText.glosses?.[langCode]?.[viewingWord.id]
+                 ?? readingText.glosses?.en?.[viewingWord.id];
+
+      if (gloss) {
+        // Parse gloss to get variants (glosses can be like "hello, peace" or just "I")
+        const glossVariants = gloss.split(',').map(v => v.trim());
+        return {
+          canonical: glossVariants[0],
+          variants: glossVariants
+        };
+      }
+
+      // Fallback to base translation if no gloss available
       return baseTranslation;
     }
 
