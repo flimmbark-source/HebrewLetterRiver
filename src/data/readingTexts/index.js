@@ -291,7 +291,8 @@ function convertSentenceToReadingText(sentence) {
     fullSentenceAnswer: {
       en: {
         canonical: sentence.english,
-        variants: [sentence.english] // Can add more variants later
+        variants: [sentence.english], // Can add more variants later
+        pattern: sentence.pattern // Include pattern for flexible grading
       }
     }
   };

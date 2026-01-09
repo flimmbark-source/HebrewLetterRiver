@@ -14,6 +14,7 @@ import VowelLayoutTeachingModal from './reading/VowelLayoutTeachingModal.jsx';
 import VowelLayoutSystemModal from './reading/VowelLayoutSystemModal.jsx';
 import { isLayoutLearned, hasShownSystemIntro, setShownSystemIntro } from '../lib/vowelLayoutProgress.js';
 import WordHelperModal from './WordHelperModal.jsx';
+import { matchesPattern } from '../lib/patternMatcher.js';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -1101,7 +1102,12 @@ useEffect(() => {
                       {(() => {
                         const correctAnswer = readingText.fullSentenceAnswer?.en?.canonical || '';
                         const userAnswer = fullSentenceInput.trim();
-                        const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+                        const pattern = readingText.fullSentenceAnswer?.en?.pattern;
+
+                        // Use pattern matching if pattern is available, otherwise fall back to exact match
+                        const isCorrect = pattern
+                          ? matchesPattern(userAnswer, pattern)
+                          : userAnswer.toLowerCase() === correctAnswer.toLowerCase();
 
                         return (
                           <div className={`p-3 rounded-lg ${isCorrect ? 'bg-emerald-900/30 border border-emerald-600' : 'bg-amber-900/30 border border-amber-600'}`}>
