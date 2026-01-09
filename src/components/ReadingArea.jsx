@@ -15,6 +15,7 @@ import VowelLayoutSystemModal from './reading/VowelLayoutSystemModal.jsx';
 import { isLayoutLearned, hasShownSystemIntro, setShownSystemIntro } from '../lib/vowelLayoutProgress.js';
 import WordHelperModal from './WordHelperModal.jsx';
 import { matchesPattern } from '../lib/patternMatcher.js';
+import { allSentences } from '../data/sentences/index.ts';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -36,11 +37,14 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
   const { t } = useLocalization();
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
 
-  // Load reading text
-  const readingText = getReadingTextById(textId, practiceLanguageId);
-
   // Check if we're in sentence mode
   const isSentenceMode = mode === 'sentence';
+
+  // Track current text ID (for sentence progression)
+  const [currentTextId, setCurrentTextId] = useState(textId);
+
+  // Load reading text
+  const readingText = getReadingTextById(currentTextId, practiceLanguageId);
 
   // State
   const [viewportWidth, setViewportWidth] = useState(
@@ -660,6 +664,36 @@ useEffect(() => {
   if (!isGrading) requestAnimationFrame(focusHiddenInput);
 }, [wordIndex, isGrading, showResults, focusHiddenInput]);
 
+  // Load next sentence (for sentence mode)
+  const loadNextSentence = useCallback(() => {
+    if (!isSentenceMode) return;
+
+    // Find current sentence in the list
+    const currentSentenceId = currentTextId.replace('sentence-', '');
+    const currentIndex = allSentences.findIndex(s => s.id === currentSentenceId);
+
+    if (currentIndex === -1 || currentIndex >= allSentences.length - 1) {
+      // No more sentences, show results
+      setShowResults(true);
+      return;
+    }
+
+    // Load next sentence
+    const nextSentence = allSentences[currentIndex + 1];
+    const nextTextId = `sentence-${nextSentence.id}`;
+
+    // Reset state for new sentence
+    setCurrentTextId(nextTextId);
+    setSentenceStage(1);
+    setWordIndex(0);
+    setViewingWordIndex(0);
+    setTypedWord('');
+    setCommittedWords([]);
+    setFullSentenceInput('');
+    setFullSentenceGraded(false);
+    setShowMeaning(false);
+  }, [isSentenceMode, currentTextId, allSentences]);
+
   // Shared keyboard handler for both focused input and document listener (desktop)
   const processKeyDown = useCallback((e) => {
     if (isGrading) return;
@@ -679,17 +713,8 @@ useEffect(() => {
         if (!fullSentenceInput.trim()) return;
         // Grade the full sentence
         if (fullSentenceGraded) {
-          // Already graded, move to next sentence or results
-          // Reset for next sentence
-          setSentenceStage(1);
-          setWordIndex(0);
-          setViewingWordIndex(isSentenceMode ? 0 : null);
-          setTypedWord('');
-          setCommittedWords([]);
-          setFullSentenceInput('');
-          setFullSentenceGraded(false);
-          setCompletedResults([]);
-          setShowMeaning(false);
+          // Already graded, load next sentence
+          loadNextSentence();
         } else {
           // Grade the sentence
           setFullSentenceGraded(true);
@@ -751,7 +776,7 @@ useEffect(() => {
       console.log('[ReadingArea] Key pressed:', key, 'Length:', key.length, 'CharCode:', key.charCodeAt(0));
       setTypedWord(prev => prev + key);
     }
-  }, [isGrading, isReviewMode, isSentenceMode, sentenceStage, fullSentenceInput, fullSentenceGraded, typedWord, appLanguageId, gradeAndCommit]);
+  }, [isGrading, isReviewMode, isSentenceMode, sentenceStage, fullSentenceInput, fullSentenceGraded, typedWord, appLanguageId, gradeAndCommit, loadNextSentence]);
 
   // Handle keyboard input (for desktop)
   const handleKeyDown = useCallback((e) => {
@@ -1296,10 +1321,19 @@ useEffect(() => {
               {t('reading.back')}
             </button>
             <button
-              onClick={() => setShowAnswer(!showAnswer)}
+              onClick={() => {
+                // In stage 2 with graded sentence, button acts as "Next"
+                if (isSentenceMode && sentenceStage === 2 && fullSentenceGraded) {
+                  loadNextSentence();
+                } else {
+                  setShowAnswer(!showAnswer);
+                }
+              }}
               className="rounded-lg border border-slate-700 bg-transparent px-4 py-2 text-sm font-medium hover:bg-slate-800"
             >
-              {showAnswer ? t('reading.hideAnswer') : t('reading.showAnswer')}
+              {isSentenceMode && sentenceStage === 2 && fullSentenceGraded
+                ? t('reading.next') || 'Next'
+                : showAnswer ? t('reading.hideAnswer') : t('reading.showAnswer')}
             </button>
           </div>
         </div>
