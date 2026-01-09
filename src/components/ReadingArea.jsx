@@ -889,6 +889,8 @@ useEffect(() => {
                 </div>
               )}
               {/* Controls row - transparent, positioned above reading word */}
+              {/* Hide controls in stage 2 */}
+              {!(isSentenceMode && sentenceStage === 2) && (
               <div className="w-full grid grid-cols-3 items-center gap-3 px-2">
                 {/* Left: Vowel Layout Icon (Hebrew only) */}
                 <div className="flex justify-start">
@@ -950,19 +952,57 @@ useEffect(() => {
                   />
                 </div>
               </div>
+              )}
               {helperHint && (
                 <div className="w-full px-2 text-left text-xs text-amber-200">{helperHint}</div>
               )}
               {/* Reading words track */}
               <div
                 className={`relative flex w-full min-w-0 items-center overflow-hidden ${isSentenceMode ? 'justify-center' : ''}`}
-                onTouchStart={!isSentenceMode ? handleSwipeStart : undefined}
-                onTouchMove={!isSentenceMode ? handleSwipeMove : undefined}
-                onTouchEnd={!isSentenceMode ? handleSwipeEnd : undefined}
-                onMouseDown={!isSentenceMode ? handleSwipeStart : undefined}
-                onMouseMove={!isSentenceMode ? handleSwipeMove : undefined}
-                onMouseUp={!isSentenceMode ? handleSwipeEnd : undefined}
+                onTouchStart={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeStart}
+                onTouchMove={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeMove}
+                onTouchEnd={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeEnd}
+                onMouseDown={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeStart}
+                onMouseMove={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeMove}
+                onMouseUp={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeEnd}
               >
+              {/* Stage 2: Show concatenated glosses */}
+              {isSentenceMode && sentenceStage === 2 ? (
+                <div className={`${appFontClass} text-2xl sm:text-3xl text-center leading-relaxed px-4`}>
+                  {fullSentenceGraded ? (
+                    // After grading, show the correct answer
+                    <span className="text-emerald-400">
+                      {readingText.fullSentenceAnswer?.en?.canonical || readingText.title?.en || ''}
+                    </span>
+                  ) : (
+                    // Before grading, show concatenated glosses
+                    <span className="text-white/90">
+                      {(() => {
+                        const langCode = getLanguageCode(appLanguageId);
+                        const glossParts = [];
+                        readingText.tokens.forEach(token => {
+                          if (token.type === 'word') {
+                            const gloss = readingText.glosses?.[langCode]?.[token.id]
+                                       ?? readingText.glosses?.en?.[token.id];
+                            if (gloss) {
+                              // Take first variant of comma-separated glosses
+                              glossParts.push(gloss.split(',')[0].trim());
+                            }
+                          } else if (token.type === 'punct') {
+                            // Add punctuation but maybe not all of it
+                            const punct = token.text.trim();
+                            if (punct === ',' || punct === '.') {
+                              glossParts.push(punct);
+                            }
+                          }
+                        });
+                        return glossParts.join(' ').replace(/\s+([,.])/g, '$1');
+                      })()}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                // Stage 1: Show Hebrew words (existing behavior)
               <div
                 ref={practiceTrackRef}
                 className={`inline-flex items-center ${isSentenceMode ? 'gap-0.5' : 'gap-4 sm:gap-6'} ${isSentenceMode ? '' : 'transition-transform duration-[260ms] ease-out'}`}
@@ -1033,13 +1073,66 @@ useEffect(() => {
                 );
               })}
             </div>
-              </div>
+            )}
+            </div>
           </div>
         </div>
 
         {/* Output Track */}
         <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
           <div className="p-3 sm:p-4">
+            {isSentenceMode && sentenceStage === 2 ? (
+              /* Stage 2: Full-width sentence input */
+              <div className="w-full">
+                <div className={`${appFontClass} relative w-full`}>
+                  <input
+                    type="text"
+                    value={fullSentenceInput}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type the full sentence..."
+                    className={`w-full bg-slate-800/50 border border-slate-600 rounded-lg px-4 py-3 text-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent ${appFontClass}`}
+                    style={{ direction: appDirection }}
+                    readOnly={fullSentenceGraded}
+                    autoFocus
+                  />
+                  {fullSentenceGraded && (
+                    <div className="mt-3 text-sm">
+                      {(() => {
+                        const correctAnswer = readingText.fullSentenceAnswer?.en?.canonical || '';
+                        const userAnswer = fullSentenceInput.trim();
+                        const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+
+                        return (
+                          <div className={`p-3 rounded-lg ${isCorrect ? 'bg-emerald-900/30 border border-emerald-600' : 'bg-amber-900/30 border border-amber-600'}`}>
+                            <div className="flex items-center gap-2 mb-2">
+                              {isCorrect ? (
+                                <>
+                                  <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="text-emerald-300 font-semibold">Perfect!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="text-amber-300 font-semibold">Close! The correct answer is:</span>
+                                </>
+                              )}
+                            </div>
+                            <div className="text-white text-base">{correctAnswer}</div>
+                            <div className="mt-2 text-xs text-slate-400">Press Enter to continue to the next sentence</div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* Stage 1: Word boxes (existing behavior) */
             <div
               ref={typedViewportRef}
               className="w-full min-w-0 overflow-hidden"
@@ -1125,10 +1218,12 @@ useEffect(() => {
                 </div>
               </div>
             </div>
+            )}
           </div>
         </div>
 
-        {/* Invisible but focusable input for all viewports */}
+        {/* Invisible but focusable input for all viewports (stage 1 only) */}
+        {!(isSentenceMode && sentenceStage === 2) && (
         <input
   ref={inputRef}
   type="text"
@@ -1157,6 +1252,7 @@ useEffect(() => {
     unicodeBidi: 'plaintext',
   }}
 />
+        )}
 
         {/* Answer Display */}
         {showAnswer && (
