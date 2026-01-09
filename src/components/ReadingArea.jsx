@@ -59,6 +59,7 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
   const [showSystemModal, setShowSystemModal] = useState(false);
   const [helperWord, setHelperWord] = useState(null);
   const [helperHint, setHelperHint] = useState('');
+  const [showMeaning, setShowMeaning] = useState(!isSentenceMode); // Hide meaning initially in sentence mode
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -562,6 +563,11 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
       setViewingWordIndex(null);
     }
 
+    // Hide meaning in sentence mode when typing starts
+    if (isSentenceMode) {
+      setShowMeaning(false);
+    }
+
     const v = e.target.value;
     setTypedWord(v);
 
@@ -574,7 +580,7 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
         el.setSelectionRange(len, len);
       } catch {}
     });
-  }, [isGrading, isReviewMode]);
+  }, [isGrading, isReviewMode, isSentenceMode]);
 
   // Focus input on mount and when grading ends
   useEffect(() => {
@@ -605,6 +611,10 @@ useEffect(() => {
       if (isReviewMode) {
         setViewingWordIndex(null);
       }
+      // Hide meaning in sentence mode when typing starts
+      if (isSentenceMode) {
+        setShowMeaning(false);
+      }
       setTypedWord(prev => prev.slice(0, -1));
       return;
     }
@@ -630,10 +640,14 @@ useEffect(() => {
       if (isReviewMode) {
         setViewingWordIndex(null);
       }
+      // Hide meaning in sentence mode when typing starts
+      if (isSentenceMode) {
+        setShowMeaning(false);
+      }
       console.log('[ReadingArea] Key pressed:', key, 'Length:', key.length, 'CharCode:', key.charCodeAt(0));
       setTypedWord(prev => prev + key);
     }
-  }, [isGrading, isReviewMode, typedWord, appLanguageId, gradeAndCommit]);
+  }, [isGrading, isReviewMode, isSentenceMode, typedWord, appLanguageId, gradeAndCommit]);
 
   // Handle keyboard input (for desktop)
   const handleKeyDown = useCallback((e) => {
@@ -802,6 +816,9 @@ useEffect(() => {
                 <div className="flex items-center justify-center pointer-events-none">
                   <span className={`${appFontClass} text-base font-medium ${isReviewMode ? 'text-cyan-300' : 'text-white/90'} whitespace-nowrap`}>
                     {(() => {
+                      // In sentence mode, only show meaning if showMeaning is true
+                      if (isSentenceMode && !showMeaning) return '—';
+
                       if (!readingText || !viewingWord) return '—';
 
                       // Primary: Use meaningKeys with i18n translation for proper localization
@@ -901,8 +918,9 @@ useEffect(() => {
                             surface: token.text
                           });
                         } else {
-                          // Not viewing yet, select this word
+                          // Not viewing yet, select this word and show meaning
                           setViewingWordIndex(wordIdx);
+                          setShowMeaning(true);
                         }
                       } else if (isActive && !isReviewMode) {
                         // Word practice mode: open helper modal when already viewing
