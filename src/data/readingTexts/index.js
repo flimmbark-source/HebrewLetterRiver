@@ -287,7 +287,13 @@ function convertSentenceToReadingText(sentence) {
     tokens,
     translations,
     glosses,
-    meaningKeys: {} // Could add i18n keys later
+    meaningKeys: {}, // Could add i18n keys later
+    fullSentenceAnswer: {
+      en: {
+        canonical: sentence.english,
+        variants: [sentence.english] // Can add more variants later
+      }
+    }
   };
 }
 

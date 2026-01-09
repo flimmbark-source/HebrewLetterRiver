@@ -61,6 +61,11 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
   const [helperHint, setHelperHint] = useState('');
   const [showMeaning, setShowMeaning] = useState(!isSentenceMode); // Hide meaning initially in sentence mode
 
+  // Sentence mode stages: 1 = type individual words, 2 = type full sentence
+  const [sentenceStage, setSentenceStage] = useState(1);
+  const [fullSentenceInput, setFullSentenceInput] = useState('');
+  const [fullSentenceGraded, setFullSentenceGraded] = useState(false);
+
   // Refs for track centering
   const practiceTrackRef = useRef(null);
   const practiceViewportRef = useRef(null);
@@ -581,9 +586,16 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
     // Advance to next word immediately (before ghost animation)
     const nextIndex = wordIndex + 1;
     if (nextIndex >= words.length) {
-      // Show results screen instead of looping
+      // In sentence mode, transition to stage 2 (full sentence typing)
+      // In word mode, show results screen
       setTimeout(() => {
-        setShowResults(true);
+        if (isSentenceMode) {
+          setSentenceStage(2);
+          setFullSentenceInput('');
+          setFullSentenceGraded(false);
+        } else {
+          setShowResults(true);
+        }
       }, revealDuration + 200);
     } else {
       setWordIndex(nextIndex);
@@ -593,12 +605,21 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
       // Don't need to refocus - input should stay focused (just changes from readOnly to editable)
     }, revealDuration);
 
-  }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId]);
+  }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId, isSentenceMode]);
 
   // Handle input change (for mobile typing)
   const handleInputChange = useCallback((e) => {
     if (isGrading) return;
 
+    const v = e.target.value;
+
+    // Stage 2: Full sentence input
+    if (isSentenceMode && sentenceStage === 2) {
+      setFullSentenceInput(v);
+      return;
+    }
+
+    // Stage 1: Individual word input
     // If in review mode, navigate back to current word when typing starts
     if (isReviewMode) {
       setViewingWordIndex(null);
@@ -609,7 +630,6 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
       setShowMeaning(false);
     }
 
-    const v = e.target.value;
     setTypedWord(v);
 
     // Mobile keyboards can insert at caret; keep caret at end
@@ -621,7 +641,7 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
         el.setSelectionRange(len, len);
       } catch {}
     });
-  }, [isGrading, isReviewMode, isSentenceMode]);
+  }, [isGrading, isReviewMode, isSentenceMode, sentenceStage]);
 
   // Focus input on mount and when grading ends
   useEffect(() => {
@@ -645,6 +665,48 @@ useEffect(() => {
 
     const key = e.key;
 
+    // Stage 2: Full sentence input handling
+    if (isSentenceMode && sentenceStage === 2) {
+      if (key === 'Backspace') {
+        e.preventDefault();
+        setFullSentenceInput(prev => prev.slice(0, -1));
+        return;
+      }
+
+      if (key === 'Enter') {
+        e.preventDefault();
+        if (!fullSentenceInput.trim()) return;
+        // Grade the full sentence
+        if (fullSentenceGraded) {
+          // Already graded, move to next sentence or results
+          // Reset for next sentence
+          setSentenceStage(1);
+          setWordIndex(0);
+          setViewingWordIndex(isSentenceMode ? 0 : null);
+          setTypedWord('');
+          setCommittedWords([]);
+          setFullSentenceInput('');
+          setFullSentenceGraded(false);
+          setCompletedResults([]);
+          setShowMeaning(false);
+        } else {
+          // Grade the sentence
+          setFullSentenceGraded(true);
+        }
+        return;
+      }
+
+      const isPrintable = key.length === 1 || key === "'" || key === '-' || key === ' ' || key === ',' || key === '.';
+      const isModified = e.ctrlKey || e.metaKey || e.altKey;
+
+      if (isPrintable && !isModified) {
+        e.preventDefault();
+        setFullSentenceInput(prev => prev + key);
+      }
+      return;
+    }
+
+    // Stage 1: Individual word input handling
     // Backspace - delete last character
     if (key === 'Backspace') {
       e.preventDefault();
@@ -688,7 +750,7 @@ useEffect(() => {
       console.log('[ReadingArea] Key pressed:', key, 'Length:', key.length, 'CharCode:', key.charCodeAt(0));
       setTypedWord(prev => prev + key);
     }
-  }, [isGrading, isReviewMode, isSentenceMode, typedWord, appLanguageId, gradeAndCommit]);
+  }, [isGrading, isReviewMode, isSentenceMode, sentenceStage, fullSentenceInput, fullSentenceGraded, typedWord, appLanguageId, gradeAndCommit]);
 
   // Handle keyboard input (for desktop)
   const handleKeyDown = useCallback((e) => {
@@ -950,19 +1012,9 @@ useEffect(() => {
                     data-word-index={wordIdx}
                     onClick={isAvailableForSwipe ? () => {
                       if (isSentenceMode) {
-                        // In sentence mode: first click selects, second click opens modal
-                        if (isViewing) {
-                          // Already viewing this word, open helper modal
-                          setHelperWord({
-                            hebrew: token.text,
-                            wordId: token.id,
-                            surface: token.text
-                          });
-                        } else {
-                          // Not viewing yet, select this word and show meaning
-                          setViewingWordIndex(wordIdx);
-                          setShowMeaning(true);
-                        }
+                        // In sentence mode: clicking any word just shows its meaning
+                        setViewingWordIndex(wordIdx);
+                        setShowMeaning(true);
                       } else if (isActive && !isReviewMode) {
                         // Word practice mode: open helper modal when already viewing
                         setHelperWord({
