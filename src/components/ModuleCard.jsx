@@ -82,7 +82,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete, onPract
     }
 
     setCardProgressMap(newProgressMap);
-  }, [vocabTextIds, grammarTextIds, module.grammarTextId, practiceLanguageId, activeSection]);
+  }, [vocabTextIds.join(','), grammarTextIds.join(','), module.grammarTextId, practiceLanguageId, activeSection]);
 
   // Notify parent when practice mode changes
   useEffect(() => {
@@ -216,14 +216,26 @@ export default function ModuleCard({ module, isLocked, onModuleComplete, onPract
   }
 
   if (activeSection === 'sentences') {
+    // Convert first sentence to reading text format for ReadingArea
+    const firstSentence = moduleSentences[0];
+    if (!firstSentence) {
+      return (
+        <div className="p-4">
+          <p>No sentences available</p>
+          <button onClick={handleBack}>Back</button>
+        </div>
+      );
+    }
+
+    // Create a synthetic reading text ID for this sentence
+    const sentenceTextId = `sentence-${firstSentence.id}`;
+
     return (
-      <div className="w-full space-y-4">
-        <SentencePracticeArea
-          theme={module.title}
-          sentences={moduleSentences}
-          onExit={handleBack}
-        />
-      </div>
+      <ReadingArea
+        textId={sentenceTextId}
+        onBack={handleBack}
+        mode="sentence"
+      />
     );
   }
 

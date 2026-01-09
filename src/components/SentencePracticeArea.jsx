@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -90,8 +90,8 @@ function SentenceWordSpan({ word, onClick }) {
     <button
       type="button"
       onClick={() => onClick(word)}
-      className="px-1 py-0.5 text-xl font-semibold text-slate-800 underline decoration-dotted decoration-amber-500"
-      style={{ lineHeight: '2.25rem' }}
+      className="px-1 py-0.5 text-lg font-semibold text-slate-800 underline decoration-dotted decoration-amber-500 whitespace-nowrap transition-all hover:scale-105 hover:text-amber-700"
+      style={{ lineHeight: '1.75rem' }}
     >
       {word.surface || word.hebrew}
     </button>
@@ -116,7 +116,7 @@ function buildSentenceNodes(sentence, onWordClick) {
     if (word.start > cursor) {
       const between = sentence.hebrew.slice(cursor, word.start);
       nodes.push(
-        <span key={`gap-${idx}`} className="text-xl text-slate-800">
+        <span key={`gap-${idx}`} className="text-lg text-slate-800 whitespace-nowrap">
           {between}
         </span>
       );
@@ -130,7 +130,7 @@ function buildSentenceNodes(sentence, onWordClick) {
 
   if (cursor < sentence.hebrew.length) {
     nodes.push(
-      <span key="tail" className="text-xl text-slate-800">
+      <span key="tail" className="text-lg text-slate-800 whitespace-nowrap">
         {sentence.hebrew.slice(cursor)}
       </span>
     );
@@ -155,6 +155,10 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
     return stored === 'true';
   });
   const [audioAttempted, setAudioAttempted] = useState(false);
+
+  // Refs for viewport/track structure
+  const sentenceViewportRef = useRef(null);
+  const sentenceTrackRef = useRef(null);
 
   useEffect(() => {
     const nextIndex = getNextSentenceIndex(theme, sentences);
@@ -367,9 +371,19 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
       )}
 
       {(!listeningMode || audioAttempted) && (
-        <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-white to-amber-50 p-4 text-center shadow-sm">
-          <div className="flex flex-wrap justify-center gap-1" dir="rtl">
-            {buildSentenceNodes(currentSentence, setSelectedWord)}
+        <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white to-amber-50 shadow-sm">
+          <div
+            ref={sentenceViewportRef}
+            className="relative flex w-full min-w-0 items-center overflow-x-auto overflow-y-hidden px-4 py-4"
+            style={{ minHeight: '72px' }}
+          >
+            <div
+              ref={sentenceTrackRef}
+              className="inline-flex items-center gap-2"
+              dir="rtl"
+            >
+              {buildSentenceNodes(currentSentence, setSelectedWord)}
+            </div>
           </div>
         </div>
       )}

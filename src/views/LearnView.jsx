@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -53,13 +53,13 @@ export default function LearnView() {
   };
 
   // Handle practice mode changes
-  const handlePracticeChange = (moduleId, activeSection) => {
+  const handlePracticeChange = useCallback((moduleId, activeSection) => {
     if (activeSection) {
       setActivePractice({ moduleId, activeSection });
     } else {
       setActivePractice(null);
     }
-  };
+  }, []);
 
   // Get reading texts for current practice language
   const readingTexts = getReadingTextsForLanguage(practiceLanguageId);
@@ -78,9 +78,6 @@ export default function LearnView() {
       setPackIntroTextId(null);
     }
   };
-  console.log('[LearnView DEBUG] practiceLanguageId:', practiceLanguageId);
-  console.log('[LearnView DEBUG] readingTexts.length:', readingTexts.length);
-  console.log('[LearnView DEBUG] readingTexts:', readingTexts);
 
   // Group texts by sectionId (pure UI layer)
   const textsBySection = {};
@@ -91,9 +88,6 @@ export default function LearnView() {
     }
     textsBySection[section].push(text);
   });
-
-  console.log('[LearnView DEBUG] textsBySection:', textsBySection);
-  console.log('[LearnView DEBUG] Object.keys(textsBySection):', Object.keys(textsBySection));
 
   // Section metadata
   const sectionMeta = {

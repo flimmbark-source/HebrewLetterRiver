@@ -29,20 +29,24 @@ const MAX_WORD_BOX_CH = 18;
  * Props:
  * - textId: ID of the reading text to display
  * - onBack: Callback when user exits reading area
+ * - mode: 'word' (default) for word-by-word practice, 'sentence' for sentence viewing
  */
-export default function ReadingArea({ textId, onBack }) {
+export default function ReadingArea({ textId, onBack, mode = 'word' }) {
   const { t } = useLocalization();
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
 
   // Load reading text
   const readingText = getReadingTextById(textId, practiceLanguageId);
 
+  // Check if we're in sentence mode
+  const isSentenceMode = mode === 'sentence';
+
   // State
   const [viewportWidth, setViewportWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1024
   );
   const [wordIndex, setWordIndex] = useState(0);
-  const [viewingWordIndex, setViewingWordIndex] = useState(null); // null means viewing current word
+  const [viewingWordIndex, setViewingWordIndex] = useState(isSentenceMode ? 0 : null); // In sentence mode, start with first word selected
   const [typedWord, setTypedWord] = useState('');
   const [committedWords, setCommittedWords] = useState([]);
   const [streak, setStreak] = useState(0);
@@ -347,27 +351,33 @@ export default function ReadingArea({ textId, onBack }) {
 
   // Initialize centering
   useEffect(() => {
-    // Initial centering should be instant
-    requestAnimationFrame(() => {
-      centerPracticeTrack(true);
-      centerOutputTrack(true);
-    });
-  }, [centerPracticeTrack, centerOutputTrack]);
-
-  // Re-center when word index changes
-  useEffect(() => {
-    centerPracticeTrack(false);
-  }, [wordIndex, centerPracticeTrack]);
-
-  // Re-center when viewing word index changes (swipe navigation)
-  useEffect(() => {
-    if (viewingWordIndex !== null) {
-      centerPracticeTrack(false, viewingWordIndex);
-    } else {
-      // When exiting review mode (viewingWordIndex becomes null), recenter on current word
-      centerPracticeTrack(false, wordIndex);
+    // Initial centering should be instant (skip in sentence mode)
+    if (!isSentenceMode) {
+      requestAnimationFrame(() => {
+        centerPracticeTrack(true);
+        centerOutputTrack(true);
+      });
     }
-  }, [viewingWordIndex, wordIndex, centerPracticeTrack]);
+  }, [centerPracticeTrack, centerOutputTrack, isSentenceMode]);
+
+  // Re-center when word index changes (skip in sentence mode)
+  useEffect(() => {
+    if (!isSentenceMode) {
+      centerPracticeTrack(false);
+    }
+  }, [wordIndex, centerPracticeTrack, isSentenceMode]);
+
+  // Re-center when viewing word index changes (swipe navigation) (skip in sentence mode)
+  useEffect(() => {
+    if (!isSentenceMode) {
+      if (viewingWordIndex !== null) {
+        centerPracticeTrack(false, viewingWordIndex);
+      } else {
+        // When exiting review mode (viewingWordIndex becomes null), recenter on current word
+        centerPracticeTrack(false, wordIndex);
+      }
+    }
+  }, [viewingWordIndex, wordIndex, centerPracticeTrack, isSentenceMode]);
 
   // Re-center output when typing
   useEffect(() => {
@@ -647,12 +657,14 @@ useEffect(() => {
     setCommittedWords([]);
     setStreak(0);
     setShowAnswer(false);
-    // Re-center tracks after reset
-    setTimeout(() => {
-      centerPracticeTrack(true);
-      centerOutputTrack(true);
-    }, 50);
-  }, [centerPracticeTrack, centerOutputTrack]);
+    // Re-center tracks after reset (skip in sentence mode)
+    if (!isSentenceMode) {
+      setTimeout(() => {
+        centerPracticeTrack(true);
+        centerOutputTrack(true);
+      }, 50);
+    }
+  }, [centerPracticeTrack, centerOutputTrack, isSentenceMode]);
 
   // Handle Back from results screen
   const handleResultsBack = useCallback(() => {
@@ -710,8 +722,12 @@ useEffect(() => {
     );
   }
 
-  const title = getLocalizedTitle(readingText, appLanguageId);
-  const subtitle = getLocalizedSubtitle(readingText, appLanguageId);
+  const title = isSentenceMode
+    ? t('read.sentenceReadingTitle', 'Sentence Reading')
+    : getLocalizedTitle(readingText, appLanguageId);
+  const subtitle = isSentenceMode
+    ? t('read.sentencesIntro')
+    : getLocalizedSubtitle(readingText, appLanguageId);
 
   // Don't normalize display - show what user actually typed (including apostrophes)
   // Normalization only happens during grading, not display
@@ -736,11 +752,11 @@ useEffect(() => {
             <div className="mb-3 w-full max-w-full overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-800/90 to-slate-900/90 shadow-lg">
             <div
               ref={practiceViewportRef}
-              className="relative flex flex-col w-full min-w-0 items-center overflow-hidden px-2 py-3 sm:px-4 sm:py-6 gap-2"
+              className={`relative flex flex-col w-full min-w-0 items-center ${isSentenceMode ? 'overflow-x-auto overflow-y-hidden' : 'overflow-hidden'} px-2 py-3 sm:px-4 sm:py-6 gap-2`}
               style={{ minHeight: '72px' }}
             >
-              {/* Review mode indicator */}
-              {isReviewMode && (
+              {/* Review mode indicator - only in word practice mode */}
+              {!isSentenceMode && isReviewMode && (
                 <div className="w-full flex items-center justify-center px-2">
                   <div className="inline-flex items-center gap-2 rounded-full bg-cyan-500/20 px-3 py-1 border border-cyan-400/30">
                     <svg className="w-4 h-4 text-cyan-300" fill="none" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24">
@@ -819,18 +835,18 @@ useEffect(() => {
               )}
               {/* Reading words track */}
               <div
-                className="relative flex w-full min-w-0 items-center overflow-hidden"
-                onTouchStart={handleSwipeStart}
-                onTouchMove={handleSwipeMove}
-                onTouchEnd={handleSwipeEnd}
-                onMouseDown={handleSwipeStart}
-                onMouseMove={handleSwipeMove}
-                onMouseUp={handleSwipeEnd}
+                className={`relative flex w-full min-w-0 items-center overflow-hidden ${isSentenceMode ? 'justify-center' : ''}`}
+                onTouchStart={!isSentenceMode ? handleSwipeStart : undefined}
+                onTouchMove={!isSentenceMode ? handleSwipeMove : undefined}
+                onTouchEnd={!isSentenceMode ? handleSwipeEnd : undefined}
+                onMouseDown={!isSentenceMode ? handleSwipeStart : undefined}
+                onMouseMove={!isSentenceMode ? handleSwipeMove : undefined}
+                onMouseUp={!isSentenceMode ? handleSwipeEnd : undefined}
               >
               <div
                 ref={practiceTrackRef}
-                className="inline-flex items-center gap-4 sm:gap-6 transition-transform duration-[260ms] ease-out"
-                style={{ willChange: 'transform' }}
+                className={`inline-flex items-center ${isSentenceMode ? 'gap-0.5' : 'gap-4 sm:gap-6'} ${isSentenceMode ? '' : 'transition-transform duration-[260ms] ease-out'}`}
+                style={isSentenceMode ? undefined : { willChange: 'transform' }}
                 dir={practiceDirection}
               >
               {readingText.tokens.map((token, idx) => {
@@ -838,7 +854,7 @@ useEffect(() => {
                   return (
                       <span
                         key={`punct-${idx}`}
-                        className="whitespace-nowrap text-3xl opacity-40 sm:text-4xl"
+                        className={`whitespace-nowrap opacity-40 ${isSentenceMode ? 'text-lg' : 'text-3xl sm:text-4xl'}`}
                         style={{ letterSpacing: '0.4px' }}
                       >
                         {token.text}
@@ -849,14 +865,23 @@ useEffect(() => {
                 const wordIdx = words.findIndex(w => w.id === token.id);
                 const isActive = wordIdx === wordIndex;
                 const isViewing = wordIdx === effectiveViewingIndex;
-                const isAvailableForSwipe = wordIdx <= wordIndex;
+                const isAvailableForSwipe = isSentenceMode ? true : wordIdx <= wordIndex;
 
                 return (
                   <span
                     key={token.id || idx}
-                    className={`${practiceFontClass} ${gameFontClass} whitespace-nowrap text-3xl leading-tight transition-all sm:text-4xl ${
-                      isViewing ? 'opacity-100 cursor-pointer hover:scale-105' :
-                      isAvailableForSwipe ? 'opacity-50 cursor-pointer' : 'opacity-30'
+                    className={`${practiceFontClass} ${gameFontClass} whitespace-nowrap leading-tight transition-all ${
+                      isSentenceMode ? 'text-lg' : 'text-3xl sm:text-4xl'
+                    } ${
+                      isSentenceMode
+                        ? isViewing
+                          ? 'opacity-100 cursor-pointer text-amber-400 font-bold scale-110'
+                          : 'opacity-70 cursor-pointer hover:opacity-90 hover:scale-105'
+                        : isViewing
+                          ? 'opacity-100 cursor-pointer hover:scale-105'
+                          : isAvailableForSwipe
+                            ? 'opacity-50 cursor-pointer'
+                            : 'opacity-30'
                     }`}
                     style={{
                       letterSpacing: '0.4px',
@@ -866,15 +891,28 @@ useEffect(() => {
                     data-active={isActive}
                     data-word-index={wordIdx}
                     onClick={isAvailableForSwipe ? () => {
-                      if (isActive && !isReviewMode) {
-                        // Only open helper modal if we're already viewing this word
+                      if (isSentenceMode) {
+                        // In sentence mode: first click selects, second click opens modal
+                        if (isViewing) {
+                          // Already viewing this word, open helper modal
+                          setHelperWord({
+                            hebrew: token.text,
+                            wordId: token.id,
+                            surface: token.text
+                          });
+                        } else {
+                          // Not viewing yet, select this word
+                          setViewingWordIndex(wordIdx);
+                        }
+                      } else if (isActive && !isReviewMode) {
+                        // Word practice mode: open helper modal when already viewing
                         setHelperWord({
                           hebrew: token.text,
                           wordId: token.id,
                           surface: token.text
                         });
                       } else {
-                        // Navigate to this word (or back to current if in review mode)
+                        // Word practice mode: navigate to this word (or back to current if in review mode)
                         setViewingWordIndex(wordIdx === wordIndex ? null : wordIdx);
                       }
                     } : undefined}
@@ -889,7 +927,7 @@ useEffect(() => {
         </div>
 
         {/* Output Track */}
-          <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
+        <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
           <div className="p-3 sm:p-4">
             <div
               ref={typedViewportRef}
@@ -1008,6 +1046,7 @@ useEffect(() => {
     unicodeBidi: 'plaintext',
   }}
 />
+
         {/* Answer Display */}
         {showAnswer && (
           <div className="mt-3 text-sm text-slate-400">
