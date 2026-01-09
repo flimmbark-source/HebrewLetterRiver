@@ -103,19 +103,17 @@ function generateVariants(tokens, index = 0, current = '') {
 /**
  * Normalize a sentence for comparison
  * - Convert to lowercase
+ * - Remove all punctuation (to make it optional)
  * - Remove extra whitespace
- * - Normalize punctuation (remove or standardize)
  */
 function normalizeSentence(sentence) {
   return sentence
     .toLowerCase()
     .trim()
+    // Remove all punctuation for lenient comparison
+    .replace(/[.,!?;:'"-]/g, '')
     // Normalize multiple spaces to single space
     .replace(/\s+/g, ' ')
-    // Remove trailing punctuation for comparison
-    .replace(/[.,!?;:]+$/, '')
-    // Normalize spaces around punctuation
-    .replace(/\s*([.,!?;:])\s*/g, '$1 ')
     .trim();
 }
 

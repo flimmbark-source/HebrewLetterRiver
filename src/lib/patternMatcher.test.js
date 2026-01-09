@@ -34,10 +34,12 @@ console.log('  "HELLO THERE" should match:', matchesPattern("HELLO THERE", patte
 console.log('  "Hi There" should match:', matchesPattern("Hi There", pattern3)); // true
 console.log('');
 
-// Test 4: Extra whitespace handling
-console.log('Pattern 1 (with extra whitespace):');
+// Test 4: Extra whitespace and punctuation handling
+console.log('Pattern 1 (with extra whitespace and punctuation):');
 console.log('  "Hi,  I\'m   Dani." should match:', matchesPattern("Hi,  I'm   Dani.", pattern1)); // true
-console.log('  "Hi, I\'m Dani" (no period) should match:', matchesPattern("Hi, I'm Dani", pattern1)); // true (punctuation normalized)
+console.log('  "Hi, I\'m Dani" (no period) should match:', matchesPattern("Hi, I'm Dani", pattern1)); // true
+console.log('  "Hi I\'m Dani" (no comma) should match:', matchesPattern("Hi I'm Dani", pattern1)); // true (punctuation optional)
+console.log('  "Hi Im Dani" (no punctuation at all) should match:', matchesPattern("Hi Im Dani", pattern1)); // true
 console.log('');
 
 // Test 5: Canonical extraction
@@ -51,6 +53,12 @@ const pattern4 = "{Where are you from, Where do you come from}? {I am, I'm} new 
 console.log('Pattern 4:', pattern4);
 console.log('  "Where are you from? I am new in the city." should match:', matchesPattern("Where are you from? I am new in the city.", pattern4)); // true
 console.log('  "Where do you come from? I\'m new in the city." should match:', matchesPattern("Where do you come from? I'm new in the city.", pattern4)); // true
+console.log('');
+
+// Test 7: User's specific case
+console.log('Test user\'s specific case:');
+console.log('  "hello I\'m Dani, nice to meet you" should match pattern 2:', matchesPattern("hello I'm Dani, nice to meet you", pattern2)); // true
+console.log('  "hello Im Dani nice to meet you" (no punctuation) should match:', matchesPattern("hello Im Dani nice to meet you", pattern2)); // true
 console.log('');
 
 console.log('All tests completed!');
