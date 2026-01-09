@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "node ./scripts/run-tests.js",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "generate-patterns": "node scripts/generateSentencePatterns.js"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
@@ -27,6 +28,7 @@
     "undici": "^7.16.0"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
     "@tailwindcss/forms": "^0.5.10",
     "@vitejs/plugin-react": "^4.2.0",
     "@vitest/ui": "^1.0.0",

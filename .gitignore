@@ -4,3 +4,7 @@ dist
 .vite
 src/i18n/*.backup
 translation-generation.log
+
+# Generated pattern outputs
+scripts/generated-patterns.txt
+scripts/generated-patterns.json
