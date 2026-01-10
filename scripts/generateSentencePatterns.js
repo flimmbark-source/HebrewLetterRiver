@@ -65,23 +65,41 @@ ${sentence.pattern ? `Existing pattern: "${sentence.pattern}"\n(You can improve 
 
 Respond with ONLY the pattern string, nothing else. No explanations, no quotes around it, just the pattern.`;
 
-  try {
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20240620',
-      max_tokens: 500,
-      messages: [{
-        role: 'user',
-        content: prompt
-      }]
-    });
+  // Try models in order of preference
+  const modelsToTry = [
+    'claude-3-5-sonnet-20241022',  // Latest Sonnet 3.5
+    'claude-3-5-sonnet-20240620',  // Earlier Sonnet 3.5
+    'claude-3-opus-20240229',      // Opus 3 (more capable but slower)
+    'claude-3-sonnet-20240229'     // Base Sonnet 3
+  ];
 
-    const pattern = message.content[0].text.trim();
-    // Remove surrounding quotes if present
-    return pattern.replace(/^["']|["']$/g, '');
-  } catch (error) {
-    console.error(`Error generating pattern for "${sentence.english}":`, error.message);
-    return null;
+  for (const model of modelsToTry) {
+    try {
+      const message = await anthropic.messages.create({
+        model: model,
+        max_tokens: 500,
+        messages: [{
+          role: 'user',
+          content: prompt
+        }]
+      });
+
+      const pattern = message.content[0].text.trim();
+      // Remove surrounding quotes if present
+      return pattern.replace(/^["']|["']$/g, '');
+    } catch (error) {
+      if (error.status === 404) {
+        // Model not available, try next one
+        continue;
+      }
+      // Other error, report it
+      console.error(`Error with model ${model} for "${sentence.english}":`, error.message);
+      return null;
+    }
   }
+
+  console.error(`All models failed for "${sentence.english}"`);
+  return null;
 }
 
 /**
