@@ -15,6 +15,8 @@ export interface Sentence {
   id: string;
   hebrew: string;
   english: string;
+  /** Optional pattern for flexible grading with {alternatives} syntax */
+  pattern?: string;
   theme: string;
   difficulty: 1 | 2 | 3 | 4 | 5;
   grammarPoints: string[];

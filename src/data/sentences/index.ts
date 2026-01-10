@@ -13,6 +13,9 @@ const baseWordIdLookup: Record<string, string> = {
   היא: 'she',
   אנחנו: 'we',
   הם: 'they',
+
+  // Names
+  דני: 'Dani',
   חבר: 'friend',
   משפחה: 'family',
   שכן: 'neighbor',
@@ -161,6 +164,7 @@ function createSentence(config: {
   id: string;
   hebrew: string;
   english: string;
+  pattern?: string;
   theme: string;
   difficulty: Sentence['difficulty'];
   grammarPoints: string[];
@@ -180,6 +184,7 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       id: 'greetings-1',
       hebrew: 'שלום, אני דני, שמח להכיר.',
       english: "Hi, I'm Dani, nice to meet you.",
+      pattern: "{Hi, Hello}, {I'm, I am} Dani, {nice to meet you, nice meeting you, it's nice to meet you}.",
       theme: 'Greetings & Introductions',
       difficulty: 1,
       grammarPoints: ['greeting', 'simple present']
@@ -188,6 +193,7 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       id: 'greetings-2',
       hebrew: 'מאיפה אתה? אני חדש בעיר.',
       english: 'Where are you from? I am new in the city.',
+      pattern: "{Where are you from, Where do you come from}? {I am, I'm} new in the city.",
       theme: 'Greetings & Introductions',
       difficulty: 1,
       grammarPoints: ['greeting', 'yes-no question']
@@ -196,6 +202,7 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       id: 'greetings-3',
       hebrew: 'תודה שבאת היום, חיכינו לך.',
       english: 'Thanks for coming today, we were waiting for you.',
+      pattern: "{Thanks, Thank you} for coming today, we were waiting for you.",
       theme: 'Greetings & Introductions',
       difficulty: 1,
       grammarPoints: ['gratitude', 'present tense linking']
@@ -204,6 +211,7 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       id: 'greetings-4',
       hebrew: 'אני שמח שאתה כאן איתנו.',
       english: "I'm happy you're here with us.",
+      pattern: "{I'm, I am} happy {you're, you are} here with us.",
       theme: 'Greetings & Introductions',
       difficulty: 2,
       grammarPoints: ['present tense', 'present progressive nuance']
@@ -212,6 +220,7 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       id: 'greetings-5',
       hebrew: 'אנחנו לומדים שפה חדשה יחד.',
       english: 'We are learning a new language together.',
+      pattern: "{We are, We're} learning a new language together.",
       theme: 'Greetings & Introductions',
       difficulty: 2,
       grammarPoints: ['plural subject', 'present progressive nuance']
@@ -220,6 +229,7 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       id: 'greetings-6',
       hebrew: 'איך היום שלך?',
       english: 'How is your day today?',
+      pattern: "How is your day {today, going}?",
       theme: 'Greetings & Introductions',
       difficulty: 2,
       grammarPoints: ['questions', 'time adverb']

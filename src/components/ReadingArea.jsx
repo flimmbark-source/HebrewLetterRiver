@@ -14,6 +14,8 @@ import VowelLayoutTeachingModal from './reading/VowelLayoutTeachingModal.jsx';
 import VowelLayoutSystemModal from './reading/VowelLayoutSystemModal.jsx';
 import { isLayoutLearned, hasShownSystemIntro, setShownSystemIntro } from '../lib/vowelLayoutProgress.js';
 import WordHelperModal from './WordHelperModal.jsx';
+import { matchesPattern } from '../lib/patternMatcher.js';
+import { allSentences } from '../data/sentences/index.ts';
 
 const WORD_BOX_PADDING_CH = 0.35;
 const WORD_GAP_CH = 3.25;
@@ -35,11 +37,14 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
   const { t } = useLocalization();
   const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
 
-  // Load reading text
-  const readingText = getReadingTextById(textId, practiceLanguageId);
-
   // Check if we're in sentence mode
   const isSentenceMode = mode === 'sentence';
+
+  // Track current text ID (for sentence progression)
+  const [currentTextId, setCurrentTextId] = useState(textId);
+
+  // Load reading text
+  const readingText = getReadingTextById(currentTextId, practiceLanguageId);
 
   // State
   const [viewportWidth, setViewportWidth] = useState(
@@ -59,6 +64,12 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
   const [showSystemModal, setShowSystemModal] = useState(false);
   const [helperWord, setHelperWord] = useState(null);
   const [helperHint, setHelperHint] = useState('');
+  const [showMeaning, setShowMeaning] = useState(!isSentenceMode); // Hide meaning initially in sentence mode
+
+  // Sentence mode stages: 1 = type individual words, 2 = type full sentence
+  const [sentenceStage, setSentenceStage] = useState(1);
+  const [fullSentenceInput, setFullSentenceInput] = useState('');
+  const [fullSentenceGraded, setFullSentenceGraded] = useState(false);
 
   // Refs for track centering
   const practiceTrackRef = useRef(null);
@@ -177,8 +188,8 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
     const translationsForLocale = readingText.translations?.[TRANSLATION_KEY_MAP[appLanguageId]];
     const translations = translationsForAppLanguage || translationsForLocale;
 
-    // Always grade against the practice language transliteration so users
-    // type the word pronunciation rather than the meaning translation.
+    // In word practice mode: grade against transliteration (pronunciation)
+    // In sentence mode: grade against translation (meaning)
     const transliterationEntry = readingText.translations?.en?.[currentWord.id];
 
     // DEBUG: Log translation lookup for first word
@@ -201,8 +212,28 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
 
     const baseTranslation = translations?.[currentWord.id];
 
-    // Prefer transliteration canonical/variants when available, but keep all
-    // other variants (including meaning translations) so they remain accepted.
+    // In sentence mode, use glosses (meanings) instead of translations (transliterations)
+    if (isSentenceMode) {
+      // Get gloss from glosses object
+      const langCode = getLanguageCode(appLanguageId);
+      const gloss = readingText.glosses?.[langCode]?.[currentWord.id]
+                 ?? readingText.glosses?.en?.[currentWord.id];
+
+      if (gloss) {
+        // Parse gloss to get variants (glosses can be like "hello, peace" or just "I")
+        const glossVariants = gloss.split(',').map(v => v.trim());
+        return {
+          canonical: glossVariants[0],
+          variants: glossVariants
+        };
+      }
+
+      // Fallback to base translation if no gloss available
+      return baseTranslation;
+    }
+
+    // In word practice mode, prefer transliteration canonical/variants when available,
+    // but keep all other variants (including meaning translations) so they remain accepted.
     if (transliterationEntry) {
       const translitVariants = transliterationEntry.variants || [transliterationEntry.canonical];
       const baseVariants = baseTranslation?.variants || (baseTranslation?.canonical ? [baseTranslation.canonical] : []);
@@ -215,7 +246,7 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
     }
 
     return baseTranslation;
-  }, [readingText, currentWord, appLanguageId]);
+  }, [readingText, currentWord, appLanguageId, isSentenceMode]);
 
   // Get transliteration for TTS (always use English transliteration for pronunciation)
   const getTransliteration = useCallback(() => {
@@ -240,6 +271,27 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
 
     const baseTranslation = translations?.[viewingWord.id];
 
+    // In sentence mode, use glosses (meanings) instead of translations (transliterations)
+    if (isSentenceMode) {
+      // Get gloss from glosses object
+      const langCode = getLanguageCode(appLanguageId);
+      const gloss = readingText.glosses?.[langCode]?.[viewingWord.id]
+                 ?? readingText.glosses?.en?.[viewingWord.id];
+
+      if (gloss) {
+        // Parse gloss to get variants (glosses can be like "hello, peace" or just "I")
+        const glossVariants = gloss.split(',').map(v => v.trim());
+        return {
+          canonical: glossVariants[0],
+          variants: glossVariants
+        };
+      }
+
+      // Fallback to base translation if no gloss available
+      return baseTranslation;
+    }
+
+    // In word practice mode, prefer transliteration canonical/variants when available
     if (transliterationEntry) {
       const translitVariants = transliterationEntry.variants || [transliterationEntry.canonical];
       const baseVariants = baseTranslation?.variants || (baseTranslation?.canonical ? [baseTranslation.canonical] : []);
@@ -252,7 +304,7 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
     }
 
     return baseTranslation;
-  }, [readingText, viewingWord, appLanguageId]);
+  }, [readingText, viewingWord, appLanguageId, isSentenceMode]);
 
   // Get transliteration for viewing word (for TTS during swipe navigation)
   const getViewingTransliteration = useCallback(() => {
@@ -539,9 +591,16 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
     // Advance to next word immediately (before ghost animation)
     const nextIndex = wordIndex + 1;
     if (nextIndex >= words.length) {
-      // Show results screen instead of looping
+      // In sentence mode, transition to stage 2 (full sentence typing)
+      // In word mode, show results screen
       setTimeout(() => {
-        setShowResults(true);
+        if (isSentenceMode) {
+          setSentenceStage(2);
+          setFullSentenceInput('');
+          setFullSentenceGraded(false);
+        } else {
+          setShowResults(true);
+        }
       }, revealDuration + 200);
     } else {
       setWordIndex(nextIndex);
@@ -551,18 +610,31 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
       // Don't need to refocus - input should stay focused (just changes from readOnly to editable)
     }, revealDuration);
 
-  }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId]);
+  }, [isGrading, currentWord, typedWord, wordIndex, words.length, getTranslation, practiceLanguageId, appLanguageId, isSentenceMode]);
 
   // Handle input change (for mobile typing)
   const handleInputChange = useCallback((e) => {
     if (isGrading) return;
 
+    const v = e.target.value;
+
+    // Stage 2: Full sentence input
+    if (isSentenceMode && sentenceStage === 2) {
+      setFullSentenceInput(v);
+      return;
+    }
+
+    // Stage 1: Individual word input
     // If in review mode, navigate back to current word when typing starts
     if (isReviewMode) {
       setViewingWordIndex(null);
     }
 
-    const v = e.target.value;
+    // Hide meaning in sentence mode when typing starts
+    if (isSentenceMode) {
+      setShowMeaning(false);
+    }
+
     setTypedWord(v);
 
     // Mobile keyboards can insert at caret; keep caret at end
@@ -574,7 +646,7 @@ export default function ReadingArea({ textId, onBack, mode = 'word' }) {
         el.setSelectionRange(len, len);
       } catch {}
     });
-  }, [isGrading, isReviewMode]);
+  }, [isGrading, isReviewMode, isSentenceMode, sentenceStage]);
 
   // Focus input on mount and when grading ends
   useEffect(() => {
@@ -592,18 +664,85 @@ useEffect(() => {
   if (!isGrading) requestAnimationFrame(focusHiddenInput);
 }, [wordIndex, isGrading, showResults, focusHiddenInput]);
 
+  // Load next sentence (for sentence mode)
+  const loadNextSentence = useCallback(() => {
+    if (!isSentenceMode) return;
+
+    // Find current sentence in the list
+    const currentSentenceId = currentTextId.replace('sentence-', '');
+    const currentIndex = allSentences.findIndex(s => s.id === currentSentenceId);
+
+    if (currentIndex === -1 || currentIndex >= allSentences.length - 1) {
+      // No more sentences, show results
+      setShowResults(true);
+      return;
+    }
+
+    // Load next sentence
+    const nextSentence = allSentences[currentIndex + 1];
+    const nextTextId = `sentence-${nextSentence.id}`;
+
+    // Reset state for new sentence
+    setCurrentTextId(nextTextId);
+    setSentenceStage(1);
+    setWordIndex(0);
+    setViewingWordIndex(0);
+    setTypedWord('');
+    setCommittedWords([]);
+    setFullSentenceInput('');
+    setFullSentenceGraded(false);
+    setShowMeaning(false);
+  }, [isSentenceMode, currentTextId, allSentences]);
+
   // Shared keyboard handler for both focused input and document listener (desktop)
   const processKeyDown = useCallback((e) => {
     if (isGrading) return;
 
     const key = e.key;
 
+    // Stage 2: Full sentence input handling
+    if (isSentenceMode && sentenceStage === 2) {
+      if (key === 'Backspace') {
+        e.preventDefault();
+        setFullSentenceInput(prev => prev.slice(0, -1));
+        return;
+      }
+
+      if (key === 'Enter') {
+        e.preventDefault();
+        if (!fullSentenceInput.trim()) return;
+        // Grade the full sentence
+        if (fullSentenceGraded) {
+          // Already graded, load next sentence
+          loadNextSentence();
+        } else {
+          // Grade the sentence
+          setFullSentenceGraded(true);
+        }
+        return;
+      }
+
+      const isPrintable = key.length === 1 || key === "'" || key === '-' || key === ' ' || key === ',' || key === '.';
+      const isModified = e.ctrlKey || e.metaKey || e.altKey;
+
+      if (isPrintable && !isModified) {
+        e.preventDefault();
+        setFullSentenceInput(prev => prev + key);
+      }
+      return;
+    }
+
+    // Stage 1: Individual word input handling
     // Backspace - delete last character
     if (key === 'Backspace') {
       e.preventDefault();
       // If in review mode, navigate back to current word when typing starts
       if (isReviewMode) {
         setViewingWordIndex(null);
+      }
+      // Hide meaning in sentence mode when typing starts
+      if (isSentenceMode) {
+        setShowMeaning(false);
       }
       setTypedWord(prev => prev.slice(0, -1));
       return;
@@ -630,10 +769,14 @@ useEffect(() => {
       if (isReviewMode) {
         setViewingWordIndex(null);
       }
+      // Hide meaning in sentence mode when typing starts
+      if (isSentenceMode) {
+        setShowMeaning(false);
+      }
       console.log('[ReadingArea] Key pressed:', key, 'Length:', key.length, 'CharCode:', key.charCodeAt(0));
       setTypedWord(prev => prev + key);
     }
-  }, [isGrading, isReviewMode, typedWord, appLanguageId, gradeAndCommit]);
+  }, [isGrading, isReviewMode, isSentenceMode, sentenceStage, fullSentenceInput, fullSentenceGraded, typedWord, appLanguageId, gradeAndCommit, loadNextSentence]);
 
   // Handle keyboard input (for desktop)
   const handleKeyDown = useCallback((e) => {
@@ -772,6 +915,8 @@ useEffect(() => {
                 </div>
               )}
               {/* Controls row - transparent, positioned above reading word */}
+              {/* Hide controls in stage 2 */}
+              {!(isSentenceMode && sentenceStage === 2) && (
               <div className="w-full grid grid-cols-3 items-center gap-3 px-2">
                 {/* Left: Vowel Layout Icon (Hebrew only) */}
                 <div className="flex justify-start">
@@ -802,6 +947,9 @@ useEffect(() => {
                 <div className="flex items-center justify-center pointer-events-none">
                   <span className={`${appFontClass} text-base font-medium ${isReviewMode ? 'text-cyan-300' : 'text-white/90'} whitespace-nowrap`}>
                     {(() => {
+                      // In sentence mode, only show meaning if showMeaning is true
+                      if (isSentenceMode && !showMeaning) return '—';
+
                       if (!readingText || !viewingWord) return '—';
 
                       // Primary: Use meaningKeys with i18n translation for proper localization
@@ -830,19 +978,57 @@ useEffect(() => {
                   />
                 </div>
               </div>
+              )}
               {helperHint && (
                 <div className="w-full px-2 text-left text-xs text-amber-200">{helperHint}</div>
               )}
               {/* Reading words track */}
               <div
                 className={`relative flex w-full min-w-0 items-center overflow-hidden ${isSentenceMode ? 'justify-center' : ''}`}
-                onTouchStart={!isSentenceMode ? handleSwipeStart : undefined}
-                onTouchMove={!isSentenceMode ? handleSwipeMove : undefined}
-                onTouchEnd={!isSentenceMode ? handleSwipeEnd : undefined}
-                onMouseDown={!isSentenceMode ? handleSwipeStart : undefined}
-                onMouseMove={!isSentenceMode ? handleSwipeMove : undefined}
-                onMouseUp={!isSentenceMode ? handleSwipeEnd : undefined}
+                onTouchStart={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeStart}
+                onTouchMove={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeMove}
+                onTouchEnd={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeEnd}
+                onMouseDown={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeStart}
+                onMouseMove={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeMove}
+                onMouseUp={!isSentenceMode || sentenceStage === 2 ? undefined : handleSwipeEnd}
               >
+              {/* Stage 2: Show concatenated glosses */}
+              {isSentenceMode && sentenceStage === 2 ? (
+                <div className={`${appFontClass} text-2xl sm:text-3xl text-center leading-relaxed px-4`}>
+                  {fullSentenceGraded ? (
+                    // After grading, show the correct answer
+                    <span className="text-emerald-400">
+                      {readingText.fullSentenceAnswer?.en?.canonical || readingText.title?.en || ''}
+                    </span>
+                  ) : (
+                    // Before grading, show concatenated glosses
+                    <span className="text-white/90">
+                      {(() => {
+                        const langCode = getLanguageCode(appLanguageId);
+                        const glossParts = [];
+                        readingText.tokens.forEach(token => {
+                          if (token.type === 'word') {
+                            const gloss = readingText.glosses?.[langCode]?.[token.id]
+                                       ?? readingText.glosses?.en?.[token.id];
+                            if (gloss) {
+                              // Take first variant of comma-separated glosses
+                              glossParts.push(gloss.split(',')[0].trim());
+                            }
+                          } else if (token.type === 'punct') {
+                            // Add punctuation but maybe not all of it
+                            const punct = token.text.trim();
+                            if (punct === ',' || punct === '.') {
+                              glossParts.push(punct);
+                            }
+                          }
+                        });
+                        return glossParts.join(' ').replace(/\s+([,.])/g, '$1');
+                      })()}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                // Stage 1: Show Hebrew words (existing behavior)
               <div
                 ref={practiceTrackRef}
                 className={`inline-flex items-center ${isSentenceMode ? 'gap-0.5' : 'gap-4 sm:gap-6'} ${isSentenceMode ? '' : 'transition-transform duration-[260ms] ease-out'}`}
@@ -892,18 +1078,9 @@ useEffect(() => {
                     data-word-index={wordIdx}
                     onClick={isAvailableForSwipe ? () => {
                       if (isSentenceMode) {
-                        // In sentence mode: first click selects, second click opens modal
-                        if (isViewing) {
-                          // Already viewing this word, open helper modal
-                          setHelperWord({
-                            hebrew: token.text,
-                            wordId: token.id,
-                            surface: token.text
-                          });
-                        } else {
-                          // Not viewing yet, select this word
-                          setViewingWordIndex(wordIdx);
-                        }
+                        // In sentence mode: clicking any word just shows its meaning
+                        setViewingWordIndex(wordIdx);
+                        setShowMeaning(true);
                       } else if (isActive && !isReviewMode) {
                         // Word practice mode: open helper modal when already viewing
                         setHelperWord({
@@ -922,13 +1099,71 @@ useEffect(() => {
                 );
               })}
             </div>
-              </div>
+            )}
+            </div>
           </div>
         </div>
 
         {/* Output Track */}
         <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900/95 to-slate-950/95 shadow-lg">
           <div className="p-3 sm:p-4">
+            {isSentenceMode && sentenceStage === 2 ? (
+              /* Stage 2: Full-width sentence input */
+              <div className="w-full">
+                <div className={`${appFontClass} relative w-full`}>
+                  <input
+                    type="text"
+                    value={fullSentenceInput}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type the full sentence..."
+                    className={`w-full bg-slate-800/50 border border-slate-600 rounded-lg px-4 py-3 text-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent ${appFontClass}`}
+                    style={{ direction: appDirection }}
+                    readOnly={fullSentenceGraded}
+                    autoFocus
+                  />
+                  {fullSentenceGraded && (
+                    <div className="mt-3 text-sm">
+                      {(() => {
+                        const correctAnswer = readingText.fullSentenceAnswer?.en?.canonical || '';
+                        const userAnswer = fullSentenceInput.trim();
+                        const pattern = readingText.fullSentenceAnswer?.en?.pattern;
+
+                        // Use pattern matching if pattern is available, otherwise fall back to exact match
+                        const isCorrect = pattern
+                          ? matchesPattern(userAnswer, pattern)
+                          : userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+
+                        return (
+                          <div className={`p-3 rounded-lg ${isCorrect ? 'bg-emerald-900/30 border border-emerald-600' : 'bg-amber-900/30 border border-amber-600'}`}>
+                            <div className="flex items-center gap-2 mb-2">
+                              {isCorrect ? (
+                                <>
+                                  <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="text-emerald-300 font-semibold">Perfect!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="text-amber-300 font-semibold">Close! The correct answer is:</span>
+                                </>
+                              )}
+                            </div>
+                            <div className="text-white text-base">{correctAnswer}</div>
+                            <div className="mt-2 text-xs text-slate-400">Press Enter to continue to the next sentence</div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* Stage 1: Word boxes (existing behavior) */
             <div
               ref={typedViewportRef}
               className="w-full min-w-0 overflow-hidden"
@@ -1014,10 +1249,12 @@ useEffect(() => {
                 </div>
               </div>
             </div>
+            )}
           </div>
         </div>
 
-        {/* Invisible but focusable input for all viewports */}
+        {/* Invisible but focusable input for all viewports (stage 1 only) */}
+        {!(isSentenceMode && sentenceStage === 2) && (
         <input
   ref={inputRef}
   type="text"
@@ -1046,6 +1283,7 @@ useEffect(() => {
     unicodeBidi: 'plaintext',
   }}
 />
+        )}
 
         {/* Answer Display */}
         {showAnswer && (
@@ -1083,10 +1321,19 @@ useEffect(() => {
               {t('reading.back')}
             </button>
             <button
-              onClick={() => setShowAnswer(!showAnswer)}
+              onClick={() => {
+                // In stage 2 with graded sentence, button acts as "Next"
+                if (isSentenceMode && sentenceStage === 2 && fullSentenceGraded) {
+                  loadNextSentence();
+                } else {
+                  setShowAnswer(!showAnswer);
+                }
+              }}
               className="rounded-lg border border-slate-700 bg-transparent px-4 py-2 text-sm font-medium hover:bg-slate-800"
             >
-              {showAnswer ? t('reading.hideAnswer') : t('reading.showAnswer')}
+              {isSentenceMode && sentenceStage === 2 && fullSentenceGraded
+                ? t('reading.next') || 'Next'
+                : showAnswer ? t('reading.hideAnswer') : t('reading.showAnswer')}
             </button>
           </div>
         </div>
