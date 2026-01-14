@@ -18,6 +18,7 @@ import { getThemeStats } from '../lib/sentenceProgressStorage.ts';
 import ModuleCard from '../components/ModuleCard.jsx';
 import { getModulesInOrder } from '../data/modules/index.ts';
 import { isModuleUnlocked, initializeFirstModule } from '../lib/moduleProgressStorage.ts';
+import ConversationView from '../components/conversation/ConversationView.jsx';
 
 export default function LearnView() {
   const { t } = useLocalization();
@@ -30,6 +31,7 @@ export default function LearnView() {
   const [showSystemModal, setShowSystemModal] = useState(false);
   const [moduleRefreshKey, setModuleRefreshKey] = useState(0);
   const [activePractice, setActivePractice] = useState(null); // { moduleId, type, data }
+  const [showConversationMode, setShowConversationMode] = useState(false);
 
   // Auto-trigger readIntro tutorial on first visit
   useEffect(() => {
@@ -152,6 +154,15 @@ export default function LearnView() {
     }
   };
 
+  // Show conversation mode if active
+  if (showConversationMode) {
+    return (
+      <ConversationView
+        onBack={() => setShowConversationMode(false)}
+      />
+    );
+  }
+
   // Note: Old vocab texts are kept for backwards compatibility but hidden in new module layout
   // If a text is selected from old sections, show the reading area
   if (selectedTextId) {
@@ -196,6 +207,47 @@ export default function LearnView() {
             Follow the modules below to learn Hebrew step by step. Complete vocab, grammar, and sentences in each module to unlock the next.
           </p>
         </header>
+      )}
+
+      {/* Conversation Practice Card - Special Feature */}
+      {!activePractice && practiceLanguageId === 'hebrew' && (
+        <div className="px-1">
+          <button
+            onClick={() => setShowConversationMode(true)}
+            className="w-full text-left bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-2 border-blue-200 hover:border-blue-300 rounded-xl p-6 transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            <div className="flex items-start gap-4">
+              <div className="text-4xl flex-shrink-0">💬</div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-slate-900 mb-1">
+                  {t('conversation.card.title', 'Conversation Practice')}
+                </h3>
+                <p className="text-sm text-slate-600 mb-3">
+                  {t('conversation.card.description', 'Practice real-world Hebrew conversations with interactive exercises')}
+                </p>
+                <div className="flex items-center gap-4 text-xs text-slate-600">
+                  <span className="flex items-center gap-1">
+                    <span>🎧</span>
+                    {t('conversation.card.feature1', 'Listen')}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span>🗣️</span>
+                    {t('conversation.card.feature2', 'Speak')}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span>⌨️</span>
+                    {t('conversation.card.feature3', 'Type')}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span>💬</span>
+                    {t('conversation.card.feature4', 'Choose')}
+                  </span>
+                </div>
+              </div>
+              <div className="text-2xl text-slate-400">→</div>
+            </div>
+          </button>
+        </div>
       )}
 
       {/* Learning Path - Modules in Sequential Order */}

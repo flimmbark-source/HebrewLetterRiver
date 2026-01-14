@@ -1379,5 +1379,150 @@
         "description": "Click Start to begin! Letters will flow across the screen - drag each to its matching box at the bottom."
       }
     }
+  },
+  "conversation": {
+    "card": {
+      "title": "Conversation Practice",
+      "description": "Practice real-world Hebrew conversations with interactive exercises",
+      "feature1": "Listen",
+      "feature2": "Speak",
+      "feature3": "Type",
+      "feature4": "Choose"
+    },
+    "list": {
+      "title": "Conversation Practice",
+      "subtitle": "Practice real-world Hebrew conversations",
+      "back": "Back",
+      "intro": {
+        "title": "Learn through conversation",
+        "description": "Each scenario teaches you practical phrases through listening, speaking, and typing exercises."
+      },
+      "phrases": "phrases",
+      "beats": "beats",
+      "practiced": "practiced",
+      "progress": "Progress",
+      "continue": "Continue practicing",
+      "start": "Start learning",
+      "empty": "No scenarios available yet"
+    },
+    "brief": {
+      "back": "Back to scenarios",
+      "difficulty": "Difficulty",
+      "phrases": "Phrases",
+      "totalBeats": "Total beats",
+      "practiceModules": "Practice modules",
+      "modulesDescription": "You'll practice each phrase using these exercises:",
+      "goals": "Learning goals",
+      "goal1": "Recognize and understand common Hebrew phrases",
+      "goal2": "Practice correct pronunciation",
+      "goal3": "Build recall and typing fluency",
+      "goal4": "Connect Hebrew words to real-world usage",
+      "tips": "Tips",
+      "tip1": "Use the audio button to hear native pronunciation",
+      "tip2": "Save phrases you want to review later",
+      "tip3": "Take your time - there's no rush!",
+      "start": "Start Practice"
+    },
+    "beat": {
+      "exit": "Exit",
+      "progress": "Beat {{current}} of {{total}}",
+      "transcript": "Transcript",
+      "savePhrase": "Save phrase to SRS",
+      "transcriptTitle": "Previous beats",
+      "errorNoLine": "Line not found",
+      "errorUnknownModule": "Unknown module type"
+    },
+    "recap": {
+      "completed": "Session completed",
+      "excellent": "Excellent!",
+      "excellentMsg": "You're mastering these phrases!",
+      "great": "Great job!",
+      "greatMsg": "You're making solid progress!",
+      "good": "Good effort!",
+      "goodMsg": "Keep practicing and you'll improve!",
+      "keepGoing": "Keep going!",
+      "keepGoingMsg": "Learning takes time - you're on the right track!",
+      "accuracy": "Accuracy",
+      "beatsCompleted": "Beats completed",
+      "phrasesPracticed": "Phrases practiced",
+      "breakdown": "Performance breakdown",
+      "correct": "Correct",
+      "partial": "Partial",
+      "incorrect": "Incorrect",
+      "savedPhrases": "Saved phrases",
+      "savedCount": "You saved {{count}} phrases for review",
+      "finish": "Finish",
+      "practiceAgain": "Practice again",
+      "reviewSaved": "Review saved"
+    },
+    "modules": {
+      "listenMeaningChoice": {
+        "name": "Listen & Pick Meaning",
+        "description": "Listen to Hebrew and choose the correct English translation",
+        "instruction": "Listen and pick the meaning",
+        "hint": "Play the audio and choose the correct English translation",
+        "playHint": "Click to hear the Hebrew phrase"
+      },
+      "shadowRepeat": {
+        "name": "Shadow & Repeat",
+        "description": "Listen and repeat the Hebrew phrase out loud",
+        "instruction": "Shadow and repeat",
+        "hint": "Listen to the phrase and repeat it out loud",
+        "playHint": "Listen as many times as needed",
+        "hideText": "Hide text",
+        "showText": "Show text to help",
+        "hebrewLabel": "Hebrew",
+        "pronunciationLabel": "Pronunciation",
+        "success": "I said it!",
+        "skip": "Skip for now",
+        "feedback": "Great job practicing!",
+        "encouragement": "Shadowing helps build muscle memory for pronunciation"
+      },
+      "guidedReplyChoice": {
+        "name": "Choose Hebrew Response",
+        "description": "Pick the correct Hebrew phrase from multiple options",
+        "instruction": "Choose the Hebrew phrase",
+        "hint": "Pick the correct Hebrew response",
+        "contextLabel": "You want to say:"
+      },
+      "typeInput": {
+        "name": "Type the Answer",
+        "description": "Type the Hebrew phrase or transliteration",
+        "instruction": "Type the answer",
+        "hintHebrew": "Type the Hebrew phrase",
+        "hintTranslit": "Type the transliteration (pronunciation)",
+        "contextLabel": "You want to say:",
+        "placeholderHebrew": "Type in Hebrew...",
+        "placeholderTranslit": "Type the transliteration...",
+        "switchToTranslit": "Switch to transliteration",
+        "switchToHebrew": "Switch to Hebrew",
+        "correctAnswer": "Correct answer:",
+        "hebrew": "Hebrew",
+        "transliteration": "Transliteration",
+        "hint": "Tip: Listen to the audio for pronunciation help"
+      },
+      "submit": "Submit",
+      "correct": "Correct!",
+      "partial": "Close! Check the correct answer below.",
+      "incorrect": "Not quite. Here's the correct answer:"
+    },
+    "scenarios": {
+      "greetings-introductions": {
+        "title": "Greetings & Introductions",
+        "subtitle": "Meet and greet in Hebrew"
+      },
+      "at-home": {
+        "title": "At Home",
+        "subtitle": "Talk about home and family"
+      },
+      "food-eating": {
+        "title": "Food & Eating",
+        "subtitle": "Order food and talk about meals"
+      },
+      "numbers-time": {
+        "title": "Numbers & Time",
+        "subtitle": "Express time and quantities"
+      }
+    }
   }
 }
