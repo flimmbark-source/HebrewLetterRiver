@@ -17,8 +17,36 @@ class TtsService {
     this.voicesLoaded = false;
     this.voiceLoadCallbacks = [];
 
+    // Track locales that have failed and should use transliteration
+    this.forceTranslitForLocale = this.loadTranslitPreferences();
+
     // Initialize voice loading
     this.initVoiceLoading();
+  }
+
+  /**
+   * Load transliteration preferences from localStorage
+   */
+  loadTranslitPreferences() {
+    try {
+      const stored = localStorage.getItem('tts_force_translit');
+      return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  /**
+   * Save that a locale should use transliteration
+   */
+  saveTranslitPreference(locale, useTranslit) {
+    try {
+      this.forceTranslitForLocale[locale] = useTranslit;
+      localStorage.setItem('tts_force_translit', JSON.stringify(this.forceTranslitForLocale));
+      console.log('[TTS] Saved preference: use transliteration for', locale);
+    } catch (e) {
+      console.warn('[TTS] Could not save preference:', e);
+    }
   }
 
   /**
@@ -228,6 +256,13 @@ class TtsService {
 
     console.log('[TTS] Will speak:', textToSpeak, 'in locale:', locale);
 
+    // Check if we should force transliteration for this locale
+    if (this.forceTranslitForLocale[locale] && transliteration && locale !== 'en-US') {
+      console.log('[TTS] Using transliteration (saved preference for', locale, ')');
+      textToSpeak = this.normalizeTranslit(transliteration);
+      locale = 'en-US';
+    }
+
     // Get voices - if not loaded yet, use default voice
     // We can't wait for voices without breaking the user gesture
     const voices = synth.getVoices();
@@ -286,8 +321,10 @@ class TtsService {
         console.warn('[TTS] ⚠️ Finished too quickly (', duration, 'ms), probably did not play audio');
 
         // Try fallback to transliteration if we haven't already and this was a non-English voice
-        if (locale !== 'en-US' && transliteration) {
+        if (locale !== 'en-US' && transliteration && !this.forceTranslitForLocale[nativeLocale]) {
           console.log('[TTS] Retrying with English transliteration fallback...');
+          // Save preference to use transliteration for this locale in the future
+          this.saveTranslitPreference(nativeLocale, true);
           setTimeout(() => {
             this.speakSmart({
               nativeText: this.normalizeTranslit(transliteration),
@@ -311,7 +348,9 @@ class TtsService {
 
       // Try English fallback if appropriate
       if (event.error === 'language-unavailable' && locale !== 'en-US' && transliteration) {
-        console.log('[TTS] Trying English fallback...');
+        console.log('[TTS] Language unavailable, trying English fallback...');
+        // Save preference to use transliteration for this locale in the future
+        this.saveTranslitPreference(nativeLocale, true);
         setTimeout(() => {
           this.speakSmart({
             nativeText: this.normalizeTranslit(transliteration),
@@ -356,6 +395,22 @@ class TtsService {
     if (synth && synth.paused) {
       synth.resume();
     }
+  }
+
+  /**
+   * Force using transliteration for a locale (useful when native voice fails silently)
+   */
+  useTransliterationFor(locale) {
+    console.log('[TTS] Manually enabling transliteration for', locale);
+    this.saveTranslitPreference(locale, true);
+  }
+
+  /**
+   * Reset transliteration preference for a locale (try native voice again)
+   */
+  resetTransliterationFor(locale) {
+    console.log('[TTS] Resetting transliteration preference for', locale);
+    this.saveTranslitPreference(locale, false);
   }
 
   /**
@@ -404,6 +459,15 @@ class TtsService {
 
 // Export singleton
 const ttsService = new TtsService();
+
+// Expose to window for debugging
+if (typeof window !== 'undefined') {
+  window.ttsService = ttsService;
+  console.log('[TTS] Service available at window.ttsService');
+  console.log('[TTS] To force transliteration: window.ttsService.useTransliterationFor("he-IL")');
+  console.log('[TTS] To reset: window.ttsService.resetTransliterationFor("he-IL")');
+}
+
 export default ttsService;
 
 export { TtsService };
