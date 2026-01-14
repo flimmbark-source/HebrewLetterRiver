@@ -12,12 +12,14 @@ import { useLocalization } from '../../../context/LocalizationContext.jsx';
 export default function ShadowRepeat({ line, onResult }) {
   const { t } = useLocalization();
   const [showTarget, setShowTarget] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const handleToggleTarget = useCallback(() => {
     setShowTarget(prev => !prev);
   }, []);
 
   const handleComplete = useCallback((success) => {
+    if (isCompleted) return;
     setIsCompleted(true);
 
     // Emit result after a short delay
@@ -29,7 +31,7 @@ export default function ShadowRepeat({ line, onResult }) {
         suggestedAnswer: success ? undefined : line.he
       });
     }, 800);
-  }, [line, onResult]);
+  }, [isCompleted, line, onResult]);
 
   return (
     <div className="flex flex-col gap-6 max-w-2xl mx-auto">
@@ -118,11 +120,13 @@ export default function ShadowRepeat({ line, onResult }) {
       <div className="flex gap-3 mt-4">
         <button
           onClick={() => handleComplete(true)}
+          disabled={isCompleted}
           className={`
             flex-1 py-4 px-6 rounded-lg font-semibold text-lg
             bg-emerald-600 hover:bg-emerald-500 text-white
             transition-all duration-200 hover:scale-105 active:scale-95
             border-2 border-emerald-500
+            disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100
           `}
         >
           ✅ {t('conversation.modules.shadowRepeat.success', "I said it!")}
@@ -130,11 +134,13 @@ export default function ShadowRepeat({ line, onResult }) {
 
         <button
           onClick={() => handleComplete(false)}
+          disabled={isCompleted}
           className={`
             flex-1 py-4 px-6 rounded-lg font-semibold text-lg
             bg-slate-700 hover:bg-slate-600 text-slate-300
             transition-all duration-200 hover:scale-105 active:scale-95
             border-2 border-slate-600
+            disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100
           `}
         >
           ⏭️ {t('conversation.modules.shadowRepeat.skip', "Skip for now")}
