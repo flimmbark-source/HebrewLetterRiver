@@ -14,6 +14,65 @@ class TtsService {
     this.listeners = new Set();
     this.isSpeaking = false;
     this.lastSpeakTime = 0;
+    this.voicesLoaded = false;
+    this.voiceLoadCallbacks = [];
+
+    // Initialize voice loading
+    this.initVoiceLoading();
+  }
+
+  /**
+   * Initialize voice loading - voices may load asynchronously
+   */
+  initVoiceLoading() {
+    const synth = this.getSynth();
+    if (!synth) return;
+
+    // Check if voices are already available
+    const voices = synth.getVoices();
+    if (voices.length > 0) {
+      console.log('[TTS] Voices already loaded:', voices.length);
+      this.voicesLoaded = true;
+      this.logAvailableVoices();
+      return;
+    }
+
+    // Listen for voices to load
+    if ('onvoiceschanged' in synth) {
+      synth.onvoiceschanged = () => {
+        const newVoices = synth.getVoices();
+        console.log('[TTS] Voices loaded:', newVoices.length);
+        this.voicesLoaded = true;
+        this.logAvailableVoices();
+
+        // Notify any waiting callbacks
+        this.voiceLoadCallbacks.forEach(cb => cb());
+        this.voiceLoadCallbacks = [];
+      };
+    } else {
+      // Fallback: assume voices are available immediately
+      this.voicesLoaded = true;
+    }
+  }
+
+  /**
+   * Log available voices for debugging
+   */
+  logAvailableVoices() {
+    const synth = this.getSynth();
+    if (!synth) return;
+
+    const voices = synth.getVoices();
+    const hebrewVoices = voices.filter(v => {
+      const lang = v.lang.toLowerCase().replace(/^iw(\b|[-_])/i, 'he$1');
+      return lang.startsWith('he');
+    });
+
+    console.log('[TTS] Total voices available:', voices.length);
+    console.log('[TTS] Hebrew voices:', hebrewVoices.length);
+    if (hebrewVoices.length > 0) {
+      console.log('[TTS] Hebrew voices:', hebrewVoices.map(v => `${v.name} (${v.lang})`).join(', '));
+    }
   }
 
   /**
@@ -177,6 +236,22 @@ class TtsService {
       console.log('[TTS] Voices not loaded yet, using default');
     }
 
+    // Check if we have voices for this locale
+    const hasVoiceForLocale = voices.some(v => {
+      const vLang = v.lang.toLowerCase().replace(/^iw(\b|[-_])/i, 'he$1');
+      const targetLang = locale.toLowerCase().replace(/^iw(\b|[-_])/i, 'he$1');
+      return vLang.startsWith(targetLang.split('-')[0]);
+    });
+
+    console.log('[TTS] Has voice for locale:', hasVoiceForLocale, '(locale:', locale, ')');
+
+    // If no voice for the target locale and we have transliteration, use English fallback
+    if (!hasVoiceForLocale && transliteration && locale !== 'en-US') {
+      console.log('[TTS] No voice for locale, using English fallback with transliteration');
+      textToSpeak = this.normalizeTranslit(transliteration);
+      locale = 'en-US';
+    }
+
     // SKIP voice selection - always use browser default
     // On Android, selecting a specific voice can break subsequent playback
     // Just set the lang attribute and let the browser choose
@@ -215,7 +290,14 @@ class TtsService {
       this.isSpeaking = false;
       this.currentUtterance = null;
       this.notifyListeners('end');
-      console.log('[TTS] ✓ Finished speaking');
+
+      // Check if it finished suspiciously quickly (probably didn't play)
+      const duration = Date.now() - this.lastSpeakTime;
+      if (!started || duration < 100) {
+        console.warn('[TTS] ⚠️ Finished too quickly (', duration, 'ms), probably did not play audio');
+      } else {
+        console.log('[TTS] ✓ Finished speaking (', duration, 'ms)');
+      }
     };
 
     utterance.onerror = (event) => {
