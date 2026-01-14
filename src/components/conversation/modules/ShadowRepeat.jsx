@@ -13,7 +13,6 @@ export default function ShadowRepeat({ line, onResult }) {
   const { t } = useLocalization();
   const [hasPlayed, setHasPlayed] = useState(false);
   const [showTarget, setShowTarget] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
 
   const handlePlayAudio = useCallback(() => {
     setHasPlayed(true);
@@ -24,17 +23,12 @@ export default function ShadowRepeat({ line, onResult }) {
   }, []);
 
   const handleComplete = useCallback((success) => {
-    setIsCompleted(true);
-
-    // Emit result after a short delay
-    setTimeout(() => {
-      onResult({
-        userResponse: success ? line.he : 'skipped',
-        isCorrect: success,
-        resultType: success ? 'correct' : 'partial',
-        suggestedAnswer: success ? undefined : line.he
-      });
-    }, 800);
+    onResult({
+      userResponse: success ? line.he : 'skipped',
+      isCorrect: success,
+      resultType: success ? 'correct' : 'partial',
+      suggestedAnswer: success ? undefined : line.he
+    });
   }, [line, onResult]);
 
   return (
@@ -125,7 +119,7 @@ export default function ShadowRepeat({ line, onResult }) {
       )}
 
       {/* Completion buttons */}
-      {hasPlayed && !isCompleted && (
+      {hasPlayed && (
         <div className="flex gap-3 mt-4">
           <button
             onClick={() => handleComplete(true)}
@@ -150,16 +144,6 @@ export default function ShadowRepeat({ line, onResult }) {
           >
             ⏭️ {t('conversation.modules.shadowRepeat.skip', "Skip for now")}
           </button>
-        </div>
-      )}
-
-      {/* Feedback message */}
-      {isCompleted && (
-        <div className={`
-          p-4 rounded-lg text-center font-medium
-          bg-emerald-500/20 text-emerald-300 border border-emerald-500/50
-        `}>
-          {t('conversation.modules.shadowRepeat.feedback', 'Great job practicing!')}
         </div>
       )}
 
