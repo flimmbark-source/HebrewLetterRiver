@@ -245,11 +245,14 @@ class TtsService {
 
     console.log('[TTS] Has voice for locale:', hasVoiceForLocale, '(locale:', locale, ')');
 
-    // If no voice for the target locale and we have transliteration, use English fallback
-    if (!hasVoiceForLocale && transliteration && locale !== 'en-US') {
-      console.log('[TTS] No voice for locale, using English fallback with transliteration');
+    // ALWAYS use transliteration fallback for non-English languages
+    // Even if voices are reported as available, they often don't work reliably
+    // This ensures consistent audio playback across all systems
+    if (transliteration && locale !== 'en-US') {
+      console.log('[TTS] Using English with transliteration for reliable audio playback');
       textToSpeak = this.normalizeTranslit(transliteration);
       locale = 'en-US';
+      console.log('[TTS] Transliterated text:', textToSpeak);
     }
 
     // SKIP voice selection - always use browser default
