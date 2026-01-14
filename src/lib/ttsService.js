@@ -236,30 +236,14 @@ class TtsService {
       console.log('[TTS] Voices not loaded yet, using default');
     }
 
-    // Check if we have voices for this locale
-    const hasVoiceForLocale = voices.some(v => {
-      const vLang = v.lang.toLowerCase().replace(/^iw(\b|[-_])/i, 'he$1');
-      const targetLang = locale.toLowerCase().replace(/^iw(\b|[-_])/i, 'he$1');
-      return vLang.startsWith(targetLang.split('-')[0]);
-    });
+    // Find the best voice for this locale
+    const voice = this.pickVoiceForLocale(locale, synth);
 
-    console.log('[TTS] Has voice for locale:', hasVoiceForLocale, '(locale:', locale, ')');
-
-    // ALWAYS use transliteration fallback for non-English languages
-    // Even if voices are reported as available, they often don't work reliably
-    // This ensures consistent audio playback across all systems
-    if (transliteration && locale !== 'en-US') {
-      console.log('[TTS] Using English with transliteration for reliable audio playback');
-      textToSpeak = this.normalizeTranslit(transliteration);
-      locale = 'en-US';
-      console.log('[TTS] Transliterated text:', textToSpeak);
+    if (voice) {
+      console.log('[TTS] Selected voice:', voice.name, '(', voice.lang, ')');
+    } else {
+      console.log('[TTS] No specific voice found, using browser default for locale:', locale);
     }
-
-    // SKIP voice selection - always use browser default
-    // On Android, selecting a specific voice can break subsequent playback
-    // Just set the lang attribute and let the browser choose
-    console.log('[TTS] Using default voice for locale:', locale);
-    const voice = null;
 
     // Create a fresh utterance
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -267,8 +251,10 @@ class TtsService {
     if (voice) {
       utterance.voice = voice;
       utterance.lang = voice.lang;
+      console.log('[TTS] Using voice:', voice.name, 'with lang:', voice.lang);
     } else {
       utterance.lang = locale;
+      console.log('[TTS] Using default voice with lang:', locale);
     }
 
     utterance.rate = mode === 'sentence' ? 0.9 : 0.85;
@@ -298,6 +284,19 @@ class TtsService {
       const duration = Date.now() - this.lastSpeakTime;
       if (!started || duration < 100) {
         console.warn('[TTS] ⚠️ Finished too quickly (', duration, 'ms), probably did not play audio');
+
+        // Try fallback to transliteration if we haven't already and this was a non-English voice
+        if (locale !== 'en-US' && transliteration) {
+          console.log('[TTS] Retrying with English transliteration fallback...');
+          setTimeout(() => {
+            this.speakSmart({
+              nativeText: this.normalizeTranslit(transliteration),
+              nativeLocale: 'en-US',
+              transliteration,
+              mode
+            });
+          }, 100);
+        }
       } else {
         console.log('[TTS] ✓ Finished speaking (', duration, 'ms)');
       }
