@@ -113,22 +113,22 @@ export default function ConversationBeatScreen({
     <div className="flex flex-col h-screen bg-slate-900 text-slate-100">
       {/* Top bar */}
       <div className="bg-slate-800/80 border-b border-slate-700 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-3">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
           <div className="flex items-center justify-between">
             {/* Left: Scenario info */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
               <button
                 onClick={onExit}
-                className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0"
                 aria-label={t('conversation.beat.exit', 'Exit')}
               >
-                <span className="text-xl">←</span>
+                <span className="text-lg sm:text-xl">←</span>
               </button>
-              <div>
-                <div className="text-sm font-medium text-slate-400">
+              <div className="min-w-0">
+                <div className="text-xs sm:text-sm font-medium text-slate-400 truncate">
                   {t(scenario.metadata.titleKey, scenario.metadata.theme)}
                 </div>
-                <div className="text-xs text-slate-500">
+                <div className="text-[10px] sm:text-xs text-slate-500">
                   {t('conversation.beat.progress', 'Beat {{current}} of {{total}}', {
                     current: beatIndex + 1,
                     total: totalBeats
@@ -138,12 +138,12 @@ export default function ConversationBeatScreen({
             </div>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
               {/* Transcript toggle */}
               <button
                 onClick={toggleTranscript}
                 className={`
-                  px-3 py-2 rounded-lg text-sm font-medium
+                  px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium
                   transition-all duration-200
                   ${showTranscript
                     ? 'bg-blue-600 text-white'
@@ -151,13 +151,14 @@ export default function ConversationBeatScreen({
                   }
                 `}
               >
-                📜 {t('conversation.beat.transcript', 'Transcript')}
+                <span className="hidden sm:inline">📜 {t('conversation.beat.transcript', 'Transcript')}</span>
+                <span className="sm:hidden">📜</span>
               </button>
 
               {/* Save phrase button */}
               <button
                 onClick={handleSavePhrase}
-                className="px-3 py-2 rounded-lg text-sm font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+                className="px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
                 title={t('conversation.beat.savePhrase', 'Save phrase to SRS')}
               >
                 💾
@@ -166,7 +167,7 @@ export default function ConversationBeatScreen({
           </div>
 
           {/* Progress bar */}
-          <div className="mt-3 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+          <div className="mt-2 sm:mt-3 h-1 sm:h-1.5 bg-slate-700 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500 ease-out"
               style={{ width: `${progressPercent}%` }}
@@ -177,14 +178,14 @@ export default function ConversationBeatScreen({
 
       {/* Main content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
           {/* Transcript panel (collapsible) */}
           {showTranscript && attemptHistory.length > 0 && (
-            <div className="mb-6 p-4 bg-slate-800/50 rounded-xl border border-slate-700">
-              <h3 className="text-lg font-semibold mb-4 text-slate-300">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-slate-300">
                 {t('conversation.beat.transcriptTitle', 'Previous beats')}
               </h3>
-              <div className="flex flex-col gap-3 max-h-64 overflow-y-auto">
+              <div className="flex flex-col gap-2 sm:gap-3 max-h-64 overflow-y-auto">
                 {attemptHistory.map((attempt, idx) => {
                   const attemptLine = scenario.lines.find(l => l.id === attempt.beat.lineId);
                   if (!attemptLine) return null;
@@ -192,18 +193,18 @@ export default function ConversationBeatScreen({
                   return (
                     <div
                       key={idx}
-                      className="flex flex-col gap-1 p-3 bg-slate-800 rounded-lg border border-slate-700/50"
+                      className="flex flex-col gap-1 p-2.5 sm:p-3 bg-slate-800 rounded-lg border border-slate-700/50"
                     >
                       {/* Hebrew */}
-                      <div className="text-sm font-semibold text-slate-200" dir="rtl">
+                      <div className="text-sm sm:text-base font-semibold text-slate-200" dir="rtl">
                         {attemptLine.he}
                       </div>
                       {/* English */}
-                      <div className="text-xs text-slate-400">
+                      <div className="text-xs sm:text-sm text-slate-400">
                         {attemptLine.en}
                       </div>
                       {/* Result indicator */}
-                      <div className="text-xs">
+                      <div className="text-[10px] sm:text-xs">
                         {attempt.isCorrect ? (
                           <span className="text-emerald-400">✓ Correct</span>
                         ) : (
@@ -218,7 +219,7 @@ export default function ConversationBeatScreen({
           )}
 
           {/* Module panel */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             {renderModule()}
           </div>
         </div>

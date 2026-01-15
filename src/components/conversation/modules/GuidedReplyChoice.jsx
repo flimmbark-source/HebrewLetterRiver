@@ -90,29 +90,29 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
   }, [selectedChoice, isSubmitted, line]);
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl mx-auto">
+    <div className="flex flex-col gap-4 sm:gap-6 max-w-2xl mx-auto">
       {/* Instructions */}
       <div className="text-center">
-        <h3 className="text-xl font-semibold text-slate-200 mb-2">
+        <h3 className="text-lg sm:text-xl font-semibold text-slate-200 mb-1 sm:mb-2">
           {t('conversation.modules.guidedReplyChoice.instruction', 'Choose the Hebrew phrase')}
         </h3>
-        <p className="text-slate-400">
+        <p className="text-sm sm:text-base text-slate-400">
           {t('conversation.modules.guidedReplyChoice.hint', 'Pick the correct Hebrew response')}
         </p>
       </div>
 
       {/* Context - show English meaning */}
-      <div className="p-6 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-700/50">
-        <div className="text-sm font-medium text-slate-400 mb-2 text-center">
+      <div className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-700/50">
+        <div className="text-xs sm:text-sm font-medium text-slate-400 mb-1 sm:mb-2 text-center">
           {t('conversation.modules.guidedReplyChoice.contextLabel', 'You want to say:')}
         </div>
-        <div className="text-2xl font-semibold text-slate-100 text-center">
+        <div className="text-lg sm:text-2xl font-semibold text-slate-100 text-center">
           {line.en}
         </div>
       </div>
 
       {/* Multiple choice options (Hebrew) */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2 sm:gap-3">
         {choices.map((choice) => (
           <div
             key={choice.id}
@@ -127,10 +127,10 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
               }
             }}
           >
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2 sm:gap-3">
               {/* Radio indicator */}
               <div className={`
-                w-6 h-6 rounded-full border-2 flex-shrink-0 mt-1
+                w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex-shrink-0 mt-0.5 sm:mt-1
                 flex items-center justify-center transition-all
                 ${selectedChoice?.id === choice.id
                   ? 'border-blue-500 bg-blue-500'
@@ -139,20 +139,20 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
                 ${isSubmitted && choice.he === line.he ? 'border-emerald-500 bg-emerald-500' : ''}
               `}>
                 {(selectedChoice?.id === choice.id || (isSubmitted && choice.he === line.he)) && (
-                  <div className="w-2 h-2 bg-white rounded-full" />
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full" />
                 )}
               </div>
 
               {/* Choice content */}
-              <div className="flex-1 flex flex-col gap-2">
+              <div className="flex-1 flex flex-col gap-1 sm:gap-2 min-w-0">
                 {/* Hebrew text */}
-                <div className="text-xl font-semibold" dir="rtl">
+                <div className="text-base sm:text-xl font-semibold" dir="rtl">
                   {choice.he}
                 </div>
 
                 {/* Transliteration hint */}
                 {choice.tl && (
-                  <div className="text-sm text-slate-400 italic">
+                  <div className="text-xs sm:text-sm text-slate-400 italic">
                     {choice.tl}
                   </div>
                 )}
@@ -168,16 +168,16 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
                   nativeLocale="he-IL"
                   transliteration={choice.tl}
                   variant="icon"
-                  className="!p-2 !min-w-[36px] !min-h-[36px]"
+                  className="!p-1.5 sm:!p-2 !min-w-[32px] sm:!min-w-[36px] !min-h-[32px] sm:!min-h-[36px]"
                 />
               </div>
 
               {/* Feedback icons */}
               {isSubmitted && choice.he === line.he && (
-                <span className="text-2xl flex-shrink-0">✅</span>
+                <span className="text-xl sm:text-2xl flex-shrink-0">✅</span>
               )}
               {isSubmitted && selectedChoice?.id === choice.id && choice.he !== line.he && (
-                <span className="text-2xl flex-shrink-0">❌</span>
+                <span className="text-xl sm:text-2xl flex-shrink-0">❌</span>
               )}
             </div>
           </div>
@@ -190,10 +190,10 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
           onClick={handleSubmit}
           disabled={!selectedChoice}
           className={`
-            py-3 px-6 rounded-lg font-semibold text-lg
+            py-2.5 sm:py-3 px-5 sm:px-6 rounded-lg font-semibold text-base sm:text-lg
             transition-all duration-200
             ${selectedChoice
-              ? 'bg-blue-600 hover:bg-blue-500 text-white cursor-pointer hover:scale-105 active:scale-95'
+              ? 'bg-blue-600 hover:bg-blue-500 text-white cursor-pointer active:scale-95'
               : 'bg-slate-700 text-slate-500 cursor-not-allowed opacity-50'
             }
           `}
@@ -205,7 +205,7 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
       {/* Feedback message */}
       {isSubmitted && (
         <div className={`
-          p-4 rounded-lg text-center font-medium
+          p-3 sm:p-4 rounded-lg text-center font-medium text-sm sm:text-base
           ${selectedChoice.he === line.he
             ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50'
             : 'bg-red-500/20 text-red-300 border border-red-500/50'
@@ -214,10 +214,10 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
           {selectedChoice.he === line.he
             ? t('conversation.modules.correct', 'Correct!')
             : (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5 sm:gap-2">
                 <div>{t('conversation.modules.incorrect', 'Not quite.')}</div>
-                <div className="text-lg" dir="rtl">{line.he}</div>
-                <div className="text-sm opacity-75">{line.tl}</div>
+                <div className="text-base sm:text-lg" dir="rtl">{line.he}</div>
+                <div className="text-xs sm:text-sm opacity-75">{line.tl}</div>
               </div>
             )
           }
