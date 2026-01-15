@@ -114,11 +114,18 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
       {/* Multiple choice options (Hebrew) */}
       <div className="flex flex-col gap-3">
         {choices.map((choice) => (
-          <button
+          <div
             key={choice.id}
             onClick={() => handleChoiceClick(choice)}
             className={getChoiceStyles(choice)}
-            disabled={isSubmitted}
+            role="button"
+            tabIndex={isSubmitted ? -1 : 0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleChoiceClick(choice);
+              }
+            }}
           >
             <div className="flex items-start gap-3">
               {/* Radio indicator */}
@@ -152,7 +159,10 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
               </div>
 
               {/* Audio button for each choice */}
-              <div className="flex-shrink-0">
+              <div
+                className="flex-shrink-0"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <SpeakButton
                   nativeText={choice.he}
                   nativeLocale="he-IL"
@@ -170,7 +180,7 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
                 <span className="text-2xl flex-shrink-0">❌</span>
               )}
             </div>
-          </button>
+          </div>
         ))}
       </div>
 
