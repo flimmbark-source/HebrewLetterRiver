@@ -170,3 +170,80 @@ export interface ConversationProgressEntry {
   /** Placeholder for future spaced repetition */
   nextReviewAt?: string;
 }
+
+/**
+ * Dual-role conversation types for alternating A/B dialogue practice
+ */
+
+/** Speaker role in a dialogue turn */
+export type SpeakerRole = 'A' | 'B';
+
+/** Step type within a turn: introduce or reinforce */
+export type TurnStepType = 'introduce' | 'reinforce';
+
+/**
+ * A single turn in a dual-role conversation
+ * Each turn has one line and is executed as Introduce + Reinforce steps
+ */
+export interface ConversationTurn {
+  /** Line ID for this turn */
+  lineId: string;
+  /** Which speaker says this line */
+  role: SpeakerRole;
+  /** Module pairing to use for this turn */
+  pairing: 'listen-shadow' | 'type-choose';
+  /** Whether this line is considered "new" (requires reinforcement) */
+  isNew?: boolean;
+}
+
+/**
+ * A complete dual-role conversation script
+ * Represents a short dialogue sequence with alternating A/B turns
+ */
+export interface DualRoleConversationScript {
+  /** Unique script identifier */
+  id: string;
+  /** Title/name of this conversation */
+  title: string;
+  /** Description of the conversation context */
+  description: string;
+  /** Ordered array of turns (alternates A/B) */
+  turns: ConversationTurn[];
+  /** Source scenario ID (optional) */
+  sourceScenarioId?: string;
+  /** Difficulty level (1-5) */
+  difficulty: number;
+}
+
+/**
+ * A single step within a turn (either introduce or reinforce)
+ */
+export interface TurnStep {
+  /** Unique identifier for this step */
+  id: string;
+  /** Line ID being practiced */
+  lineId: string;
+  /** Speaker role */
+  role: SpeakerRole;
+  /** Step type within the turn */
+  stepType: TurnStepType;
+  /** Module to use for this step */
+  moduleId: ConversationModuleType;
+  /** Configuration for this step */
+  config?: Record<string, any>;
+}
+
+/**
+ * Dual-role session state
+ * Extends the regular session with turn tracking
+ */
+export interface DualRoleSessionState extends ConversationSessionState {
+  /** The dual-role script being practiced */
+  script: DualRoleConversationScript;
+  /** Current turn index in the script */
+  currentTurnIndex: number;
+  /** Current step within the turn (0 = introduce, 1 = reinforce) */
+  currentStepInTurn: number;
+  /** All steps expanded from the script */
+  steps: TurnStep[];
+}

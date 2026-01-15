@@ -69,3 +69,7 @@ export function getModuleById(moduleId: string): ConversationModule | undefined 
 // Re-export types
 export * from './types.ts';
 export * from './scenarioFactory.ts';
+
+// Re-export dual-role exports
+export * from './dualRoleConversation.ts';
+export * from './dualRoleScripts.ts';
