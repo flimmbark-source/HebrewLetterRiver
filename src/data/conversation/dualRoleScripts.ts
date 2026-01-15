@@ -7,13 +7,13 @@
  */
 
 import { sentencesByTheme } from '../sentences/index.ts';
-import { allConversationScenarios } from './index.ts';
+import { buildAllScenarios } from './scenarioFactory.ts';
 import {
   generateBeginnerScript,
   createGreetingScript,
   generateDualRoleScript
 } from './dualRoleConversation.ts';
-import type { DualRoleConversationScript } from './types.ts';
+import type { DualRoleConversationScript, ConversationScenario } from './types.ts';
 
 /**
  * Generate all dual-role scripts from available content
@@ -21,9 +21,12 @@ import type { DualRoleConversationScript } from './types.ts';
 function generateAllDualRoleScripts(): DualRoleConversationScript[] {
   const scripts: DualRoleConversationScript[] = [];
 
+  // Build scenarios directly to avoid circular dependency
+  const allScenarios = buildAllScenarios(sentencesByTheme);
+
   // Find scenario IDs for progress tracking
   const getScenarioId = (themeKey: string) => {
-    const scenario = allConversationScenarios.find(
+    const scenario = allScenarios.find(
       s => s.metadata.theme === themeKey
     );
     return scenario?.metadata.id;
@@ -100,7 +103,10 @@ export function getDualRoleScriptsByDifficulty(minDiff: number, maxDiff: number)
 /**
  * Get the source scenario for a dual-role script
  */
-export function getSourceScenarioForScript(script: DualRoleConversationScript) {
+export function getSourceScenarioForScript(script: DualRoleConversationScript): ConversationScenario | null {
   if (!script.sourceScenarioId) return null;
-  return allConversationScenarios.find(s => s.metadata.id === script.sourceScenarioId);
+
+  // Build scenarios to find the matching one
+  const allScenarios = buildAllScenarios(sentencesByTheme);
+  return allScenarios.find(s => s.metadata.id === script.sourceScenarioId) || null;
 }
