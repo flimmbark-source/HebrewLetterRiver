@@ -28,6 +28,7 @@ export default function ConversationBeatScreen({
   const { t } = useLocalization();
   const [showTranscript, setShowTranscript] = useState(false);
   const [showNextBanner, setShowNextBanner] = useState(false);
+  const [showFeedbackBanner, setShowFeedbackBanner] = useState(false);
   const [pendingResult, setPendingResult] = useState(null);
 
   // Find the line for this beat
@@ -41,13 +42,21 @@ export default function ConversationBeatScreen({
   }, [scenario.lines, beat.lineId]);
 
   const handleModuleResult = useCallback((result) => {
-    // Store the result and show the next banner
+    // Store the result and show the feedback banner first
     setPendingResult({
       beat,
       ...result,
       timestamp: new Date().toISOString()
     });
-    setShowNextBanner(true);
+    setShowFeedbackBanner(true);
+
+    // After 2 seconds, hide feedback and show next banner
+    setTimeout(() => {
+      setShowFeedbackBanner(false);
+      setTimeout(() => {
+        setShowNextBanner(true);
+      }, 300); // Small delay for smooth transition
+    }, 2000);
   }, [beat]);
 
   const handleNext = useCallback(() => {
@@ -237,53 +246,65 @@ export default function ConversationBeatScreen({
         </div>
       </div>
 
+      {/* Feedback banner - slides down from top */}
+      <div
+        className={`fixed top-0 left-0 right-0 bg-gradient-to-b from-slate-800 via-slate-800 to-slate-800/95 border-b border-slate-700 shadow-2xl z-30 transition-all duration-300 ease-out ${
+          showFeedbackBanner ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
+        }`}
+      >
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex items-center justify-center gap-4 sm:gap-6">
+            {pendingResult?.isCorrect ? (
+              <>
+                <span className="text-5xl sm:text-6xl">✅</span>
+                <div className="text-center">
+                  <div className="text-2xl sm:text-3xl font-bold text-emerald-400 mb-1 sm:mb-2">
+                    {t('conversation.beat.correct', 'Correct!')}
+                  </div>
+                  <div className="text-base sm:text-lg text-slate-300">
+                    {t('conversation.beat.greatJob', 'Great job!')}
+                  </div>
+                </div>
+                <span className="text-5xl sm:text-6xl">✅</span>
+              </>
+            ) : (
+              <>
+                <span className="text-5xl sm:text-6xl">💪</span>
+                <div className="text-center">
+                  <div className="text-2xl sm:text-3xl font-bold text-amber-400 mb-1 sm:mb-2">
+                    {t('conversation.beat.keepGoing', 'Keep practicing!')}
+                  </div>
+                  <div className="text-base sm:text-lg text-slate-300">
+                    {pendingResult?.suggestedAnswer
+                      ? `${t('conversation.beat.correctAnswer', 'Correct answer')}: ${pendingResult.suggestedAnswer}`
+                      : t('conversation.beat.tryAgain', 'You\'ll get it next time')
+                    }
+                  </div>
+                </div>
+                <span className="text-5xl sm:text-6xl">💪</span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Next button banner - slides up from bottom */}
       <div
-        className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-slate-800 via-slate-800 to-transparent border-t border-slate-700 shadow-2xl z-20 transition-all duration-300 ease-out ${
+        className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-slate-800 via-slate-800 to-slate-800/95 border-t border-slate-700 shadow-2xl z-20 transition-all duration-300 ease-out ${
           showNextBanner ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
         }`}
       >
-          <div className="max-w-4xl mx-auto px-4 py-4 sm:py-5">
-            <div className="flex items-center justify-between gap-4">
-              {/* Feedback message */}
-              <div className="flex items-center gap-3">
-                {pendingResult?.isCorrect ? (
-                  <>
-                    <span className="text-2xl sm:text-3xl">✅</span>
-                    <div>
-                      <div className="text-base sm:text-lg font-bold text-emerald-400">
-                        {t('conversation.beat.correct', 'Correct!')}
-                      </div>
-                      <div className="text-xs sm:text-sm text-slate-400">
-                        {t('conversation.beat.greatJob', 'Great job!')}
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-2xl sm:text-3xl">💪</span>
-                    <div>
-                      <div className="text-base sm:text-lg font-bold text-amber-400">
-                        {t('conversation.beat.keepGoing', 'Keep practicing!')}
-                      </div>
-                      <div className="text-xs sm:text-sm text-slate-400">
-                        {pendingResult?.suggestedAnswer || t('conversation.beat.tryAgain', 'You\'ll get it next time')}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* Next button */}
-              <button
-                onClick={handleNext}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-base sm:text-lg rounded-lg transition-all duration-200 active:scale-95 shadow-lg flex items-center gap-2 flex-shrink-0"
-              >
-                {t('conversation.beat.next', 'Next')}
-                <span className="text-xl">→</span>
-              </button>
-            </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 sm:py-6">
+          <div className="flex items-center justify-center">
+            <button
+              onClick={handleNext}
+              className="px-8 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xl sm:text-2xl rounded-xl transition-all duration-200 active:scale-95 shadow-lg flex items-center gap-3 sm:gap-4"
+            >
+              {t('conversation.beat.next', 'Next')}
+              <span className="text-2xl sm:text-3xl">→</span>
+            </button>
           </div>
+        </div>
       </div>
     </div>
   );

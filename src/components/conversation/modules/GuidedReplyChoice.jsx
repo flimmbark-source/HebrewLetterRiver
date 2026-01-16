@@ -54,15 +54,13 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
     const isCorrect = selectedChoice.he === line.he;
     setIsSubmitted(true);
 
-    // Emit result after a short delay to show feedback
-    setTimeout(() => {
-      onResult({
-        userResponse: selectedChoice.he,
-        isCorrect,
-        resultType: isCorrect ? 'correct' : 'incorrect',
-        suggestedAnswer: isCorrect ? undefined : line.he
-      });
-    }, 1000);
+    // Emit result immediately - feedback will be shown in top banner
+    onResult({
+      userResponse: selectedChoice.he,
+      isCorrect,
+      resultType: isCorrect ? 'correct' : 'incorrect',
+      suggestedAnswer: isCorrect ? undefined : line.he
+    });
   }, [selectedChoice, isSubmitted, line, onResult]);
 
   const getChoiceStyles = useCallback((choice) => {
@@ -200,28 +198,6 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
         >
           {t('conversation.modules.submit', 'Submit')}
         </button>
-      )}
-
-      {/* Feedback message */}
-      {isSubmitted && (
-        <div className={`
-          p-3 sm:p-4 rounded-lg text-center font-medium text-sm sm:text-base
-          ${selectedChoice.he === line.he
-            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50'
-            : 'bg-red-500/20 text-red-300 border border-red-500/50'
-          }
-        `}>
-          {selectedChoice.he === line.he
-            ? t('conversation.modules.correct', 'Correct!')
-            : (
-              <div className="flex flex-col gap-1.5 sm:gap-2">
-                <div>{t('conversation.modules.incorrect', 'Not quite.')}</div>
-                <div className="text-base sm:text-lg" dir="rtl">{line.he}</div>
-                <div className="text-xs sm:text-sm opacity-75">{line.tl}</div>
-              </div>
-            )
-          }
-        </div>
       )}
     </div>
   );

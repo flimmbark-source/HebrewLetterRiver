@@ -45,15 +45,13 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
       const isCorrect = choice.text === line.en;
       setIsSubmitted(true);
 
-      // Emit result after a short delay to show feedback
-      setTimeout(() => {
-        onResult({
-          userResponse: choice.text,
-          isCorrect,
-          resultType: isCorrect ? 'correct' : 'incorrect',
-          suggestedAnswer: isCorrect ? undefined : line.en
-        });
-      }, 1000);
+      // Emit result immediately - feedback will be shown in top banner
+      onResult({
+        userResponse: choice.text,
+        isCorrect,
+        resultType: isCorrect ? 'correct' : 'incorrect',
+        suggestedAnswer: isCorrect ? undefined : line.en
+      });
     } else {
       // Otherwise, just select it
       setSelectedChoice(choice);
@@ -167,22 +165,6 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
       {!isSubmitted && selectedChoice && (
         <div className="text-center text-sm text-slate-400">
           {t('conversation.modules.listenMeaningChoice.submitHint', 'Click the play button to submit your answer')}
-        </div>
-      )}
-
-      {/* Feedback message */}
-      {isSubmitted && (
-        <div className={`
-          p-4 rounded-lg text-center font-medium
-          ${selectedChoice.text === line.en
-            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50'
-            : 'bg-red-500/20 text-red-300 border border-red-500/50'
-          }
-        `}>
-          {selectedChoice.text === line.en
-            ? t('conversation.modules.correct', 'Correct!')
-            : t('conversation.modules.incorrect', 'Not quite. The correct answer is: ') + line.en
-          }
         </div>
       )}
     </div>
