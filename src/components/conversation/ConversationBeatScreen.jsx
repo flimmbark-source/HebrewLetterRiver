@@ -294,14 +294,14 @@ export default function ConversationBeatScreen({
           showNextBanner ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
         }`}
       >
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 sm:py-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
           <div className="flex items-center justify-center">
             <button
               onClick={handleNext}
-              className="px-8 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xl sm:text-2xl rounded-xl transition-all duration-200 active:scale-95 shadow-lg flex items-center gap-3 sm:gap-4"
+              className="px-16 sm:px-20 py-6 sm:py-8 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-2xl sm:text-3xl rounded-2xl transition-all duration-200 active:scale-95 shadow-lg flex items-center gap-4 sm:gap-6"
             >
               {t('conversation.beat.next', 'Next')}
-              <span className="text-2xl sm:text-3xl">→</span>
+              <span className="text-3xl sm:text-4xl">→</span>
             </button>
           </div>
         </div>

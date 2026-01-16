@@ -214,37 +214,37 @@ export default function LearnView() {
         <div className="px-1">
           <button
             onClick={() => setShowConversationMode(true)}
-            className="w-full text-left bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-2 border-blue-200 hover:border-blue-300 rounded-xl p-6 transition-all duration-200 shadow-sm hover:shadow-md"
+            className="w-full text-left bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-2 border-blue-200 hover:border-blue-300 rounded-xl p-4 sm:p-6 transition-all duration-200 shadow-sm hover:shadow-md"
           >
-            <div className="flex items-start gap-4">
-              <div className="text-4xl flex-shrink-0">💬</div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-slate-900 mb-1">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="text-3xl sm:text-4xl flex-shrink-0">💬</div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1">
                   {t('conversation.card.title', 'Conversation Practice')}
                 </h3>
-                <p className="text-sm text-slate-600 mb-3">
+                <p className="text-xs sm:text-sm text-slate-600 mb-2 sm:mb-3">
                   {t('conversation.card.description', 'Practice real-world Hebrew conversations with interactive exercises')}
                 </p>
-                <div className="flex items-center gap-4 text-xs text-slate-600">
+                <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-slate-600 flex-wrap">
                   <span className="flex items-center gap-1">
                     <span>🎧</span>
-                    {t('conversation.card.feature1', 'Listen')}
+                    <span className="hidden sm:inline">{t('conversation.card.feature1', 'Listen')}</span>
                   </span>
                   <span className="flex items-center gap-1">
                     <span>🗣️</span>
-                    {t('conversation.card.feature2', 'Speak')}
+                    <span className="hidden sm:inline">{t('conversation.card.feature2', 'Speak')}</span>
                   </span>
                   <span className="flex items-center gap-1">
                     <span>⌨️</span>
-                    {t('conversation.card.feature3', 'Type')}
+                    <span className="hidden sm:inline">{t('conversation.card.feature3', 'Type')}</span>
                   </span>
                   <span className="flex items-center gap-1">
                     <span>💬</span>
-                    {t('conversation.card.feature4', 'Choose')}
+                    <span className="hidden sm:inline">{t('conversation.card.feature4', 'Choose')}</span>
                   </span>
                 </div>
               </div>
-              <div className="text-2xl text-slate-400">→</div>
+              <div className="text-xl sm:text-2xl text-slate-400 flex-shrink-0">→</div>
             </div>
           </button>
         </div>
