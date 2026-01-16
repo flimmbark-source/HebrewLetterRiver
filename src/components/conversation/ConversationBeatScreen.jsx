@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import ListenMeaningChoice from './modules/ListenMeaningChoice.jsx';
 import ShadowRepeat from './modules/ShadowRepeat.jsx';
@@ -31,6 +31,14 @@ export default function ConversationBeatScreen({
   const [showFeedbackBanner, setShowFeedbackBanner] = useState(false);
   const [pendingResult, setPendingResult] = useState(null);
 
+  // Hide main app navigation bar while in conversation practice
+  useEffect(() => {
+    document.body.classList.add('in-conversation-practice');
+    return () => {
+      document.body.classList.remove('in-conversation-practice');
+    };
+  }, []);
+
   // Find the line for this beat
   const currentLine = useMemo(() => {
     return scenario.lines.find(l => l.id === beat.lineId);
@@ -42,27 +50,21 @@ export default function ConversationBeatScreen({
   }, [scenario.lines, beat.lineId]);
 
   const handleModuleResult = useCallback((result) => {
-    // Store the result and show the feedback banner first
+    // Store the result and show both banners at the same time
     setPendingResult({
       beat,
       ...result,
       timestamp: new Date().toISOString()
     });
     setShowFeedbackBanner(true);
-
-    // After 2 seconds, hide feedback and show next banner
-    setTimeout(() => {
-      setShowFeedbackBanner(false);
-      setTimeout(() => {
-        setShowNextBanner(true);
-      }, 300); // Small delay for smooth transition
-    }, 2000);
+    setShowNextBanner(true);
   }, [beat]);
 
   const handleNext = useCallback(() => {
     if (pendingResult) {
       onBeatComplete(pendingResult);
       setShowNextBanner(false);
+      setShowFeedbackBanner(false);
       setPendingResult(null);
     }
   }, [pendingResult, onBeatComplete]);
@@ -132,8 +134,8 @@ export default function ConversationBeatScreen({
 
   return (
     <div className="flex flex-col h-screen bg-slate-900 text-slate-100">
-      {/* Top bar - hidden */}
-      <div className="hidden bg-slate-800/80 border-b border-slate-700 backdrop-blur-sm sticky top-0 z-10">
+      {/* Top bar */}
+      <div className="bg-slate-800/80 border-b border-slate-700 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
           <div className="flex items-center justify-between">
             {/* Left: Scenario info */}

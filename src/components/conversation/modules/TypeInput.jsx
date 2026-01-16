@@ -16,6 +16,7 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [inputMode, setInputMode] = useState(mode === 'auto' ? 'transliteration' : mode);
   const [displayMode, setDisplayMode] = useState('english'); // Controls what's shown in "You want to say"
+  const [showPopup, setShowPopup] = useState(false);
   const inputRef = useRef(null);
 
   // Focus input on mount
@@ -89,6 +90,10 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
     setDisplayMode(prev => prev === 'english' ? 'hebrew' : 'english');
   }, [isSubmitted]);
 
+  const togglePopup = useCallback(() => {
+    setShowPopup(prev => !prev);
+  }, []);
+
   const getInputPlaceholder = useCallback(() => {
     if (inputMode === 'hebrew') {
       return t('conversation.modules.typeInput.placeholderHebrew', 'Type in Hebrew...');
@@ -112,13 +117,57 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
       </div>
 
       {/* Context - show based on display mode */}
-      <div className="p-6 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-700/50">
+      <div className="relative p-6 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-700/50">
         <div className="text-sm font-medium text-slate-400 mb-2 text-center">
           {t('conversation.modules.typeInput.contextLabel', 'You want to say:')}
         </div>
-        <div className="text-2xl font-semibold text-slate-100 text-center" dir={displayMode === 'hebrew' ? 'rtl' : 'ltr'}>
+        <div
+          className="text-2xl font-semibold text-slate-100 text-center cursor-pointer hover:text-blue-300 transition-colors"
+          dir={displayMode === 'hebrew' ? 'rtl' : 'ltr'}
+          onClick={togglePopup}
+        >
           {displayMode === 'english' ? line.en : line.he}
         </div>
+
+        {/* Popup with Hebrew, transliteration, and meaning */}
+        {showPopup && (
+          <div className="absolute top-full left-0 right-0 mt-2 z-50">
+            <div className="bg-slate-800 border-2 border-blue-500 rounded-lg shadow-2xl p-4">
+              <button
+                onClick={togglePopup}
+                className="absolute top-2 right-2 text-slate-400 hover:text-slate-200 text-xl leading-none"
+              >
+                ×
+              </button>
+
+              <div className="flex flex-col gap-3">
+                {/* Hebrew */}
+                <div className="text-center border-b border-slate-700 pb-3">
+                  <div className="text-xs text-slate-400 mb-1">Hebrew</div>
+                  <div className="text-xl font-semibold text-slate-100" dir="rtl">
+                    {line.he}
+                  </div>
+                </div>
+
+                {/* Transliteration */}
+                <div className="text-center border-b border-slate-700 pb-3">
+                  <div className="text-xs text-slate-400 mb-1">Transliteration</div>
+                  <div className="text-lg text-blue-300 italic">
+                    {line.tl}
+                  </div>
+                </div>
+
+                {/* English meaning */}
+                <div className="text-center">
+                  <div className="text-xs text-slate-400 mb-1">Meaning</div>
+                  <div className="text-base text-slate-200">
+                    {line.en}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Audio hint */}
         <div className="flex justify-center mt-4">

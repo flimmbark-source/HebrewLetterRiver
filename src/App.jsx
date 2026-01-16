@@ -238,6 +238,26 @@ function Shell() {
   const { currentTutorial, currentStepIndex } = useTutorial();
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
+  const [inConversationPractice, setInConversationPractice] = React.useState(false);
+
+  // Check if we're in conversation practice mode
+  React.useEffect(() => {
+    const checkConversationMode = () => {
+      setInConversationPractice(document.body.classList.contains('in-conversation-practice'));
+    };
+
+    // Check initially
+    checkConversationMode();
+
+    // Set up observer to watch for class changes
+    const observer = new MutationObserver(checkConversationMode);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Check if play button should be disabled during tutorial
   const isPlayDisabled = currentTutorial?.id === 'firstTime' && currentStepIndex < 4;
@@ -275,7 +295,7 @@ function Shell() {
           <Route path="/play" element={<Navigate to="/home" replace />} />
         </Routes>
       </main>
-      {!(isGameVisible && isGameRunning) && (
+      {!(isGameVisible && isGameRunning) && !inConversationPractice && (
         <nav className="bottom-nav">
           <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
