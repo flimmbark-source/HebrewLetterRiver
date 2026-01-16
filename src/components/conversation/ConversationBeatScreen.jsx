@@ -178,14 +178,14 @@ export default function ConversationBeatScreen({
 
       {/* Main content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {/* Transcript panel (collapsible) */}
           {showTranscript && attemptHistory.length > 0 && (
-            <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-              <h3 className="text-sm sm:text-base font-semibold mb-2 sm:mb-3 text-slate-300">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 text-slate-300">
                 {t('conversation.beat.transcriptTitle', 'Previous beats')}
               </h3>
-              <div className="flex flex-col gap-1.5 sm:gap-2 max-h-48 overflow-y-auto">
+              <div className="flex flex-col gap-2 sm:gap-3 max-h-60 overflow-y-auto">
                 {attemptHistory.map((attempt, idx) => {
                   const attemptLine = scenario.lines.find(l => l.id === attempt.beat.lineId);
                   if (!attemptLine) return null;
@@ -193,7 +193,7 @@ export default function ConversationBeatScreen({
                   return (
                     <div
                       key={idx}
-                      className="flex flex-col gap-1 p-2.5 sm:p-3 bg-slate-800 rounded-lg border border-slate-700/50"
+                      className="flex flex-col gap-1.5 p-3 bg-slate-800 rounded-lg border border-slate-700/50"
                     >
                       {/* Hebrew */}
                       <div className="text-sm sm:text-base font-semibold text-slate-200" dir="rtl">
@@ -204,7 +204,7 @@ export default function ConversationBeatScreen({
                         {attemptLine.en}
                       </div>
                       {/* Result indicator */}
-                      <div className="text-[10px] sm:text-xs">
+                      <div className="text-xs">
                         {attempt.isCorrect ? (
                           <span className="text-emerald-400">✓ Correct</span>
                         ) : (
