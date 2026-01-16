@@ -75,45 +75,25 @@ export default function ConversationScenarioList({
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
-        {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          {onBack && (
-            <button
-              onClick={onBack}
-              className="mb-3 sm:mb-4 flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-colors"
-            >
-              <span className="text-xl">←</span>
-              <span>{t('conversation.list.back', 'Back')}</span>
-            </button>
-          )}
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center p-3 sm:p-4">
+      <div className="max-w-3xl w-full">
+        {/* Header - compact */}
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="mb-2 flex items-center gap-1.5 text-slate-400 hover:text-slate-200 transition-colors"
+          >
+            <span className="text-base sm:text-lg">←</span>
+            <span className="text-xs sm:text-sm">{t('conversation.list.back', 'Back')}</span>
+          </button>
+        )}
 
-          <h1 className="text-2xl sm:text-4xl font-bold mb-1 sm:mb-2">
-            {t('conversation.list.title', 'Conversation Practice')}
-          </h1>
-          <p className="text-base sm:text-lg text-slate-400">
-            {t('conversation.list.subtitle', 'Practice real-world Hebrew conversations')}
-          </p>
-        </div>
+        <h1 className="text-lg sm:text-xl font-bold mb-3 text-center">
+          {mode === 'dual-role' ? 'Dual-Role Conversations' : 'Choose a Scenario'}
+        </h1>
 
-        {/* Intro message */}
-        <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-blue-900/20 border border-blue-700/50 rounded-lg">
-          <div className="flex items-start gap-3">
-            <span className="text-xl sm:text-2xl flex-shrink-0">💬</span>
-            <div>
-              <h3 className="font-semibold text-slate-200 mb-1 text-sm sm:text-base">
-                {t('conversation.list.intro.title', 'Learn through conversation')}
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300">
-                {t('conversation.list.intro.description', 'Each scenario teaches you practical phrases through listening, speaking, and typing exercises.')}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Items grid */}
-        <div className="grid gap-4">
+        {/* Items grid - compact */}
+        <div className="grid gap-2">
           {itemsWithStats.map((item) => {
             const completionPercent = item.stats.completionRate * 100;
             const hasProgress = item.stats.practicedLines > 0;
@@ -130,79 +110,35 @@ export default function ConversationScenarioList({
               <button
                 key={item.metadata.id}
                 onClick={handleClick}
-                className="w-full text-left bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-750 hover:to-slate-850 border border-slate-700 hover:border-slate-600 rounded-xl p-4 sm:p-6 transition-all duration-200 active:scale-98 shadow-lg hover:shadow-xl"
+                className="w-full text-left bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-750 hover:to-slate-850 border border-slate-700 hover:border-slate-600 rounded-lg p-2.5 sm:p-3 transition-all duration-200 active:scale-98 shadow-lg hover:shadow-xl"
               >
-                {/* Header row */}
-                <div className="flex items-start justify-between mb-2 sm:mb-3 gap-3">
+                {/* Single row layout */}
+                <div className="flex items-center justify-between gap-2 mb-1">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-xl font-bold text-slate-100 mb-0.5 sm:mb-1">
+                    <h3 className="text-sm sm:text-base font-bold text-slate-100 leading-tight">
                       {item.metadata.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-400">
-                      {item.metadata.subtitle}
-                    </p>
                   </div>
 
-                  {/* Difficulty badge */}
-                  <div className={`flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-slate-800/50 border border-slate-700 flex-shrink-0 ${getDifficultyColor(item.metadata.difficulty)}`}>
-                    <span className="text-xs sm:text-sm">
+                  {/* Compact stats */}
+                  <div className="flex items-center gap-2 flex-shrink-0 text-[10px] sm:text-xs text-slate-400">
+                    <span className={getDifficultyColor(item.metadata.difficulty)}>
                       {difficultyStars(item.metadata.difficulty)}
                     </span>
+                    <span>•</span>
+                    <span>{item.metadata.lineCount}</span>
                   </div>
                 </div>
 
-                {/* Stats row */}
-                <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-3 text-xs sm:text-sm flex-wrap">
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-slate-400">
-                    <span>{item.type === 'script' ? '🎭' : '💬'}</span>
-                    <span>
-                      {item.metadata.lineCount} {t('conversation.list.phrases', 'phrases')}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-slate-400">
-                    <span>🎯</span>
-                    <span>
-                      {item.metadata.beatsCount} {t('conversation.list.beats', 'beats')}
-                    </span>
-                  </div>
-
-                  {hasProgress && (
-                    <div className="flex items-center gap-1.5 sm:gap-2 text-blue-400">
-                      <span>📊</span>
-                      <span>
-                        {item.stats.practicedLines}/{item.stats.totalLines} {t('conversation.list.practiced', 'practiced')}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Progress bar */}
+                {/* Progress bar - compact */}
                 {hasProgress && (
-                  <div className="mb-2">
-                    <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-                      <span>{t('conversation.list.progress', 'Progress')}</span>
-                      <span>{Math.round(completionPercent)}%</span>
-                    </div>
-                    <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
-                        style={{ width: `${completionPercent}%` }}
-                      />
-                    </div>
+                  <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+                      style={{ width: `${completionPercent}%` }}
+                    />
                   </div>
                 )}
-
-                {/* Footer hint */}
-                <div className="mt-3 text-xs text-slate-500 flex items-center justify-between">
-                  <span>
-                    {hasProgress
-                      ? t('conversation.list.continue', 'Continue practicing')
-                      : t('conversation.list.start', 'Start learning')
-                    }
-                  </span>
-                  <span>→</span>
-                </div>
               </button>
             );
           })}
