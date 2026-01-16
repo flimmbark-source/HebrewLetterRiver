@@ -110,29 +110,46 @@ export default function ConversationScenarioList({
               <button
                 key={item.metadata.id}
                 onClick={handleClick}
-                className="w-full text-left bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-750 hover:to-slate-850 border border-slate-700 hover:border-slate-600 rounded-lg p-2.5 sm:p-3 transition-all duration-200 active:scale-98 shadow-lg hover:shadow-xl"
+                className="w-full text-left bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-750 hover:to-slate-850 border border-slate-700 hover:border-slate-600 rounded-lg p-3 sm:p-3.5 transition-all duration-200 active:scale-98 shadow-lg hover:shadow-xl"
               >
-                {/* Single row layout */}
-                <div className="flex items-center justify-between gap-2 mb-1">
+                {/* Header row */}
+                <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm sm:text-base font-bold text-slate-100 leading-tight">
+                    <h3 className="text-sm sm:text-base font-bold text-slate-100 leading-tight mb-1">
                       {item.metadata.title}
                     </h3>
+                    <p className="text-[11px] sm:text-xs text-slate-400 leading-tight">
+                      {item.metadata.subtitle}
+                    </p>
                   </div>
 
-                  {/* Compact stats */}
-                  <div className="flex items-center gap-2 flex-shrink-0 text-[10px] sm:text-xs text-slate-400">
-                    <span className={getDifficultyColor(item.metadata.difficulty)}>
-                      {difficultyStars(item.metadata.difficulty)}
-                    </span>
-                    <span>•</span>
-                    <span>{item.metadata.lineCount}</span>
+                  {/* Difficulty badge */}
+                  <div className={`flex items-center gap-1 px-2 py-1 rounded bg-slate-800/50 border border-slate-700 flex-shrink-0 text-[10px] sm:text-xs ${getDifficultyColor(item.metadata.difficulty)}`}>
+                    <span>{difficultyStars(item.metadata.difficulty)}</span>
                   </div>
                 </div>
 
-                {/* Progress bar - compact */}
+                {/* Stats row */}
+                <div className="flex items-center gap-3 text-[10px] sm:text-xs text-slate-400 mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <span>{item.type === 'script' ? '🎭' : '💬'}</span>
+                    <span>{item.metadata.lineCount} phrases</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span>🎯</span>
+                    <span>{item.metadata.beatsCount} beats</span>
+                  </div>
+                  {hasProgress && (
+                    <div className="flex items-center gap-1.5 text-blue-400">
+                      <span>📊</span>
+                      <span>{item.stats.practicedLines}/{item.stats.totalLines}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Progress bar */}
                 {hasProgress && (
-                  <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
                       style={{ width: `${completionPercent}%` }}

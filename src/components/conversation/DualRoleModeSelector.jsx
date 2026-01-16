@@ -72,8 +72,8 @@ export default function DualRoleModeSelector({ onSelectMode, onBack }) {
                 </div>
               )}
 
-              {/* Single row layout */}
-              <div className="flex items-center gap-2 pr-14 sm:pr-16">
+              {/* Header row */}
+              <div className="flex items-start gap-2 sm:gap-3 pr-14 sm:pr-16 mb-2">
                 <div className="text-xl sm:text-2xl flex-shrink-0">{mode.icon}</div>
                 <div className="flex-1 min-w-0">
                   <h2 className="text-sm sm:text-base font-bold text-slate-100 leading-tight">
@@ -83,6 +83,21 @@ export default function DualRoleModeSelector({ onSelectMode, onBack }) {
                     {mode.subtitle}
                   </p>
                 </div>
+              </div>
+
+              {/* Description */}
+              <p className="text-[11px] sm:text-xs text-slate-300 leading-snug mb-2">
+                {mode.description}
+              </p>
+
+              {/* Key features - compact */}
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] sm:text-xs text-slate-400">
+                {mode.features.slice(0, 2).map((feature, idx) => (
+                  <div key={idx} className="flex items-center gap-1">
+                    <span className="text-emerald-400">✓</span>
+                    <span>{feature}</span>
+                  </div>
+                ))}
               </div>
             </button>
           ))}
