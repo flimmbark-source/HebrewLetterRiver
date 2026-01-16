@@ -15,6 +15,7 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
   const [evaluation, setEvaluation] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [inputMode, setInputMode] = useState(mode === 'auto' ? 'transliteration' : mode);
+  const [displayMode, setDisplayMode] = useState('english'); // Controls what's shown in "You want to say"
   const inputRef = useRef(null);
 
   // Focus input on mount
@@ -53,30 +54,27 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
       });
       setIsSubmitted(true);
 
-      setTimeout(() => {
-        onResult({
-          userResponse: userInput,
-          isCorrect: false,
-          resultType: 'incorrect',
-          suggestedAnswer: inputMode === 'hebrew' ? line.he : line.tl
-        });
-      }, 1200);
+      // Emit result immediately - feedback will be shown in banner
+      onResult({
+        userResponse: userInput,
+        isCorrect: false,
+        resultType: 'incorrect',
+        suggestedAnswer: inputMode === 'hebrew' ? line.he : line.tl
+      });
       return;
     }
 
     setEvaluation(result);
     setIsSubmitted(true);
 
-    // Emit result after showing feedback
-    setTimeout(() => {
-      onResult({
-        userResponse: userInput,
-        isCorrect: result.status === 'correct',
-        resultType: result.status,
-        suggestedAnswer: result.status === 'correct' ? undefined : (inputMode === 'hebrew' ? line.he : line.tl),
-        score: result.blendedScore
-      });
-    }, 1200);
+    // Emit result immediately - feedback will be shown in banner
+    onResult({
+      userResponse: userInput,
+      isCorrect: result.status === 'correct',
+      resultType: result.status,
+      suggestedAnswer: result.status === 'correct' ? undefined : (inputMode === 'hebrew' ? line.he : line.tl),
+      score: result.blendedScore
+    });
   }, [userInput, isSubmitted, inputMode, line, onResult]);
 
   const handleKeyPress = useCallback((e) => {
@@ -86,11 +84,9 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
     }
   }, [handleSubmit]);
 
-  const toggleInputMode = useCallback(() => {
+  const toggleDisplayMode = useCallback(() => {
     if (isSubmitted) return;
-    setInputMode(prev => prev === 'hebrew' ? 'transliteration' : 'hebrew');
-    setUserInput('');
-    inputRef.current?.focus();
+    setDisplayMode(prev => prev === 'english' ? 'hebrew' : 'english');
   }, [isSubmitted]);
 
   const getInputPlaceholder = useCallback(() => {
@@ -115,13 +111,13 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
         </p>
       </div>
 
-      {/* Context - show English meaning */}
+      {/* Context - show based on display mode */}
       <div className="p-6 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-700/50">
         <div className="text-sm font-medium text-slate-400 mb-2 text-center">
           {t('conversation.modules.typeInput.contextLabel', 'You want to say:')}
         </div>
-        <div className="text-2xl font-semibold text-slate-100 text-center">
-          {line.en}
+        <div className="text-2xl font-semibold text-slate-100 text-center" dir={displayMode === 'hebrew' ? 'rtl' : 'ltr'}>
+          {displayMode === 'english' ? line.en : line.he}
         </div>
 
         {/* Audio hint */}
@@ -136,11 +132,11 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
         </div>
       </div>
 
-      {/* Input mode toggle (if auto mode) */}
+      {/* Display mode toggle (if auto mode) */}
       {mode === 'auto' && (
         <div className="flex justify-center">
           <button
-            onClick={toggleInputMode}
+            onClick={toggleDisplayMode}
             disabled={isSubmitted}
             className={`
               px-4 py-2 rounded-lg text-sm font-medium
@@ -151,9 +147,9 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
               }
             `}
           >
-            {inputMode === 'hebrew'
-              ? t('conversation.modules.typeInput.switchToTranslit', 'Switch to transliteration')
-              : t('conversation.modules.typeInput.switchToHebrew', 'Switch to Hebrew')
+            {displayMode === 'english'
+              ? t('conversation.modules.typeInput.switchToHebrew', 'Show Hebrew')
+              : t('conversation.modules.typeInput.switchToEnglish', 'Show English')
             }
           </button>
         </div>
@@ -224,77 +220,6 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
         >
           {t('conversation.modules.submit', 'Submit')}
         </button>
-      )}
-
-      {/* Feedback */}
-      {isSubmitted && evaluation && (
-        <div className="flex flex-col gap-3">
-          {/* Status message */}
-          <div className={`
-            p-4 rounded-lg text-center font-medium
-            ${evaluation.status === 'correct'
-              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50'
-              : evaluation.status === 'partial'
-              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50'
-              : 'bg-red-500/20 text-red-300 border border-red-500/50'
-            }
-          `}>
-            {evaluation.status === 'correct' ? (
-              <div>
-                <div className="text-2xl mb-1">✅</div>
-                <div>{t('conversation.modules.correct', 'Correct!')}</div>
-              </div>
-            ) : evaluation.status === 'partial' ? (
-              <div>
-                <div className="text-2xl mb-1">⚠️</div>
-                <div>{t('conversation.modules.partial', 'Close! Check the correct answer below.')}</div>
-              </div>
-            ) : (
-              <div>
-                <div className="text-2xl mb-1">❌</div>
-                <div>{t('conversation.modules.incorrect', 'Not quite. Here\'s the correct answer:')}</div>
-              </div>
-            )}
-          </div>
-
-          {/* Show correct answer if not perfect */}
-          {evaluation.status !== 'correct' && (
-            <div className="p-5 bg-slate-800/50 rounded-lg border border-slate-700">
-              <div className="text-sm font-medium text-slate-400 mb-3 text-center">
-                {t('conversation.modules.typeInput.correctAnswer', 'Correct answer:')}
-              </div>
-
-              <div className="flex flex-col gap-3">
-                {/* Hebrew */}
-                <div className="text-center">
-                  <div className="text-xs text-slate-500 mb-1">
-                    {t('conversation.modules.typeInput.hebrew', 'Hebrew')}
-                  </div>
-                  <div className="text-2xl font-semibold text-slate-100" dir="rtl">
-                    {line.he}
-                  </div>
-                </div>
-
-                {/* Transliteration */}
-                <div className="text-center">
-                  <div className="text-xs text-slate-500 mb-1">
-                    {t('conversation.modules.typeInput.transliteration', 'Transliteration')}
-                  </div>
-                  <div className="text-lg text-blue-300 italic">
-                    {line.tl}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Hint for new users */}
-      {!isSubmitted && !userInput && (
-        <div className="text-center text-sm text-slate-500 italic">
-          {t('conversation.modules.typeInput.hint', 'Tip: Listen to the audio for pronunciation help')}
-        </div>
       )}
     </div>
   );

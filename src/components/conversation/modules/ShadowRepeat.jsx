@@ -22,15 +22,13 @@ export default function ShadowRepeat({ line, onResult }) {
     if (isCompleted) return;
     setIsCompleted(true);
 
-    // Emit result after a short delay
-    setTimeout(() => {
-      onResult({
-        userResponse: success ? line.he : 'skipped',
-        isCorrect: success,
-        resultType: success ? 'correct' : 'partial',
-        suggestedAnswer: success ? undefined : line.he
-      });
-    }, 800);
+    // Emit result immediately - feedback will be shown in banner
+    onResult({
+      userResponse: success ? line.he : 'skipped',
+      isCorrect: success,
+      resultType: success ? 'correct' : 'partial',
+      suggestedAnswer: success ? undefined : line.he
+    });
   }, [isCompleted, line, onResult]);
 
   return (

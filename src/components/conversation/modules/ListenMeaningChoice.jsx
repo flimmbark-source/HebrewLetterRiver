@@ -60,7 +60,7 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
 
   const getChoiceStyles = useCallback((choice) => {
     const baseStyles = `
-      w-full p-4 rounded-lg border-2
+      w-full p-3 sm:p-4 rounded-lg border-2
       text-left font-medium transition-all duration-200
       cursor-pointer hover:scale-102
     `;
@@ -83,33 +83,33 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
   }, [selectedChoice, isSubmitted, line]);
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl mx-auto">
+    <div className="flex flex-col gap-3 sm:gap-4 max-w-2xl mx-auto">
       {/* Instructions */}
       <div className="text-center">
-        <h3 className="text-xl font-semibold text-slate-200 mb-2">
+        <h3 className="text-lg sm:text-xl font-semibold text-slate-200 mb-1 sm:mb-2">
           {t('conversation.modules.listenMeaningChoice.instruction', 'Listen and pick the meaning')}
         </h3>
-        <p className="text-slate-400">
+        <p className="text-xs sm:text-sm text-slate-400">
           {t('conversation.modules.listenMeaningChoice.hint', 'Play the audio and choose the correct English translation')}
         </p>
       </div>
 
       {/* Audio player */}
-      <div className="flex justify-center items-center gap-4 p-6 bg-slate-800/50 rounded-xl border border-slate-700">
+      <div className="flex justify-center items-center gap-3 p-3 sm:p-4 bg-slate-800/50 rounded-lg border border-slate-700">
         <SpeakButton
           nativeText={line.he}
           nativeLocale="he-IL"
           transliteration={line.tl}
           variant="iconWithLabel"
-          className="!py-3 !px-5 !text-base"
+          className="!py-2 sm:!py-3 !px-3 sm:!px-4 !text-sm sm:!text-base"
         />
-        <div className="text-slate-400 text-sm">
+        <div className="text-slate-400 text-xs sm:text-sm">
           {t('conversation.modules.listenMeaningChoice.playHint', 'Click to hear the Hebrew phrase')}
         </div>
       </div>
 
       {/* Multiple choice options */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2 sm:gap-3">
         {choices.map((choice) => (
           <button
             key={choice.id}
@@ -147,14 +147,14 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
               </div>
 
               {/* Choice text */}
-              <span className="text-lg">{choice.text}</span>
+              <span className="text-base sm:text-lg">{choice.text}</span>
 
               {/* Feedback icons */}
               {isSubmitted && choice.text === line.en && (
-                <span className="ml-auto text-2xl">✅</span>
+                <span className="ml-auto text-xl sm:text-2xl">✅</span>
               )}
               {isSubmitted && selectedChoice?.id === choice.id && choice.text !== line.en && (
-                <span className="ml-auto text-2xl">❌</span>
+                <span className="ml-auto text-xl sm:text-2xl">❌</span>
               )}
             </div>
           </button>
@@ -163,7 +163,7 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
 
       {/* Instruction hint */}
       {!isSubmitted && selectedChoice && (
-        <div className="text-center text-sm text-slate-400">
+        <div className="text-center text-xs sm:text-sm text-slate-400">
           {t('conversation.modules.listenMeaningChoice.submitHint', 'Click the play button to submit your answer')}
         </div>
       )}
