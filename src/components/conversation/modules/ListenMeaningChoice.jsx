@@ -39,25 +39,26 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
 
   const handleChoiceClick = useCallback((choice) => {
     if (isSubmitted) return;
-    setSelectedChoice(choice);
-  }, [isSubmitted]);
 
-  const handleSubmit = useCallback(() => {
-    if (!selectedChoice || isSubmitted) return;
+    // If clicking the already selected choice, submit it
+    if (selectedChoice?.id === choice.id) {
+      const isCorrect = choice.text === line.en;
+      setIsSubmitted(true);
 
-    const isCorrect = selectedChoice.text === line.en;
-    setIsSubmitted(true);
-
-    // Emit result after a short delay to show feedback
-    setTimeout(() => {
-      onResult({
-        userResponse: selectedChoice.text,
-        isCorrect,
-        resultType: isCorrect ? 'correct' : 'incorrect',
-        suggestedAnswer: isCorrect ? undefined : line.en
-      });
-    }, 1000);
-  }, [selectedChoice, isSubmitted, line, onResult]);
+      // Emit result after a short delay to show feedback
+      setTimeout(() => {
+        onResult({
+          userResponse: choice.text,
+          isCorrect,
+          resultType: isCorrect ? 'correct' : 'incorrect',
+          suggestedAnswer: isCorrect ? undefined : line.en
+        });
+      }, 1000);
+    } else {
+      // Otherwise, just select it
+      setSelectedChoice(choice);
+    }
+  }, [isSubmitted, selectedChoice, line, onResult]);
 
   const getChoiceStyles = useCallback((choice) => {
     const baseStyles = `
@@ -119,17 +120,30 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
             disabled={isSubmitted}
           >
             <div className="flex items-center gap-3">
-              {/* Radio indicator */}
+              {/* Radio/Play indicator */}
               <div className={`
-                w-6 h-6 rounded-full border-2 flex-shrink-0
+                w-8 h-8 rounded-full border-2 flex-shrink-0
                 flex items-center justify-center transition-all
-                ${selectedChoice?.id === choice.id
-                  ? 'border-blue-500 bg-blue-500'
-                  : 'border-slate-500 bg-transparent'
+                ${selectedChoice?.id === choice.id && !isSubmitted
+                  ? 'border-blue-500 bg-blue-500 hover:bg-blue-400 cursor-pointer'
+                  : !isSubmitted
+                  ? 'border-slate-500 bg-transparent'
+                  : ''
                 }
                 ${isSubmitted && choice.text === line.en ? 'border-emerald-500 bg-emerald-500' : ''}
               `}>
-                {(selectedChoice?.id === choice.id || (isSubmitted && choice.text === line.en)) && (
+                {/* Show play triangle when selected but not submitted */}
+                {selectedChoice?.id === choice.id && !isSubmitted && (
+                  <svg className="w-4 h-4 ml-0.5" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                )}
+                {/* Show dot when not selected */}
+                {selectedChoice?.id !== choice.id && !isSubmitted && (
+                  <div className="w-0 h-0" />
+                )}
+                {/* Show checkmark when submitted and correct */}
+                {isSubmitted && choice.text === line.en && (
                   <div className="w-2 h-2 bg-white rounded-full" />
                 )}
               </div>
@@ -149,22 +163,11 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
         ))}
       </div>
 
-      {/* Submit button */}
-      {!isSubmitted && (
-        <button
-          onClick={handleSubmit}
-          disabled={!selectedChoice}
-          className={`
-            py-3 px-6 rounded-lg font-semibold text-lg
-            transition-all duration-200
-            ${selectedChoice
-              ? 'bg-blue-600 hover:bg-blue-500 text-white cursor-pointer hover:scale-105 active:scale-95'
-              : 'bg-slate-700 text-slate-500 cursor-not-allowed opacity-50'
-            }
-          `}
-        >
-          {t('conversation.modules.submit', 'Submit')}
-        </button>
+      {/* Instruction hint */}
+      {!isSubmitted && selectedChoice && (
+        <div className="text-center text-sm text-slate-400">
+          {t('conversation.modules.listenMeaningChoice.submitHint', 'Click the play button to submit your answer')}
+        </div>
       )}
 
       {/* Feedback message */}

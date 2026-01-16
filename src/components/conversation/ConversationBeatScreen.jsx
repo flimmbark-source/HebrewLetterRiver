@@ -27,6 +27,8 @@ export default function ConversationBeatScreen({
 }) {
   const { t } = useLocalization();
   const [showTranscript, setShowTranscript] = useState(false);
+  const [showNextBanner, setShowNextBanner] = useState(false);
+  const [pendingResult, setPendingResult] = useState(null);
 
   // Find the line for this beat
   const currentLine = useMemo(() => {
@@ -39,12 +41,22 @@ export default function ConversationBeatScreen({
   }, [scenario.lines, beat.lineId]);
 
   const handleModuleResult = useCallback((result) => {
-    onBeatComplete({
+    // Store the result and show the next banner
+    setPendingResult({
       beat,
       ...result,
       timestamp: new Date().toISOString()
     });
-  }, [beat, onBeatComplete]);
+    setShowNextBanner(true);
+  }, [beat]);
+
+  const handleNext = useCallback(() => {
+    if (pendingResult) {
+      onBeatComplete(pendingResult);
+      setShowNextBanner(false);
+      setPendingResult(null);
+    }
+  }, [pendingResult, onBeatComplete]);
 
   const handleSavePhrase = useCallback(() => {
     if (currentLine) {
@@ -223,6 +235,55 @@ export default function ConversationBeatScreen({
             {renderModule()}
           </div>
         </div>
+      </div>
+
+      {/* Next button banner - slides up from bottom */}
+      <div
+        className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-slate-800 via-slate-800 to-transparent border-t border-slate-700 shadow-2xl z-20 transition-all duration-300 ease-out ${
+          showNextBanner ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
+        }`}
+      >
+          <div className="max-w-4xl mx-auto px-4 py-4 sm:py-5">
+            <div className="flex items-center justify-between gap-4">
+              {/* Feedback message */}
+              <div className="flex items-center gap-3">
+                {pendingResult?.isCorrect ? (
+                  <>
+                    <span className="text-2xl sm:text-3xl">✅</span>
+                    <div>
+                      <div className="text-base sm:text-lg font-bold text-emerald-400">
+                        {t('conversation.beat.correct', 'Correct!')}
+                      </div>
+                      <div className="text-xs sm:text-sm text-slate-400">
+                        {t('conversation.beat.greatJob', 'Great job!')}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-2xl sm:text-3xl">💪</span>
+                    <div>
+                      <div className="text-base sm:text-lg font-bold text-amber-400">
+                        {t('conversation.beat.keepGoing', 'Keep practicing!')}
+                      </div>
+                      <div className="text-xs sm:text-sm text-slate-400">
+                        {pendingResult?.suggestedAnswer || t('conversation.beat.tryAgain', 'You\'ll get it next time')}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Next button */}
+              <button
+                onClick={handleNext}
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-base sm:text-lg rounded-lg transition-all duration-200 active:scale-95 shadow-lg flex items-center gap-2 flex-shrink-0"
+              >
+                {t('conversation.beat.next', 'Next')}
+                <span className="text-xl">→</span>
+              </button>
+            </div>
+          </div>
       </div>
     </div>
   );
