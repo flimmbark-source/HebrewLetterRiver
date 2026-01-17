@@ -100,31 +100,88 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
         </p>
       </div>
 
-      {/* Audio player and dictionary */}
+      {/* Audio player */}
+      <div className="flex justify-center items-center gap-3 p-3 sm:p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+        <SpeakButton
+          nativeText={line.he}
+          nativeLocale="he-IL"
+          transliteration={line.tl}
+          variant="iconWithLabel"
+          className="!py-2 sm:!py-3 !px-3 sm:!px-4 !text-sm sm:!text-base"
+        />
+        <div className="text-slate-400 text-xs sm:text-sm">
+          {t('conversation.modules.listenMeaningChoice.playHint', 'Click to hear the Hebrew phrase')}
+        </div>
+      </div>
+
+      {/* Multiple choice options */}
+      <div className="flex flex-col gap-2 sm:gap-3">
+        {choices.map((choice) => (
+          <button
+            key={choice.id}
+            onClick={() => handleChoiceClick(choice)}
+            className={getChoiceStyles(choice)}
+            disabled={isSubmitted}
+          >
+            <div className="flex items-center gap-3">
+              {/* Radio/Play indicator */}
+              <div className={`
+                w-8 h-8 rounded-full border-2 flex-shrink-0
+                flex items-center justify-center transition-all
+                ${selectedChoice?.id === choice.id && !isSubmitted
+                  ? 'border-blue-500 bg-blue-500 hover:bg-blue-400 cursor-pointer'
+                  : !isSubmitted
+                  ? 'border-slate-500 bg-transparent'
+                  : ''
+                }
+                ${isSubmitted && choice.text === line.en ? 'border-emerald-500 bg-emerald-500' : ''}
+              `}>
+                {/* Show play triangle when selected but not submitted */}
+                {selectedChoice?.id === choice.id && !isSubmitted && (
+                  <svg className="w-4 h-4 ml-0.5" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                )}
+                {/* Show dot when not selected */}
+                {selectedChoice?.id !== choice.id && !isSubmitted && (
+                  <div className="w-0 h-0" />
+                )}
+                {/* Show checkmark when submitted and correct */}
+                {isSubmitted && choice.text === line.en && (
+                  <div className="w-2 h-2 bg-white rounded-full" />
+                )}
+              </div>
+
+              {/* Choice text */}
+              <span className="text-base sm:text-lg">{choice.text}</span>
+
+              {/* Feedback icons */}
+              {isSubmitted && choice.text === line.en && (
+                <span className="ml-auto text-xl sm:text-2xl">✅</span>
+              )}
+              {isSubmitted && selectedChoice?.id === choice.id && choice.text !== line.en && (
+                <span className="ml-auto text-xl sm:text-2xl">❌</span>
+              )}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Dictionary button and popup */}
       <div className="relative">
-        <div className="flex justify-center items-center gap-3 p-3 sm:p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-          <SpeakButton
-            nativeText={line.he}
-            nativeLocale="he-IL"
-            transliteration={line.tl}
-            variant="iconWithLabel"
-            className="!py-2 sm:!py-3 !px-3 sm:!px-4 !text-sm sm:!text-base"
-          />
+        <div className="flex justify-center">
           <button
             onClick={toggleDictionary}
-            className="py-2 sm:py-3 px-3 sm:px-4 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors text-sm sm:text-base font-medium flex items-center gap-2"
+            className="py-2 sm:py-3 px-4 sm:px-6 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors text-sm sm:text-base font-medium flex items-center gap-2"
           >
             <span>📖</span>
             <span>{t('conversation.modules.dictionary', 'Dictionary')}</span>
           </button>
-          <div className="text-slate-400 text-xs sm:text-sm">
-            {t('conversation.modules.listenMeaningChoice.playHint', 'Click to hear the Hebrew phrase')}
-          </div>
         </div>
 
         {/* Dictionary popup */}
         {showDictionary && (
-          <div className="absolute top-full left-0 right-0 mt-2 z-50">
+          <div className="absolute bottom-full left-0 right-0 mb-2 z-50">
             <div className="bg-slate-800 border-2 border-blue-500 rounded-lg shadow-2xl p-4 max-h-96 overflow-y-auto">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-lg font-semibold text-slate-200">
@@ -206,59 +263,6 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
             </div>
           </div>
         )}
-      </div>
-
-      {/* Multiple choice options */}
-      <div className="flex flex-col gap-2 sm:gap-3">
-        {choices.map((choice) => (
-          <button
-            key={choice.id}
-            onClick={() => handleChoiceClick(choice)}
-            className={getChoiceStyles(choice)}
-            disabled={isSubmitted}
-          >
-            <div className="flex items-center gap-3">
-              {/* Radio/Play indicator */}
-              <div className={`
-                w-8 h-8 rounded-full border-2 flex-shrink-0
-                flex items-center justify-center transition-all
-                ${selectedChoice?.id === choice.id && !isSubmitted
-                  ? 'border-blue-500 bg-blue-500 hover:bg-blue-400 cursor-pointer'
-                  : !isSubmitted
-                  ? 'border-slate-500 bg-transparent'
-                  : ''
-                }
-                ${isSubmitted && choice.text === line.en ? 'border-emerald-500 bg-emerald-500' : ''}
-              `}>
-                {/* Show play triangle when selected but not submitted */}
-                {selectedChoice?.id === choice.id && !isSubmitted && (
-                  <svg className="w-4 h-4 ml-0.5" viewBox="0 0 24 24" fill="white">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                )}
-                {/* Show dot when not selected */}
-                {selectedChoice?.id !== choice.id && !isSubmitted && (
-                  <div className="w-0 h-0" />
-                )}
-                {/* Show checkmark when submitted and correct */}
-                {isSubmitted && choice.text === line.en && (
-                  <div className="w-2 h-2 bg-white rounded-full" />
-                )}
-              </div>
-
-              {/* Choice text */}
-              <span className="text-base sm:text-lg">{choice.text}</span>
-
-              {/* Feedback icons */}
-              {isSubmitted && choice.text === line.en && (
-                <span className="ml-auto text-xl sm:text-2xl">✅</span>
-              )}
-              {isSubmitted && selectedChoice?.id === choice.id && choice.text !== line.en && (
-                <span className="ml-auto text-xl sm:text-2xl">❌</span>
-              )}
-            </div>
-          </button>
-        ))}
       </div>
 
       {/* Instruction hint */}
