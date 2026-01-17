@@ -129,29 +129,33 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
 
         {/* Display words individually */}
         <div
-          className="flex flex-wrap justify-center gap-2 text-2xl font-semibold text-slate-100"
+          className="text-center text-2xl font-semibold text-slate-100 leading-relaxed"
           dir={displayMode === 'hebrew' ? 'rtl' : 'ltr'}
         >
           {displayMode === 'english' ? (
             // Show English words
             line.en.split(' ').map((word, index) => (
-              <span
-                key={index}
-                className="cursor-pointer hover:text-blue-300 transition-colors px-1 py-0.5 rounded hover:bg-blue-900/30"
-                onClick={() => handleWordClick(index)}
-              >
-                {word}
+              <span key={index}>
+                <span
+                  className="cursor-pointer hover:text-blue-300 transition-colors px-0.5 py-0.5 rounded hover:bg-blue-900/30 inline-block"
+                  onClick={() => handleWordClick(index)}
+                >
+                  {word}
+                </span>
+                {index < line.en.split(' ').length - 1 && ' '}
               </span>
             ))
           ) : (
             // Show Hebrew words
             line.sentenceData.words.map((word, index) => (
-              <span
-                key={index}
-                className="cursor-pointer hover:text-blue-300 transition-colors px-1 py-0.5 rounded hover:bg-blue-900/30"
-                onClick={() => handleWordClick(index)}
-              >
-                {word.hebrew}
+              <span key={index}>
+                <span
+                  className="cursor-pointer hover:text-blue-300 transition-colors px-0.5 py-0.5 rounded hover:bg-blue-900/30 inline-block"
+                  onClick={() => handleWordClick(index)}
+                >
+                  {word.hebrew}
+                </span>
+                {index < line.sentenceData.words.length - 1 && ' '}
               </span>
             ))
           )}
