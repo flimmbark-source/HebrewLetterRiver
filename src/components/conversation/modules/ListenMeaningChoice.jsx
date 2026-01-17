@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import SpeakButton from '../../SpeakButton.jsx';
 import { useLocalization } from '../../../context/LocalizationContext.jsx';
+import { findDictionaryEntryForWord } from '../../../lib/sentenceDictionaryLookup.ts';
 
 /**
  * ListenMeaningChoice Module
@@ -13,6 +14,7 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [choices, setChoices] = useState([]);
+  const [showDictionary, setShowDictionary] = useState(false);
 
   // Generate multiple choice options
   useEffect(() => {
@@ -58,6 +60,10 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
     }
   }, [isSubmitted, selectedChoice, line, onResult]);
 
+  const toggleDictionary = useCallback(() => {
+    setShowDictionary(prev => !prev);
+  }, []);
+
   const getChoiceStyles = useCallback((choice) => {
     const baseStyles = `
       w-full p-3 sm:p-4 rounded-lg border-2
@@ -94,18 +100,112 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
         </p>
       </div>
 
-      {/* Audio player */}
-      <div className="flex justify-center items-center gap-3 p-3 sm:p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-        <SpeakButton
-          nativeText={line.he}
-          nativeLocale="he-IL"
-          transliteration={line.tl}
-          variant="iconWithLabel"
-          className="!py-2 sm:!py-3 !px-3 sm:!px-4 !text-sm sm:!text-base"
-        />
-        <div className="text-slate-400 text-xs sm:text-sm">
-          {t('conversation.modules.listenMeaningChoice.playHint', 'Click to hear the Hebrew phrase')}
+      {/* Audio player and dictionary */}
+      <div className="relative">
+        <div className="flex justify-center items-center gap-3 p-3 sm:p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+          <SpeakButton
+            nativeText={line.he}
+            nativeLocale="he-IL"
+            transliteration={line.tl}
+            variant="iconWithLabel"
+            className="!py-2 sm:!py-3 !px-3 sm:!px-4 !text-sm sm:!text-base"
+          />
+          <button
+            onClick={toggleDictionary}
+            className="py-2 sm:py-3 px-3 sm:px-4 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors text-sm sm:text-base font-medium flex items-center gap-2"
+          >
+            <span>📖</span>
+            <span>{t('conversation.modules.dictionary', 'Dictionary')}</span>
+          </button>
+          <div className="text-slate-400 text-xs sm:text-sm">
+            {t('conversation.modules.listenMeaningChoice.playHint', 'Click to hear the Hebrew phrase')}
+          </div>
         </div>
+
+        {/* Dictionary popup */}
+        {showDictionary && (
+          <div className="absolute top-full left-0 right-0 mt-2 z-50">
+            <div className="bg-slate-800 border-2 border-blue-500 rounded-lg shadow-2xl p-4 max-h-96 overflow-y-auto">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-lg font-semibold text-slate-200">
+                  {t('conversation.modules.dictionaryTitle', 'Word Dictionary')}
+                </h4>
+                <button
+                  onClick={toggleDictionary}
+                  className="text-slate-400 hover:text-slate-200 text-xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {line.sentenceData.words.map((word, index) => {
+                  const wordId = word.wordId;
+
+                  if (!wordId) {
+                    // Fallback if no wordId
+                    return (
+                      <div key={index} className="p-3 bg-slate-700/50 rounded-lg">
+                        <div className="text-base font-semibold text-slate-100 text-center" dir="rtl">
+                          {word.hebrew}
+                        </div>
+                        <div className="text-xs text-slate-400 text-center mt-1">
+                          {t('conversation.modules.typeInput.noWordData', 'Word details not available')}
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  const entry = findDictionaryEntryForWord(wordId, 'hebrew', 'en', t);
+
+                  if (!entry) {
+                    // Fallback if word not found in dictionary
+                    return (
+                      <div key={index} className="p-3 bg-slate-700/50 rounded-lg">
+                        <div className="text-base font-semibold text-slate-100 text-center" dir="rtl">
+                          {word.hebrew}
+                        </div>
+                        <div className="text-xs text-slate-400 text-center mt-1">
+                          {t('conversation.modules.typeInput.wordNotFound', 'Word not found in dictionary')}
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        {/* Hebrew */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Hebrew</div>
+                          <div className="text-base font-semibold text-slate-100" dir="rtl">
+                            {entry.practiceWord}
+                          </div>
+                        </div>
+
+                        {/* Transliteration */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
+                          <div className="text-sm text-blue-300 italic">
+                            {entry.canonical}
+                          </div>
+                        </div>
+
+                        {/* English meaning */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Meaning</div>
+                          <div className="text-sm text-slate-200">
+                            {entry.meaning}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Multiple choice options */}
