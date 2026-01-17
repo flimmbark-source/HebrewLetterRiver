@@ -19,7 +19,7 @@ import { cafeTalkTransliterations } from '../readingTexts/cafeTalk/lexicon/hebre
 /**
  * Simple transliteration lookup extending cafeTalk with sentence-specific words
  */
-const sentenceTransliterationLookup: Record<string, string> = {
+export const sentenceTransliterationLookup: Record<string, string> = {
   // From baseWordIdLookup in sentences/index.ts
   'שלום': 'shalom',
   'תודה': 'todah',

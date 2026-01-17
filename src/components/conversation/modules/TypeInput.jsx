@@ -3,6 +3,7 @@ import SpeakButton from '../../SpeakButton.jsx';
 import { useLocalization } from '../../../context/LocalizationContext.jsx';
 import { evaluateWithVariants } from '../../../lib/translationEvaluator.ts';
 import { findDictionaryEntryForWord } from '../../../lib/sentenceDictionaryLookup.ts';
+import { sentenceTransliterationLookup } from '../../../data/conversation/scenarioFactory.ts';
 
 /**
  * TypeInput Module
@@ -193,14 +194,32 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
                 const entry = findDictionaryEntryForWord(wordId, 'hebrew', 'en', t);
 
                 if (!entry) {
-                  // Fallback if word not found in dictionary
+                  // Fallback if word not found in dictionary - show transliteration from lookup table
+                  const transliteration = sentenceTransliterationLookup[word.hebrew];
                   return (
-                    <div className="text-center">
-                      <div className="text-xl font-semibold text-slate-100" dir="rtl">
-                        {word.hebrew}
+                    <div className="flex flex-col gap-3">
+                      {/* Hebrew */}
+                      <div className="text-center border-b border-slate-700 pb-3">
+                        <div className="text-xs text-slate-400 mb-1">Hebrew</div>
+                        <div className="text-xl font-semibold text-slate-100" dir="rtl">
+                          {word.hebrew}
+                        </div>
                       </div>
-                      <div className="text-sm text-slate-400 mt-2">
-                        {t('conversation.modules.typeInput.wordNotFound', 'Word not found in dictionary')}
+
+                      {/* Transliteration */}
+                      <div className="text-center border-b border-slate-700 pb-3">
+                        <div className="text-xs text-slate-400 mb-1">Transliteration</div>
+                        <div className="text-lg text-blue-300 italic">
+                          {transliteration || '—'}
+                        </div>
+                      </div>
+
+                      {/* English meaning placeholder */}
+                      <div className="text-center">
+                        <div className="text-xs text-slate-400 mb-1">Meaning</div>
+                        <div className="text-base text-slate-500 italic">
+                          —
+                        </div>
                       </div>
                     </div>
                   );

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import SpeakButton from '../../SpeakButton.jsx';
 import { useLocalization } from '../../../context/LocalizationContext.jsx';
 import { findDictionaryEntryForWord } from '../../../lib/sentenceDictionaryLookup.ts';
+import { sentenceTransliterationLookup } from '../../../data/conversation/scenarioFactory.ts';
 
 /**
  * ListenMeaningChoice Module
@@ -216,14 +217,34 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
                   const entry = findDictionaryEntryForWord(wordId, 'hebrew', 'en', t);
 
                   if (!entry) {
-                    // Fallback if word not found in dictionary
+                    // Fallback if word not found in dictionary - show transliteration from lookup table
+                    const transliteration = sentenceTransliterationLookup[word.hebrew];
                     return (
-                      <div key={index} className="p-3 bg-slate-700/50 rounded-lg">
-                        <div className="text-base font-semibold text-slate-100 text-center" dir="rtl">
-                          {word.hebrew}
-                        </div>
-                        <div className="text-xs text-slate-400 text-center mt-1">
-                          {t('conversation.modules.typeInput.wordNotFound', 'Word not found in dictionary')}
+                      <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          {/* Hebrew */}
+                          <div>
+                            <div className="text-xs text-slate-400 mb-1">Hebrew</div>
+                            <div className="text-base font-semibold text-slate-100" dir="rtl">
+                              {word.hebrew}
+                            </div>
+                          </div>
+
+                          {/* Transliteration */}
+                          <div>
+                            <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
+                            <div className="text-sm text-blue-300 italic">
+                              {transliteration || '—'}
+                            </div>
+                          </div>
+
+                          {/* Meaning placeholder */}
+                          <div>
+                            <div className="text-xs text-slate-400 mb-1">Meaning</div>
+                            <div className="text-sm text-slate-500 italic">
+                              —
+                            </div>
+                          </div>
                         </div>
                       </div>
                     );
