@@ -181,29 +181,6 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
         </div>
       </div>
 
-      {/* Display mode toggle (if auto mode) */}
-      {mode === 'auto' && (
-        <div className="flex justify-center">
-          <button
-            onClick={toggleDisplayMode}
-            disabled={isSubmitted}
-            className={`
-              px-4 py-2 rounded-lg text-sm font-medium
-              border-2 transition-all duration-200
-              ${isSubmitted
-                ? 'bg-slate-700 border-slate-600 text-slate-500 cursor-not-allowed'
-                : 'bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500'
-              }
-            `}
-          >
-            {displayMode === 'english'
-              ? t('conversation.modules.typeInput.switchToHebrew', 'Show Hebrew')
-              : t('conversation.modules.typeInput.switchToEnglish', 'Show English')
-            }
-          </button>
-        </div>
-      )}
-
       {/* Input field */}
       <div className="relative">
         <textarea
@@ -253,22 +230,38 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
         </div>
       </div>
 
-      {/* Submit button */}
+      {/* Button row: Display mode toggle and Submit */}
       {!isSubmitted && (
-        <button
-          onClick={handleSubmit}
-          disabled={!userInput.trim()}
-          className={`
-            py-3 px-6 rounded-lg font-semibold text-lg
-            transition-all duration-200
-            ${userInput.trim()
-              ? 'bg-blue-600 hover:bg-blue-500 text-white cursor-pointer hover:scale-105 active:scale-95'
-              : 'bg-slate-700 text-slate-500 cursor-not-allowed opacity-50'
-            }
-          `}
-        >
-          {t('conversation.modules.submit', 'Submit')}
-        </button>
+        <div className="flex justify-center gap-3">
+          {/* Display mode toggle (if auto mode) */}
+          {mode === 'auto' && (
+            <button
+              onClick={toggleDisplayMode}
+              className="px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500"
+            >
+              {displayMode === 'english'
+                ? t('conversation.modules.typeInput.switchToHebrew', 'Show Hebrew')
+                : t('conversation.modules.typeInput.switchToEnglish', 'Show English')
+              }
+            </button>
+          )}
+
+          {/* Submit button */}
+          <button
+            onClick={handleSubmit}
+            disabled={!userInput.trim()}
+            className={`
+              px-4 py-2 rounded-lg text-sm font-medium
+              transition-all duration-200
+              ${userInput.trim()
+                ? 'bg-blue-600 hover:bg-blue-500 text-white cursor-pointer'
+                : 'bg-slate-700 text-slate-500 cursor-not-allowed opacity-50'
+              }
+            `}
+          >
+            {t('conversation.modules.submit', 'Submit')}
+          </button>
+        </div>
       )}
     </div>
   );

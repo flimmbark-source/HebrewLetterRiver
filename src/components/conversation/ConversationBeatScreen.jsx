@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import ListenMeaningChoice from './modules/ListenMeaningChoice.jsx';
 import ShadowRepeat from './modules/ShadowRepeat.jsx';
@@ -30,6 +30,7 @@ export default function ConversationBeatScreen({
   const [showNextBanner, setShowNextBanner] = useState(false);
   const [showFeedbackBanner, setShowFeedbackBanner] = useState(false);
   const [pendingResult, setPendingResult] = useState(null);
+  const mainContentRef = useRef(null);
 
   // Hide main app navigation bar while in conversation practice
   useEffect(() => {
@@ -38,6 +39,13 @@ export default function ConversationBeatScreen({
       document.body.classList.remove('in-conversation-practice');
     };
   }, []);
+
+  // Scroll to top when beat changes
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [beatIndex]);
 
   // Find the line for this beat
   const currentLine = useMemo(() => {
@@ -200,7 +208,7 @@ export default function ConversationBeatScreen({
       </div>
 
       {/* Main content */}
-      <div className="flex-1 overflow-y-auto">
+      <div ref={mainContentRef} className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {/* Transcript panel (collapsible) */}
           {showTranscript && attemptHistory.length > 0 && (
@@ -254,36 +262,36 @@ export default function ConversationBeatScreen({
           showFeedbackBanner ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
         }`}
       >
-        <div className="px-4 sm:px-6 py-4 sm:py-5">
-          <div className="flex items-center justify-center gap-4 sm:gap-6">
+        <div className="px-3 sm:px-4 py-2 sm:py-3">
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
             {pendingResult?.isCorrect ? (
               <>
-                <span className="text-5xl sm:text-6xl">✅</span>
+                <span className="text-3xl sm:text-4xl">✅</span>
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-emerald-400 mb-1 sm:mb-2">
+                  <div className="text-xl sm:text-2xl font-bold text-emerald-400 mb-0.5 sm:mb-1">
                     {t('conversation.beat.correct', 'Correct!')}
                   </div>
-                  <div className="text-base sm:text-lg text-slate-300">
+                  <div className="text-sm sm:text-base text-slate-300">
                     {t('conversation.beat.greatJob', 'Great job!')}
                   </div>
                 </div>
-                <span className="text-5xl sm:text-6xl">✅</span>
+                <span className="text-3xl sm:text-4xl">✅</span>
               </>
             ) : (
               <>
-                <span className="text-5xl sm:text-6xl">💪</span>
+                <span className="text-3xl sm:text-4xl">💪</span>
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-amber-400 mb-1 sm:mb-2">
+                  <div className="text-xl sm:text-2xl font-bold text-amber-400 mb-0.5 sm:mb-1">
                     {t('conversation.beat.keepGoing', 'Keep practicing!')}
                   </div>
-                  <div className="text-base sm:text-lg text-slate-300">
+                  <div className="text-sm sm:text-base text-slate-300">
                     {pendingResult?.suggestedAnswer
                       ? `${t('conversation.beat.correctAnswer', 'Correct answer')}: ${pendingResult.suggestedAnswer}`
                       : t('conversation.beat.tryAgain', 'You\'ll get it next time')
                     }
                   </div>
                 </div>
-                <span className="text-5xl sm:text-6xl">💪</span>
+                <span className="text-3xl sm:text-4xl">💪</span>
               </>
             )}
           </div>
@@ -296,14 +304,14 @@ export default function ConversationBeatScreen({
           showNextBanner ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
         }`}
       >
-        <div className="px-4 sm:px-6 py-4 sm:py-5">
+        <div className="px-3 sm:px-4 py-2 sm:py-3">
           <div className="flex items-center justify-center">
             <button
               onClick={handleNext}
-              className="px-16 sm:px-20 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-2xl sm:text-3xl rounded-2xl transition-all duration-200 active:scale-95 shadow-lg flex items-center gap-4 sm:gap-6"
+              className="px-8 sm:px-12 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xl sm:text-2xl rounded-xl transition-all duration-200 active:scale-95 shadow-lg flex items-center gap-2 sm:gap-3"
             >
               {t('conversation.beat.next', 'Next')}
-              <span className="text-3xl sm:text-4xl">→</span>
+              <span className="text-2xl sm:text-3xl">→</span>
             </button>
           </div>
         </div>
