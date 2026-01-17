@@ -144,7 +144,7 @@ export default function ConversationBeatScreen({
     <div className="flex flex-col h-screen bg-slate-900 text-slate-100">
       {/* Top bar */}
       <div className="bg-slate-800/80 border-b border-slate-700 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
+        <div className="w-full max-w-full md:max-w-[768px] mx-auto px-3 sm:px-4 py-2 sm:py-3">
           <div className="flex items-center justify-between">
             {/* Left: Scenario info */}
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
@@ -209,7 +209,7 @@ export default function ConversationBeatScreen({
 
       {/* Main content */}
       <div ref={mainContentRef} className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        <div className="w-full max-w-full md:max-w-[768px] mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {/* Transcript panel (collapsible) */}
           {showTranscript && attemptHistory.length > 0 && (
             <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-slate-800/50 rounded-xl border border-slate-700">
@@ -262,36 +262,49 @@ export default function ConversationBeatScreen({
           showFeedbackBanner ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
         }`}
       >
-        <div className="px-3 sm:px-4 py-2 sm:py-3">
-          <div className="flex items-center justify-center gap-2 sm:gap-3">
+        <div className="px-2 sm:px-3 py-1.5 sm:py-2">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2">
             {pendingResult?.isCorrect ? (
               <>
-                <span className="text-3xl sm:text-4xl">✅</span>
+                <span className="text-2xl sm:text-3xl">✅</span>
                 <div className="text-center">
-                  <div className="text-xl sm:text-2xl font-bold text-emerald-400 mb-0.5 sm:mb-1">
+                  <div className="text-lg sm:text-xl font-bold text-emerald-400">
                     {t('conversation.beat.correct', 'Correct!')}
                   </div>
-                  <div className="text-sm sm:text-base text-slate-300">
-                    {t('conversation.beat.greatJob', 'Great job!')}
-                  </div>
+                  {pendingResult?.userResponse && (
+                    <div className="text-xs sm:text-sm text-slate-300">
+                      {pendingResult.userResponse}
+                    </div>
+                  )}
                 </div>
-                <span className="text-3xl sm:text-4xl">✅</span>
+                <span className="text-2xl sm:text-3xl">✅</span>
               </>
             ) : (
               <>
-                <span className="text-3xl sm:text-4xl">💪</span>
+                <span className="text-2xl sm:text-3xl">💪</span>
                 <div className="text-center">
-                  <div className="text-xl sm:text-2xl font-bold text-amber-400 mb-0.5 sm:mb-1">
-                    {t('conversation.beat.keepGoing', 'Keep practicing!')}
-                  </div>
-                  <div className="text-sm sm:text-base text-slate-300">
-                    {pendingResult?.suggestedAnswer
-                      ? `${t('conversation.beat.correctAnswer', 'Correct answer')}: ${pendingResult.suggestedAnswer}`
-                      : t('conversation.beat.tryAgain', 'You\'ll get it next time')
+                  <div className="text-lg sm:text-xl font-bold text-amber-400">
+                    {pendingResult?.resultType === 'partial'
+                      ? t('conversation.beat.almostThere', 'Almost there!')
+                      : t('conversation.beat.keepGoing', 'Keep practicing!')
                     }
                   </div>
+                  <div className="text-xs sm:text-sm text-slate-300 space-y-0.5">
+                    {pendingResult?.userResponse && (
+                      <div>
+                        <span className="text-red-300">{t('conversation.beat.yourAnswer', 'You')}: </span>
+                        {pendingResult.userResponse}
+                      </div>
+                    )}
+                    {pendingResult?.suggestedAnswer && (
+                      <div>
+                        <span className="text-emerald-300">{t('conversation.beat.correctAnswer', 'Correct')}: </span>
+                        {pendingResult.suggestedAnswer}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <span className="text-3xl sm:text-4xl">💪</span>
+                <span className="text-2xl sm:text-3xl">💪</span>
               </>
             )}
           </div>
@@ -304,14 +317,14 @@ export default function ConversationBeatScreen({
           showNextBanner ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
         }`}
       >
-        <div className="px-3 sm:px-4 py-2 sm:py-3">
+        <div className="px-2 sm:px-3 py-1.5 sm:py-2">
           <div className="flex items-center justify-center">
             <button
               onClick={handleNext}
-              className="px-8 sm:px-12 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xl sm:text-2xl rounded-xl transition-all duration-200 active:scale-95 shadow-lg flex items-center gap-2 sm:gap-3"
+              className="px-6 sm:px-8 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-lg sm:text-xl rounded-lg transition-all duration-200 active:scale-95 shadow-lg flex items-center gap-1.5 sm:gap-2"
             >
               {t('conversation.beat.next', 'Next')}
-              <span className="text-2xl sm:text-3xl">→</span>
+              <span className="text-xl sm:text-2xl">→</span>
             </button>
           </div>
         </div>
