@@ -17,7 +17,7 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
   const [evaluation, setEvaluation] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [inputMode, setInputMode] = useState(mode === 'auto' ? 'transliteration' : mode);
-  const [displayMode, setDisplayMode] = useState('english'); // Controls what's shown in "You want to say"
+  const [displayMode, setDisplayMode] = useState('hebrew'); // Controls what's shown in "You want to say"
   const [clickedWordIndex, setClickedWordIndex] = useState(null); // Track which word was clicked
   const inputRef = useRef(null);
 
