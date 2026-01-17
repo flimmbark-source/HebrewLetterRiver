@@ -174,7 +174,16 @@ function generateTransliteration(hebrewSentence: string): string {
   const transliterated = words.map(word => {
     // Remove punctuation
     const cleanWord = word.replace(/[,\.!?،؛]/g, '');
-    return sentenceTransliterationLookup[cleanWord] || cleanWord;
+    const transliteration = sentenceTransliterationLookup[cleanWord];
+
+    if (!transliteration) {
+      // Log warning for missing transliteration
+      console.warn(`Missing transliteration for Hebrew word: "${cleanWord}"`);
+      // Return placeholder instead of Hebrew text
+      return `[${cleanWord}]`;
+    }
+
+    return transliteration;
   });
 
   return transliterated.join(' ');
