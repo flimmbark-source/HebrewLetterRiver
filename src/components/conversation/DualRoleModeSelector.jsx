@@ -22,20 +22,6 @@ export default function DualRoleModeSelector({ onSelectMode, onBack }) {
         'Conversation-like progression',
         'Reinforcement for new phrases'
       ]
-    },
-    {
-      id: 'regular',
-      title: 'Regular Practice',
-      subtitle: 'Traditional multi-module practice',
-      description: 'Practice each phrase through all four modules in sequence. Comprehensive practice for deeper mastery.',
-      icon: '📚',
-      recommended: false,
-      features: [
-        'Complete module sequence per phrase',
-        'Listen → Shadow → Reply → Type',
-        'Thorough reinforcement',
-        'Best for difficult content'
-      ]
     }
   ];
 

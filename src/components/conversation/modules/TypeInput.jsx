@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import SpeakButton from '../../SpeakButton.jsx';
 import { useLocalization } from '../../../context/LocalizationContext.jsx';
 import { evaluateWithVariants } from '../../../lib/translationEvaluator.ts';
@@ -107,6 +107,45 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
     return t('conversation.modules.typeInput.placeholderTranslit', 'Type the transliteration...');
   }, [inputMode, t]);
 
+  const hebrewSegments = useMemo(() => {
+    const sentenceText = line.sentenceData.hebrew;
+    const words = line.sentenceData.words;
+    const segments = [];
+    let cursor = 0;
+
+    words.forEach((word, index) => {
+      const start = Number.isFinite(word.start) ? word.start : sentenceText.indexOf(word.hebrew, cursor);
+      const end = Number.isFinite(word.end) ? word.end : start + word.hebrew.length - 1;
+
+      if (start > cursor) {
+        segments.push({
+          type: 'punct',
+          text: sentenceText.slice(cursor, start),
+          key: `punct-${index}-${cursor}`
+        });
+      }
+
+      segments.push({
+        type: 'word',
+        text: sentenceText.slice(start, end + 1),
+        wordIndex: index,
+        key: `word-${index}`
+      });
+
+      cursor = end + 1;
+    });
+
+    if (cursor < sentenceText.length) {
+      segments.push({
+        type: 'punct',
+        text: sentenceText.slice(cursor),
+        key: `punct-tail-${cursor}`
+      });
+    }
+
+    return segments;
+  }, [line.sentenceData.hebrew, line.sentenceData.words]);
+
   return (
     <div className="flex flex-col gap-6 max-w-2xl mx-auto">
       {/* Instructions */}
@@ -147,17 +186,19 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
               </span>
             ))
           ) : (
-            // Show Hebrew words
-            line.sentenceData.words.map((word, index) => (
-              <span key={index}>
+            // Show Hebrew with punctuation
+            hebrewSegments.map((segment) => (
+              segment.type === 'word' ? (
                 <span
+                  key={segment.key}
                   className="cursor-pointer hover:text-blue-300 transition-colors px-0.5 py-0.5 rounded hover:bg-blue-900/30 inline-block"
-                  onClick={() => handleWordClick(index)}
+                  onClick={() => handleWordClick(segment.wordIndex)}
                 >
-                  {word.hebrew}
+                  {segment.text}
                 </span>
-                {index < line.sentenceData.words.length - 1 && ' '}
-              </span>
+              ) : (
+                <span key={segment.key}>{segment.text}</span>
+              )
             ))
           )}
         </div>
