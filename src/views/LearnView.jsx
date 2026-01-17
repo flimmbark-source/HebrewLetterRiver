@@ -39,10 +39,13 @@ export default function LearnView() {
     <div className="space-y-6">
       <header className="space-y-2 px-1">
         <h2 className="text-2xl font-semibold text-slate-800">
-          {t('conversation.list.titleDualRole', 'Dual-Role Conversations')}
+          {t('read.title', 'Read')}
         </h2>
         <p className="text-sm text-slate-600">
-          {t('conversation.list.subtitleDualRole', 'Practice both sides of a conversation')}
+          {t(
+            'read.intro',
+            'Select a text to practice translating word by word. Type the translation and press Enter to continue.'
+          )}
         </p>
       </header>
 
