@@ -45,23 +45,22 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
 
   const handleChoiceClick = useCallback((choice) => {
     if (isSubmitted) return;
-    setSelectedChoice(choice);
-  }, [isSubmitted]);
 
-  const handleSubmit = useCallback(() => {
-    if (!selectedChoice || isSubmitted) return;
+    if (selectedChoice?.id === choice.id) {
+      const isCorrect = choice.he === line.he;
+      setIsSubmitted(true);
 
-    const isCorrect = selectedChoice.he === line.he;
-    setIsSubmitted(true);
-
-    // Emit result immediately - feedback will be shown in top banner
-    onResult({
-      userResponse: selectedChoice.he,
-      isCorrect,
-      resultType: isCorrect ? 'correct' : 'incorrect',
-      suggestedAnswer: isCorrect ? undefined : line.he
-    });
-  }, [selectedChoice, isSubmitted, line, onResult]);
+      // Emit result immediately - feedback will be shown in top banner
+      onResult({
+        userResponse: choice.he,
+        isCorrect,
+        resultType: isCorrect ? 'correct' : 'incorrect',
+        suggestedAnswer: isCorrect ? undefined : line.he
+      });
+    } else {
+      setSelectedChoice(choice);
+    }
+  }, [isSubmitted, selectedChoice, line, onResult]);
 
   const getChoiceStyles = useCallback((choice) => {
     const baseStyles = `
@@ -112,32 +111,36 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
       {/* Multiple choice options (Hebrew) */}
       <div className="flex flex-col gap-2 sm:gap-3">
         {choices.map((choice) => (
-          <div
+          <button
             key={choice.id}
             onClick={() => handleChoiceClick(choice)}
             className={getChoiceStyles(choice)}
-            role="button"
-            tabIndex={isSubmitted ? -1 : 0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleChoiceClick(choice);
-              }
-            }}
+            disabled={isSubmitted}
           >
             <div className="flex items-start gap-2 sm:gap-3">
-              {/* Radio indicator */}
+              {/* Radio/Play indicator */}
               <div className={`
-                w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex-shrink-0 mt-0.5 sm:mt-1
+                w-8 h-8 rounded-full border-2 flex-shrink-0 mt-0.5 sm:mt-1
                 flex items-center justify-center transition-all
-                ${selectedChoice?.id === choice.id
-                  ? 'border-blue-500 bg-blue-500'
-                  : 'border-slate-500 bg-transparent'
+                ${selectedChoice?.id === choice.id && !isSubmitted
+                  ? 'border-blue-500 bg-blue-500 hover:bg-blue-400 cursor-pointer'
+                  : !isSubmitted
+                  ? 'border-slate-500 bg-transparent'
+                  : ''
                 }
                 ${isSubmitted && choice.he === line.he ? 'border-emerald-500 bg-emerald-500' : ''}
+                ${isSubmitted && selectedChoice?.id === choice.id && choice.he !== line.he ? 'border-red-500 bg-red-500' : ''}
               `}>
-                {(selectedChoice?.id === choice.id || (isSubmitted && choice.he === line.he)) && (
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full" />
+                {selectedChoice?.id === choice.id && !isSubmitted && (
+                  <svg className="w-4 h-4 ml-0.5" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                )}
+                {selectedChoice?.id !== choice.id && !isSubmitted && (
+                  <div className="w-0 h-0" />
+                )}
+                {isSubmitted && choice.he === line.he && (
+                  <div className="w-2 h-2 bg-white rounded-full" />
                 )}
               </div>
 
@@ -178,27 +181,9 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
                 <span className="text-xl sm:text-2xl flex-shrink-0">❌</span>
               )}
             </div>
-          </div>
+          </button>
         ))}
       </div>
-
-      {/* Submit button */}
-      {!isSubmitted && (
-        <button
-          onClick={handleSubmit}
-          disabled={!selectedChoice}
-          className={`
-            py-2.5 sm:py-3 px-5 sm:px-6 rounded-lg font-semibold text-base sm:text-lg
-            transition-all duration-200
-            ${selectedChoice
-              ? 'bg-blue-600 hover:bg-blue-500 text-white cursor-pointer active:scale-95'
-              : 'bg-slate-700 text-slate-500 cursor-not-allowed opacity-50'
-            }
-          `}
-        >
-          {t('conversation.modules.submit', 'Submit')}
-        </button>
-      )}
     </div>
   );
 }
