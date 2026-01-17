@@ -1,0 +1,297 @@
+import { useState, useEffect, useCallback } from 'react';
+import SpeakButton from '../../SpeakButton.jsx';
+import { useLocalization } from '../../../context/LocalizationContext.jsx';
+import { findDictionaryEntryForWord } from '../../../lib/sentenceDictionaryLookup.ts';
+import { sentenceTransliterationLookup } from '../../../data/conversation/scenarioFactory.ts';
+
+/**
+ * ListenMeaningChoice Module
+ *
+ * Play Hebrew audio and show multiple-choice English meanings.
+ * The learner picks the correct English translation.
+ */
+export default function ListenMeaningChoice({ line, distractorLines = [], onResult }) {
+  const { t } = useLocalization();
+  const [selectedChoice, setSelectedChoice] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [choices, setChoices] = useState([]);
+  const [showDictionary, setShowDictionary] = useState(false);
+
+  // Generate multiple choice options
+  useEffect(() => {
+    const correctAnswer = line.en;
+
+    // Get distractor answers from other lines
+    const distractors = distractorLines
+      .filter(dl => dl.en !== correctAnswer)
+      .slice(0, 3)
+      .map(dl => dl.en);
+
+    // If we don't have enough distractors, use placeholder
+    while (distractors.length < 3) {
+      distractors.push(`[Placeholder ${distractors.length + 1}]`);
+    }
+
+    // Shuffle choices
+    const allChoices = [correctAnswer, ...distractors]
+      .map(choice => ({ text: choice, id: Math.random() }))
+      .sort(() => Math.random() - 0.5);
+
+    setChoices(allChoices);
+  }, [line, distractorLines]);
+
+  const handleChoiceClick = useCallback((choice) => {
+    if (isSubmitted) return;
+
+    // If clicking the already selected choice, submit it
+    if (selectedChoice?.id === choice.id) {
+      const isCorrect = choice.text === line.en;
+      setIsSubmitted(true);
+
+      // Emit result immediately - feedback will be shown in top banner
+      onResult({
+        userResponse: choice.text,
+        isCorrect,
+        resultType: isCorrect ? 'correct' : 'incorrect',
+        suggestedAnswer: isCorrect ? undefined : line.en
+      });
+    } else {
+      // Otherwise, just select it
+      setSelectedChoice(choice);
+    }
+  }, [isSubmitted, selectedChoice, line, onResult]);
+
+  const toggleDictionary = useCallback(() => {
+    setShowDictionary(prev => !prev);
+  }, []);
+
+  const getChoiceStyles = useCallback((choice) => {
+    const baseStyles = `
+      w-full p-3 sm:p-4 rounded-lg border-2
+      text-left font-medium transition-all duration-200
+      cursor-pointer hover:scale-102
+    `;
+
+    if (!isSubmitted) {
+      if (selectedChoice?.id === choice.id) {
+        return `${baseStyles} bg-blue-500/20 border-blue-500 ring-2 ring-blue-500/50`;
+      }
+      return `${baseStyles} bg-slate-800/50 border-slate-700 hover:bg-slate-700 hover:border-slate-600`;
+    }
+
+    // After submission, show correct/incorrect
+    if (choice.text === line.en) {
+      return `${baseStyles} bg-emerald-500/20 border-emerald-500 ring-2 ring-emerald-500/50`;
+    }
+    if (selectedChoice?.id === choice.id) {
+      return `${baseStyles} bg-red-500/20 border-red-500 ring-2 ring-red-500/50`;
+    }
+    return `${baseStyles} bg-slate-800/30 border-slate-700/50 opacity-50`;
+  }, [selectedChoice, isSubmitted, line]);
+
+  return (
+    <div className="flex flex-col gap-3 sm:gap-4 max-w-2xl mx-auto">
+      {/* Instructions */}
+      <div className="text-center">
+        <h3 className="text-lg sm:text-xl font-semibold text-slate-200 mb-1 sm:mb-2">
+          {t('conversation.modules.listenMeaningChoice.instruction', 'Listen and pick the meaning')}
+        </h3>
+        <p className="text-xs sm:text-sm text-slate-400">
+          {t('conversation.modules.listenMeaningChoice.hint', 'Play the audio and choose the correct English translation')}
+        </p>
+      </div>
+
+      {/* Audio player */}
+      <div className="flex justify-center items-center gap-3 p-3 sm:p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+        <SpeakButton
+          nativeText={line.he}
+          nativeLocale="he-IL"
+          transliteration={line.tl}
+          variant="iconWithLabel"
+          className="!py-2 sm:!py-3 !px-3 sm:!px-4 !text-sm sm:!text-base"
+        />
+        <div className="text-slate-400 text-xs sm:text-sm">
+          {t('conversation.modules.listenMeaningChoice.playHint', 'Click to hear the Hebrew phrase')}
+        </div>
+      </div>
+
+      {/* Multiple choice options */}
+      <div className="flex flex-col gap-2 sm:gap-3">
+        {choices.map((choice) => (
+          <button
+            key={choice.id}
+            onClick={() => handleChoiceClick(choice)}
+            className={getChoiceStyles(choice)}
+            disabled={isSubmitted}
+          >
+            <div className="flex items-center gap-3">
+              {/* Radio/Play indicator */}
+              <div className={`
+                w-8 h-8 rounded-full border-2 flex-shrink-0
+                flex items-center justify-center transition-all
+                ${selectedChoice?.id === choice.id && !isSubmitted
+                  ? 'border-blue-500 bg-blue-500 hover:bg-blue-400 cursor-pointer'
+                  : !isSubmitted
+                  ? 'border-slate-500 bg-transparent'
+                  : ''
+                }
+                ${isSubmitted && choice.text === line.en ? 'border-emerald-500 bg-emerald-500' : ''}
+              `}>
+                {/* Show play triangle when selected but not submitted */}
+                {selectedChoice?.id === choice.id && !isSubmitted && (
+                  <svg className="w-4 h-4 ml-0.5" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                )}
+                {/* Show dot when not selected */}
+                {selectedChoice?.id !== choice.id && !isSubmitted && (
+                  <div className="w-0 h-0" />
+                )}
+                {/* Show checkmark when submitted and correct */}
+                {isSubmitted && choice.text === line.en && (
+                  <div className="w-2 h-2 bg-white rounded-full" />
+                )}
+              </div>
+
+              {/* Choice text */}
+              <span className="text-base sm:text-lg">{choice.text}</span>
+
+              {/* Feedback icons */}
+              {isSubmitted && choice.text === line.en && (
+                <span className="ml-auto text-xl sm:text-2xl">✅</span>
+              )}
+              {isSubmitted && selectedChoice?.id === choice.id && choice.text !== line.en && (
+                <span className="ml-auto text-xl sm:text-2xl">❌</span>
+              )}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Dictionary button and popup */}
+      <div className="relative">
+        <div className="flex justify-center">
+          <button
+            onClick={toggleDictionary}
+            className="py-2 sm:py-3 px-4 sm:px-6 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors text-sm sm:text-base font-medium flex items-center gap-2"
+          >
+            <span>📖</span>
+            <span>{t('conversation.modules.dictionary', 'Dictionary')}</span>
+          </button>
+        </div>
+
+        {/* Dictionary popup */}
+        {showDictionary && (
+          <div className="absolute bottom-full left-0 right-0 mb-2 z-50">
+            <div className="bg-slate-800 border-2 border-blue-500 rounded-lg shadow-2xl p-4 max-h-96 overflow-y-auto">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-lg font-semibold text-slate-200">
+                  {t('conversation.modules.dictionaryTitle', 'Word Dictionary')}
+                </h4>
+                <button
+                  onClick={toggleDictionary}
+                  className="text-slate-400 hover:text-slate-200 text-xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {line.sentenceData.words.map((word, index) => {
+                  const wordId = word.wordId;
+
+                  if (!wordId) {
+                    // Fallback if no wordId
+                    return (
+                      <div key={index} className="p-3 bg-slate-700/50 rounded-lg">
+                        <div className="text-base font-semibold text-slate-100 text-center" dir="rtl">
+                          {word.hebrew}
+                        </div>
+                        <div className="text-xs text-slate-400 text-center mt-1">
+                          {t('conversation.modules.typeInput.noWordData', 'Word details not available')}
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  const entry = findDictionaryEntryForWord(wordId, 'hebrew', 'en', t);
+
+                  if (!entry) {
+                    // Fallback if word not found in dictionary - show transliteration from lookup table
+                    const transliteration = sentenceTransliterationLookup[word.hebrew];
+                    return (
+                      <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          {/* Hebrew */}
+                          <div>
+                            <div className="text-xs text-slate-400 mb-1">Hebrew</div>
+                            <div className="text-base font-semibold text-slate-100" dir="rtl">
+                              {word.hebrew}
+                            </div>
+                          </div>
+
+                          {/* Transliteration */}
+                          <div>
+                            <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
+                            <div className="text-sm text-blue-300 italic">
+                              {transliteration || '—'}
+                            </div>
+                          </div>
+
+                          {/* Meaning placeholder */}
+                          <div>
+                            <div className="text-xs text-slate-400 mb-1">Meaning</div>
+                            <div className="text-sm text-slate-500 italic">
+                              —
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        {/* Hebrew */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Hebrew</div>
+                          <div className="text-base font-semibold text-slate-100" dir="rtl">
+                            {entry.practiceWord}
+                          </div>
+                        </div>
+
+                        {/* Transliteration */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
+                          <div className="text-sm text-blue-300 italic">
+                            {entry.canonical}
+                          </div>
+                        </div>
+
+                        {/* English meaning */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Meaning</div>
+                          <div className="text-sm text-slate-200">
+                            {entry.meaning}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Instruction hint */}
+      {!isSubmitted && selectedChoice && (
+        <div className="text-center text-xs sm:text-sm text-slate-400">
+          {t('conversation.modules.listenMeaningChoice.submitHint', 'Click the play button to submit your answer')}
+        </div>
+      )}
+    </div>
+  );
+}
