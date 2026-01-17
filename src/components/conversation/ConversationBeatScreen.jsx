@@ -250,11 +250,11 @@ export default function ConversationBeatScreen({
 
       {/* Feedback banner - slides down from top */}
       <div
-        className={`fixed top-0 left-0 right-0 bg-gradient-to-b from-slate-800 via-slate-800 to-slate-800/95 border-b border-slate-700 shadow-2xl z-30 transition-all duration-300 ease-out ${
+        className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-full md:max-w-[768px] bg-gradient-to-b from-slate-800 via-slate-800 to-slate-800/95 border-b border-slate-700 shadow-2xl z-30 transition-all duration-300 ease-out ${
           showFeedbackBanner ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
         }`}
       >
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="px-4 sm:px-6 py-4 sm:py-5">
           <div className="flex items-center justify-center gap-4 sm:gap-6">
             {pendingResult?.isCorrect ? (
               <>
@@ -292,11 +292,11 @@ export default function ConversationBeatScreen({
 
       {/* Next button banner - slides up from bottom */}
       <div
-        className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-slate-800 via-slate-800 to-slate-800/95 border-t border-slate-700 shadow-2xl z-20 transition-all duration-300 ease-out ${
+        className={`fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-full md:max-w-[768px] bg-gradient-to-t from-slate-800 via-slate-800 to-slate-800/95 border-t border-slate-700 shadow-2xl z-20 transition-all duration-300 ease-out ${
           showNextBanner ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
         }`}
       >
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-7 sm:py-9">
+        <div className="px-4 sm:px-6 py-4 sm:py-5">
           <div className="flex items-center justify-center">
             <button
               onClick={handleNext}
