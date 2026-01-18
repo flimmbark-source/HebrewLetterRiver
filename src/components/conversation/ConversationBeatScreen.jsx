@@ -210,7 +210,7 @@ export default function ConversationBeatScreen({
                   }
                 `}
               >
-                <span className="hidden sm:inline">📜 {t('conversation.beat.transcript', 'Transcript')}</span>
+                <span className="hidden sm:inline">📜</span>
                 <span className="sm:hidden">📜</span>
               </button>
 

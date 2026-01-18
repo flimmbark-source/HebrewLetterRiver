@@ -28,7 +28,7 @@ export default function ConversationBriefScreen({ scenario, onStart, onBack }) {
                          '☆'.repeat(5 - scenario.metadata.difficulty);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-start justify-center px-3 sm:px-4 pt-0 pb-3 sm:pb-6">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-start justify-center px-3 sm:px-4 pt-3 pb-3 sm:pb-6">
       <div className="max-w-2xl w-full">
         {/* Back button */}
         <button
