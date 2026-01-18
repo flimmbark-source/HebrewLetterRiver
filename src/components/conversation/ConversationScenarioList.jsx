@@ -116,35 +116,36 @@ export default function ConversationScenarioList({
                       </p>
                     </div>
 
-                    {/* Difficulty badge */}
-                    <div className={`flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/50 border border-slate-700 flex-shrink-0 text-xs sm:text-sm ${getDifficultyColor(item.metadata.difficulty)}`}>
-                      <span>{difficultyStars(item.metadata.difficulty)}</span>
+                    {/* Stats badges */}
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      {/* Phrases */}
+                      <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/50 border border-slate-700 text-xs sm:text-sm text-slate-400">
+                        <span>💬</span>
+                        <span>{item.metadata.lineCount}</span>
+                      </div>
+
+                      {/* Beats */}
+                      <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/50 border border-slate-700 text-xs sm:text-sm text-slate-400">
+                        <span>🎯</span>
+                        <span>{item.metadata.beatsCount}</span>
+                      </div>
+
+                      {/* Difficulty */}
+                      <div className={`flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/50 border border-slate-700 text-xs sm:text-sm ${getDifficultyColor(item.metadata.difficulty)}`}>
+                        <span>{difficultyStars(item.metadata.difficulty)}</span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Stats row */}
-                  <div className="flex items-center gap-4 mb-1.5 text-xs sm:text-sm flex-wrap text-slate-400">
-                    <div className="flex items-center gap-2">
-                      <span>💬</span>
+                  {/* Progress stats row (only shown if has progress) */}
+                  {hasProgress && (
+                    <div className="flex items-center gap-2 mb-1.5 text-xs sm:text-sm text-blue-400">
+                      <span>📊</span>
                       <span>
-                        {item.metadata.lineCount} {t('conversation.list.phrases', 'phrases')}
+                        {item.stats.practicedLines}/{item.stats.totalLines} {t('conversation.list.practiced', 'practiced')}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span>🎯</span>
-                      <span>
-                        {item.metadata.beatsCount} {t('conversation.list.beats', 'beats')}
-                      </span>
-                    </div>
-                    {hasProgress && (
-                      <div className="flex items-center gap-2 text-blue-400">
-                        <span>📊</span>
-                        <span>
-                          {item.stats.practicedLines}/{item.stats.totalLines} {t('conversation.list.practiced', 'practiced')}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                  )}
 
                   {/* Progress bar */}
                   {hasProgress && (
