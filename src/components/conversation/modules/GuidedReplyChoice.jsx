@@ -64,7 +64,7 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
 
   const getChoiceStyles = useCallback((choice) => {
     const baseStyles = `
-      w-full p-4 rounded-lg border-2
+      w-full p-2 sm:p-3 md:p-2.5 rounded-lg border-2
       text-left font-medium transition-all duration-200
       cursor-pointer hover:scale-102
     `;
@@ -99,17 +99,17 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
       </div>
 
       {/* Context - show English meaning */}
-      <div className="p-3 sm:p-4 md:p-4 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-700/50">
-        <div className="text-xs sm:text-sm font-medium text-slate-400 mb-1 sm:mb-2 text-center">
+      <div className="p-2 sm:p-3 md:p-3 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-700/50">
+        <div className="text-xs font-medium text-slate-400 mb-1 text-center">
           {t('conversation.modules.guidedReplyChoice.contextLabel', 'You want to say:')}
         </div>
-        <div className="text-lg sm:text-2xl font-semibold text-slate-100 text-center">
+        <div className="text-base sm:text-lg md:text-lg font-semibold text-slate-100 text-center">
           {line.en}
         </div>
       </div>
 
       {/* Multiple choice options (Hebrew) */}
-      <div className="flex flex-col gap-2 sm:gap-3">
+      <div className="flex flex-col gap-1.5 sm:gap-2 md:gap-1.5">
         {choices.map((choice) => (
           <button
             key={choice.id}
@@ -145,15 +145,15 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
               </div>
 
               {/* Choice content */}
-              <div className="flex-1 flex flex-col gap-1 sm:gap-2 min-w-0">
+              <div className="flex-1 flex flex-col gap-0.5 sm:gap-1 md:gap-0.5 min-w-0">
                 {/* Hebrew text */}
-                <div className="text-base sm:text-xl font-semibold" dir="rtl">
+                <div className="text-base sm:text-lg md:text-base font-semibold" dir="rtl">
                   {choice.he}
                 </div>
 
                 {/* Transliteration hint */}
                 {choice.tl && (
-                  <div className="text-xs sm:text-sm text-slate-400 italic">
+                  <div className="text-xs text-slate-400 italic">
                     {choice.tl}
                   </div>
                 )}
