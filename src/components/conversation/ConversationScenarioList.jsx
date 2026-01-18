@@ -55,21 +55,21 @@ export default function ConversationScenarioList({
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center px-4 py-6 sm:p-6">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center px-4 py-3 sm:py-4 md:py-4">
       <div className="max-w-3xl w-full">
         {/* Header */}
-        <div className="mb-4 sm:mb-6">
+        <div className="mb-3 sm:mb-4 md:mb-3">
           {onBack && (
             <button
               onClick={onBack}
-              className="mb-3 flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-colors"
+              className="mb-2 flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-colors"
             >
               <span className="text-xl">←</span>
               <span className="text-sm">{t('conversation.list.back', 'Back')}</span>
             </button>
           )}
 
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+          <h1 className="text-xl sm:text-2xl md:text-2xl font-bold mb-1.5">
             {mode === 'dual-role'
               ? t('conversation.list.titleDualRole', 'Dual-Role Conversations')
               : t('conversation.list.title', 'Conversation Practice')}
@@ -88,7 +88,7 @@ export default function ConversationScenarioList({
             onSelect={(item) => onSelectScript?.(item.script, item.scenario)}
           />
         ) : (
-          <div className="grid gap-3 sm:gap-4">
+          <div className="grid gap-2 sm:gap-3 md:gap-2.5">
             {itemsWithStats.map((item) => {
               const completionPercent = item.stats.completionRate * 100;
               const hasProgress = item.stats.practicedLines > 0;
@@ -103,10 +103,10 @@ export default function ConversationScenarioList({
                 <button
                   key={item.metadata.id}
                   onClick={handleClick}
-                  className="w-full text-left bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-750 hover:to-slate-850 border border-slate-700 hover:border-slate-600 rounded-xl p-4 sm:p-5 transition-all duration-200 active:scale-98 shadow-lg hover:shadow-xl"
+                  className="w-full text-left bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-750 hover:to-slate-850 border border-slate-700 hover:border-slate-600 rounded-xl p-3 sm:p-4 md:p-3.5 transition-all duration-200 active:scale-98 shadow-lg hover:shadow-xl"
                 >
                   {/* Header row */}
-                  <div className="flex items-start justify-between mb-3 gap-3">
+                  <div className="flex items-start justify-between mb-2 gap-3">
                     <div className="flex-1 min-w-0">
                       <h3 className="text-base sm:text-lg font-bold text-slate-100 mb-1">
                         {item.metadata.title}
@@ -123,7 +123,7 @@ export default function ConversationScenarioList({
                   </div>
 
                   {/* Stats row */}
-                  <div className="flex items-center gap-4 mb-3 text-xs sm:text-sm flex-wrap text-slate-400">
+                  <div className="flex items-center gap-4 mb-2 text-xs sm:text-sm flex-wrap text-slate-400">
                     <div className="flex items-center gap-2">
                       <span>💬</span>
                       <span>
