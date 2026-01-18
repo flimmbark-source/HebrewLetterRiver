@@ -32,25 +32,25 @@ export default function ShadowRepeat({ line, onResult }) {
   }, [isCompleted, line, onResult]);
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl mx-auto">
+    <div className="flex flex-col gap-3 md:gap-4 max-w-2xl mx-auto">
       {/* Instructions */}
       <div className="text-center">
-        <h3 className="text-xl font-semibold text-slate-200 mb-2">
+        <h3 className="text-base sm:text-lg md:text-lg font-semibold text-slate-200 mb-1">
           {t('conversation.modules.shadowRepeat.instruction', 'Shadow and repeat')}
         </h3>
-        <p className="text-slate-400">
+        <p className="text-sm text-slate-400">
           {t('conversation.modules.shadowRepeat.hint', 'Listen to the phrase and repeat it out loud')}
         </p>
       </div>
 
       {/* Audio player */}
-      <div className="flex justify-center items-center gap-4 p-6 bg-slate-800/50 rounded-xl border border-slate-700">
+      <div className="flex justify-center items-center gap-4 p-3 sm:p-4 md:p-4 bg-slate-800/50 rounded-xl border border-slate-700">
         <SpeakButton
           nativeText={line.he}
           nativeLocale="he-IL"
           transliteration={line.tl}
           variant="iconWithLabel"
-          className="!py-3 !px-5 !text-base"
+          className="!py-2 sm:!py-2 md:!py-2 !px-3 sm:!px-4 md:!px-4 !text-sm"
         />
         <div className="text-slate-400 text-sm">
           {t('conversation.modules.shadowRepeat.playHint', 'Listen as many times as needed')}
@@ -58,11 +58,11 @@ export default function ShadowRepeat({ line, onResult }) {
       </div>
 
       {/* Target text toggle */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2 md:gap-3">
         <button
           onClick={handleToggleTarget}
           className={`
-            py-3 px-5 rounded-lg font-medium transition-all duration-200
+            py-2 sm:py-2.5 md:py-2.5 px-4 rounded-lg font-medium transition-all duration-200
             ${showTarget
               ? 'bg-slate-700 border-slate-600'
               : 'bg-blue-600 hover:bg-blue-500'
@@ -78,8 +78,8 @@ export default function ShadowRepeat({ line, onResult }) {
 
         {/* Target Hebrew text and transliteration */}
         {showTarget && (
-          <div className="p-6 bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 shadow-lg">
-            <div className="flex flex-col gap-4">
+          <div className="p-3 sm:p-4 md:p-4 bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 shadow-lg">
+            <div className="flex flex-col gap-2 md:gap-3">
               {/* Hebrew text */}
               <div className="text-center">
                 <div className="text-sm font-medium text-slate-400 mb-2">
@@ -115,12 +115,12 @@ export default function ShadowRepeat({ line, onResult }) {
       </div>
 
       {/* Completion buttons */}
-      <div className="flex gap-3 mt-4">
+      <div className="flex gap-2 sm:gap-3 md:gap-3">
         <button
           onClick={() => handleComplete(true)}
           disabled={isCompleted}
           className={`
-            flex-1 py-4 px-6 rounded-lg font-semibold text-lg
+            flex-1 py-2.5 sm:py-3 md:py-3 px-4 sm:px-5 md:px-5 rounded-lg font-semibold text-base md:text-base
             bg-emerald-600 hover:bg-emerald-500 text-white
             transition-all duration-200 hover:scale-105 active:scale-95
             border-2 border-emerald-500
@@ -134,7 +134,7 @@ export default function ShadowRepeat({ line, onResult }) {
           onClick={() => handleComplete(false)}
           disabled={isCompleted}
           className={`
-            flex-1 py-4 px-6 rounded-lg font-semibold text-lg
+            flex-1 py-2.5 sm:py-3 md:py-3 px-4 sm:px-5 md:px-5 rounded-lg font-semibold text-base md:text-base
             bg-slate-700 hover:bg-slate-600 text-slate-300
             transition-all duration-200 hover:scale-105 active:scale-95
             border-2 border-slate-600
@@ -143,11 +143,6 @@ export default function ShadowRepeat({ line, onResult }) {
         >
           ⏭️ {t('conversation.modules.shadowRepeat.skip', "Skip for now")}
         </button>
-      </div>
-
-      {/* Encouragement for users */}
-      <div className="text-center text-sm text-slate-500 italic">
-        {t('conversation.modules.shadowRepeat.encouragement', 'Shadowing helps build muscle memory for pronunciation')}
       </div>
     </div>
   );

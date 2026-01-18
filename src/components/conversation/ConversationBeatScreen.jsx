@@ -369,7 +369,7 @@ export default function ConversationBeatScreen({
 
       {/* Main content */}
       <div ref={mainContentRef} className="flex-1 overflow-y-auto">
-        <div className="w-full max-w-full md:max-w-[768px] mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        <div className="w-full max-w-full md:max-w-[768px] mx-auto px-3 sm:px-4 py-3 sm:py-4 md:py-4">
           {/* Transcript panel (collapsible) */}
           {showTranscript && attemptHistory.length > 0 && (
             <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-slate-800/50 rounded-xl border border-slate-700">
