@@ -55,7 +55,7 @@ export default function ConversationScenarioList({
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center px-4 py-2 sm:py-3 md:py-2.5">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-start justify-center px-4 py-2 sm:py-3 md:py-2.5">
       <div className="max-w-3xl w-full">
         {/* Header */}
         <div className="mb-2 sm:mb-3 md:mb-2">
