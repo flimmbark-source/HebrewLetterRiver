@@ -164,13 +164,13 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
   }, [line.sentenceData.hebrew, line.sentenceData.words]);
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl mx-auto">
+    <div className="flex flex-col gap-3 md:gap-4 max-w-2xl mx-auto">
       {/* Instructions */}
       <div className="text-center">
-        <h3 className="text-xl font-semibold text-slate-200 mb-2">
+        <h3 className="text-base sm:text-lg md:text-lg font-semibold text-slate-200 mb-1">
           {t('conversation.modules.typeInput.instruction', 'Type the answer')}
         </h3>
-        <p className="text-slate-400">
+        <p className="text-sm text-slate-400">
           {inputMode === 'hebrew'
             ? t('conversation.modules.typeInput.hintHebrew', 'Type the Hebrew phrase')
             : t('conversation.modules.typeInput.hintTranslit', 'Type the transliteration (pronunciation)')
@@ -179,7 +179,7 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
       </div>
 
       {/* Context - show individual clickable words */}
-      <div className="relative p-6 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-700/50">
+      <div className="relative p-3 sm:p-4 md:p-4 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-700/50">
         <div className="text-sm font-medium text-slate-400 mb-2 text-center">
           {t('conversation.modules.typeInput.contextLabel', 'You want to say:')}
         </div>

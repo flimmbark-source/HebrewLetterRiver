@@ -60,7 +60,7 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
 
   const getChoiceStyles = useCallback((choice) => {
     const baseStyles = `
-      w-full p-3 sm:p-4 rounded-lg border-2
+      w-full p-2 sm:p-3 md:p-3 rounded-lg border-2
       text-left font-medium transition-all duration-200
       cursor-pointer hover:scale-102
     `;
@@ -83,10 +83,10 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
   }, [selectedChoice, isSubmitted, line]);
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-4 max-w-2xl mx-auto">
+    <div className="flex flex-col gap-2 md:gap-3 max-w-2xl mx-auto">
       {/* Instructions */}
       <div className="text-center">
-        <h3 className="text-lg sm:text-xl font-semibold text-slate-200 mb-1 sm:mb-2">
+        <h3 className="text-base sm:text-lg md:text-lg font-semibold text-slate-200 mb-1">
           {t('conversation.modules.listenMeaningChoice.instruction', 'Listen and pick the meaning')}
         </h3>
         <p className="text-xs sm:text-sm text-slate-400">
@@ -95,13 +95,13 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
       </div>
 
       {/* Audio player */}
-      <div className="flex justify-center items-center gap-3 p-3 sm:p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+      <div className="flex justify-center items-center gap-3 p-2 sm:p-3 md:p-3 bg-slate-800/50 rounded-lg border border-slate-700">
         <SpeakButton
           nativeText={line.he}
           nativeLocale="he-IL"
           transliteration={line.tl}
           variant="iconWithLabel"
-          className="!py-2 sm:!py-3 !px-3 sm:!px-4 !text-sm sm:!text-base"
+          className="!py-1.5 sm:!py-2 md:!py-2 !px-2 sm:!px-3 md:!px-3 !text-sm"
         />
         <div className="text-slate-400 text-xs sm:text-sm">
           {t('conversation.modules.listenMeaningChoice.playHint', 'Click to hear the Hebrew phrase')}
@@ -109,7 +109,7 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
       </div>
 
       {/* Multiple choice options */}
-      <div className="flex flex-col gap-2 sm:gap-3">
+      <div className="flex flex-col gap-1.5 sm:gap-2 md:gap-2">
         {choices.map((choice) => (
           <button
             key={choice.id}

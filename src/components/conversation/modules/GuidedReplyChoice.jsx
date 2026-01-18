@@ -87,19 +87,19 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
   }, [selectedChoice, isSubmitted, line]);
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6 max-w-2xl mx-auto">
+    <div className="flex flex-col gap-2 md:gap-3 max-w-2xl mx-auto">
       {/* Instructions */}
       <div className="text-center">
-        <h3 className="text-lg sm:text-xl font-semibold text-slate-200 mb-1 sm:mb-2">
+        <h3 className="text-base sm:text-lg md:text-lg font-semibold text-slate-200 mb-1">
           {t('conversation.modules.guidedReplyChoice.instruction', 'Choose the Hebrew phrase')}
         </h3>
-        <p className="text-sm sm:text-base text-slate-400">
+        <p className="text-sm text-slate-400">
           {t('conversation.modules.guidedReplyChoice.hint', 'Pick the correct Hebrew response')}
         </p>
       </div>
 
       {/* Context - show English meaning */}
-      <div className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-700/50">
+      <div className="p-3 sm:p-4 md:p-4 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-700/50">
         <div className="text-xs sm:text-sm font-medium text-slate-400 mb-1 sm:mb-2 text-center">
           {t('conversation.modules.guidedReplyChoice.contextLabel', 'You want to say:')}
         </div>
