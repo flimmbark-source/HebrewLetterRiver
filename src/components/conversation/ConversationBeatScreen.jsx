@@ -5,7 +5,7 @@ import ShadowRepeat from './modules/ShadowRepeat.jsx';
 import GuidedReplyChoice from './modules/GuidedReplyChoice.jsx';
 import TypeInput from './modules/TypeInput.jsx';
 import { findDictionaryEntryForWord } from '../../lib/sentenceDictionaryLookup.ts';
-import { sentenceTransliterationLookup } from '../../data/conversation/scenarioFactory.ts';
+import { sentenceTransliterationLookup, sentenceMeaningsLookup } from '../../data/conversation/scenarioFactory.ts';
 
 /**
  * ConversationBeatScreen
@@ -34,6 +34,7 @@ export default function ConversationBeatScreen({
   const [showFeedbackBanner, setShowFeedbackBanner] = useState(false);
   const [pendingResult, setPendingResult] = useState(null);
   const mainContentRef = useRef(null);
+  const dictionaryPopupRef = useRef(null);
 
   // Hide main app navigation bar while in conversation practice
   useEffect(() => {
@@ -49,6 +50,22 @@ export default function ConversationBeatScreen({
       mainContentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [beatIndex]);
+
+  // Click outside to close dictionary popup
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dictionaryPopupRef.current && !dictionaryPopupRef.current.contains(event.target)) {
+        setShowDictionary(false);
+      }
+    };
+
+    if (showDictionary) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showDictionary]);
 
   // Find the line for this beat
   const currentLine = useMemo(() => {
@@ -223,7 +240,7 @@ export default function ConversationBeatScreen({
 
       {/* Dictionary popup */}
       {showDictionary && currentLine && (
-        <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] sm:w-full max-w-md px-4 sm:px-0">
+        <div ref={dictionaryPopupRef} className="fixed top-14 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] sm:w-full max-w-md px-4 sm:px-0">
           <div className="bg-slate-800 border-2 border-blue-500 rounded-lg shadow-2xl p-4 max-h-96 overflow-y-auto">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-lg font-semibold text-slate-200">
@@ -244,8 +261,7 @@ export default function ConversationBeatScreen({
                 if (!wordId) {
                   // Fallback if no wordId - but try to show transliteration and meaning
                   const transliteration = sentenceTransliterationLookup[word.hebrew];
-                  const isProperName = transliteration && /^[A-Z]/.test(transliteration);
-                  const meaningText = isProperName ? '(name)' : word.meaning || '—';
+                  const meaningText = sentenceMeaningsLookup[word.hebrew] || '—';
 
                   return (
                     <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
@@ -281,12 +297,9 @@ export default function ConversationBeatScreen({
                 const entry = findDictionaryEntryForWord(wordId, 'hebrew', 'en', t);
 
                 if (!entry) {
-                  // Fallback if word not found in dictionary - show transliteration from lookup table
+                  // Fallback if word not found in dictionary - show transliteration and meaning from lookup tables
                   const transliteration = sentenceTransliterationLookup[word.hebrew];
-
-                  // Check if it's a proper name (starts with capital letter)
-                  const isProperName = transliteration && /^[A-Z]/.test(transliteration);
-                  const meaningText = isProperName ? '(name)' : word.meaning || '—';
+                  const meaningText = sentenceMeaningsLookup[word.hebrew] || '—';
 
                   return (
                     <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
