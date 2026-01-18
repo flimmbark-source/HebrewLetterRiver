@@ -50,43 +50,40 @@ export default function ConversationBriefScreen({ scenario, onStart, onBack }) {
               {t(scenario.metadata.subtitleKey, `Practice ${scenario.metadata.theme.toLowerCase()}`)}
             </p>
 
-            {/* Difficulty */}
-            <div className="mt-2 sm:mt-3 flex items-center gap-2 sm:gap-3">
-              <span className="text-xs sm:text-sm font-medium text-slate-400">
-                {t('conversation.brief.difficulty', 'Difficulty')}:
-              </span>
-              <span className="text-base sm:text-lg text-amber-400">
-                {difficultyStars}
-              </span>
-              <span className="text-xs sm:text-sm text-slate-500">
-                ({scenario.metadata.difficulty}/5)
-              </span>
+            {/* Difficulty + stats */}
+            <div className="mt-2 sm:mt-3 flex flex-wrap items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm font-medium text-slate-400">
+                  {t('conversation.brief.difficulty', 'Difficulty')}:
+                </span>
+                <span className="text-base sm:text-lg text-amber-400">
+                  {difficultyStars}
+                </span>
+                <span className="text-xs sm:text-sm text-slate-500">
+                  ({scenario.metadata.difficulty}/5)
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm font-medium text-slate-400">
+                  {t('conversation.brief.phrases', 'Phrases')}:
+                </span>
+                <span className="text-base sm:text-lg text-slate-200">
+                  {scenario.metadata.lineCount}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm font-medium text-slate-400">
+                  {t('conversation.brief.totalBeats', 'Total beats')}:
+                </span>
+                <span className="text-base sm:text-lg text-slate-200">
+                  {scenario.defaultPlan.beats.length}
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Content */}
           <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              <div className="bg-slate-800/50 rounded-lg p-3 sm:p-4 border border-slate-700">
-                <div className="text-xs sm:text-sm text-slate-400 mb-0.5 sm:mb-1">
-                  {t('conversation.brief.phrases', 'Phrases')}
-                </div>
-                <div className="text-xl sm:text-2xl font-bold text-blue-400">
-                  {scenario.metadata.lineCount}
-                </div>
-              </div>
-
-              <div className="bg-slate-800/50 rounded-lg p-3 sm:p-4 border border-slate-700">
-                <div className="text-xs sm:text-sm text-slate-400 mb-0.5 sm:mb-1">
-                  {t('conversation.brief.totalBeats', 'Total beats')}
-                </div>
-                <div className="text-xl sm:text-2xl font-bold text-purple-400">
-                  {scenario.defaultPlan.beats.length}
-                </div>
-              </div>
-            </div>
-
             {/* Practice modules - compact */}
             <div>
               <h3 className="text-sm sm:text-base font-semibold mb-2 text-slate-200">
