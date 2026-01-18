@@ -4,6 +4,8 @@ import ListenMeaningChoice from './modules/ListenMeaningChoice.jsx';
 import ShadowRepeat from './modules/ShadowRepeat.jsx';
 import GuidedReplyChoice from './modules/GuidedReplyChoice.jsx';
 import TypeInput from './modules/TypeInput.jsx';
+import { findDictionaryEntryForWord } from '../../lib/sentenceDictionaryLookup.ts';
+import { sentenceTransliterationLookup } from '../../data/conversation/scenarioFactory.ts';
 
 /**
  * ConversationBeatScreen
@@ -27,6 +29,7 @@ export default function ConversationBeatScreen({
 }) {
   const { t } = useLocalization();
   const [showTranscript, setShowTranscript] = useState(false);
+  const [showDictionary, setShowDictionary] = useState(false);
   const [showNextBanner, setShowNextBanner] = useState(false);
   const [showFeedbackBanner, setShowFeedbackBanner] = useState(false);
   const [pendingResult, setPendingResult] = useState(null);
@@ -85,6 +88,10 @@ export default function ConversationBeatScreen({
 
   const toggleTranscript = useCallback(() => {
     setShowTranscript(prev => !prev);
+  }, []);
+
+  const toggleDictionary = useCallback(() => {
+    setShowDictionary(prev => !prev);
   }, []);
 
   // Render the appropriate module
@@ -186,6 +193,22 @@ export default function ConversationBeatScreen({
                 <span className="sm:hidden">📜</span>
               </button>
 
+              {/* Dictionary toggle */}
+              <button
+                onClick={toggleDictionary}
+                className={`
+                  px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium
+                  transition-all duration-200
+                  ${showDictionary
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  }
+                `}
+                title={t('conversation.modules.dictionary', 'Dictionary')}
+              >
+                📖
+              </button>
+
               {/* Save phrase button */}
               <button
                 onClick={handleSavePhrase}
@@ -206,6 +229,111 @@ export default function ConversationBeatScreen({
           </div>
         </div>
       </div>
+
+      {/* Dictionary popup */}
+      {showDictionary && currentLine && (
+        <div className="fixed top-14 right-4 z-50 w-full max-w-md">
+          <div className="bg-slate-800 border-2 border-blue-500 rounded-lg shadow-2xl p-4 max-h-96 overflow-y-auto">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-lg font-semibold text-slate-200">
+                {t('conversation.modules.dictionaryTitle', 'Word Dictionary')}
+              </h4>
+              <button
+                onClick={toggleDictionary}
+                className="text-slate-400 hover:text-slate-200 text-xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              {currentLine.sentenceData.words.map((word, index) => {
+                const wordId = word.wordId;
+
+                if (!wordId) {
+                  // Fallback if no wordId
+                  return (
+                    <div key={index} className="p-3 bg-slate-700/50 rounded-lg">
+                      <div className="text-base font-semibold text-slate-100 text-center" dir="rtl">
+                        {word.hebrew}
+                      </div>
+                      <div className="text-xs text-slate-400 text-center mt-1">
+                        {t('conversation.modules.typeInput.noWordData', 'Word details not available')}
+                      </div>
+                    </div>
+                  );
+                }
+
+                const entry = findDictionaryEntryForWord(wordId, 'hebrew', 'en', t);
+
+                if (!entry) {
+                  // Fallback if word not found in dictionary - show transliteration from lookup table
+                  const transliteration = sentenceTransliterationLookup[word.hebrew];
+                  return (
+                    <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        {/* Hebrew */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Hebrew</div>
+                          <div className="text-base font-semibold text-slate-100" dir="rtl">
+                            {word.hebrew}
+                          </div>
+                        </div>
+
+                        {/* Transliteration */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
+                          <div className="text-sm text-blue-300 italic">
+                            {transliteration || '—'}
+                          </div>
+                        </div>
+
+                        {/* Meaning placeholder */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Meaning</div>
+                          <div className="text-sm text-slate-500 italic">
+                            —
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      {/* Hebrew */}
+                      <div>
+                        <div className="text-xs text-slate-400 mb-1">Hebrew</div>
+                        <div className="text-base font-semibold text-slate-100" dir="rtl">
+                          {entry.practiceWord}
+                        </div>
+                      </div>
+
+                      {/* Transliteration */}
+                      <div>
+                        <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
+                        <div className="text-sm text-blue-300 italic">
+                          {entry.canonical}
+                        </div>
+                      </div>
+
+                      {/* English meaning */}
+                      <div>
+                        <div className="text-xs text-slate-400 mb-1">Meaning</div>
+                        <div className="text-sm text-slate-200">
+                          {entry.meaning}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main content */}
       <div ref={mainContentRef} className="flex-1 overflow-y-auto">

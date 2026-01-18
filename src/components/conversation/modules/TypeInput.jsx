@@ -19,7 +19,6 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
   const [inputMode, setInputMode] = useState(mode === 'auto' ? 'transliteration' : mode);
   const [displayMode, setDisplayMode] = useState('hebrew'); // Controls what's shown in "You want to say"
   const [clickedWordIndex, setClickedWordIndex] = useState(null); // Track which word was clicked
-  const [showDictionary, setShowDictionary] = useState(false);
   const inputRef = useRef(null);
   const wordPopupRef = useRef(null);
 
@@ -118,10 +117,6 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
     setClickedWordIndex(null);
   }, []);
 
-  const toggleDictionary = useCallback(() => {
-    setShowDictionary(prev => !prev);
-  }, []);
-
   const getInputPlaceholder = useCallback(() => {
     if (inputMode === 'hebrew') {
       return t('conversation.modules.typeInput.placeholderHebrew', 'Type in Hebrew...');
@@ -181,122 +176,6 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
             : t('conversation.modules.typeInput.hintTranslit', 'Type the transliteration (pronunciation)')
           }
         </p>
-      </div>
-
-      {/* Top bar with dictionary button */}
-      <div className="relative flex justify-end gap-2">
-        <button
-          onClick={toggleDictionary}
-          className="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors text-xl"
-          title={t('conversation.modules.dictionary', 'Dictionary')}
-        >
-          📖
-        </button>
-
-        {/* Dictionary popup */}
-        {showDictionary && (
-          <div className="absolute top-full right-0 mt-2 z-50 w-full sm:w-96">
-            <div className="bg-slate-800 border-2 border-blue-500 rounded-lg shadow-2xl p-4 max-h-96 overflow-y-auto">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-lg font-semibold text-slate-200">
-                  {t('conversation.modules.dictionaryTitle', 'Word Dictionary')}
-                </h4>
-                <button
-                  onClick={toggleDictionary}
-                  className="text-slate-400 hover:text-slate-200 text-xl leading-none"
-                >
-                  ×
-                </button>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                {line.sentenceData.words.map((word, index) => {
-                  const wordId = word.wordId;
-
-                  if (!wordId) {
-                    // Fallback if no wordId
-                    return (
-                      <div key={index} className="p-3 bg-slate-700/50 rounded-lg">
-                        <div className="text-base font-semibold text-slate-100 text-center" dir="rtl">
-                          {word.hebrew}
-                        </div>
-                        <div className="text-xs text-slate-400 text-center mt-1">
-                          {t('conversation.modules.typeInput.noWordData', 'Word details not available')}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  const entry = findDictionaryEntryForWord(wordId, 'hebrew', 'en', t);
-
-                  if (!entry) {
-                    // Fallback if word not found in dictionary - show transliteration from lookup table
-                    const transliteration = sentenceTransliterationLookup[word.hebrew];
-                    return (
-                      <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
-                        <div className="grid grid-cols-3 gap-2 text-center">
-                          {/* Hebrew */}
-                          <div>
-                            <div className="text-xs text-slate-400 mb-1">Hebrew</div>
-                            <div className="text-base font-semibold text-slate-100" dir="rtl">
-                              {word.hebrew}
-                            </div>
-                          </div>
-
-                          {/* Transliteration */}
-                          <div>
-                            <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
-                            <div className="text-sm text-blue-300 italic">
-                              {transliteration || '—'}
-                            </div>
-                          </div>
-
-                          {/* Meaning placeholder */}
-                          <div>
-                            <div className="text-xs text-slate-400 mb-1">Meaning</div>
-                            <div className="text-sm text-slate-500 italic">
-                              —
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
-                      <div className="grid grid-cols-3 gap-2 text-center">
-                        {/* Hebrew */}
-                        <div>
-                          <div className="text-xs text-slate-400 mb-1">Hebrew</div>
-                          <div className="text-base font-semibold text-slate-100" dir="rtl">
-                            {entry.practiceWord}
-                          </div>
-                        </div>
-
-                        {/* Transliteration */}
-                        <div>
-                          <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
-                          <div className="text-sm text-blue-300 italic">
-                            {entry.canonical}
-                          </div>
-                        </div>
-
-                        {/* English meaning */}
-                        <div>
-                          <div className="text-xs text-slate-400 mb-1">Meaning</div>
-                          <div className="text-sm text-slate-200">
-                            {entry.meaning}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Context - show individual clickable words */}
