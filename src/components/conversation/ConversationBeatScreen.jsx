@@ -47,7 +47,12 @@ export default function ConversationBeatScreen({
   // Scroll to top when beat changes
   useEffect(() => {
     if (mainContentRef.current) {
-      mainContentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        if (mainContentRef.current) {
+          mainContentRef.current.scrollTo({ top: 0, behavior: 'auto' });
+        }
+      });
     }
   }, [beatIndex]);
 
