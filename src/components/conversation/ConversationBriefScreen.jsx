@@ -105,15 +105,6 @@ export default function ConversationBriefScreen({ scenario, onStart, onBack }) {
               </div>
             </div>
 
-            {/* Quick tip - condensed */}
-            <div className="bg-blue-900/20 border border-blue-700/50 rounded-lg p-3 sm:p-4">
-              <div className="flex items-start gap-2 sm:gap-3">
-                <span className="text-lg sm:text-xl flex-shrink-0">💡</span>
-                <div className="text-xs sm:text-sm text-slate-300">
-                  {t('conversation.brief.quickTip', 'Use audio buttons for pronunciation. Save phrases you want to review. Take your time!')}
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Footer */}
