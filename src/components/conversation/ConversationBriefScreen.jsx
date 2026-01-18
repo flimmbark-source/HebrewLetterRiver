@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import { getModuleById } from '../../data/conversation/index.ts';
 
@@ -14,6 +14,10 @@ import { getModuleById } from '../../data/conversation/index.ts';
  */
 export default function ConversationBriefScreen({ scenario, onStart, onBack }) {
   const { t } = useLocalization();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
 
   // Get unique modules used in this scenario's plan
   const modulesUsed = useMemo(() => {
