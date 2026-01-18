@@ -208,15 +208,6 @@ export default function ConversationBeatScreen({
               >
                 📖
               </button>
-
-              {/* Save phrase button */}
-              <button
-                onClick={handleSavePhrase}
-                className="px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
-                title={t('conversation.beat.savePhrase', 'Save phrase to SRS')}
-              >
-                💾
-              </button>
             </div>
           </div>
 
@@ -232,7 +223,7 @@ export default function ConversationBeatScreen({
 
       {/* Dictionary popup */}
       {showDictionary && currentLine && (
-        <div className="fixed top-14 right-4 z-50 w-full max-w-md">
+        <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] sm:w-full max-w-md px-4 sm:px-0">
           <div className="bg-slate-800 border-2 border-blue-500 rounded-lg shadow-2xl p-4 max-h-96 overflow-y-auto">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-lg font-semibold text-slate-200">
@@ -251,24 +242,11 @@ export default function ConversationBeatScreen({
                 const wordId = word.wordId;
 
                 if (!wordId) {
-                  // Fallback if no wordId
-                  return (
-                    <div key={index} className="p-3 bg-slate-700/50 rounded-lg">
-                      <div className="text-base font-semibold text-slate-100 text-center" dir="rtl">
-                        {word.hebrew}
-                      </div>
-                      <div className="text-xs text-slate-400 text-center mt-1">
-                        {t('conversation.modules.typeInput.noWordData', 'Word details not available')}
-                      </div>
-                    </div>
-                  );
-                }
-
-                const entry = findDictionaryEntryForWord(wordId, 'hebrew', 'en', t);
-
-                if (!entry) {
-                  // Fallback if word not found in dictionary - show transliteration from lookup table
+                  // Fallback if no wordId - but try to show transliteration and meaning
                   const transliteration = sentenceTransliterationLookup[word.hebrew];
+                  const isProperName = transliteration && /^[A-Z]/.test(transliteration);
+                  const meaningText = isProperName ? '(name)' : word.meaning || '—';
+
                   return (
                     <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
                       <div className="grid grid-cols-3 gap-2 text-center">
@@ -288,11 +266,52 @@ export default function ConversationBeatScreen({
                           </div>
                         </div>
 
-                        {/* Meaning placeholder */}
+                        {/* Meaning */}
                         <div>
                           <div className="text-xs text-slate-400 mb-1">Meaning</div>
-                          <div className="text-sm text-slate-500 italic">
-                            —
+                          <div className={`text-sm ${meaningText === '—' ? 'text-slate-500 italic' : 'text-slate-200'}`}>
+                            {meaningText}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                const entry = findDictionaryEntryForWord(wordId, 'hebrew', 'en', t);
+
+                if (!entry) {
+                  // Fallback if word not found in dictionary - show transliteration from lookup table
+                  const transliteration = sentenceTransliterationLookup[word.hebrew];
+
+                  // Check if it's a proper name (starts with capital letter)
+                  const isProperName = transliteration && /^[A-Z]/.test(transliteration);
+                  const meaningText = isProperName ? '(name)' : word.meaning || '—';
+
+                  return (
+                    <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        {/* Hebrew */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Hebrew</div>
+                          <div className="text-base font-semibold text-slate-100" dir="rtl">
+                            {word.hebrew}
+                          </div>
+                        </div>
+
+                        {/* Transliteration */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
+                          <div className="text-sm text-blue-300 italic">
+                            {transliteration || '—'}
+                          </div>
+                        </div>
+
+                        {/* Meaning */}
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Meaning</div>
+                          <div className={`text-sm ${meaningText === '—' ? 'text-slate-500 italic' : 'text-slate-200'}`}>
+                            {meaningText}
                           </div>
                         </div>
                       </div>

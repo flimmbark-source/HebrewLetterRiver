@@ -35,6 +35,7 @@ const baseWordIdLookup: Record<string, string> = {
   קפה: 'coffee',
   עיר: 'city',
   לעיר: 'city',
+  בעיר: 'city',
   היום: 'today',
   מחר: 'tomorrow',
   אתמול: 'yesterday',
