@@ -117,23 +117,12 @@ export default function ConversationScenarioList({
                     </div>
 
                     {/* Stats badges */}
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      {/* Phrases */}
-                      <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/50 border border-slate-700 text-xs sm:text-sm text-slate-400">
-                        <span>💬</span>
-                        <span>{item.metadata.lineCount}</span>
-                      </div>
-
-                      {/* Beats */}
-                      <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/50 border border-slate-700 text-xs sm:text-sm text-slate-400">
-                        <span>🎯</span>
-                        <span>{item.metadata.beatsCount}</span>
-                      </div>
-
-                      {/* Difficulty */}
-                      <div className={`flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/50 border border-slate-700 text-xs sm:text-sm ${getDifficultyColor(item.metadata.difficulty)}`}>
-                        <span>{difficultyStars(item.metadata.difficulty)}</span>
-                      </div>
+                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 text-xs sm:text-sm">
+                      <span className="text-slate-400">💬 {item.metadata.lineCount}</span>
+                      <span className="text-slate-400">🎯 {item.metadata.beatsCount}</span>
+                      <span className={getDifficultyColor(item.metadata.difficulty)}>
+                        {difficultyStars(item.metadata.difficulty)}
+                      </span>
                     </div>
                   </div>
 
