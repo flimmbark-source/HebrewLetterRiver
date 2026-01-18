@@ -1483,7 +1483,9 @@
         "description": "Pick the correct Hebrew phrase from multiple options",
         "instruction": "Choose the Hebrew phrase",
         "hint": "Pick the correct Hebrew response",
-        "contextLabel": "You want to say:"
+        "contextLabel": "You want to say:",
+        "showTransliterations": "Show Transliterations",
+        "hideTransliterations": "Hide Transliterations"
       },
       "typeInput": {
         "name": "Type the Answer",

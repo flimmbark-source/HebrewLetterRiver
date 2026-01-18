@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import { getModuleById } from '../../data/conversation/index.ts';
 
@@ -15,6 +15,10 @@ import { getModuleById } from '../../data/conversation/index.ts';
 export default function ConversationBriefScreen({ scenario, onStart, onBack }) {
   const { t } = useLocalization();
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+
   // Get unique modules used in this scenario's plan
   const modulesUsed = useMemo(() => {
     const moduleIds = new Set(scenario.defaultPlan.beats.map(b => b.moduleId));
@@ -28,7 +32,7 @@ export default function ConversationBriefScreen({ scenario, onStart, onBack }) {
                          '☆'.repeat(5 - scenario.metadata.difficulty);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex sm:items-center justify-center px-3 sm:px-4 py-3 sm:py-6">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-start justify-center px-3 sm:px-4 pt-3 pb-3 sm:pb-6">
       <div className="max-w-2xl w-full">
         {/* Back button */}
         <button
@@ -50,43 +54,40 @@ export default function ConversationBriefScreen({ scenario, onStart, onBack }) {
               {t(scenario.metadata.subtitleKey, `Practice ${scenario.metadata.theme.toLowerCase()}`)}
             </p>
 
-            {/* Difficulty */}
-            <div className="mt-2 sm:mt-3 flex items-center gap-2 sm:gap-3">
-              <span className="text-xs sm:text-sm font-medium text-slate-400">
-                {t('conversation.brief.difficulty', 'Difficulty')}:
-              </span>
-              <span className="text-base sm:text-lg text-amber-400">
-                {difficultyStars}
-              </span>
-              <span className="text-xs sm:text-sm text-slate-500">
-                ({scenario.metadata.difficulty}/5)
-              </span>
+            {/* Difficulty + stats */}
+            <div className="mt-2 sm:mt-3 flex flex-wrap items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm font-medium text-slate-400">
+                  {t('conversation.brief.difficulty', 'Difficulty')}:
+                </span>
+                <span className="text-base sm:text-lg text-amber-400">
+                  {difficultyStars}
+                </span>
+                <span className="text-xs sm:text-sm text-slate-500">
+                  ({scenario.metadata.difficulty}/5)
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm font-medium text-slate-400">
+                  {t('conversation.brief.phrases', 'Phrases')}:
+                </span>
+                <span className="text-base sm:text-lg text-slate-200">
+                  {scenario.metadata.lineCount}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm font-medium text-slate-400">
+                  {t('conversation.brief.totalBeats', 'Total beats')}:
+                </span>
+                <span className="text-base sm:text-lg text-slate-200">
+                  {scenario.defaultPlan.beats.length}
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Content */}
           <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              <div className="bg-slate-800/50 rounded-lg p-3 sm:p-4 border border-slate-700">
-                <div className="text-xs sm:text-sm text-slate-400 mb-0.5 sm:mb-1">
-                  {t('conversation.brief.phrases', 'Phrases')}
-                </div>
-                <div className="text-xl sm:text-2xl font-bold text-blue-400">
-                  {scenario.metadata.lineCount}
-                </div>
-              </div>
-
-              <div className="bg-slate-800/50 rounded-lg p-3 sm:p-4 border border-slate-700">
-                <div className="text-xs sm:text-sm text-slate-400 mb-0.5 sm:mb-1">
-                  {t('conversation.brief.totalBeats', 'Total beats')}
-                </div>
-                <div className="text-xl sm:text-2xl font-bold text-purple-400">
-                  {scenario.defaultPlan.beats.length}
-                </div>
-              </div>
-            </div>
-
             {/* Practice modules - compact */}
             <div>
               <h3 className="text-sm sm:text-base font-semibold mb-2 text-slate-200">
@@ -108,15 +109,6 @@ export default function ConversationBriefScreen({ scenario, onStart, onBack }) {
               </div>
             </div>
 
-            {/* Quick tip - condensed */}
-            <div className="bg-blue-900/20 border border-blue-700/50 rounded-lg p-3 sm:p-4">
-              <div className="flex items-start gap-2 sm:gap-3">
-                <span className="text-lg sm:text-xl flex-shrink-0">💡</span>
-                <div className="text-xs sm:text-sm text-slate-300">
-                  {t('conversation.brief.quickTip', 'Use audio buttons for pronunciation. Save phrases you want to review. Take your time!')}
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Footer */}

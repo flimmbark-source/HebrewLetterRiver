@@ -12,6 +12,7 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
   const { t } = useLocalization();
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showTransliterations, setShowTransliterations] = useState(false);
   const [choices, setChoices] = useState([]);
 
   // Generate multiple choice options
@@ -152,7 +153,7 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
                 </div>
 
                 {/* Transliteration hint */}
-                {choice.tl && (
+                {choice.tl && showTransliterations && (
                   <div className="text-xs text-slate-400 italic">
                     {choice.tl}
                   </div>
@@ -183,6 +184,18 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
             </div>
           </button>
         ))}
+      </div>
+
+      <div className="flex justify-center pt-1">
+        <button
+          type="button"
+          onClick={() => setShowTransliterations((prev) => !prev)}
+          className="px-4 py-2 text-sm font-semibold rounded-full border border-slate-600 text-slate-200 bg-slate-800/70 hover:bg-slate-700 hover:border-slate-500 transition"
+        >
+          {showTransliterations
+            ? t('conversation.modules.guidedReplyChoice.hideTransliterations', 'Hide Transliterations')
+            : t('conversation.modules.guidedReplyChoice.showTransliterations', 'Show Transliterations')}
+        </button>
       </div>
     </div>
   );

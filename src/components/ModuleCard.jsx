@@ -91,6 +91,13 @@ export default function ModuleCard({ module, isLocked, onModuleComplete, onPract
     }
   }, [activeSection, module.id, onPracticeChange]);
 
+  useEffect(() => {
+    if (!activeSection) return;
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    });
+  }, [activeSection]);
+
   // Get sentences for this module
   const moduleSentences = allSentences.filter(s =>
     module.sentenceIds.includes(s.id)

@@ -46,14 +46,13 @@ export default function ConversationBeatScreen({
 
   // Scroll to top when beat changes
   useEffect(() => {
-    if (mainContentRef.current) {
-      // Use requestAnimationFrame to ensure DOM has updated
-      requestAnimationFrame(() => {
-        if (mainContentRef.current) {
-          mainContentRef.current.scrollTo({ top: 0, behavior: 'auto' });
-        }
-      });
-    }
+    // Use requestAnimationFrame to ensure DOM has updated
+    requestAnimationFrame(() => {
+      if (mainContentRef.current) {
+        mainContentRef.current.scrollTo({ top: 0, behavior: 'auto' });
+      }
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    });
   }, [beatIndex]);
 
   // Click outside to close dictionary popup
@@ -211,7 +210,7 @@ export default function ConversationBeatScreen({
                   }
                 `}
               >
-                <span className="hidden sm:inline">📜 {t('conversation.beat.transcript', 'Transcript')}</span>
+                <span className="hidden sm:inline">📜</span>
                 <span className="sm:hidden">📜</span>
               </button>
 
