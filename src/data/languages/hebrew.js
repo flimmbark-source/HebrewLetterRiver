@@ -1,35 +1,35 @@
 export const hebrewConsonants = [
-  { id: 'aleph', symbol: 'א', sound: '(A)', name: 'Aleph' },
-  { id: 'bet-dagesh', symbol: 'בּ', sound: 'B', name: 'Bet' },
-  { id: 'vet', symbol: 'ב', sound: 'V', name: 'Vet' },
-  { id: 'gimel', symbol: 'ג', sound: 'G', name: 'Gimel' },
-  { id: 'dalet', symbol: 'ד', sound: 'D', name: 'Dalet' },
-  { id: 'heh', symbol: 'ה', sound: 'H', name: 'Heh' },
-  { id: 'vav', symbol: 'ו', sound: 'V/o/u', name: 'Vav' },
-  { id: 'zayin', symbol: 'ז', sound: 'Z', name: 'Zayin' },
-  { id: 'chet', symbol: 'ח', sound: 'Ch', name: 'Chet' },
-  { id: 'tet', symbol: 'ט', sound: 'T', name: 'Tet' },
-  { id: 'yud', symbol: 'י', sound: 'Y', name: 'Yud' },
-  { id: 'kaf-dagesh', symbol: 'כּ', sound: 'K', name: 'Kaf' },
-  { id: 'chaf', symbol: 'כ', sound: 'Ch', name: 'Chaf' },
-  { id: 'final-chaf', symbol: 'ך', sound: 'Ch', name: 'Final Chaf' },
-  { id: 'lamed', symbol: 'ל', sound: 'L', name: 'Lamed' },
-  { id: 'mem', symbol: 'מ', sound: 'M', name: 'Mem' },
-  { id: 'final-mem', symbol: 'ם', sound: 'M', name: 'Final Mem' },
-  { id: 'nun', symbol: 'נ', sound: 'N', name: 'Nun' },
-  { id: 'final-nun', symbol: 'ן', sound: 'N', name: 'Final Nun' },
-  { id: 'samech', symbol: 'ס', sound: 'S', name: 'Samech' },
-  { id: 'ayin', symbol: 'ע', sound: '(Ah)', name: 'Ayin' },
-  { id: 'pei-dagesh', symbol: 'פּ', sound: 'P', name: 'Pei' },
-  { id: 'fei', symbol: 'פ', sound: 'F', name: 'Fei' },
-  { id: 'final-fei', symbol: 'ף', sound: 'F', name: 'Final Fei' },
-  { id: 'tzadi', symbol: 'צ', sound: 'Tz', name: 'Tzadi' },
-  { id: 'final-tzadi', symbol: 'ץ', sound: 'Tz', name: 'Final Tzadi' },
-  { id: 'kuf', symbol: 'ק', sound: 'K', name: 'Kuf' },
-  { id: 'resh', symbol: 'ר', sound: 'R', name: 'Resh' },
-  { id: 'shin', symbol: 'שׁ', sound: 'Sh', name: 'Shin' },
-  { id: 'sin', symbol: 'שׂ', sound: 'S', name: 'Sin' },
-  { id: 'tav', symbol: 'ת', sound: 'T', name: 'Tav' }
+  { id: 'aleph', symbol: 'א', sound: '(A)', pronunciation: '(A)', name: 'Aleph' },
+  { id: 'bet-dagesh', symbol: 'בּ', sound: 'B', pronunciation: 'B', name: 'Bet' },
+  { id: 'vet', symbol: 'ב', sound: 'V', pronunciation: 'V', name: 'Vet' },
+  { id: 'gimel', symbol: 'ג', sound: 'G', pronunciation: 'G', name: 'Gimel' },
+  { id: 'dalet', symbol: 'ד', sound: 'D', pronunciation: 'D', name: 'Dalet' },
+  { id: 'heh', symbol: 'ה', sound: 'H', pronunciation: 'H', name: 'Heh' },
+  { id: 'vav', symbol: 'ו', sound: 'V/o/u', pronunciation: 'V/o/u', name: 'Vav' },
+  { id: 'zayin', symbol: 'ז', sound: 'Z', pronunciation: 'Z', name: 'Zayin' },
+  { id: 'chet', symbol: 'ח', sound: 'Ch', pronunciation: 'Ch', name: 'Chet' },
+  { id: 'tet', symbol: 'ט', sound: 'T', pronunciation: 'T', name: 'Tet' },
+  { id: 'yud', symbol: 'י', sound: 'Y', pronunciation: 'Y', name: 'Yud' },
+  { id: 'kaf-dagesh', symbol: 'כּ', sound: 'K', pronunciation: 'K', name: 'Kaf' },
+  { id: 'chaf', symbol: 'כ', sound: 'Ch', pronunciation: 'Ch', name: 'Chaf' },
+  { id: 'final-chaf', symbol: 'ך', sound: 'Ch', pronunciation: 'Ch', name: 'Final Chaf' },
+  { id: 'lamed', symbol: 'ל', sound: 'L', pronunciation: 'L', name: 'Lamed' },
+  { id: 'mem', symbol: 'מ', sound: 'M', pronunciation: 'M', name: 'Mem' },
+  { id: 'final-mem', symbol: 'ם', sound: 'M', pronunciation: 'M', name: 'Final Mem' },
+  { id: 'nun', symbol: 'נ', sound: 'N', pronunciation: 'N', name: 'Nun' },
+  { id: 'final-nun', symbol: 'ן', sound: 'N', pronunciation: 'N', name: 'Final Nun' },
+  { id: 'samech', symbol: 'ס', sound: 'S', pronunciation: 'S', name: 'Samech' },
+  { id: 'ayin', symbol: 'ע', sound: '(Ah)', pronunciation: '(Ah)', name: 'Ayin' },
+  { id: 'pei-dagesh', symbol: 'פּ', sound: 'P', pronunciation: 'P', name: 'Pei' },
+  { id: 'fei', symbol: 'פ', sound: 'F', pronunciation: 'F', name: 'Fei' },
+  { id: 'final-fei', symbol: 'ף', sound: 'F', pronunciation: 'F', name: 'Final Fei' },
+  { id: 'tzadi', symbol: 'צ', sound: 'Tz', pronunciation: 'Tz', name: 'Tzadi' },
+  { id: 'final-tzadi', symbol: 'ץ', sound: 'Tz', pronunciation: 'Tz', name: 'Final Tzadi' },
+  { id: 'kuf', symbol: 'ק', sound: 'K', pronunciation: 'K', name: 'Kuf' },
+  { id: 'resh', symbol: 'ר', sound: 'R', pronunciation: 'R', name: 'Resh' },
+  { id: 'shin', symbol: 'שׁ', sound: 'Sh', pronunciation: 'Sh', name: 'Shin' },
+  { id: 'sin', symbol: 'שׂ', sound: 'S', pronunciation: 'S', name: 'Sin' },
+  { id: 'tav', symbol: 'ת', sound: 'T', pronunciation: 'T', name: 'Tav' }
 ];
 
 export const hebrewVowelMarkers = [
@@ -45,26 +45,26 @@ export const hebrewVowelGroups = [
 ];
 
 export const hebrewSyllableBases = [
-  { id: 'bet', symbol: 'ב', name: 'Bet', baseSound: 'B' },
-  { id: 'gimel-base', symbol: 'ג', name: 'Gimel', baseSound: 'G' },
-  { id: 'dalet-base', symbol: 'ד', name: 'Dalet', baseSound: 'D' },
-  { id: 'heh-base', symbol: 'ה', name: 'Heh', baseSound: 'H' },
-  { id: 'vav-base', symbol: 'ו', name: 'Vav', baseSound: 'V' },
-  { id: 'zayin-base', symbol: 'ז', name: 'Zayin', baseSound: 'Z' },
-  { id: 'chet-base', symbol: 'ח', name: 'Chet', baseSound: 'Ch' },
-  { id: 'tet-base', symbol: 'ט', name: 'Tet', baseSound: 'T' },
-  { id: 'yud-base', symbol: 'י', name: 'Yud', baseSound: 'Y' },
-  { id: 'kaf-base', symbol: 'כ', name: 'Kaf/Chaf', baseSound: 'K' },
-  { id: 'lamed-base', symbol: 'ל', name: 'Lamed', baseSound: 'L' },
-  { id: 'mem-base', symbol: 'מ', name: 'Mem', baseSound: 'M' },
-  { id: 'nun-base', symbol: 'נ', name: 'Nun', baseSound: 'N' },
-  { id: 'samech-base', symbol: 'ס', name: 'Samech', baseSound: 'S' },
-  { id: 'pei-base', symbol: 'פ', name: 'Pei/Fei', baseSound: 'P' },
-  { id: 'tzadi-base', symbol: 'צ', name: 'Tzadi', baseSound: 'Tz' },
-  { id: 'kuf-base', symbol: 'ק', name: 'Kuf', baseSound: 'K' },
-  { id: 'resh-base', symbol: 'ר', name: 'Resh', baseSound: 'R' },
-  { id: 'shin-base', symbol: 'ש', name: 'Shin/Sin', baseSound: 'Sh' },
-  { id: 'tav-base', symbol: 'ת', name: 'Tav', baseSound: 'T' }
+  { id: 'bet', symbol: 'ב', name: 'Bet', baseSound: 'B', sound: 'B', pronunciation: 'B' },
+  { id: 'gimel-base', symbol: 'ג', name: 'Gimel', baseSound: 'G', sound: 'G', pronunciation: 'G' },
+  { id: 'dalet-base', symbol: 'ד', name: 'Dalet', baseSound: 'D', sound: 'D', pronunciation: 'D' },
+  { id: 'heh-base', symbol: 'ה', name: 'Heh', baseSound: 'H', sound: 'H', pronunciation: 'H' },
+  { id: 'vav-base', symbol: 'ו', name: 'Vav', baseSound: 'V', sound: 'V', pronunciation: 'V' },
+  { id: 'zayin-base', symbol: 'ז', name: 'Zayin', baseSound: 'Z', sound: 'Z', pronunciation: 'Z' },
+  { id: 'chet-base', symbol: 'ח', name: 'Chet', baseSound: 'Ch', sound: 'Ch', pronunciation: 'Ch' },
+  { id: 'tet-base', symbol: 'ט', name: 'Tet', baseSound: 'T', sound: 'T', pronunciation: 'T' },
+  { id: 'yud-base', symbol: 'י', name: 'Yud', baseSound: 'Y', sound: 'Y', pronunciation: 'Y' },
+  { id: 'kaf-base', symbol: 'כ', name: 'Kaf/Chaf', baseSound: 'K', sound: 'K', pronunciation: 'K' },
+  { id: 'lamed-base', symbol: 'ל', name: 'Lamed', baseSound: 'L', sound: 'L', pronunciation: 'L' },
+  { id: 'mem-base', symbol: 'מ', name: 'Mem', baseSound: 'M', sound: 'M', pronunciation: 'M' },
+  { id: 'nun-base', symbol: 'נ', name: 'Nun', baseSound: 'N', sound: 'N', pronunciation: 'N' },
+  { id: 'samech-base', symbol: 'ס', name: 'Samech', baseSound: 'S', sound: 'S', pronunciation: 'S' },
+  { id: 'pei-base', symbol: 'פ', name: 'Pei/Fei', baseSound: 'P', sound: 'P', pronunciation: 'P' },
+  { id: 'tzadi-base', symbol: 'צ', name: 'Tzadi', baseSound: 'Tz', sound: 'Tz', pronunciation: 'Tz' },
+  { id: 'kuf-base', symbol: 'ק', name: 'Kuf', baseSound: 'K', sound: 'K', pronunciation: 'K' },
+  { id: 'resh-base', symbol: 'ר', name: 'Resh', baseSound: 'R', sound: 'R', pronunciation: 'R' },
+  { id: 'shin-base', symbol: 'ש', name: 'Shin/Sin', baseSound: 'Sh', sound: 'Sh', pronunciation: 'Sh' },
+  { id: 'tav-base', symbol: 'ת', name: 'Tav', baseSound: 'T', sound: 'T', pronunciation: 'T' }
 ];
 
 // Basic consonants (excluding final forms) for the consonants-basic mode
@@ -84,11 +84,13 @@ function randomFrom(arr) {
 // Niqqud with a random carrier letter (using hebrewSyllableBases as the pool)
 export const hebrewNiqqudWithCarrier = hebrewVowelMarkers.map((marker) => {
   const base = randomFrom(hebrewSyllableBases); // pick a random base consonant
+  const soundValue = `${base.baseSound}${marker.soundSuffix}`;
 
   return {
     id: `carrier-${base.id}-${marker.id}`,
     symbol: `${base.symbol}${marker.mark}`,         // e.g. ג + ַ
-    sound: `${base.baseSound}${marker.soundSuffix}`,// e.g. G + a → "Ga"
+    sound: soundValue,                              // e.g. G + a → "Ga"
+    pronunciation: soundValue,                      // e.g. "Ga"
     name: `${base.name} + ${marker.name}`,          // e.g. "Gimel + Patach"
     type: 'vowel',
     markerId: marker.id,
