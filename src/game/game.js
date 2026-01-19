@@ -1598,7 +1598,7 @@ function startClickMode(itemEl, payload) {
     waveCorrectCount = 0;
 
     let roundItems = [];
-    const itemPool = getModePool(gameMode);
+    const itemPool = getCombinedModePool(selectedModeIds);
     const isFirstWaveOfLevel = !hasIntroducedForItemInLevel;
 
     if (isRandomLettersModeActive()) {
@@ -1787,27 +1787,12 @@ function startClickMode(itemEl, payload) {
       });
     } else {
       // Subsequent waves: spawn all items at once with no delays
-    const STAGGER_MS = 500;
-
-    items.forEach((itemData, index) => {
-    if (!itemData || !itemData.id) return;
-    if (currentRound.id !== roundId) return;
-
-    const delay = index * STAGGER_MS;
-
-    const cb = () => {
-      if (!gameActive || isPaused || currentRound.id !== roundId) return;
-      startItemDrop(itemData, roundId);
-    };
-
-    const h = trackTimeout(cb, delay);
-    currentRound.timers.push({
-      handle: h,
-      startTime: Date.now(),
-      delay,
-      callback: cb,
+      items.forEach((itemData) => {
+        if (!itemData || !itemData.id) return;
+        if (currentRound.id !== roundId) return;
+        if (!gameActive || isPaused) return;
+        startItemDrop(itemData, roundId);
       });
-     });
     }
   } 
 
