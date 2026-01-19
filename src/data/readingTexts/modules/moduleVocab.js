@@ -420,11 +420,11 @@ export const module4VocabText = createReadingText({
     { type: 'word', text: 'פגישה', id: 'meeting' },
     { type: 'word', text: 'שעה', id: 'hour' },
     { type: 'word', text: 'דקות', id: 'minutes' },
-    { type: 'word', text: 'באים', id: 'come' },
-    { type: 'word', text: 'מגיעים', id: 'arrive' },
-    { type: 'word', text: 'מחכה', id: 'wait' },
-    { type: 'word', text: 'הולך', id: 'go' },
-    { type: 'word', text: 'מסיימים', id: 'finish' },
+    { type: 'word', text: 'באים', id: 'baim' },
+    { type: 'word', text: 'מגיעים', id: 'magiim' },
+    { type: 'word', text: 'מחכה', id: 'mechake' },
+    { type: 'word', text: 'הולך', id: 'holech' },
+    { type: 'word', text: 'מסיימים', id: 'mesayemim' },
     { type: 'word', text: 'לנוח', id: 'rest' }
   ],
   glosses: {
@@ -440,11 +440,11 @@ export const module4VocabText = createReadingText({
       meeting: 'meeting',
       hour: 'hour, o\'clock',
       minutes: 'minutes',
-      come: 'come',
-      arrive: 'arrive',
-      wait: 'wait',
-      go: 'go',
-      finish: 'finish',
+      baim: 'come',
+      magiim: 'arrive',
+      mechake: 'waiting',
+      holech: 'going',
+      mesayemim: 'finishing',
       rest: 'to rest'
     }
   },
