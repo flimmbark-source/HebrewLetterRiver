@@ -103,8 +103,8 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
           variant="iconWithLabel"
           className="!py-1.5 sm:!py-2 md:!py-2 !px-2 sm:!px-3 md:!px-3 !text-sm"
         />
-        <div className="text-slate-400 text-xs sm:text-sm">
-          {t('conversation.modules.listenMeaningChoice.playHint', 'Click to hear the Hebrew phrase')}
+        <div className="text-slate-200 text-lg sm:text-xl md:text-2xl font-semibold" dir="rtl">
+          {line.he}
         </div>
       </div>
 
