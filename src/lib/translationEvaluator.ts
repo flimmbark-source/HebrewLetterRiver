@@ -16,6 +16,96 @@ function normalizeWord(word: string): string {
 }
 
 /**
+ * Calculate Levenshtein distance (edit distance) between two strings
+ * Returns both the distance and the diff matrix for traceback
+ */
+function levenshteinDistanceWithMatrix(a: string, b: string): { distance: number; matrix: number[][] } {
+  const matrix: number[][] = [];
+
+  // Initialize matrix
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  // Calculate distances
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          matrix[i][j - 1] + 1,     // insertion
+          matrix[i - 1][j] + 1      // deletion
+        );
+      }
+    }
+  }
+
+  return { distance: matrix[b.length][a.length], matrix };
+}
+
+/**
+ * Calculate Levenshtein distance (edit distance) between two strings
+ */
+function levenshteinDistance(a: string, b: string): number {
+  return levenshteinDistanceWithMatrix(a, b).distance;
+}
+
+/**
+ * Generate character-level diff showing which characters in the correct answer differ from user input
+ */
+function generateCharDiff(correct: string, userInput: string): CharDiff[] {
+  const { matrix } = levenshteinDistanceWithMatrix(correct, userInput);
+  const diff: CharDiff[] = [];
+
+  let i = userInput.length;
+  let j = correct.length;
+
+  // Traceback to find the actual differences
+  while (i > 0 || j > 0) {
+    if (i === 0) {
+      // Remaining characters in correct were deleted from user input
+      diff.unshift({ char: correct[j - 1], type: 'delete' });
+      j--;
+    } else if (j === 0) {
+      // User inserted extra characters (we skip these in correct answer display)
+      i--;
+    } else if (userInput[i - 1] === correct[j - 1]) {
+      // Characters match
+      diff.unshift({ char: correct[j - 1], type: 'match' });
+      i--;
+      j--;
+    } else {
+      // Find which operation was used
+      const substituteCost = matrix[i - 1][j - 1];
+      const insertCost = matrix[i][j - 1];
+      const deleteCost = matrix[i - 1][j];
+      const minCost = Math.min(substituteCost, insertCost, deleteCost);
+
+      if (minCost === substituteCost) {
+        // Substitution
+        diff.unshift({ char: correct[j - 1], type: 'substitute' });
+        i--;
+        j--;
+      } else if (minCost === deleteCost) {
+        // Deletion (character missing in user input)
+        diff.unshift({ char: correct[j - 1], type: 'delete' });
+        j--;
+      } else {
+        // Insertion (extra character in user input)
+        i--;
+      }
+    }
+  }
+
+  return diff;
+}
+
+/**
  * Tokenize a sentence into normalized words
  */
 function tokenizeSentence(sentence: string): string[] {
@@ -44,6 +134,11 @@ function longestCommonSubsequenceLength(a: string[], b: string[]): number {
   return dp[a.length][b.length];
 }
 
+export interface CharDiff {
+  char: string;
+  type: 'match' | 'insert' | 'delete' | 'substitute';
+}
+
 export interface TranslationEvaluation {
   evaluations: Array<{ word: string; isMatch: boolean }>;
   status: 'correct' | 'partial' | 'incorrect';
@@ -52,6 +147,7 @@ export interface TranslationEvaluation {
   contentScore: number;
   orderScore: number;
   blendedScore: number;
+  charDiff?: CharDiff[];
 }
 
 /**
@@ -99,7 +195,17 @@ export function evaluateTranslation(
     : 0;
 
   const blendedScore = (contentScore * 0.7) + (orderScore * 0.3);
+
+  // Check character-level edit distance for lenient grading
+  // Normalize both strings by removing all whitespace and punctuation
+  const normalizedCorrect = correctSentence.toLowerCase().replace(/[\s.,!?;:'"()\[\]،؛-]/g, '');
+  const normalizedResponse = response.toLowerCase().replace(/[\s.,!?;:'"()\[\]،؛-]/g, '');
+  const editDistance = levenshteinDistance(normalizedCorrect, normalizedResponse);
+
+  // If edit distance is 2 or less, consider it correct (lenient grading)
+  // Otherwise use the percentage-based thresholds
   const status: 'correct' | 'partial' | 'incorrect' =
+    editDistance <= 2 ? 'correct' :
     blendedScore >= 0.85 ? 'correct' :
     blendedScore >= 0.55 ? 'partial' :
     'incorrect';
@@ -115,6 +221,9 @@ export function evaluateTranslation(
     return { word, isMatch };
   });
 
+  // Generate character-level diff for highlighting mistakes
+  const charDiff = generateCharDiff(correctSentence, response);
+
   return {
     evaluations,
     status,
@@ -122,7 +231,8 @@ export function evaluateTranslation(
     total: expectedTokens.length,
     contentScore,
     orderScore,
-    blendedScore
+    blendedScore,
+    charDiff
   };
 }
 

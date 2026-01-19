@@ -186,6 +186,32 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
         </div>
       </div>
 
+      {/* Show correct answer with character diff highlighting */}
+      {isSubmitted && evaluation && evaluation.status !== 'correct' && evaluation.charDiff && (
+        <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+          <div className="text-xs text-slate-400 mb-2 text-center">
+            Correct answer:
+          </div>
+          <div
+            className="text-lg font-medium text-center leading-relaxed"
+            dir={inputMode === 'hebrew' ? 'rtl' : 'ltr'}
+          >
+            {evaluation.charDiff.map((diff, index) => (
+              <span
+                key={index}
+                className={
+                  diff.type === 'match'
+                    ? 'text-slate-200'
+                    : 'text-red-400 font-bold'
+                }
+              >
+                {diff.char}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Button row: Display mode toggle and Submit */}
       {!isSubmitted && (
         <div className="flex justify-center gap-3">
