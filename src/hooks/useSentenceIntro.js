@@ -36,14 +36,22 @@ export function useSentenceIntro({
 
   // Extract word pairs from sentence
   const wordPairs = useMemo(() => {
-    if (!sentence?.words) return [];
+    if (!sentence?.words) {
+      console.log('[useSentenceIntro] No sentence or words:', sentence);
+      return [];
+    }
 
     const pairs = [];
     const seenMeanings = new Map();
 
+    console.log('[useSentenceIntro] Processing sentence:', sentence.id, 'with', sentence.words.length, 'words');
+
     sentence.words.forEach((word) => {
       // Skip words without dictionary entries
-      if (!word.wordId) return;
+      if (!word.wordId) {
+        console.log('[useSentenceIntro] Skipping word without wordId:', word.hebrew);
+        return;
+      }
 
       const entry = findDictionaryEntryForWord(
         word.wordId,
@@ -52,7 +60,10 @@ export function useSentenceIntro({
         t
       );
 
-      if (!entry?.meaning) return;
+      if (!entry?.meaning) {
+        console.log('[useSentenceIntro] No dictionary entry/meaning for:', word.wordId, entry);
+        return;
+      }
 
       const hebrew = word.surface || word.hebrew;
       let meaning = entry.meaning;
@@ -73,12 +84,22 @@ export function useSentenceIntro({
       });
     });
 
+    console.log('[useSentenceIntro] Extracted word pairs:', pairs);
+
     // Cap at 8 pairs for manageability
     return pairs.slice(0, 8);
   }, [sentence, practiceLanguageId, appLanguageId, t]);
 
   // Determine if popup should be shown
   const shouldShow = useMemo(() => {
+    console.log('[useSentenceIntro] Checking shouldShow:', {
+      enabled,
+      sentenceId: sentence?.id,
+      wordPairsLength: wordPairs.length,
+      isIntroduced: sentence?.id ? isSentenceIntroduced(sentence.id) : 'no-id',
+      hasShownInSession: sentence?.id ? hasShownInSession(sentence.id) : 'no-id'
+    });
+
     if (!enabled || !sentence?.id) return false;
     if (wordPairs.length === 0) return false;
     if (isSentenceIntroduced(sentence.id)) return false;
@@ -86,9 +107,16 @@ export function useSentenceIntro({
     return true;
   }, [enabled, sentence?.id, wordPairs.length]);
 
+  // Reset hasChecked when sentence changes
+  useEffect(() => {
+    setHasChecked(false);
+  }, [sentence?.id]);
+
   // Auto-show popup on mount if needed
   useEffect(() => {
+    console.log('[useSentenceIntro] Auto-show effect:', { hasChecked, shouldShow, sentenceId: sentence?.id });
     if (!hasChecked && shouldShow) {
+      console.log('[useSentenceIntro] ✅ SHOWING POPUP for sentence:', sentence?.id);
       setHasChecked(true);
       setShowPopup(true);
       if (sentence?.id) {
@@ -113,7 +141,7 @@ export function useSentenceIntro({
     // This callback is for any additional logic needed by the parent
   }, []);
 
-  return {
+  const result = {
     shouldShow,
     showPopup: showPopup && wordPairs.length > 0,
     openPopup: handleShowPopup,
@@ -126,6 +154,14 @@ export function useSentenceIntro({
       onComplete: handleComplete
     }
   };
+
+  console.log('[useSentenceIntro] Returning:', {
+    shouldShow: result.shouldShow,
+    showPopup: result.showPopup,
+    wordPairsCount: wordPairs.length
+  });
+
+  return result;
 }
 
 /**
