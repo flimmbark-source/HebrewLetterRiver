@@ -12,6 +12,7 @@ const FADE_DURATION = 1000; // Fade lines over 1 second
 const CAPSULE_RADIUS = 40; // Hit detection radius
 const BOUNCE_DAMPING = 0.7; // Velocity reduction on bounce
 const LINE_OF_SIGHT_BUFFER = 65; // Clearance for matched capsules
+const CAPSULE_CLEARANCE_BUFFER = 14; // Extra spacing to avoid overlaps
 
 export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const canvasRef = useRef(null);
@@ -50,16 +51,31 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     const capsules = [];
     const padding = 80;
-    const minSpacing = 100; // Minimum distance between capsules
     const usableWidth = bounds.width - padding * 2;
     const usableHeight = bounds.height - padding * 2;
 
+    const measurementCanvas = document.createElement('canvas');
+    const measurementContext = measurementCanvas.getContext('2d');
+    const getCapsuleRadius = (text, isHebrew) => {
+      if (!measurementContext) {
+        return CAPSULE_RADIUS;
+      }
+      const fontSize = isHebrew ? 18 : 16;
+      const fontFamily = isHebrew ? '"Noto Sans Hebrew", "Arial", sans-serif' : '"Inter", "Arial", sans-serif';
+      measurementContext.font = `600 ${fontSize}px ${fontFamily}`;
+      const textWidth = measurementContext.measureText(text).width;
+      const width = textWidth + 32;
+      const height = fontSize + 16;
+      return Math.max(width, height) / 2 + CAPSULE_CLEARANCE_BUFFER;
+    };
+
     // Helper to check if position is too close to existing capsules
-    const isTooClose = (x, y, existingCapsules) => {
+    const isTooClose = (x, y, radius, existingCapsules) => {
       return existingCapsules.some(cap => {
         const dx = cap.x - x;
         const dy = cap.y - y;
-        return Math.sqrt(dx * dx + dy * dy) < minSpacing;
+        const minDistance = radius + (cap.radius ?? CAPSULE_RADIUS) + CAPSULE_CLEARANCE_BUFFER;
+        return Math.sqrt(dx * dx + dy * dy) < minDistance;
       });
     };
 
@@ -107,20 +123,46 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     // Create capsules scattered like leaves in a river - pairs start near each other
     uniquePairs.forEach((pair, index) => {
+      const radii = {
+        hebrew: getCapsuleRadius(pair.hebrew, true),
+        transliteration: getCapsuleRadius(pair.transliteration || pair.hebrew, false),
+        meaning: getCapsuleRadius(pair.meaning, false)
+      };
+      const minPairSpacing = Math.max(
+        radii.hebrew + radii.transliteration,
+        radii.hebrew + radii.meaning,
+        radii.transliteration + radii.meaning
+      ) + CAPSULE_CLEARANCE_BUFFER;
+
       // Find a valid center point that doesn't overlap with existing capsules
-      const pairSpacings = [110, 95, 80]; // Distance between pair members
+      const pairSpacings = [
+        minPairSpacing + 30,
+        minPairSpacing + 15,
+        minPairSpacing
+      ]; // Distance between pair members
       let centerX, centerY, hebrewX, hebrewY, translitX, translitY, meaningX, meaningY;
       const isValidPlacement = (positions) => {
         const withinBounds = [positions.hebrew, positions.transliteration, positions.meaning]
           .every(pos => isWithinBounds(pos.x, pos.y));
 
-        const spacingOk = !isTooClose(positions.hebrew.x, positions.hebrew.y, capsules) &&
-          !isTooClose(positions.transliteration.x, positions.transliteration.y, capsules) &&
-          !isTooClose(positions.meaning.x, positions.meaning.y, capsules);
+        const spacingOk = !isTooClose(positions.hebrew.x, positions.hebrew.y, radii.hebrew, capsules) &&
+          !isTooClose(positions.transliteration.x, positions.transliteration.y, radii.transliteration, capsules) &&
+          !isTooClose(positions.meaning.x, positions.meaning.y, radii.meaning, capsules);
+
+        const pairSpacingOk = [
+          ['hebrew', 'transliteration'],
+          ['hebrew', 'meaning'],
+          ['transliteration', 'meaning']
+        ].every(([first, second]) => {
+          const dx = positions[first].x - positions[second].x;
+          const dy = positions[first].y - positions[second].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          return distance >= radii[first] + radii[second] + CAPSULE_CLEARANCE_BUFFER;
+        });
 
         const lineOfSightOk = hasClearLineOfSight(positions, capsules);
 
-        return withinBounds && spacingOk && lineOfSightOk;
+        return withinBounds && spacingOk && pairSpacingOk && lineOfSightOk;
       };
 
       const applyPlacement = (positions) => {
@@ -217,6 +259,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         pairIndex: index,
         x: hebrewX,
         y: hebrewY,
+        radius: radii.hebrew,
         vx: (Math.random() - 0.5) * 0.4,
         vy: (Math.random() - 0.5) * 0.4,
         targetVx: (Math.random() - 0.5) * 0.4,
@@ -234,6 +277,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         pairIndex: index,
         x: translitX,
         y: translitY,
+        radius: radii.transliteration,
         vx: (Math.random() - 0.5) * 0.4,
         vy: (Math.random() - 0.5) * 0.4,
         targetVx: (Math.random() - 0.5) * 0.4,
@@ -251,6 +295,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         pairIndex: index,
         x: meaningX,
         y: meaningY,
+        radius: radii.meaning,
         vx: (Math.random() - 0.5) * 0.4,
         vy: (Math.random() - 0.5) * 0.4,
         targetVx: (Math.random() - 0.5) * 0.4,
