@@ -11,7 +11,7 @@ import { getReadingTextById } from '../data/readingTexts/index.js';
  * @param {Object} sentence - Sentence object with id and words array
  * @param {string} practiceLanguageId - Practice language (e.g., 'hebrew')
  * @param {string} appLanguageId - App language (e.g., 'en')
- * @returns {Map<string, {hebrew: string, meaning: string, wordId: string}>} Map of wordId to entry
+ * @returns {Map<string, {hebrew: string, meaning: string, transliteration?: string, wordId: string}>} Map of wordId to entry
  */
 export function getSentenceWordMeanings(sentence, practiceLanguageId = 'hebrew', appLanguageId = 'en') {
   if (!sentence?.id || !sentence?.words) {
@@ -28,15 +28,18 @@ export function getSentenceWordMeanings(sentence, practiceLanguageId = 'hebrew',
 
   const meanings = new Map();
   const glosses = readingText.glosses?.[appLanguageId] || readingText.glosses?.['en'] || {};
+  const translations = readingText.translations?.['en'] || readingText.translations?.[appLanguageId] || {};
 
   sentence.words.forEach(word => {
     if (!word.wordId) return;
 
     const meaning = glosses[word.wordId];
+    const transliteration = translations[word.wordId]?.canonical;
     if (meaning) {
       meanings.set(word.wordId, {
         hebrew: word.surface || word.hebrew,
         meaning,
+        transliteration,
         wordId: word.wordId
       });
     }

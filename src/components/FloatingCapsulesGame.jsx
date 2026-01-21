@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 /**
  * FloatingCapsulesGame - A word-matching mini-game with floating capsules
  *
- * Players drag Hebrew capsules onto their matching English meaning capsules.
+ * Players drag Hebrew, transliteration, or meaning capsules onto their matching partners.
  * Capsules float gently like leaves on water with connecting lines shown at start.
  */
 
@@ -24,7 +24,6 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
   // Capsule state
   const capsulesRef = useRef([]);
-  const [matchedPairs, setMatchedPairs] = useState(new Set());
   const [ghostPairs, setGhostPairs] = useState([]);
 
   // Drag state
@@ -84,8 +83,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     // Create capsules scattered like leaves in a river - pairs start near each other
     uniquePairs.forEach((pair, index) => {
       // Find a valid center point that doesn't overlap with existing capsules
-      const pairSpacing = 100; // Distance between pair members
-      let centerX, centerY, hebrewX, hebrewY, meaningX, meaningY;
+      const pairSpacing = 110; // Distance between pair members
+      let centerX, centerY, hebrewX, hebrewY, translitX, translitY, meaningX, meaningY;
       let attempts = 0;
       const maxAttempts = 100;
 
@@ -94,19 +93,19 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         centerX = padding + Math.random() * usableWidth;
         centerY = padding + Math.random() * usableHeight;
 
-        const angle = Math.random() * Math.PI * 2;
-        const hebrewOffsetX = Math.cos(angle) * (pairSpacing / 2);
-        const hebrewOffsetY = Math.sin(angle) * (pairSpacing / 2);
-        const meaningOffsetX = -hebrewOffsetX;
-        const meaningOffsetY = -hebrewOffsetY;
+        const baseAngle = Math.random() * Math.PI * 2;
+        const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
 
-        hebrewX = centerX + hebrewOffsetX;
-        hebrewY = centerY + hebrewOffsetY;
-        meaningX = centerX + meaningOffsetX;
-        meaningY = centerY + meaningOffsetY;
+        hebrewX = centerX + Math.cos(angles[0]) * pairSpacing;
+        hebrewY = centerY + Math.sin(angles[0]) * pairSpacing;
+        translitX = centerX + Math.cos(angles[1]) * pairSpacing;
+        translitY = centerY + Math.sin(angles[1]) * pairSpacing;
+        meaningX = centerX + Math.cos(angles[2]) * pairSpacing;
+        meaningY = centerY + Math.sin(angles[2]) * pairSpacing;
 
-        // Check if both positions are valid (not too close to existing capsules)
+        // Check if all positions are valid (not too close to existing capsules)
         if (!isTooClose(hebrewX, hebrewY, capsules) &&
+            !isTooClose(translitX, translitY, capsules) &&
             !isTooClose(meaningX, meaningY, capsules)) {
           break;
         }
@@ -121,11 +120,14 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         centerX = padding + usableWidth * ((col + 0.5) / 3);
         centerY = padding + usableHeight * ((row + 0.5) / Math.ceil(uniquePairs.length / 3));
 
-        const angle = Math.random() * Math.PI * 2;
-        hebrewX = centerX + Math.cos(angle) * (pairSpacing / 2);
-        hebrewY = centerY + Math.sin(angle) * (pairSpacing / 2);
-        meaningX = centerX - Math.cos(angle) * (pairSpacing / 2);
-        meaningY = centerY - Math.sin(angle) * (pairSpacing / 2);
+        const baseAngle = Math.random() * Math.PI * 2;
+        const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
+        hebrewX = centerX + Math.cos(angles[0]) * pairSpacing;
+        hebrewY = centerY + Math.sin(angles[0]) * pairSpacing;
+        translitX = centerX + Math.cos(angles[1]) * pairSpacing;
+        translitY = centerY + Math.sin(angles[1]) * pairSpacing;
+        meaningX = centerX + Math.cos(angles[2]) * pairSpacing;
+        meaningY = centerY + Math.sin(angles[2]) * pairSpacing;
       }
 
       // Hebrew capsule
@@ -136,6 +138,20 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         pairIndex: index,
         x: hebrewX,
         y: hebrewY,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
+        matched: false,
+        shaking: false
+      });
+
+      // Transliteration capsule
+      capsules.push({
+        id: `transliteration-${index}`,
+        type: 'transliteration',
+        text: pair.transliteration || pair.hebrew,
+        pairIndex: index,
+        x: translitX,
+        y: translitY,
         vx: (Math.random() - 0.5) * 0.6,
         vy: (Math.random() - 0.5) * 0.6,
         matched: false,
@@ -252,7 +268,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     };
   }, [gameState, playAreaBounds]);
 
-  // Pointer event handlers - both types are now draggable
+  // Pointer event handlers - all capsule types are draggable
   const handlePointerDown = useCallback((e, capsule, index) => {
     if (capsule.matched) return; // Only prevent dragging matched capsules
 
@@ -285,64 +301,66 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     const index = dragStateRef.current.capsuleIndex;
     const draggedCapsule = capsulesRef.current[index];
-    const targetType = draggedCapsule.type === 'hebrew' ? 'meaning' : 'hebrew';
 
-    // Check for matches with opposite type capsules
-    let matched = false;
-    capsulesRef.current.forEach(capsule => {
-      if (capsule.type === targetType && !capsule.matched) {
+    const candidates = capsulesRef.current
+      .map((capsule, capsuleIndex) => ({ capsule, capsuleIndex }))
+      .filter(({ capsule, capsuleIndex }) => capsuleIndex !== index && !capsule.matched)
+      .map(({ capsule }) => {
         const dx = draggedCapsule.x - capsule.x;
         const dy = draggedCapsule.y - capsule.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
+        return { capsule, distance };
+      })
+      .filter(({ distance }) => distance < CAPSULE_RADIUS * 2)
+      .sort((a, b) => a.distance - b.distance);
 
-        if (distance < CAPSULE_RADIUS * 2) {
-          // Check if correct match
-          if (draggedCapsule.pairIndex === capsule.pairIndex) {
-            // Correct match! Mark as popping before setting matched
-            draggedCapsule.popping = true;
-            capsule.popping = true;
+    const target = candidates[0]?.capsule;
 
-            // Delay the actual match marking to show pop animation
-            setTimeout(() => {
-              draggedCapsule.matched = true;
-              capsule.matched = true;
-              matched = true;
+    if (target) {
+      if (draggedCapsule.pairIndex === target.pairIndex) {
+        const remainingForPair = capsulesRef.current.filter(
+          c => c.pairIndex === draggedCapsule.pairIndex && !c.matched
+        );
+        const removeTarget = remainingForPair.length <= 2;
 
-              setMatchedPairs(prev => new Set([...prev, draggedCapsule.pairIndex]));
-
-              // Check if all matched
-              const allMatched = capsulesRef.current
-                .filter(c => c.type === 'hebrew')
-                .every(c => c.matched);
-
-              if (allMatched) {
-                const time = Date.now() - startTimeRef.current;
-                setCompletionTime(time);
-                setGameState('completed');
-              }
-            }, 400);
-
-            // Determine which is hebrew and which is meaning
-            const hebrewCapsule = draggedCapsule.type === 'hebrew' ? draggedCapsule : capsule;
-            const meaningCapsule = draggedCapsule.type === 'meaning' ? draggedCapsule : capsule;
-
-            // Add floating ghost that moves upward
-            setGhostPairs(prev => [...prev, {
-              hebrew: hebrewCapsule.text,
-              meaning: meaningCapsule.text,
-              x: (draggedCapsule.x + capsule.x) / 2,
-              y: (draggedCapsule.y + capsule.y) / 2,
-              startY: (draggedCapsule.y + capsule.y) / 2,
-              timestamp: Date.now()
-            }]);
-          } else {
-            // Incorrect match
-            draggedCapsule.shaking = true;
-            setMismatchCount(prev => prev + 1);
-          }
+        draggedCapsule.popping = true;
+        if (removeTarget) {
+          target.popping = true;
         }
+
+        setTimeout(() => {
+          draggedCapsule.matched = true;
+          if (removeTarget) {
+            target.matched = true;
+          }
+
+          const allMatched = capsulesRef.current.every(c => c.matched);
+          if (allMatched) {
+            const time = Date.now() - startTimeRef.current;
+            setCompletionTime(time);
+            setGameState('completed');
+          }
+        }, 400);
+
+        const removedCapsules = [
+          { text: draggedCapsule.text, type: draggedCapsule.type }
+        ];
+        if (removeTarget) {
+          removedCapsules.push({ text: target.text, type: target.type });
+        }
+
+        setGhostPairs(prev => [...prev, {
+          items: removedCapsules,
+          x: removeTarget ? (draggedCapsule.x + target.x) / 2 : draggedCapsule.x,
+          y: removeTarget ? (draggedCapsule.y + target.y) / 2 : draggedCapsule.y,
+          startY: removeTarget ? (draggedCapsule.y + target.y) / 2 : draggedCapsule.y,
+          timestamp: Date.now()
+        }]);
+      } else {
+        draggedCapsule.shaking = true;
+        setMismatchCount(prev => prev + 1);
       }
-    });
+    }
 
     dragStateRef.current.isDragging = false;
   }, []);
@@ -364,20 +382,27 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       if (!showLines || lineOpacity <= 0) return;
 
       const capsules = capsulesRef.current;
-      const hebrewCapsules = capsules.filter(c => c.type === 'hebrew');
-      const meaningCapsules = capsules.filter(c => c.type === 'meaning');
-
       ctx.strokeStyle = `rgba(255, 255, 255, ${lineOpacity * 0.4})`;
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
 
-      hebrewCapsules.forEach(hebrew => {
-        const meaning = meaningCapsules.find(m => m.pairIndex === hebrew.pairIndex);
-        if (meaning) {
-          ctx.beginPath();
-          ctx.moveTo(hebrew.x, hebrew.y);
-          ctx.lineTo(meaning.x, meaning.y);
-          ctx.stroke();
+      const capsulesByPair = new Map();
+      capsules.forEach(capsule => {
+        if (capsule.matched) return;
+        if (!capsulesByPair.has(capsule.pairIndex)) {
+          capsulesByPair.set(capsule.pairIndex, []);
+        }
+        capsulesByPair.get(capsule.pairIndex).push(capsule);
+      });
+
+      capsulesByPair.forEach(pairCapsules => {
+        for (let i = 0; i < pairCapsules.length; i += 1) {
+          for (let j = i + 1; j < pairCapsules.length; j += 1) {
+            ctx.beginPath();
+            ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
+            ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
+            ctx.stroke();
+          }
         }
       });
 
@@ -474,8 +499,20 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
                 opacity
               }}
             >
-              <span className="hebrew-font text-emerald-400 font-bold text-base drop-shadow-lg" dir="rtl">{ghost.hebrew}</span>
-              <span className="text-teal-400 font-semibold text-sm drop-shadow-lg">{ghost.meaning}</span>
+              {ghost.items.map((item, itemIndex) => {
+                const isHebrew = item.type === 'hebrew';
+                return (
+                  <span
+                    key={`${item.text}-${itemIndex}`}
+                    className={`font-semibold drop-shadow-lg ${
+                      isHebrew ? 'hebrew-font text-emerald-200' : 'text-slate-200'
+                    }`}
+                    dir={isHebrew ? 'rtl' : 'ltr'}
+                  >
+                    {item.text}
+                  </span>
+                );
+              })}
             </div>
           );
         })}
@@ -485,6 +522,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
           if (capsule.matched) return null;
 
           const isHebrew = capsule.type === 'hebrew';
+          const isTransliteration = capsule.type === 'transliteration';
           const isDragging = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === index;
           const isPopping = capsule.popping;
 
@@ -508,7 +546,9 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
                 className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap shadow-lg transition-all ${
                   isHebrew
                     ? 'bg-blue-600 text-white'
-                    : 'bg-purple-600 text-white'
+                    : isTransliteration
+                      ? 'bg-amber-500 text-white'
+                      : 'bg-purple-600 text-white'
                 } ${
                   isDragging ? 'scale-110 shadow-2xl' : ''
                 } ${

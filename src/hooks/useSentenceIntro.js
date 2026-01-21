@@ -73,6 +73,7 @@ export function useSentenceIntro({
 
       const hebrew = word.surface || word.hebrew;
       let meaning = entry.meaning;
+      const transliteration = entry.transliteration;
 
       // Handle duplicate meanings by adding disambiguators
       if (seenMeanings.has(meaning)) {
@@ -86,6 +87,7 @@ export function useSentenceIntro({
       pairs.push({
         hebrew,
         meaning,
+        transliteration,
         wordId: word.wordId
       });
     });
