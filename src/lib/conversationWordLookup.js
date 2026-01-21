@@ -3,12 +3,12 @@
  * Uses the sentenceMeaningsLookup from scenarioFactory which is specific to conversation practice
  */
 
-import { sentenceMeaningsLookup } from '../data/conversation/scenarioFactory.ts';
+import { sentenceMeaningsLookup, sentenceTransliterationLookup } from '../data/conversation/scenarioFactory.ts';
 
 /**
  * Get word meanings for a conversation line
  * @param {Object} line - ConversationLine with sentenceData
- * @returns {Array} Array of {hebrew, meaning, wordId} pairs
+ * @returns {Array} Array of {hebrew, meaning, transliteration, wordId} pairs
  */
 export function getConversationWordMeanings(line) {
   if (!line?.sentenceData?.words) {
@@ -32,6 +32,7 @@ export function getConversationWordMeanings(line) {
     // Try to get meaning from sentenceMeaningsLookup
     const hebrewText = word.surface || word.hebrew;
     let meaning = sentenceMeaningsLookup[hebrewText] || sentenceMeaningsLookup[word.hebrew];
+    const transliteration = sentenceTransliterationLookup[hebrewText] || sentenceTransliterationLookup[word.hebrew];
 
     // If not found in lookup, try by wordId
     if (!meaning && word.wordId) {
@@ -55,6 +56,7 @@ export function getConversationWordMeanings(line) {
     pairs.push({
       hebrew: hebrewText,
       meaning,
+      transliteration,
       wordId: word.wordId || hebrewText
     });
   });
