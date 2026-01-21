@@ -127,6 +127,28 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       const minY = padding;
       const maxY = bounds.height - padding;
       const maxIterations = 30;
+      const pairGroups = new Map();
+
+      capsulesToResolve.forEach(capsule => {
+        if (!pairGroups.has(capsule.pairIndex)) {
+          pairGroups.set(capsule.pairIndex, []);
+        }
+        pairGroups.get(capsule.pairIndex).push(capsule);
+      });
+
+      const clampCapsule = (capsule) => {
+        capsule.x = Math.max(minX, Math.min(maxX, capsule.x));
+        capsule.y = Math.max(minY, Math.min(maxY, capsule.y));
+      };
+
+      const applyPairOffset = (pairIndex, offsetX, offsetY) => {
+        const group = pairGroups.get(pairIndex) || [];
+        group.forEach(member => {
+          member.x += offsetX;
+          member.y += offsetY;
+          clampCapsule(member);
+        });
+      };
 
       for (let iteration = 0; iteration < maxIterations; iteration += 1) {
         let moved = false;
@@ -148,10 +170,17 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
               const offsetX = Math.cos(angle) * (overlap / 2);
               const offsetY = Math.sin(angle) * (overlap / 2);
 
-              first.x = Math.max(minX, Math.min(maxX, first.x - offsetX));
-              first.y = Math.max(minY, Math.min(maxY, first.y - offsetY));
-              second.x = Math.max(minX, Math.min(maxX, second.x + offsetX));
-              second.y = Math.max(minY, Math.min(maxY, second.y + offsetY));
+              if (first.pairIndex === second.pairIndex) {
+                first.x -= offsetX;
+                first.y -= offsetY;
+                second.x += offsetX;
+                second.y += offsetY;
+                clampCapsule(first);
+                clampCapsule(second);
+              } else {
+                applyPairOffset(first.pairIndex, -offsetX, -offsetY);
+                applyPairOffset(second.pairIndex, offsetX, offsetY);
+              }
               moved = true;
             }
           }
