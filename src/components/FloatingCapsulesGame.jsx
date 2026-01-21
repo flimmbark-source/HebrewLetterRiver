@@ -81,33 +81,37 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       };
     };
 
-    // Create Hebrew capsules (left side)
+    // Create capsules in pairs - place them near each other for clear preview lines
     uniquePairs.forEach((pair, index) => {
-      const pos = findGoodPosition(0, usableWidth * 0.45, capsules);
+      const numPairs = uniquePairs.length;
+      const rowHeight = usableHeight / (numPairs + 1);
+      const yBase = padding + rowHeight * (index + 1);
+
+      // Add some vertical variation so they're not perfectly aligned
+      const yVariation = (Math.random() - 0.5) * 60;
+
+      // Hebrew capsule (left side)
       capsules.push({
         id: `hebrew-${index}`,
         type: 'hebrew',
         text: pair.hebrew,
         pairIndex: index,
-        x: pos.x,
-        y: pos.y,
+        x: padding + usableWidth * 0.25,
+        y: yBase + yVariation,
         vx: (Math.random() - 0.5) * 0.3,
         vy: (Math.random() - 0.5) * 0.3,
         matched: false,
         shaking: false
       });
-    });
 
-    // Create meaning capsules (right side)
-    uniquePairs.forEach((pair, index) => {
-      const pos = findGoodPosition(usableWidth * 0.55, usableWidth, capsules);
+      // Meaning capsule (right side, roughly aligned with its pair)
       capsules.push({
         id: `meaning-${index}`,
         type: 'meaning',
         text: pair.meaning,
         pairIndex: index,
-        x: pos.x,
-        y: pos.y,
+        x: padding + usableWidth * 0.75,
+        y: yBase + yVariation,
         vx: (Math.random() - 0.5) * 0.3,
         vy: (Math.random() - 0.5) * 0.3,
         matched: false,
@@ -155,7 +159,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     });
   }
 
-  // Animation loop
+  // Animation loop - keep capsules moving even during drag
   useEffect(() => {
     if (gameState !== 'playing') return;
 
@@ -163,8 +167,11 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       const capsules = capsulesRef.current;
       const bounds = playAreaBounds;
 
-      capsules.forEach(capsule => {
-        if (capsule.matched || dragStateRef.current.isDragging) return;
+      capsules.forEach((capsule, index) => {
+        // Skip matched capsules and the one currently being dragged
+        if (capsule.matched) return;
+        const isDragging = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === index;
+        if (isDragging) return;
 
         // Update position
         capsule.x += capsule.vx;
@@ -253,36 +260,43 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         if (distance < CAPSULE_RADIUS * 2) {
           // Check if correct match
           if (draggedCapsule.pairIndex === capsule.pairIndex) {
-            // Correct match!
-            draggedCapsule.matched = true;
-            capsule.matched = true;
-            matched = true;
+            // Correct match! Mark as popping before setting matched
+            draggedCapsule.popping = true;
+            capsule.popping = true;
 
-            setMatchedPairs(prev => new Set([...prev, draggedCapsule.pairIndex]));
+            // Delay the actual match marking to show pop animation
+            setTimeout(() => {
+              draggedCapsule.matched = true;
+              capsule.matched = true;
+              matched = true;
+
+              setMatchedPairs(prev => new Set([...prev, draggedCapsule.pairIndex]));
+
+              // Check if all matched
+              const allMatched = capsulesRef.current
+                .filter(c => c.type === 'hebrew')
+                .every(c => c.matched);
+
+              if (allMatched) {
+                const time = Date.now() - startTimeRef.current;
+                setCompletionTime(time);
+                setGameState('completed');
+              }
+            }, 400);
 
             // Determine which is hebrew and which is meaning
             const hebrewCapsule = draggedCapsule.type === 'hebrew' ? draggedCapsule : capsule;
             const meaningCapsule = draggedCapsule.type === 'meaning' ? draggedCapsule : capsule;
 
-            // Add ghost
+            // Add floating ghost that moves upward
             setGhostPairs(prev => [...prev, {
               hebrew: hebrewCapsule.text,
               meaning: meaningCapsule.text,
               x: (draggedCapsule.x + capsule.x) / 2,
               y: (draggedCapsule.y + capsule.y) / 2,
+              startY: (draggedCapsule.y + capsule.y) / 2,
               timestamp: Date.now()
             }]);
-
-            // Check if all matched
-            const allMatched = capsulesRef.current
-              .filter(c => c.type === 'hebrew')
-              .every(c => c.matched);
-
-            if (allMatched) {
-              const time = Date.now() - startTimeRef.current;
-              setCompletionTime(time);
-              setGameState('completed');
-            }
           } else {
             // Incorrect match
             draggedCapsule.shaking = true;
@@ -409,24 +423,40 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
-        {/* Ghost pairs (afterimages) */}
+        {/* Ghost pairs (afterimages) - float upward with color */}
         {ghostPairs.map((ghost, i) => {
           const age = Date.now() - ghost.timestamp;
-          const opacity = Math.max(0, 1 - age / 2000);
+          const duration = 2500; // Float for 2.5 seconds
+          const progress = Math.min(age / duration, 1);
+
+          // Float upward 150px over the duration
+          const floatDistance = 150;
+          const currentY = ghost.startY - (floatDistance * progress);
+
+          // Scale grows slightly then shrinks
+          const scale = 1 + Math.sin(progress * Math.PI) * 0.3;
+
+          // Fade out in the last 30% of the animation
+          const fadeStart = 0.7;
+          const opacity = progress < fadeStart ? 1 : 1 - ((progress - fadeStart) / (1 - fadeStart));
+
+          if (progress >= 1) return null; // Don't render if done
+
           return (
             <div
               key={`ghost-${i}`}
-              className="absolute pointer-events-none transition-opacity duration-1000"
+              className="absolute pointer-events-none"
               style={{
                 left: ghost.x,
-                top: ghost.y,
-                transform: 'translate(-50%, -50%)',
-                opacity
+                top: currentY,
+                transform: `translate(-50%, -50%) scale(${scale})`,
+                opacity,
+                transition: 'none'
               }}
             >
-              <div className="flex flex-col items-center gap-1 text-slate-400 text-sm">
-                <span className="hebrew-font" dir="rtl">{ghost.hebrew}</span>
-                <span>{ghost.meaning}</span>
+              <div className="flex flex-col items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-emerald-500/80 to-teal-500/80 rounded-lg shadow-lg">
+                <span className="hebrew-font text-white font-bold text-sm" dir="rtl">{ghost.hebrew}</span>
+                <span className="text-white font-semibold text-xs">{ghost.meaning}</span>
               </div>
             </div>
           );
@@ -438,12 +468,15 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
           const isHebrew = capsule.type === 'hebrew';
           const isDragging = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === index;
+          const isPopping = capsule.popping;
 
           return (
             <div
               key={capsule.id}
               className={`absolute select-none transition-all cursor-grab active:cursor-grabbing ${
                 capsule.shaking ? 'animate-shake' : ''
+              } ${
+                isPopping ? 'animate-pop' : ''
               }`}
               style={{
                 left: capsule.x,
@@ -454,7 +487,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
               onPointerDown={(e) => handlePointerDown(e, capsule, index)}
             >
               <div
-                className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap shadow-lg ${
+                className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap shadow-lg transition-all ${
                   isHebrew
                     ? 'bg-blue-600 text-white'
                     : 'bg-purple-600 text-white'
@@ -507,6 +540,17 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         }
         .animate-shake {
           animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes pop {
+          0% { transform: translate(-50%, -50%) scale(1); }
+          25% { transform: translate(-50%, -50%) scale(1.2); }
+          50% { transform: translate(-50%, -50%) scale(0.9); }
+          75% { transform: translate(-50%, -50%) scale(1.15); }
+          100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        }
+        .animate-pop {
+          animation: pop 0.4s ease-out forwards;
         }
       `}</style>
     </div>
