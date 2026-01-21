@@ -83,18 +83,50 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     // Create capsules scattered like leaves in a river - pairs start near each other
     uniquePairs.forEach((pair, index) => {
-      // Pick a random center point in the play area for this pair
-      const centerX = padding + Math.random() * usableWidth;
-      const centerY = padding + Math.random() * usableHeight;
-
-      // Place Hebrew and meaning capsules near this center point
+      // Find a valid center point that doesn't overlap with existing capsules
       const pairSpacing = 100; // Distance between pair members
-      const angle = Math.random() * Math.PI * 2; // Random angle for pair orientation
+      let centerX, centerY, hebrewX, hebrewY, meaningX, meaningY;
+      let attempts = 0;
+      const maxAttempts = 100;
 
-      const hebrewOffsetX = Math.cos(angle) * (pairSpacing / 2);
-      const hebrewOffsetY = Math.sin(angle) * (pairSpacing / 2);
-      const meaningOffsetX = -hebrewOffsetX;
-      const meaningOffsetY = -hebrewOffsetY;
+      // Keep trying until we find a valid position for the pair
+      while (attempts < maxAttempts) {
+        centerX = padding + Math.random() * usableWidth;
+        centerY = padding + Math.random() * usableHeight;
+
+        const angle = Math.random() * Math.PI * 2;
+        const hebrewOffsetX = Math.cos(angle) * (pairSpacing / 2);
+        const hebrewOffsetY = Math.sin(angle) * (pairSpacing / 2);
+        const meaningOffsetX = -hebrewOffsetX;
+        const meaningOffsetY = -hebrewOffsetY;
+
+        hebrewX = centerX + hebrewOffsetX;
+        hebrewY = centerY + hebrewOffsetY;
+        meaningX = centerX + meaningOffsetX;
+        meaningY = centerY + meaningOffsetY;
+
+        // Check if both positions are valid (not too close to existing capsules)
+        if (!isTooClose(hebrewX, hebrewY, capsules) &&
+            !isTooClose(meaningX, meaningY, capsules)) {
+          break;
+        }
+
+        attempts++;
+      }
+
+      // If we couldn't find a good spot, fall back to grid positioning
+      if (attempts >= maxAttempts) {
+        const col = index % 3;
+        const row = Math.floor(index / 3);
+        centerX = padding + usableWidth * ((col + 0.5) / 3);
+        centerY = padding + usableHeight * ((row + 0.5) / Math.ceil(uniquePairs.length / 3));
+
+        const angle = Math.random() * Math.PI * 2;
+        hebrewX = centerX + Math.cos(angle) * (pairSpacing / 2);
+        hebrewY = centerY + Math.sin(angle) * (pairSpacing / 2);
+        meaningX = centerX - Math.cos(angle) * (pairSpacing / 2);
+        meaningY = centerY - Math.sin(angle) * (pairSpacing / 2);
+      }
 
       // Hebrew capsule
       capsules.push({
@@ -102,8 +134,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         type: 'hebrew',
         text: pair.hebrew,
         pairIndex: index,
-        x: centerX + hebrewOffsetX,
-        y: centerY + hebrewOffsetY,
+        x: hebrewX,
+        y: hebrewY,
         vx: (Math.random() - 0.5) * 0.6,
         vy: (Math.random() - 0.5) * 0.6,
         matched: false,
@@ -116,8 +148,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         type: 'meaning',
         text: pair.meaning,
         pairIndex: index,
-        x: centerX + meaningOffsetX,
-        y: centerY + meaningOffsetY,
+        x: meaningX,
+        y: meaningY,
         vx: (Math.random() - 0.5) * 0.6,
         vy: (Math.random() - 0.5) * 0.6,
         matched: false,
