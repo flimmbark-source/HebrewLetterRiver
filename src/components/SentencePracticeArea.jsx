@@ -340,6 +340,17 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
 
   return (
     <div className="space-y-4 p-4">
+      {/* DEBUG: Show intro popup state */}
+      <div className="bg-yellow-100 border border-yellow-400 p-2 text-xs font-mono space-y-1">
+        <div>DEBUG: showPopup={String(sentenceIntro.showPopup)} | shouldShow={String(sentenceIntro.shouldShow)} | wordPairs={sentenceIntro.popupProps.wordPairs.length}</div>
+        <button
+          onClick={sentenceIntro.openPopup}
+          className="px-2 py-1 bg-blue-600 text-white rounded text-xs"
+        >
+          Force Open Popup
+        </button>
+      </div>
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <button

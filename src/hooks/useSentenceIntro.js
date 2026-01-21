@@ -31,6 +31,13 @@ export function useSentenceIntro({
   t = (key) => key,
   enabled = true
 } = {}) {
+  console.log('[useSentenceIntro] HOOK CALLED with:', {
+    sentenceId: sentence?.id,
+    enabled,
+    hasSentence: !!sentence,
+    hasWords: !!sentence?.words
+  });
+
   const [showPopup, setShowPopup] = useState(false);
   const [hasChecked, setHasChecked] = useState(false);
 
