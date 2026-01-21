@@ -38,7 +38,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const playAreaRef = useRef(null);
   const [playAreaBounds, setPlayAreaBounds] = useState({ width: 0, height: 0 });
 
-  // Initialize capsules with random positions
+  // Initialize capsules with well-distributed positions
   useEffect(() => {
     if (!playAreaRef.current) return;
 
@@ -49,21 +49,50 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     const uniquePairs = ensureUniquePairs(wordPairs);
 
     const capsules = [];
-    const padding = 60;
+    const padding = 80;
+    const minSpacing = 100; // Minimum distance between capsules
     const usableWidth = bounds.width - padding * 2;
     const usableHeight = bounds.height - padding * 2;
 
+    // Helper to check if position is too close to existing capsules
+    const isTooClose = (x, y, existingCapsules) => {
+      return existingCapsules.some(cap => {
+        const dx = cap.x - x;
+        const dy = cap.y - y;
+        return Math.sqrt(dx * dx + dy * dy) < minSpacing;
+      });
+    };
+
+    // Helper to find a good random position
+    const findGoodPosition = (xMin, xMax, existingCapsules, maxAttempts = 50) => {
+      for (let i = 0; i < maxAttempts; i++) {
+        const x = padding + xMin + Math.random() * (xMax - xMin);
+        const y = padding + Math.random() * usableHeight;
+        if (!isTooClose(x, y, existingCapsules)) {
+          return { x, y };
+        }
+      }
+      // Fallback to grid-based positioning if random fails
+      const row = existingCapsules.length % 3;
+      const col = Math.floor(existingCapsules.length / 3);
+      return {
+        x: padding + xMin + (xMax - xMin) * (col * 0.3),
+        y: padding + usableHeight * ((row + 0.5) / 4)
+      };
+    };
+
     // Create Hebrew capsules (left side)
     uniquePairs.forEach((pair, index) => {
+      const pos = findGoodPosition(0, usableWidth * 0.45, capsules);
       capsules.push({
         id: `hebrew-${index}`,
         type: 'hebrew',
         text: pair.hebrew,
         pairIndex: index,
-        x: padding + Math.random() * (usableWidth * 0.4),
-        y: padding + Math.random() * usableHeight,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
+        x: pos.x,
+        y: pos.y,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
         matched: false,
         shaking: false
       });
@@ -71,16 +100,18 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     // Create meaning capsules (right side)
     uniquePairs.forEach((pair, index) => {
+      const pos = findGoodPosition(usableWidth * 0.55, usableWidth, capsules);
       capsules.push({
         id: `meaning-${index}`,
         type: 'meaning',
         text: pair.meaning,
         pairIndex: index,
-        x: padding + usableWidth * 0.6 + Math.random() * (usableWidth * 0.4),
-        y: padding + Math.random() * usableHeight,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        matched: false
+        x: pos.x,
+        y: pos.y,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        matched: false,
+        shaking: false
       });
     });
 
@@ -176,15 +207,16 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     };
   }, [gameState, playAreaBounds]);
 
-  // Pointer event handlers
+  // Pointer event handlers - both types are now draggable
   const handlePointerDown = useCallback((e, capsule, index) => {
-    if (capsule.type !== 'hebrew' || capsule.matched) return;
+    if (capsule.matched) return; // Only prevent dragging matched capsules
 
     e.preventDefault();
     const rect = playAreaRef.current.getBoundingClientRect();
     dragStateRef.current = {
       isDragging: true,
       capsuleIndex: index,
+      capsuleType: capsule.type, // Track which type we're dragging
       offsetX: e.clientX - rect.left - capsule.x,
       offsetY: e.clientY - rect.top - capsule.y
     };
@@ -207,32 +239,37 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     if (!dragStateRef.current.isDragging) return;
 
     const index = dragStateRef.current.capsuleIndex;
-    const hebrewCapsule = capsulesRef.current[index];
+    const draggedCapsule = capsulesRef.current[index];
+    const targetType = draggedCapsule.type === 'hebrew' ? 'meaning' : 'hebrew';
 
-    // Check for matches with meaning capsules
+    // Check for matches with opposite type capsules
     let matched = false;
     capsulesRef.current.forEach(capsule => {
-      if (capsule.type === 'meaning' && !capsule.matched) {
-        const dx = hebrewCapsule.x - capsule.x;
-        const dy = hebrewCapsule.y - capsule.y;
+      if (capsule.type === targetType && !capsule.matched) {
+        const dx = draggedCapsule.x - capsule.x;
+        const dy = draggedCapsule.y - capsule.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < CAPSULE_RADIUS * 2) {
           // Check if correct match
-          if (hebrewCapsule.pairIndex === capsule.pairIndex) {
+          if (draggedCapsule.pairIndex === capsule.pairIndex) {
             // Correct match!
-            hebrewCapsule.matched = true;
+            draggedCapsule.matched = true;
             capsule.matched = true;
             matched = true;
 
-            setMatchedPairs(prev => new Set([...prev, hebrewCapsule.pairIndex]));
+            setMatchedPairs(prev => new Set([...prev, draggedCapsule.pairIndex]));
+
+            // Determine which is hebrew and which is meaning
+            const hebrewCapsule = draggedCapsule.type === 'hebrew' ? draggedCapsule : capsule;
+            const meaningCapsule = draggedCapsule.type === 'meaning' ? draggedCapsule : capsule;
 
             // Add ghost
             setGhostPairs(prev => [...prev, {
               hebrew: hebrewCapsule.text,
-              meaning: capsule.text,
-              x: (hebrewCapsule.x + capsule.x) / 2,
-              y: (hebrewCapsule.y + capsule.y) / 2,
+              meaning: meaningCapsule.text,
+              x: (draggedCapsule.x + capsule.x) / 2,
+              y: (draggedCapsule.y + capsule.y) / 2,
               timestamp: Date.now()
             }]);
 
@@ -248,7 +285,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
             }
           } else {
             // Incorrect match
-            hebrewCapsule.shaking = true;
+            draggedCapsule.shaking = true;
             setMismatchCount(prev => prev + 1);
           }
         }
@@ -347,7 +384,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     <div className="relative w-full h-full">
       {/* Instructions */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-slate-800/90 px-4 py-2 rounded-lg text-center">
-        <p className="text-sm text-slate-200">Drag Hebrew words to their meanings</p>
+        <p className="text-sm text-slate-200">Drag words together to match them</p>
         {showLines && (
           <p className="text-xs text-slate-400 mt-1">Lines will fade soon...</p>
         )}
@@ -405,9 +442,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
           return (
             <div
               key={capsule.id}
-              className={`absolute select-none transition-all ${
-                isHebrew ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
-              } ${
+              className={`absolute select-none transition-all cursor-grab active:cursor-grabbing ${
                 capsule.shaking ? 'animate-shake' : ''
               }`}
               style={{
