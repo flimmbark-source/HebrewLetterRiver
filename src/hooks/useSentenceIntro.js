@@ -4,7 +4,7 @@ import {
   hasShownInSession,
   markShownInSession
 } from '../lib/introducedSentenceStorage';
-import { findDictionaryEntryForWord } from '../lib/sentenceDictionaryLookup';
+import { getSentenceWordMeanings } from '../lib/sentenceWordLookup';
 
 /**
  * Hook for managing sentence introduction pop-ups.
@@ -41,10 +41,14 @@ export function useSentenceIntro({
       return [];
     }
 
+    console.log('[useSentenceIntro] Processing sentence:', sentence.id, 'with', sentence.words.length, 'words');
+
+    // Get word meanings for the sentence
+    const wordMeanings = getSentenceWordMeanings(sentence, practiceLanguageId, appLanguageId);
+    console.log('[useSentenceIntro] Word meanings map:', wordMeanings);
+
     const pairs = [];
     const seenMeanings = new Map();
-
-    console.log('[useSentenceIntro] Processing sentence:', sentence.id, 'with', sentence.words.length, 'words');
 
     sentence.words.forEach((word) => {
       // Skip words without dictionary entries
@@ -53,15 +57,10 @@ export function useSentenceIntro({
         return;
       }
 
-      const entry = findDictionaryEntryForWord(
-        word.wordId,
-        practiceLanguageId,
-        appLanguageId,
-        t
-      );
+      const entry = wordMeanings.get(word.wordId);
 
       if (!entry?.meaning) {
-        console.log('[useSentenceIntro] No dictionary entry/meaning for:', word.wordId, entry);
+        console.log('[useSentenceIntro] No meaning for:', word.wordId, 'entry:', entry);
         return;
       }
 
@@ -88,7 +87,7 @@ export function useSentenceIntro({
 
     // Cap at 8 pairs for manageability
     return pairs.slice(0, 8);
-  }, [sentence, practiceLanguageId, appLanguageId, t]);
+  }, [sentence, practiceLanguageId, appLanguageId]);
 
   // Determine if popup should be shown
   const shouldShow = useMemo(() => {
