@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  isSentenceIntroduced,
-  hasShownInSession,
-  markShownInSession
-} from '../lib/introducedSentenceStorage';
+  hasShownModuleWordInSession,
+  isModuleWordIntroduced,
+  markModuleWordsShownInSession
+} from '../lib/introducedModuleWordStorage';
 import { getConversationWordMeanings } from '../lib/conversationWordLookup';
 
 /**
@@ -20,11 +20,13 @@ import { getConversationWordMeanings } from '../lib/conversationWordLookup';
  */
 export function useConversationIntro({
   line,
+  moduleId,
   enabled = true
 } = {}) {
   console.log('[useConversationIntro] HOOK CALLED with:', {
     lineId: line?.id,
     sentenceId: line?.sentenceData?.id,
+    moduleId,
     enabled,
     hasLine: !!line,
     hasSentenceData: !!line?.sentenceData,
@@ -48,28 +50,35 @@ export function useConversationIntro({
   }, [line]);
 
   // Determine if popup should be shown
-  const shouldShow = useMemo(() => {
-    const sentenceId = line?.sentenceData?.id;
+  const unseenWordPairs = useMemo(() => {
+    if (!moduleId) return [];
+    return wordPairs.filter((pair) => {
+      const wordId = pair.wordId || pair.hebrew;
+      return (
+        !isModuleWordIntroduced(moduleId, wordId) &&
+        !hasShownModuleWordInSession(moduleId, wordId)
+      );
+    });
+  }, [moduleId, wordPairs]);
 
+  const shouldShow = useMemo(() => {
     console.log('[useConversationIntro] Checking shouldShow:', {
       enabled,
-      sentenceId,
+      moduleId,
       wordPairsLength: wordPairs.length,
-      isIntroduced: sentenceId ? isSentenceIntroduced(sentenceId) : 'no-id',
-      hasShownInSession: sentenceId ? hasShownInSession(sentenceId) : 'no-id'
+      unseenWordPairsLength: unseenWordPairs.length
     });
 
-    if (!enabled || !sentenceId) return false;
+    if (!enabled || !moduleId) return false;
     if (wordPairs.length === 0) return false;
-    if (isSentenceIntroduced(sentenceId)) return false;
-    if (hasShownInSession(sentenceId)) return false;
+    if (unseenWordPairs.length === 0) return false;
     return true;
-  }, [enabled, line?.sentenceData?.id, wordPairs.length]);
+  }, [enabled, moduleId, wordPairs.length, unseenWordPairs.length]);
 
   // Reset hasChecked when line/sentence changes
   useEffect(() => {
     setHasChecked(false);
-  }, [line?.sentenceData?.id]);
+  }, [line?.sentenceData?.id, moduleId]);
 
   // Auto-show popup on mount if needed
   useEffect(() => {
@@ -80,19 +89,24 @@ export function useConversationIntro({
       console.log('[useConversationIntro] ✅ SHOWING POPUP for sentence:', sentenceId);
       setHasChecked(true);
       setShowPopup(true);
-      if (sentenceId) {
-        markShownInSession(sentenceId);
+      if (moduleId && unseenWordPairs.length > 0) {
+        markModuleWordsShownInSession(
+          moduleId,
+          unseenWordPairs.map((pair) => pair.wordId || pair.hebrew)
+        );
       }
     }
-  }, [hasChecked, shouldShow, line?.sentenceData?.id]);
+  }, [hasChecked, shouldShow, line?.sentenceData?.id, moduleId, unseenWordPairs]);
 
   const handleShowPopup = useCallback(() => {
     setShowPopup(true);
-    const sentenceId = line?.sentenceData?.id;
-    if (sentenceId) {
-      markShownInSession(sentenceId);
+    if (moduleId && unseenWordPairs.length > 0) {
+      markModuleWordsShownInSession(
+        moduleId,
+        unseenWordPairs.map((pair) => pair.wordId || pair.hebrew)
+      );
     }
-  }, [line?.sentenceData?.id]);
+  }, [moduleId, unseenWordPairs]);
 
   const handleHidePopup = useCallback(() => {
     setShowPopup(false);
@@ -105,13 +119,15 @@ export function useConversationIntro({
 
   const result = {
     shouldShow,
-    showPopup: showPopup && wordPairs.length > 0,
+    showPopup: showPopup && unseenWordPairs.length > 0,
     openPopup: handleShowPopup,
     closePopup: handleHidePopup,
     popupProps: {
       sentenceId: line?.sentenceData?.id,
       sentenceText: line?.he || line?.sentenceData?.hebrew,
-      wordPairs,
+      wordPairs: unseenWordPairs,
+      moduleId,
+      trackingMode: 'moduleWords',
       onClose: handleHidePopup,
       onComplete: handleComplete
     }
@@ -120,7 +136,7 @@ export function useConversationIntro({
   console.log('[useConversationIntro] Returning:', {
     shouldShow: result.shouldShow,
     showPopup: result.showPopup,
-    wordPairsCount: wordPairs.length
+    wordPairsCount: unseenWordPairs.length
   });
 
   return result;
