@@ -6,6 +6,8 @@ import GuidedReplyChoice from './modules/GuidedReplyChoice.jsx';
 import TypeInput from './modules/TypeInput.jsx';
 import { findDictionaryEntryForWord } from '../../lib/sentenceDictionaryLookup.ts';
 import { sentenceTransliterationLookup, sentenceMeaningsLookup } from '../../data/conversation/scenarioFactory.ts';
+import SentenceIntroPopup from '../SentenceIntroPopup.jsx';
+import { useConversationIntro } from '../../hooks/useConversationIntro.js';
 
 /**
  * ConversationBeatScreen
@@ -80,6 +82,12 @@ export default function ConversationBeatScreen({
   const distractorLines = useMemo(() => {
     return scenario.lines.filter(l => l.id !== beat.lineId);
   }, [scenario.lines, beat.lineId]);
+
+  // Sentence introduction popup hook - shows word-match game for new sentences
+  const sentenceIntro = useConversationIntro({
+    line: currentLine,
+    enabled: true
+  });
 
   const handleModuleResult = useCallback((result) => {
     // Store the result and show both banners at the same time
@@ -261,80 +269,16 @@ export default function ConversationBeatScreen({
             <div className="flex flex-col gap-3">
               {currentLine.sentenceData.words.map((word, index) => {
                 const wordId = word.wordId;
-
-                if (!wordId) {
-                  // Fallback if no wordId - but try to show transliteration and meaning
-                  const transliteration = sentenceTransliterationLookup[word.hebrew];
-                  const meaningText = sentenceMeaningsLookup[word.hebrew] || '—';
-
-                  return (
-                    <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
-                      <div className="grid grid-cols-3 gap-2 text-center">
-                        {/* Hebrew */}
-                        <div>
-                          <div className="text-xs text-slate-400 mb-1">Hebrew</div>
-                          <div className="text-base font-semibold text-slate-100" dir="rtl">
-                            {word.hebrew}
-                          </div>
-                        </div>
-
-                        {/* Transliteration */}
-                        <div>
-                          <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
-                          <div className="text-sm text-blue-300 italic">
-                            {transliteration || '—'}
-                          </div>
-                        </div>
-
-                        {/* Meaning */}
-                        <div>
-                          <div className="text-xs text-slate-400 mb-1">Meaning</div>
-                          <div className={`text-sm ${meaningText === '—' ? 'text-slate-500 italic' : 'text-slate-200'}`}>
-                            {meaningText}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-
-                const entry = findDictionaryEntryForWord(wordId, 'hebrew', 'en', t);
-
-                if (!entry) {
-                  // Fallback if word not found in dictionary - show transliteration and meaning from lookup tables
-                  const transliteration = sentenceTransliterationLookup[word.hebrew];
-                  const meaningText = sentenceMeaningsLookup[word.hebrew] || '—';
-
-                  return (
-                    <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
-                      <div className="grid grid-cols-3 gap-2 text-center">
-                        {/* Hebrew */}
-                        <div>
-                          <div className="text-xs text-slate-400 mb-1">Hebrew</div>
-                          <div className="text-base font-semibold text-slate-100" dir="rtl">
-                            {word.hebrew}
-                          </div>
-                        </div>
-
-                        {/* Transliteration */}
-                        <div>
-                          <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
-                          <div className="text-sm text-blue-300 italic">
-                            {transliteration || '—'}
-                          </div>
-                        </div>
-
-                        {/* Meaning */}
-                        <div>
-                          <div className="text-xs text-slate-400 mb-1">Meaning</div>
-                          <div className={`text-sm ${meaningText === '—' ? 'text-slate-500 italic' : 'text-slate-200'}`}>
-                            {meaningText}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
+                const hebrewText = word.surface || word.hebrew;
+                const entry = wordId ? findDictionaryEntryForWord(wordId, 'hebrew', 'en', t) : null;
+                const transliteration = sentenceTransliterationLookup[hebrewText]
+                  || sentenceTransliterationLookup[word.hebrew]
+                  || entry?.canonical
+                  || '—';
+                const meaningText = entry?.meaning
+                  || sentenceMeaningsLookup[hebrewText]
+                  || sentenceMeaningsLookup[word.hebrew]
+                  || '—';
 
                 return (
                   <div key={index} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
@@ -343,7 +287,7 @@ export default function ConversationBeatScreen({
                       <div>
                         <div className="text-xs text-slate-400 mb-1">Hebrew</div>
                         <div className="text-base font-semibold text-slate-100" dir="rtl">
-                          {entry.practiceWord}
+                          {hebrewText}
                         </div>
                       </div>
 
@@ -351,15 +295,15 @@ export default function ConversationBeatScreen({
                       <div>
                         <div className="text-xs text-slate-400 mb-1">Pronunciation</div>
                         <div className="text-sm text-blue-300 italic">
-                          {entry.canonical}
+                          {transliteration}
                         </div>
                       </div>
 
                       {/* English meaning */}
                       <div>
                         <div className="text-xs text-slate-400 mb-1">Meaning</div>
-                        <div className="text-sm text-slate-200">
-                          {entry.meaning}
+                        <div className={`text-sm ${meaningText === '—' ? 'text-slate-500 italic' : 'text-slate-200'}`}>
+                          {meaningText}
                         </div>
                       </div>
                     </div>
@@ -493,6 +437,11 @@ export default function ConversationBeatScreen({
           </div>
         </div>
       </div>
+
+      {/* Sentence intro popup - word-match game for new sentences */}
+      {sentenceIntro.showPopup && (
+        <SentenceIntroPopup {...sentenceIntro.popupProps} />
+      )}
     </div>
   );
 }

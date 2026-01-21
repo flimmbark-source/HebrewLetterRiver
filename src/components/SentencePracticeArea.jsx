@@ -8,6 +8,8 @@ import {
   recordSentenceResult
 } from '../lib/sentenceProgressStorage.ts';
 import WordHelperModal from './WordHelperModal.jsx';
+import SentenceIntroPopup from './SentenceIntroPopup.jsx';
+import { useSentenceIntro } from '../hooks/useSentenceIntro.js';
 
 function normalizeWord(word) {
   return word
@@ -159,6 +161,15 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
   // Refs for viewport/track structure
   const sentenceViewportRef = useRef(null);
   const sentenceTrackRef = useRef(null);
+
+  // Sentence introduction popup hook
+  const sentenceIntro = useSentenceIntro({
+    sentence: currentSentence,
+    practiceLanguageId,
+    appLanguageId,
+    t,
+    enabled: !showResultsScreen
+  });
 
   useEffect(() => {
     const nextIndex = getNextSentenceIndex(theme, sentences);
@@ -472,6 +483,10 @@ export default function SentencePracticeArea({ theme, sentences, onExit }) {
         onUseHint={(hint) => setHintText(hint)}
         t={t}
       />
+
+      {sentenceIntro.showPopup && (
+        <SentenceIntroPopup {...sentenceIntro.popupProps} />
+      )}
     </div>
   );
 }
