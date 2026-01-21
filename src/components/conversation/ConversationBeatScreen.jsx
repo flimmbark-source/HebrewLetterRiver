@@ -86,6 +86,7 @@ export default function ConversationBeatScreen({
   // Sentence introduction popup hook - shows word-match game for new sentences
   const sentenceIntro = useConversationIntro({
     line: currentLine,
+    moduleId: beat.moduleId,
     enabled: true
   });
 

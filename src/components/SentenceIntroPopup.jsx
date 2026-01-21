@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import FloatingCapsulesGame from './FloatingCapsulesGame';
 import { markSentenceIntroduced } from '../lib/introducedSentenceStorage';
+import { markModuleWordsIntroduced } from '../lib/introducedModuleWordStorage';
 
 /**
  * SentenceIntroPopup - Modal overlay that shows the word-matching mini-game
@@ -18,6 +19,8 @@ export default function SentenceIntroPopup({
   sentenceId,
   sentenceText,
   wordPairs,
+  moduleId,
+  trackingMode = 'sentence',
   onClose,
   onComplete
 }) {
@@ -95,11 +98,18 @@ export default function SentenceIntroPopup({
   };
 
   const handleGameComplete = (stats) => {
-    // Save to storage
-    markSentenceIntroduced(sentenceId, {
-      completionTime: stats.completionTime,
-      mismatchCount: stats.mismatchCount
-    });
+    if (trackingMode === 'moduleWords' && moduleId) {
+      const wordIds = wordPairs
+        .map((pair) => pair.wordId || pair.hebrew)
+        .filter(Boolean);
+      markModuleWordsIntroduced(moduleId, wordIds);
+    } else if (sentenceId) {
+      // Save to storage
+      markSentenceIntroduced(sentenceId, {
+        completionTime: stats.completionTime,
+        mismatchCount: stats.mismatchCount
+      });
+    }
 
     // Notify parent
     if (onComplete) {
