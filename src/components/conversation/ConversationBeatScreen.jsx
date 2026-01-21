@@ -1,6 +1,5 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
-import { useLanguage } from '../../context/LanguageContext.jsx';
 import ListenMeaningChoice from './modules/ListenMeaningChoice.jsx';
 import ShadowRepeat from './modules/ShadowRepeat.jsx';
 import GuidedReplyChoice from './modules/GuidedReplyChoice.jsx';
@@ -8,7 +7,7 @@ import TypeInput from './modules/TypeInput.jsx';
 import { findDictionaryEntryForWord } from '../../lib/sentenceDictionaryLookup.ts';
 import { sentenceTransliterationLookup, sentenceMeaningsLookup } from '../../data/conversation/scenarioFactory.ts';
 import SentenceIntroPopup from '../SentenceIntroPopup.jsx';
-import { useSentenceIntro } from '../../hooks/useSentenceIntro.js';
+import { useConversationIntro } from '../../hooks/useConversationIntro.js';
 
 /**
  * ConversationBeatScreen
@@ -31,7 +30,6 @@ export default function ConversationBeatScreen({
   onExit
 }) {
   const { t } = useLocalization();
-  const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
   const [showTranscript, setShowTranscript] = useState(false);
   const [showDictionary, setShowDictionary] = useState(false);
   const [showNextBanner, setShowNextBanner] = useState(false);
@@ -86,11 +84,8 @@ export default function ConversationBeatScreen({
   }, [scenario.lines, beat.lineId]);
 
   // Sentence introduction popup hook - shows word-match game for new sentences
-  const sentenceIntro = useSentenceIntro({
-    sentence: currentLine?.sentenceData,
-    practiceLanguageId,
-    appLanguageId,
-    t,
+  const sentenceIntro = useConversationIntro({
+    line: currentLine,
     enabled: true
   });
 
