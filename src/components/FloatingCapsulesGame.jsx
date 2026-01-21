@@ -121,6 +121,48 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       );
     };
 
+    const resolveSpawnOverlaps = (capsulesToResolve) => {
+      const minX = padding;
+      const maxX = bounds.width - padding;
+      const minY = padding;
+      const maxY = bounds.height - padding;
+      const maxIterations = 30;
+
+      for (let iteration = 0; iteration < maxIterations; iteration += 1) {
+        let moved = false;
+
+        for (let i = 0; i < capsulesToResolve.length; i += 1) {
+          for (let j = i + 1; j < capsulesToResolve.length; j += 1) {
+            const first = capsulesToResolve[i];
+            const second = capsulesToResolve[j];
+            const dx = second.x - first.x;
+            const dy = second.y - first.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDistance = (first.radius ?? CAPSULE_RADIUS) +
+              (second.radius ?? CAPSULE_RADIUS) +
+              CAPSULE_CLEARANCE_BUFFER;
+
+            if (distance < minDistance) {
+              const overlap = minDistance - distance;
+              const angle = distance === 0 ? Math.random() * Math.PI * 2 : Math.atan2(dy, dx);
+              const offsetX = Math.cos(angle) * (overlap / 2);
+              const offsetY = Math.sin(angle) * (overlap / 2);
+
+              first.x = Math.max(minX, Math.min(maxX, first.x - offsetX));
+              first.y = Math.max(minY, Math.min(maxY, first.y - offsetY));
+              second.x = Math.max(minX, Math.min(maxX, second.x + offsetX));
+              second.y = Math.max(minY, Math.min(maxY, second.y + offsetY));
+              moved = true;
+            }
+          }
+        }
+
+        if (!moved) {
+          break;
+        }
+      }
+    };
+
     // Create capsules scattered like leaves in a river - pairs start near each other
     uniquePairs.forEach((pair, index) => {
       const radii = {
@@ -305,6 +347,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         shaking: false
       });
     });
+
+    resolveSpawnOverlaps(capsules);
 
     capsulesRef.current = capsules;
 
