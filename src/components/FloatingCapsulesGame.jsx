@@ -11,6 +11,7 @@ const PREVIEW_DURATION = 3000; // Show lines for 3 seconds
 const FADE_DURATION = 1000; // Fade lines over 1 second
 const CAPSULE_RADIUS = 40; // Hit detection radius
 const BOUNCE_DAMPING = 0.7; // Velocity reduction on bounce
+const LINE_OF_SIGHT_BUFFER = 65; // Clearance for matched capsules
 
 export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const canvasRef = useRef(null);
@@ -62,75 +63,153 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       });
     };
 
-    // Helper to find a good random position
-    const findGoodPosition = (xMin, xMax, existingCapsules, maxAttempts = 50) => {
-      for (let i = 0; i < maxAttempts; i++) {
-        const x = padding + xMin + Math.random() * (xMax - xMin);
-        const y = padding + Math.random() * usableHeight;
-        if (!isTooClose(x, y, existingCapsules)) {
-          return { x, y };
-        }
+    const isWithinBounds = (x, y) => {
+      return (
+        x >= padding &&
+        x <= bounds.width - padding &&
+        y >= padding &&
+        y <= bounds.height - padding
+      );
+    };
+
+    const distanceToSegment = (point, start, end) => {
+      const dx = end.x - start.x;
+      const dy = end.y - start.y;
+      if (dx === 0 && dy === 0) {
+        const px = point.x - start.x;
+        const py = point.y - start.y;
+        return Math.sqrt(px * px + py * py);
       }
-      // Fallback to grid-based positioning if random fails
-      const row = existingCapsules.length % 3;
-      const col = Math.floor(existingCapsules.length / 3);
-      return {
-        x: padding + xMin + (xMax - xMin) * (col * 0.3),
-        y: padding + usableHeight * ((row + 0.5) / 4)
-      };
+
+      const t = ((point.x - start.x) * dx + (point.y - start.y) * dy) / (dx * dx + dy * dy);
+      const clampedT = Math.max(0, Math.min(1, t));
+      const closestX = start.x + clampedT * dx;
+      const closestY = start.y + clampedT * dy;
+      const distX = point.x - closestX;
+      const distY = point.y - closestY;
+      return Math.sqrt(distX * distX + distY * distY);
+    };
+
+    const hasClearLineOfSight = (pairPositions, existingCapsules) => {
+      const segments = [
+        [pairPositions.hebrew, pairPositions.transliteration],
+        [pairPositions.hebrew, pairPositions.meaning],
+        [pairPositions.transliteration, pairPositions.meaning]
+      ];
+
+      return segments.every(([start, end]) =>
+        existingCapsules.every(cap => {
+          const distance = distanceToSegment({ x: cap.x, y: cap.y }, start, end);
+          return distance >= LINE_OF_SIGHT_BUFFER;
+        })
+      );
     };
 
     // Create capsules scattered like leaves in a river - pairs start near each other
     uniquePairs.forEach((pair, index) => {
       // Find a valid center point that doesn't overlap with existing capsules
-      const pairSpacing = 110; // Distance between pair members
+      const pairSpacings = [110, 95, 80]; // Distance between pair members
       let centerX, centerY, hebrewX, hebrewY, translitX, translitY, meaningX, meaningY;
-      let attempts = 0;
-      const maxAttempts = 100;
+      const isValidPlacement = (positions) => {
+        const withinBounds = [positions.hebrew, positions.transliteration, positions.meaning]
+          .every(pos => isWithinBounds(pos.x, pos.y));
 
-      // Keep trying until we find a valid position for the pair
-      while (attempts < maxAttempts) {
-        centerX = padding + Math.random() * usableWidth;
-        centerY = padding + Math.random() * usableHeight;
+        const spacingOk = !isTooClose(positions.hebrew.x, positions.hebrew.y, capsules) &&
+          !isTooClose(positions.transliteration.x, positions.transliteration.y, capsules) &&
+          !isTooClose(positions.meaning.x, positions.meaning.y, capsules);
 
-        const baseAngle = Math.random() * Math.PI * 2;
-        const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
+        const lineOfSightOk = hasClearLineOfSight(positions, capsules);
 
-        hebrewX = centerX + Math.cos(angles[0]) * pairSpacing;
-        hebrewY = centerY + Math.sin(angles[0]) * pairSpacing;
-        translitX = centerX + Math.cos(angles[1]) * pairSpacing;
-        translitY = centerY + Math.sin(angles[1]) * pairSpacing;
-        meaningX = centerX + Math.cos(angles[2]) * pairSpacing;
-        meaningY = centerY + Math.sin(angles[2]) * pairSpacing;
+        return withinBounds && spacingOk && lineOfSightOk;
+      };
 
-        // Check if all positions are valid (not too close to existing capsules)
-        if (!isTooClose(hebrewX, hebrewY, capsules) &&
-            !isTooClose(translitX, translitY, capsules) &&
-            !isTooClose(meaningX, meaningY, capsules)) {
-          break;
+      const applyPlacement = (positions) => {
+        hebrewX = positions.hebrew.x;
+        hebrewY = positions.hebrew.y;
+        translitX = positions.transliteration.x;
+        translitY = positions.transliteration.y;
+        meaningX = positions.meaning.x;
+        meaningY = positions.meaning.y;
+      };
+
+      const findPairPlacement = () => {
+        for (const pairSpacing of pairSpacings) {
+          let attempts = 0;
+          const maxAttempts = 120;
+
+          while (attempts < maxAttempts) {
+            centerX = padding + Math.random() * usableWidth;
+            centerY = padding + Math.random() * usableHeight;
+
+            const baseAngles = [
+              Math.random() * Math.PI * 2,
+              Math.random() * Math.PI * 2,
+              Math.random() * Math.PI * 2
+            ];
+
+            for (const baseAngle of baseAngles) {
+              const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
+              const positions = {
+                hebrew: { x: centerX + Math.cos(angles[0]) * pairSpacing, y: centerY + Math.sin(angles[0]) * pairSpacing },
+                transliteration: { x: centerX + Math.cos(angles[1]) * pairSpacing, y: centerY + Math.sin(angles[1]) * pairSpacing },
+                meaning: { x: centerX + Math.cos(angles[2]) * pairSpacing, y: centerY + Math.sin(angles[2]) * pairSpacing }
+              };
+
+              if (isValidPlacement(positions)) {
+                applyPlacement(positions);
+                return true;
+              }
+            }
+
+            attempts++;
+          }
         }
 
-        attempts++;
-      }
+        const gridRows = Math.ceil(Math.sqrt(uniquePairs.length + 1));
+        const gridCols = gridRows;
+        for (const pairSpacing of pairSpacings) {
+          for (let row = 0; row < gridRows; row += 1) {
+            for (let col = 0; col < gridCols; col += 1) {
+              centerX = padding + usableWidth * ((col + 0.5) / gridCols);
+              centerY = padding + usableHeight * ((row + 0.5) / gridRows);
 
-      // If we couldn't find a good spot, fall back to grid positioning
-      if (attempts >= maxAttempts) {
-        const col = index % 3;
-        const row = Math.floor(index / 3);
-        centerX = padding + usableWidth * ((col + 0.5) / 3);
-        centerY = padding + usableHeight * ((row + 0.5) / Math.ceil(uniquePairs.length / 3));
+              const angleSteps = 6;
+              for (let step = 0; step < angleSteps; step += 1) {
+                const baseAngle = (step / angleSteps) * Math.PI * 2;
+                const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
+                const positions = {
+                  hebrew: { x: centerX + Math.cos(angles[0]) * pairSpacing, y: centerY + Math.sin(angles[0]) * pairSpacing },
+                  transliteration: { x: centerX + Math.cos(angles[1]) * pairSpacing, y: centerY + Math.sin(angles[1]) * pairSpacing },
+                  meaning: { x: centerX + Math.cos(angles[2]) * pairSpacing, y: centerY + Math.sin(angles[2]) * pairSpacing }
+                };
 
+                if (isValidPlacement(positions)) {
+                  applyPlacement(positions);
+                  return true;
+                }
+              }
+            }
+          }
+        }
+
+        return false;
+      };
+
+      if (!findPairPlacement()) {
+        centerX = padding + usableWidth / 2;
+        centerY = padding + usableHeight / 2;
+        const fallbackSpacing = pairSpacings[pairSpacings.length - 1];
         const baseAngle = Math.random() * Math.PI * 2;
         const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
-        hebrewX = centerX + Math.cos(angles[0]) * pairSpacing;
-        hebrewY = centerY + Math.sin(angles[0]) * pairSpacing;
-        translitX = centerX + Math.cos(angles[1]) * pairSpacing;
-        translitY = centerY + Math.sin(angles[1]) * pairSpacing;
-        meaningX = centerX + Math.cos(angles[2]) * pairSpacing;
-        meaningY = centerY + Math.sin(angles[2]) * pairSpacing;
+        applyPlacement({
+          hebrew: { x: centerX + Math.cos(angles[0]) * fallbackSpacing, y: centerY + Math.sin(angles[0]) * fallbackSpacing },
+          transliteration: { x: centerX + Math.cos(angles[1]) * fallbackSpacing, y: centerY + Math.sin(angles[1]) * fallbackSpacing },
+          meaning: { x: centerX + Math.cos(angles[2]) * fallbackSpacing, y: centerY + Math.sin(angles[2]) * fallbackSpacing }
+        });
       }
 
       // Hebrew capsule
+      const wanderDelay = 1200 + Math.random() * 1800;
       capsules.push({
         id: `hebrew-${index}`,
         type: 'hebrew',
@@ -138,8 +217,11 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         pairIndex: index,
         x: hebrewX,
         y: hebrewY,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        targetVx: (Math.random() - 0.5) * 0.4,
+        targetVy: (Math.random() - 0.5) * 0.4,
+        nextWanderAt: Date.now() + wanderDelay,
         matched: false,
         shaking: false
       });
@@ -152,8 +234,11 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         pairIndex: index,
         x: translitX,
         y: translitY,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        targetVx: (Math.random() - 0.5) * 0.4,
+        targetVy: (Math.random() - 0.5) * 0.4,
+        nextWanderAt: Date.now() + wanderDelay,
         matched: false,
         shaking: false
       });
@@ -166,8 +251,11 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         pairIndex: index,
         x: meaningX,
         y: meaningY,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        targetVx: (Math.random() - 0.5) * 0.4,
+        targetVy: (Math.random() - 0.5) * 0.4,
+        nextWanderAt: Date.now() + wanderDelay,
         matched: false,
         shaking: false
       });
@@ -221,11 +309,30 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       const capsules = capsulesRef.current;
       const bounds = playAreaBounds;
 
+      const now = Date.now();
       capsules.forEach((capsule, index) => {
         // Skip matched capsules and the one currently being dragged
         if (capsule.matched) return;
         const isDragging = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === index;
         if (isDragging) return;
+
+        const timeForWander = capsule.nextWanderAt && now >= capsule.nextWanderAt;
+        if (timeForWander) {
+          capsule.targetVx = (Math.random() - 0.5) * 0.4;
+          capsule.targetVy = (Math.random() - 0.5) * 0.4;
+          capsule.nextWanderAt = now + 1200 + Math.random() * 1800;
+        }
+
+        const smoothing = 0.02;
+        capsule.vx += (capsule.targetVx - capsule.vx) * smoothing;
+        capsule.vy += (capsule.targetVy - capsule.vy) * smoothing;
+
+        const speedLimit = 0.7;
+        const speed = Math.sqrt(capsule.vx * capsule.vx + capsule.vy * capsule.vy);
+        if (speed > speedLimit) {
+          capsule.vx = (capsule.vx / speed) * speedLimit;
+          capsule.vy = (capsule.vy / speed) * speedLimit;
+        }
 
         // Update position
         capsule.x += capsule.vx;
@@ -235,24 +342,18 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         const margin = 50;
         if (capsule.x < margin || capsule.x > bounds.width - margin) {
           capsule.vx *= -BOUNCE_DAMPING;
+          capsule.targetVx = -capsule.targetVx;
           capsule.x = Math.max(margin, Math.min(bounds.width - margin, capsule.x));
         }
         if (capsule.y < margin || capsule.y > bounds.height - margin) {
           capsule.vy *= -BOUNCE_DAMPING;
+          capsule.targetVy = -capsule.targetVy;
           capsule.y = Math.max(margin, Math.min(bounds.height - margin, capsule.y));
         }
 
-        // Occasionally change direction slightly
-        if (Math.random() < 0.02) {
-          capsule.vx += (Math.random() - 0.5) * 0.2;
-          capsule.vy += (Math.random() - 0.5) * 0.2;
-        }
-
-        // Clear shaking after animation
-        if (capsule.shaking) {
-          setTimeout(() => {
-            capsule.shaking = false;
-          }, 500);
+        if (capsule.shakeUntil && now >= capsule.shakeUntil) {
+          capsule.shaking = false;
+          capsule.shakeUntil = null;
         }
       });
 
@@ -358,6 +459,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         }]);
       } else {
         draggedCapsule.shaking = true;
+        draggedCapsule.shakeUntil = Date.now() + 500;
         setMismatchCount(prev => prev + 1);
       }
     }
