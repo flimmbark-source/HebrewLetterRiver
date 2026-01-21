@@ -22,6 +22,7 @@ export default function SentenceIntroPopup({
   onComplete
 }) {
   const [isClosing, setIsClosing] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const overlayRef = useRef(null);
   const previousFocusRef = useRef(null);
 
@@ -31,6 +32,11 @@ export default function SentenceIntroPopup({
 
     // Prevent scrolling on body
     document.body.style.overflow = 'hidden';
+
+    // Trigger fade-in animation
+    requestAnimationFrame(() => {
+      setIsVisible(true);
+    });
 
     // Focus the overlay
     if (overlayRef.current) {
@@ -119,8 +125,8 @@ export default function SentenceIntroPopup({
   return (
     <div
       ref={overlayRef}
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-200 ${
-        isClosing ? 'opacity-0' : 'opacity-100'
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+        isClosing ? 'opacity-0' : isVisible ? 'opacity-100' : 'opacity-0'
       }`}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
@@ -128,28 +134,19 @@ export default function SentenceIntroPopup({
       aria-modal="true"
       aria-labelledby="intro-popup-title"
     >
-      {/* Modal container - smaller centered modal */}
+      {/* Modal container - half size centered modal */}
       <div
-        className={`relative w-[90vw] h-[80vh] max-w-4xl bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl overflow-hidden transition-transform duration-200 ${
-          isClosing ? 'scale-95' : 'scale-100'
+        className={`relative w-[45vw] h-[40vh] max-w-2xl bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ${
+          isClosing ? 'scale-95 opacity-0' : isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}
       >
         {/* Header */}
-        <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-gradient-to-b from-slate-800/95 to-transparent pointer-events-none">
+        <div className="absolute top-0 left-0 right-0 z-20 p-3 bg-gradient-to-b from-slate-800/95 to-transparent pointer-events-none">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h2 id="intro-popup-title" className="text-xl font-bold text-white mb-1">
+              <h2 id="intro-popup-title" className="text-lg font-bold text-white">
                 Learn These Words
               </h2>
-              <p className="text-slate-300 text-xs mb-2">
-                Drag words to their matching meanings
-              </p>
-              <div
-                className="hebrew-font text-base text-blue-300 bg-slate-900/50 px-3 py-1.5 rounded-lg inline-block truncate max-w-full"
-                dir="rtl"
-              >
-                {sentenceText}
-              </div>
             </div>
 
             {/* Skip button */}
@@ -164,18 +161,11 @@ export default function SentenceIntroPopup({
         </div>
 
         {/* Game area */}
-        <div className="absolute inset-0 pt-24 pb-12">
+        <div className="absolute inset-0 pt-14 pb-4">
           <FloatingCapsulesGame
             wordPairs={cappedWordPairs}
             onComplete={handleGameComplete}
           />
-        </div>
-
-        {/* Footer hint */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-slate-800/95 to-transparent pointer-events-none">
-          <p className="text-center text-xs text-slate-400">
-            Drag any word to match it with its pair
-          </p>
         </div>
       </div>
     </div>

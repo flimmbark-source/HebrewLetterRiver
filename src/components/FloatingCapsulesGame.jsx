@@ -87,16 +87,17 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       const rowHeight = usableHeight / (numPairs + 1);
       const yBase = padding + rowHeight * (index + 1);
 
-      // Add some vertical variation so they're not perfectly aligned
+      // Add vertical and horizontal variation to prevent bunching
       const yVariation = (Math.random() - 0.5) * 60;
+      const xVariation = (Math.random() - 0.5) * 80;
 
-      // Hebrew capsule (left side)
+      // Hebrew capsule (left side with variation)
       capsules.push({
         id: `hebrew-${index}`,
         type: 'hebrew',
         text: pair.hebrew,
         pairIndex: index,
-        x: padding + usableWidth * 0.25,
+        x: padding + usableWidth * 0.25 + xVariation,
         y: yBase + yVariation,
         vx: (Math.random() - 0.5) * 0.3,
         vy: (Math.random() - 0.5) * 0.3,
@@ -104,13 +105,13 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         shaking: false
       });
 
-      // Meaning capsule (right side, roughly aligned with its pair)
+      // Meaning capsule (right side with variation, roughly aligned with its pair)
       capsules.push({
         id: `meaning-${index}`,
         type: 'meaning',
         text: pair.meaning,
         pairIndex: index,
-        x: padding + usableWidth * 0.75,
+        x: padding + usableWidth * 0.75 + xVariation,
         y: yBase + yVariation,
         vx: (Math.random() - 0.5) * 0.3,
         vy: (Math.random() - 0.5) * 0.3,
@@ -396,19 +397,6 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
   return (
     <div className="relative w-full h-full">
-      {/* Instructions */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-slate-800/90 px-4 py-2 rounded-lg text-center">
-        <p className="text-sm text-slate-200">Drag words together to match them</p>
-        {showLines && (
-          <p className="text-xs text-slate-400 mt-1">Lines will fade soon...</p>
-        )}
-      </div>
-
-      {/* Stats */}
-      <div className="absolute top-4 right-4 z-10 bg-slate-800/90 px-4 py-2 rounded-lg">
-        <p className="text-sm text-slate-300">Mismatches: {mismatchCount}</p>
-      </div>
-
       {/* Canvas for lines */}
       <canvas
         ref={canvasRef}
