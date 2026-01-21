@@ -134,9 +134,9 @@ export default function SentenceIntroPopup({
       aria-modal="true"
       aria-labelledby="intro-popup-title"
     >
-      {/* Modal container - half size centered modal */}
+      {/* Modal container - responsive sizing */}
       <div
-        className={`relative w-[45vw] h-[40vh] max-w-2xl bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ${
+        className={`relative w-[90vw] h-[70vh] md:w-[45vw] md:h-[80vh] max-w-4xl bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ${
           isClosing ? 'scale-95 opacity-0' : isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}
       >

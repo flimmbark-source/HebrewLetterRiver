@@ -81,40 +81,45 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       };
     };
 
-    // Create capsules in pairs - place them near each other for clear preview lines
+    // Create capsules scattered like leaves in a river - pairs start near each other
     uniquePairs.forEach((pair, index) => {
-      const numPairs = uniquePairs.length;
-      const rowHeight = usableHeight / (numPairs + 1);
-      const yBase = padding + rowHeight * (index + 1);
+      // Pick a random center point in the play area for this pair
+      const centerX = padding + Math.random() * usableWidth;
+      const centerY = padding + Math.random() * usableHeight;
 
-      // Add vertical and horizontal variation to prevent bunching
-      const yVariation = (Math.random() - 0.5) * 60;
-      const xVariation = (Math.random() - 0.5) * 80;
+      // Place Hebrew and meaning capsules near this center point
+      const pairSpacing = 100; // Distance between pair members
+      const angle = Math.random() * Math.PI * 2; // Random angle for pair orientation
 
-      // Hebrew capsule (left side with variation)
+      const hebrewOffsetX = Math.cos(angle) * (pairSpacing / 2);
+      const hebrewOffsetY = Math.sin(angle) * (pairSpacing / 2);
+      const meaningOffsetX = -hebrewOffsetX;
+      const meaningOffsetY = -hebrewOffsetY;
+
+      // Hebrew capsule
       capsules.push({
         id: `hebrew-${index}`,
         type: 'hebrew',
         text: pair.hebrew,
         pairIndex: index,
-        x: padding + usableWidth * 0.25 + xVariation,
-        y: yBase + yVariation,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
+        x: centerX + hebrewOffsetX,
+        y: centerY + hebrewOffsetY,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
         matched: false,
         shaking: false
       });
 
-      // Meaning capsule (right side with variation, roughly aligned with its pair)
+      // Meaning capsule
       capsules.push({
         id: `meaning-${index}`,
         type: 'meaning',
         text: pair.meaning,
         pairIndex: index,
-        x: padding + usableWidth * 0.75 + xVariation,
-        y: yBase + yVariation,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
+        x: centerX + meaningOffsetX,
+        y: centerY + meaningOffsetY,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
         matched: false,
         shaking: false
       });
@@ -411,7 +416,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
-        {/* Ghost pairs (afterimages) - float upward with color */}
+        {/* Ghost pairs (afterimages) - float upward with colored text */}
         {ghostPairs.map((ghost, i) => {
           const age = Date.now() - ghost.timestamp;
           const duration = 2500; // Float for 2.5 seconds
@@ -421,31 +426,24 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
           const floatDistance = 150;
           const currentY = ghost.startY - (floatDistance * progress);
 
-          // Scale grows slightly then shrinks
-          const scale = 1 + Math.sin(progress * Math.PI) * 0.3;
-
-          // Fade out in the last 30% of the animation
-          const fadeStart = 0.7;
-          const opacity = progress < fadeStart ? 1 : 1 - ((progress - fadeStart) / (1 - fadeStart));
+          // Fade out gradually
+          const opacity = 1 - progress;
 
           if (progress >= 1) return null; // Don't render if done
 
           return (
             <div
               key={`ghost-${i}`}
-              className="absolute pointer-events-none"
+              className="absolute pointer-events-none flex flex-col items-center gap-1"
               style={{
                 left: ghost.x,
                 top: currentY,
-                transform: `translate(-50%, -50%) scale(${scale})`,
-                opacity,
-                transition: 'none'
+                transform: 'translate(-50%, -50%)',
+                opacity
               }}
             >
-              <div className="flex flex-col items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-emerald-500/80 to-teal-500/80 rounded-lg shadow-lg">
-                <span className="hebrew-font text-white font-bold text-sm" dir="rtl">{ghost.hebrew}</span>
-                <span className="text-white font-semibold text-xs">{ghost.meaning}</span>
-              </div>
+              <span className="hebrew-font text-emerald-400 font-bold text-base drop-shadow-lg" dir="rtl">{ghost.hebrew}</span>
+              <span className="text-teal-400 font-semibold text-sm drop-shadow-lg">{ghost.meaning}</span>
             </div>
           );
         })}
