@@ -192,134 +192,55 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       }
     };
 
-    // Create capsules scattered like leaves in a river - pairs start near each other
+    // Create capsules in columns (left: Hebrew, middle: Transliteration, right: Meaning)
+    // with randomized positions within each column
+    const columnWidth = usableWidth / 3;
+    const hebrewColumnX = padding + columnWidth / 2;
+    const translitColumnX = padding + columnWidth + columnWidth / 2;
+    const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
+
     uniquePairs.forEach((pair, index) => {
       const radii = {
         hebrew: getCapsuleRadius(pair.hebrew, true),
         transliteration: getCapsuleRadius(pair.transliteration || pair.hebrew, false),
         meaning: getCapsuleRadius(pair.meaning, false)
       };
-      const minPairSpacing = Math.max(
-        radii.hebrew + radii.transliteration,
-        radii.hebrew + radii.meaning,
-        radii.transliteration + radii.meaning
-      ) + CAPSULE_CLEARANCE_BUFFER;
 
-      // Find a valid center point that doesn't overlap with existing capsules
-      const pairSpacings = [
-        minPairSpacing + 30,
-        minPairSpacing + 15,
-        minPairSpacing
-      ]; // Distance between pair members
-      let centerX, centerY, hebrewX, hebrewY, translitX, translitY, meaningX, meaningY;
-      const isValidPlacement = (positions) => {
-        const withinBounds = [positions.hebrew, positions.transliteration, positions.meaning]
-          .every(pos => isWithinBounds(pos.x, pos.y));
+      // Helper function to find a random position within a column that doesn't overlap
+      const findColumnPosition = (columnCenterX, radius) => {
+        const maxAttempts = 50;
+        const columnHalfWidth = columnWidth / 2 - padding / 2;
 
-        const spacingOk = !isTooClose(positions.hebrew.x, positions.hebrew.y, radii.hebrew, capsules) &&
-          !isTooClose(positions.transliteration.x, positions.transliteration.y, radii.transliteration, capsules) &&
-          !isTooClose(positions.meaning.x, positions.meaning.y, radii.meaning, capsules);
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+          const x = columnCenterX + (Math.random() - 0.5) * columnHalfWidth * 1.6;
+          const y = padding + Math.random() * usableHeight;
 
-        const pairSpacingOk = [
-          ['hebrew', 'transliteration'],
-          ['hebrew', 'meaning'],
-          ['transliteration', 'meaning']
-        ].every(([first, second]) => {
-          const dx = positions[first].x - positions[second].x;
-          const dy = positions[first].y - positions[second].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          return distance >= radii[first] + radii[second] + CAPSULE_CLEARANCE_BUFFER;
-        });
-
-        const lineOfSightOk = hasClearLineOfSight(positions, capsules);
-
-        return withinBounds && spacingOk && pairSpacingOk && lineOfSightOk;
-      };
-
-      const applyPlacement = (positions) => {
-        hebrewX = positions.hebrew.x;
-        hebrewY = positions.hebrew.y;
-        translitX = positions.transliteration.x;
-        translitY = positions.transliteration.y;
-        meaningX = positions.meaning.x;
-        meaningY = positions.meaning.y;
-      };
-
-      const findPairPlacement = () => {
-        for (const pairSpacing of pairSpacings) {
-          let attempts = 0;
-          const maxAttempts = 120;
-
-          while (attempts < maxAttempts) {
-            centerX = padding + Math.random() * usableWidth;
-            centerY = padding + Math.random() * usableHeight;
-
-            const baseAngles = [
-              Math.random() * Math.PI * 2,
-              Math.random() * Math.PI * 2,
-              Math.random() * Math.PI * 2
-            ];
-
-            for (const baseAngle of baseAngles) {
-              const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
-              const positions = {
-                hebrew: { x: centerX + Math.cos(angles[0]) * pairSpacing, y: centerY + Math.sin(angles[0]) * pairSpacing },
-                transliteration: { x: centerX + Math.cos(angles[1]) * pairSpacing, y: centerY + Math.sin(angles[1]) * pairSpacing },
-                meaning: { x: centerX + Math.cos(angles[2]) * pairSpacing, y: centerY + Math.sin(angles[2]) * pairSpacing }
-              };
-
-              if (isValidPlacement(positions)) {
-                applyPlacement(positions);
-                return true;
-              }
-            }
-
-            attempts++;
+          if (!isTooClose(x, y, radius, capsules)) {
+            return { x, y };
           }
         }
 
-        const gridRows = Math.ceil(Math.sqrt(uniquePairs.length + 1));
-        const gridCols = gridRows;
-        for (const pairSpacing of pairSpacings) {
-          for (let row = 0; row < gridRows; row += 1) {
-            for (let col = 0; col < gridCols; col += 1) {
-              centerX = padding + usableWidth * ((col + 0.5) / gridCols);
-              centerY = padding + usableHeight * ((row + 0.5) / gridRows);
-
-              const angleSteps = 6;
-              for (let step = 0; step < angleSteps; step += 1) {
-                const baseAngle = (step / angleSteps) * Math.PI * 2;
-                const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
-                const positions = {
-                  hebrew: { x: centerX + Math.cos(angles[0]) * pairSpacing, y: centerY + Math.sin(angles[0]) * pairSpacing },
-                  transliteration: { x: centerX + Math.cos(angles[1]) * pairSpacing, y: centerY + Math.sin(angles[1]) * pairSpacing },
-                  meaning: { x: centerX + Math.cos(angles[2]) * pairSpacing, y: centerY + Math.sin(angles[2]) * pairSpacing }
-                };
-
-                if (isValidPlacement(positions)) {
-                  applyPlacement(positions);
-                  return true;
-                }
-              }
-            }
-          }
-        }
-
-        return false;
+        // Fallback: just use column center with random y
+        return {
+          x: columnCenterX,
+          y: padding + Math.random() * usableHeight
+        };
       };
 
-      if (!findPairPlacement()) {
-        centerX = padding + usableWidth / 2;
-        centerY = padding + usableHeight / 2;
-        const fallbackSpacing = pairSpacings[pairSpacings.length - 1];
-        const baseAngle = Math.random() * Math.PI * 2;
-        const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
-        applyPlacement({
-          hebrew: { x: centerX + Math.cos(angles[0]) * fallbackSpacing, y: centerY + Math.sin(angles[0]) * fallbackSpacing },
-          transliteration: { x: centerX + Math.cos(angles[1]) * fallbackSpacing, y: centerY + Math.sin(angles[1]) * fallbackSpacing },
-          meaning: { x: centerX + Math.cos(angles[2]) * fallbackSpacing, y: centerY + Math.sin(angles[2]) * fallbackSpacing }
-        });
-      }
+      // Place Hebrew capsule in left column
+      const hebrewPos = findColumnPosition(hebrewColumnX, radii.hebrew);
+      const hebrewX = hebrewPos.x;
+      const hebrewY = hebrewPos.y;
+
+      // Place Transliteration capsule in middle column
+      const translitPos = findColumnPosition(translitColumnX, radii.transliteration);
+      const translitX = translitPos.x;
+      const translitY = translitPos.y;
+
+      // Place Meaning capsule in right column
+      const meaningPos = findColumnPosition(meaningColumnX, radii.meaning);
+      const meaningX = meaningPos.x;
+      const meaningY = meaningPos.y;
 
       // Hebrew capsule
       const wanderDelay = 1200 + Math.random() * 1800;
@@ -474,6 +395,63 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
           capsule.shakeUntil = null;
         }
       });
+
+      // Capsule-to-capsule collision detection and response
+      for (let i = 0; i < capsules.length; i++) {
+        const capsuleA = capsules[i];
+        if (capsuleA.matched) continue;
+        const isDraggingA = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === i;
+        if (isDraggingA) continue;
+
+        for (let j = i + 1; j < capsules.length; j++) {
+          const capsuleB = capsules[j];
+          if (capsuleB.matched) continue;
+          const isDraggingB = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === j;
+          if (isDraggingB) continue;
+
+          const dx = capsuleB.x - capsuleA.x;
+          const dy = capsuleB.y - capsuleA.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const minDistance = (capsuleA.radius ?? CAPSULE_RADIUS) + (capsuleB.radius ?? CAPSULE_RADIUS);
+
+          if (distance < minDistance && distance > 0) {
+            // Collision detected - apply elastic collision response
+            const overlap = minDistance - distance;
+            const angle = Math.atan2(dy, dx);
+
+            // Separate capsules
+            const separationX = Math.cos(angle) * (overlap / 2);
+            const separationY = Math.sin(angle) * (overlap / 2);
+
+            capsuleA.x -= separationX;
+            capsuleA.y -= separationY;
+            capsuleB.x += separationX;
+            capsuleB.y += separationY;
+
+            // Exchange velocities with damping for elastic collision
+            const relativeVx = capsuleB.vx - capsuleA.vx;
+            const relativeVy = capsuleB.vy - capsuleA.vy;
+            const dotProduct = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
+
+            if (dotProduct < 0) {
+              const collisionDamping = 0.6; // Energy loss on collision
+              const impulseX = Math.cos(angle) * dotProduct * collisionDamping;
+              const impulseY = Math.sin(angle) * dotProduct * collisionDamping;
+
+              capsuleA.vx += impulseX;
+              capsuleA.vy += impulseY;
+              capsuleB.vx -= impulseX;
+              capsuleB.vy -= impulseY;
+
+              // Update target velocities too so wandering doesn't immediately counteract
+              capsuleA.targetVx = capsuleA.vx;
+              capsuleA.targetVy = capsuleA.vy;
+              capsuleB.targetVx = capsuleB.vx;
+              capsuleB.targetVy = capsuleB.vy;
+            }
+          }
+        }
+      }
 
       animationRef.current = requestAnimationFrame(animate);
     }
