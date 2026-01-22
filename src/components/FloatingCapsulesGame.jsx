@@ -296,7 +296,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         }
         return nextIndex;
       });
-    }, 1000); // 1 second per pair
+    }, 300); // 0.3 seconds per pair
 
     return () => clearInterval(hintInterval);
   }, [wordPairs]);
@@ -796,7 +796,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
                 }
                 return nextIndex;
               });
-            }, 1000); // 1 second per pair
+            }, 300); // 0.3 seconds per pair
           }}
           className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-all"
         >
