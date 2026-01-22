@@ -200,14 +200,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     const translitColumnX = padding + columnWidth + columnWidth / 2;
     const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
 
-    // Calculate evenly spaced Y positions for capsules in each column
-    const numCapsules = uniquePairs.length;
-    const spacing = usableHeight / (numCapsules + 1); // +1 for even spacing at top and bottom
-
-    // Create ALL Hebrew capsules in left column (straight vertical line)
+    // Create ALL Hebrew capsules in left column (randomized Y positions)
     uniquePairs.forEach((pair, index) => {
       const radius = getCapsuleRadius(pair.hebrew, true);
-      const y = padding + spacing * (index + 1); // Evenly spaced
+      const y = padding + Math.random() * usableHeight; // Randomized within column
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
@@ -228,10 +224,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       });
     });
 
-    // Create ALL Transliteration capsules in middle column (straight vertical line)
+    // Create ALL Transliteration capsules in middle column (randomized Y positions)
     uniquePairs.forEach((pair, index) => {
       const radius = getCapsuleRadius(pair.transliteration || pair.hebrew, false);
-      const y = padding + spacing * (index + 1); // Evenly spaced
+      const y = padding + Math.random() * usableHeight; // Randomized within column
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
@@ -252,10 +248,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       });
     });
 
-    // Create ALL Meaning capsules in right column (straight vertical line)
+    // Create ALL Meaning capsules in right column (randomized Y positions)
     uniquePairs.forEach((pair, index) => {
       const radius = getCapsuleRadius(pair.meaning, false);
-      const y = padding + spacing * (index + 1); // Evenly spaced
+      const y = padding + Math.random() * usableHeight; // Randomized within column
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
