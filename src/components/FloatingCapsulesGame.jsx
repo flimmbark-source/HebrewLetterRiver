@@ -50,7 +50,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     const uniquePairs = ensureUniquePairs(wordPairs);
 
     const capsules = [];
-    const padding = 10; // Minimal padding at edges
+    const padding = 2; // Very minimal padding at edges
     const usableWidth = bounds.width - padding * 2;
     const usableHeight = bounds.height - padding * 2;
 
@@ -355,8 +355,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         capsule.x += capsule.vx;
         capsule.y += capsule.vy;
 
-        // Bounce off walls - use capsule's radius plus small padding
-        const margin = (capsule.radius ?? CAPSULE_RADIUS) + 5;
+        // Bounce off walls - use capsule's radius plus minimal padding
+        const margin = (capsule.radius ?? CAPSULE_RADIUS) + 2;
         if (capsule.x < margin || capsule.x > bounds.width - margin) {
           capsule.vx *= -BOUNCE_DAMPING;
           capsule.targetVx = -capsule.targetVx;
