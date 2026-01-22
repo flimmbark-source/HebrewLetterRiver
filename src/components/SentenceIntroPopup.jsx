@@ -44,6 +44,12 @@ export default function SentenceIntroPopup({
       overlayRef.current.focus();
     }
 
+    // Mark words as seen immediately when the game starts (when player sees them)
+    const wordIds = wordPairs.map(pair => pair.wordId).filter(Boolean);
+    if (wordIds.length > 0) {
+      markWordsSeen(wordIds);
+    }
+
     return () => {
       // Restore scrolling
       document.body.style.overflow = '';
@@ -53,7 +59,7 @@ export default function SentenceIntroPopup({
         previousFocusRef.current.focus();
       }
     };
-  }, []);
+  }, [wordPairs]);
 
   // Trap focus within modal
   const handleKeyDown = (e) => {
@@ -102,11 +108,7 @@ export default function SentenceIntroPopup({
       mismatchCount: stats.mismatchCount
     });
 
-    // Mark all words in this game as seen
-    const wordIds = wordPairs.map(pair => pair.wordId).filter(Boolean);
-    if (wordIds.length > 0) {
-      markWordsSeen(wordIds);
-    }
+    // Words are already marked as seen when the game starts (in useEffect)
 
     // Notify parent
     if (onComplete) {
