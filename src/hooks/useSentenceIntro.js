@@ -5,6 +5,7 @@ import {
   markShownInSession
 } from '../lib/introducedSentenceStorage';
 import { getSentenceWordMeanings } from '../lib/sentenceWordLookup';
+import { isWordSeen } from '../lib/seenWordsStorage';
 
 /**
  * Hook for managing sentence introduction pop-ups.
@@ -94,8 +95,12 @@ export function useSentenceIntro({
 
     console.log('[useSentenceIntro] Extracted word pairs:', pairs);
 
+    // Filter out words that have already been seen
+    const unseenPairs = pairs.filter(pair => !isWordSeen(pair.wordId));
+    console.log('[useSentenceIntro] Filtered to unseen pairs:', unseenPairs);
+
     // Cap at 8 pairs for manageability
-    return pairs.slice(0, 8);
+    return unseenPairs.slice(0, 8);
   }, [sentence, practiceLanguageId, appLanguageId]);
 
   // Determine if popup should be shown

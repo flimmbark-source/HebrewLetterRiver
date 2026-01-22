@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import FloatingCapsulesGame from './FloatingCapsulesGame';
 import { markSentenceIntroduced } from '../lib/introducedSentenceStorage';
+import { markWordsSeen } from '../lib/seenWordsStorage';
 
 /**
  * SentenceIntroPopup - Modal overlay that shows the word-matching mini-game
@@ -95,11 +96,17 @@ export default function SentenceIntroPopup({
   };
 
   const handleGameComplete = (stats) => {
-    // Save to storage
+    // Save sentence completion to storage
     markSentenceIntroduced(sentenceId, {
       completionTime: stats.completionTime,
       mismatchCount: stats.mismatchCount
     });
+
+    // Mark all words in this game as seen
+    const wordIds = wordPairs.map(pair => pair.wordId).filter(Boolean);
+    if (wordIds.length > 0) {
+      markWordsSeen(wordIds);
+    }
 
     // Notify parent
     if (onComplete) {
