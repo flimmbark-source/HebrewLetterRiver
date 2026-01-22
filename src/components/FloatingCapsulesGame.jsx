@@ -21,7 +21,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const [mismatchCount, setMismatchCount] = useState(0);
   const [completionTime, setCompletionTime] = useState(0);
   const [showLines, setShowLines] = useState(true);
-  const [lineOpacity, setLineOpacity] = useState(1);
+  const [currentHintPairIndex, setCurrentHintPairIndex] = useState(0);
   const startTimeRef = useRef(Date.now());
 
   // Capsule state
@@ -50,7 +50,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     const uniquePairs = ensureUniquePairs(wordPairs);
 
     const capsules = [];
-    const padding = 80;
+    const padding = 2; // Very minimal padding at edges
     const usableWidth = bounds.width - padding * 2;
     const usableHeight = bounds.height - padding * 2;
 
@@ -66,7 +66,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       const textWidth = measurementContext.measureText(text).width;
       const width = textWidth + 32;
       const height = fontSize + 16;
-      return Math.max(width, height) / 2 + CAPSULE_CLEARANCE_BUFFER;
+      // Use actual visual size without extra buffer
+      return Math.max(width, height) / 2;
     };
 
     // Helper to check if position is too close to existing capsules
@@ -74,7 +75,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       return existingCapsules.some(cap => {
         const dx = cap.x - x;
         const dy = cap.y - y;
-        const minDistance = radius + (cap.radius ?? CAPSULE_RADIUS) + CAPSULE_CLEARANCE_BUFFER;
+        // Just use the actual radii, no extra buffer
+        const minDistance = radius + (cap.radius ?? CAPSULE_RADIUS);
         return Math.sqrt(dx * dx + dy * dy) < minDistance;
       });
     };
@@ -192,181 +194,27 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       }
     };
 
-    // Create capsules scattered like leaves in a river - pairs start near each other
+    // Create capsules in straight vertical columns by TYPE
+    // (left: ALL Hebrew, middle: ALL Transliteration, right: ALL Meaning)
+    const columnWidth = usableWidth / 3;
+    const hebrewColumnX = padding + columnWidth / 2;
+    const translitColumnX = padding + columnWidth + columnWidth / 2;
+    const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
+
+    // Create ALL Hebrew capsules in left column (randomized Y positions)
     uniquePairs.forEach((pair, index) => {
-      const radii = {
-        hebrew: getCapsuleRadius(pair.hebrew, true),
-        transliteration: getCapsuleRadius(pair.transliteration || pair.hebrew, false),
-        meaning: getCapsuleRadius(pair.meaning, false)
-      };
-      const minPairSpacing = Math.max(
-        radii.hebrew + radii.transliteration,
-        radii.hebrew + radii.meaning,
-        radii.transliteration + radii.meaning
-      ) + CAPSULE_CLEARANCE_BUFFER;
-
-      // Find a valid center point that doesn't overlap with existing capsules
-      const pairSpacings = [
-        minPairSpacing + 30,
-        minPairSpacing + 15,
-        minPairSpacing
-      ]; // Distance between pair members
-      let centerX, centerY, hebrewX, hebrewY, translitX, translitY, meaningX, meaningY;
-      const isValidPlacement = (positions) => {
-        const withinBounds = [positions.hebrew, positions.transliteration, positions.meaning]
-          .every(pos => isWithinBounds(pos.x, pos.y));
-
-        const spacingOk = !isTooClose(positions.hebrew.x, positions.hebrew.y, radii.hebrew, capsules) &&
-          !isTooClose(positions.transliteration.x, positions.transliteration.y, radii.transliteration, capsules) &&
-          !isTooClose(positions.meaning.x, positions.meaning.y, radii.meaning, capsules);
-
-        const pairSpacingOk = [
-          ['hebrew', 'transliteration'],
-          ['hebrew', 'meaning'],
-          ['transliteration', 'meaning']
-        ].every(([first, second]) => {
-          const dx = positions[first].x - positions[second].x;
-          const dy = positions[first].y - positions[second].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          return distance >= radii[first] + radii[second] + CAPSULE_CLEARANCE_BUFFER;
-        });
-
-        const lineOfSightOk = hasClearLineOfSight(positions, capsules);
-
-        return withinBounds && spacingOk && pairSpacingOk && lineOfSightOk;
-      };
-
-      const applyPlacement = (positions) => {
-        hebrewX = positions.hebrew.x;
-        hebrewY = positions.hebrew.y;
-        translitX = positions.transliteration.x;
-        translitY = positions.transliteration.y;
-        meaningX = positions.meaning.x;
-        meaningY = positions.meaning.y;
-      };
-
-      const findPairPlacement = () => {
-        for (const pairSpacing of pairSpacings) {
-          let attempts = 0;
-          const maxAttempts = 120;
-
-          while (attempts < maxAttempts) {
-            centerX = padding + Math.random() * usableWidth;
-            centerY = padding + Math.random() * usableHeight;
-
-            const baseAngles = [
-              Math.random() * Math.PI * 2,
-              Math.random() * Math.PI * 2,
-              Math.random() * Math.PI * 2
-            ];
-
-            for (const baseAngle of baseAngles) {
-              const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
-              const positions = {
-                hebrew: { x: centerX + Math.cos(angles[0]) * pairSpacing, y: centerY + Math.sin(angles[0]) * pairSpacing },
-                transliteration: { x: centerX + Math.cos(angles[1]) * pairSpacing, y: centerY + Math.sin(angles[1]) * pairSpacing },
-                meaning: { x: centerX + Math.cos(angles[2]) * pairSpacing, y: centerY + Math.sin(angles[2]) * pairSpacing }
-              };
-
-              if (isValidPlacement(positions)) {
-                applyPlacement(positions);
-                return true;
-              }
-            }
-
-            attempts++;
-          }
-        }
-
-        const gridRows = Math.ceil(Math.sqrt(uniquePairs.length + 1));
-        const gridCols = gridRows;
-        for (const pairSpacing of pairSpacings) {
-          for (let row = 0; row < gridRows; row += 1) {
-            for (let col = 0; col < gridCols; col += 1) {
-              centerX = padding + usableWidth * ((col + 0.5) / gridCols);
-              centerY = padding + usableHeight * ((row + 0.5) / gridRows);
-
-              const angleSteps = 6;
-              for (let step = 0; step < angleSteps; step += 1) {
-                const baseAngle = (step / angleSteps) * Math.PI * 2;
-                const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
-                const positions = {
-                  hebrew: { x: centerX + Math.cos(angles[0]) * pairSpacing, y: centerY + Math.sin(angles[0]) * pairSpacing },
-                  transliteration: { x: centerX + Math.cos(angles[1]) * pairSpacing, y: centerY + Math.sin(angles[1]) * pairSpacing },
-                  meaning: { x: centerX + Math.cos(angles[2]) * pairSpacing, y: centerY + Math.sin(angles[2]) * pairSpacing }
-                };
-
-                if (isValidPlacement(positions)) {
-                  applyPlacement(positions);
-                  return true;
-                }
-              }
-            }
-          }
-        }
-
-        return false;
-      };
-
-      if (!findPairPlacement()) {
-        centerX = padding + usableWidth / 2;
-        centerY = padding + usableHeight / 2;
-        const fallbackSpacing = pairSpacings[pairSpacings.length - 1];
-        const baseAngle = Math.random() * Math.PI * 2;
-        const angles = [baseAngle, baseAngle + (Math.PI * 2) / 3, baseAngle + (Math.PI * 4) / 3];
-        applyPlacement({
-          hebrew: { x: centerX + Math.cos(angles[0]) * fallbackSpacing, y: centerY + Math.sin(angles[0]) * fallbackSpacing },
-          transliteration: { x: centerX + Math.cos(angles[1]) * fallbackSpacing, y: centerY + Math.sin(angles[1]) * fallbackSpacing },
-          meaning: { x: centerX + Math.cos(angles[2]) * fallbackSpacing, y: centerY + Math.sin(angles[2]) * fallbackSpacing }
-        });
-      }
-
-      // Hebrew capsule
+      const radius = getCapsuleRadius(pair.hebrew, true);
+      const y = padding + Math.random() * usableHeight;
       const wanderDelay = 1200 + Math.random() * 1800;
+
       capsules.push({
         id: `hebrew-${index}`,
         type: 'hebrew',
         text: pair.hebrew,
         pairIndex: index,
-        x: hebrewX,
-        y: hebrewY,
-        radius: radii.hebrew,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        targetVx: (Math.random() - 0.5) * 0.4,
-        targetVy: (Math.random() - 0.5) * 0.4,
-        nextWanderAt: Date.now() + wanderDelay,
-        matched: false,
-        shaking: false
-      });
-
-      // Transliteration capsule
-      capsules.push({
-        id: `transliteration-${index}`,
-        type: 'transliteration',
-        text: pair.transliteration || pair.hebrew,
-        pairIndex: index,
-        x: translitX,
-        y: translitY,
-        radius: radii.transliteration,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        targetVx: (Math.random() - 0.5) * 0.4,
-        targetVy: (Math.random() - 0.5) * 0.4,
-        nextWanderAt: Date.now() + wanderDelay,
-        matched: false,
-        shaking: false
-      });
-
-      // Meaning capsule
-      capsules.push({
-        id: `meaning-${index}`,
-        type: 'meaning',
-        text: pair.meaning,
-        pairIndex: index,
-        x: meaningX,
-        y: meaningY,
-        radius: radii.meaning,
+        x: hebrewColumnX,
+        y: y,
+        radius: radius,
         vx: (Math.random() - 0.5) * 0.4,
         vy: (Math.random() - 0.5) * 0.4,
         targetVx: (Math.random() - 0.5) * 0.4,
@@ -377,25 +225,80 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       });
     });
 
-    resolveSpawnOverlaps(capsules);
+    // Create ALL Transliteration capsules in middle column (randomized Y positions)
+    uniquePairs.forEach((pair, index) => {
+      const radius = getCapsuleRadius(pair.transliteration || pair.hebrew, false);
+      const y = padding + Math.random() * usableHeight;
+      const wanderDelay = 1200 + Math.random() * 1800;
+
+      capsules.push({
+        id: `transliteration-${index}`,
+        type: 'transliteration',
+        text: pair.transliteration || pair.hebrew,
+        pairIndex: index,
+        x: translitColumnX,
+        y: y,
+        radius: radius,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        targetVx: (Math.random() - 0.5) * 0.4,
+        targetVy: (Math.random() - 0.5) * 0.4,
+        nextWanderAt: Date.now() + wanderDelay,
+        matched: false,
+        shaking: false
+      });
+    });
+
+    // Create ALL Meaning capsules in right column (randomized Y positions)
+    uniquePairs.forEach((pair, index) => {
+      const radius = getCapsuleRadius(pair.meaning, false);
+      const y = padding + Math.random() * usableHeight;
+      const wanderDelay = 1200 + Math.random() * 1800;
+
+      capsules.push({
+        id: `meaning-${index}`,
+        type: 'meaning',
+        text: pair.meaning,
+        pairIndex: index,
+        x: meaningColumnX,
+        y: y,
+        radius: radius,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        targetVx: (Math.random() - 0.5) * 0.4,
+        targetVy: (Math.random() - 0.5) * 0.4,
+        nextWanderAt: Date.now() + wanderDelay,
+        matched: false,
+        shaking: false
+      });
+    });
+
+    // NOTE: resolveSpawnOverlaps is disabled because:
+    // 1. It adds CAPSULE_CLEARANCE_BUFFER which we don't want for tight collisions
+    // 2. It moves entire pairs together, breaking the column-by-type layout
+    // 3. We already handle collision avoidance during initial placement with isTooClose()
+    // resolveSpawnOverlaps(capsules);
 
     capsulesRef.current = capsules;
 
-    // Start line fade timer
-    setTimeout(() => {
-      const fadeStart = Date.now();
-      const fadeInterval = setInterval(() => {
-        const elapsed = Date.now() - fadeStart;
-        const progress = Math.min(elapsed / FADE_DURATION, 1);
-        setLineOpacity(1 - progress);
+    // Start hint line succession timer (1 second per pair)
+    const totalPairs = uniquePairs.length;
+    setCurrentHintPairIndex(0);
+    setShowLines(true);
 
-        if (progress >= 1) {
+    const hintInterval = setInterval(() => {
+      setCurrentHintPairIndex(prev => {
+        const nextIndex = prev + 1;
+        if (nextIndex >= totalPairs) {
           setShowLines(false);
-          clearInterval(fadeInterval);
+          clearInterval(hintInterval);
+          return prev;
         }
-      }, 16);
-    }, PREVIEW_DURATION);
+        return nextIndex;
+      });
+    }, 300); // 0.3 seconds per pair
 
+    return () => clearInterval(hintInterval);
   }, [wordPairs]);
 
   // Ensure no duplicate meanings (add disambiguators if needed)
@@ -456,8 +359,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         capsule.x += capsule.vx;
         capsule.y += capsule.vy;
 
-        // Bounce off walls
-        const margin = 50;
+        // Bounce off walls - use capsule's radius plus minimal padding
+        const margin = (capsule.radius ?? CAPSULE_RADIUS) + 2;
         if (capsule.x < margin || capsule.x > bounds.width - margin) {
           capsule.vx *= -BOUNCE_DAMPING;
           capsule.targetVx = -capsule.targetVx;
@@ -474,6 +377,66 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
           capsule.shakeUntil = null;
         }
       });
+
+      // Capsule-to-capsule collision detection and response (gentle bumping)
+      for (let i = 0; i < capsules.length; i++) {
+        const capsuleA = capsules[i];
+        if (capsuleA.matched) continue;
+        const isDraggingA = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === i;
+        if (isDraggingA) continue;
+
+        for (let j = i + 1; j < capsules.length; j++) {
+          const capsuleB = capsules[j];
+          if (capsuleB.matched) continue;
+          const isDraggingB = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === j;
+          if (isDraggingB) continue;
+
+          const dx = capsuleB.x - capsuleA.x;
+          const dy = capsuleB.y - capsuleA.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const minDistance = (capsuleA.radius ?? CAPSULE_RADIUS) + (capsuleB.radius ?? CAPSULE_RADIUS);
+
+          // Allow some overlap before responding (tolerance of 5px)
+          const overlapTolerance = 5;
+          if (distance < minDistance - overlapTolerance && distance > 0) {
+            // Gentle collision response
+            const overlap = minDistance - distance;
+            const angle = Math.atan2(dy, dx);
+
+            // Gentle separation (only 20% of overlap instead of 50%)
+            const separationFactor = 0.2;
+            const separationX = Math.cos(angle) * (overlap * separationFactor);
+            const separationY = Math.sin(angle) * (overlap * separationFactor);
+
+            capsuleA.x -= separationX;
+            capsuleA.y -= separationY;
+            capsuleB.x += separationX;
+            capsuleB.y += separationY;
+
+            // Very gentle velocity exchange
+            const relativeVx = capsuleB.vx - capsuleA.vx;
+            const relativeVy = capsuleB.vy - capsuleA.vy;
+            const dotProduct = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
+
+            if (dotProduct < 0) {
+              const collisionDamping = 0.3; // Lower damping for gentler bumps
+              const impulseX = Math.cos(angle) * dotProduct * collisionDamping;
+              const impulseY = Math.sin(angle) * dotProduct * collisionDamping;
+
+              capsuleA.vx += impulseX;
+              capsuleA.vy += impulseY;
+              capsuleB.vx -= impulseX;
+              capsuleB.vy -= impulseY;
+
+              // Update target velocities too so wandering doesn't immediately counteract
+              capsuleA.targetVx = capsuleA.vx;
+              capsuleA.targetVy = capsuleA.vy;
+              capsuleB.targetVx = capsuleB.vx;
+              capsuleB.targetVy = capsuleB.vy;
+            }
+          }
+        }
+      }
 
       animationRef.current = requestAnimationFrame(animate);
     }
@@ -553,6 +516,41 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
             target.matched = true;
           }
 
+          // Check for orphaned capsules (single capsule left in a triplet)
+          const pairGroups = new Map();
+          capsulesRef.current.forEach(c => {
+            if (!c.matched) {
+              if (!pairGroups.has(c.pairIndex)) {
+                pairGroups.set(c.pairIndex, []);
+              }
+              pairGroups.get(c.pairIndex).push(c);
+            }
+          });
+
+          // Auto-remove any orphaned capsules (only 1 remaining in group)
+          const orphanedCapsules = [];
+          pairGroups.forEach((group, pairIndex) => {
+            if (group.length === 1) {
+              const orphan = group[0];
+              orphan.matched = true;
+              orphan.popping = true;
+              orphanedCapsules.push(orphan);
+            }
+          });
+
+          // Add orphaned capsules to ghost pairs
+          if (orphanedCapsules.length > 0) {
+            orphanedCapsules.forEach(orphan => {
+              setGhostPairs(prev => [...prev, {
+                items: [{ text: orphan.text, type: orphan.type }],
+                x: orphan.x,
+                y: orphan.y,
+                startY: orphan.y,
+                timestamp: Date.now()
+              }]);
+            });
+          }
+
           const allMatched = capsulesRef.current.every(c => c.matched);
           if (allMatched) {
             const time = Date.now() - startTimeRef.current;
@@ -599,38 +597,33 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (!showLines || lineOpacity <= 0) return;
+      if (!showLines) return;
 
       const capsules = capsulesRef.current;
-      ctx.strokeStyle = `rgba(255, 255, 255, ${lineOpacity * 0.4})`;
+      ctx.strokeStyle = `rgba(255, 255, 255, 0.6)`;
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
 
-      const capsulesByPair = new Map();
-      capsules.forEach(capsule => {
-        if (capsule.matched) return;
-        if (!capsulesByPair.has(capsule.pairIndex)) {
-          capsulesByPair.set(capsule.pairIndex, []);
-        }
-        capsulesByPair.get(capsule.pairIndex).push(capsule);
-      });
+      // Only show lines for the current hint pair
+      const pairCapsules = capsules.filter(
+        c => !c.matched && c.pairIndex === currentHintPairIndex
+      );
 
-      capsulesByPair.forEach(pairCapsules => {
-        for (let i = 0; i < pairCapsules.length; i += 1) {
-          for (let j = i + 1; j < pairCapsules.length; j += 1) {
-            ctx.beginPath();
-            ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
-            ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
-            ctx.stroke();
-          }
+      // Draw lines connecting all capsules in this pair
+      for (let i = 0; i < pairCapsules.length; i += 1) {
+        for (let j = i + 1; j < pairCapsules.length; j += 1) {
+          ctx.beginPath();
+          ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
+          ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
+          ctx.stroke();
         }
-      });
+      }
 
       requestAnimationFrame(draw);
     }
 
     draw();
-  }, [showLines, lineOpacity, playAreaBounds]);
+  }, [showLines, currentHintPairIndex, playAreaBounds]);
 
   // Clean up ghosts after fade
   useEffect(() => {
@@ -683,7 +676,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       <canvas
         ref={canvasRef}
         className="absolute inset-0 pointer-events-none"
-        style={{ opacity: showLines ? lineOpacity : 0 }}
+        style={{ opacity: showLines ? 1 : 0 }}
       />
 
       {/* Play area */}
@@ -788,21 +781,22 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       {!showLines && (
         <button
           onClick={() => {
+            // Restart hint succession
+            setCurrentHintPairIndex(0);
             setShowLines(true);
-            setLineOpacity(1);
-            setTimeout(() => {
-              const fadeStart = Date.now();
-              const fadeInterval = setInterval(() => {
-                const elapsed = Date.now() - fadeStart;
-                const progress = Math.min(elapsed / FADE_DURATION, 1);
-                setLineOpacity(1 - progress);
 
-                if (progress >= 1) {
+            const totalPairs = wordPairs.length;
+            const hintInterval = setInterval(() => {
+              setCurrentHintPairIndex(prev => {
+                const nextIndex = prev + 1;
+                if (nextIndex >= totalPairs) {
                   setShowLines(false);
-                  clearInterval(fadeInterval);
+                  clearInterval(hintInterval);
+                  return prev;
                 }
-              }, 16);
-            }, 2000);
+                return nextIndex;
+              });
+            }, 300); // 0.3 seconds per pair
           }}
           className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-all"
         >
