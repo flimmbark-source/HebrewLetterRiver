@@ -200,23 +200,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     const translitColumnX = padding + columnWidth + columnWidth / 2;
     const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
 
-    // Helper to find non-overlapping Y position in column
-    const findColumnY = (x, radius) => {
-      const maxAttempts = 50;
-      for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        const y = padding + Math.random() * usableHeight;
-        if (!isTooClose(x, y, radius, capsules)) {
-          return y;
-        }
-      }
-      // Fallback: return random position anyway
-      return padding + Math.random() * usableHeight;
-    };
-
     // Create ALL Hebrew capsules in left column (randomized Y positions)
     uniquePairs.forEach((pair, index) => {
       const radius = getCapsuleRadius(pair.hebrew, true);
-      const y = findColumnY(hebrewColumnX, radius);
+      const y = padding + Math.random() * usableHeight;
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
@@ -240,7 +227,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     // Create ALL Transliteration capsules in middle column (randomized Y positions)
     uniquePairs.forEach((pair, index) => {
       const radius = getCapsuleRadius(pair.transliteration || pair.hebrew, false);
-      const y = findColumnY(translitColumnX, radius);
+      const y = padding + Math.random() * usableHeight;
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
@@ -264,7 +251,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     // Create ALL Meaning capsules in right column (randomized Y positions)
     uniquePairs.forEach((pair, index) => {
       const radius = getCapsuleRadius(pair.meaning, false);
-      const y = findColumnY(meaningColumnX, radius);
+      const y = padding + Math.random() * usableHeight;
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
@@ -387,7 +374,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         }
       });
 
-      // Capsule-to-capsule collision detection and response
+      // Capsule-to-capsule collision detection and response (gentle bumping)
       for (let i = 0; i < capsules.length; i++) {
         const capsuleA = capsules[i];
         if (capsuleA.matched) continue;
@@ -405,27 +392,30 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
           const distance = Math.sqrt(dx * dx + dy * dy);
           const minDistance = (capsuleA.radius ?? CAPSULE_RADIUS) + (capsuleB.radius ?? CAPSULE_RADIUS);
 
-          if (distance < minDistance && distance > 0) {
-            // Collision detected - apply elastic collision response
+          // Allow some overlap before responding (tolerance of 5px)
+          const overlapTolerance = 5;
+          if (distance < minDistance - overlapTolerance && distance > 0) {
+            // Gentle collision response
             const overlap = minDistance - distance;
             const angle = Math.atan2(dy, dx);
 
-            // Separate capsules
-            const separationX = Math.cos(angle) * (overlap / 2);
-            const separationY = Math.sin(angle) * (overlap / 2);
+            // Gentle separation (only 20% of overlap instead of 50%)
+            const separationFactor = 0.2;
+            const separationX = Math.cos(angle) * (overlap * separationFactor);
+            const separationY = Math.sin(angle) * (overlap * separationFactor);
 
             capsuleA.x -= separationX;
             capsuleA.y -= separationY;
             capsuleB.x += separationX;
             capsuleB.y += separationY;
 
-            // Exchange velocities with damping for elastic collision
+            // Very gentle velocity exchange
             const relativeVx = capsuleB.vx - capsuleA.vx;
             const relativeVy = capsuleB.vy - capsuleA.vy;
             const dotProduct = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
 
             if (dotProduct < 0) {
-              const collisionDamping = 0.6; // Energy loss on collision
+              const collisionDamping = 0.3; // Lower damping for gentler bumps
               const impulseX = Math.cos(angle) * dotProduct * collisionDamping;
               const impulseY = Math.sin(angle) * dotProduct * collisionDamping;
 
