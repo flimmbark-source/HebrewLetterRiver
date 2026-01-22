@@ -21,7 +21,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const [mismatchCount, setMismatchCount] = useState(0);
   const [completionTime, setCompletionTime] = useState(0);
   const [showLines, setShowLines] = useState(true);
-  const [lineOpacity, setLineOpacity] = useState(1);
+  const [currentHintPairIndex, setCurrentHintPairIndex] = useState(0);
   const startTimeRef = useRef(Date.now());
 
   // Capsule state
@@ -281,21 +281,24 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     capsulesRef.current = capsules;
 
-    // Start line fade timer
-    setTimeout(() => {
-      const fadeStart = Date.now();
-      const fadeInterval = setInterval(() => {
-        const elapsed = Date.now() - fadeStart;
-        const progress = Math.min(elapsed / FADE_DURATION, 1);
-        setLineOpacity(1 - progress);
+    // Start hint line succession timer (1 second per pair)
+    const totalPairs = uniquePairs.length;
+    setCurrentHintPairIndex(0);
+    setShowLines(true);
 
-        if (progress >= 1) {
+    const hintInterval = setInterval(() => {
+      setCurrentHintPairIndex(prev => {
+        const nextIndex = prev + 1;
+        if (nextIndex >= totalPairs) {
           setShowLines(false);
-          clearInterval(fadeInterval);
+          clearInterval(hintInterval);
+          return prev;
         }
-      }, 16);
-    }, PREVIEW_DURATION);
+        return nextIndex;
+      });
+    }, 1000); // 1 second per pair
 
+    return () => clearInterval(hintInterval);
   }, [wordPairs]);
 
   // Ensure no duplicate meanings (add disambiguators if needed)
@@ -594,38 +597,33 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (!showLines || lineOpacity <= 0) return;
+      if (!showLines) return;
 
       const capsules = capsulesRef.current;
-      ctx.strokeStyle = `rgba(255, 255, 255, ${lineOpacity * 0.4})`;
+      ctx.strokeStyle = `rgba(255, 255, 255, 0.6)`;
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
 
-      const capsulesByPair = new Map();
-      capsules.forEach(capsule => {
-        if (capsule.matched) return;
-        if (!capsulesByPair.has(capsule.pairIndex)) {
-          capsulesByPair.set(capsule.pairIndex, []);
-        }
-        capsulesByPair.get(capsule.pairIndex).push(capsule);
-      });
+      // Only show lines for the current hint pair
+      const pairCapsules = capsules.filter(
+        c => !c.matched && c.pairIndex === currentHintPairIndex
+      );
 
-      capsulesByPair.forEach(pairCapsules => {
-        for (let i = 0; i < pairCapsules.length; i += 1) {
-          for (let j = i + 1; j < pairCapsules.length; j += 1) {
-            ctx.beginPath();
-            ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
-            ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
-            ctx.stroke();
-          }
+      // Draw lines connecting all capsules in this pair
+      for (let i = 0; i < pairCapsules.length; i += 1) {
+        for (let j = i + 1; j < pairCapsules.length; j += 1) {
+          ctx.beginPath();
+          ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
+          ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
+          ctx.stroke();
         }
-      });
+      }
 
       requestAnimationFrame(draw);
     }
 
     draw();
-  }, [showLines, lineOpacity, playAreaBounds]);
+  }, [showLines, currentHintPairIndex, playAreaBounds]);
 
   // Clean up ghosts after fade
   useEffect(() => {
@@ -678,7 +676,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       <canvas
         ref={canvasRef}
         className="absolute inset-0 pointer-events-none"
-        style={{ opacity: showLines ? lineOpacity : 0 }}
+        style={{ opacity: showLines ? 1 : 0 }}
       />
 
       {/* Play area */}
@@ -783,21 +781,22 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       {!showLines && (
         <button
           onClick={() => {
+            // Restart hint succession
+            setCurrentHintPairIndex(0);
             setShowLines(true);
-            setLineOpacity(1);
-            setTimeout(() => {
-              const fadeStart = Date.now();
-              const fadeInterval = setInterval(() => {
-                const elapsed = Date.now() - fadeStart;
-                const progress = Math.min(elapsed / FADE_DURATION, 1);
-                setLineOpacity(1 - progress);
 
-                if (progress >= 1) {
+            const totalPairs = wordPairs.length;
+            const hintInterval = setInterval(() => {
+              setCurrentHintPairIndex(prev => {
+                const nextIndex = prev + 1;
+                if (nextIndex >= totalPairs) {
                   setShowLines(false);
-                  clearInterval(fadeInterval);
+                  clearInterval(hintInterval);
+                  return prev;
                 }
-              }, 16);
-            }, 2000);
+                return nextIndex;
+              });
+            }, 1000); // 1 second per pair
           }}
           className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-all"
         >
