@@ -293,7 +293,11 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       });
     });
 
-    resolveSpawnOverlaps(capsules);
+    // NOTE: resolveSpawnOverlaps is disabled because:
+    // 1. It adds CAPSULE_CLEARANCE_BUFFER which we don't want for tight collisions
+    // 2. It moves entire pairs together, breaking the column-by-type layout
+    // 3. We already handle collision avoidance during initial placement with isTooClose()
+    // resolveSpawnOverlaps(capsules);
 
     capsulesRef.current = capsules;
 
