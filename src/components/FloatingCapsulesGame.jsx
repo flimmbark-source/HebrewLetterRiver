@@ -50,7 +50,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     const uniquePairs = ensureUniquePairs(wordPairs);
 
     const capsules = [];
-    const padding = CAPSULE_RADIUS; // Just enough for capsule size
+    const padding = 10; // Minimal padding at edges
     const usableWidth = bounds.width - padding * 2;
     const usableHeight = bounds.height - padding * 2;
 
@@ -193,38 +193,21 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       }
     };
 
-    // Create capsules in columns by TYPE (left: ALL Hebrew, middle: ALL Transliteration, right: ALL Meaning)
-    // with randomized positions within each column
+    // Create capsules in straight vertical columns by TYPE
+    // (left: ALL Hebrew, middle: ALL Transliteration, right: ALL Meaning)
     const columnWidth = usableWidth / 3;
     const hebrewColumnX = padding + columnWidth / 2;
     const translitColumnX = padding + columnWidth + columnWidth / 2;
     const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
 
-    // Helper function to find a random position within a column that doesn't overlap
-    const findColumnPosition = (columnCenterX, radius) => {
-      const maxAttempts = 50;
-      const columnHalfWidth = columnWidth / 2 - padding / 2;
+    // Calculate evenly spaced Y positions for capsules in each column
+    const numCapsules = uniquePairs.length;
+    const spacing = usableHeight / (numCapsules + 1); // +1 for even spacing at top and bottom
 
-      for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        const x = columnCenterX + (Math.random() - 0.5) * columnHalfWidth * 1.6;
-        const y = padding + Math.random() * usableHeight;
-
-        if (!isTooClose(x, y, radius, capsules)) {
-          return { x, y };
-        }
-      }
-
-      // Fallback: just use column center with random y
-      return {
-        x: columnCenterX,
-        y: padding + Math.random() * usableHeight
-      };
-    };
-
-    // Create ALL Hebrew capsules in left column
+    // Create ALL Hebrew capsules in left column (straight vertical line)
     uniquePairs.forEach((pair, index) => {
       const radius = getCapsuleRadius(pair.hebrew, true);
-      const pos = findColumnPosition(hebrewColumnX, radius);
+      const y = padding + spacing * (index + 1); // Evenly spaced
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
@@ -232,8 +215,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         type: 'hebrew',
         text: pair.hebrew,
         pairIndex: index,
-        x: pos.x,
-        y: pos.y,
+        x: hebrewColumnX,
+        y: y,
         radius: radius,
         vx: (Math.random() - 0.5) * 0.4,
         vy: (Math.random() - 0.5) * 0.4,
@@ -245,10 +228,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       });
     });
 
-    // Create ALL Transliteration capsules in middle column
+    // Create ALL Transliteration capsules in middle column (straight vertical line)
     uniquePairs.forEach((pair, index) => {
       const radius = getCapsuleRadius(pair.transliteration || pair.hebrew, false);
-      const pos = findColumnPosition(translitColumnX, radius);
+      const y = padding + spacing * (index + 1); // Evenly spaced
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
@@ -256,8 +239,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         type: 'transliteration',
         text: pair.transliteration || pair.hebrew,
         pairIndex: index,
-        x: pos.x,
-        y: pos.y,
+        x: translitColumnX,
+        y: y,
         radius: radius,
         vx: (Math.random() - 0.5) * 0.4,
         vy: (Math.random() - 0.5) * 0.4,
@@ -269,10 +252,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       });
     });
 
-    // Create ALL Meaning capsules in right column
+    // Create ALL Meaning capsules in right column (straight vertical line)
     uniquePairs.forEach((pair, index) => {
       const radius = getCapsuleRadius(pair.meaning, false);
-      const pos = findColumnPosition(meaningColumnX, radius);
+      const y = padding + spacing * (index + 1); // Evenly spaced
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
@@ -280,8 +263,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         type: 'meaning',
         text: pair.meaning,
         pairIndex: index,
-        x: pos.x,
-        y: pos.y,
+        x: meaningColumnX,
+        y: y,
         radius: radius,
         vx: (Math.random() - 0.5) * 0.4,
         vy: (Math.random() - 0.5) * 0.4,
@@ -376,8 +359,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         capsule.x += capsule.vx;
         capsule.y += capsule.vy;
 
-        // Bounce off walls - use capsule's actual radius as margin
-        const margin = capsule.radius ?? CAPSULE_RADIUS;
+        // Bounce off walls - use capsule's radius plus small padding
+        const margin = (capsule.radius ?? CAPSULE_RADIUS) + 5;
         if (capsule.x < margin || capsule.x > bounds.width - margin) {
           capsule.vx *= -BOUNCE_DAMPING;
           capsule.targetVx = -capsule.targetVx;
