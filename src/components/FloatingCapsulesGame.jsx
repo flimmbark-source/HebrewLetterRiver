@@ -66,7 +66,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       const textWidth = measurementContext.measureText(text).width;
       const width = textWidth + 32;
       const height = fontSize + 16;
-      return Math.max(width, height) / 2 + CAPSULE_CLEARANCE_BUFFER;
+      // Use actual visual size without extra buffer
+      return Math.max(width, height) / 2;
     };
 
     // Helper to check if position is too close to existing capsules
