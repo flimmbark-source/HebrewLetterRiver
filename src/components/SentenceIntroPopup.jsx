@@ -24,7 +24,6 @@ export default function SentenceIntroPopup({
 }) {
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [showNewWordsText, setShowNewWordsText] = useState(true);
   const overlayRef = useRef(null);
   const previousFocusRef = useRef(null);
 
@@ -61,15 +60,6 @@ export default function SentenceIntroPopup({
       }
     };
   }, [wordPairs]);
-
-  // Show "New Words!" text for 1 second before showing the game
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowNewWordsText(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   // Trap focus within modal
   const handleKeyDown = (e) => {
@@ -179,21 +169,13 @@ export default function SentenceIntroPopup({
           </div>
         </div>
 
-        {/* New Words text or Game area */}
-        {showNewWordsText ? (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <h1 className="text-6xl font-bold text-white animate-pulse">
-              New Words!
-            </h1>
-          </div>
-        ) : (
-          <div className="absolute inset-0 pt-14 pb-4">
-            <FloatingCapsulesGame
-              wordPairs={cappedWordPairs}
-              onComplete={handleGameComplete}
-            />
-          </div>
-        )}
+        {/* Game area */}
+        <div className="absolute inset-0 pt-14 pb-4">
+          <FloatingCapsulesGame
+            wordPairs={cappedWordPairs}
+            onComplete={handleGameComplete}
+          />
+        </div>
       </div>
     </div>
   );
