@@ -553,6 +553,41 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
             target.matched = true;
           }
 
+          // Check for orphaned capsules (single capsule left in a triplet)
+          const pairGroups = new Map();
+          capsulesRef.current.forEach(c => {
+            if (!c.matched) {
+              if (!pairGroups.has(c.pairIndex)) {
+                pairGroups.set(c.pairIndex, []);
+              }
+              pairGroups.get(c.pairIndex).push(c);
+            }
+          });
+
+          // Auto-remove any orphaned capsules (only 1 remaining in group)
+          const orphanedCapsules = [];
+          pairGroups.forEach((group, pairIndex) => {
+            if (group.length === 1) {
+              const orphan = group[0];
+              orphan.matched = true;
+              orphan.popping = true;
+              orphanedCapsules.push(orphan);
+            }
+          });
+
+          // Add orphaned capsules to ghost pairs
+          if (orphanedCapsules.length > 0) {
+            orphanedCapsules.forEach(orphan => {
+              setGhostPairs(prev => [...prev, {
+                items: [{ text: orphan.text, type: orphan.type }],
+                x: orphan.x,
+                y: orphan.y,
+                startY: orphan.y,
+                timestamp: Date.now()
+              }]);
+            });
+          }
+
           const allMatched = capsulesRef.current.every(c => c.matched);
           if (allMatched) {
             const time = Date.now() - startTimeRef.current;
