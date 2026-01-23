@@ -676,23 +676,26 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     ];
 
     // Helper to calculate edge points for line connections
+    // Lines connect at far end points: right edge of left capsule, left edge of right capsule
     const getEdgePoints = (capsuleA, capsuleB) => {
-      const dx = capsuleB.x - capsuleA.x;
-      const dy = capsuleB.y - capsuleA.y;
-      const angle = Math.atan2(dy, dx);
-
       const radiusA = capsuleA.radius ?? CAPSULE_RADIUS;
       const radiusB = capsuleB.radius ?? CAPSULE_RADIUS;
 
-      // Edge point of capsule A facing towards B
-      const edgeAx = capsuleA.x + radiusA * Math.cos(angle);
-      const edgeAy = capsuleA.y + radiusA * Math.sin(angle);
+      // Determine which capsule is on the left based on x position
+      const leftCapsule = capsuleA.x < capsuleB.x ? capsuleA : capsuleB;
+      const rightCapsule = capsuleA.x < capsuleB.x ? capsuleB : capsuleA;
+      const leftRadius = leftCapsule.radius ?? CAPSULE_RADIUS;
+      const rightRadius = rightCapsule.radius ?? CAPSULE_RADIUS;
 
-      // Edge point of capsule B facing towards A (opposite direction)
-      const edgeBx = capsuleB.x - radiusB * Math.cos(angle);
-      const edgeBy = capsuleB.y - radiusB * Math.sin(angle);
+      // Start at right edge of left capsule
+      const startX = leftCapsule.x + leftRadius;
+      const startY = leftCapsule.y;
 
-      return { startX: edgeAx, startY: edgeAy, endX: edgeBx, endY: edgeBy };
+      // End at left edge of right capsule
+      const endX = rightCapsule.x - rightRadius;
+      const endY = rightCapsule.y;
+
+      return { startX, startY, endX, endY };
     };
 
     function draw() {
