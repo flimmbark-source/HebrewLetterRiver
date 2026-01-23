@@ -202,16 +202,39 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     const translitColumnX = padding + columnWidth + columnWidth / 2;
     const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
 
-    // Calculate equidistant Y positions for grid formation
+    // Calculate equidistant Y positions for grid formation with contextual centering
     const numPairs = uniquePairs.length;
     const gridYPositions = [];
-    const topPadding = 60; // Extra padding from top
-    const bottomPadding = 60; // Extra padding from bottom
-    const availableHeight = usableHeight - topPadding - bottomPadding;
 
-    for (let i = 0; i < numPairs; i++) {
-      const y = padding + topPadding + (availableHeight / (numPairs + 1)) * (i + 1);
-      gridYPositions.push(y);
+    if (numPairs === 1) {
+      // Single pair - center it vertically
+      gridYPositions.push(bounds.height / 2);
+    } else {
+      // Multiple pairs - calculate centered grid based on number of capsules
+      const targetSpacing = 100; // Target spacing between capsule centers
+      const minEdgePadding = 60; // Minimum padding from edges
+      const totalGridHeight = targetSpacing * (numPairs - 1);
+      const maxAvailableHeight = usableHeight - 2 * minEdgePadding;
+
+      let actualGridHeight, topOffset;
+
+      if (totalGridHeight <= maxAvailableHeight) {
+        // Grid fits with target spacing - center it vertically
+        actualGridHeight = totalGridHeight;
+        const extraSpace = usableHeight - actualGridHeight;
+        topOffset = padding + extraSpace / 2;
+      } else {
+        // Grid too large - compress to fit with minimum padding
+        actualGridHeight = maxAvailableHeight;
+        topOffset = padding + minEdgePadding;
+      }
+
+      const actualSpacing = actualGridHeight / (numPairs - 1);
+
+      for (let i = 0; i < numPairs; i++) {
+        const y = topOffset + (actualSpacing * i);
+        gridYPositions.push(y);
+      }
     }
 
     // Shuffle helper function (Fisher-Yates shuffle)
