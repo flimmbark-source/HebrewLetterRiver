@@ -22,6 +22,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const [completionTime, setCompletionTime] = useState(0);
   const [showLines, setShowLines] = useState(true);
   const [currentHintPairIndex, setCurrentHintPairIndex] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
   const startTimeRef = useRef(Date.now());
 
   // Capsule state
@@ -281,24 +282,9 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     capsulesRef.current = capsules;
 
-    // Start hint line succession timer (1 second per pair)
-    const totalPairs = uniquePairs.length;
-    setCurrentHintPairIndex(0);
+    // Show all hint lines initially (will be hidden when Start is pressed)
     setShowLines(true);
-
-    const hintInterval = setInterval(() => {
-      setCurrentHintPairIndex(prev => {
-        const nextIndex = prev + 1;
-        if (nextIndex >= totalPairs) {
-          setShowLines(false);
-          clearInterval(hintInterval);
-          return prev;
-        }
-        return nextIndex;
-      });
-    }, 300); // 0.3 seconds per pair
-
-    return () => clearInterval(hintInterval);
+    setCurrentHintPairIndex(-1); // -1 means show all lines
   }, [wordPairs]);
 
   // Ensure no duplicate meanings (add disambiguators if needed)
@@ -324,7 +310,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
   // Animation loop - keep capsules moving even during drag
   useEffect(() => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || !gameStarted) return;
 
     function animate() {
       const capsules = capsulesRef.current;
@@ -448,11 +434,11 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [gameState, playAreaBounds]);
+  }, [gameState, gameStarted, playAreaBounds]);
 
   // Pointer event handlers - all capsule types are draggable
   const handlePointerDown = useCallback((e, capsule, index) => {
-    if (capsule.matched) return; // Only prevent dragging matched capsules
+    if (capsule.matched || !gameStarted) return; // Prevent dragging before game starts or if already matched
 
     e.preventDefault();
     const rect = playAreaRef.current.getBoundingClientRect();
@@ -465,7 +451,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     };
 
     e.target.setPointerCapture(e.pointerId);
-  }, []);
+  }, [gameStarted]);
 
   const handlePointerMove = useCallback((e) => {
     if (!dragStateRef.current.isDragging) return;
@@ -594,28 +580,70 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     canvas.width = bounds.width;
     canvas.height = bounds.height;
 
+    // Colors for hint lines (avoiding blue, yellow, purple)
+    const hintColors = [
+      'rgba(239, 68, 68, 0.6)',    // Red
+      'rgba(34, 197, 94, 0.6)',    // Green
+      'rgba(249, 115, 22, 0.6)',   // Orange
+      'rgba(6, 182, 212, 0.6)',    // Cyan
+      'rgba(236, 72, 153, 0.6)',   // Pink
+      'rgba(132, 204, 22, 0.6)',   // Lime
+      'rgba(20, 184, 166, 0.6)',   // Teal
+      'rgba(244, 63, 94, 0.6)',    // Rose
+    ];
+
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (!showLines) return;
 
       const capsules = capsulesRef.current;
-      ctx.strokeStyle = `rgba(255, 255, 255, 0.6)`;
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
 
-      // Only show lines for the current hint pair
-      const pairCapsules = capsules.filter(
-        c => !c.matched && c.pairIndex === currentHintPairIndex
-      );
+      if (currentHintPairIndex === -1) {
+        // Show all hint lines initially
+        const pairs = new Map();
+        capsules.forEach(c => {
+          if (!c.matched) {
+            if (!pairs.has(c.pairIndex)) {
+              pairs.set(c.pairIndex, []);
+            }
+            pairs.get(c.pairIndex).push(c);
+          }
+        });
 
-      // Draw lines connecting all capsules in this pair
-      for (let i = 0; i < pairCapsules.length; i += 1) {
-        for (let j = i + 1; j < pairCapsules.length; j += 1) {
-          ctx.beginPath();
-          ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
-          ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
-          ctx.stroke();
+        pairs.forEach((pairCapsules, pairIndex) => {
+          // Use different color for each pair
+          ctx.strokeStyle = hintColors[pairIndex % hintColors.length];
+
+          // Draw lines connecting all capsules in this pair
+          for (let i = 0; i < pairCapsules.length; i += 1) {
+            for (let j = i + 1; j < pairCapsules.length; j += 1) {
+              ctx.beginPath();
+              ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
+              ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
+              ctx.stroke();
+            }
+          }
+        });
+      } else {
+        // Show lines for the current hint pair only (succession mode)
+        const pairCapsules = capsules.filter(
+          c => !c.matched && c.pairIndex === currentHintPairIndex
+        );
+
+        // Use different color for each pair
+        ctx.strokeStyle = hintColors[currentHintPairIndex % hintColors.length];
+
+        // Draw lines connecting all capsules in this pair
+        for (let i = 0; i < pairCapsules.length; i += 1) {
+          for (let j = i + 1; j < pairCapsules.length; j += 1) {
+            ctx.beginPath();
+            ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
+            ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
+            ctx.stroke();
+          }
         }
       }
 
@@ -777,31 +805,44 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         })}
       </div>
 
-      {/* Hint button */}
-      {!showLines && (
+      {/* Start/Hint button */}
+      {!gameStarted ? (
         <button
           onClick={() => {
-            // Restart hint succession
-            setCurrentHintPairIndex(0);
-            setShowLines(true);
-
-            const totalPairs = wordPairs.length;
-            const hintInterval = setInterval(() => {
-              setCurrentHintPairIndex(prev => {
-                const nextIndex = prev + 1;
-                if (nextIndex >= totalPairs) {
-                  setShowLines(false);
-                  clearInterval(hintInterval);
-                  return prev;
-                }
-                return nextIndex;
-              });
-            }, 300); // 0.3 seconds per pair
+            setGameStarted(true);
+            setShowLines(false);
+            startTimeRef.current = Date.now();
           }}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-all"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-all"
         >
-          Show Hint
+          Start
         </button>
+      ) : (
+        !showLines && (
+          <button
+            onClick={() => {
+              // Restart hint succession
+              setCurrentHintPairIndex(0);
+              setShowLines(true);
+
+              const totalPairs = wordPairs.length;
+              const hintInterval = setInterval(() => {
+                setCurrentHintPairIndex(prev => {
+                  const nextIndex = prev + 1;
+                  if (nextIndex >= totalPairs) {
+                    setShowLines(false);
+                    clearInterval(hintInterval);
+                    return prev;
+                  }
+                  return nextIndex;
+                });
+              }, 300); // 0.3 seconds per pair
+            }}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-all"
+          >
+            Show Hint
+          </button>
+        )
       )}
 
       <style jsx>{`
