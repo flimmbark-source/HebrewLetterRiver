@@ -52,8 +52,9 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     const capsules = [];
     const padding = 2; // Very minimal padding at edges
+    const bottomReservedSpace = 68; // Space for start button (16px bottom + ~44px button height + 8px padding)
     const usableWidth = bounds.width - padding * 2;
-    const usableHeight = bounds.height - padding * 2;
+    const usableHeight = bounds.height - padding - bottomReservedSpace;
 
     const measurementCanvas = document.createElement('canvas');
     const measurementContext = measurementCanvas.getContext('2d');
@@ -207,8 +208,9 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     const gridYPositions = [];
 
     if (numPairs === 1) {
-      // Single pair - center it vertically
-      gridYPositions.push(bounds.height / 2);
+      // Single pair - center it vertically in the available space (excluding bottom button area)
+      const availableCenter = padding + (usableHeight / 2);
+      gridYPositions.push(availableCenter);
     } else {
       // Multiple pairs - calculate centered grid based on number of capsules
       const targetSpacing = 100; // Target spacing between capsule centers
