@@ -201,7 +201,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     // (left: ALL Hebrew, middle: ALL Transliteration, right: ALL Meaning)
     const columnWidth = usableWidth / 3;
     const hebrewColumnX = padding + columnWidth / 2;
-    const translitColumnX = padding + columnWidth + columnWidth / 2;
+    const translitColumnX = bounds.width / 2; // Center column aligned with start button
     const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
 
     // Calculate equidistant Y positions for grid formation with contextual centering
