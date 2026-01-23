@@ -45,8 +45,13 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   useEffect(() => {
     if (!playAreaRef.current) return;
 
-    const bounds = playAreaRef.current.getBoundingClientRect();
-    setPlayAreaBounds({ width: bounds.width, height: bounds.height });
+    // Wait for layout to settle before measuring bounds
+    // This ensures we get accurate dimensions, especially on subsequent renders
+    requestAnimationFrame(() => {
+      if (!playAreaRef.current) return;
+
+      const bounds = playAreaRef.current.getBoundingClientRect();
+      setPlayAreaBounds({ width: bounds.width, height: bounds.height });
 
     // Ensure we have unique pairs (handle duplicates by adding disambiguation)
     const uniquePairs = ensureUniquePairs(wordPairs);
@@ -199,10 +204,12 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     // Create capsules in straight vertical columns by TYPE
     // (left: ALL Hebrew, middle: ALL Transliteration, right: ALL Meaning)
-    const columnWidth = usableWidth / 3;
-    const hebrewColumnX = padding + columnWidth / 2;
-    const translitColumnX = bounds.width / 2; // Center column aligned with start button
-    const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
+    // Center column must align with start button at bounds.width / 2
+    const centerX = bounds.width / 2;
+    const columnSpacing = usableWidth / 3;
+    const hebrewColumnX = padding + columnSpacing / 2;
+    const translitColumnX = centerX; // Exact center for alignment with start button
+    const meaningColumnX = bounds.width - padding - columnSpacing / 2;
 
     // Calculate equidistant Y positions for grid formation with contextual centering
     const numPairs = uniquePairs.length;
@@ -344,6 +351,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     // Show all hint lines initially (will be hidden when Start is pressed)
     setShowLines(true);
     setCurrentHintPairIndex(-1); // -1 means show all lines
+    });
   }, [wordPairs]);
 
   // Staggered spawn: make each pair visible with 2s delay between pairs, starting 1s after mount
