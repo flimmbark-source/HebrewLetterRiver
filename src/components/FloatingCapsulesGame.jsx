@@ -352,7 +352,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     // Schedule visibility for each pair
     for (let pairIndex = 0; pairIndex < numPairs; pairIndex++) {
-      const delay = 1000 + (pairIndex * 2000); // 1s initial + 2s per pair
+      const delay = 1000 + (pairIndex * 1000); // 1s initial + 2s per pair
       const timeout = setTimeout(() => {
         capsulesRef.current.forEach(capsule => {
           if (capsule.pairIndex === pairIndex) {
