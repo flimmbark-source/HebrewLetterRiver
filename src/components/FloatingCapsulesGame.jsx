@@ -199,10 +199,12 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     // Create capsules in straight vertical columns by TYPE
     // (left: ALL Hebrew, middle: ALL Transliteration, right: ALL Meaning)
-    const columnWidth = usableWidth / 3;
-    const hebrewColumnX = padding + columnWidth / 2;
-    const translitColumnX = bounds.width / 2; // Center column aligned with start button
-    const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
+    // Ensure center column is exactly at the middle, with outer columns symmetrically placed
+    const centerX = bounds.width / 2;
+    const columnSpacing = usableWidth / 3;
+    const hebrewColumnX = padding + columnSpacing / 2;
+    const translitColumnX = centerX; // Exact center for alignment with start button
+    const meaningColumnX = bounds.width - padding - columnSpacing / 2;
 
     // Calculate equidistant Y positions for grid formation with contextual centering
     const numPairs = uniquePairs.length;
