@@ -269,10 +269,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         x: hebrewColumnX,
         y: y,
         radius: radius,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        targetVx: (Math.random() - 0.5) * 0.4,
-        targetVy: (Math.random() - 0.5) * 0.4,
+        vx: 0,
+        vy: 0,
+        targetVx: 0,
+        targetVy: 0,
         nextWanderAt: Date.now() + wanderDelay,
         matched: false,
         shaking: false,
@@ -295,10 +295,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         x: translitColumnX,
         y: y,
         radius: radius,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        targetVx: (Math.random() - 0.5) * 0.4,
-        targetVy: (Math.random() - 0.5) * 0.4,
+        vx: 0,
+        vy: 0,
+        targetVx: 0,
+        targetVy: 0,
         nextWanderAt: Date.now() + wanderDelay,
         matched: false,
         shaking: false,
@@ -321,10 +321,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         x: meaningColumnX,
         y: y,
         radius: radius,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        targetVx: (Math.random() - 0.5) * 0.4,
-        targetVy: (Math.random() - 0.5) * 0.4,
+        vx: 0,
+        vy: 0,
+        targetVx: 0,
+        targetVy: 0,
         nextWanderAt: Date.now() + wanderDelay,
         matched: false,
         shaking: false,
@@ -399,111 +399,15 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
       const now = Date.now();
       capsules.forEach((capsule, index) => {
-        // Skip matched, invisible capsules and the one currently being dragged
+        // Skip matched or invisible capsules
         if (capsule.matched || !capsule.visible) return;
-        const isDragging = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === index;
-        if (isDragging) return;
 
-        const timeForWander = capsule.nextWanderAt && now >= capsule.nextWanderAt;
-        if (timeForWander) {
-          capsule.targetVx = (Math.random() - 0.5) * 0.4;
-          capsule.targetVy = (Math.random() - 0.5) * 0.4;
-          capsule.nextWanderAt = now + 1200 + Math.random() * 1800;
-        }
-
-        const smoothing = 0.02;
-        capsule.vx += (capsule.targetVx - capsule.vx) * smoothing;
-        capsule.vy += (capsule.targetVy - capsule.vy) * smoothing;
-
-        const speedLimit = 0.7;
-        const speed = Math.sqrt(capsule.vx * capsule.vx + capsule.vy * capsule.vy);
-        if (speed > speedLimit) {
-          capsule.vx = (capsule.vx / speed) * speedLimit;
-          capsule.vy = (capsule.vy / speed) * speedLimit;
-        }
-
-        // Update position
-        capsule.x += capsule.vx;
-        capsule.y += capsule.vy;
-
-        // Bounce off walls - use capsule's radius plus minimal padding
-        const margin = (capsule.radius ?? CAPSULE_RADIUS) + 2;
-        if (capsule.x < margin || capsule.x > bounds.width - margin) {
-          capsule.vx *= -BOUNCE_DAMPING;
-          capsule.targetVx = -capsule.targetVx;
-          capsule.x = Math.max(margin, Math.min(bounds.width - margin, capsule.x));
-        }
-        if (capsule.y < margin || capsule.y > bounds.height - margin) {
-          capsule.vy *= -BOUNCE_DAMPING;
-          capsule.targetVy = -capsule.targetVy;
-          capsule.y = Math.max(margin, Math.min(bounds.height - margin, capsule.y));
-        }
-
+        // Clean up shake animation
         if (capsule.shakeUntil && now >= capsule.shakeUntil) {
           capsule.shaking = false;
           capsule.shakeUntil = null;
         }
       });
-
-      // Capsule-to-capsule collision detection and response (gentle bumping)
-      for (let i = 0; i < capsules.length; i++) {
-        const capsuleA = capsules[i];
-        if (capsuleA.matched || !capsuleA.visible) continue;
-        const isDraggingA = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === i;
-        if (isDraggingA) continue;
-
-        for (let j = i + 1; j < capsules.length; j++) {
-          const capsuleB = capsules[j];
-          if (capsuleB.matched || !capsuleB.visible) continue;
-          const isDraggingB = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === j;
-          if (isDraggingB) continue;
-
-          const dx = capsuleB.x - capsuleA.x;
-          const dy = capsuleB.y - capsuleA.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          const minDistance = (capsuleA.radius ?? CAPSULE_RADIUS) + (capsuleB.radius ?? CAPSULE_RADIUS);
-
-          // Allow some overlap before responding (tolerance of 5px)
-          const overlapTolerance = 5;
-          if (distance < minDistance - overlapTolerance && distance > 0) {
-            // Gentle collision response
-            const overlap = minDistance - distance;
-            const angle = Math.atan2(dy, dx);
-
-            // Gentle separation (only 20% of overlap instead of 50%)
-            const separationFactor = 0.2;
-            const separationX = Math.cos(angle) * (overlap * separationFactor);
-            const separationY = Math.sin(angle) * (overlap * separationFactor);
-
-            capsuleA.x -= separationX;
-            capsuleA.y -= separationY;
-            capsuleB.x += separationX;
-            capsuleB.y += separationY;
-
-            // Very gentle velocity exchange
-            const relativeVx = capsuleB.vx - capsuleA.vx;
-            const relativeVy = capsuleB.vy - capsuleA.vy;
-            const dotProduct = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
-
-            if (dotProduct < 0) {
-              const collisionDamping = 0.3; // Lower damping for gentler bumps
-              const impulseX = Math.cos(angle) * dotProduct * collisionDamping;
-              const impulseY = Math.sin(angle) * dotProduct * collisionDamping;
-
-              capsuleA.vx += impulseX;
-              capsuleA.vy += impulseY;
-              capsuleB.vx -= impulseX;
-              capsuleB.vy -= impulseY;
-
-              // Update target velocities too so wandering doesn't immediately counteract
-              capsuleA.targetVx = capsuleA.vx;
-              capsuleA.targetVy = capsuleA.vy;
-              capsuleB.targetVx = capsuleB.vx;
-              capsuleB.targetVy = capsuleB.vy;
-            }
-          }
-        }
-      }
 
       animationRef.current = requestAnimationFrame(animate);
     }
