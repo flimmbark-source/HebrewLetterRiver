@@ -352,7 +352,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     // Schedule visibility for each pair
     for (let pairIndex = 0; pairIndex < numPairs; pairIndex++) {
-      const delay = 1000 + (pairIndex * 2000); // 1s initial + 2s per pair
+      const delay = 1000 + (pairIndex * 1000); // 1s initial + 2s per pair
       const timeout = setTimeout(() => {
         capsulesRef.current.forEach(capsule => {
           if (capsule.pairIndex === pairIndex) {
@@ -862,7 +862,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
                   }
                   return nextIndex;
                 });
-              }, 300); // 0.3 seconds per pair
+              }, 800); // 0.3 seconds per pair
             }}
             className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-all"
           >
