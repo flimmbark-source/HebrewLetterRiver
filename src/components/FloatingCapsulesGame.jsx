@@ -649,13 +649,20 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
           // Use different color for each pair
           ctx.strokeStyle = hintColors[pairIndex % hintColors.length];
 
-          // Draw lines connecting all capsules in this pair
+          // Draw lines connecting all capsules in this pair (except Hebrew-to-Meaning)
           for (let i = 0; i < pairCapsules.length; i += 1) {
             for (let j = i + 1; j < pairCapsules.length; j += 1) {
-              ctx.beginPath();
-              ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
-              ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
-              ctx.stroke();
+              // Skip Hebrew-to-Meaning connection
+              const isHebrewToMeaning =
+                (pairCapsules[i].type === 'hebrew' && pairCapsules[j].type === 'meaning') ||
+                (pairCapsules[i].type === 'meaning' && pairCapsules[j].type === 'hebrew');
+
+              if (!isHebrewToMeaning) {
+                ctx.beginPath();
+                ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
+                ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
+                ctx.stroke();
+              }
             }
           }
         });
@@ -668,13 +675,20 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         // Use different color for each pair
         ctx.strokeStyle = hintColors[currentHintPairIndex % hintColors.length];
 
-        // Draw lines connecting all capsules in this pair
+        // Draw lines connecting all capsules in this pair (except Hebrew-to-Meaning)
         for (let i = 0; i < pairCapsules.length; i += 1) {
           for (let j = i + 1; j < pairCapsules.length; j += 1) {
-            ctx.beginPath();
-            ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
-            ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
-            ctx.stroke();
+            // Skip Hebrew-to-Meaning connection
+            const isHebrewToMeaning =
+              (pairCapsules[i].type === 'hebrew' && pairCapsules[j].type === 'meaning') ||
+              (pairCapsules[i].type === 'meaning' && pairCapsules[j].type === 'hebrew');
+
+            if (!isHebrewToMeaning) {
+              ctx.beginPath();
+              ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
+              ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
+              ctx.stroke();
+            }
           }
         }
       }
