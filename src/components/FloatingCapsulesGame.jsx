@@ -29,6 +29,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   // Capsule state
   const capsulesRef = useRef([]);
   const [ghostPairs, setGhostPairs] = useState([]);
+  const initializedWordPairsRef = useRef(null);
 
   // Drag state
   const dragStateRef = useRef({
@@ -41,12 +42,38 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const playAreaRef = useRef(null);
   const [playAreaBounds, setPlayAreaBounds] = useState({ width: 0, height: 0 });
 
-  // Initialize capsules with well-distributed positions
-  useEffect(() => {
+  // Measure bounds accurately after layout is complete
+  const updateBounds = useCallback(() => {
     if (!playAreaRef.current) return;
 
-    const bounds = playAreaRef.current.getBoundingClientRect();
-    setPlayAreaBounds({ width: bounds.width, height: bounds.height });
+    // Double requestAnimationFrame ensures layout is 100% complete
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (playAreaRef.current) {
+          const bounds = playAreaRef.current.getBoundingClientRect();
+          setPlayAreaBounds({ width: bounds.width, height: bounds.height });
+        }
+      });
+    });
+  }, []);
+
+  // Update bounds on window resize
+  useEffect(() => {
+    updateBounds();
+
+    window.addEventListener('resize', updateBounds);
+    return () => window.removeEventListener('resize', updateBounds);
+  }, [updateBounds]);
+
+  // Initialize capsules with well-distributed positions
+  useEffect(() => {
+    if (!playAreaRef.current || playAreaBounds.width === 0) return;
+
+    // Only reinitialize if wordPairs actually changed (not just bounds)
+    if (initializedWordPairsRef.current === wordPairs) return;
+    initializedWordPairsRef.current = wordPairs;
+
+    const bounds = playAreaBounds;
 
     // Ensure we have unique pairs (handle duplicates by adding disambiguation)
     const uniquePairs = ensureUniquePairs(wordPairs);
@@ -344,7 +371,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     // Show all hint lines initially (will be hidden when Start is pressed)
     setShowLines(true);
     setCurrentHintPairIndex(-1); // -1 means show all lines
-  }, [wordPairs]);
+  }, [wordPairs, playAreaBounds]);
 
   // Staggered spawn: make each pair visible with 2s delay between pairs, starting 1s after mount
   useEffect(() => {
