@@ -202,17 +202,45 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     const translitColumnX = padding + columnWidth + columnWidth / 2;
     const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
 
-    // Create ALL Hebrew capsules in left column (randomized Y positions)
-    uniquePairs.forEach((pair, index) => {
+    // Calculate equidistant Y positions for grid formation
+    const numPairs = uniquePairs.length;
+    const gridYPositions = [];
+    const topPadding = 60; // Extra padding from top
+    const bottomPadding = 60; // Extra padding from bottom
+    const availableHeight = usableHeight - topPadding - bottomPadding;
+
+    for (let i = 0; i < numPairs; i++) {
+      const y = padding + topPadding + (availableHeight / (numPairs + 1)) * (i + 1);
+      gridYPositions.push(y);
+    }
+
+    // Shuffle helper function (Fisher-Yates shuffle)
+    const shuffle = (array) => {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    };
+
+    // Create randomized orderings for each column
+    const hebrewOrder = shuffle([...Array(numPairs).keys()]);
+    const translitOrder = shuffle([...Array(numPairs).keys()]);
+    const meaningOrder = shuffle([...Array(numPairs).keys()]);
+
+    // Create ALL Hebrew capsules in left column (grid positions, randomized order)
+    uniquePairs.forEach((pair, pairIndex) => {
       const radius = getCapsuleRadius(pair.hebrew, true);
-      const y = padding + Math.random() * usableHeight;
+      const positionIndex = hebrewOrder[pairIndex];
+      const y = gridYPositions[positionIndex];
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
-        id: `hebrew-${index}`,
+        id: `hebrew-${pairIndex}`,
         type: 'hebrew',
         text: pair.hebrew,
-        pairIndex: index,
+        pairIndex: pairIndex,
         x: hebrewColumnX,
         y: y,
         radius: radius,
@@ -226,17 +254,18 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       });
     });
 
-    // Create ALL Transliteration capsules in middle column (randomized Y positions)
-    uniquePairs.forEach((pair, index) => {
+    // Create ALL Transliteration capsules in middle column (grid positions, randomized order)
+    uniquePairs.forEach((pair, pairIndex) => {
       const radius = getCapsuleRadius(pair.transliteration || pair.hebrew, false);
-      const y = padding + Math.random() * usableHeight;
+      const positionIndex = translitOrder[pairIndex];
+      const y = gridYPositions[positionIndex];
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
-        id: `transliteration-${index}`,
+        id: `transliteration-${pairIndex}`,
         type: 'transliteration',
         text: pair.transliteration || pair.hebrew,
-        pairIndex: index,
+        pairIndex: pairIndex,
         x: translitColumnX,
         y: y,
         radius: radius,
@@ -250,17 +279,18 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       });
     });
 
-    // Create ALL Meaning capsules in right column (randomized Y positions)
-    uniquePairs.forEach((pair, index) => {
+    // Create ALL Meaning capsules in right column (grid positions, randomized order)
+    uniquePairs.forEach((pair, pairIndex) => {
       const radius = getCapsuleRadius(pair.meaning, false);
-      const y = padding + Math.random() * usableHeight;
+      const positionIndex = meaningOrder[pairIndex];
+      const y = gridYPositions[positionIndex];
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
-        id: `meaning-${index}`,
+        id: `meaning-${pairIndex}`,
         type: 'meaning',
         text: pair.meaning,
-        pairIndex: index,
+        pairIndex: pairIndex,
         x: meaningColumnX,
         y: y,
         radius: radius,
@@ -580,16 +610,18 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     canvas.width = bounds.width;
     canvas.height = bounds.height;
 
-    // Colors for hint lines (avoiding blue, yellow, purple)
+    // Colors for hint lines - highly distinguishable colors with better contrast
     const hintColors = [
-      'rgba(239, 68, 68, 0.6)',    // Red
-      'rgba(34, 197, 94, 0.6)',    // Green
-      'rgba(249, 115, 22, 0.6)',   // Orange
-      'rgba(6, 182, 212, 0.6)',    // Cyan
-      'rgba(236, 72, 153, 0.6)',   // Pink
-      'rgba(132, 204, 22, 0.6)',   // Lime
-      'rgba(20, 184, 166, 0.6)',   // Teal
-      'rgba(244, 63, 94, 0.6)',    // Rose
+      'rgba(239, 68, 68, 0.7)',     // Bright Red
+      'rgba(22, 163, 74, 0.7)',     // Deep Green
+      'rgba(255, 159, 28, 0.7)',    // Bright Orange
+      'rgba(59, 130, 246, 0.7)',    // Bright Blue
+      'rgba(236, 72, 153, 0.7)',    // Hot Pink
+      'rgba(168, 85, 247, 0.7)',    // Purple
+      'rgba(14, 165, 233, 0.7)',    // Sky Blue
+      'rgba(234, 179, 8, 0.7)',     // Gold/Yellow
+      'rgba(20, 184, 166, 0.7)',    // Teal
+      'rgba(248, 113, 113, 0.7)',   // Light Red
     ];
 
     function draw() {
