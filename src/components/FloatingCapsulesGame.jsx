@@ -39,11 +39,33 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   });
 
   const playAreaRef = useRef(null);
+  const startButtonRef = useRef(null);
   const [playAreaBounds, setPlayAreaBounds] = useState({ width: 0, height: 0 });
+  const [buttonCenterX, setButtonCenterX] = useState(null);
+
+  // Measure start button position for alignment
+  useEffect(() => {
+    // Use a small delay to ensure the button is fully rendered
+    const measureButton = () => {
+      if (!startButtonRef.current || !playAreaRef.current) return;
+
+      const playAreaRect = playAreaRef.current.getBoundingClientRect();
+      const buttonRect = startButtonRef.current.getBoundingClientRect();
+
+      // Calculate button center relative to play area
+      const buttonCenter = buttonRect.left + buttonRect.width / 2 - playAreaRect.left;
+      setButtonCenterX(buttonCenter);
+    };
+
+    // Measure after a short delay to ensure DOM is ready
+    const timeoutId = setTimeout(measureButton, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, []); // Measure once on mount
 
   // Initialize capsules with well-distributed positions
   useEffect(() => {
-    if (!playAreaRef.current) return;
+    if (!playAreaRef.current || buttonCenterX === null) return;
 
     const bounds = playAreaRef.current.getBoundingClientRect();
     setPlayAreaBounds({ width: bounds.width, height: bounds.height });
@@ -201,7 +223,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     // (left: ALL Hebrew, middle: ALL Transliteration, right: ALL Meaning)
     const columnWidth = usableWidth / 3;
     const hebrewColumnX = padding + columnWidth / 2;
-    const translitColumnX = bounds.width / 2; // Center column aligned with start button
+    const translitColumnX = buttonCenterX; // Center column aligned with measured start button center
     const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
 
     // Calculate equidistant Y positions for grid formation with contextual centering
@@ -344,7 +366,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     // Show all hint lines initially (will be hidden when Start is pressed)
     setShowLines(true);
     setCurrentHintPairIndex(-1); // -1 means show all lines
-  }, [wordPairs]);
+  }, [wordPairs, buttonCenterX]);
 
   // Staggered spawn: make each pair visible with 2s delay between pairs, starting 1s after mount
   useEffect(() => {
@@ -837,6 +859,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       {/* Start/Hint button */}
       {!gameStarted ? (
         <button
+          ref={startButtonRef}
           onClick={() => {
             setGameStarted(true);
             setShowLines(false);
