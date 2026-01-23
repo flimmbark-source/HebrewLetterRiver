@@ -275,7 +275,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         targetVy: (Math.random() - 0.5) * 0.4,
         nextWanderAt: Date.now() + wanderDelay,
         matched: false,
-        shaking: false
+        shaking: false,
+        visible: false
       });
     });
 
@@ -300,7 +301,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         targetVy: (Math.random() - 0.5) * 0.4,
         nextWanderAt: Date.now() + wanderDelay,
         matched: false,
-        shaking: false
+        shaking: false,
+        visible: false
       });
     });
 
@@ -325,7 +327,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         targetVy: (Math.random() - 0.5) * 0.4,
         nextWanderAt: Date.now() + wanderDelay,
         matched: false,
-        shaking: false
+        shaking: false,
+        visible: false
       });
     });
 
@@ -340,6 +343,29 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     // Show all hint lines initially (will be hidden when Start is pressed)
     setShowLines(true);
     setCurrentHintPairIndex(-1); // -1 means show all lines
+  }, [wordPairs]);
+
+  // Staggered spawn: make each pair visible with 2s delay between pairs, starting 1s after mount
+  useEffect(() => {
+    const timeouts = [];
+    const numPairs = wordPairs.length;
+
+    // Schedule visibility for each pair
+    for (let pairIndex = 0; pairIndex < numPairs; pairIndex++) {
+      const delay = 1000 + (pairIndex * 2000); // 1s initial + 2s per pair
+      const timeout = setTimeout(() => {
+        capsulesRef.current.forEach(capsule => {
+          if (capsule.pairIndex === pairIndex) {
+            capsule.visible = true;
+          }
+        });
+      }, delay);
+      timeouts.push(timeout);
+    }
+
+    return () => {
+      timeouts.forEach(timeout => clearTimeout(timeout));
+    };
   }, [wordPairs]);
 
   // Ensure no duplicate meanings (add disambiguators if needed)
@@ -373,8 +399,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
       const now = Date.now();
       capsules.forEach((capsule, index) => {
-        // Skip matched capsules and the one currently being dragged
-        if (capsule.matched) return;
+        // Skip matched, invisible capsules and the one currently being dragged
+        if (capsule.matched || !capsule.visible) return;
         const isDragging = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === index;
         if (isDragging) return;
 
@@ -422,13 +448,13 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       // Capsule-to-capsule collision detection and response (gentle bumping)
       for (let i = 0; i < capsules.length; i++) {
         const capsuleA = capsules[i];
-        if (capsuleA.matched) continue;
+        if (capsuleA.matched || !capsuleA.visible) continue;
         const isDraggingA = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === i;
         if (isDraggingA) continue;
 
         for (let j = i + 1; j < capsules.length; j++) {
           const capsuleB = capsules[j];
-          if (capsuleB.matched) continue;
+          if (capsuleB.matched || !capsuleB.visible) continue;
           const isDraggingB = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === j;
           if (isDraggingB) continue;
 
@@ -493,7 +519,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
   // Pointer event handlers - all capsule types are draggable
   const handlePointerDown = useCallback((e, capsule, index) => {
-    if (capsule.matched || !gameStarted) return; // Prevent dragging before game starts or if already matched
+    if (capsule.matched || !capsule.visible || !gameStarted) return; // Prevent dragging before game starts, if invisible, or if already matched
 
     e.preventDefault();
     const rect = playAreaRef.current.getBoundingClientRect();
@@ -527,7 +553,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     const candidates = capsulesRef.current
       .map((capsule, capsuleIndex) => ({ capsule, capsuleIndex }))
-      .filter(({ capsule, capsuleIndex }) => capsuleIndex !== index && !capsule.matched)
+      .filter(({ capsule, capsuleIndex }) => capsuleIndex !== index && !capsule.matched && capsule.visible)
       .map(({ capsule }) => {
         const dx = draggedCapsule.x - capsule.x;
         const dy = draggedCapsule.y - capsule.y;
@@ -649,6 +675,26 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       'rgba(248, 113, 113, 0.7)',   // Light Red
     ];
 
+    // Helper to calculate edge points for line connections
+    const getEdgePoints = (capsuleA, capsuleB) => {
+      const dx = capsuleB.x - capsuleA.x;
+      const dy = capsuleB.y - capsuleA.y;
+      const angle = Math.atan2(dy, dx);
+
+      const radiusA = capsuleA.radius ?? CAPSULE_RADIUS;
+      const radiusB = capsuleB.radius ?? CAPSULE_RADIUS;
+
+      // Edge point of capsule A facing towards B
+      const edgeAx = capsuleA.x + radiusA * Math.cos(angle);
+      const edgeAy = capsuleA.y + radiusA * Math.sin(angle);
+
+      // Edge point of capsule B facing towards A (opposite direction)
+      const edgeBx = capsuleB.x - radiusB * Math.cos(angle);
+      const edgeBy = capsuleB.y - radiusB * Math.sin(angle);
+
+      return { startX: edgeAx, startY: edgeAy, endX: edgeBx, endY: edgeBy };
+    };
+
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -662,7 +708,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         // Show all hint lines initially
         const pairs = new Map();
         capsules.forEach(c => {
-          if (!c.matched) {
+          if (!c.matched && c.visible) {
             if (!pairs.has(c.pairIndex)) {
               pairs.set(c.pairIndex, []);
             }
@@ -683,9 +729,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
                 (pairCapsules[i].type === 'meaning' && pairCapsules[j].type === 'hebrew');
 
               if (!isHebrewToMeaning) {
+                const { startX, startY, endX, endY } = getEdgePoints(pairCapsules[i], pairCapsules[j]);
                 ctx.beginPath();
-                ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
-                ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
                 ctx.stroke();
               }
             }
@@ -694,7 +741,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       } else {
         // Show lines for the current hint pair only (succession mode)
         const pairCapsules = capsules.filter(
-          c => !c.matched && c.pairIndex === currentHintPairIndex
+          c => !c.matched && c.visible && c.pairIndex === currentHintPairIndex
         );
 
         // Use different color for each pair
@@ -709,9 +756,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
               (pairCapsules[i].type === 'meaning' && pairCapsules[j].type === 'hebrew');
 
             if (!isHebrewToMeaning) {
+              const { startX, startY, endX, endY } = getEdgePoints(pairCapsules[i], pairCapsules[j]);
               ctx.beginPath();
-              ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
-              ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
+              ctx.moveTo(startX, startY);
+              ctx.lineTo(endX, endY);
               ctx.stroke();
             }
           }
@@ -831,7 +879,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
         {/* Capsules */}
         {capsulesRef.current.map((capsule, index) => {
-          if (capsule.matched) return null;
+          if (capsule.matched || !capsule.visible) return null;
 
           const isHebrew = capsule.type === 'hebrew';
           const isTransliteration = capsule.type === 'transliteration';
