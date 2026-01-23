@@ -23,6 +23,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const [showLines, setShowLines] = useState(true);
   const [currentHintPairIndex, setCurrentHintPairIndex] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
+  const [, forceUpdate] = useState(0);
   const startTimeRef = useRef(Date.now());
 
   // Capsule state
@@ -359,6 +360,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
             capsule.visible = true;
           }
         });
+        // Force re-render so capsules appear at the same time as hint lines
+        forceUpdate(n => n + 1);
       }, delay);
       timeouts.push(timeout);
     }
