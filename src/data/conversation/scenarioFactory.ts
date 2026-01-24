@@ -597,10 +597,6 @@ function generateSegments(
       title: `Segment ${segIdx + 1}`
     };
 
-    // Debug: Log what sentences are in this segment
-    console.log(`Segment ${segIdx + 1} contains:`, segmentPairs.map(p => `${p.shortSentenceId} + ${p.longSentenceId}`));
-    console.log(`  Total beats: ${segmentBeats.length}, First beat lineId: ${segmentBeats[0]?.lineId}`);
-
     segments.push(segment);
   }
 
