@@ -512,6 +512,7 @@ function createScenarioMetadata(
 /**
  * Generate practice segments from paired sentences
  * Detects sentence pairs (sentences ending in -short paired with their base version)
+ * Groups pairs into segments (2 pairs per segment = 4 sentences per segment)
  */
 function generateSegments(
   scenarioId: string,
@@ -529,9 +530,10 @@ function generateSegments(
     return undefined;
   }
 
-  // Create segments from pairs
-  for (let i = 0; i < shortSentences.length; i++) {
-    const shortSentence = shortSentences[i];
+  // First, create all sentence pairs
+  const allPairs: Array<{ shortSentenceId: string; longSentenceId: string }> = [];
+
+  for (const shortSentence of shortSentences) {
     const baseId = shortSentence.id.replace('-short', '');
     const longSentence = sentences.find(s => s.id === baseId);
 
@@ -540,7 +542,22 @@ function generateSegments(
       continue;
     }
 
-    // Create practice plan for this segment (short + long, both through all modules)
+    allPairs.push({
+      shortSentenceId: shortSentence.id,
+      longSentenceId: longSentence.id
+    });
+  }
+
+  // Group pairs into segments (2 pairs per segment)
+  const pairsPerSegment = 2;
+  const numSegments = Math.ceil(allPairs.length / pairsPerSegment);
+
+  for (let segIdx = 0; segIdx < numSegments; segIdx++) {
+    const startIdx = segIdx * pairsPerSegment;
+    const endIdx = Math.min(startIdx + pairsPerSegment, allPairs.length);
+    const segmentPairs = allPairs.slice(startIdx, endIdx);
+
+    // Create practice plan for this segment
     const segmentBeats: ConversationBeat[] = [];
     const moduleSequence: ConversationModuleType[] = [
       'listenMeaningChoice',
@@ -549,33 +566,35 @@ function generateSegments(
       'typeInput'
     ];
 
-    // Add beats for short sentence
-    for (const moduleId of moduleSequence) {
-      segmentBeats.push({
-        lineId: shortSentence.id,
-        moduleId
-      });
-    }
+    // For each pair in the segment, add beats in order: short1, long1, short2, long2
+    for (const pair of segmentPairs) {
+      // Add beats for short sentence
+      for (const moduleId of moduleSequence) {
+        segmentBeats.push({
+          lineId: pair.shortSentenceId,
+          moduleId
+        });
+      }
 
-    // Add beats for long sentence
-    for (const moduleId of moduleSequence) {
-      segmentBeats.push({
-        lineId: longSentence.id,
-        moduleId
-      });
+      // Add beats for long sentence
+      for (const moduleId of moduleSequence) {
+        segmentBeats.push({
+          lineId: pair.longSentenceId,
+          moduleId
+        });
+      }
     }
 
     const segment: PracticeSegment = {
-      id: `${scenarioId}-segment-${i + 1}`,
-      index: i,
-      shortSentenceId: shortSentence.id,
-      longSentenceId: longSentence.id,
+      id: `${scenarioId}-segment-${segIdx + 1}`,
+      index: segIdx,
+      pairs: segmentPairs,
       plan: {
         scenarioId,
         beats: segmentBeats,
-        planName: `segment-${i + 1}`
+        planName: `segment-${segIdx + 1}`
       },
-      title: `Segment ${i + 1}`
+      title: `Segment ${segIdx + 1}`
     };
 
     segments.push(segment);

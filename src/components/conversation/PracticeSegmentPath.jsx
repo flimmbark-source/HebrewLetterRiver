@@ -13,12 +13,13 @@ export default function PracticeSegmentPath({ scenario, segments, onSelectSegmen
   // Get line details for each segment
   const segmentsWithLines = useMemo(() => {
     return segments.map(segment => {
-      const shortLine = scenario.lines.find(l => l.id === segment.shortSentenceId);
-      const longLine = scenario.lines.find(l => l.id === segment.longSentenceId);
+      const pairsWithLines = segment.pairs.map(pair => ({
+        shortLine: scenario.lines.find(l => l.id === pair.shortSentenceId),
+        longLine: scenario.lines.find(l => l.id === pair.longSentenceId)
+      }));
       return {
         ...segment,
-        shortLine,
-        longLine
+        pairsWithLines
       };
     });
   }, [segments, scenario.lines]);
@@ -51,37 +52,51 @@ export default function PracticeSegmentPath({ scenario, segments, onSelectSegmen
                   {index + 1}
                 </div>
 
-                <div className="space-y-2 sm:space-y-3">
-                  {/* Short sentence preview */}
-                  <div className="bg-slate-800/50 rounded-lg p-2 sm:p-3 border border-slate-700/50">
-                    <div className="text-[10px] sm:text-xs text-slate-400 mb-1">
-                      {t('conversation.segments.intro', 'Intro')}
-                    </div>
-                    <div className="text-sm sm:text-base font-semibold text-slate-200 text-right mb-1">
-                      {segment.shortLine?.he}
-                    </div>
-                    <div className="text-xs sm:text-sm text-slate-400">
-                      {segment.shortLine?.en}
-                    </div>
+                <div className="space-y-2 sm:space-y-2.5">
+                  {/* Title */}
+                  <div className="text-center text-xs sm:text-sm font-semibold text-blue-300 mb-1">
+                    {segment.pairs.length} {t('conversation.segments.pairs', 'Sentence Pairs')}
                   </div>
 
-                  {/* Arrow connector */}
-                  <div className="flex justify-center">
-                    <div className="text-blue-400 text-xs sm:text-sm">↓</div>
-                  </div>
+                  {/* Render each pair */}
+                  {segment.pairsWithLines.map((pair, pairIdx) => (
+                    <div key={pairIdx} className="space-y-2">
+                      {pairIdx > 0 && (
+                        <div className="border-t border-slate-600/50 pt-2" />
+                      )}
 
-                  {/* Long sentence preview */}
-                  <div className="bg-slate-800/50 rounded-lg p-2 sm:p-3 border border-slate-700/50">
-                    <div className="text-[10px] sm:text-xs text-slate-400 mb-1">
-                      {t('conversation.segments.expand', 'Expand')}
+                      {/* Short sentence */}
+                      <div className="bg-slate-800/50 rounded-lg p-2 sm:p-2.5 border border-slate-700/50">
+                        <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5">
+                          {t('conversation.segments.intro', 'Intro')} {pairIdx + 1}
+                        </div>
+                        <div className="text-sm sm:text-base font-semibold text-slate-200 text-right mb-0.5">
+                          {pair.shortLine?.he}
+                        </div>
+                        <div className="text-xs sm:text-sm text-slate-400">
+                          {pair.shortLine?.en}
+                        </div>
+                      </div>
+
+                      {/* Arrow connector */}
+                      <div className="flex justify-center">
+                        <div className="text-blue-400 text-xs">↓</div>
+                      </div>
+
+                      {/* Long sentence */}
+                      <div className="bg-slate-800/50 rounded-lg p-2 sm:p-2.5 border border-slate-700/50">
+                        <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5">
+                          {t('conversation.segments.expand', 'Expand')} {pairIdx + 1}
+                        </div>
+                        <div className="text-sm sm:text-base font-semibold text-slate-200 text-right mb-0.5">
+                          {pair.longLine?.he}
+                        </div>
+                        <div className="text-xs sm:text-sm text-slate-400">
+                          {pair.longLine?.en}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-sm sm:text-base font-semibold text-slate-200 text-right mb-1">
-                      {segment.longLine?.he}
-                    </div>
-                    <div className="text-xs sm:text-sm text-slate-400">
-                      {segment.longLine?.en}
-                    </div>
-                  </div>
+                  ))}
 
                   {/* Beats count */}
                   <div className="text-center pt-1">
@@ -110,7 +125,7 @@ export default function PracticeSegmentPath({ scenario, segments, onSelectSegmen
       <div className="mt-4 text-center text-xs sm:text-sm text-slate-400 px-4">
         {t(
           'conversation.segments.info',
-          'Each segment starts with a short sentence and builds to a longer one using the same vocabulary.'
+          'Each segment has 2 short intro sentences followed by 2 longer sentences that reuse the vocabulary.'
         )}
       </div>
     </div>
