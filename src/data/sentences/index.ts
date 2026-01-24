@@ -183,21 +183,21 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
   'Greetings & Introductions': [
     createSentence({
       id: 'greetings-1',
-      hebrew: 'שלום, אני דני, שמח להכיר.',
-      english: "Hi, I'm Dani, nice to meet you.",
-      pattern: "{Hi, Hello}, {I'm, I am} Dani, {nice to meet you, nice meeting you, it's nice to meet you}.",
+      hebrew: 'שלום, אני דני.',
+      english: "Hi, I'm Dani.",
+      pattern: "{Hi, Hello}, {I'm, I am} Dani.",
       theme: 'Greetings & Introductions',
       difficulty: 1,
       grammarPoints: ['greeting', 'simple present']
     }),
     createSentence({
       id: 'greetings-2',
-      hebrew: 'מאיפה אתה? אני חדש בעיר.',
-      english: 'Where are you from? I am new in the city.',
-      pattern: "{Where are you from, Where do you come from}? {I am, I'm} new in the city.",
+      hebrew: 'אני חדש כאן.',
+      english: 'I am new here.',
+      pattern: "{I am, I'm} new here.",
       theme: 'Greetings & Introductions',
       difficulty: 1,
-      grammarPoints: ['greeting', 'yes-no question']
+      grammarPoints: ['greeting', 'simple present']
     }),
     createSentence({
       id: 'greetings-3',
