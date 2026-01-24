@@ -22,11 +22,14 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const [completionTime, setCompletionTime] = useState(0);
   const [showLines, setShowLines] = useState(true);
   const [currentHintPairIndex, setCurrentHintPairIndex] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [, forceUpdate] = useState(0);
   const startTimeRef = useRef(Date.now());
 
   // Capsule state
   const capsulesRef = useRef([]);
   const [ghostPairs, setGhostPairs] = useState([]);
+  const initializedWordPairsRef = useRef(null);
 
   // Drag state
   const dragStateRef = useRef({
@@ -39,20 +42,47 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const playAreaRef = useRef(null);
   const [playAreaBounds, setPlayAreaBounds] = useState({ width: 0, height: 0 });
 
-  // Initialize capsules with well-distributed positions
-  useEffect(() => {
+  // Measure bounds accurately after layout is complete
+  const updateBounds = useCallback(() => {
     if (!playAreaRef.current) return;
 
-    const bounds = playAreaRef.current.getBoundingClientRect();
-    setPlayAreaBounds({ width: bounds.width, height: bounds.height });
+    // Double requestAnimationFrame ensures layout is 100% complete
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (playAreaRef.current) {
+          const bounds = playAreaRef.current.getBoundingClientRect();
+          setPlayAreaBounds({ width: bounds.width, height: bounds.height });
+        }
+      });
+    });
+  }, []);
+
+  // Update bounds on window resize
+  useEffect(() => {
+    updateBounds();
+
+    window.addEventListener('resize', updateBounds);
+    return () => window.removeEventListener('resize', updateBounds);
+  }, [updateBounds]);
+
+  // Initialize capsules with well-distributed positions
+  useEffect(() => {
+    if (!playAreaRef.current || playAreaBounds.width === 0) return;
+
+    // Only reinitialize if wordPairs actually changed (not just bounds)
+    if (initializedWordPairsRef.current === wordPairs) return;
+    initializedWordPairsRef.current = wordPairs;
+
+    const bounds = playAreaBounds;
 
     // Ensure we have unique pairs (handle duplicates by adding disambiguation)
     const uniquePairs = ensureUniquePairs(wordPairs);
 
     const capsules = [];
     const padding = 2; // Very minimal padding at edges
+    const bottomReservedSpace = 68; // Space for start button (16px bottom + ~44px button height + 8px padding)
     const usableWidth = bounds.width - padding * 2;
-    const usableHeight = bounds.height - padding * 2;
+    const usableHeight = bounds.height - padding - bottomReservedSpace;
 
     const measurementCanvas = document.createElement('canvas');
     const measurementContext = measurementCanvas.getContext('2d');
@@ -198,78 +228,135 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     // (left: ALL Hebrew, middle: ALL Transliteration, right: ALL Meaning)
     const columnWidth = usableWidth / 3;
     const hebrewColumnX = padding + columnWidth / 2;
-    const translitColumnX = padding + columnWidth + columnWidth / 2;
+    const translitColumnX = bounds.width / 2; // Center column aligned with start button
     const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
 
-    // Create ALL Hebrew capsules in left column (randomized Y positions)
-    uniquePairs.forEach((pair, index) => {
+    // Calculate equidistant Y positions for grid formation with contextual centering
+    const numPairs = uniquePairs.length;
+    const gridYPositions = [];
+
+    if (numPairs === 1) {
+      // Single pair - center it vertically in the available space (excluding bottom button area)
+      const availableCenter = padding + (usableHeight / 2);
+      gridYPositions.push(availableCenter);
+    } else {
+      // Multiple pairs - calculate centered grid based on number of capsules
+      const targetSpacing = 100; // Target spacing between capsule centers
+      const minEdgePadding = 60; // Minimum padding from edges
+      const totalGridHeight = targetSpacing * (numPairs - 1);
+      const maxAvailableHeight = usableHeight - 2 * minEdgePadding;
+
+      let actualGridHeight, topOffset;
+
+      if (totalGridHeight <= maxAvailableHeight) {
+        // Grid fits with target spacing - center it vertically
+        actualGridHeight = totalGridHeight;
+        const extraSpace = usableHeight - actualGridHeight;
+        topOffset = padding + extraSpace / 2;
+      } else {
+        // Grid too large - compress to fit with minimum padding
+        actualGridHeight = maxAvailableHeight;
+        topOffset = padding + minEdgePadding;
+      }
+
+      const actualSpacing = actualGridHeight / (numPairs - 1);
+
+      for (let i = 0; i < numPairs; i++) {
+        const y = topOffset + (actualSpacing * i);
+        gridYPositions.push(y);
+      }
+    }
+
+    // Shuffle helper function (Fisher-Yates shuffle)
+    const shuffle = (array) => {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    };
+
+    // Create randomized orderings for each column
+    const hebrewOrder = shuffle([...Array(numPairs).keys()]);
+    const translitOrder = shuffle([...Array(numPairs).keys()]);
+    const meaningOrder = shuffle([...Array(numPairs).keys()]);
+
+    // Create ALL Hebrew capsules in left column (grid positions, randomized order)
+    uniquePairs.forEach((pair, pairIndex) => {
       const radius = getCapsuleRadius(pair.hebrew, true);
-      const y = padding + Math.random() * usableHeight;
+      const positionIndex = hebrewOrder[pairIndex];
+      const y = gridYPositions[positionIndex];
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
-        id: `hebrew-${index}`,
+        id: `hebrew-${pairIndex}`,
         type: 'hebrew',
         text: pair.hebrew,
-        pairIndex: index,
+        pairIndex: pairIndex,
         x: hebrewColumnX,
         y: y,
         radius: radius,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        targetVx: (Math.random() - 0.5) * 0.4,
-        targetVy: (Math.random() - 0.5) * 0.4,
+        vx: 0,
+        vy: 0,
+        targetVx: 0,
+        targetVy: 0,
         nextWanderAt: Date.now() + wanderDelay,
         matched: false,
-        shaking: false
+        shaking: false,
+        visible: false
       });
     });
 
-    // Create ALL Transliteration capsules in middle column (randomized Y positions)
-    uniquePairs.forEach((pair, index) => {
+    // Create ALL Transliteration capsules in middle column (grid positions, randomized order)
+    uniquePairs.forEach((pair, pairIndex) => {
       const radius = getCapsuleRadius(pair.transliteration || pair.hebrew, false);
-      const y = padding + Math.random() * usableHeight;
+      const positionIndex = translitOrder[pairIndex];
+      const y = gridYPositions[positionIndex];
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
-        id: `transliteration-${index}`,
+        id: `transliteration-${pairIndex}`,
         type: 'transliteration',
         text: pair.transliteration || pair.hebrew,
-        pairIndex: index,
+        pairIndex: pairIndex,
         x: translitColumnX,
         y: y,
         radius: radius,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        targetVx: (Math.random() - 0.5) * 0.4,
-        targetVy: (Math.random() - 0.5) * 0.4,
+        vx: 0,
+        vy: 0,
+        targetVx: 0,
+        targetVy: 0,
         nextWanderAt: Date.now() + wanderDelay,
         matched: false,
-        shaking: false
+        shaking: false,
+        visible: false
       });
     });
 
-    // Create ALL Meaning capsules in right column (randomized Y positions)
-    uniquePairs.forEach((pair, index) => {
+    // Create ALL Meaning capsules in right column (grid positions, randomized order)
+    uniquePairs.forEach((pair, pairIndex) => {
       const radius = getCapsuleRadius(pair.meaning, false);
-      const y = padding + Math.random() * usableHeight;
+      const positionIndex = meaningOrder[pairIndex];
+      const y = gridYPositions[positionIndex];
       const wanderDelay = 1200 + Math.random() * 1800;
 
       capsules.push({
-        id: `meaning-${index}`,
+        id: `meaning-${pairIndex}`,
         type: 'meaning',
         text: pair.meaning,
-        pairIndex: index,
+        pairIndex: pairIndex,
         x: meaningColumnX,
         y: y,
         radius: radius,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        targetVx: (Math.random() - 0.5) * 0.4,
-        targetVy: (Math.random() - 0.5) * 0.4,
+        vx: 0,
+        vy: 0,
+        targetVx: 0,
+        targetVy: 0,
         nextWanderAt: Date.now() + wanderDelay,
         matched: false,
-        shaking: false
+        shaking: false,
+        visible: false
       });
     });
 
@@ -281,24 +368,34 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     capsulesRef.current = capsules;
 
-    // Start hint line succession timer (1 second per pair)
-    const totalPairs = uniquePairs.length;
-    setCurrentHintPairIndex(0);
+    // Show all hint lines initially (will be hidden when Start is pressed)
     setShowLines(true);
+    setCurrentHintPairIndex(-1); // -1 means show all lines
+  }, [wordPairs, playAreaBounds]);
 
-    const hintInterval = setInterval(() => {
-      setCurrentHintPairIndex(prev => {
-        const nextIndex = prev + 1;
-        if (nextIndex >= totalPairs) {
-          setShowLines(false);
-          clearInterval(hintInterval);
-          return prev;
-        }
-        return nextIndex;
-      });
-    }, 300); // 0.3 seconds per pair
+  // Staggered spawn: make each pair visible with 2s delay between pairs, starting 1s after mount
+  useEffect(() => {
+    const timeouts = [];
+    const numPairs = wordPairs.length;
 
-    return () => clearInterval(hintInterval);
+    // Schedule visibility for each pair
+    for (let pairIndex = 0; pairIndex < numPairs; pairIndex++) {
+      const delay = 1000 + (pairIndex * 1000); // 1s initial + 2s per pair
+      const timeout = setTimeout(() => {
+        capsulesRef.current.forEach(capsule => {
+          if (capsule.pairIndex === pairIndex) {
+            capsule.visible = true;
+          }
+        });
+        // Force re-render so capsules appear at the same time as hint lines
+        forceUpdate(n => n + 1);
+      }, delay);
+      timeouts.push(timeout);
+    }
+
+    return () => {
+      timeouts.forEach(timeout => clearTimeout(timeout));
+    };
   }, [wordPairs]);
 
   // Ensure no duplicate meanings (add disambiguators if needed)
@@ -324,7 +421,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
   // Animation loop - keep capsules moving even during drag
   useEffect(() => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || !gameStarted) return;
 
     function animate() {
       const capsules = capsulesRef.current;
@@ -332,111 +429,15 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
       const now = Date.now();
       capsules.forEach((capsule, index) => {
-        // Skip matched capsules and the one currently being dragged
-        if (capsule.matched) return;
-        const isDragging = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === index;
-        if (isDragging) return;
+        // Skip matched or invisible capsules
+        if (capsule.matched || !capsule.visible) return;
 
-        const timeForWander = capsule.nextWanderAt && now >= capsule.nextWanderAt;
-        if (timeForWander) {
-          capsule.targetVx = (Math.random() - 0.5) * 0.4;
-          capsule.targetVy = (Math.random() - 0.5) * 0.4;
-          capsule.nextWanderAt = now + 1200 + Math.random() * 1800;
-        }
-
-        const smoothing = 0.02;
-        capsule.vx += (capsule.targetVx - capsule.vx) * smoothing;
-        capsule.vy += (capsule.targetVy - capsule.vy) * smoothing;
-
-        const speedLimit = 0.7;
-        const speed = Math.sqrt(capsule.vx * capsule.vx + capsule.vy * capsule.vy);
-        if (speed > speedLimit) {
-          capsule.vx = (capsule.vx / speed) * speedLimit;
-          capsule.vy = (capsule.vy / speed) * speedLimit;
-        }
-
-        // Update position
-        capsule.x += capsule.vx;
-        capsule.y += capsule.vy;
-
-        // Bounce off walls - use capsule's radius plus minimal padding
-        const margin = (capsule.radius ?? CAPSULE_RADIUS) + 2;
-        if (capsule.x < margin || capsule.x > bounds.width - margin) {
-          capsule.vx *= -BOUNCE_DAMPING;
-          capsule.targetVx = -capsule.targetVx;
-          capsule.x = Math.max(margin, Math.min(bounds.width - margin, capsule.x));
-        }
-        if (capsule.y < margin || capsule.y > bounds.height - margin) {
-          capsule.vy *= -BOUNCE_DAMPING;
-          capsule.targetVy = -capsule.targetVy;
-          capsule.y = Math.max(margin, Math.min(bounds.height - margin, capsule.y));
-        }
-
+        // Clean up shake animation
         if (capsule.shakeUntil && now >= capsule.shakeUntil) {
           capsule.shaking = false;
           capsule.shakeUntil = null;
         }
       });
-
-      // Capsule-to-capsule collision detection and response (gentle bumping)
-      for (let i = 0; i < capsules.length; i++) {
-        const capsuleA = capsules[i];
-        if (capsuleA.matched) continue;
-        const isDraggingA = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === i;
-        if (isDraggingA) continue;
-
-        for (let j = i + 1; j < capsules.length; j++) {
-          const capsuleB = capsules[j];
-          if (capsuleB.matched) continue;
-          const isDraggingB = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === j;
-          if (isDraggingB) continue;
-
-          const dx = capsuleB.x - capsuleA.x;
-          const dy = capsuleB.y - capsuleA.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          const minDistance = (capsuleA.radius ?? CAPSULE_RADIUS) + (capsuleB.radius ?? CAPSULE_RADIUS);
-
-          // Allow some overlap before responding (tolerance of 5px)
-          const overlapTolerance = 5;
-          if (distance < minDistance - overlapTolerance && distance > 0) {
-            // Gentle collision response
-            const overlap = minDistance - distance;
-            const angle = Math.atan2(dy, dx);
-
-            // Gentle separation (only 20% of overlap instead of 50%)
-            const separationFactor = 0.2;
-            const separationX = Math.cos(angle) * (overlap * separationFactor);
-            const separationY = Math.sin(angle) * (overlap * separationFactor);
-
-            capsuleA.x -= separationX;
-            capsuleA.y -= separationY;
-            capsuleB.x += separationX;
-            capsuleB.y += separationY;
-
-            // Very gentle velocity exchange
-            const relativeVx = capsuleB.vx - capsuleA.vx;
-            const relativeVy = capsuleB.vy - capsuleA.vy;
-            const dotProduct = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
-
-            if (dotProduct < 0) {
-              const collisionDamping = 0.3; // Lower damping for gentler bumps
-              const impulseX = Math.cos(angle) * dotProduct * collisionDamping;
-              const impulseY = Math.sin(angle) * dotProduct * collisionDamping;
-
-              capsuleA.vx += impulseX;
-              capsuleA.vy += impulseY;
-              capsuleB.vx -= impulseX;
-              capsuleB.vy -= impulseY;
-
-              // Update target velocities too so wandering doesn't immediately counteract
-              capsuleA.targetVx = capsuleA.vx;
-              capsuleA.targetVy = capsuleA.vy;
-              capsuleB.targetVx = capsuleB.vx;
-              capsuleB.targetVy = capsuleB.vy;
-            }
-          }
-        }
-      }
 
       animationRef.current = requestAnimationFrame(animate);
     }
@@ -448,11 +449,11 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [gameState, playAreaBounds]);
+  }, [gameState, gameStarted, playAreaBounds]);
 
   // Pointer event handlers - all capsule types are draggable
   const handlePointerDown = useCallback((e, capsule, index) => {
-    if (capsule.matched) return; // Only prevent dragging matched capsules
+    if (capsule.matched || !capsule.visible || !gameStarted) return; // Prevent dragging before game starts, if invisible, or if already matched
 
     e.preventDefault();
     const rect = playAreaRef.current.getBoundingClientRect();
@@ -465,7 +466,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     };
 
     e.target.setPointerCapture(e.pointerId);
-  }, []);
+  }, [gameStarted]);
 
   const handlePointerMove = useCallback((e) => {
     if (!dragStateRef.current.isDragging) return;
@@ -486,7 +487,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     const candidates = capsulesRef.current
       .map((capsule, capsuleIndex) => ({ capsule, capsuleIndex }))
-      .filter(({ capsule, capsuleIndex }) => capsuleIndex !== index && !capsule.matched)
+      .filter(({ capsule, capsuleIndex }) => capsuleIndex !== index && !capsule.matched && capsule.visible)
       .map(({ capsule }) => {
         const dx = draggedCapsule.x - capsule.x;
         const dy = draggedCapsule.y - capsule.y;
@@ -594,28 +595,111 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     canvas.width = bounds.width;
     canvas.height = bounds.height;
 
+    // Colors for hint lines - highly distinguishable colors with better contrast
+    const hintColors = [
+      'rgba(239, 68, 68, 0.7)',     // Bright Red
+      'rgba(22, 163, 74, 0.7)',     // Deep Green
+      'rgba(255, 159, 28, 0.7)',    // Bright Orange
+      'rgba(59, 130, 246, 0.7)',    // Bright Blue
+      'rgba(236, 72, 153, 0.7)',    // Hot Pink
+      'rgba(168, 85, 247, 0.7)',    // Purple
+      'rgba(14, 165, 233, 0.7)',    // Sky Blue
+      'rgba(234, 179, 8, 0.7)',     // Gold/Yellow
+      'rgba(20, 184, 166, 0.7)',    // Teal
+      'rgba(248, 113, 113, 0.7)',   // Light Red
+    ];
+
+    // Helper to calculate edge points for line connections
+    // Lines connect at far end points: right edge of left capsule, left edge of right capsule
+    const getEdgePoints = (capsuleA, capsuleB) => {
+      const radiusA = capsuleA.radius ?? CAPSULE_RADIUS;
+      const radiusB = capsuleB.radius ?? CAPSULE_RADIUS;
+
+      // Determine which capsule is on the left based on x position
+      const leftCapsule = capsuleA.x < capsuleB.x ? capsuleA : capsuleB;
+      const rightCapsule = capsuleA.x < capsuleB.x ? capsuleB : capsuleA;
+      const leftRadius = leftCapsule.radius ?? CAPSULE_RADIUS;
+      const rightRadius = rightCapsule.radius ?? CAPSULE_RADIUS;
+
+      // Start at right edge of left capsule
+      const startX = leftCapsule.x + leftRadius;
+      const startY = leftCapsule.y;
+
+      // End at left edge of right capsule
+      const endX = rightCapsule.x - rightRadius;
+      const endY = rightCapsule.y;
+
+      return { startX, startY, endX, endY };
+    };
+
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (!showLines) return;
 
       const capsules = capsulesRef.current;
-      ctx.strokeStyle = `rgba(255, 255, 255, 0.6)`;
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
 
-      // Only show lines for the current hint pair
-      const pairCapsules = capsules.filter(
-        c => !c.matched && c.pairIndex === currentHintPairIndex
-      );
+      if (currentHintPairIndex === -1) {
+        // Show all hint lines initially
+        const pairs = new Map();
+        capsules.forEach(c => {
+          if (!c.matched && c.visible) {
+            if (!pairs.has(c.pairIndex)) {
+              pairs.set(c.pairIndex, []);
+            }
+            pairs.get(c.pairIndex).push(c);
+          }
+        });
 
-      // Draw lines connecting all capsules in this pair
-      for (let i = 0; i < pairCapsules.length; i += 1) {
-        for (let j = i + 1; j < pairCapsules.length; j += 1) {
-          ctx.beginPath();
-          ctx.moveTo(pairCapsules[i].x, pairCapsules[i].y);
-          ctx.lineTo(pairCapsules[j].x, pairCapsules[j].y);
-          ctx.stroke();
+        pairs.forEach((pairCapsules, pairIndex) => {
+          // Use different color for each pair
+          ctx.strokeStyle = hintColors[pairIndex % hintColors.length];
+
+          // Draw lines connecting all capsules in this pair (except Hebrew-to-Meaning)
+          for (let i = 0; i < pairCapsules.length; i += 1) {
+            for (let j = i + 1; j < pairCapsules.length; j += 1) {
+              // Skip Hebrew-to-Meaning connection
+              const isHebrewToMeaning =
+                (pairCapsules[i].type === 'hebrew' && pairCapsules[j].type === 'meaning') ||
+                (pairCapsules[i].type === 'meaning' && pairCapsules[j].type === 'hebrew');
+
+              if (!isHebrewToMeaning) {
+                const { startX, startY, endX, endY } = getEdgePoints(pairCapsules[i], pairCapsules[j]);
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+              }
+            }
+          }
+        });
+      } else {
+        // Show lines for the current hint pair only (succession mode)
+        const pairCapsules = capsules.filter(
+          c => !c.matched && c.visible && c.pairIndex === currentHintPairIndex
+        );
+
+        // Use different color for each pair
+        ctx.strokeStyle = hintColors[currentHintPairIndex % hintColors.length];
+
+        // Draw lines connecting all capsules in this pair (except Hebrew-to-Meaning)
+        for (let i = 0; i < pairCapsules.length; i += 1) {
+          for (let j = i + 1; j < pairCapsules.length; j += 1) {
+            // Skip Hebrew-to-Meaning connection
+            const isHebrewToMeaning =
+              (pairCapsules[i].type === 'hebrew' && pairCapsules[j].type === 'meaning') ||
+              (pairCapsules[i].type === 'meaning' && pairCapsules[j].type === 'hebrew');
+
+            if (!isHebrewToMeaning) {
+              const { startX, startY, endX, endY } = getEdgePoints(pairCapsules[i], pairCapsules[j]);
+              ctx.beginPath();
+              ctx.moveTo(startX, startY);
+              ctx.lineTo(endX, endY);
+              ctx.stroke();
+            }
+          }
         }
       }
 
@@ -732,7 +816,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
         {/* Capsules */}
         {capsulesRef.current.map((capsule, index) => {
-          if (capsule.matched) return null;
+          if (capsule.matched || !capsule.visible) return null;
 
           const isHebrew = capsule.type === 'hebrew';
           const isTransliteration = capsule.type === 'transliteration';
@@ -777,31 +861,44 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         })}
       </div>
 
-      {/* Hint button */}
-      {!showLines && (
+      {/* Start/Hint button */}
+      {!gameStarted ? (
         <button
           onClick={() => {
-            // Restart hint succession
-            setCurrentHintPairIndex(0);
-            setShowLines(true);
-
-            const totalPairs = wordPairs.length;
-            const hintInterval = setInterval(() => {
-              setCurrentHintPairIndex(prev => {
-                const nextIndex = prev + 1;
-                if (nextIndex >= totalPairs) {
-                  setShowLines(false);
-                  clearInterval(hintInterval);
-                  return prev;
-                }
-                return nextIndex;
-              });
-            }, 300); // 0.3 seconds per pair
+            setGameStarted(true);
+            setShowLines(false);
+            startTimeRef.current = Date.now();
           }}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-all"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-all"
         >
-          Show Hint
+          Start
         </button>
+      ) : (
+        !showLines && (
+          <button
+            onClick={() => {
+              // Restart hint succession
+              setCurrentHintPairIndex(0);
+              setShowLines(true);
+
+              const totalPairs = wordPairs.length;
+              const hintInterval = setInterval(() => {
+                setCurrentHintPairIndex(prev => {
+                  const nextIndex = prev + 1;
+                  if (nextIndex >= totalPairs) {
+                    setShowLines(false);
+                    clearInterval(hintInterval);
+                    return prev;
+                  }
+                  return nextIndex;
+                });
+              }, 800); // 0.3 seconds per pair
+            }}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-all"
+          >
+            Show Hint
+          </button>
+        )
       )}
 
       <style jsx>{`
