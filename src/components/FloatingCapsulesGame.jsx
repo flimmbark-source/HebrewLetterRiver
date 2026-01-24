@@ -227,9 +227,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
     // Create capsules in straight vertical columns by TYPE
     // (left: ALL Hebrew, middle: ALL Transliteration, right: ALL Meaning)
     const columnWidth = usableWidth / 3;
-    const hebrewColumnX = padding + columnWidth / 2;
-    const translitColumnX = bounds.width / 2; // Center column aligned with start button
-    const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2;
+    const rightShift = 15; // Shift entire grid 15px to the right
+    const hebrewColumnX = padding + columnWidth / 2 + rightShift;
+    const translitColumnX = bounds.width / 2 + rightShift; // Center column aligned with start button (shifted)
+    const meaningColumnX = padding + 2 * columnWidth + columnWidth / 2 + rightShift;
 
     // Calculate equidistant Y positions for grid formation with contextual centering
     const numPairs = uniquePairs.length;
