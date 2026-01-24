@@ -1,6 +1,7 @@
 import { useMemo, useEffect } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import { getModuleById } from '../../data/conversation/index.ts';
+import PracticeSegmentPath from './PracticeSegmentPath.jsx';
 
 /**
  * ConversationBriefScreen
@@ -12,8 +13,11 @@ import { getModuleById } from '../../data/conversation/index.ts';
  * - Modules that will be used
  * - Start button
  */
-export default function ConversationBriefScreen({ scenario, onStart, onBack }) {
+export default function ConversationBriefScreen({ scenario, onStart, onStartSegment, onBack }) {
   const { t } = useLocalization();
+
+  // Check if this scenario has segments (progressive vocabulary mode)
+  const hasSegments = scenario.segments && scenario.segments.length > 0;
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -111,14 +115,22 @@ export default function ConversationBriefScreen({ scenario, onStart, onBack }) {
 
           </div>
 
-          {/* Footer */}
+          {/* Footer - Segments path or Start button */}
           <div className="p-4 sm:p-6 bg-slate-800/50 border-t border-slate-700">
-            <button
-              onClick={onStart}
-              className="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-base sm:text-lg rounded-lg transition-all duration-200 active:scale-95 shadow-lg"
-            >
-              {t('conversation.brief.start', 'Start Practice')} →
-            </button>
+            {hasSegments ? (
+              <PracticeSegmentPath
+                scenario={scenario}
+                segments={scenario.segments}
+                onSelectSegment={onStartSegment || onStart}
+              />
+            ) : (
+              <button
+                onClick={onStart}
+                className="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-base sm:text-lg rounded-lg transition-all duration-200 active:scale-95 shadow-lg"
+              >
+                {t('conversation.brief.start', 'Start Practice')} →
+              </button>
+            )}
           </div>
         </div>
       </div>

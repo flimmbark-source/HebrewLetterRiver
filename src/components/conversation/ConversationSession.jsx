@@ -23,13 +23,14 @@ export default function ConversationSession({ scenario, onExit }) {
   const [currentBeatIndex, setCurrentBeatIndex] = useState(0);
   const [attemptHistory, setAttemptHistory] = useState([]);
   const [savedLineIds, setSavedLineIds] = useState([]);
+  const [activePlan, setActivePlan] = useState(scenario.defaultPlan);
 
   // Initialize session
   useEffect(() => {
     if (!sessionId) {
       const newSessionId = createSession({
         scenarioId: scenario.metadata.id,
-        plan: scenario.defaultPlan,
+        plan: activePlan,
         currentBeatIndex: 0,
         attemptHistory: [],
         savedLineIds: [],
@@ -37,12 +38,23 @@ export default function ConversationSession({ scenario, onExit }) {
       });
       setSessionId(newSessionId);
     }
-  }, [sessionId, scenario]);
+  }, [sessionId, scenario, activePlan]);
 
-  // Start practice from brief screen
+  // Start practice from brief screen (default plan)
   const handleStart = useCallback(() => {
+    setActivePlan(scenario.defaultPlan);
     setScreen('beat');
     setCurrentBeatIndex(0);
+  }, [scenario.defaultPlan]);
+
+  // Start practice from a specific segment
+  const handleStartSegment = useCallback((segment) => {
+    setActivePlan(segment.plan);
+    setSessionId(null); // Reset session to use new plan
+    setScreen('beat');
+    setCurrentBeatIndex(0);
+    setAttemptHistory([]);
+    setSavedLineIds([]);
   }, []);
 
   // Handle beat completion
@@ -60,7 +72,7 @@ export default function ConversationSession({ scenario, onExit }) {
 
     // Move to next beat or recap
     const nextIndex = currentBeatIndex + 1;
-    if (nextIndex < scenario.defaultPlan.beats.length) {
+    if (nextIndex < activePlan.beats.length) {
       setCurrentBeatIndex(nextIndex);
     } else {
       // Session complete
@@ -69,7 +81,7 @@ export default function ConversationSession({ scenario, onExit }) {
       }
       setScreen('recap');
     }
-  }, [attemptHistory, currentBeatIndex, scenario.defaultPlan.beats.length, sessionId]);
+  }, [attemptHistory, currentBeatIndex, activePlan.beats.length, sessionId]);
 
   // Save phrase to SRS
   const handleSavePhrase = useCallback((lineId) => {
@@ -90,8 +102,9 @@ export default function ConversationSession({ scenario, onExit }) {
     setCurrentBeatIndex(0);
     setAttemptHistory([]);
     setSavedLineIds([]);
+    setActivePlan(scenario.defaultPlan); // Reset to default plan
     setSessionId(null); // Will create new session
-  }, []);
+  }, [scenario.defaultPlan]);
 
   // Review saved phrases
   const handleReviewSaved = useCallback(() => {
@@ -111,13 +124,14 @@ export default function ConversationSession({ scenario, onExit }) {
       <ConversationBriefScreen
         scenario={scenario}
         onStart={handleStart}
+        onStartSegment={handleStartSegment}
         onBack={onExit}
       />
     );
   }
 
   if (screen === 'beat') {
-    const currentBeat = scenario.defaultPlan.beats[currentBeatIndex];
+    const currentBeat = activePlan.beats[currentBeatIndex];
     if (!currentBeat) {
       // Safety: if beat not found, go to recap
       setScreen('recap');
@@ -129,7 +143,7 @@ export default function ConversationSession({ scenario, onExit }) {
         scenario={scenario}
         beat={currentBeat}
         beatIndex={currentBeatIndex}
-        totalBeats={scenario.defaultPlan.beats.length}
+        totalBeats={activePlan.beats.length}
         attemptHistory={attemptHistory}
         onBeatComplete={handleBeatComplete}
         onSavePhrase={handleSavePhrase}

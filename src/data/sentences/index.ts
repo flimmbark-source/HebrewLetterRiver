@@ -181,7 +181,7 @@ function createSentence(config: {
 
 export const sentencesByTheme: Record<string, Sentence[]> = {
   'Greetings & Introductions': [
-    // Short intro sentences (3 words) to introduce vocabulary
+    // Pair 1: Introduction with name
     createSentence({
       id: 'greetings-1-short',
       hebrew: 'שלום, אני דני.',
@@ -192,6 +192,17 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       grammarPoints: ['greeting', 'simple present']
     }),
     createSentence({
+      id: 'greetings-1',
+      hebrew: 'שלום, אני דני, שמח להכיר.',
+      english: "Hi, I'm Dani, nice to meet you.",
+      pattern: "{Hi, Hello}, {I'm, I am} Dani, {nice to meet you, nice meeting you, it's nice to meet you}.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['greeting', 'simple present']
+    }),
+
+    // Pair 2: Being new in the city
+    createSentence({
       id: 'greetings-2-short',
       hebrew: 'אני חדש כאן.',
       english: "I'm new here.",
@@ -200,15 +211,45 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       difficulty: 1,
       grammarPoints: ['simple present', 'location']
     }),
-    // Longer sentences that build on the vocabulary from the short sentences
     createSentence({
-      id: 'greetings-1',
-      hebrew: 'שלום, אני דני, שמח להכיר.',
-      english: "Hi, I'm Dani, nice to meet you.",
-      pattern: "{Hi, Hello}, {I'm, I am} Dani, {nice to meet you, nice meeting you, it's nice to meet you}.",
+      id: 'greetings-2',
+      hebrew: 'אני חדש בעיר.',
+      english: 'I am new in the city.',
+      pattern: "{I am, I'm} new in the city.",
       theme: 'Greetings & Introductions',
       difficulty: 1,
-      grammarPoints: ['greeting', 'simple present']
+      grammarPoints: ['greeting', 'location']
+    }),
+
+    // Pair 3: Thanking for coming
+    createSentence({
+      id: 'greetings-3-short',
+      hebrew: 'תודה שבאת היום.',
+      english: 'Thanks for coming today.',
+      pattern: "{Thanks, Thank you} for coming today.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['gratitude', 'time reference']
+    }),
+    createSentence({
+      id: 'greetings-3',
+      hebrew: 'תודה שבאת היום, חיכינו לך.',
+      english: 'Thanks for coming today, we were waiting for you.',
+      pattern: "{Thanks, Thank you} for coming today, we were waiting for you.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['gratitude', 'present tense linking']
+    }),
+
+    // Pair 4: Being happy together
+    createSentence({
+      id: 'greetings-4-short',
+      hebrew: 'אני שמח כאן.',
+      english: "I'm happy here.",
+      pattern: "{I'm, I am} happy here.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['present tense', 'location']
     }),
     createSentence({
       id: 'greetings-4',
@@ -218,6 +259,122 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       theme: 'Greetings & Introductions',
       difficulty: 2,
       grammarPoints: ['present tense', 'present progressive nuance']
+    }),
+
+    // Pair 5: Learning language together
+    createSentence({
+      id: 'greetings-5-short',
+      hebrew: 'אנחנו לומדים שפה.',
+      english: 'We are learning a language.',
+      pattern: "{We are, We're} learning a language.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['plural subject', 'present progressive']
+    }),
+    createSentence({
+      id: 'greetings-5',
+      hebrew: 'אנחנו לומדים שפה חדשה יחד.',
+      english: 'We are learning a new language together.',
+      pattern: "{We are, We're} learning a new language together.",
+      theme: 'Greetings & Introductions',
+      difficulty: 2,
+      grammarPoints: ['plural subject', 'present progressive nuance']
+    }),
+
+    // Pair 6: Asking about the day
+    createSentence({
+      id: 'greetings-6-short',
+      hebrew: 'איך אתה?',
+      english: 'How are you?',
+      pattern: "How are you?",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['questions', 'greeting']
+    }),
+    createSentence({
+      id: 'greetings-6',
+      hebrew: 'איך היום שלך?',
+      english: 'How is your day today?',
+      pattern: "How is your day {today, going}?",
+      theme: 'Greetings & Introductions',
+      difficulty: 2,
+      grammarPoints: ['questions', 'time adverb']
+    }),
+
+    // Pair 7: Asking a question
+    createSentence({
+      id: 'greetings-7-short',
+      hebrew: 'אני רוצה לשאול.',
+      english: 'I want to ask.',
+      pattern: "I want to ask.",
+      theme: 'Greetings & Introductions',
+      difficulty: 2,
+      grammarPoints: ['verb + infinitive']
+    }),
+    createSentence({
+      id: 'greetings-7',
+      hebrew: 'אני רוצה לשאול שאלה קצרה.',
+      english: 'I want to ask a quick question.',
+      theme: 'Greetings & Introductions',
+      difficulty: 3,
+      grammarPoints: ['verb + infinitive', 'object noun']
+    }),
+
+    // Pair 8: Thanking for answer
+    createSentence({
+      id: 'greetings-8-short',
+      hebrew: 'תודה על התשובה.',
+      english: 'Thanks for the answer.',
+      pattern: "{Thanks, Thank you} for the answer.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['gratitude', 'prepositions']
+    }),
+    createSentence({
+      id: 'greetings-8',
+      hebrew: 'תודה על התשובה, זה עוזר.',
+      english: 'Thanks for the answer, it helps.',
+      theme: 'Greetings & Introductions',
+      difficulty: 2,
+      grammarPoints: ['prepositions', 'noun modifiers']
+    }),
+
+    // Pair 9: Having an idea
+    createSentence({
+      id: 'greetings-9-short',
+      hebrew: 'יש לנו רעיון.',
+      english: 'We have an idea.',
+      pattern: "We have an idea.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['possession', 'simple present']
+    }),
+    createSentence({
+      id: 'greetings-9',
+      hebrew: 'היום יש לנו רעיון טוב להתחיל.',
+      english: 'Today we have a good idea to get started.',
+      theme: 'Greetings & Introductions',
+      difficulty: 2,
+      grammarPoints: ['possession', 'adjectives']
+    }),
+
+    // Pair 10: Name and learning with friends
+    createSentence({
+      id: 'greetings-10-short',
+      hebrew: 'שמי אורי.',
+      english: 'My name is Ori.',
+      pattern: "My name is Ori.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['simple present', 'introduction']
+    }),
+    createSentence({
+      id: 'greetings-10',
+      hebrew: 'שמי אורי ואני אוהב ללמוד שפה עם חברים.',
+      english: 'My name is Ori and I love to study the language with friends.',
+      theme: 'Greetings & Introductions',
+      difficulty: 3,
+      grammarPoints: ['coordination', 'infinitive phrase']
     })
   ],
   'At Home': [
