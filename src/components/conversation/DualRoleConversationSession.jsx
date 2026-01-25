@@ -38,6 +38,7 @@ export default function DualRoleConversationSession({
   const [attemptHistory, setAttemptHistory] = useState([]);
   const [savedLineIds, setSavedLineIds] = useState([]);
   const [expandedSteps, setExpandedSteps] = useState([]);
+  const [activeSteps, setActiveSteps] = useState([]);
 
   // Expand script into steps on mount or when script changes
   useEffect(() => {
@@ -47,6 +48,10 @@ export default function DualRoleConversationSession({
       setExpandedSteps(steps);
     }
   }, [script]);
+
+  useEffect(() => {
+    setActiveSteps(expandedSteps);
+  }, [expandedSteps]);
 
   // Create a practice plan from expanded steps
   const createPlanFromSteps = useCallback((steps) => {
@@ -67,8 +72,8 @@ export default function DualRoleConversationSession({
 
   // Initialize session
   useEffect(() => {
-    if (!sessionId && expandedSteps.length > 0) {
-      const plan = createPlanFromSteps(expandedSteps);
+    if (!sessionId && activeSteps.length > 0) {
+      const plan = createPlanFromSteps(activeSteps);
       const newSessionId = createSession({
         scenarioId: scenario.metadata.id,
         plan,
@@ -79,13 +84,31 @@ export default function DualRoleConversationSession({
       });
       setSessionId(newSessionId);
     }
-  }, [sessionId, expandedSteps, scenario, createPlanFromSteps]);
+  }, [sessionId, activeSteps, scenario, createPlanFromSteps]);
 
   // Start practice from brief screen
   const handleStart = useCallback(() => {
+    setActiveSteps(expandedSteps);
+    setSessionId(null);
     setScreen('beat');
     setCurrentBeatIndex(0);
-  }, []);
+    setAttemptHistory([]);
+    setSavedLineIds([]);
+  }, [expandedSteps]);
+
+  const handleStartSegment = useCallback((segment) => {
+    const lineIds = new Set([
+      ...segment.pairs.map(pair => pair.shortSentenceId),
+      ...segment.pairs.map(pair => pair.longSentenceId)
+    ]);
+    const segmentSteps = expandedSteps.filter(step => lineIds.has(step.lineId));
+    setActiveSteps(segmentSteps.length > 0 ? segmentSteps : expandedSteps);
+    setSessionId(null);
+    setScreen('beat');
+    setCurrentBeatIndex(0);
+    setAttemptHistory([]);
+    setSavedLineIds([]);
+  }, [expandedSteps]);
 
   // Handle beat completion
   const handleBeatComplete = useCallback((attemptResult) => {
@@ -102,7 +125,7 @@ export default function DualRoleConversationSession({
 
     // Move to next beat or recap
     const nextIndex = currentBeatIndex + 1;
-    if (nextIndex < expandedSteps.length) {
+    if (nextIndex < activeSteps.length) {
       setCurrentBeatIndex(nextIndex);
     } else {
       // Session complete
@@ -111,7 +134,7 @@ export default function DualRoleConversationSession({
       }
       setScreen('recap');
     }
-  }, [attemptHistory, currentBeatIndex, expandedSteps.length, sessionId]);
+  }, [attemptHistory, currentBeatIndex, activeSteps.length, sessionId]);
 
   // Save phrase to SRS
   const handleSavePhrase = useCallback((lineId) => {
@@ -131,8 +154,9 @@ export default function DualRoleConversationSession({
     setCurrentBeatIndex(0);
     setAttemptHistory([]);
     setSavedLineIds([]);
+    setActiveSteps(expandedSteps);
     setSessionId(null);
-  }, []);
+  }, [expandedSteps]);
 
   // Review saved phrases
   const handleReviewSaved = useCallback(() => {
@@ -143,7 +167,8 @@ export default function DualRoleConversationSession({
   // Go back to brief from beat screen
   const handleBackToBrief = useCallback(() => {
     setScreen('brief');
-  }, []);
+    setActiveSteps(expandedSteps);
+  }, [expandedSteps]);
 
   // Check if steps are ready
   if (expandedSteps.length === 0) {
@@ -175,6 +200,7 @@ export default function DualRoleConversationSession({
       <ConversationBriefScreen
         scenario={briefScenario}
         onStart={handleStart}
+        onStartSegment={handleStartSegment}
         onBack={onExit}
       />
     );
@@ -182,7 +208,7 @@ export default function DualRoleConversationSession({
 
   // Render beat screen
   if (screen === 'beat') {
-    const currentStep = getCurrentStep(expandedSteps, currentBeatIndex);
+    const currentStep = getCurrentStep(activeSteps, currentBeatIndex);
 
     if (!currentStep) {
       setScreen('recap');
@@ -201,7 +227,7 @@ export default function DualRoleConversationSession({
         scenario={scenario}
         beat={currentBeat}
         beatIndex={currentBeatIndex}
-        totalBeats={expandedSteps.length}
+        totalBeats={activeSteps.length}
         attemptHistory={attemptHistory}
         onBeatComplete={handleBeatComplete}
         onSavePhrase={handleSavePhrase}
