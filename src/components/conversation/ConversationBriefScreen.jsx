@@ -25,6 +25,7 @@ export default function ConversationBriefScreen({ scenario, onStart, onStartSegm
 
   // Check if this scenario has segments (progressive vocabulary mode)
   const hasSegments = scenario.segments && scenario.segments.length > 0;
+  const canSelectSegments = hasSegments && typeof onStartSegment === 'function';
 
   // DEBUG: Log detailed segment data
   if (scenario.segments) {
@@ -147,14 +148,16 @@ export default function ConversationBriefScreen({ scenario, onStart, onStartSegm
           {/* Footer - Segments path or Start button */}
           <div className="p-4 sm:p-6 bg-slate-800/50 border-t border-slate-700">
             {(() => {
-              console.log('[ConversationBriefScreen] RENDERING:', hasSegments ? 'SEGMENT PATH' : 'START BUTTON');
-              const selectedCallback = onStartSegment || onStart;
-              console.log('[ConversationBriefScreen] Using callback:', onStartSegment ? 'onStartSegment' : 'onStart (fallback)');
-              return hasSegments ? (
+              console.log('[ConversationBriefScreen] RENDERING:', canSelectSegments ? 'SEGMENT PATH' : 'START BUTTON');
+              if (hasSegments && !canSelectSegments) {
+                console.warn('[ConversationBriefScreen] Segments available but no onStartSegment handler provided.');
+              }
+
+              return canSelectSegments ? (
                 <PracticeSegmentPath
                   scenario={scenario}
                   segments={scenario.segments}
-                  onSelectSegment={selectedCallback}
+                  onSelectSegment={onStartSegment}
                 />
               ) : (
                 <button
