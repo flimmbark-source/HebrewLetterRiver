@@ -18,12 +18,22 @@ import {
  * 3. Recap screen (summary)
  */
 export default function ConversationSession({ scenario, onExit }) {
+  console.log('[ConversationSession] Component rendering, current screen will be checked below');
+
   const [sessionId, setSessionId] = useState(null);
   const [screen, setScreen] = useState('brief'); // 'brief' | 'beat' | 'recap'
   const [currentBeatIndex, setCurrentBeatIndex] = useState(0);
   const [attemptHistory, setAttemptHistory] = useState([]);
   const [savedLineIds, setSavedLineIds] = useState([]);
   const [activePlan, setActivePlan] = useState(scenario.defaultPlan);
+
+  console.log('[ConversationSession] Current state:', {
+    screen,
+    currentBeatIndex,
+    activePlanName: activePlan.planName,
+    hasSegments: !!scenario.segments,
+    scenarioId: scenario.metadata.id
+  });
 
   // Initialize session
   useEffect(() => {
@@ -42,6 +52,8 @@ export default function ConversationSession({ scenario, onExit }) {
 
   // Start practice from brief screen (default plan)
   const handleStart = useCallback(() => {
+    console.log('[ConversationSession] handleStart called - using DEFAULT plan');
+    console.log('Default plan beats:', scenario.defaultPlan.beats.slice(0, 5).map(b => b.lineId));
     setActivePlan(scenario.defaultPlan);
     setScreen('beat');
     setCurrentBeatIndex(0);
