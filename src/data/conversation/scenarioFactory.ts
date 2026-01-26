@@ -514,7 +514,7 @@ function createScenarioMetadata(
  * Detects sentence pairs (sentences ending in -short paired with their base version)
  * Groups pairs into segments (2 pairs per segment = 4 sentences per segment)
  */
-function generateSegments(
+export function generateSegmentsFromSentences(
   scenarioId: string,
   sentences: Sentence[],
   lines: ConversationLine[]
@@ -619,7 +619,7 @@ export function createScenarioFromTheme(
   const metadata = createScenarioMetadata(themeKey, sentences, 'sentencesByTheme');
   const lines = sentences.map(sentenceToLine);
   const defaultPlan = generateDefaultPlan(metadata.id, lines);
-  const segments = generateSegments(metadata.id, sentences, lines);
+  const segments = generateSegmentsFromSentences(metadata.id, sentences, lines);
 
   return {
     metadata,
