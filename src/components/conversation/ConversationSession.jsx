@@ -17,6 +17,13 @@ import {
  * 2. Beat screens (practice each beat)
  * 3. Recap screen (summary)
  */
+const SEGMENT_MODULE_SEQUENCE = [
+  'listenMeaningChoice',
+  'shadowRepeat',
+  'guidedReplyChoice',
+  'typeInput'
+];
+
 export default function ConversationSession({ scenario, onExit }) {
   console.log('[ConversationSession] Component rendering, current screen will be checked below');
 
@@ -26,6 +33,34 @@ export default function ConversationSession({ scenario, onExit }) {
   const [attemptHistory, setAttemptHistory] = useState([]);
   const [savedLineIds, setSavedLineIds] = useState([]);
   const [activePlan, setActivePlan] = useState(scenario.defaultPlan);
+
+  const buildSegmentPlan = useCallback((segment) => {
+    if (!segment?.pairs?.length) {
+      return null;
+    }
+
+    const beats = [];
+    for (const pair of segment.pairs) {
+      for (const moduleId of SEGMENT_MODULE_SEQUENCE) {
+        beats.push({
+          lineId: pair.shortSentenceId,
+          moduleId
+        });
+      }
+      for (const moduleId of SEGMENT_MODULE_SEQUENCE) {
+        beats.push({
+          lineId: pair.longSentenceId,
+          moduleId
+        });
+      }
+    }
+
+    return {
+      scenarioId: scenario.metadata.id,
+      beats,
+      planName: segment.plan?.planName ?? segment.id ?? 'segment'
+    };
+  }, [scenario.metadata.id]);
 
   console.log('[ConversationSession] Current state:', {
     screen,
@@ -64,15 +99,16 @@ export default function ConversationSession({ scenario, onExit }) {
     console.log('=== Starting Segment ===');
     console.log('Segment ID:', segment.id);
     console.log('Segment pairs:', segment.pairs);
-    console.log('First 5 beat lineIds:', segment.plan.beats.slice(0, 5).map(b => b.lineId));
+    console.log('First 5 beat lineIds:', segment.plan?.beats?.slice(0, 5).map(b => b.lineId));
 
-    setActivePlan(segment.plan);
+    const nextPlan = buildSegmentPlan(segment) ?? segment.plan ?? scenario.defaultPlan;
+    setActivePlan(nextPlan);
     setSessionId(null); // Reset session to use new plan
     setScreen('beat');
     setCurrentBeatIndex(0);
     setAttemptHistory([]);
     setSavedLineIds([]);
-  }, []);
+  }, [buildSegmentPlan, scenario.defaultPlan]);
 
   // Handle beat completion
   const handleBeatComplete = useCallback((attemptResult) => {

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import ConversationBriefScreen from './ConversationBriefScreen.jsx';
 import ConversationBeatScreen from './ConversationBeatScreen.jsx';
 import ConversationRecapScreen from './ConversationRecapScreen.jsx';
@@ -14,6 +14,7 @@ import {
   isSessionComplete,
   getSessionStats
 } from '../../data/conversation/dualRoleConversation.ts';
+import { generateSegmentsFromSentences } from '../../data/conversation/scenarioFactory.ts';
 
 /**
  * DualRoleConversationSession
@@ -52,6 +53,27 @@ export default function DualRoleConversationSession({
   useEffect(() => {
     setActiveSteps(expandedSteps);
   }, [expandedSteps]);
+
+  const scriptSegments = useMemo(() => {
+    if (!script || expandedSteps.length === 0) {
+      return undefined;
+    }
+
+    const lineMap = new Map(scenario.lines.map(line => [line.id, line]));
+    const scriptLineIds = script.turns.map(turn => turn.lineId);
+    const scriptLines = scriptLineIds
+      .map(lineId => lineMap.get(lineId))
+      .filter(Boolean);
+    const scriptSentences = scriptLines
+      .map(line => line.sentenceData)
+      .filter(Boolean);
+
+    return generateSegmentsFromSentences(
+      scenario.metadata.id,
+      scriptSentences,
+      scriptLines
+    );
+  }, [expandedSteps.length, script, scenario.lines, scenario.metadata.id]);
 
   // Create a practice plan from expanded steps
   const createPlanFromSteps = useCallback((steps) => {
@@ -193,7 +215,8 @@ export default function DualRoleConversationSession({
         titleKey: script.title,
         subtitleKey: script.description
       },
-      defaultPlan: createPlanFromSteps(expandedSteps)
+      defaultPlan: createPlanFromSteps(expandedSteps),
+      segments: scriptSegments
     };
 
     return (
