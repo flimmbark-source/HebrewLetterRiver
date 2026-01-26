@@ -19,17 +19,27 @@ export default function ConversationBriefScreen({ scenario, onStart, onStartSegm
   // Check if this scenario has segments (progressive vocabulary mode)
   const hasSegments = scenario.segments && scenario.segments.length > 0;
 
-  // DEBUG: Log segment data
-  console.log('[ConversationBriefScreen] Scenario segments:', {
-    hasSegments,
-    segmentCount: scenario.segments?.length,
-    segments: scenario.segments?.map(seg => ({
-      id: seg.id,
-      pairs: seg.pairs,
-      firstBeatLineId: seg.plan.beats[0]?.lineId,
-      beatCount: seg.plan.beats.length
-    }))
-  });
+  // DEBUG: Log detailed segment data
+  if (scenario.segments) {
+    console.log('[ConversationBriefScreen] DETAILED SEGMENT ANALYSIS:');
+    console.log('Segment count:', scenario.segments.length);
+
+    scenario.segments.forEach((seg, idx) => {
+      console.log(`\n--- SEGMENT ${idx + 1} (${seg.id}) ---`);
+      console.log('Pairs:', JSON.stringify(seg.pairs, null, 2));
+      console.log('Beat count:', seg.plan.beats.length);
+      console.log('First 8 beat lineIds:', seg.plan.beats.slice(0, 8).map(b => b.lineId).join(', '));
+      console.log('Plan name:', seg.plan.planName);
+    });
+
+    // Also check if all segments point to the same plan object
+    if (scenario.segments.length > 1) {
+      const samePlan = scenario.segments[0].plan === scenario.segments[1].plan;
+      console.log('\n⚠️  All segments share same plan object?', samePlan);
+    }
+  } else {
+    console.log('[ConversationBriefScreen] NO SEGMENTS FOUND');
+  }
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
