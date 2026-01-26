@@ -137,6 +137,14 @@ export default function ConversationSession({ scenario, onExit }) {
 
   if (screen === 'beat') {
     const currentBeat = activePlan.beats[currentBeatIndex];
+    console.log('[ConversationSession] Rendering beat screen:', {
+      currentBeatIndex,
+      beatLineId: currentBeat?.lineId,
+      totalBeats: activePlan.beats.length,
+      first5Beats: activePlan.beats.slice(0, 5).map(b => b.lineId),
+      activePlanName: activePlan.planName
+    });
+
     if (!currentBeat) {
       // Safety: if beat not found, go to recap
       setScreen('recap');

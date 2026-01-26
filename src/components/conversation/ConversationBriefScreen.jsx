@@ -19,6 +19,18 @@ export default function ConversationBriefScreen({ scenario, onStart, onStartSegm
   // Check if this scenario has segments (progressive vocabulary mode)
   const hasSegments = scenario.segments && scenario.segments.length > 0;
 
+  // DEBUG: Log segment data
+  console.log('[ConversationBriefScreen] Scenario segments:', {
+    hasSegments,
+    segmentCount: scenario.segments?.length,
+    segments: scenario.segments?.map(seg => ({
+      id: seg.id,
+      pairs: seg.pairs,
+      firstBeatLineId: seg.plan.beats[0]?.lineId,
+      beatCount: seg.plan.beats.length
+    }))
+  });
+
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, []);

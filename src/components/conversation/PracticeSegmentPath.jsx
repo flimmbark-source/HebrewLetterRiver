@@ -30,7 +30,15 @@ export default function PracticeSegmentPath({ scenario, segments, onSelectSegmen
 
               {/* Segment button */}
               <button
-                onClick={() => onSelectSegment(segment)}
+                onClick={() => {
+                  console.log('[PracticeSegmentPath] Clicked segment:', {
+                    id: segment.id,
+                    pairs: segment.pairs,
+                    firstBeatLineId: segment.plan.beats[0]?.lineId,
+                    first5BeatLineIds: segment.plan.beats.slice(0, 5).map(b => b.lineId)
+                  });
+                  onSelectSegment(segment);
+                }}
                 className="w-full max-w-md group relative bg-gradient-to-r from-slate-800 to-slate-900 hover:from-blue-900/50 hover:to-purple-900/50 border-2 border-slate-700 hover:border-blue-500/50 rounded-xl p-4 sm:p-5 transition-all duration-200 active:scale-98 shadow-lg hover:shadow-xl"
               >
                 {/* Segment number badge */}
