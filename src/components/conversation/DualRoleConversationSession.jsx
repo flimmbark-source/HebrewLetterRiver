@@ -12,7 +12,8 @@ import {
   expandScriptToSteps,
   getCurrentStep,
   isSessionComplete,
-  getSessionStats
+  getSessionStats,
+  generateDualRoleScript
 } from '../../data/conversation/dualRoleConversation.ts';
 import { generateSegmentsFromSentences } from '../../data/conversation/scenarioFactory.ts';
 
@@ -119,18 +120,40 @@ export default function DualRoleConversationSession({
   }, [expandedSteps]);
 
   const handleStartSegment = useCallback((segment) => {
-    const lineIds = new Set([
-      ...segment.pairs.map(pair => pair.shortSentenceId),
-      ...segment.pairs.map(pair => pair.longSentenceId)
+    const lineMap = new Map(scenario.lines.map(line => [line.id, line]));
+    const segmentLineIds = segment.pairs.flatMap(pair => [
+      pair.shortSentenceId,
+      pair.longSentenceId
     ]);
-    const segmentSteps = expandedSteps.filter(step => lineIds.has(step.lineId));
-    setActiveSteps(segmentSteps.length > 0 ? segmentSteps : expandedSteps);
+    const segmentSentences = segmentLineIds
+      .map(lineId => lineMap.get(lineId)?.sentenceData)
+      .filter(Boolean);
+
+    if (segmentSentences.length === 0) {
+      setActiveSteps(expandedSteps);
+      setSessionId(null);
+      setScreen('beat');
+      setCurrentBeatIndex(0);
+      setAttemptHistory([]);
+      setSavedLineIds([]);
+      return;
+    }
+
+    const segmentScript = generateDualRoleScript(
+      segmentSentences,
+      `${segment.id}-dual`,
+      scenario.metadata.theme,
+      `Practice ${scenario.metadata.theme.toLowerCase()} in dual-role mode`,
+      scenario.metadata.id
+    );
+    const segmentSteps = expandScriptToSteps(segmentScript, true);
+    setActiveSteps(segmentSteps);
     setSessionId(null);
     setScreen('beat');
     setCurrentBeatIndex(0);
     setAttemptHistory([]);
     setSavedLineIds([]);
-  }, [expandedSteps]);
+  }, [expandedSteps, scenario.lines, scenario.metadata.id, scenario.metadata.theme]);
 
   // Handle beat completion
   const handleBeatComplete = useCallback((attemptResult) => {
@@ -216,7 +239,7 @@ export default function DualRoleConversationSession({
         subtitleKey: script.description
       },
       defaultPlan: createPlanFromSteps(expandedSteps),
-      segments: scriptSegments
+      segments: scenario.segments
     };
 
     return (
