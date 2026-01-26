@@ -80,7 +80,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     const capsules = [];
     const padding = 2; // Very minimal padding at edges
-    const bottomReservedSpace = 68; // Space for start button (16px bottom + ~44px button height + 8px padding)
+    const bottomReservedSpace = 68; // Space for hint button (16px bottom + ~44px button height + 8px padding)
     const usableWidth = bounds.width - padding * 2;
     const usableHeight = bounds.height - padding - bottomReservedSpace;
 
@@ -368,7 +368,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
     capsulesRef.current = capsules;
 
-    // Show all hint lines initially (will be hidden when Start is pressed)
+    // Show all hint lines initially (will be hidden when player first clicks a capsule)
     setShowLines(true);
     setCurrentHintPairIndex(-1); // -1 means show all lines
   }, [wordPairs, playAreaBounds]);
@@ -453,7 +453,14 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
   // Pointer event handlers - all capsule types are draggable
   const handlePointerDown = useCallback((e, capsule, index) => {
-    if (capsule.matched || !capsule.visible || !gameStarted) return; // Prevent dragging before game starts, if invisible, or if already matched
+    if (capsule.matched || !capsule.visible) return; // Prevent dragging if invisible or if already matched
+
+    // Auto-start game on first capsule interaction
+    if (!gameStarted) {
+      setGameStarted(true);
+      setShowLines(false);
+      startTimeRef.current = Date.now();
+    }
 
     e.preventDefault();
     const rect = playAreaRef.current.getBoundingClientRect();
@@ -861,44 +868,31 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
         })}
       </div>
 
-      {/* Start/Hint button */}
-      {!gameStarted ? (
+      {/* Hint button (only shown after game has started) */}
+      {gameStarted && !showLines && (
         <button
           onClick={() => {
-            setGameStarted(true);
-            setShowLines(false);
-            startTimeRef.current = Date.now();
-          }}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-all"
-        >
-          Start
-        </button>
-      ) : (
-        !showLines && (
-          <button
-            onClick={() => {
-              // Restart hint succession
-              setCurrentHintPairIndex(0);
-              setShowLines(true);
+            // Restart hint succession
+            setCurrentHintPairIndex(0);
+            setShowLines(true);
 
-              const totalPairs = wordPairs.length;
-              const hintInterval = setInterval(() => {
-                setCurrentHintPairIndex(prev => {
-                  const nextIndex = prev + 1;
-                  if (nextIndex >= totalPairs) {
-                    setShowLines(false);
-                    clearInterval(hintInterval);
-                    return prev;
-                  }
-                  return nextIndex;
-                });
-              }, 800); // 0.3 seconds per pair
-            }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-all"
-          >
-            Show Hint
-          </button>
-        )
+            const totalPairs = wordPairs.length;
+            const hintInterval = setInterval(() => {
+              setCurrentHintPairIndex(prev => {
+                const nextIndex = prev + 1;
+                if (nextIndex >= totalPairs) {
+                  setShowLines(false);
+                  clearInterval(hintInterval);
+                  return prev;
+                }
+                return nextIndex;
+              });
+            }, 800); // 0.8 seconds per pair
+          }}
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-all"
+        >
+          Show Hint
+        </button>
       )}
 
       <style jsx>{`

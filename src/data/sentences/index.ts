@@ -181,6 +181,16 @@ function createSentence(config: {
 
 export const sentencesByTheme: Record<string, Sentence[]> = {
   'Greetings & Introductions': [
+    // Pair 1: Introduction with name
+    createSentence({
+      id: 'greetings-1-short',
+      hebrew: 'שלום, אני דני.',
+      english: "Hi, I'm Dani.",
+      pattern: "{Hi, Hello}, {I'm, I am} Dani.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['greeting', 'simple present']
+    }),
     createSentence({
       id: 'greetings-1',
       hebrew: 'שלום, אני דני, שמח להכיר.',
@@ -190,14 +200,36 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       difficulty: 1,
       grammarPoints: ['greeting', 'simple present']
     }),
+
+    // Pair 2: Being new in the city
     createSentence({
-      id: 'greetings-2',
-      hebrew: 'מאיפה אתה? אני חדש בעיר.',
-      english: 'Where are you from? I am new in the city.',
-      pattern: "{Where are you from, Where do you come from}? {I am, I'm} new in the city.",
+      id: 'greetings-2-short',
+      hebrew: 'אני חדש כאן.',
+      english: "I'm new here.",
+      pattern: "{I'm, I am} new here.",
       theme: 'Greetings & Introductions',
       difficulty: 1,
-      grammarPoints: ['greeting', 'yes-no question']
+      grammarPoints: ['simple present', 'location']
+    }),
+    createSentence({
+      id: 'greetings-2',
+      hebrew: 'אני חדש בעיר.',
+      english: 'I am new in the city.',
+      pattern: "{I am, I'm} new in the city.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['greeting', 'location']
+    }),
+
+    // Pair 3: Thanking for coming
+    createSentence({
+      id: 'greetings-3-short',
+      hebrew: 'תודה שבאת היום.',
+      english: 'Thanks for coming today.',
+      pattern: "{Thanks, Thank you} for coming today.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['gratitude', 'time reference']
     }),
     createSentence({
       id: 'greetings-3',
@@ -208,6 +240,17 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       difficulty: 1,
       grammarPoints: ['gratitude', 'present tense linking']
     }),
+
+    // Pair 4: Being happy together
+    createSentence({
+      id: 'greetings-4-short',
+      hebrew: 'אני שמח כאן.',
+      english: "I'm happy here.",
+      pattern: "{I'm, I am} happy here.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['present tense', 'location']
+    }),
     createSentence({
       id: 'greetings-4',
       hebrew: 'אני שמח שאתה כאן איתנו.',
@@ -216,6 +259,17 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       theme: 'Greetings & Introductions',
       difficulty: 2,
       grammarPoints: ['present tense', 'present progressive nuance']
+    }),
+
+    // Pair 5: Learning language together
+    createSentence({
+      id: 'greetings-5-short',
+      hebrew: 'אנחנו לומדים שפה.',
+      english: 'We are learning a language.',
+      pattern: "{We are, We're} learning a language.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['plural subject', 'present progressive']
     }),
     createSentence({
       id: 'greetings-5',
@@ -226,6 +280,17 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       difficulty: 2,
       grammarPoints: ['plural subject', 'present progressive nuance']
     }),
+
+    // Pair 6: Asking about the day
+    createSentence({
+      id: 'greetings-6-short',
+      hebrew: 'איך אתה?',
+      english: 'How are you?',
+      pattern: "How are you?",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['questions', 'greeting']
+    }),
     createSentence({
       id: 'greetings-6',
       hebrew: 'איך היום שלך?',
@@ -235,6 +300,17 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       difficulty: 2,
       grammarPoints: ['questions', 'time adverb']
     }),
+
+    // Pair 7: Asking a question
+    createSentence({
+      id: 'greetings-7-short',
+      hebrew: 'אני רוצה לשאול.',
+      english: 'I want to ask.',
+      pattern: "I want to ask.",
+      theme: 'Greetings & Introductions',
+      difficulty: 2,
+      grammarPoints: ['verb + infinitive']
+    }),
     createSentence({
       id: 'greetings-7',
       hebrew: 'אני רוצה לשאול שאלה קצרה.',
@@ -242,6 +318,17 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       theme: 'Greetings & Introductions',
       difficulty: 3,
       grammarPoints: ['verb + infinitive', 'object noun']
+    }),
+
+    // Pair 8: Thanking for answer
+    createSentence({
+      id: 'greetings-8-short',
+      hebrew: 'תודה על התשובה.',
+      english: 'Thanks for the answer.',
+      pattern: "{Thanks, Thank you} for the answer.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['gratitude', 'prepositions']
     }),
     createSentence({
       id: 'greetings-8',
@@ -251,6 +338,17 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       difficulty: 2,
       grammarPoints: ['prepositions', 'noun modifiers']
     }),
+
+    // Pair 9: Having an idea
+    createSentence({
+      id: 'greetings-9-short',
+      hebrew: 'יש לנו רעיון.',
+      english: 'We have an idea.',
+      pattern: "We have an idea.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['possession', 'simple present']
+    }),
     createSentence({
       id: 'greetings-9',
       hebrew: 'היום יש לנו רעיון טוב להתחיל.',
@@ -258,6 +356,17 @@ export const sentencesByTheme: Record<string, Sentence[]> = {
       theme: 'Greetings & Introductions',
       difficulty: 2,
       grammarPoints: ['possession', 'adjectives']
+    }),
+
+    // Pair 10: Name and learning with friends
+    createSentence({
+      id: 'greetings-10-short',
+      hebrew: 'שמי אורי.',
+      english: 'My name is Ori.',
+      pattern: "My name is Ori.",
+      theme: 'Greetings & Introductions',
+      difficulty: 1,
+      grammarPoints: ['simple present', 'introduction']
     }),
     createSentence({
       id: 'greetings-10',

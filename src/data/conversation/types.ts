@@ -78,6 +78,33 @@ export interface ConversationPracticePlan {
 }
 
 /**
+ * A sentence pair (short intro + longer expansion)
+ */
+export interface SentencePair {
+  /** Short intro sentence ID */
+  shortSentenceId: string;
+  /** Longer sentence ID that builds on the short one */
+  longSentenceId: string;
+}
+
+/**
+ * A practice segment containing multiple sentence pairs
+ * Used for progressive vocabulary learning
+ */
+export interface PracticeSegment {
+  /** Unique segment identifier */
+  id: string;
+  /** Index in the progression path (0-based) */
+  index: number;
+  /** Sentence pairs in this segment (typically 2 pairs = 4 sentences) */
+  pairs: SentencePair[];
+  /** Practice plan for this specific segment */
+  plan: ConversationPracticePlan;
+  /** Display title for this segment */
+  title?: string;
+}
+
+/**
  * Result of a single module attempt
  */
 export interface ConversationAttemptResult {
@@ -129,6 +156,8 @@ export interface ConversationScenario {
   defaultPlan: ConversationPracticePlan;
   /** Alternative practice plans */
   alternativePlans?: ConversationPracticePlan[];
+  /** Practice segments for progressive vocabulary learning (optional) */
+  segments?: PracticeSegment[];
 }
 
 /**

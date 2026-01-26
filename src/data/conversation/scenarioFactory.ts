@@ -12,7 +12,8 @@ import type {
   ConversationScenarioMetadata,
   ConversationPracticePlan,
   ConversationBeat,
-  ConversationModuleType
+  ConversationModuleType,
+  PracticeSegment
 } from './types.ts';
 import { cafeTalkTransliterations } from '../readingTexts/cafeTalk/lexicon/hebrew.js';
 
@@ -509,6 +510,106 @@ function createScenarioMetadata(
 }
 
 /**
+ * Generate practice segments from paired sentences
+ * Detects sentence pairs (sentences ending in -short paired with their base version)
+ * Groups pairs into segments (2 pairs per segment = 4 sentences per segment)
+ */
+export function generateSegmentsFromSentences(
+  scenarioId: string,
+  sentences: Sentence[],
+  lines: ConversationLine[]
+): PracticeSegment[] | undefined {
+  const segments: PracticeSegment[] = [];
+  const linesMap = new Map(lines.map(line => [line.id, line]));
+
+  // Group sentences into pairs
+  const shortSentences = sentences.filter(s => s.id.endsWith('-short'));
+
+  if (shortSentences.length === 0) {
+    // No paired structure detected
+    return undefined;
+  }
+
+  // First, create all sentence pairs
+  const allPairs: Array<{ shortSentenceId: string; longSentenceId: string }> = [];
+
+  for (const shortSentence of shortSentences) {
+    const baseId = shortSentence.id.replace('-short', '');
+    const longSentence = sentences.find(s => s.id === baseId);
+
+    if (!longSentence) {
+      console.warn(`No matching long sentence found for ${shortSentence.id}`);
+      continue;
+    }
+
+    allPairs.push({
+      shortSentenceId: shortSentence.id,
+      longSentenceId: longSentence.id
+    });
+  }
+
+  // Group pairs into segments (2 pairs per segment)
+  const pairsPerSegment = 2;
+  const numSegments = Math.ceil(allPairs.length / pairsPerSegment);
+
+  for (let segIdx = 0; segIdx < numSegments; segIdx++) {
+    const startIdx = segIdx * pairsPerSegment;
+    const endIdx = Math.min(startIdx + pairsPerSegment, allPairs.length);
+    const segmentPairs = allPairs.slice(startIdx, endIdx);
+
+    // Create practice plan for this segment
+    const segmentBeats: ConversationBeat[] = [];
+    const moduleSequence: ConversationModuleType[] = [
+      'listenMeaningChoice',
+      'shadowRepeat',
+      'guidedReplyChoice',
+      'typeInput'
+    ];
+
+    // For each pair in the segment, add beats in order: short1, long1, short2, long2
+    for (const pair of segmentPairs) {
+      // Add beats for short sentence
+      for (const moduleId of moduleSequence) {
+        segmentBeats.push({
+          lineId: pair.shortSentenceId,
+          moduleId
+        });
+      }
+
+      // Add beats for long sentence
+      for (const moduleId of moduleSequence) {
+        segmentBeats.push({
+          lineId: pair.longSentenceId,
+          moduleId
+        });
+      }
+    }
+
+    const segment: PracticeSegment = {
+      id: `${scenarioId}-segment-${segIdx + 1}`,
+      index: segIdx,
+      pairs: segmentPairs,
+      plan: {
+        scenarioId,
+        beats: segmentBeats,
+        planName: `segment-${segIdx + 1}`
+      },
+      title: `Segment ${segIdx + 1}`
+    };
+
+    console.log(`Generated Segment ${segIdx + 1}:`, {
+      pairs: segmentPairs.map(p => `${p.shortSentenceId}+${p.longSentenceId}`),
+      beatCount: segmentBeats.length,
+      firstBeatLineId: segmentBeats[0]?.lineId
+    });
+
+    segments.push(segment);
+  }
+
+  return segments.length > 0 ? segments : undefined;
+}
+
+/**
  * Convert a theme's sentences into a conversation scenario
  */
 export function createScenarioFromTheme(
@@ -518,11 +619,13 @@ export function createScenarioFromTheme(
   const metadata = createScenarioMetadata(themeKey, sentences, 'sentencesByTheme');
   const lines = sentences.map(sentenceToLine);
   const defaultPlan = generateDefaultPlan(metadata.id, lines);
+  const segments = generateSegmentsFromSentences(metadata.id, sentences, lines);
 
   return {
     metadata,
     lines,
-    defaultPlan
+    defaultPlan,
+    segments
   };
 }
 
