@@ -110,3 +110,89 @@ Most likely scenario: Segments are not being generated (returning undefined), so
 3. Click on what looks like "Segment 2"
 4. Check which logs appear (segment click or start button click)
 5. The logs will show exactly where the problem is
+
+## UPDATE: Findings from First Console Output
+
+From the console logs provided by the user:
+
+1. ✅ **Segments ARE generated correctly** - All 5 segments have the right sentence pairs
+   - Segment 1: greetings-1-short + greetings-1, greetings-2-short + greetings-2
+   - Segment 2: greetings-3-short + greetings-3, greetings-4-short + greetings-4
+   - etc.
+
+2. ✅ **Segment path IS rendered** - "[ConversationBriefScreen] RENDERING: SEGMENT PATH"
+
+3. ✅ **Segment 2 click IS registered** - PracticeSegmentPath logs show correct segment data:
+   ```
+   firstBeatLineId: 'greetings-3-short'
+   ```
+
+4. ❌ **handleStartSegment is NOT called** - No "=== Starting Segment ===" logs appear
+
+5. ❌ **Beat screen logs don't appear** - No "[ConversationSession] Rendering beat screen:" logs
+
+6. ✅ **Beat screen DOES render** - useConversationIntro logs appear with:
+   ```
+   lineId: 'greetings-1-short'
+   ```
+
+**The Problem**: Segment click works, but `handleStartSegment` never executes. Instead, something causes the beat screen to render with greetings-1-short (the first sentence in the default plan).
+
+**Most Likely Cause**: The `onStartSegment` prop is undefined or falsy, causing fallback to `onStart`, which uses the default plan starting from greetings-1-short.
+
+## Additional Debugging Added (Round 2)
+
+New logs will show:
+
+### ConversationBriefScreen (lines 19-25, 151-152)
+- Whether `onStartSegment` prop is defined: `hasOnStartSegment`
+- Type of onStartSegment: `onStartSegmentType`
+- Which callback is actually used: "onStartSegment" or "onStart (fallback)"
+
+### ConversationSession (lines 21-32, 44-46)
+- Component render and state: screen, beatIndex, activePlan, etc.
+- When `handleStart` is called: "handleStart called - using DEFAULT plan"
+- When `handleStartSegment` is called: "=== Starting Segment ==="
+
+## What to Look For in Next Console Output
+
+When you refresh the page and click Segment 2:
+
+### Expected if working correctly:
+```
+[ConversationBriefScreen] Props received: {
+  hasOnStartSegment: true,  ✅
+  onStartSegmentType: "function"
+}
+
+[ConversationBriefScreen] Using callback: onStartSegment  ✅
+
+[PracticeSegmentPath] Clicked segment: {...}
+
+=== Starting Segment ===  ✅
+Segment ID: conversation-greetings-introductions-segment-2
+First 5 beat lineIds: greetings-3-short, greetings-3-short, ...
+
+[ConversationSession] Rendering beat screen:
+beatLineId: greetings-3-short  ✅
+```
+
+### What we're actually seeing (Bug confirmed):
+```
+[ConversationBriefScreen] Props received: {
+  hasOnStartSegment: ???  ← KEY FINDING
+  onStartSegmentType: ???
+}
+
+[ConversationBriefScreen] Using callback: onStart (fallback)  ❌
+
+[PracticeSegmentPath] Clicked segment: {...}
+
+[ConversationSession] handleStart called - using DEFAULT plan  ❌
+
+[useConversationIntro] lineId: 'greetings-1-short'  ❌
+```
+
+The new logs will definitively show whether:
+1. `onStartSegment` is undefined/null (prop passing issue)
+2. Or `onStartSegment` exists but wrong callback is used (logic issue)
