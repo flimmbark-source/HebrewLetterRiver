@@ -16,6 +16,13 @@ import PracticeSegmentPath from './PracticeSegmentPath.jsx';
 export default function ConversationBriefScreen({ scenario, onStart, onStartSegment, onBack }) {
   const { t } = useLocalization();
 
+  // DEBUG: Check if onStartSegment is actually defined
+  console.log('[ConversationBriefScreen] Props received:', {
+    hasOnStart: !!onStart,
+    hasOnStartSegment: !!onStartSegment,
+    onStartSegmentType: typeof onStartSegment
+  });
+
   // Check if this scenario has segments (progressive vocabulary mode)
   const hasSegments = scenario.segments && scenario.segments.length > 0;
 
@@ -141,11 +148,13 @@ export default function ConversationBriefScreen({ scenario, onStart, onStartSegm
           <div className="p-4 sm:p-6 bg-slate-800/50 border-t border-slate-700">
             {(() => {
               console.log('[ConversationBriefScreen] RENDERING:', hasSegments ? 'SEGMENT PATH' : 'START BUTTON');
+              const selectedCallback = onStartSegment || onStart;
+              console.log('[ConversationBriefScreen] Using callback:', onStartSegment ? 'onStartSegment' : 'onStart (fallback)');
               return hasSegments ? (
                 <PracticeSegmentPath
                   scenario={scenario}
                   segments={scenario.segments}
-                  onSelectSegment={onStartSegment || onStart}
+                  onSelectSegment={selectedCallback}
                 />
               ) : (
                 <button
