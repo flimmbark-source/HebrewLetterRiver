@@ -49,6 +49,11 @@ export default function ConversationSession({ scenario, onExit }) {
 
   // Start practice from a specific segment
   const handleStartSegment = useCallback((segment) => {
+    console.log('=== Starting Segment ===');
+    console.log('Segment ID:', segment.id);
+    console.log('Segment pairs:', segment.pairs);
+    console.log('First 5 beat lineIds:', segment.plan.beats.slice(0, 5).map(b => b.lineId));
+
     setActivePlan(segment.plan);
     setSessionId(null); // Reset session to use new plan
     setScreen('beat');

@@ -597,6 +597,12 @@ function generateSegments(
       title: `Segment ${segIdx + 1}`
     };
 
+    console.log(`Generated Segment ${segIdx + 1}:`, {
+      pairs: segmentPairs.map(p => `${p.shortSentenceId}+${p.longSentenceId}`),
+      beatCount: segmentBeats.length,
+      firstBeatLineId: segmentBeats[0]?.lineId
+    });
+
     segments.push(segment);
   }
 
