@@ -139,20 +139,26 @@ export default function ConversationBriefScreen({ scenario, onStart, onStartSegm
 
           {/* Footer - Segments path or Start button */}
           <div className="p-4 sm:p-6 bg-slate-800/50 border-t border-slate-700">
-            {hasSegments ? (
-              <PracticeSegmentPath
-                scenario={scenario}
-                segments={scenario.segments}
-                onSelectSegment={onStartSegment || onStart}
-              />
-            ) : (
-              <button
-                onClick={onStart}
-                className="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-base sm:text-lg rounded-lg transition-all duration-200 active:scale-95 shadow-lg"
-              >
-                {t('conversation.brief.start', 'Start Practice')} →
-              </button>
-            )}
+            {(() => {
+              console.log('[ConversationBriefScreen] RENDERING:', hasSegments ? 'SEGMENT PATH' : 'START BUTTON');
+              return hasSegments ? (
+                <PracticeSegmentPath
+                  scenario={scenario}
+                  segments={scenario.segments}
+                  onSelectSegment={onStartSegment || onStart}
+                />
+              ) : (
+                <button
+                  onClick={() => {
+                    console.log('[ConversationBriefScreen] CLICKED START BUTTON (not a segment)');
+                    onStart();
+                  }}
+                  className="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-base sm:text-lg rounded-lg transition-all duration-200 active:scale-95 shadow-lg"
+                >
+                  {t('conversation.brief.start', 'Start Practice')} →
+                </button>
+              );
+            })()}
           </div>
         </div>
       </div>
