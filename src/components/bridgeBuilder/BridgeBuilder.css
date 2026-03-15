@@ -224,7 +224,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
               opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -234,7 +234,7 @@
 
 /* Each plank position — fixed width so layout never shifts */
 .bb-slot-pos {
-  width: 140px;
+  width: 46%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -246,16 +246,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 14px 18px;
+  padding: 16px 20px;
   border-radius: 6px;
   overflow: hidden;
   white-space: nowrap;
-  max-width: 136px;
+  max-width: 100%;
 }
 .bb-placed-text {
   position: relative;
   z-index: 2;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1.3;
 }
@@ -297,12 +297,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 14px 20px;
+  padding: 16px 20px;
   border: 2px dashed rgba(255,255,255,0.4);
   border-radius: 6px;
   background: rgba(255,255,255,0.1);
-  min-width: 60px;
-  height: 56px;
+  width: 80%;
+  height: 60px;
   animation: bb-gap-pulse 2s ease-in-out infinite;
 }
 .bb-gap-q {
