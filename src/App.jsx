@@ -3,6 +3,7 @@ import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import HomeView from './views/HomeView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import LearnView from './views/LearnView.jsx';
+import BridgeBuilderView from './views/BridgeBuilderView.jsx';
 import SettingsView from './views/SettingsView.jsx';
 import DailyView from './views/DailyView.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
@@ -290,6 +291,7 @@ function Shell() {
           <Route path="/home" element={<HomeView />} />
           <Route path="/achievements" element={<AchievementsView />} />
           <Route path="/read" element={<LearnView />} />
+          <Route path="/bridge" element={<BridgeBuilderView />} />
           <Route path="/daily" element={<DailyView />} />
           <Route path="/settings" element={<SettingsView />} />
           <Route path="/play" element={<Navigate to="/home" replace />} />
@@ -303,11 +305,11 @@ function Shell() {
             </div>
             <span className="label">{t('app.nav.home')}</span>
           </NavLink>
-          <NavLink to="/read" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
+          <NavLink to="/bridge" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
-              <span>📚</span>
+              <span>🌉</span>
             </div>
-            <span className="label">{t('app.nav.read')}</span>
+            <span className="label">Bridge</span>
           </NavLink>
           <button
             type="button"

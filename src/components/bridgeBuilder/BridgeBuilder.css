@@ -1,0 +1,369 @@
+/* ═══════════════════════════════════════════════════════
+   Bridge Builder — game styles
+   Matches Letter River arcade / storybook feel
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Container ─────────────────────────────────────── */
+.bb-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(175deg, #E8FFE3 0%, #d4f5f7 40%, #b3e8f0 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 24px;
+  font-family: 'Nunito', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── Top bar ───────────────────────────────────────── */
+.bb-top-bar {
+  padding: 12px 16px 0;
+}
+
+.bb-back-btn {
+  background: rgba(255,255,255,0.7);
+  border: 2px solid #A7F3D0;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #064E3B;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.bb-back-btn:hover {
+  background: rgba(255,255,255,0.95);
+}
+
+/* ─── HUD ───────────────────────────────────────────── */
+.bb-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  gap: 8px;
+}
+
+.bb-hud-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.bb-hud-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #065F46;
+  opacity: 0.7;
+}
+
+.bb-hud-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #064E3B;
+  font-family: 'Baloo 2', system-ui, sans-serif;
+}
+
+.bb-hud-hearts {
+  display: flex;
+  gap: 4px;
+  font-size: 18px;
+}
+
+.bb-heart--lost {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+/* ─── Hebrew Prompt Card ────────────────────────────── */
+.bb-prompt-card {
+  margin: 8px auto 12px;
+  padding: 20px 32px;
+  background: linear-gradient(135deg, #fffcea 0%, #fcfff2 100%);
+  border: 3px solid #A7F3D0;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  width: fit-content;
+  min-width: 140px;
+}
+
+.bb-prompt-card--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bb-prompt-hebrew {
+  font-family: 'Heebo', 'Noto Sans Hebrew', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #4a2208;
+  direction: rtl;
+}
+
+/* ─── Bridge Area ───────────────────────────────────── */
+.bb-bridge-area {
+  position: relative;
+  margin: 0 16px;
+  min-height: 110px;
+}
+
+.bb-river {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.bb-river-water {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    #5bc8e8 0%, #49c5e0 20%, #6dd5f0 40%,
+    #49c5e0 60%, #5bc8e8 80%, #49c5e0 100%
+  );
+  background-size: 200% 100%;
+  animation: bb-water-flow 4s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes bb-water-flow {
+  0% { background-position: 0 0; }
+  100% { background-position: 200% 0; }
+}
+
+.bb-bridge {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 6px;
+  padding: 12px 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.bb-bridge::-webkit-scrollbar { display: none; }
+
+.bb-bridge-segment {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.bb-bridge-segment--placed {
+  animation: bb-segment-drop 0.35s ease-out;
+}
+
+@keyframes bb-segment-drop {
+  0% { opacity: 0; transform: translateY(-16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.bb-plank--bridge {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 60px;
+}
+
+.bb-plank--translit {
+  background: linear-gradient(135deg, #d4a76a 0%, #c4944d 100%);
+  color: #3e1f04;
+  border: 2px solid #a87836;
+  box-shadow: 0 2px 0 #8a6124;
+}
+
+.bb-plank--meaning {
+  background: linear-gradient(135deg, #b8d4a0 0%, #9ac17e 100%);
+  color: #1a3a0a;
+  border: 2px solid #7da85e;
+  box-shadow: 0 2px 0 #5e8a3e;
+}
+
+.bb-plank-slot {
+  width: 60px;
+  height: 28px;
+  border: 2px dashed rgba(255,255,255,0.5);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.15);
+}
+
+/* ─── Choices Area ──────────────────────────────────── */
+.bb-choices-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 16px 16px;
+  min-height: 180px;
+}
+
+.bb-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bb-choices--enter {
+  animation: bb-choices-rise 0.35s ease-out;
+}
+
+@keyframes bb-choices-rise {
+  0% { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Choice Plank (answer button) ──────────────────── */
+.bb-choice-plank {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  border: 3px solid #c4944d;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #f5e6cc 0%, #e8d0a8 100%);
+  box-shadow: 0 4px 0 #a87836, 0 6px 12px rgba(0,0,0,0.1);
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #3e1f04;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
+  text-align: center;
+}
+
+.bb-choice-plank:hover:not(:disabled) {
+  background: linear-gradient(180deg, #fff0d6 0%, #eedcb8 100%);
+}
+
+.bb-choice-plank:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #a87836, 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.bb-choice-plank:disabled {
+  cursor: default;
+}
+
+.bb-choice-plank--correct {
+  background: linear-gradient(180deg, #bbf7d0 0%, #86efac 100%) !important;
+  border-color: #22c55e !important;
+  box-shadow: 0 4px 0 #16a34a, 0 6px 12px rgba(0,0,0,0.1) !important;
+  animation: bb-correct-pulse 0.4s ease;
+}
+
+@keyframes bb-correct-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.bb-choice-plank--wrong {
+  background: linear-gradient(180deg, #fecaca 0%, #fca5a5 100%) !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 4px 0 #dc2626, 0 6px 12px rgba(0,0,0,0.1) !important;
+  animation: bb-wrong-shake 0.4s ease;
+}
+
+@keyframes bb-wrong-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* ─── Teach plank (single meaning reveal) ───────────── */
+.bb-choice-plank--teach {
+  background: linear-gradient(180deg, #d4f5d0 0%, #b8e8a8 100%);
+  border-color: #7da85e;
+  box-shadow: 0 4px 0 #5e8a3e, 0 6px 12px rgba(0,0,0,0.1);
+  animation: bb-teach-glow 1.2s ease infinite;
+}
+
+@keyframes bb-teach-glow {
+  0%, 100% { box-shadow: 0 4px 0 #5e8a3e, 0 6px 12px rgba(0,0,0,0.1); }
+  50% { box-shadow: 0 4px 0 #5e8a3e, 0 6px 20px rgba(94,138,62,0.35); }
+}
+
+.bb-teach-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ─── End Screen ────────────────────────────────────── */
+.bb-end-screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.bb-end-card {
+  background: linear-gradient(135deg, #fffcea 0%, #fcfff2 100%);
+  border: 3px solid #A7F3D0;
+  border-radius: 24px;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  max-width: 320px;
+  width: 100%;
+}
+
+.bb-end-title {
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: #4a2208;
+  margin: 0 0 12px;
+}
+
+.bb-end-score {
+  font-size: 20px;
+  font-weight: 700;
+  color: #064E3B;
+  margin: 0 0 4px;
+}
+
+.bb-end-detail {
+  font-size: 14px;
+  color: #065F46;
+  margin: 0 0 20px;
+}
+
+.bb-restart-btn {
+  display: inline-block;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 999px;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #4a1a06;
+  background: radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%);
+  box-shadow: 0 4px 0 #c85a24, 0 7px 12px rgba(200,90,36,0.7);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.bb-restart-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #c85a24, 0 8px 14px rgba(200,90,36,0.7);
+}
+
+.bb-restart-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #c85a24, 0 5px 10px rgba(200,90,36,0.7);
+}

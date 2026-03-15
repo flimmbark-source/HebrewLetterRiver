@@ -36,7 +36,6 @@ export default function ModuleCard({ module, isLocked, onModuleComplete, onPract
   const [showDictionary, setShowDictionary] = useState(false);
   const [selectedGrammarTextId, setSelectedGrammarTextId] = useState(module.grammarTextId);
   const [cardProgressMap, setCardProgressMap] = useState({}); // Track progress for each card
-  const [expandedVocabId, setExpandedVocabId] = useState(null); // Track which vocab section has options expanded
   const { openGame } = useGame();
   const hasPerVocabGrammar =
     grammarTextIds.length > 0 && grammarTextIds.length === vocabTextIds.length;
@@ -307,38 +306,15 @@ export default function ModuleCard({ module, isLocked, onModuleComplete, onPract
                     <p className="text-sm text-muted-foreground">
                       {vocabSubtitle}
                     </p>
-                    {expandedVocabId === vocabTextId ? (
-                      <div className="space-y-2">
-                        <Button
-                          onClick={() => {
-                            setActiveSection(vocabTextId);
-                            setExpandedVocabId(null);
-                          }}
-                          className="w-full"
-                          variant="default"
-                        >
-                          Reading
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            handlePlayGame(vocabTextId);
-                            setExpandedVocabId(null);
-                          }}
-                          className="w-full"
-                          variant="outline"
-                        >
-                          Play Game
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button
-                        onClick={() => setExpandedVocabId(vocabTextId)}
-                        className="w-full"
-                        variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
-                      >
-                        {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Practice' : 'Start Practice'}
-                      </Button>
-                    )}
+                    <Button
+                      onClick={() => {
+                        handlePlayGame(vocabTextId);
+                      }}
+                      className="w-full"
+                      variant={progress?.vocabSectionsPracticed?.includes(vocabTextId) ? "outline" : "default"}
+                    >
+                      {progress?.vocabSectionsPracticed?.includes(vocabTextId) ? 'Play Game' : 'Start Game'}
+                    </Button>
                   </div>
                 );
               })}
