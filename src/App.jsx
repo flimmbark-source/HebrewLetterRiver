@@ -241,7 +241,7 @@ function Shell() {
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
   const [inConversationPractice, setInConversationPractice] = React.useState(false);
   const location = useLocation();
-  const isBridgeMode = location.pathname === '/bridge';
+
 
   // Check if we're in conversation practice mode
   React.useEffect(() => {
@@ -299,7 +299,7 @@ function Shell() {
           <Route path="/play" element={<Navigate to="/home" replace />} />
         </Routes>
       </main>
-      {!(isGameVisible && isGameRunning) && !inConversationPractice && !isBridgeMode && (
+      {!(isGameVisible && isGameRunning) && !inConversationPractice && (
         <nav className="bottom-nav">
           <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">

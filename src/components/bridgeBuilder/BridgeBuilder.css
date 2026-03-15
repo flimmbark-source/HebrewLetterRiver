@@ -11,6 +11,7 @@
   font-family: 'Nunito', system-ui, sans-serif;
   overflow: hidden;
   background: linear-gradient(180deg, #c9e8f7 0%, #daf0fc 30%, #e4f6ee 60%, #d0ecc8 100%);
+  z-index: 101;
 }
 
 /* ─── Top bar — fixed height ────────────────────────────── */
