@@ -368,6 +368,14 @@
   width: 100%;
   max-width: 360px;
 }
+
+@media (min-width: 600px) {
+  .bb-planks {
+    flex-direction: row;
+    justify-content: center;
+    max-width: 720px;
+  }
+}
 .bb-planks--enter {
   animation: bb-planks-slide 0.3s ease-out;
 }
