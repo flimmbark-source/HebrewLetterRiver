@@ -1,0 +1,301 @@
+/* ═══════════════════════════════════════════════════════════
+   Bridge Builder Setup Screen
+   ═══════════════════════════════════════════════════════════ */
+
+.bbs-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Nunito', system-ui, sans-serif;
+  background: linear-gradient(180deg, #c9e8f7 0%, #daf0fc 30%, #e4f6ee 60%, #d0ecc8 100%);
+  overflow: hidden;
+}
+
+/* ─── Header ──────────────────────────────────────────────── */
+.bbs-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+}
+
+.bbs-back {
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(6px);
+  border: 2px solid rgba(255,255,255,0.5);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  color: #1a4a30;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.bbs-back:active { transform: translateY(1px); }
+
+.bbs-title {
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: #1a4a30;
+  margin: 0;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+}
+
+/* ─── Scrollable content ──────────────────────────────────── */
+.bbs-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 16px 16px;
+}
+
+/* ─── Section ─────────────────────────────────────────────── */
+.bbs-section {
+  margin-bottom: 20px;
+}
+
+.bbs-section-title {
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #3e1f04;
+  margin: 0 0 10px 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ─── Pack List ───────────────────────────────────────────── */
+.bbs-pack-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ─── Pack Card ───────────────────────────────────────────── */
+.bbs-pack-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #fffdf0 0%, #fff8e1 100%);
+  border: 3px solid #d4a76a;
+  border-radius: 16px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  box-shadow: 0 3px 0 #a07030, 0 5px 12px rgba(0,0,0,0.08);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.bbs-pack-card:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #a07030, 0 3px 6px rgba(0,0,0,0.08);
+}
+
+.bbs-pack-card--selected {
+  border-color: #22c55e;
+  box-shadow: 0 3px 0 #16a34a, 0 5px 14px rgba(34,197,94,0.2);
+  background: linear-gradient(135deg, #f0fdf4 0%, #e8fce8 100%);
+}
+
+.bbs-pack-card--locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(30%);
+}
+
+.bbs-pack-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: rgba(212,167,106,0.15);
+  border-radius: 12px;
+}
+
+.bbs-pack-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.bbs-pack-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #3e1f04;
+  line-height: 1.2;
+}
+
+.bbs-pack-desc {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8b6f47;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.bbs-pack-status {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.bbs-pack-status--new {
+  color: #1a4a30;
+  background: rgba(34,197,94,0.15);
+}
+
+.bbs-pack-status--progress {
+  color: #92400e;
+  background: rgba(251,191,36,0.2);
+}
+
+.bbs-pack-status--completed {
+  color: #166534;
+  background: rgba(34,197,94,0.2);
+}
+
+.bbs-pack-status--locked {
+  color: #6b7280;
+  background: rgba(107,114,128,0.1);
+}
+
+/* Pack progress bar */
+.bbs-pack-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: rgba(0,0,0,0.06);
+}
+
+.bbs-pack-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  border-radius: 0 2px 2px 0;
+  transition: width 0.3s ease;
+}
+
+/* ─── Review Card ─────────────────────────────────────────── */
+.bbs-review-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+  border: 3px solid #7c9fd4;
+  border-radius: 16px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  box-shadow: 0 3px 0 #5a7fba, 0 5px 12px rgba(0,0,0,0.08);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.2s;
+}
+
+.bbs-review-card:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #5a7fba, 0 3px 6px rgba(0,0,0,0.08);
+}
+
+.bbs-review-card--selected {
+  border-color: #22c55e;
+  box-shadow: 0 3px 0 #16a34a, 0 5px 14px rgba(34,197,94,0.2);
+  background: linear-gradient(135deg, #f0fdf4 0%, #e8fce8 100%);
+}
+
+.bbs-review-card--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(30%);
+}
+
+.bbs-review-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: rgba(124,159,212,0.15);
+  border-radius: 12px;
+}
+
+.bbs-review-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.bbs-review-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1e3a5f;
+  line-height: 1.2;
+}
+
+.bbs-review-desc {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5a7fba;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+/* ─── Footer — Play button ────────────────────────────────── */
+.bbs-footer {
+  flex-shrink: 0;
+  padding: 12px 20px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, transparent, rgba(208,236,200,0.6) 30%);
+}
+
+.bbs-play {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 16px;
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s;
+
+  color: #fff;
+  background: #94a3b8;
+  box-shadow: 0 4px 0 #64748b, 0 6px 12px rgba(0,0,0,0.1);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bbs-play--active {
+  opacity: 1;
+  cursor: pointer;
+  color: #4a1a06;
+  background: radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%);
+  box-shadow: 0 4px 0 #c85a24, 0 7px 14px rgba(200,90,36,0.35);
+}
+
+.bbs-play--active:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #c85a24, 0 4px 8px rgba(200,90,36,0.35);
+}

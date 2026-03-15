@@ -116,7 +116,7 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack }) {
 
 /* ─── Main ─────────────────────────────────────────────── */
 
-export default function BridgeBuilderGame({ onBack }) {
+export default function BridgeBuilderGame({ sessionConfig, onBack }) {
   const {
     phase,
     currentWord,
@@ -137,7 +137,7 @@ export default function BridgeBuilderGame({ onBack }) {
     handleMeaningTeachPlace,
     handleMeaningChoice,
     restartGame,
-  } = useBridgeBuilderGame();
+  } = useBridgeBuilderGame(sessionConfig);
 
   // Track slide transition state for bridge slot
   const [slideState, setSlideState] = useState('center');

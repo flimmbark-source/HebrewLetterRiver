@@ -97,5 +97,74 @@ export function recordMeaningAttempt(wordId, correct) {
   return wp;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Pack progress — derived from word progress
+   ═══════════════════════════════════════════════════════════ */
+
+/**
+ * Compute progress for a single pack.
+ * Derived from per-word progress — no separate storage needed.
+ *
+ * @param {Object} pack — pack definition from bridgeBuilderPacks
+ * @param {{ [wordId: string]: WordProgress }} allProgress — all word progress
+ * @returns {{ packId, wordsIntroducedCount, wordsLearnedCount, totalWords, completed, lastPlayedAt }}
+ */
+export function getPackProgress(pack, allProgress) {
+  let wordsIntroducedCount = 0;
+  let wordsLearnedCount = 0;
+  let lastPlayedAt = null;
+
+  for (const wordId of pack.wordIds) {
+    const wp = allProgress[wordId];
+    if (!wp) continue;
+    if (wp.masteryStage !== 'new') wordsIntroducedCount++;
+    if (wp.masteryStage === 'learned') wordsLearnedCount++;
+    if (wp.lastSeenAt && (!lastPlayedAt || wp.lastSeenAt > lastPlayedAt)) {
+      lastPlayedAt = wp.lastSeenAt;
+    }
+  }
+
+  return {
+    packId: pack.id,
+    wordsIntroducedCount,
+    wordsLearnedCount,
+    totalWords: pack.wordIds.length,
+    completed: wordsIntroducedCount >= pack.wordIds.length,
+    lastPlayedAt,
+  };
+}
+
+/**
+ * Determine if a pack is unlocked.
+ * A pack is unlocked if:
+ *   - it has no unlockAfter requirement, OR
+ *   - the required prior pack is completed (all words introduced)
+ *
+ * @param {Object} pack — pack definition
+ * @param {Object[]} allPacks — all pack definitions
+ * @param {{ [wordId: string]: WordProgress }} allProgress — all word progress
+ */
+export function isPackUnlocked(pack, allPacks, allProgress) {
+  if (!pack.unlockAfter) return true;
+  const priorPack = allPacks.find(p => p.id === pack.unlockAfter);
+  if (!priorPack) return true;
+  const priorProgress = getPackProgress(priorPack, allProgress);
+  return priorProgress.completed;
+}
+
+/**
+ * Get word IDs eligible for Random Review mode.
+ * Returns words that have been introduced (meaning_taught, practicing, or learned).
+ * Excludes brand-new unseen words.
+ *
+ * Future glossary note: this same filter can power a "practiced words" glossary tab.
+ */
+export function getReviewEligibleWordIds() {
+  const allProgress = getAllWordProgress();
+  return Object.values(allProgress)
+    .filter(wp => wp.masteryStage !== 'new' && wp.meaningIntroduced)
+    .map(wp => wp.wordId);
+}
+
 // Future glossary hook: call getAllWordProgress() and join with bridgeBuilderWords
 // to render a full glossary view with mastery indicators.

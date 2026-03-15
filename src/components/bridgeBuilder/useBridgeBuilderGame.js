@@ -1,6 +1,11 @@
 /**
  * useBridgeBuilderGame — state machine hook for the Bridge Builder game mode.
  *
+ * Accepts a session config that determines which words to use:
+ *   - sessionType: 'guided_pack' | 'random_review'
+ *   - selectedWordIds: word IDs to draw from
+ *   - packId: (optional) which pack is being played
+ *
  * Phases:
  *   promptIntro          — Hebrew prompt fades in
  *   transliterationChoice — player picks correct transliteration
@@ -39,21 +44,30 @@ function shuffle(arr) {
   return a;
 }
 
-function buildQueue() {
-  // Pick WORDS_PER_ROUND words, prioritising words the player hasn't mastered
-  const scored = bridgeBuilderWords.map(w => {
+/**
+ * Build a play queue from a list of word IDs.
+ * Prioritises words the player hasn't mastered yet.
+ * For guided packs, uses all words in the pack.
+ * For random review, picks up to WORDS_PER_ROUND from the pool.
+ */
+function buildQueueFromWordIds(wordIds, limit) {
+  const wordMap = new Map(bridgeBuilderWords.map(w => [w.id, w]));
+  const words = wordIds.map(id => wordMap.get(id)).filter(Boolean);
+
+  const scored = words.map(w => {
     const prog = getWordProgress(w.id);
     let priority = 0;
     if (prog.masteryStage === 'new') priority = 3;
     else if (prog.masteryStage === 'meaning_taught') priority = 2;
     else if (prog.masteryStage === 'practicing') priority = 1;
     else priority = 0;
-    // Add a small random factor so order isn't fixed
     priority += Math.random() * 0.5;
     return { word: w, priority };
   });
   scored.sort((a, b) => b.priority - a.priority);
-  return scored.slice(0, WORDS_PER_ROUND).map(s => s.word);
+
+  const count = limit || words.length;
+  return scored.slice(0, count).map(s => s.word);
 }
 
 function buildTransliterationChoices(word) {
@@ -66,9 +80,19 @@ function buildMeaningChoices(word) {
   return shuffle([word.translation, ...distractors]);
 }
 
-export default function useBridgeBuilderGame() {
+/**
+ * @param {Object} sessionConfig
+ * @param {string} sessionConfig.sessionType — 'guided_pack' | 'random_review'
+ * @param {string|null} sessionConfig.packId
+ * @param {string[]} sessionConfig.selectedWordIds
+ */
+export default function useBridgeBuilderGame(sessionConfig) {
+  const { sessionType, selectedWordIds } = sessionConfig;
+  const isReview = sessionType === 'random_review';
+  const queueLimit = isReview ? WORDS_PER_ROUND : null; // packs use all words
+
   const [phase, setPhase] = useState('promptIntro');
-  const [queue, setQueue] = useState(() => buildQueue());
+  const [queue, setQueue] = useState(() => buildQueueFromWordIds(selectedWordIds, queueLimit));
   const [wordIndex, setWordIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -231,7 +255,7 @@ export default function useBridgeBuilderGame() {
   }, [phase, currentWord]);
 
   const restartGame = useCallback(() => {
-    const newQueue = buildQueue();
+    const newQueue = buildQueueFromWordIds(selectedWordIds, queueLimit);
     setQueue(newQueue);
     setWordIndex(0);
     setScore(0);
@@ -241,7 +265,7 @@ export default function useBridgeBuilderGame() {
     setSelectedChoice(null);
     setChoiceResult(null);
     setPhase('promptIntro');
-  }, []);
+  }, [selectedWordIds, queueLimit]);
 
   return {
     // State
