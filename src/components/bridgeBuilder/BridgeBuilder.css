@@ -356,7 +356,7 @@
   align-items: flex-start;
   justify-content: center;
   z-index: 20;
-  padding: 37px 20px 0;
+  padding: 20px 20px 0;
   background: linear-gradient(180deg, #4a9e5a 0%, #3d8a4e 5%, #6b5132 10%, #5a4428 100%);
 }
 
@@ -372,7 +372,7 @@
   animation: bb-planks-slide 0.3s ease-out;
 }
 @keyframes bb-planks-slide {
-  0% { opacity: 0; transform: translateY(16px); }
+  0% { opacity: 0; transform: translateY(4px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
