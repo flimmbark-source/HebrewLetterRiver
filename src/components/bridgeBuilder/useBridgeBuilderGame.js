@@ -6,6 +6,13 @@
  *   - selectedWordIds: word IDs to draw from
  *   - packId: (optional) which pack is being played
  *
+ * Session word lifecycle (guided packs):
+ *   pending   → word has not been seen this session
+ *   learned   → word was introduced/played once this session (NOT completed yet)
+ *   completed → word was successfully recalled AFTER being learned
+ *
+ * For random review, words go directly pending → completed (one pass).
+ *
  * Phases:
  *   promptIntro          — Hebrew prompt fades in
  *   transliterationChoice — player picks correct transliteration
@@ -13,11 +20,11 @@
  *   meaningTeach         — (new words) single revealed meaning plank
  *   meaningChoice        — (introduced words) pick correct meaning
  *   meaningResolved      — meaning plank animates into bridge
- *   wordComplete         — short pause, then next word
- *   roundComplete        — all words done
+ *   wordComplete         — short pause, then advance session state and pick next word
+ *   roundComplete        — all words completed (or game over)
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
   bridgeBuilderWords,
   getTransliterationDistractors,
@@ -30,7 +37,6 @@ import {
   recordMeaningAttempt,
 } from '../../lib/bridgeBuilderStorage.js';
 
-const WORDS_PER_ROUND = 6;
 const MAX_HEARTS = 3;
 const TRANSLIT_CHOICES = 3;
 const MEANING_CHOICES = 3;
@@ -45,29 +51,33 @@ function shuffle(arr) {
 }
 
 /**
- * Build a play queue from a list of word IDs.
- * Prioritises words the player hasn't mastered yet.
- * For guided packs, uses all words in the pack.
- * For random review, picks up to WORDS_PER_ROUND from the pool.
+ * Pick the next word to show based on session states.
+ * Avoids repeating the same word back-to-back.
+ * Prefers learned words (they need recall for completion) over pending words.
  */
-function buildQueueFromWordIds(wordIds, limit) {
-  const wordMap = new Map(bridgeBuilderWords.map(w => [w.id, w]));
-  const words = wordIds.map(id => wordMap.get(id)).filter(Boolean);
+function pickNextWord(sessionStates, allWords, lastWordId) {
+  const available = allWords.filter(w =>
+    sessionStates[w.id] !== 'completed' && w.id !== lastWordId
+  );
 
-  const scored = words.map(w => {
-    const prog = getWordProgress(w.id);
-    let priority = 0;
-    if (prog.masteryStage === 'new') priority = 3;
-    else if (prog.masteryStage === 'meaning_taught') priority = 2;
-    else if (prog.masteryStage === 'practicing') priority = 1;
-    else priority = 0;
-    priority += Math.random() * 0.5;
-    return { word: w, priority };
-  });
-  scored.sort((a, b) => b.priority - a.priority);
+  if (available.length === 0) {
+    // Edge case: only one non-completed word left and it was the last shown
+    const remaining = allWords.filter(w => sessionStates[w.id] !== 'completed');
+    return remaining.length > 0 ? remaining[0] : null;
+  }
 
-  const count = limit || words.length;
-  return scored.slice(0, count).map(s => s.word);
+  const learned = available.filter(w => sessionStates[w.id] === 'learned');
+  const pending = available.filter(w => sessionStates[w.id] === 'pending');
+
+  let pool;
+  if (learned.length > 0 && pending.length > 0) {
+    // Prefer recalling learned words, but still introduce new ones
+    pool = Math.random() < 0.7 ? learned : pending;
+  } else {
+    pool = learned.length > 0 ? learned : pending;
+  }
+
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function buildTransliterationChoices(word) {
@@ -88,12 +98,36 @@ function buildMeaningChoices(word) {
  */
 export default function useBridgeBuilderGame(sessionConfig) {
   const { sessionType, selectedWordIds } = sessionConfig;
-  const isReview = sessionType === 'random_review';
-  const queueLimit = isReview ? WORDS_PER_ROUND : null; // packs use all words
+  const isGuidedPack = sessionType === 'guided_pack';
 
+  // Resolve word IDs to word objects (stable for the session)
+  const allSessionWords = useMemo(() => {
+    const wordMap = new Map(bridgeBuilderWords.map(w => [w.id, w]));
+    return selectedWordIds.map(id => wordMap.get(id)).filter(Boolean);
+  }, [selectedWordIds]);
+
+  // Session-level word states: wordId → 'pending' | 'learned' | 'completed'
+  const buildInitialStates = useCallback(() => {
+    const states = {};
+    for (const w of allSessionWords) states[w.id] = 'pending';
+    return states;
+  }, [allSessionWords]);
+
+  const sessionStatesRef = useRef(buildInitialStates());
+  const [sessionStates, setSessionStates] = useState(() => sessionStatesRef.current);
+  const lastWordIdRef = useRef(null);
+
+  const completedCount = useMemo(
+    () => Object.values(sessionStates).filter(s => s === 'completed').length,
+    [sessionStates]
+  );
+
+  // Phase machine state
   const [phase, setPhase] = useState('promptIntro');
-  const [queue, setQueue] = useState(() => buildQueueFromWordIds(selectedWordIds, queueLimit));
-  const [wordIndex, setWordIndex] = useState(0);
+  const [currentWord, setCurrentWord] = useState(
+    () => pickNextWord(sessionStatesRef.current, allSessionWords, null)
+  );
+  const [stepIndex, setStepIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [hearts, setHearts] = useState(MAX_HEARTS);
@@ -107,7 +141,6 @@ export default function useBridgeBuilderGame(sessionConfig) {
 
   const timerRef = useRef(null);
 
-  const currentWord = queue[wordIndex] || null;
   const isRoundComplete = phase === 'roundComplete';
   const isGameOver = hearts <= 0;
 
@@ -152,23 +185,52 @@ export default function useBridgeBuilderGame(sessionConfig) {
     }
   }, [phase]);
 
-  // After word complete, advance to next word or end round
+  // After word complete — update session state, pick next word or end
   useEffect(() => {
-    if (phase === 'wordComplete') {
+    if (phase === 'wordComplete' && currentWord) {
       timerRef.current = setTimeout(() => {
-        const nextIndex = wordIndex + 1;
-        if (nextIndex >= queue.length || hearts <= 0) {
+        if (hearts <= 0) {
+          setPhase('roundComplete');
+          return;
+        }
+
+        // Advance session state for the current word
+        const wordId = currentWord.id;
+        const prevState = sessionStatesRef.current[wordId];
+        let nextState;
+        if (isGuidedPack && prevState === 'pending') {
+          // First encounter in guided pack → learned (must come back for recall)
+          nextState = 'learned';
+        } else {
+          // Recall in guided pack (learned → completed), or any encounter in review
+          nextState = 'completed';
+        }
+
+        const newStates = { ...sessionStatesRef.current, [wordId]: nextState };
+        sessionStatesRef.current = newStates;
+        setSessionStates(newStates);
+        lastWordIdRef.current = wordId;
+
+        // Check if all words are completed
+        const allCompleted = allSessionWords.every(w => newStates[w.id] === 'completed');
+        if (allCompleted) {
           setPhase('roundComplete');
         } else {
-          setWordIndex(nextIndex);
-          setSelectedChoice(null);
-          setChoiceResult(null);
-          setPhase('promptIntro');
+          const nextWord = pickNextWord(newStates, allSessionWords, wordId);
+          if (!nextWord) {
+            setPhase('roundComplete');
+          } else {
+            setCurrentWord(nextWord);
+            setStepIndex(s => s + 1);
+            setSelectedChoice(null);
+            setChoiceResult(null);
+            setPhase('promptIntro');
+          }
         }
       }, 500);
       return () => clearTimeout(timerRef.current);
     }
-  }, [phase, wordIndex, queue.length, hearts]);
+  }, [phase, currentWord, hearts, isGuidedPack, allSessionWords]);
 
   const handleTransliterationChoice = useCallback((choice) => {
     if (phase !== 'transliterationChoice' || !currentWord) return;
@@ -255,9 +317,14 @@ export default function useBridgeBuilderGame(sessionConfig) {
   }, [phase, currentWord]);
 
   const restartGame = useCallback(() => {
-    const newQueue = buildQueueFromWordIds(selectedWordIds, queueLimit);
-    setQueue(newQueue);
-    setWordIndex(0);
+    const states = buildInitialStates();
+    sessionStatesRef.current = states;
+    setSessionStates(states);
+    lastWordIdRef.current = null;
+
+    const first = pickNextWord(states, allSessionWords, null);
+    setCurrentWord(first);
+    setStepIndex(0);
     setScore(0);
     setStreak(0);
     setHearts(MAX_HEARTS);
@@ -265,7 +332,7 @@ export default function useBridgeBuilderGame(sessionConfig) {
     setSelectedChoice(null);
     setChoiceResult(null);
     setPhase('promptIntro');
-  }, [selectedWordIds, queueLimit]);
+  }, [allSessionWords, buildInitialStates]);
 
   return {
     // State
@@ -276,8 +343,9 @@ export default function useBridgeBuilderGame(sessionConfig) {
     hearts,
     maxHearts: MAX_HEARTS,
     bridgeSegments,
-    totalWords: queue.length,
-    wordIndex,
+    totalWords: allSessionWords.length,
+    wordIndex: stepIndex,       // step counter for animation keys
+    completedCount,             // session-completed words (for dots)
     isRoundComplete,
     isGameOver,
 

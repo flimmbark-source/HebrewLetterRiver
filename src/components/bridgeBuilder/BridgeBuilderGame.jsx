@@ -4,7 +4,7 @@ import './BridgeBuilder.css';
 
 /* ─── HUD (compact strip) ──────────────────────────────── */
 
-function HUD({ score, streak, hearts, maxHearts, wordIndex, totalWords }) {
+function HUD({ score, streak, hearts, maxHearts, completedCount, totalWords }) {
   return (
     <div className="bb-hud">
       <span className="bb-hud-stat">
@@ -19,7 +19,7 @@ function HUD({ score, streak, hearts, maxHearts, wordIndex, totalWords }) {
         ))}
       </span>
       <span className="bb-hud-stat">
-        {wordIndex}<span className="bb-hud-stat-label">/{totalWords}</span>
+        {completedCount}<span className="bb-hud-stat-label">/{totalWords}</span>
       </span>
     </div>
   );
@@ -127,6 +127,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack }) {
     bridgeSegments,
     totalWords,
     wordIndex,
+    completedCount,
     isRoundComplete,
     isGameOver,
     translitChoices,
@@ -168,11 +169,11 @@ export default function BridgeBuilderGame({ sessionConfig, onBack }) {
     }
   }, [wordIndex, currentSegment]);
 
-  // Progress dots
+  // Progress dots — fill based on session-completed words only
   const dots = Array.from({ length: totalWords }).map((_, i) => {
     let cls = 'bb-dot';
-    if (i < wordIndex) cls += ' bb-dot--done';
-    else if (i === wordIndex) cls += ' bb-dot--active';
+    if (i < completedCount) cls += ' bb-dot--done';
+    else if (i === completedCount) cls += ' bb-dot--active';
     return <span key={i} className={cls} />;
   });
 
@@ -209,7 +210,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack }) {
           streak={streak}
           hearts={hearts}
           maxHearts={maxHearts}
-          wordIndex={wordIndex}
+          completedCount={completedCount}
           totalWords={totalWords}
         />
       </div>
