@@ -527,38 +527,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px 16px;
+  padding: 16px 12px;
 }
 .bb-end-card {
   background: linear-gradient(135deg, #fffdf0 0%, #fff8e1 100%);
   border: 3px solid #d4a76a;
   border-radius: 24px;
-  padding: 36px 28px;
+  padding: 40px 24px;
   text-align: center;
   box-shadow: 0 4px 0 #a07030, 0 8px 20px rgba(0,0,0,0.12);
-  max-width: 420px;
-  width: 100%;
+  max-width: 480px;
+  width: calc(100% - 24px);
 }
 .bb-end-title {
   font-family: 'Baloo 2', system-ui, sans-serif;
-  font-size: 32px;
+  font-size: 36px;
   font-weight: 800;
   color: #3e1f04;
-  margin: 0 0 20px;
+  margin: 0 0 24px;
 }
 .bb-end-bridge-mini {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
-.bb-end-seg { display: flex; gap: 3px; }
+.bb-end-seg { display: flex; gap: 4px; }
 .bb-end-plank {
   display: inline-block;
-  padding: 6px 10px;
-  border-radius: 5px;
-  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.3;
 }
@@ -574,27 +574,30 @@
 }
 .bb-end-score {
   font-family: 'Baloo 2', system-ui, sans-serif;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 800;
   color: #1a4a30;
-  margin: 0 0 24px;
+  margin: 0 0 28px;
 }
 .bb-end-actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   align-items: center;
+  width: 100%;
 }
 .bb-end-btn {
   display: inline-block;
-  padding: 14px 40px;
+  padding: 16px 48px;
   border: none;
   border-radius: 999px;
   font-family: 'Nunito', system-ui, sans-serif;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   cursor: pointer;
   transition: transform 0.1s, box-shadow 0.1s;
+  width: 80%;
+  max-width: 300px;
 }
 .bb-end-btn--primary {
   color: #4a1a06;
@@ -610,8 +613,10 @@
   background: rgba(255,255,255,0.6);
   border: 2px solid #d4a76a;
   box-shadow: 0 2px 0 #a07030;
-  padding: 12px 32px;
-  font-size: 17px;
+  padding: 14px 36px;
+  font-size: 19px;
+  width: 70%;
+  max-width: 260px;
 }
 .bb-end-btn--secondary:active {
   transform: translateY(1px);
