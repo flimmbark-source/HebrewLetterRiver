@@ -168,17 +168,13 @@ export default function useBridgeBuilderGame() {
     } else {
       setStreak(0);
       setHearts(h => h - 1);
-      // Let the wrong animation play, then allow retry or skip
+      // Wrong plank breaks — remove it from choices, let player retry
       setTimeout(() => {
-        // Auto-resolve with correct answer after wrong
-        setBridgeSegments(segs => [
-          ...segs,
-          { wordId: currentWord.id, transliteration: currentWord.transliteration, translation: null },
-        ]);
+        setTranslitChoices(prev => prev.filter(c => c !== choice));
         setSelectedChoice(null);
         setChoiceResult(null);
-        setPhase('transliterationResolved');
-      }, 1000);
+        // Stay in transliterationChoice phase so player can pick again
+      }, 800);
     }
   }, [phase, currentWord]);
 
@@ -224,19 +220,13 @@ export default function useBridgeBuilderGame() {
     } else {
       setStreak(0);
       setHearts(h => h - 1);
+      // Wrong plank breaks — remove it from choices, let player retry
       setTimeout(() => {
-        setBridgeSegments(segs => {
-          const updated = [...segs];
-          const last = updated[updated.length - 1];
-          if (last && last.wordId === currentWord.id) {
-            updated[updated.length - 1] = { ...last, translation: currentWord.translation };
-          }
-          return updated;
-        });
+        setMeaningChoices(prev => prev.filter(c => c !== choice));
         setSelectedChoice(null);
         setChoiceResult(null);
-        setPhase('meaningResolved');
-      }, 1000);
+        // Stay in meaningChoice phase so player can pick again
+      }, 800);
     }
   }, [phase, currentWord]);
 

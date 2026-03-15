@@ -25,133 +25,40 @@ function HUD({ score, streak, hearts, maxHearts, wordIndex, totalWords }) {
   );
 }
 
-/* ─── Bridge Slot — the two plank positions for the current word ─── */
+/* ─── Bridge Slot — the two plank positions between the rails ─── */
 
-function BridgeSlot({ segment, phase, slideState }) {
-  // slideState: 'center' | 'exit' | 'enter'
+function BridgeSlot({ segment, slideState }) {
   const hasTranslit = segment && segment.transliteration;
   const hasMeaning = segment && segment.translation;
 
-  // Determine what to show in each slot
-  const showTranslitPlank = hasTranslit;
-  const showMeaningPlank = hasMeaning;
-  const showTranslitGap = !hasTranslit;
-  const showMeaningGap = hasTranslit && !hasMeaning;
-
   return (
     <div className={`bb-slot bb-slot--${slideState}`}>
-      {/* Transliteration position */}
-      {showTranslitPlank ? (
-        <div className="bb-placed bb-placed--translit bb-placed--drop">
-          <span className="bb-placed-grain" />
-          <span className="bb-placed-text">{segment.transliteration}</span>
-        </div>
-      ) : showTranslitGap ? (
-        <div className="bb-gap">
-          <span className="bb-gap-q">?</span>
-        </div>
-      ) : null}
-
-      {/* Meaning position */}
-      {showMeaningPlank ? (
-        <div className="bb-placed bb-placed--meaning bb-placed--drop">
-          <span className="bb-placed-grain" />
-          <span className="bb-placed-text">{segment.translation}</span>
-        </div>
-      ) : showMeaningGap ? (
-        <div className="bb-gap">
-          <span className="bb-gap-q">?</span>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-/* ─── River Scene ──────────────────────────────────────── */
-
-function RiverScene({ segment, currentWord, promptVisible, phase, wordIndex, totalWords }) {
-  const [slideState, setSlideState] = useState('center');
-  const [displaySegment, setDisplaySegment] = useState(segment);
-  const prevWordIndex = useRef(wordIndex);
-
-  useEffect(() => {
-    // When wordIndex changes, trigger the slide transition
-    if (wordIndex !== prevWordIndex.current) {
-      // Slide old content off to the left
-      setSlideState('exit');
-
-      const timer = setTimeout(() => {
-        // Swap to new content positioned off-right, then slide to center
-        setDisplaySegment(segment);
-        setSlideState('enter');
-
-        const timer2 = setTimeout(() => {
-          setSlideState('center');
-        }, 50);
-        return () => clearTimeout(timer2);
-      }, 400);
-
-      prevWordIndex.current = wordIndex;
-      return () => clearTimeout(timer);
-    } else {
-      // Same word, just update the segment (plank was placed)
-      setDisplaySegment(segment);
-    }
-  }, [wordIndex, segment]);
-
-  // Progress dots
-  const dots = Array.from({ length: totalWords }).map((_, i) => {
-    let cls = 'bb-dot';
-    if (i < wordIndex) cls += ' bb-dot--done';
-    else if (i === wordIndex) cls += ' bb-dot--active';
-    return <span key={i} className={cls} />;
-  });
-
-  return (
-    <div className="bb-scene">
-      {/* Top bank */}
-      <div className="bb-bank bb-bank--top">
-        <div className="bb-bank-grass" />
-        <div className="bb-bank-dirt" />
-      </div>
-
-      {/* River zone */}
-      <div className="bb-river-zone">
-        <div className="bb-water">
-          <div className="bb-water-surface" />
-          <div className="bb-water-shimmer" />
-        </div>
-
-        {/* Bridge rails */}
-        <div className="bb-rails">
-          <div className="bb-rail bb-rail--top" />
-          <div className="bb-rail bb-rail--bottom" />
-        </div>
-
-        {/* Hebrew prompt — above the build area */}
-        {currentWord && (
-          <div className={`bb-prompt ${promptVisible ? 'bb-prompt--visible' : ''}`}>
-            <span className="bb-prompt-hebrew">{currentWord.hebrew}</span>
+      {/* Left plank: transliteration */}
+      <div className="bb-slot-pos">
+        {hasTranslit ? (
+          <div className="bb-placed bb-placed--translit bb-placed--drop" key={segment.transliteration}>
+            <span className="bb-placed-grain" />
+            <span className="bb-placed-text">{segment.transliteration}</span>
+          </div>
+        ) : (
+          <div className="bb-gap">
+            <span className="bb-gap-q">?</span>
           </div>
         )}
-
-        {/* Current build slot */}
-        <BridgeSlot
-          segment={displaySegment}
-          phase={phase}
-          slideState={slideState}
-        />
-
-        {/* Progress dots below the bridge area */}
-        <div className="bb-progress-dots">
-          {dots}
-        </div>
       </div>
 
-      {/* Bottom bank */}
-      <div className="bb-bank bb-bank--bottom">
-        <div className="bb-bank-dirt" />
-        <div className="bb-bank-grass" />
+      {/* Right plank: meaning */}
+      <div className="bb-slot-pos">
+        {hasMeaning ? (
+          <div className="bb-placed bb-placed--meaning bb-placed--drop" key={segment.translation}>
+            <span className="bb-placed-grain" />
+            <span className="bb-placed-text">{segment.translation}</span>
+          </div>
+        ) : (
+          <div className="bb-gap">
+            <span className="bb-gap-q">?</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -159,11 +66,12 @@ function RiverScene({ segment, currentWord, promptVisible, phase, wordIndex, tot
 
 /* ─── Choice Plank ─────────────────────────────────────── */
 
-function ChoicePlank({ text, onClick, state, disabled, variant }) {
+function ChoicePlank({ text, onClick, state, disabled, variant, exiting }) {
   let cls = 'bb-choice';
   if (variant === 'teach') cls += ' bb-choice--teach';
   if (state === 'correct') cls += ' bb-choice--correct';
   else if (state === 'wrong') cls += ' bb-choice--wrong';
+  if (exiting) cls += ' bb-choice--exit';
 
   return (
     <button className={cls} onClick={onClick} disabled={disabled} type="button">
@@ -231,10 +139,42 @@ export default function BridgeBuilderGame({ onBack }) {
     restartGame,
   } = useBridgeBuilderGame();
 
-  // The current segment being built (last in bridgeSegments, or null if not started)
+  // Track slide transition state for bridge slot
+  const [slideState, setSlideState] = useState('center');
+  const [displaySegment, setDisplaySegment] = useState(null);
+  const prevWordIndex = useRef(wordIndex);
+
+  // Current segment being built
   const currentSegment = bridgeSegments.length > 0 && bridgeSegments[bridgeSegments.length - 1].wordId === currentWord?.id
     ? bridgeSegments[bridgeSegments.length - 1]
     : null;
+
+  useEffect(() => {
+    if (wordIndex !== prevWordIndex.current) {
+      // Slide old content off to the left
+      setSlideState('exit');
+      const timer = setTimeout(() => {
+        setDisplaySegment(null);
+        setSlideState('enter');
+        const timer2 = setTimeout(() => {
+          setSlideState('center');
+        }, 50);
+        return () => clearTimeout(timer2);
+      }, 400);
+      prevWordIndex.current = wordIndex;
+      return () => clearTimeout(timer);
+    } else {
+      setDisplaySegment(currentSegment);
+    }
+  }, [wordIndex, currentSegment]);
+
+  // Progress dots
+  const dots = Array.from({ length: totalWords }).map((_, i) => {
+    let cls = 'bb-dot';
+    if (i < wordIndex) cls += ' bb-dot--done';
+    else if (i === wordIndex) cls += ' bb-dot--active';
+    return <span key={i} className={cls} />;
+  });
 
   if (isRoundComplete || isGameOver) {
     return (
@@ -261,7 +201,7 @@ export default function BridgeBuilderGame({ onBack }) {
 
   return (
     <div className="bb-world">
-      {/* Top controls */}
+      {/* Top: back + HUD */}
       <div className="bb-topbar">
         <button className="bb-back" onClick={onBack} type="button">Back</button>
         <HUD
@@ -274,17 +214,48 @@ export default function BridgeBuilderGame({ onBack }) {
         />
       </div>
 
-      {/* Center: the river scene with only the current word */}
-      <RiverScene
-        segment={currentSegment}
-        currentWord={currentWord}
-        promptVisible={promptVisible}
-        phase={phase}
-        wordIndex={wordIndex}
-        totalWords={totalWords}
-      />
+      {/* Hebrew prompt area — fixed height, centered */}
+      <div className="bb-prompt-zone">
+        {currentWord && (
+          <div className={`bb-prompt ${promptVisible ? 'bb-prompt--visible' : ''}`}>
+            <span className="bb-prompt-hebrew">{currentWord.hebrew}</span>
+          </div>
+        )}
+      </div>
 
-      {/* Bottom: answer planks */}
+      {/* River scene — fixed height */}
+      <div className="bb-scene">
+        <div className="bb-bank bb-bank--top">
+          <div className="bb-bank-grass" />
+          <div className="bb-bank-dirt" />
+        </div>
+
+        <div className="bb-river-zone">
+          <div className="bb-water">
+            <div className="bb-water-surface" />
+            <div className="bb-water-shimmer" />
+          </div>
+
+          {/* Bridge: rails + slot centered between them */}
+          <div className="bb-bridge">
+            <div className="bb-rail bb-rail--top" />
+            <BridgeSlot segment={displaySegment} slideState={slideState} />
+            <div className="bb-rail bb-rail--bottom" />
+          </div>
+        </div>
+
+        <div className="bb-bank bb-bank--bottom">
+          <div className="bb-bank-dirt" />
+          <div className="bb-bank-grass" />
+        </div>
+      </div>
+
+      {/* Progress dots */}
+      <div className="bb-progress-bar">
+        {dots}
+      </div>
+
+      {/* Answer planks — fixed height zone */}
       <div className="bb-planks-tray">
         {showTranslit && (
           <div className="bb-planks bb-planks--enter" key={'t-' + wordIndex}>

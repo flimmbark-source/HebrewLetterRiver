@@ -1,9 +1,8 @@
 /* ═══════════════════════════════════════════════════════════
-   Bridge Builder — single-word focused river scene
-   Mobile-first, auto-sized planks, slide transitions
+   Bridge Builder — fixed-zone layout, no resizing
    ═══════════════════════════════════════════════════════════ */
 
-/* ─── World (full viewport, no scroll) ──────────────────── */
+/* ─── World ─────────────────────────────────────────────── */
 .bb-world {
   position: fixed;
   inset: 0;
@@ -11,19 +10,19 @@
   flex-direction: column;
   font-family: 'Nunito', system-ui, sans-serif;
   overflow: hidden;
-  background: linear-gradient(180deg, #c9e8f7 0%, #daf0fc 20%, #e4f6ee 50%);
+  background: linear-gradient(180deg, #c9e8f7 0%, #daf0fc 30%, #e4f6ee 60%, #d0ecc8 100%);
 }
 
-/* ─── Top bar ───────────────────────────────────────────── */
+/* ─── Top bar — fixed height ────────────────────────────── */
 .bb-topbar {
-  position: relative;
-  z-index: 20;
+  flex-shrink: 0;
+  height: 40px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px 4px;
-  /* safe-area for notched phones */
-  padding-top: max(8px, env(safe-area-inset-top));
+  padding: 0 12px;
+  padding-top: env(safe-area-inset-top, 0);
+  z-index: 20;
 }
 
 .bb-back {
@@ -50,7 +49,6 @@
   justify-content: flex-end;
   gap: 10px;
 }
-
 .bb-hud-stat {
   font-family: 'Baloo 2', system-ui, sans-serif;
   font-size: 15px;
@@ -58,51 +56,73 @@
   color: #1a4a30;
   text-shadow: 0 1px 0 rgba(255,255,255,0.5);
 }
-.bb-hud-stat-label {
-  font-size: 10px;
-  font-weight: 600;
-  opacity: 0.6;
-}
+.bb-hud-stat-label { font-size: 10px; font-weight: 600; opacity: 0.6; }
 .bb-hud-streak { color: #b45309; }
-
 .bb-hud-hearts { display: flex; gap: 3px; }
-
 .bb-heart {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 14px; height: 14px;
   background: radial-gradient(circle at 35% 35%, #ff6b6b, #e53e3e);
   clip-path: path('M8 14s-6.5-4.5-6.5-8C1.5 3.5 3.5 1.5 5.5 1.5c1.2 0 2 .6 2.5 1.2C8.5 2.1 9.3 1.5 10.5 1.5c2 0 4 2 4 4.5C14.5 9.5 8 14 8 14z');
-  transition: opacity 0.3s;
 }
-.bb-heart--lost {
-  background: #94a3b8;
-  opacity: 0.3;
+.bb-heart--lost { background: #94a3b8; opacity: 0.3; }
+
+/* ═══════════════════════════════════════════════════════════
+   PROMPT ZONE — fixed height, Hebrew word centered
+   ═══════════════════════════════════════════════════════════ */
+.bb-prompt-zone {
+  flex-shrink: 0;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.bb-prompt {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.bb-prompt--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.bb-prompt-hebrew {
+  display: inline-block;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #fffdf0 0%, #fff8e1 100%);
+  border: 3px solid #d4a76a;
+  border-radius: 14px;
+  box-shadow: 0 3px 0 #a07030, 0 6px 16px rgba(0,0,0,0.12);
+  font-family: 'Heebo', 'Noto Sans Hebrew', sans-serif;
+  font-size: 34px;
+  font-weight: 700;
+  color: #3e1f04;
+  direction: rtl;
+  white-space: nowrap;
 }
 
 /* ═══════════════════════════════════════════════════════════
-   SCENE — river with banks, single word focus
+   RIVER SCENE — fixed height
    ═══════════════════════════════════════════════════════════ */
 .bb-scene {
-  flex: 1;
+  flex-shrink: 0;
+  height: 160px;
+  position: relative;
   display: flex;
   flex-direction: column;
-  position: relative;
-  min-height: 0;
   overflow: hidden;
 }
 
-/* ─── Banks ─────────────────────────────────────────────── */
+/* Banks */
 .bb-bank {
   flex-shrink: 0;
   position: relative;
   z-index: 2;
 }
-.bb-bank--top { order: 1; }
-.bb-bank--bottom { order: 3; }
-
 .bb-bank-grass {
-  height: 16px;
+  height: 14px;
   background: linear-gradient(180deg, #6db86a 0%, #4a9e5a 60%, #3d8a4e 100%);
   position: relative;
 }
@@ -111,45 +131,36 @@
   content: '';
   position: absolute;
   left: 0; right: 0;
-  height: 6px;
+  height: 5px;
   background:
-    radial-gradient(ellipse 12px 5px at 8% 50%, #4a9e5a 70%, transparent 71%),
-    radial-gradient(ellipse 14px 6px at 22% 50%, #3d8a4e 70%, transparent 71%),
-    radial-gradient(ellipse 10px 5px at 38% 50%, #4a9e5a 70%, transparent 71%),
-    radial-gradient(ellipse 16px 6px at 54% 50%, #3d8a4e 70%, transparent 71%),
-    radial-gradient(ellipse 11px 5px at 68% 50%, #4a9e5a 70%, transparent 71%),
-    radial-gradient(ellipse 13px 5px at 84% 50%, #3d8a4e 70%, transparent 71%);
+    radial-gradient(ellipse 12px 4px at 8% 50%, #4a9e5a 70%, transparent 71%),
+    radial-gradient(ellipse 14px 5px at 22% 50%, #3d8a4e 70%, transparent 71%),
+    radial-gradient(ellipse 10px 4px at 38% 50%, #4a9e5a 70%, transparent 71%),
+    radial-gradient(ellipse 16px 5px at 54% 50%, #3d8a4e 70%, transparent 71%),
+    radial-gradient(ellipse 11px 4px at 68% 50%, #4a9e5a 70%, transparent 71%),
+    radial-gradient(ellipse 13px 4px at 84% 50%, #3d8a4e 70%, transparent 71%);
   z-index: 1;
 }
 .bb-bank--top .bb-bank-grass::after { bottom: -3px; }
 .bb-bank--bottom .bb-bank-grass::after { top: -3px; transform: scaleY(-1); }
 
 .bb-bank-dirt {
-  height: 24px;
+  height: 20px;
   background: linear-gradient(180deg, #8B6F47 0%, #7a5e3a 100%);
 }
-.bb-bank--top .bb-bank-dirt {
-  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
-}
+.bb-bank--top .bb-bank-dirt { box-shadow: 0 3px 6px rgba(0,0,0,0.12); }
 
-/* ─── River zone ────────────────────────────────────────── */
+/* River zone */
 .bb-river-zone {
   flex: 1;
-  order: 2;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 140px;
   overflow: hidden;
 }
 
-/* ─── Water ─────────────────────────────────────────────── */
+/* Water */
 .bb-water {
   position: absolute;
   inset: 0;
-  overflow: hidden;
 }
 .bb-water-surface {
   position: absolute;
@@ -187,96 +198,64 @@
   100% { transform: translateY(4px); }
 }
 
-/* ─── Bridge rails (horizontal lines across river) ────── */
-.bb-rails {
+/* ─── Bridge (rails + slot) — centered in river ─────────── */
+.bb-bridge {
   position: absolute;
   left: 0; right: 0;
   top: 50%;
   transform: translateY(-50%);
-  height: 72px;
-  z-index: 1;
-  pointer-events: none;
+  height: 64px;
+  display: flex;
+  flex-direction: column;
+  z-index: 3;
 }
+
 .bb-rail {
-  position: absolute;
-  left: 0; right: 0;
-  height: 4px;
+  flex-shrink: 0;
+  height: 5px;
   background: linear-gradient(90deg, #6b5132, #7a5e3a 30%, #6b5132 50%, #7a5e3a 70%, #6b5132);
   border-radius: 2px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-.bb-rail--top { top: 0; }
-.bb-rail--bottom { bottom: 0; }
-
-/* ─── Hebrew prompt — centered above the slot ───────────── */
-.bb-prompt {
-  position: relative;
-  z-index: 10;
-  margin-bottom: 12px;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-.bb-prompt--visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.bb-prompt-hebrew {
-  display: inline-block;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #fffdf0 0%, #fff8e1 100%);
-  border: 3px solid #d4a76a;
-  border-radius: 14px;
-  box-shadow: 0 3px 0 #a07030, 0 6px 16px rgba(0,0,0,0.12);
-  font-family: 'Heebo', 'Noto Sans Hebrew', sans-serif;
-  font-size: 32px;
-  font-weight: 700;
-  color: #3e1f04;
-  direction: rtl;
-  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.25);
 }
 
-/* ─── Build slot — the two-plank area for the current word ─ */
+/* ─── Slot — lives between the two rails ────────────────── */
 .bb-slot {
-  position: relative;
-  z-index: 5;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 54px;
+  gap: 8px;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
               opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.bb-slot--center {
-  transform: translateX(0);
-  opacity: 1;
-}
-.bb-slot--exit {
-  transform: translateX(-120%);
-  opacity: 0;
-}
-.bb-slot--enter {
-  transform: translateX(120%);
-  opacity: 0;
-  transition: none; /* snap to right instantly, then animate to center */
+.bb-slot--center { transform: translateX(0); opacity: 1; }
+.bb-slot--exit   { transform: translateX(-120%); opacity: 0; }
+.bb-slot--enter  { transform: translateX(120%); opacity: 0; transition: none; }
+
+/* Each plank position — fixed width so layout never shifts */
+.bb-slot-pos {
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ─── Placed plank (in the bridge) ──────────────────────── */
+/* ─── Placed plank (in the bridge, between rails) ───────── */
 .bb-placed {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 16px;
-  border-radius: 5px;
+  padding: 6px 14px;
+  border-radius: 4px;
   overflow: hidden;
   white-space: nowrap;
+  max-width: 116px;
 }
 .bb-placed-text {
   position: relative;
   z-index: 2;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   line-height: 1.3;
 }
@@ -290,29 +269,26 @@
   pointer-events: none;
 }
 
-/* Transliteration placed plank — warm wood */
 .bb-placed--translit {
   background: linear-gradient(180deg, #d4a76a 0%, #c49558 50%, #d4a76a 100%);
   border: 2px solid #a07030;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 2px 3px rgba(0,0,0,0.2);
 }
 .bb-placed--translit .bb-placed-text { color: #3e1f04; }
 
-/* Meaning placed plank — darker wood */
 .bb-placed--meaning {
   background: linear-gradient(180deg, #8B6F47 0%, #7a5f3e 50%, #8B6F47 100%);
   border: 2px solid #5a4428;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 3px rgba(0,0,0,0.2);
 }
 .bb-placed--meaning .bb-placed-text { color: #f5e6cc; }
 
-/* Drop-in animation */
 .bb-placed--drop {
   animation: bb-drop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes bb-drop {
-  0% { opacity: 0; transform: translateY(-24px) scale(0.9); }
-  60% { opacity: 1; transform: translateY(3px) scale(1.03); }
+  0% { opacity: 0; transform: translateY(-20px) scale(0.9); }
+  60% { opacity: 1; transform: translateY(2px) scale(1.02); }
   100% { transform: translateY(0) scale(1); }
 }
 
@@ -321,16 +297,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 20px;
+  padding: 6px 18px;
   border: 2px dashed rgba(255,255,255,0.4);
-  border-radius: 5px;
+  border-radius: 4px;
   background: rgba(255,255,255,0.1);
   min-width: 48px;
-  min-height: 38px;
+  height: 36px;
   animation: bb-gap-pulse 2s ease-in-out infinite;
 }
 .bb-gap-q {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: rgba(255,255,255,0.45);
 }
@@ -339,24 +315,24 @@
   50% { border-color: rgba(255,255,255,0.6); }
 }
 
-/* ─── Progress dots ─────────────────────────────────────── */
-.bb-progress-dots {
-  position: relative;
-  z-index: 5;
+/* ─── Progress dots — fixed height ──────────────────────── */
+.bb-progress-bar {
+  flex-shrink: 0;
+  height: 24px;
   display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 6px;
-  margin-top: 12px;
 }
 .bb-dot {
-  width: 8px;
-  height: 8px;
+  width: 8px; height: 8px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.3);
+  background: rgba(0,0,0,0.12);
   transition: background 0.3s, transform 0.3s;
 }
 .bb-dot--done {
-  background: #86efac;
-  box-shadow: 0 0 4px rgba(134,239,172,0.4);
+  background: #22c55e;
+  box-shadow: 0 0 4px rgba(34,197,94,0.4);
 }
 .bb-dot--active {
   background: #fbbf24;
@@ -365,22 +341,26 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ANSWER PLANKS — bottom tray, auto-sized
+   ANSWER PLANKS — takes remaining space, raised up
    ═══════════════════════════════════════════════════════════ */
 .bb-planks-tray {
-  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   z-index: 20;
-  padding: 12px 16px 16px;
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, #4a9e5a 0%, #3d8a4e 6%, #6b5132 10%, #5a4428 100%);
-  min-height: 60px;
+  padding: 12px 20px 20px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 0));
+  background: linear-gradient(180deg, #4a9e5a 0%, #3d8a4e 5%, #6b5132 10%, #5a4428 100%);
 }
 
 .bb-planks {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
 }
 .bb-planks--enter {
   animation: bb-planks-slide 0.3s ease-out;
@@ -390,20 +370,20 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Choice plank — auto-width, wooden board ───────────── */
+/* ─── Choice plank — big, readable, wooden ──────────────── */
 .bb-choice {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 28px;
+  padding: 14px 32px;
   border: 3px solid #a07030;
   border-radius: 6px;
   cursor: pointer;
   overflow: hidden;
   white-space: nowrap;
-  transition: transform 0.1s, box-shadow 0.1s;
-  min-width: 100px;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.3s;
+  min-width: 120px;
 
   background: linear-gradient(
     90deg,
@@ -436,7 +416,7 @@
   position: relative;
   z-index: 1;
   font-family: 'Nunito', system-ui, sans-serif;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 800;
   color: #3e1f04;
   text-shadow: 0 1px 0 rgba(255,255,255,0.25);
@@ -469,7 +449,7 @@
   100% { transform: scale(1); }
 }
 
-/* Wrong */
+/* Wrong — cracks, shakes, then falls off */
 .bb-choice--wrong {
   background: linear-gradient(90deg, #c4836a 0%, #b0725a 40%, #c4836a 100%) !important;
   border-color: #8b3a2a !important;
@@ -477,25 +457,28 @@
     inset 0 2px 0 rgba(255,255,255,0.1),
     0 4px 0 #6b2a1a,
     0 6px 10px rgba(139,58,42,0.18) !important;
-  animation: bb-wrong 0.45s ease;
+  animation: bb-wrong-fall 0.8s ease forwards;
 }
 .bb-choice--wrong .bb-choice-text { color: #4a1a0a; }
+/* Crack overlay */
 .bb-choice--wrong::after {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(135deg, transparent 40%, rgba(0,0,0,0.12) 42%, transparent 44%),
-    linear-gradient(225deg, transparent 45%, rgba(0,0,0,0.08) 47%, transparent 49%);
+    linear-gradient(135deg, transparent 38%, rgba(0,0,0,0.15) 40%, transparent 42%),
+    linear-gradient(225deg, transparent 43%, rgba(0,0,0,0.1) 45%, transparent 47%);
   pointer-events: none;
   z-index: 3;
 }
-@keyframes bb-wrong {
-  0%, 100% { transform: translateX(0) rotate(0); }
-  15% { transform: translateX(-5px) rotate(-1deg); }
-  30% { transform: translateX(5px) rotate(1deg); }
-  45% { transform: translateX(-3px) rotate(-0.5deg); }
-  60% { transform: translateX(3px) rotate(0.5deg); }
+@keyframes bb-wrong-fall {
+  0% { transform: translateX(0) rotate(0); opacity: 1; }
+  10% { transform: translateX(-5px) rotate(-1.5deg); }
+  20% { transform: translateX(5px) rotate(1.5deg); }
+  30% { transform: translateX(-3px) rotate(-1deg); }
+  40% { transform: translateX(3px) rotate(0.5deg); }
+  50% { transform: translateX(0) rotate(0); opacity: 1; }
+  100% { transform: translateY(80px) rotate(8deg); opacity: 0; }
 }
 
 /* Teach plank — darker wood, glow */
