@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
+import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import HomeView from './views/HomeView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import LearnView from './views/LearnView.jsx';
@@ -240,6 +240,8 @@ function Shell() {
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
   const [inConversationPractice, setInConversationPractice] = React.useState(false);
+  const location = useLocation();
+  const isBridgeMode = location.pathname === '/bridge';
 
   // Check if we're in conversation practice mode
   React.useEffect(() => {
@@ -297,7 +299,7 @@ function Shell() {
           <Route path="/play" element={<Navigate to="/home" replace />} />
         </Routes>
       </main>
-      {!(isGameVisible && isGameRunning) && !inConversationPractice && (
+      {!(isGameVisible && isGameRunning) && !inConversationPractice && !isBridgeMode && (
         <nav className="bottom-nav">
           <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">

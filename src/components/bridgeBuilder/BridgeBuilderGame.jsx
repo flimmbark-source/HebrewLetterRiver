@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useBridgeBuilderGame from './useBridgeBuilderGame.js';
 import './BridgeBuilder.css';
 
@@ -10,7 +10,7 @@ function HUD({ score, streak, hearts, maxHearts, wordIndex, totalWords }) {
       <span className="bb-hud-stat">
         {score}<span className="bb-hud-stat-label"> pts</span>
       </span>
-      <span className="bb-hud-stat bb-hud-streak" title="Streak">
+      <span className="bb-hud-stat bb-hud-streak">
         {streak}x
       </span>
       <span className="bb-hud-hearts" aria-label={`${hearts} of ${maxHearts} hearts`}>
@@ -25,99 +25,133 @@ function HUD({ score, streak, hearts, maxHearts, wordIndex, totalWords }) {
   );
 }
 
+/* ─── Bridge Slot — the two plank positions for the current word ─── */
+
+function BridgeSlot({ segment, phase, slideState }) {
+  // slideState: 'center' | 'exit' | 'enter'
+  const hasTranslit = segment && segment.transliteration;
+  const hasMeaning = segment && segment.translation;
+
+  // Determine what to show in each slot
+  const showTranslitPlank = hasTranslit;
+  const showMeaningPlank = hasMeaning;
+  const showTranslitGap = !hasTranslit;
+  const showMeaningGap = hasTranslit && !hasMeaning;
+
+  return (
+    <div className={`bb-slot bb-slot--${slideState}`}>
+      {/* Transliteration position */}
+      {showTranslitPlank ? (
+        <div className="bb-placed bb-placed--translit bb-placed--drop">
+          <span className="bb-placed-grain" />
+          <span className="bb-placed-text">{segment.transliteration}</span>
+        </div>
+      ) : showTranslitGap ? (
+        <div className="bb-gap">
+          <span className="bb-gap-q">?</span>
+        </div>
+      ) : null}
+
+      {/* Meaning position */}
+      {showMeaningPlank ? (
+        <div className="bb-placed bb-placed--meaning bb-placed--drop">
+          <span className="bb-placed-grain" />
+          <span className="bb-placed-text">{segment.translation}</span>
+        </div>
+      ) : showMeaningGap ? (
+        <div className="bb-gap">
+          <span className="bb-gap-q">?</span>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 /* ─── River Scene ──────────────────────────────────────── */
 
-function RiverScene({ segments, totalWords, currentWord, promptVisible, phase }) {
-  const bridgeRef = useRef(null);
+function RiverScene({ segment, currentWord, promptVisible, phase, wordIndex, totalWords }) {
+  const [slideState, setSlideState] = useState('center');
+  const [displaySegment, setDisplaySegment] = useState(segment);
+  const prevWordIndex = useRef(wordIndex);
 
-  // Auto-scroll bridge to show the leading edge
   useEffect(() => {
-    if (bridgeRef.current) {
-      bridgeRef.current.scrollLeft = bridgeRef.current.scrollWidth;
-    }
-  }, [segments.length]);
+    // When wordIndex changes, trigger the slide transition
+    if (wordIndex !== prevWordIndex.current) {
+      // Slide old content off to the left
+      setSlideState('exit');
 
-  // How many plank slots total (each word = 2 planks side by side)
-  const totalSlots = totalWords;
-  const builtCount = segments.length;
-  // Is the current word partially placed (transliteration done, meaning pending)?
-  const lastSeg = segments[segments.length - 1];
-  const lastSegPartial = lastSeg && !lastSeg.translation;
+      const timer = setTimeout(() => {
+        // Swap to new content positioned off-right, then slide to center
+        setDisplaySegment(segment);
+        setSlideState('enter');
+
+        const timer2 = setTimeout(() => {
+          setSlideState('center');
+        }, 50);
+        return () => clearTimeout(timer2);
+      }, 400);
+
+      prevWordIndex.current = wordIndex;
+      return () => clearTimeout(timer);
+    } else {
+      // Same word, just update the segment (plank was placed)
+      setDisplaySegment(segment);
+    }
+  }, [wordIndex, segment]);
+
+  // Progress dots
+  const dots = Array.from({ length: totalWords }).map((_, i) => {
+    let cls = 'bb-dot';
+    if (i < wordIndex) cls += ' bb-dot--done';
+    else if (i === wordIndex) cls += ' bb-dot--active';
+    return <span key={i} className={cls} />;
+  });
 
   return (
     <div className="bb-scene">
-      {/* Left bank */}
-      <div className="bb-bank bb-bank--left">
+      {/* Top bank */}
+      <div className="bb-bank bb-bank--top">
         <div className="bb-bank-grass" />
         <div className="bb-bank-dirt" />
       </div>
 
-      {/* River + bridge */}
+      {/* River zone */}
       <div className="bb-river-zone">
-        {/* Water layers */}
         <div className="bb-water">
           <div className="bb-water-surface" />
           <div className="bb-water-shimmer" />
         </div>
 
-        {/* Bridge rail / track across the river */}
-        <div className="bb-bridge-track" ref={bridgeRef}>
-          {/* Built segments */}
-          {segments.map((seg, i) => (
-            <div
-              key={seg.wordId + '-' + i}
-              className={`bb-segment ${i === builtCount - 1 ? 'bb-segment--newest' : ''}`}
-            >
-              <div className="bb-plank bb-plank--translit">
-                <span className="bb-plank-text">{seg.transliteration}</span>
-              </div>
-              {seg.translation ? (
-                <div className="bb-plank bb-plank--meaning">
-                  <span className="bb-plank-text">{seg.translation}</span>
-                </div>
-              ) : (
-                <div className="bb-plank bb-plank--gap">
-                  <span className="bb-plank-text">?</span>
-                </div>
-              )}
-            </div>
-          ))}
-
-          {/* Current gap — the active build point */}
-          {builtCount < totalSlots && !lastSegPartial && (
-            <div className="bb-segment bb-segment--active">
-              <div className="bb-plank bb-plank--gap">
-                <span className="bb-plank-text">?</span>
-              </div>
-              <div className="bb-plank bb-plank--gap">
-                <span className="bb-plank-text">?</span>
-              </div>
-            </div>
-          )}
-
-          {/* Future segments */}
-          {Array.from({
-            length: Math.max(0, totalSlots - builtCount - (lastSegPartial ? 0 : 1)),
-          }).map((_, i) => (
-            <div key={'future-' + i} className="bb-segment bb-segment--future">
-              <div className="bb-plank bb-plank--ghost" />
-              <div className="bb-plank bb-plank--ghost" />
-            </div>
-          ))}
+        {/* Bridge rails */}
+        <div className="bb-rails">
+          <div className="bb-rail bb-rail--top" />
+          <div className="bb-rail bb-rail--bottom" />
         </div>
 
-        {/* Hebrew prompt floats above the gap */}
+        {/* Hebrew prompt — above the build area */}
         {currentWord && (
           <div className={`bb-prompt ${promptVisible ? 'bb-prompt--visible' : ''}`}>
             <span className="bb-prompt-hebrew">{currentWord.hebrew}</span>
           </div>
         )}
+
+        {/* Current build slot */}
+        <BridgeSlot
+          segment={displaySegment}
+          phase={phase}
+          slideState={slideState}
+        />
+
+        {/* Progress dots below the bridge area */}
+        <div className="bb-progress-dots">
+          {dots}
+        </div>
       </div>
 
-      {/* Right bank */}
-      <div className="bb-bank bb-bank--right">
-        <div className="bb-bank-grass" />
+      {/* Bottom bank */}
+      <div className="bb-bank bb-bank--bottom">
         <div className="bb-bank-dirt" />
+        <div className="bb-bank-grass" />
       </div>
     </div>
   );
@@ -139,7 +173,7 @@ function ChoicePlank({ text, onClick, state, disabled, variant }) {
   );
 }
 
-/* ─── Round Complete / Game Over ───────────────────────── */
+/* ─── End Screen ───────────────────────────────────────── */
 
 function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack }) {
   return (
@@ -197,6 +231,11 @@ export default function BridgeBuilderGame({ onBack }) {
     restartGame,
   } = useBridgeBuilderGame();
 
+  // The current segment being built (last in bridgeSegments, or null if not started)
+  const currentSegment = bridgeSegments.length > 0 && bridgeSegments[bridgeSegments.length - 1].wordId === currentWord?.id
+    ? bridgeSegments[bridgeSegments.length - 1]
+    : null;
+
   if (isRoundComplete || isGameOver) {
     return (
       <div className="bb-world">
@@ -235,19 +274,20 @@ export default function BridgeBuilderGame({ onBack }) {
         />
       </div>
 
-      {/* Center: the river scene */}
+      {/* Center: the river scene with only the current word */}
       <RiverScene
-        segments={bridgeSegments}
-        totalWords={totalWords}
+        segment={currentSegment}
         currentWord={currentWord}
         promptVisible={promptVisible}
         phase={phase}
+        wordIndex={wordIndex}
+        totalWords={totalWords}
       />
 
       {/* Bottom: answer planks */}
       <div className="bb-planks-tray">
         {showTranslit && (
-          <div className="bb-planks bb-planks--enter" key="translit">
+          <div className="bb-planks bb-planks--enter" key={'t-' + wordIndex}>
             {translitChoices.map((c) => (
               <ChoicePlank
                 key={c}
@@ -261,7 +301,7 @@ export default function BridgeBuilderGame({ onBack }) {
         )}
 
         {showTeach && currentWord && (
-          <div className="bb-planks bb-planks--enter" key="teach">
+          <div className="bb-planks bb-planks--enter" key={'teach-' + wordIndex}>
             <ChoicePlank
               text={currentWord.translation}
               onClick={handleMeaningTeachPlace}
@@ -273,7 +313,7 @@ export default function BridgeBuilderGame({ onBack }) {
         )}
 
         {showMeaning && (
-          <div className="bb-planks bb-planks--enter" key="meaning">
+          <div className="bb-planks bb-planks--enter" key={'m-' + wordIndex}>
             {meaningChoices.map((c) => (
               <ChoicePlank
                 key={c}
