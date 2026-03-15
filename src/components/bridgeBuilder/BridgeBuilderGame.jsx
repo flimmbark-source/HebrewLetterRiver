@@ -1,76 +1,123 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import useBridgeBuilderGame from './useBridgeBuilderGame.js';
 import './BridgeBuilder.css';
 
-/* ─── HUD ──────────────────────────────────────────────── */
+/* ─── HUD (compact strip) ──────────────────────────────── */
 
 function HUD({ score, streak, hearts, maxHearts, wordIndex, totalWords }) {
   return (
     <div className="bb-hud">
-      <div className="bb-hud-item">
-        <span className="bb-hud-label">Score</span>
-        <span className="bb-hud-value">{score}</span>
-      </div>
-      <div className="bb-hud-item">
-        <span className="bb-hud-label">Streak</span>
-        <span className="bb-hud-value">{streak}</span>
-      </div>
-      <div className="bb-hud-hearts">
+      <span className="bb-hud-stat">
+        {score}<span className="bb-hud-stat-label"> pts</span>
+      </span>
+      <span className="bb-hud-stat bb-hud-streak" title="Streak">
+        {streak}x
+      </span>
+      <span className="bb-hud-hearts" aria-label={`${hearts} of ${maxHearts} hearts`}>
         {Array.from({ length: maxHearts }).map((_, i) => (
-          <span key={i} className={`bb-heart ${i < hearts ? '' : 'bb-heart--lost'}`}>
-            {i < hearts ? '❤️' : '🖤'}
-          </span>
+          <span key={i} className={i < hearts ? 'bb-heart' : 'bb-heart bb-heart--lost'} />
         ))}
-      </div>
-      <div className="bb-hud-item">
-        <span className="bb-hud-label">Bridge</span>
-        <span className="bb-hud-value">{wordIndex}/{totalWords}</span>
-      </div>
+      </span>
+      <span className="bb-hud-stat">
+        {wordIndex}<span className="bb-hud-stat-label">/{totalWords}</span>
+      </span>
     </div>
   );
 }
 
-/* ─── Hebrew Prompt Card ───────────────────────────────── */
+/* ─── River Scene ──────────────────────────────────────── */
 
-function HebrewPromptCard({ word, visible }) {
-  if (!word) return null;
+function RiverScene({ segments, totalWords, currentWord, promptVisible, phase }) {
+  const bridgeRef = useRef(null);
+
+  // Auto-scroll bridge to show the leading edge
+  useEffect(() => {
+    if (bridgeRef.current) {
+      bridgeRef.current.scrollLeft = bridgeRef.current.scrollWidth;
+    }
+  }, [segments.length]);
+
+  // How many plank slots total (each word = 2 planks side by side)
+  const totalSlots = totalWords;
+  const builtCount = segments.length;
+  // Is the current word partially placed (transliteration done, meaning pending)?
+  const lastSeg = segments[segments.length - 1];
+  const lastSegPartial = lastSeg && !lastSeg.translation;
+
   return (
-    <div className={`bb-prompt-card ${visible ? 'bb-prompt-card--visible' : ''}`}>
-      <span className="bb-prompt-hebrew">{word.hebrew}</span>
-    </div>
-  );
-}
-
-/* ─── Bridge Area ──────────────────────────────────────── */
-
-function BridgeArea({ segments, totalWords }) {
-  return (
-    <div className="bb-bridge-area">
-      {/* River */}
-      <div className="bb-river">
-        <div className="bb-river-water" />
+    <div className="bb-scene">
+      {/* Left bank */}
+      <div className="bb-bank bb-bank--left">
+        <div className="bb-bank-grass" />
+        <div className="bb-bank-dirt" />
       </div>
-      {/* Bridge planks */}
-      <div className="bb-bridge">
-        {segments.map((seg, i) => (
-          <div key={seg.wordId + '-' + i} className="bb-bridge-segment bb-bridge-segment--placed">
-            <div className="bb-plank bb-plank--bridge bb-plank--translit">
-              {seg.transliteration}
-            </div>
-            {seg.translation && (
-              <div className="bb-plank bb-plank--bridge bb-plank--meaning">
-                {seg.translation}
+
+      {/* River + bridge */}
+      <div className="bb-river-zone">
+        {/* Water layers */}
+        <div className="bb-water">
+          <div className="bb-water-surface" />
+          <div className="bb-water-shimmer" />
+        </div>
+
+        {/* Bridge rail / track across the river */}
+        <div className="bb-bridge-track" ref={bridgeRef}>
+          {/* Built segments */}
+          {segments.map((seg, i) => (
+            <div
+              key={seg.wordId + '-' + i}
+              className={`bb-segment ${i === builtCount - 1 ? 'bb-segment--newest' : ''}`}
+            >
+              <div className="bb-plank bb-plank--translit">
+                <span className="bb-plank-text">{seg.transliteration}</span>
               </div>
-            )}
+              {seg.translation ? (
+                <div className="bb-plank bb-plank--meaning">
+                  <span className="bb-plank-text">{seg.translation}</span>
+                </div>
+              ) : (
+                <div className="bb-plank bb-plank--gap">
+                  <span className="bb-plank-text">?</span>
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* Current gap — the active build point */}
+          {builtCount < totalSlots && !lastSegPartial && (
+            <div className="bb-segment bb-segment--active">
+              <div className="bb-plank bb-plank--gap">
+                <span className="bb-plank-text">?</span>
+              </div>
+              <div className="bb-plank bb-plank--gap">
+                <span className="bb-plank-text">?</span>
+              </div>
+            </div>
+          )}
+
+          {/* Future segments */}
+          {Array.from({
+            length: Math.max(0, totalSlots - builtCount - (lastSegPartial ? 0 : 1)),
+          }).map((_, i) => (
+            <div key={'future-' + i} className="bb-segment bb-segment--future">
+              <div className="bb-plank bb-plank--ghost" />
+              <div className="bb-plank bb-plank--ghost" />
+            </div>
+          ))}
+        </div>
+
+        {/* Hebrew prompt floats above the gap */}
+        {currentWord && (
+          <div className={`bb-prompt ${promptVisible ? 'bb-prompt--visible' : ''}`}>
+            <span className="bb-prompt-hebrew">{currentWord.hebrew}</span>
           </div>
-        ))}
-        {/* Empty slots for remaining */}
-        {Array.from({ length: Math.max(0, totalWords - segments.length) }).map((_, i) => (
-          <div key={'empty-' + i} className="bb-bridge-segment bb-bridge-segment--empty">
-            <div className="bb-plank-slot" />
-            <div className="bb-plank-slot" />
-          </div>
-        ))}
+        )}
+      </div>
+
+      {/* Right bank */}
+      <div className="bb-bank bb-bank--right">
+        <div className="bb-bank-grass" />
+        <div className="bb-bank-dirt" />
       </div>
     </div>
   );
@@ -78,65 +125,56 @@ function BridgeArea({ segments, totalWords }) {
 
 /* ─── Choice Plank ─────────────────────────────────────── */
 
-function ChoicePlank({ text, onClick, state, disabled }) {
-  let className = 'bb-choice-plank';
-  if (state === 'correct') className += ' bb-choice-plank--correct';
-  else if (state === 'wrong') className += ' bb-choice-plank--wrong';
+function ChoicePlank({ text, onClick, state, disabled, variant }) {
+  let cls = 'bb-choice';
+  if (variant === 'teach') cls += ' bb-choice--teach';
+  if (state === 'correct') cls += ' bb-choice--correct';
+  else if (state === 'wrong') cls += ' bb-choice--wrong';
 
   return (
-    <button
-      className={className}
-      onClick={onClick}
-      disabled={disabled}
-      type="button"
-    >
-      {text}
+    <button className={cls} onClick={onClick} disabled={disabled} type="button">
+      <span className="bb-choice-grain" />
+      <span className="bb-choice-text">{text}</span>
     </button>
   );
 }
 
-/* ─── Meaning Teach Plank (single revealed) ────────────── */
+/* ─── Round Complete / Game Over ───────────────────────── */
 
-function MeaningTeachPlank({ translation, onPlace }) {
+function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack }) {
   return (
-    <div className="bb-teach-area">
-      <button
-        className="bb-choice-plank bb-choice-plank--teach"
-        onClick={onPlace}
-        type="button"
-      >
-        {translation}
-      </button>
-    </div>
-  );
-}
-
-/* ─── Round Complete / Game Over screens ───────────────── */
-
-function RoundCompleteScreen({ score, bridgeSegments, hearts, isGameOver, onRestart }) {
-  return (
-    <div className="bb-end-screen">
+    <div className="bb-end">
       <div className="bb-end-card">
         <h2 className="bb-end-title">
           {isGameOver ? 'Bridge Collapsed!' : 'Bridge Complete!'}
         </h2>
-        <p className="bb-end-score">Score: {score}</p>
-        <p className="bb-end-detail">
-          {bridgeSegments.length} segment{bridgeSegments.length !== 1 ? 's' : ''} built
-        </p>
-        <button className="bb-restart-btn" onClick={onRestart} type="button">
-          Build Again
-        </button>
+        <div className="bb-end-bridge-mini">
+          {bridgeSegments.map((seg, i) => (
+            <div key={i} className="bb-end-seg">
+              <span className="bb-end-plank bb-end-plank--t">{seg.transliteration}</span>
+              {seg.translation && (
+                <span className="bb-end-plank bb-end-plank--m">{seg.translation}</span>
+              )}
+            </div>
+          ))}
+        </div>
+        <p className="bb-end-score">{score} points</p>
+        <div className="bb-end-actions">
+          <button className="bb-end-btn bb-end-btn--primary" onClick={onRestart} type="button">
+            Build Again
+          </button>
+          <button className="bb-end-btn bb-end-btn--secondary" onClick={onBack} type="button">
+            Back
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ─── Main Component ───────────────────────────────────── */
+/* ─── Main ─────────────────────────────────────────────── */
 
 export default function BridgeBuilderGame({ onBack }) {
-  const game = useBridgeBuilderGame();
-
   const {
     phase,
     currentWord,
@@ -157,98 +195,94 @@ export default function BridgeBuilderGame({ onBack }) {
     handleMeaningTeachPlace,
     handleMeaningChoice,
     restartGame,
-  } = game;
+  } = useBridgeBuilderGame();
 
   if (isRoundComplete || isGameOver) {
     return (
-      <div className="bb-container">
-        <div className="bb-top-bar">
-          <button className="bb-back-btn" onClick={onBack} type="button">
-            ← Back
-          </button>
+      <div className="bb-world">
+        <div className="bb-topbar">
+          <button className="bb-back" onClick={onBack} type="button">Back</button>
         </div>
-        <RoundCompleteScreen
+        <EndScreen
           score={score}
           bridgeSegments={bridgeSegments}
-          hearts={hearts}
           isGameOver={isGameOver}
           onRestart={restartGame}
+          onBack={onBack}
         />
       </div>
     );
   }
 
-  const showPrompt = phase !== 'roundComplete';
-  const showTranslitChoices = phase === 'transliterationChoice';
-  const showMeaningTeach = phase === 'meaningTeach';
-  const showMeaningChoices = phase === 'meaningChoice';
-  const isChoiceDisabled = choiceResult !== null;
+  const promptVisible = phase !== 'roundComplete';
+  const showTranslit = phase === 'transliterationChoice';
+  const showTeach = phase === 'meaningTeach';
+  const showMeaning = phase === 'meaningChoice';
+  const disabled = choiceResult !== null;
 
   return (
-    <div className="bb-container">
-      <div className="bb-top-bar">
-        <button className="bb-back-btn" onClick={onBack} type="button">
-          ← Back
-        </button>
+    <div className="bb-world">
+      {/* Top controls */}
+      <div className="bb-topbar">
+        <button className="bb-back" onClick={onBack} type="button">Back</button>
+        <HUD
+          score={score}
+          streak={streak}
+          hearts={hearts}
+          maxHearts={maxHearts}
+          wordIndex={wordIndex}
+          totalWords={totalWords}
+        />
       </div>
 
-      <HUD
-        score={score}
-        streak={streak}
-        hearts={hearts}
-        maxHearts={maxHearts}
-        wordIndex={wordIndex}
+      {/* Center: the river scene */}
+      <RiverScene
+        segments={bridgeSegments}
         totalWords={totalWords}
+        currentWord={currentWord}
+        promptVisible={promptVisible}
+        phase={phase}
       />
 
-      <HebrewPromptCard word={currentWord} visible={showPrompt} />
-
-      <BridgeArea segments={bridgeSegments} totalWords={totalWords} />
-
-      {/* Choice area — only one set of planks visible at a time */}
-      <div className="bb-choices-area">
-        {showTranslitChoices && (
-          <div className="bb-choices bb-choices--enter">
-            {translitChoices.map((choice) => {
-              let state = null;
-              if (selectedChoice === choice) state = choiceResult;
-              return (
-                <ChoicePlank
-                  key={choice}
-                  text={choice}
-                  onClick={() => handleTransliterationChoice(choice)}
-                  state={state}
-                  disabled={isChoiceDisabled}
-                />
-              );
-            })}
+      {/* Bottom: answer planks */}
+      <div className="bb-planks-tray">
+        {showTranslit && (
+          <div className="bb-planks bb-planks--enter" key="translit">
+            {translitChoices.map((c) => (
+              <ChoicePlank
+                key={c}
+                text={c}
+                onClick={() => handleTransliterationChoice(c)}
+                state={selectedChoice === c ? choiceResult : null}
+                disabled={disabled}
+              />
+            ))}
           </div>
         )}
 
-        {showMeaningTeach && currentWord && (
-          <div className="bb-choices bb-choices--enter">
-            <MeaningTeachPlank
-              translation={currentWord.translation}
-              onPlace={handleMeaningTeachPlace}
+        {showTeach && currentWord && (
+          <div className="bb-planks bb-planks--enter" key="teach">
+            <ChoicePlank
+              text={currentWord.translation}
+              onClick={handleMeaningTeachPlace}
+              variant="teach"
+              state={null}
+              disabled={false}
             />
           </div>
         )}
 
-        {showMeaningChoices && (
-          <div className="bb-choices bb-choices--enter">
-            {meaningChoices.map((choice) => {
-              let state = null;
-              if (selectedChoice === choice) state = choiceResult;
-              return (
-                <ChoicePlank
-                  key={choice}
-                  text={choice}
-                  onClick={() => handleMeaningChoice(choice)}
-                  state={state}
-                  disabled={isChoiceDisabled}
-                />
-              );
-            })}
+        {showMeaning && (
+          <div className="bb-planks bb-planks--enter" key="meaning">
+            {meaningChoices.map((c) => (
+              <ChoicePlank
+                key={c}
+                text={c}
+                onClick={() => handleMeaningChoice(c)}
+                state={selectedChoice === c ? choiceResult : null}
+                disabled={disabled}
+              />
+            ))}
           </div>
         )}
       </div>
