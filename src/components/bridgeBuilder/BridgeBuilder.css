@@ -351,7 +351,7 @@
   align-items: flex-start;
   justify-content: center;
   z-index: 20;
-  padding: 12px 20px 0;
+  padding: 37px 20px 0;
   background: linear-gradient(180deg, #4a9e5a 0%, #3d8a4e 5%, #6b5132 10%, #5a4428 100%);
 }
 
@@ -417,7 +417,7 @@
   position: relative;
   z-index: 1;
   font-family: 'Nunito', system-ui, sans-serif;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 800;
   color: #3e1f04;
   text-shadow: 0 1px 0 rgba(255,255,255,0.25);
