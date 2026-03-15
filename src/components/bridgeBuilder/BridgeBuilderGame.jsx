@@ -250,12 +250,7 @@ export default function BridgeBuilderGame({ onBack }) {
         </div>
       </div>
 
-      {/* Progress dots */}
-      <div className="bb-progress-bar">
-        {dots}
-      </div>
-
-      {/* Answer planks — fixed height zone */}
+      {/* Answer planks */}
       <div className="bb-planks-tray">
         {showTranslit && (
           <div className="bb-planks bb-planks--enter" key={'t-' + wordIndex}>
@@ -296,6 +291,11 @@ export default function BridgeBuilderGame({ onBack }) {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Progress dots — pinned to bottom */}
+      <div className="bb-progress-bar">
+        {dots}
       </div>
     </div>
   );
