@@ -1,8 +1,9 @@
 import React from 'react';
-import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
+import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import HomeView from './views/HomeView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import LearnView from './views/LearnView.jsx';
+import BridgeBuilderView from './views/BridgeBuilderView.jsx';
 import SettingsView from './views/SettingsView.jsx';
 import DailyView from './views/DailyView.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
@@ -239,6 +240,8 @@ function Shell() {
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
   const [inConversationPractice, setInConversationPractice] = React.useState(false);
+  const location = useLocation();
+  const isBridgeMode = location.pathname === '/bridge';
 
   // Check if we're in conversation practice mode
   React.useEffect(() => {
@@ -290,12 +293,13 @@ function Shell() {
           <Route path="/home" element={<HomeView />} />
           <Route path="/achievements" element={<AchievementsView />} />
           <Route path="/read" element={<LearnView />} />
+          <Route path="/bridge" element={<BridgeBuilderView />} />
           <Route path="/daily" element={<DailyView />} />
           <Route path="/settings" element={<SettingsView />} />
           <Route path="/play" element={<Navigate to="/home" replace />} />
         </Routes>
       </main>
-      {!(isGameVisible && isGameRunning) && !inConversationPractice && (
+      {!(isGameVisible && isGameRunning) && !inConversationPractice && !isBridgeMode && (
         <nav className="bottom-nav">
           <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
@@ -303,11 +307,11 @@ function Shell() {
             </div>
             <span className="label">{t('app.nav.home')}</span>
           </NavLink>
-          <NavLink to="/read" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
+          <NavLink to="/bridge" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
-              <span>📚</span>
+              <span>🌉</span>
             </div>
-            <span className="label">{t('app.nav.read')}</span>
+            <span className="label">Bridge</span>
           </NavLink>
           <button
             type="button"
