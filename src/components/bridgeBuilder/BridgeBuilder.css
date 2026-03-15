@@ -11,6 +11,7 @@
   font-family: 'Nunito', system-ui, sans-serif;
   overflow: hidden;
   background: linear-gradient(180deg, #c9e8f7 0%, #daf0fc 30%, #e4f6ee 60%, #d0ecc8 100%);
+  z-index: 101;
 }
 
 /* ─── Top bar — fixed height ────────────────────────────── */
@@ -71,7 +72,7 @@
    PROMPT ZONE — fixed height, Hebrew word centered
    ═══════════════════════════════════════════════════════════ */
 .bb-prompt-zone {
-  flex: 1;
+  flex: 0.5;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -356,7 +357,7 @@
   align-items: flex-start;
   justify-content: center;
   z-index: 20;
-  padding: 37px 20px 0;
+  padding: 67px 20px 0;
   background: linear-gradient(180deg, #4a9e5a 0%, #3d8a4e 5%, #6b5132 10%, #5a4428 100%);
 }
 
@@ -368,11 +369,19 @@
   width: 100%;
   max-width: 360px;
 }
+
+@media (min-width: 600px) {
+  .bb-planks {
+    flex-direction: row;
+    justify-content: center;
+    max-width: 720px;
+  }
+}
 .bb-planks--enter {
   animation: bb-planks-slide 0.3s ease-out;
 }
 @keyframes bb-planks-slide {
-  0% { opacity: 0; transform: translateY(16px); }
+  0% { opacity: 0; transform: translateY(4px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 

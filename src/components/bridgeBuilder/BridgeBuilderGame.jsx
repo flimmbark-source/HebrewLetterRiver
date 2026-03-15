@@ -84,6 +84,17 @@ function ChoicePlank({ text, onClick, state, disabled, variant, exiting }) {
 /* ─── End Screen ───────────────────────────────────────── */
 
 function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack }) {
+  // Deduplicate segments by wordId — words may appear multiple times
+  // during a session (learn + recall), but show each only once on results
+  const uniqueSegments = [];
+  const seen = new Set();
+  for (const seg of bridgeSegments) {
+    if (!seen.has(seg.wordId)) {
+      seen.add(seg.wordId);
+      uniqueSegments.push(seg);
+    }
+  }
+
   return (
     <div className="bb-end">
       <div className="bb-end-card">
@@ -91,7 +102,7 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack }) {
           {isGameOver ? 'Bridge Collapsed!' : 'Bridge Complete!'}
         </h2>
         <div className="bb-end-bridge-mini">
-          {bridgeSegments.map((seg, i) => (
+          {uniqueSegments.map((seg, i) => (
             <div key={i} className="bb-end-seg">
               <span className="bb-end-plank bb-end-plank--t">{seg.transliteration}</span>
               {seg.translation && (

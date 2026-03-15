@@ -5,6 +5,7 @@
 .bbs-screen {
   position: fixed;
   inset: 0;
+  bottom: 64px;
   display: flex;
   flex-direction: column;
   font-family: 'Nunito', system-ui, sans-serif;
