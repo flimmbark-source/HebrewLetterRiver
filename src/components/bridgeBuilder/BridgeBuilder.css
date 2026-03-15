@@ -71,11 +71,11 @@
    PROMPT ZONE — fixed height, Hebrew word centered
    ═══════════════════════════════════════════════════════════ */
 .bb-prompt-zone {
-  flex-shrink: 0;
-  height: 90px;
+  flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+  padding-bottom: 8px;
   z-index: 10;
 }
 
