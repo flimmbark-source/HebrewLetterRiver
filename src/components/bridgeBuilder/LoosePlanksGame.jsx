@@ -17,46 +17,63 @@ function shuffle(arr) {
  * Returns an array of { top, left } percentage values.
  */
 function generatePositions(count, containerEl) {
-  // Use actual container dimensions to calculate pixel-aware positions
   const cw = containerEl?.offsetWidth || 360;
   const ch = containerEl?.offsetHeight || 500;
 
-  // Plank approximate size in pixels (padding + text)
-  const plankW = 120;
-  const plankH = 50;
+  // Generous plank size estimate (includes padding, border, shadow)
+  const plankW = 140;
+  const plankH = 56;
 
-  // Screen-edge buffer in pixels
-  const edgeX = 16;
-  const edgeY = 16;
+  // Minimum gap between any two planks
+  const minGapX = 16;
+  const minGapY = 12;
 
-  // Usable area in pixels (account for plank size so they don't overflow)
-  const areaX = edgeX;
-  const areaY = edgeY;
-  const areaW = cw - plankW - edgeX * 2;
-  const areaH = ch - plankH - edgeY * 2;
+  // Edge buffer
+  const edgeX = 20;
+  const edgeY = 20;
 
-  // Grid-based: divide into cells, jitter within each
-  const cols = Math.min(count, 3);
-  const rows = Math.ceil(count / cols);
-  const cellW = areaW / cols;
-  const cellH = areaH / rows;
+  // Bounding box for plank top-left corner placement
+  const maxX = cw - plankW - edgeX;
+  const maxY = ch - plankH - edgeY;
 
-  // Inner cell padding so planks don't crowd neighbors
-  const gapX = Math.min(cellW * 0.18, 20);
-  const gapY = Math.min(cellH * 0.15, 16);
-  const innerW = Math.max(cellW - gapX * 2, 0);
-  const innerH = Math.max(cellH - gapY * 2, 0);
-
-  const positions = [];
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (positions.length >= count) break;
-      const px = areaX + cellW * c + gapX + Math.random() * innerW;
-      const py = areaY + cellH * r + gapY + Math.random() * innerH;
-      positions.push({ top: `${py}px`, left: `${px}px` });
+  // Check if candidate overlaps any placed position (including min gap)
+  function overlaps(x, y, placed) {
+    for (const p of placed) {
+      if (Math.abs(x - p.x) < plankW + minGapX && Math.abs(y - p.y) < plankH + minGapY) {
+        return true;
+      }
     }
+    return false;
   }
-  return shuffle(positions);
+
+  const placed = [];
+  for (let i = 0; i < count; i++) {
+    let best = null;
+    // Try random candidates, pick one that doesn't overlap
+    for (let attempt = 0; attempt < 200; attempt++) {
+      const x = edgeX + Math.random() * (maxX - edgeX);
+      const y = edgeY + Math.random() * (maxY - edgeY);
+      if (!overlaps(x, y, placed)) {
+        best = { x, y };
+        break;
+      }
+    }
+    // Fallback: if all random attempts collided, use grid placement
+    if (!best) {
+      const cols = Math.min(count, 3);
+      const r = Math.floor(i / cols);
+      const c = i % cols;
+      const cellW = (maxX - edgeX) / cols;
+      const cellH = (maxY - edgeY) / Math.ceil(count / cols);
+      best = {
+        x: edgeX + cellW * c + cellW * 0.2,
+        y: edgeY + cellH * r + cellH * 0.2,
+      };
+    }
+    placed.push(best);
+  }
+
+  return shuffle(placed.map(p => ({ top: `${p.y}px`, left: `${p.x}px` })));
 }
 
 /**
