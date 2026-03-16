@@ -315,36 +315,40 @@
 /* ─── Pack completion dots (top-right) ────────────────────── */
 .bbs-pack-dots {
   position: absolute;
-  top: 8px;
-  right: 10px;
+  top: 4px;
+  right: 8px;
   display: flex;
-  gap: 5px;
+  gap: 8px;
   z-index: 2;
 }
 
+.bbs-pack-dot-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bbs-pack-dot-emoji {
+  font-size: 8px;
+  line-height: 1;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 .bbs-pack-dot {
-  position: relative;
   width: 9px;
   height: 9px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.12);
   border: 1.5px solid rgba(0, 0, 0, 0.08);
   transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  pointer-events: none;
 }
 
-/* Enlarge tap target without changing visual size */
-.bbs-pack-dot::before {
-  content: '';
-  position: absolute;
-  top: -6px;
-  left: -6px;
-  right: -6px;
-  bottom: -6px;
-}
-
-.bbs-pack-dot:hover {
+.bbs-pack-dot-col:hover .bbs-pack-dot {
   transform: scale(1.3);
 }
 

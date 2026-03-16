@@ -73,18 +73,14 @@ function PackCard({ pack, progress, unlocked, selected, onSelect, completion, mo
     >
       {/* Progress dots — top-right corner, individually clickable */}
       <div className="bbs-pack-dots">
-        <span
-          className={dot1Cls}
-          onClick={handleDot1Click}
-          role="button"
-          tabIndex={unlocked ? 0 : -1}
-        />
-        <span
-          className={dot2Cls}
-          onClick={handleDot2Click}
-          role="button"
-          tabIndex={unlocked ? 0 : -1}
-        />
+        <div className="bbs-pack-dot-col" onClick={handleDot1Click} role="button" tabIndex={unlocked ? 0 : -1}>
+          <span className="bbs-pack-dot-emoji">🪢</span>
+          <span className={dot1Cls} />
+        </div>
+        <div className="bbs-pack-dot-col" onClick={handleDot2Click} role="button" tabIndex={unlocked ? 0 : -1}>
+          <span className="bbs-pack-dot-emoji">🪵</span>
+          <span className={dot2Cls} />
+        </div>
       </div>
       <div className="bbs-pack-icon">
         {!unlocked ? '🔒' : completed ? '✅' : '📦'}
