@@ -15,11 +15,12 @@ function shuffle(arr) {
 /**
  * Generate center-biased scattered positions for planks.
  */
-function generatePositions(count, containerEl) {
+function generatePositions(count, containerEl, minTopClearance = 0) {
   const cw = containerEl?.offsetWidth || 360;
   const ch = containerEl?.offsetHeight || 500;
 
-  const plankW = 140;
+  // Keep this aligned with CSS max width so planks stay on-screen on mobile.
+  const plankW = 180;
   const plankH = 56;
   const minGapX = 16;
   const minGapY = 12;
@@ -27,11 +28,12 @@ function generatePositions(count, containerEl) {
   const edgeY = 24;
 
   const maxX = cw - plankW - edgeX;
+  const minY = Math.max(edgeY, minTopClearance);
   const maxY = ch - plankH - edgeY;
   const rangeX = maxX - edgeX;
-  const rangeY = maxY - edgeY;
+  const rangeY = Math.max(0, maxY - minY);
   const centerX = edgeX + rangeX / 2;
-  const centerY = edgeY + rangeY / 2;
+  const centerY = minY + rangeY / 2;
 
   function centerRand(center, range) {
     const r = (Math.random() + Math.random()) / 2;
@@ -52,7 +54,7 @@ function generatePositions(count, containerEl) {
     let best = null;
     for (let attempt = 0; attempt < 300; attempt++) {
       const x = Math.max(edgeX, Math.min(maxX, centerRand(centerX, rangeX)));
-      const y = Math.max(edgeY, Math.min(maxY, centerRand(centerY, rangeY)));
+      const y = Math.max(minY, Math.min(maxY, centerRand(centerY, rangeY)));
       if (!overlaps(x, y, placed)) {
         best = { x, y };
         break;
@@ -63,10 +65,10 @@ function generatePositions(count, containerEl) {
       const r = Math.floor(i / cols);
       const c = i % cols;
       const cellW = rangeX / cols;
-      const cellH = rangeY / Math.ceil(count / cols);
+      const cellH = rangeY / Math.ceil(count / cols || 1);
       best = {
         x: edgeX + cellW * c + cellW * 0.3,
-        y: edgeY + cellH * r + cellH * 0.3,
+        y: minY + cellH * r + cellH * 0.3,
       };
     }
     placed.push(best);
@@ -127,6 +129,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
   const [roundComplete, setRoundComplete] = useState(false);
 
   const riverRef = useRef(null);
+  const hebrewRowRef = useRef(null);
   const [riverSize, setRiverSize] = useState(null);
 
   useEffect(() => {
@@ -166,7 +169,17 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
         text: pt === 'translit' ? w.transliteration : w.translation,
       };
     });
-    const positions = generatePositions(planks.length, riverRef.current);
+    const riverRect = riverRef.current?.getBoundingClientRect();
+    const hebrewRect = hebrewRowRef.current?.getBoundingClientRect();
+
+    // Keep floating planks at least 20px below any top Hebrew plank overlap.
+    const overlapIntoRiver =
+      riverRect && hebrewRect
+        ? Math.max(0, hebrewRect.bottom - riverRect.top)
+        : 0;
+    const minTopClearance = overlapIntoRiver + 20;
+
+    const positions = generatePositions(planks.length, riverRef.current, minTopClearance);
     return planks.map((p, i) => ({ ...p, style: positions[i] }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundIndex, currentGroup.length, plankTypes, riverSize]);
@@ -270,7 +283,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
       </div>
 
       {/* Hebrew planks — fixed row at top, wraps if needed */}
-      <div className="lp-hebrew-row" key={`hrow-${roundIndex}`}>
+      <div className="lp-hebrew-row" key={`hrow-${roundIndex}`} ref={hebrewRowRef}>
         {hebrewPlanks.map((plank) => {
           const isMatched = matched.has(plank.wordId);
           const isSelected = selected?.wordId === plank.wordId && selected?.type === plank.type;
