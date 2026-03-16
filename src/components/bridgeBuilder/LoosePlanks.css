@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   Loose Planks — matching game, reuses Bridge Builder visual language
+   Loose Planks — matching game with river extending to bottom
    ═══════════════════════════════════════════════════════════ */
 
 .lp-world {
@@ -9,7 +9,7 @@
   flex-direction: column;
   font-family: 'Nunito', system-ui, sans-serif;
   overflow: hidden;
-  background: linear-gradient(180deg, #c9e8f7 0%, #daf0fc 30%, #e4f6ee 60%, #d0ecc8 100%);
+  background: linear-gradient(180deg, #c9e8f7 0%, #daf0fc 50%, #e4f6ee 100%);
   z-index: 101;
 }
 
@@ -68,34 +68,50 @@
   opacity: 0.7;
 }
 
-/* ─── River scene ──────────────────────────────────────── */
-.lp-scene {
+/* ─── Top bank (only one bank — river extends to bottom) ─ */
+.lp-bank {
   flex-shrink: 0;
-  height: 280px;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  z-index: 2;
 }
-
-/* Banks */
-.lp-bank { flex-shrink: 0; position: relative; z-index: 2; }
 .lp-bank-grass {
   height: 14px;
   background: linear-gradient(180deg, #6db86a 0%, #4a9e5a 60%, #3d8a4e 100%);
+  position: relative;
+}
+.lp-bank--top .lp-bank-grass::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  bottom: -3px;
+  height: 5px;
+  background:
+    radial-gradient(ellipse 12px 4px at 8% 50%, #4a9e5a 70%, transparent 71%),
+    radial-gradient(ellipse 14px 5px at 22% 50%, #3d8a4e 70%, transparent 71%),
+    radial-gradient(ellipse 10px 4px at 38% 50%, #4a9e5a 70%, transparent 71%),
+    radial-gradient(ellipse 16px 5px at 54% 50%, #3d8a4e 70%, transparent 71%),
+    radial-gradient(ellipse 11px 4px at 68% 50%, #4a9e5a 70%, transparent 71%),
+    radial-gradient(ellipse 13px 4px at 84% 50%, #3d8a4e 70%, transparent 71%);
+  z-index: 1;
 }
 .lp-bank-dirt {
   height: 20px;
   background: linear-gradient(180deg, #8B6F47 0%, #7a5e3a 100%);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
 }
-.lp-bank--top .lp-bank-dirt { box-shadow: 0 3px 6px rgba(0,0,0,0.12); }
 
-/* River */
-.lp-river-zone { flex: 1; position: relative; overflow: hidden; }
+/* ─── River — fills remaining space to bottom ──────────── */
+.lp-river {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Water fills the entire river zone */
 .lp-water { position: absolute; inset: 0; }
 .lp-water-surface {
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, #3694b8 0%, #49c5e0 35%, #5bd0e8 50%, #49c5e0 65%, #3cb4d5 100%);
+  background: linear-gradient(180deg, #3694b8 0%, #49c5e0 20%, #5bd0e8 40%, #49c5e0 60%, #3cb4d5 80%, #2d8aaa 100%);
 }
 .lp-water-shimmer {
   position: absolute; inset: 0;
@@ -111,13 +127,28 @@
   0% { background-position: 0 0; }
   100% { background-position: 360px 0; }
 }
+/* Extra ripple layer for depth */
+.lp-water-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px, rgba(255,255,255,0.04) 1px,
+    transparent 2px, transparent 18px
+  );
+  animation: lp-ripple 3s ease-in-out infinite alternate;
+}
+@keyframes lp-ripple {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
 
-/* ─── Bridge area ──────────────────────────────────────── */
+/* ─── Bridge area — positioned near top of river ─────── */
 .lp-bridge {
   position: absolute;
   left: 0; right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 10px;
   height: 150px;
   display: flex;
   flex-direction: column;
@@ -132,7 +163,6 @@
   box-shadow: 0 1px 2px rgba(0,0,0,0.25);
 }
 
-/* Fixed Hebrew planks — centered in bridge */
 .lp-fixed-planks {
   flex: 1;
   display: flex;
@@ -142,7 +172,7 @@
   padding: 0 12px;
 }
 
-/* ─── Hebrew plank (fixed) ─────────────────────────────── */
+/* ─── Hebrew plank (fixed on bridge) ─────────────────── */
 .lp-hebrew-plank {
   position: relative;
   display: flex;
@@ -230,41 +260,27 @@
   pointer-events: none;
 }
 
-/* ─── Floating transliteration planks tray ─────────────── */
-.lp-loose-tray {
-  flex: 1;
+/* ─── Floating transliteration planks — on the water ───── */
+.lp-floating-area {
+  position: absolute;
+  left: 0; right: 0;
+  top: 180px;
+  bottom: 0;
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  z-index: 20;
-  padding: 50px 20px 0;
-  background: linear-gradient(180deg, #4a9e5a 0%, #3d8a4e 5%, #6b5132 10%, #5a4428 100%);
-}
-
-.lp-loose-planks {
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  width: 100%;
-  max-width: 360px;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+  z-index: 4;
   animation: lp-planks-enter 0.3s ease-out;
 }
 
-@media (min-width: 600px) {
-  .lp-loose-planks {
-    flex-direction: row;
-    justify-content: center;
-    max-width: 720px;
-  }
-}
-
 @keyframes lp-planks-enter {
-  0% { opacity: 0; transform: translateY(4px); }
+  0% { opacity: 0; transform: translateY(8px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Transliteration plank (loose / floating) ─────────── */
 .lp-translit-plank {
   position: relative;
   display: inline-flex;
@@ -289,16 +305,25 @@
     inset 0 2px 0 rgba(255,255,255,0.2),
     inset 0 -2px 0 rgba(0,0,0,0.08),
     0 4px 0 #8a5e28,
-    0 6px 10px rgba(0,0,0,0.12);
-  animation: lp-float 3s ease-in-out infinite;
+    0 6px 12px rgba(0,0,0,0.18);
 }
 
-.lp-translit-plank:nth-child(2) { animation-delay: -1s; }
-.lp-translit-plank:nth-child(3) { animation-delay: -2s; }
+/* Staggered floating animations for organic feel */
+.lp-translit-plank--pos0 { animation: lp-float-a 3.2s ease-in-out infinite; }
+.lp-translit-plank--pos1 { animation: lp-float-b 2.8s ease-in-out infinite; }
+.lp-translit-plank--pos2 { animation: lp-float-c 3.5s ease-in-out infinite; }
 
-@keyframes lp-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+@keyframes lp-float-a {
+  0%, 100% { transform: translateY(0) rotate(-0.5deg); }
+  50% { transform: translateY(-6px) rotate(0.5deg); }
+}
+@keyframes lp-float-b {
+  0%, 100% { transform: translateY(0) rotate(0.5deg); }
+  50% { transform: translateY(-5px) rotate(-0.5deg); }
+}
+@keyframes lp-float-c {
+  0%, 100% { transform: translateY(0) rotate(0.3deg); }
+  50% { transform: translateY(-7px) rotate(-0.3deg); }
 }
 
 .lp-translit-plank:active:not(:disabled) {
@@ -308,6 +333,7 @@
     inset 0 -2px 0 rgba(0,0,0,0.08),
     0 1px 0 #8a5e28,
     0 3px 6px rgba(0,0,0,0.12);
+  animation: none;
 }
 
 .lp-translit-plank--matched {
@@ -317,10 +343,10 @@
     inset 0 2px 0 rgba(255,255,255,0.3),
     0 4px 0 #2d6b3a,
     0 6px 14px rgba(61,138,78,0.25);
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: default;
-  animation: none;
-  transform: scale(0.95);
+  animation: none !important;
+  transform: scale(0.92);
 }
 
 .lp-translit-plank--wrong {
@@ -349,12 +375,14 @@
   justify-content: center;
   gap: 6px;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  background: #5a4428;
+  background: rgba(30, 70, 100, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10;
 }
 .lp-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.12);
+  background: rgba(255,255,255,0.2);
   transition: background 0.3s, transform 0.3s;
 }
 .lp-dot--done {

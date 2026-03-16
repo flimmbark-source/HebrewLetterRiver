@@ -15,11 +15,11 @@ function shuffle(arr) {
 /**
  * LoosePlanksGame — second-pass reinforcement mode.
  *
- * Shows 3 Hebrew word planks fixed in place and 3 transliteration planks
- * floating in the river. Player taps a Hebrew plank, then taps the matching
- * transliteration plank to secure it.
+ * Shows 3 Hebrew word planks fixed on the bridge and 3 transliteration planks
+ * floating on the river below. Player taps a Hebrew plank, then taps the
+ * matching transliteration plank to secure it.
  *
- * Works through the pack's words in groups of 3 until all are matched.
+ * The river extends all the way to the bottom of the screen.
  */
 export default function LoosePlanksGame({ sessionConfig, onBack }) {
   const { packId, selectedWordIds } = sessionConfig;
@@ -40,14 +40,13 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
   }, [allWords]);
 
   const [groupIndex, setGroupIndex] = useState(0);
-  const [matched, setMatched] = useState(new Set()); // matched wordIds in current group
-  const [selectedHebrew, setSelectedHebrew] = useState(null); // wordId of selected Hebrew plank
-  const [wrongPair, setWrongPair] = useState(null); // { hebrewId, translitId } for wrong flash
+  const [matched, setMatched] = useState(new Set());
+  const [selectedHebrew, setSelectedHebrew] = useState(null);
+  const [wrongPair, setWrongPair] = useState(null);
   const [roundComplete, setRoundComplete] = useState(false);
 
   const currentGroup = groups[groupIndex] || [];
 
-  // Shuffled transliteration planks for current group (stable per group)
   const shuffledTranslits = useMemo(
     () => shuffle(currentGroup.map(w => ({ wordId: w.id, transliteration: w.transliteration }))),
     [groupIndex, currentGroup.length] // eslint-disable-line react-hooks/exhaustive-deps
@@ -62,17 +61,13 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
     if (!selectedHebrew || matched.has(translit.wordId) || wrongPair) return;
 
     if (translit.wordId === selectedHebrew) {
-      // Correct match
       const newMatched = new Set(matched);
       newMatched.add(translit.wordId);
       setMatched(newMatched);
       setSelectedHebrew(null);
 
-      // Check if group is complete
       if (newMatched.size >= currentGroup.length) {
-        // Move to next group or finish
         if (groupIndex + 1 >= groups.length) {
-          // All groups done — mark Loose Planks complete
           if (packId) markLoosePlanksComplete(packId);
           setRoundComplete(true);
         } else {
@@ -84,7 +79,6 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
         }
       }
     } else {
-      // Wrong match — flash and reset selection
       setWrongPair({ hebrewId: selectedHebrew, translitId: translit.wordId });
       setTimeout(() => {
         setWrongPair(null);
@@ -143,67 +137,61 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
           : 'Tap a Hebrew plank to select it'}
       </div>
 
-      {/* River scene with fixed Hebrew planks and floating transliteration planks */}
-      <div className="lp-scene">
-        <div className="lp-bank lp-bank--top">
-          <div className="lp-bank-grass" />
-          <div className="lp-bank-dirt" />
-        </div>
-
-        <div className="lp-river-zone">
-          <div className="lp-water">
-            <div className="lp-water-surface" />
-            <div className="lp-water-shimmer" />
-          </div>
-
-          {/* Bridge rails + Hebrew fixed planks */}
-          <div className="lp-bridge">
-            <div className="lp-rail lp-rail--top" />
-            <div className="lp-fixed-planks">
-              {currentGroup.map(w => {
-                const isMatched = matched.has(w.id);
-                const isSelected = selectedHebrew === w.id;
-                const isWrong = wrongPair?.hebrewId === w.id;
-                let cls = 'lp-hebrew-plank';
-                if (isMatched) cls += ' lp-hebrew-plank--matched';
-                else if (isWrong) cls += ' lp-hebrew-plank--wrong';
-                else if (isSelected) cls += ' lp-hebrew-plank--selected';
-                return (
-                  <button
-                    key={w.id}
-                    className={cls}
-                    onClick={() => handleHebrewTap(w.id)}
-                    disabled={isMatched}
-                    type="button"
-                  >
-                    <span className="lp-plank-grain" />
-                    <span className="lp-hebrew-text">{w.hebrew}</span>
-                    {isMatched && (
-                      <span className="lp-matched-translit">{w.transliteration}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="lp-rail lp-rail--bottom" />
-          </div>
-        </div>
-
-        <div className="lp-bank lp-bank--bottom">
-          <div className="lp-bank-dirt" />
-          <div className="lp-bank-grass" />
-        </div>
+      {/* Top bank only — river extends to the bottom */}
+      <div className="lp-bank lp-bank--top">
+        <div className="lp-bank-grass" />
+        <div className="lp-bank-dirt" />
       </div>
 
-      {/* Floating transliteration planks */}
-      <div className="lp-loose-tray">
-        <div className="lp-loose-planks" key={groupIndex}>
-          {shuffledTranslits.map(t => {
+      {/* Full river area: bridge at top, floating planks below */}
+      <div className="lp-river">
+        <div className="lp-water">
+          <div className="lp-water-surface" />
+          <div className="lp-water-shimmer" />
+        </div>
+
+        {/* Bridge rails + Hebrew fixed planks */}
+        <div className="lp-bridge">
+          <div className="lp-rail lp-rail--top" />
+          <div className="lp-fixed-planks">
+            {currentGroup.map(w => {
+              const isMatched = matched.has(w.id);
+              const isSelected = selectedHebrew === w.id;
+              const isWrong = wrongPair?.hebrewId === w.id;
+              let cls = 'lp-hebrew-plank';
+              if (isMatched) cls += ' lp-hebrew-plank--matched';
+              else if (isWrong) cls += ' lp-hebrew-plank--wrong';
+              else if (isSelected) cls += ' lp-hebrew-plank--selected';
+              return (
+                <button
+                  key={w.id}
+                  className={cls}
+                  onClick={() => handleHebrewTap(w.id)}
+                  disabled={isMatched}
+                  type="button"
+                >
+                  <span className="lp-plank-grain" />
+                  <span className="lp-hebrew-text">{w.hebrew}</span>
+                  {isMatched && (
+                    <span className="lp-matched-translit">{w.transliteration}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          <div className="lp-rail lp-rail--bottom" />
+        </div>
+
+        {/* Floating transliteration planks — on the water */}
+        <div className="lp-floating-area" key={groupIndex}>
+          {shuffledTranslits.map((t, i) => {
             const isMatched = matched.has(t.wordId);
             const isWrong = wrongPair?.translitId === t.wordId;
             let cls = 'lp-translit-plank';
             if (isMatched) cls += ' lp-translit-plank--matched';
             else if (isWrong) cls += ' lp-translit-plank--wrong';
+            // Stagger positions for organic floating feel
+            cls += ` lp-translit-plank--pos${i}`;
             return (
               <button
                 key={t.wordId}
@@ -220,7 +208,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
         </div>
       </div>
 
-      {/* Progress dots */}
+      {/* Progress dots — pinned to bottom */}
       <div className="lp-progress-bar">
         {Array.from({ length: totalWords }).map((_, i) => {
           let cls = 'lp-dot';
