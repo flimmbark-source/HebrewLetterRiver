@@ -144,12 +144,10 @@ export function getPackProgress(pack, allProgress) {
  * @param {Object[]} allPacks — all pack definitions
  * @param {{ [wordId: string]: WordProgress }} allProgress — all word progress
  */
-export function isPackUnlocked(pack, allPacks, allProgress) {
-  if (!pack.unlockAfter) return true;
-  const priorPack = allPacks.find(p => p.id === pack.unlockAfter);
-  if (!priorPack) return true;
-  const priorProgress = getPackProgress(priorPack, allProgress);
-  return priorProgress.completed;
+export function isPackUnlocked(/* pack, allPacks, allProgress */) {
+  // All packs are currently unlocked — progression gating can be
+  // re-enabled later by checking pack.unlockAfter against prior pack completion.
+  return true;
 }
 
 /**
@@ -214,15 +212,10 @@ export function getSectionProgress(section, sectionPacks, allProgress) {
  * @param {Object[]} allPacks — all pack definitions
  * @param {{ [wordId: string]: WordProgress }} allProgress — all word progress
  */
-export function isSectionUnlocked(section, allSections, allPacks, allProgress) {
-  if (section.order === 1) return true;
-
-  const prevSection = allSections.find(s => s.order === section.order - 1);
-  if (!prevSection) return true;
-
-  const prevPacks = allPacks.filter(p => p.sectionId === prevSection.id);
-  const prevProgress = getSectionProgress(prevSection, prevPacks, allProgress);
-  return prevProgress.packsCompleted >= prevProgress.totalPacks;
+export function isSectionUnlocked(/* section, allSections, allPacks, allProgress */) {
+  // All sections are currently unlocked — progression gating can be
+  // re-enabled later by checking prior section completion.
+  return true;
 }
 
 // Future glossary hook: call getAllWordProgress() and join with bridgeBuilderWords
