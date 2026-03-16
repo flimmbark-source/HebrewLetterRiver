@@ -17,18 +17,30 @@ function shuffle(arr) {
  * Returns an array of { top, left } percentage values.
  */
 function generatePositions(count) {
-  // Grid-based approach: divide space into cells, jitter within each cell
+  // Screen-edge buffer (percentage of the floating area)
+  const padX = 6;  // left/right margin
+  const padY = 5;  // top/bottom margin
+  const usableW = 100 - padX * 2;
+  const usableH = 100 - padY * 2;
+
+  // Grid-based approach: divide usable space into cells, jitter within each cell
   const cols = Math.min(count, 3);
   const rows = Math.ceil(count / cols);
+  const cellW = usableW / cols;
+  const cellH = usableH / rows;
+
+  // Inner cell padding so planks don't crowd cell edges (and thus each other)
+  const cellPadX = cellW * 0.12;
+  const cellPadY = cellH * 0.10;
+  const innerW = cellW - cellPadX * 2;
+  const innerH = cellH - cellPadY * 2;
+
   const positions = [];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (positions.length >= count) break;
-      const cellW = 100 / cols;
-      const cellH = 100 / rows;
-      // Jitter within cell, with padding to avoid edges
-      const left = cellW * c + cellW * 0.15 + Math.random() * cellW * 0.5;
-      const top = cellH * r + cellH * 0.1 + Math.random() * cellH * 0.5;
+      const left = padX + cellW * c + cellPadX + Math.random() * innerW;
+      const top = padY + cellH * r + cellPadY + Math.random() * innerH;
       positions.push({ top: `${top}%`, left: `${left}%` });
     }
   }
