@@ -19,12 +19,14 @@ function generatePositions(count, containerEl) {
   const cw = containerEl?.offsetWidth || 360;
   const ch = containerEl?.offsetHeight || 500;
 
-  const plankW = 140;
+  const edgeX = 24;
+  const edgeY = 24;
+  // Keep horizontal placement conservative so variable-width text planks
+  // still stay on-screen on narrow mobile viewports.
+  const plankW = Math.min(280, Math.max(140, cw - edgeX * 2));
   const plankH = 56;
   const minGapX = 16;
   const minGapY = 12;
-  const edgeX = 24;
-  const edgeY = 24;
 
   const maxX = cw - plankW - edgeX;
   const maxY = ch - plankH - edgeY;
@@ -32,6 +34,21 @@ function generatePositions(count, containerEl) {
   const rangeY = maxY - edgeY;
   const centerX = edgeX + rangeX / 2;
   const centerY = edgeY + rangeY / 2;
+  const clusterSpreadX = Math.max(110, rangeX * 0.34);
+  const clusterSpreadY = Math.max(96, rangeY * 0.28);
+
+  // Keep anchors center-biased, but randomize angle/radius so layouts are
+  // less uniform and don't collapse into an obvious tight line.
+  const clusterCount = Math.min(4, Math.max(2, Math.ceil(count / 2)));
+  const anchors = Array.from({ length: clusterCount }, () => {
+    const angle = Math.random() * Math.PI * 2;
+    const radiusX = (0.08 + Math.random() * 0.18) * rangeX;
+    const radiusY = (0.06 + Math.random() * 0.16) * rangeY;
+    return {
+      x: centerX + Math.cos(angle) * radiusX,
+      y: centerY + Math.sin(angle) * radiusY,
+    };
+  });
 
   function centerRand(center, range) {
     const r = (Math.random() + Math.random()) / 2;
@@ -51,8 +68,11 @@ function generatePositions(count, containerEl) {
   for (let i = 0; i < count; i++) {
     let best = null;
     for (let attempt = 0; attempt < 300; attempt++) {
-      const x = Math.max(edgeX, Math.min(maxX, centerRand(centerX, rangeX)));
-      const y = Math.max(edgeY, Math.min(maxY, centerRand(centerY, rangeY)));
+      const anchor = anchors[Math.floor(Math.random() * anchors.length)];
+      const localSpreadX = clusterSpreadX * (0.8 + Math.random() * 0.5);
+      const localSpreadY = clusterSpreadY * (0.8 + Math.random() * 0.5);
+      const x = Math.max(edgeX, Math.min(maxX, centerRand(anchor.x, localSpreadX)));
+      const y = Math.max(edgeY, Math.min(maxY, centerRand(anchor.y, localSpreadY)));
       if (!overlaps(x, y, placed)) {
         best = { x, y };
         break;
