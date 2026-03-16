@@ -122,25 +122,29 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
 
   const currentGroup = groups[groupIndex] || [];
 
-  // Generate all plank data for current group: Hebrew + transliteration, shuffled positions
-  const plankLayout = useMemo(() => {
-    const hebrewPlanks = currentGroup.map(w => ({
+  // Hebrew planks shown in a fixed row at the top; transliteration scattered on water
+  const hebrewPlanks = useMemo(() =>
+    currentGroup.map(w => ({
       key: `h-${w.id}`,
       type: 'hebrew',
       wordId: w.id,
       text: w.hebrew,
       isRtl: true,
-    }));
-    const translitPlanks = shuffle(currentGroup).map(w => ({
+    })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [groupIndex, currentGroup.length]
+  );
+
+  const translitLayout = useMemo(() => {
+    const planks = shuffle(currentGroup).map(w => ({
       key: `t-${w.id}`,
       type: 'translit',
       wordId: w.id,
       text: w.transliteration,
       isRtl: false,
     }));
-    const allPlanks = shuffle([...hebrewPlanks, ...translitPlanks]);
-    const positions = generatePositions(allPlanks.length, riverRef.current);
-    return allPlanks.map((p, i) => ({ ...p, style: positions[i] }));
+    const positions = generatePositions(planks.length, riverRef.current);
+    return planks.map((p, i) => ({ ...p, style: positions[i] }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupIndex, currentGroup.length, riverSize]);
 
@@ -247,22 +251,53 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
           : 'Tap a plank to select it'}
       </div>
 
-      {/* Top bank only — river extends to the bottom */}
+      {/* Hebrew planks — fixed row at top, wraps if needed */}
+      <div className="lp-hebrew-row" key={`hrow-${groupIndex}`}>
+        {hebrewPlanks.map((plank) => {
+          const isMatched = matched.has(plank.wordId);
+          const isSelected = selected?.wordId === plank.wordId && selected?.type === plank.type;
+          const isWrongSrc = wrongPair && (
+            (selected?.wordId === plank.wordId && selected?.type === plank.type) ||
+            (wrongPair.wordId1 === plank.wordId || wrongPair.wordId2 === plank.wordId)
+          );
+
+          let cls = 'lp-plank-inline lp-plank--hebrew';
+          if (isMatched) cls += ' lp-plank--matched';
+          else if (isWrongSrc) cls += ' lp-plank--wrong';
+          else if (isSelected) cls += ' lp-plank--selected';
+
+          return (
+            <button
+              key={plank.key}
+              className={cls}
+              onClick={() => handlePlankTap(plank)}
+              disabled={isMatched}
+              type="button"
+            >
+              <span className="lp-plank-grain" />
+              <span className="lp-plank-text lp-plank-text--rtl">
+                {plank.text}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Top bank — river extends to the bottom */}
       <div className="lp-bank lp-bank--top">
         <div className="lp-bank-grass" />
         <div className="lp-bank-dirt" />
       </div>
 
-      {/* Full river area with all planks floating */}
+      {/* River area with transliteration planks floating */}
       <div className="lp-river" ref={riverRef}>
         <div className="lp-water">
           <div className="lp-water-surface" />
           <div className="lp-water-shimmer" />
         </div>
 
-        {/* All planks scattered on the water */}
         <div className="lp-floating-area" key={groupIndex}>
-          {plankLayout.map((plank, i) => {
+          {translitLayout.map((plank, i) => {
             const isMatched = matched.has(plank.wordId);
             const isSelected = selected?.wordId === plank.wordId && selected?.type === plank.type;
             const isWrongSrc = wrongPair && (
@@ -270,11 +305,10 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
               (wrongPair.wordId1 === plank.wordId || wrongPair.wordId2 === plank.wordId)
             );
 
-            let cls = plank.type === 'hebrew' ? 'lp-plank lp-plank--hebrew' : 'lp-plank lp-plank--translit';
+            let cls = 'lp-plank lp-plank--translit';
             if (isMatched) cls += ' lp-plank--matched';
             else if (isWrongSrc) cls += ' lp-plank--wrong';
             else if (isSelected) cls += ' lp-plank--selected';
-            // Float animation variant
             if (!isMatched) cls += ` ${floatVariants[i % floatVariants.length]}`;
 
             return (
@@ -287,7 +321,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
                 type="button"
               >
                 <span className="lp-plank-grain" />
-                <span className={`lp-plank-text ${plank.isRtl ? 'lp-plank-text--rtl' : ''}`}>
+                <span className="lp-plank-text">
                   {plank.text}
                 </span>
               </button>

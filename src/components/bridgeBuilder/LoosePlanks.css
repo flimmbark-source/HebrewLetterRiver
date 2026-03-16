@@ -138,6 +138,34 @@
   100% { transform: translateY(4px); }
 }
 
+/* ─── Hebrew plank row — fixed at top, wraps ────────────── */
+.lp-hebrew-row {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px;
+  z-index: 5;
+  animation: lp-planks-enter 0.35s ease-out;
+}
+
+/* Inline plank (flow layout, not absolute) */
+.lp-plank-inline {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: box-shadow 0.15s, border-color 0.2s;
+  transform-origin: center center;
+}
+
 /* ─── Floating area — all planks scattered here ────────── */
 .lp-floating-area {
   position: absolute;
