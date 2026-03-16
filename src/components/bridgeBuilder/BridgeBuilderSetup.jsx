@@ -8,13 +8,15 @@ import {
   getSectionProgress,
   isSectionUnlocked,
   getReviewEligibleWordIds,
+  getAllPackCompletions,
 } from '../../lib/bridgeBuilderStorage.js';
 import './BridgeBuilderSetup.css';
 
 /* ─── Pack Card ───────────────────────────────────────────── */
 
-function PackCard({ pack, progress, unlocked, selected, onSelect }) {
+function PackCard({ pack, progress, unlocked, selected, onSelect, completion }) {
   const { wordsIntroducedCount, wordsLearnedCount, totalWords, completed } = progress;
+  const { bridgeBuilderComplete, loosePlanksComplete } = completion;
 
   let statusLabel;
   let statusCls = 'bbs-pack-status';
@@ -43,6 +45,11 @@ function PackCard({ pack, progress, unlocked, selected, onSelect }) {
       onClick={() => unlocked && onSelect(pack.id)}
       disabled={!unlocked}
     >
+      {/* Progress dots — top-right corner */}
+      <div className="bbs-pack-dots">
+        <span className={`bbs-pack-dot ${bridgeBuilderComplete ? 'bbs-pack-dot--complete' : ''}`} />
+        <span className={`bbs-pack-dot ${loosePlanksComplete ? 'bbs-pack-dot--complete' : ''}`} />
+      </div>
       <div className="bbs-pack-icon">
         {!unlocked ? '🔒' : completed ? '✅' : '📦'}
       </div>
@@ -158,6 +165,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const sections = useMemo(() => getSectionsInOrder(), []);
   const allProgress = useMemo(() => getAllWordProgress(), []);
   const reviewWordIds = useMemo(() => getReviewEligibleWordIds(), []);
+  const packCompletions = useMemo(() => getAllPackCompletions(), []);
 
   // Build section data with packs
   const sectionData = useMemo(() => {
@@ -170,10 +178,11 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
         pack,
         progress: getPackProgress(pack, allProgress),
         unlocked: unlocked && isPackUnlocked(pack, packs, allProgress),
+        completion: packCompletions[pack.id] || { bridgeBuilderComplete: false, loosePlanksComplete: false },
       }));
       return { section, sectionProgress, unlocked, packData };
     });
-  }, [sections, allProgress]);
+  }, [sections, allProgress, packCompletions]);
 
   const handleToggleSection = (sectionId) => {
     setExpandedSection(prev => prev === sectionId ? null : sectionId);
@@ -191,19 +200,31 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     if (!selection) return;
     if (selection.type === 'pack') {
       // Find the pack across all sections
-      const allPacks = sectionData.flatMap(sd => sd.packData.map(pd => pd.pack));
-      const pack = allPacks.find(p => p.id === selection.packId);
-      if (!pack) return;
+      const allPackData = sectionData.flatMap(sd => sd.packData);
+      const pd = allPackData.find(p => p.pack.id === selection.packId);
+      if (!pd) return;
+      const pack = pd.pack;
+      const { bridgeBuilderComplete, loosePlanksComplete } = pd.completion;
+
+      // Determine game mode based on completion state
+      let gameMode = 'bridge_builder';
+      if (bridgeBuilderComplete && !loosePlanksComplete) {
+        gameMode = 'loose_planks';
+      }
+      // Fully completed packs replay standard Bridge Builder
+
       onPlay({
         sessionType: 'guided_pack',
         packId: pack.id,
         selectedWordIds: pack.wordIds,
+        gameMode,
       });
     } else if (selection.type === 'review') {
       onPlay({
         sessionType: 'random_review',
         packId: null,
         selectedWordIds: reviewWordIds,
+        gameMode: 'bridge_builder',
       });
     }
   };
@@ -235,7 +256,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
             />
             {expandedSection === section.id && unlocked && (
               <div className="bbs-pack-list">
-                {packData.map(({ pack, progress, unlocked: packUnlocked }) => (
+                {packData.map(({ pack, progress, unlocked: packUnlocked, completion }) => (
                   <PackCard
                     key={pack.id}
                     pack={pack}
@@ -243,6 +264,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                     unlocked={packUnlocked}
                     selected={isPackSelected(pack.id)}
                     onSelect={handlePackSelect}
+                    completion={completion}
                   />
                 ))}
               </div>

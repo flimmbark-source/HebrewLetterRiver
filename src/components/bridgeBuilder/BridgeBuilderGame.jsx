@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useBridgeBuilderGame from './useBridgeBuilderGame.js';
 import './BridgeBuilder.css';
 
@@ -127,7 +127,7 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack }) {
 
 /* ─── Main ─────────────────────────────────────────────── */
 
-export default function BridgeBuilderGame({ sessionConfig, onBack }) {
+export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComplete }) {
   const {
     phase,
     currentWord,
@@ -179,6 +179,15 @@ export default function BridgeBuilderGame({ sessionConfig, onBack }) {
       setDisplaySegment(currentSegment);
     }
   }, [wordIndex, currentSegment]);
+
+  // Notify parent when round completes successfully (not game over)
+  const notifiedRef = useRef(false);
+  useEffect(() => {
+    if (isRoundComplete && !isGameOver && !notifiedRef.current && onRoundComplete) {
+      notifiedRef.current = true;
+      onRoundComplete(sessionConfig.packId);
+    }
+  }, [isRoundComplete, isGameOver, onRoundComplete, sessionConfig.packId]);
 
   // Progress dots — fill based on session-completed words only
   const dots = Array.from({ length: totalWords }).map((_, i) => {
