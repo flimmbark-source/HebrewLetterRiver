@@ -19,12 +19,14 @@ function generatePositions(count, containerEl) {
   const cw = containerEl?.offsetWidth || 360;
   const ch = containerEl?.offsetHeight || 500;
 
-  const plankW = 140;
+  const edgeX = 24;
+  const edgeY = 24;
+  // Keep horizontal placement conservative so variable-width text planks
+  // still stay on-screen on narrow mobile viewports.
+  const plankW = Math.min(280, Math.max(140, cw - edgeX * 2));
   const plankH = 56;
   const minGapX = 16;
   const minGapY = 12;
-  const edgeX = 24;
-  const edgeY = 24;
 
   const maxX = cw - plankW - edgeX;
   const maxY = ch - plankH - edgeY;
