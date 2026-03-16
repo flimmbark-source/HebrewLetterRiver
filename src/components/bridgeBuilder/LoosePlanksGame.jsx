@@ -18,8 +18,8 @@ function shuffle(arr) {
  */
 function generatePositions(count) {
   // Screen-edge buffer (percentage of the floating area)
-  const padX = 6;  // left/right margin
-  const padY = 5;  // top/bottom margin
+  const padX = 12; // left/right margin
+  const padY = 10; // top/bottom margin
   const usableW = 100 - padX * 2;
   const usableH = 100 - padY * 2;
 
