@@ -166,5 +166,64 @@ export function getReviewEligibleWordIds() {
     .map(wp => wp.wordId);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Section progress — derived from pack progress
+   ═══════════════════════════════════════════════════════════ */
+
+/**
+ * Compute progress for a section.
+ * Aggregates progress across all packs in the section.
+ *
+ * @param {Object} section — section definition from bridgeBuilderSections
+ * @param {Object[]} sectionPacks — packs belonging to this section
+ * @param {{ [wordId: string]: WordProgress }} allProgress — all word progress
+ * @returns {{ sectionId, packsCompleted, totalPacks, wordsIntroducedCount, wordsLearnedCount, totalWords }}
+ */
+export function getSectionProgress(section, sectionPacks, allProgress) {
+  let packsCompleted = 0;
+  let wordsIntroducedCount = 0;
+  let wordsLearnedCount = 0;
+  let totalWords = 0;
+
+  for (const pack of sectionPacks) {
+    const pp = getPackProgress(pack, allProgress);
+    if (pp.completed) packsCompleted++;
+    wordsIntroducedCount += pp.wordsIntroducedCount;
+    wordsLearnedCount += pp.wordsLearnedCount;
+    totalWords += pp.totalWords;
+  }
+
+  return {
+    sectionId: section.id,
+    packsCompleted,
+    totalPacks: sectionPacks.length,
+    wordsIntroducedCount,
+    wordsLearnedCount,
+    totalWords,
+  };
+}
+
+/**
+ * Determine if a section is unlocked.
+ * A section is unlocked if:
+ *   - it is the first section (order 1), OR
+ *   - the previous section (by order) has all packs completed
+ *
+ * @param {Object} section — section definition
+ * @param {Object[]} allSections — all section definitions (sorted by order)
+ * @param {Object[]} allPacks — all pack definitions
+ * @param {{ [wordId: string]: WordProgress }} allProgress — all word progress
+ */
+export function isSectionUnlocked(section, allSections, allPacks, allProgress) {
+  if (section.order === 1) return true;
+
+  const prevSection = allSections.find(s => s.order === section.order - 1);
+  if (!prevSection) return true;
+
+  const prevPacks = allPacks.filter(p => p.sectionId === prevSection.id);
+  const prevProgress = getSectionProgress(prevSection, prevPacks, allProgress);
+  return prevProgress.packsCompleted >= prevProgress.totalPacks;
+}
+
 // Future glossary hook: call getAllWordProgress() and join with bridgeBuilderWords
 // to render a full glossary view with mastery indicators.
