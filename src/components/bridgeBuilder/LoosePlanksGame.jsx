@@ -14,7 +14,6 @@ function shuffle(arr) {
 
 /**
  * Generate center-biased scattered positions for planks.
- * Uses a Gaussian-like distribution to cluster planks toward the center.
  */
 function generatePositions(count, containerEl) {
   const cw = containerEl?.offsetWidth || 360;
@@ -34,9 +33,8 @@ function generatePositions(count, containerEl) {
   const centerX = edgeX + rangeX / 2;
   const centerY = edgeY + rangeY / 2;
 
-  // Center-biased random: average of two uniform randoms pulls toward center
   function centerRand(center, range) {
-    const r = (Math.random() + Math.random()) / 2; // triangular distribution, peaks at 0.5
+    const r = (Math.random() + Math.random()) / 2;
     return center + (r - 0.5) * range;
   }
 
@@ -80,9 +78,8 @@ function generatePositions(count, containerEl) {
 /**
  * LoosePlanksGame — second-pass reinforcement mode.
  *
- * Hebrew planks sit in a fixed row at the top. The floating planks on the
- * water are either transliteration or translation, chosen randomly per round.
- * Each word must be matched in both modes before the game is complete.
+ * Hebrew planks sit in a row at the top. Floating planks on the water are
+ * randomly either transliteration or translation per word per round.
  */
 export default function LoosePlanksGame({ sessionConfig, onBack }) {
   const { packId, selectedWordIds } = sessionConfig;
@@ -92,42 +89,16 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
     return selectedWordIds.map(id => wordMap.get(id)).filter(Boolean);
   }, [selectedWordIds]);
 
-  // Per-word completion: wordId → { translit: bool, translation: bool }
-  const [wordDone, setWordDone] = useState(() => {
-    const d = {};
-    for (const w of allWords) d[w.id] = { translit: false, translation: false };
-    return d;
-  });
-
-  // Build rounds: groups of 3, each round picks a plank type (translit or translation).
-  // A word appears in a round for whichever type it still needs.
-  // We rebuild rounds whenever wordDone changes.
-  const rounds = useMemo(() => {
-    // Collect words that still need translit, and words that still need translation
-    const needTranslit = allWords.filter(w => !wordDone[w.id].translit);
-    const needTranslation = allWords.filter(w => !wordDone[w.id].translation);
-
-    const result = [];
-
-    // Build rounds from needTranslit
-    for (let i = 0; i < needTranslit.length; i += 3) {
-      result.push({
-        words: needTranslit.slice(i, i + 3),
-        plankType: 'translit',
-      });
+  // Break words into groups of 3
+  const groups = useMemo(() => {
+    const g = [];
+    for (let i = 0; i < allWords.length; i += 3) {
+      g.push(allWords.slice(i, i + 3));
     }
-    // Build rounds from needTranslation
-    for (let i = 0; i < needTranslation.length; i += 3) {
-      result.push({
-        words: needTranslation.slice(i, i + 3),
-        plankType: 'translation',
-      });
-    }
+    return g;
+  }, [allWords]);
 
-    return shuffle(result);
-  }, [allWords, wordDone]);
-
-  const [roundIndex, setRoundIndex] = useState(0);
+  const [groupIndex, setGroupIndex] = useState(0);
   const [matched, setMatched] = useState(new Set());
   const [selected, setSelected] = useState(null);
   const [wrongPair, setWrongPair] = useState(null);
@@ -146,76 +117,48 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
     return () => ro.disconnect();
   }, []);
 
-  const currentRound = rounds[roundIndex] || null;
-  const currentWords = currentRound?.words || [];
-  const currentPlankType = currentRound?.plankType || 'translit';
+  const currentGroup = groups[groupIndex] || [];
 
-  // Hebrew planks for the current round
+  // For each word in the group, randomly pick translit or translation (stable per group)
+  const plankTypes = useMemo(() => {
+    const types = {};
+    for (const w of currentGroup) {
+      types[w.id] = Math.random() < 0.5 ? 'translit' : 'translation';
+    }
+    return types;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupIndex, currentGroup.length]);
+
+  // Hebrew planks — fixed row at top
   const hebrewPlanks = useMemo(() =>
-    currentWords.map(w => ({
-      key: `h-${w.id}-${roundIndex}`,
+    currentGroup.map(w => ({
+      key: `h-${w.id}`,
       type: 'hebrew',
       wordId: w.id,
       text: w.hebrew,
     })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [roundIndex, currentWords.length]
+    [groupIndex, currentGroup.length]
   );
 
-  // Floating planks: either transliteration or translation
+  // Floating planks — translit or translation per word
   const floatingLayout = useMemo(() => {
-    const planks = shuffle(currentWords).map(w => ({
-      key: `f-${w.id}-${roundIndex}`,
-      type: currentPlankType,
-      wordId: w.id,
-      text: currentPlankType === 'translit' ? w.transliteration : w.translation,
-    }));
+    const planks = shuffle(currentGroup).map(w => {
+      const pt = plankTypes[w.id];
+      return {
+        key: `f-${w.id}`,
+        type: pt,
+        wordId: w.id,
+        text: pt === 'translit' ? w.transliteration : w.translation,
+      };
+    });
     const positions = generatePositions(planks.length, riverRef.current);
     return planks.map((p, i) => ({ ...p, style: positions[i] }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roundIndex, currentWords.length, riverSize]);
+  }, [groupIndex, currentGroup.length, plankTypes, riverSize]);
 
   const floatVariants = ['lp-plank--float-a', 'lp-plank--float-b', 'lp-plank--float-c',
                          'lp-plank--float-d', 'lp-plank--float-e', 'lp-plank--float-f'];
-
-  const advanceRound = useCallback(() => {
-    if (roundIndex + 1 >= rounds.length) {
-      // All current rounds done — check if everything is fully complete
-      // (wordDone will be updated, triggering rounds recalc)
-      // If rounds becomes empty after update, we're done
-      setRoundComplete(true);
-    } else {
-      setTimeout(() => {
-        setRoundIndex(r => r + 1);
-        setMatched(new Set());
-        setSelected(null);
-      }, 600);
-    }
-  }, [roundIndex, rounds.length]);
-
-  // When wordDone changes, check if all words have both types done
-  const allComplete = useMemo(() =>
-    allWords.every(w => wordDone[w.id].translit && wordDone[w.id].translation),
-    [allWords, wordDone]
-  );
-
-  // When roundComplete is set but not allComplete, restart with new rounds
-  useEffect(() => {
-    if (roundComplete && !allComplete) {
-      // More rounds needed — reset for the new rounds list
-      setRoundComplete(false);
-      setRoundIndex(0);
-      setMatched(new Set());
-      setSelected(null);
-    }
-  }, [roundComplete, allComplete]);
-
-  // When truly all complete, mark pack done
-  useEffect(() => {
-    if (allComplete && roundComplete) {
-      if (packId) markLoosePlanksComplete(packId);
-    }
-  }, [allComplete, roundComplete, packId]);
 
   const handlePlankTap = useCallback((plank) => {
     if (matched.has(plank.wordId) || wrongPair) return;
@@ -241,17 +184,17 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
       setMatched(newMatched);
       setSelected(null);
 
-      // Mark this plank type as done for the word
-      setWordDone(prev => ({
-        ...prev,
-        [plank.wordId]: {
-          ...prev[plank.wordId],
-          [currentPlankType]: true,
-        },
-      }));
-
-      if (newMatched.size >= currentWords.length) {
-        advanceRound();
+      if (newMatched.size >= currentGroup.length) {
+        if (groupIndex + 1 >= groups.length) {
+          if (packId) markLoosePlanksComplete(packId);
+          setRoundComplete(true);
+        } else {
+          setTimeout(() => {
+            setGroupIndex(g => g + 1);
+            setMatched(new Set());
+            setSelected(null);
+          }, 600);
+        }
       }
     } else {
       setWrongPair({ wordId1: selected.wordId, wordId2: plank.wordId });
@@ -260,15 +203,12 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
         setSelected(null);
       }, 600);
     }
-  }, [selected, matched, currentWords, currentPlankType, wrongPair, advanceRound]);
+  }, [selected, matched, currentGroup, groupIndex, groups.length, packId, wrongPair]);
 
-  // Progress tracking
-  const totalPairs = allWords.length * 2; // each word needs translit + translation
-  const donePairs = allWords.reduce((n, w) =>
-    n + (wordDone[w.id].translit ? 1 : 0) + (wordDone[w.id].translation ? 1 : 0), 0
-  );
+  const totalMatched = groupIndex * 3 + matched.size;
+  const totalWords = allWords.length;
 
-  if (allComplete && roundComplete) {
+  if (roundComplete) {
     return (
       <div className="lp-world">
         <div className="lp-topbar">
@@ -303,7 +243,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
         <button className="lp-back" onClick={onBack} type="button">Back</button>
         <div className="lp-hud">
           <span className="lp-hud-stat">
-            {donePairs}<span className="lp-hud-label">/{totalPairs}</span>
+            {totalMatched}<span className="lp-hud-label">/{totalWords}</span>
           </span>
         </div>
       </div>
@@ -312,11 +252,11 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
       <div className="lp-instruction">
         {selected
           ? 'Now tap the matching plank'
-          : `Match the ${currentPlankType === 'translit' ? 'transliteration' : 'translation'}`}
+          : 'Tap a plank to select it'}
       </div>
 
       {/* Hebrew planks — fixed row at top, wraps if needed */}
-      <div className="lp-hebrew-row" key={`hrow-${roundIndex}`}>
+      <div className="lp-hebrew-row" key={`hrow-${groupIndex}`}>
         {hebrewPlanks.map((plank) => {
           const isMatched = matched.has(plank.wordId);
           const isSelected = selected?.wordId === plank.wordId && selected?.type === plank.type;
@@ -360,7 +300,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
           <div className="lp-water-shimmer" />
         </div>
 
-        <div className="lp-floating-area" key={roundIndex}>
+        <div className="lp-floating-area" key={groupIndex}>
           {floatingLayout.map((plank, i) => {
             const isMatched = matched.has(plank.wordId);
             const isSelected = selected?.wordId === plank.wordId && selected?.type === plank.type;
@@ -396,10 +336,10 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
 
       {/* Progress dots — pinned to bottom */}
       <div className="lp-progress-bar">
-        {Array.from({ length: totalPairs }).map((_, i) => {
+        {Array.from({ length: totalWords }).map((_, i) => {
           let cls = 'lp-dot';
-          if (i < donePairs) cls += ' lp-dot--done';
-          else if (i === donePairs) cls += ' lp-dot--active';
+          if (i < totalMatched) cls += ' lp-dot--done';
+          else if (i === totalMatched) cls += ' lp-dot--active';
           return <span key={i} className={cls} />;
         })}
       </div>
