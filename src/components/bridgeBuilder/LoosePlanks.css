@@ -193,6 +193,9 @@
   cursor: pointer;
   overflow: hidden;
   white-space: nowrap;
+  box-sizing: border-box;
+  width: min(180px, calc(100% - 48px));
+  max-width: calc(100% - 48px);
   font-family: inherit;
   transition: box-shadow 0.15s, border-color 0.2s;
   transform-origin: center center;
@@ -259,6 +262,8 @@
   font-size: 20px;
   font-weight: 800;
   text-shadow: 0 1px 0 rgba(255,255,255,0.15);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .lp-plank-text--rtl {
   font-family: 'Heebo', 'Noto Sans Hebrew', sans-serif;
