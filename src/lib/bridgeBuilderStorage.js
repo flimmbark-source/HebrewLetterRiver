@@ -144,12 +144,10 @@ export function getPackProgress(pack, allProgress) {
  * @param {Object[]} allPacks — all pack definitions
  * @param {{ [wordId: string]: WordProgress }} allProgress — all word progress
  */
-export function isPackUnlocked(pack, allPacks, allProgress) {
-  if (!pack.unlockAfter) return true;
-  const priorPack = allPacks.find(p => p.id === pack.unlockAfter);
-  if (!priorPack) return true;
-  const priorProgress = getPackProgress(priorPack, allProgress);
-  return priorProgress.completed;
+export function isPackUnlocked(/* pack, allPacks, allProgress */) {
+  // All packs are currently unlocked — progression gating can be
+  // re-enabled later by checking pack.unlockAfter against prior pack completion.
+  return true;
 }
 
 /**
@@ -164,6 +162,60 @@ export function getReviewEligibleWordIds() {
   return Object.values(allProgress)
     .filter(wp => wp.masteryStage !== 'new' && wp.meaningIntroduced)
     .map(wp => wp.wordId);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Section progress — derived from pack progress
+   ═══════════════════════════════════════════════════════════ */
+
+/**
+ * Compute progress for a section.
+ * Aggregates progress across all packs in the section.
+ *
+ * @param {Object} section — section definition from bridgeBuilderSections
+ * @param {Object[]} sectionPacks — packs belonging to this section
+ * @param {{ [wordId: string]: WordProgress }} allProgress — all word progress
+ * @returns {{ sectionId, packsCompleted, totalPacks, wordsIntroducedCount, wordsLearnedCount, totalWords }}
+ */
+export function getSectionProgress(section, sectionPacks, allProgress) {
+  let packsCompleted = 0;
+  let wordsIntroducedCount = 0;
+  let wordsLearnedCount = 0;
+  let totalWords = 0;
+
+  for (const pack of sectionPacks) {
+    const pp = getPackProgress(pack, allProgress);
+    if (pp.completed) packsCompleted++;
+    wordsIntroducedCount += pp.wordsIntroducedCount;
+    wordsLearnedCount += pp.wordsLearnedCount;
+    totalWords += pp.totalWords;
+  }
+
+  return {
+    sectionId: section.id,
+    packsCompleted,
+    totalPacks: sectionPacks.length,
+    wordsIntroducedCount,
+    wordsLearnedCount,
+    totalWords,
+  };
+}
+
+/**
+ * Determine if a section is unlocked.
+ * A section is unlocked if:
+ *   - it is the first section (order 1), OR
+ *   - the previous section (by order) has all packs completed
+ *
+ * @param {Object} section — section definition
+ * @param {Object[]} allSections — all section definitions (sorted by order)
+ * @param {Object[]} allPacks — all pack definitions
+ * @param {{ [wordId: string]: WordProgress }} allProgress — all word progress
+ */
+export function isSectionUnlocked(/* section, allSections, allPacks, allProgress */) {
+  // All sections are currently unlocked — progression gating can be
+  // re-enabled later by checking prior section completion.
+  return true;
 }
 
 // Future glossary hook: call getAllWordProgress() and join with bridgeBuilderWords

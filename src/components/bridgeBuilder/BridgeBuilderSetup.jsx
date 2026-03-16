@@ -1,9 +1,12 @@
-import React, { useMemo } from 'react';
-import { getPacksInOrder } from '../../data/bridgeBuilderPacks.js';
+import React, { useMemo, useState } from 'react';
+import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
+import { getPacksBySection } from '../../data/bridgeBuilderPacks.js';
 import {
   getAllWordProgress,
   getPackProgress,
   isPackUnlocked,
+  getSectionProgress,
+  isSectionUnlocked,
   getReviewEligibleWordIds,
 } from '../../lib/bridgeBuilderStorage.js';
 import './BridgeBuilderSetup.css';
@@ -60,6 +63,63 @@ function PackCard({ pack, progress, unlocked, selected, onSelect }) {
   );
 }
 
+/* ─── Section Header Card ─────────────────────────────────── */
+
+function SectionCard({ section, sectionProgress, unlocked, expanded, onToggle }) {
+  const { packsCompleted, totalPacks, wordsIntroducedCount, totalWords } = sectionProgress;
+
+  let statusLabel;
+  let statusCls = 'bbs-section-status';
+  if (!unlocked) {
+    statusLabel = 'Locked';
+    statusCls += ' bbs-section-status--locked';
+  } else if (packsCompleted >= totalPacks) {
+    statusLabel = 'Completed';
+    statusCls += ' bbs-section-status--completed';
+  } else if (wordsIntroducedCount > 0) {
+    statusLabel = `${packsCompleted}/${totalPacks} packs`;
+    statusCls += ' bbs-section-status--progress';
+  } else {
+    statusLabel = `${totalPacks} packs`;
+    statusCls += ' bbs-section-status--new';
+  }
+
+  let cardCls = 'bbs-section-card';
+  if (!unlocked) cardCls += ' bbs-section-card--locked';
+  if (expanded) cardCls += ' bbs-section-card--expanded';
+
+  return (
+    <button
+      type="button"
+      className={cardCls}
+      onClick={() => unlocked && onToggle(section.id)}
+      disabled={!unlocked}
+    >
+      <div className="bbs-section-icon">
+        {!unlocked ? '🔒' : packsCompleted >= totalPacks ? '⭐' : '📖'}
+      </div>
+      <div className="bbs-section-info">
+        <div className="bbs-section-card-title">{section.title}</div>
+        <div className="bbs-section-desc">{section.description}</div>
+        <div className={statusCls}>{statusLabel}</div>
+      </div>
+      {unlocked && (
+        <div className={`bbs-section-chevron ${expanded ? 'bbs-section-chevron--open' : ''}`}>
+          ▸
+        </div>
+      )}
+      {unlocked && wordsIntroducedCount > 0 && (
+        <div className="bbs-section-bar">
+          <div
+            className="bbs-section-bar-fill"
+            style={{ width: `${(packsCompleted / totalPacks) * 100}%` }}
+          />
+        </div>
+      )}
+    </button>
+  );
+}
+
 /* ─── Random Review Card ──────────────────────────────────── */
 
 function ReviewCard({ eligibleCount, selected, onSelect }) {
@@ -92,19 +152,32 @@ function ReviewCard({ eligibleCount, selected, onSelect }) {
 /* ─── Main Setup Screen ──────────────────────────────────── */
 
 export default function BridgeBuilderSetup({ onPlay, onBack }) {
-  const [selection, setSelection] = React.useState(null); // { type: 'pack', packId } | { type: 'review' } | null
+  const [selection, setSelection] = useState(null); // { type: 'pack', packId } | { type: 'review' } | null
+  const [expandedSection, setExpandedSection] = useState('foundations'); // start with first section open
 
-  const packs = useMemo(() => getPacksInOrder(), []);
+  const sections = useMemo(() => getSectionsInOrder(), []);
   const allProgress = useMemo(() => getAllWordProgress(), []);
   const reviewWordIds = useMemo(() => getReviewEligibleWordIds(), []);
 
-  const packData = useMemo(() => {
-    return packs.map(pack => ({
-      pack,
-      progress: getPackProgress(pack, allProgress),
-      unlocked: isPackUnlocked(pack, packs, allProgress),
-    }));
-  }, [packs, allProgress]);
+  // Build section data with packs
+  const sectionData = useMemo(() => {
+    const allPacks = sections.flatMap(s => getPacksBySection(s.id));
+    return sections.map(section => {
+      const packs = getPacksBySection(section.id);
+      const sectionProgress = getSectionProgress(section, packs, allProgress);
+      const unlocked = isSectionUnlocked(section, sections, allPacks, allProgress);
+      const packData = packs.map(pack => ({
+        pack,
+        progress: getPackProgress(pack, allProgress),
+        unlocked: unlocked && isPackUnlocked(pack, packs, allProgress),
+      }));
+      return { section, sectionProgress, unlocked, packData };
+    });
+  }, [sections, allProgress]);
+
+  const handleToggleSection = (sectionId) => {
+    setExpandedSection(prev => prev === sectionId ? null : sectionId);
+  };
 
   const handlePackSelect = (packId) => {
     setSelection({ type: 'pack', packId });
@@ -117,7 +190,9 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const handlePlay = () => {
     if (!selection) return;
     if (selection.type === 'pack') {
-      const pack = packs.find(p => p.id === selection.packId);
+      // Find the pack across all sections
+      const allPacks = sectionData.flatMap(sd => sd.packData.map(pd => pd.pack));
+      const pack = allPacks.find(p => p.id === selection.packId);
       if (!pack) return;
       onPlay({
         sessionType: 'guided_pack',
@@ -148,22 +223,32 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
 
       {/* Scrollable content */}
       <div className="bbs-content">
-        {/* Guided Packs */}
-        <section className="bbs-section">
-          <h2 className="bbs-section-title">Guided Packs</h2>
-          <div className="bbs-pack-list">
-            {packData.map(({ pack, progress, unlocked }) => (
-              <PackCard
-                key={pack.id}
-                pack={pack}
-                progress={progress}
-                unlocked={unlocked}
-                selected={isPackSelected(pack.id)}
-                onSelect={handlePackSelect}
-              />
-            ))}
-          </div>
-        </section>
+        {/* Curriculum Sections */}
+        {sectionData.map(({ section, sectionProgress, unlocked, packData }) => (
+          <section key={section.id} className="bbs-section">
+            <SectionCard
+              section={section}
+              sectionProgress={sectionProgress}
+              unlocked={unlocked}
+              expanded={expandedSection === section.id}
+              onToggle={handleToggleSection}
+            />
+            {expandedSection === section.id && unlocked && (
+              <div className="bbs-pack-list">
+                {packData.map(({ pack, progress, unlocked: packUnlocked }) => (
+                  <PackCard
+                    key={pack.id}
+                    pack={pack}
+                    progress={progress}
+                    unlocked={packUnlocked}
+                    selected={isPackSelected(pack.id)}
+                    onSelect={handlePackSelect}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        ))}
 
         {/* Random Review */}
         <section className="bbs-section">
