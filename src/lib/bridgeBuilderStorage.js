@@ -218,5 +218,50 @@ export function isSectionUnlocked(/* section, allSections, allPacks, allProgress
   return true;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Pack completion — 2-step progression (Bridge Builder → Loose Planks)
+   ═══════════════════════════════════════════════════════════ */
+
+const PACK_COMPLETION_KEY = 'bridgeBuilderPackCompletion';
+
+/**
+ * Get completion state for a pack.
+ * @returns {{ bridgeBuilderComplete: boolean, loosePlanksComplete: boolean }}
+ */
+export function getPackCompletion(packId) {
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  return all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false };
+}
+
+/**
+ * Get completion state for all packs.
+ * @returns {{ [packId: string]: { bridgeBuilderComplete: boolean, loosePlanksComplete: boolean } }}
+ */
+export function getAllPackCompletions() {
+  return loadState(PACK_COMPLETION_KEY, {});
+}
+
+/**
+ * Mark a pack's Bridge Builder pass as complete.
+ */
+export function markBridgeBuilderComplete(packId) {
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false };
+  entry.bridgeBuilderComplete = true;
+  all[packId] = entry;
+  saveState(PACK_COMPLETION_KEY, all);
+}
+
+/**
+ * Mark a pack's Loose Planks pass as complete.
+ */
+export function markLoosePlanksComplete(packId) {
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false };
+  entry.loosePlanksComplete = true;
+  all[packId] = entry;
+  saveState(PACK_COMPLETION_KEY, all);
+}
+
 // Future glossary hook: call getAllWordProgress() and join with bridgeBuilderWords
 // to render a full glossary view with mastery indicators.

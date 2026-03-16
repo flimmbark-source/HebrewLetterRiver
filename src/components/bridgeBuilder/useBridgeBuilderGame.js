@@ -199,8 +199,9 @@ export default function useBridgeBuilderGame(sessionConfig) {
         const prevState = sessionStatesRef.current[wordId];
         let nextState;
         if (isGuidedPack && prevState === 'pending') {
-          // First encounter in guided pack → learned (must come back for recall)
-          nextState = 'learned';
+          // Words already introduced in a prior session complete in one pass
+          const prog = getWordProgress(wordId);
+          nextState = prog.meaningIntroduced ? 'completed' : 'learned';
         } else {
           // Recall in guided pack (learned → completed), or any encounter in review
           nextState = 'completed';

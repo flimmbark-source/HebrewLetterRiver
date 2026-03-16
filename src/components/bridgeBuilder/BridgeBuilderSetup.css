@@ -312,6 +312,59 @@
   background: rgba(107,114,128,0.1);
 }
 
+/* ─── Pack completion dots (top-right) ────────────────────── */
+.bbs-pack-dots {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.bbs-pack-dot-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bbs-pack-dot-emoji {
+  font-size: 8px;
+  line-height: 1;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.bbs-pack-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.12);
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  pointer-events: none;
+}
+
+.bbs-pack-dot-col:hover .bbs-pack-dot {
+  transform: scale(1.3);
+}
+
+.bbs-pack-dot--complete {
+  background: #22c55e;
+  border-color: #16a34a;
+  box-shadow: 0 0 4px rgba(34, 197, 94, 0.35);
+}
+
+.bbs-pack-dot--override {
+  background: #fbbf24;
+  border-color: #d97706;
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
+  transform: scale(1.2);
+}
+
 /* Pack progress bar */
 .bbs-pack-bar {
   position: absolute;

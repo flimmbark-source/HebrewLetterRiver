@@ -8,13 +8,15 @@ import {
   getSectionProgress,
   isSectionUnlocked,
   getReviewEligibleWordIds,
+  getAllPackCompletions,
 } from '../../lib/bridgeBuilderStorage.js';
 import './BridgeBuilderSetup.css';
 
 /* ─── Pack Card ───────────────────────────────────────────── */
 
-function PackCard({ pack, progress, unlocked, selected, onSelect }) {
+function PackCard({ pack, progress, unlocked, selected, onSelect, completion, modeOverride, onDotClick }) {
   const { wordsIntroducedCount, wordsLearnedCount, totalWords, completed } = progress;
+  const { bridgeBuilderComplete, loosePlanksComplete } = completion;
 
   let statusLabel;
   let statusCls = 'bbs-pack-status';
@@ -36,6 +38,32 @@ function PackCard({ pack, progress, unlocked, selected, onSelect }) {
   if (selected) cardCls += ' bbs-pack-card--selected';
   if (!unlocked) cardCls += ' bbs-pack-card--locked';
 
+  // Dot 1 = Bridge Builder, Dot 2 = Loose Planks
+  // Natural state: gray (incomplete) or green (complete)
+  // Override state: yellow (this mode will be played)
+  const dot1Override = modeOverride === 'bridge_builder';
+  const dot2Override = modeOverride === 'loose_planks';
+
+  let dot1Cls = 'bbs-pack-dot';
+  if (dot1Override) dot1Cls += ' bbs-pack-dot--override';
+  else if (bridgeBuilderComplete) dot1Cls += ' bbs-pack-dot--complete';
+
+  let dot2Cls = 'bbs-pack-dot';
+  if (dot2Override) dot2Cls += ' bbs-pack-dot--override';
+  else if (loosePlanksComplete) dot2Cls += ' bbs-pack-dot--complete';
+
+  const handleDot1Click = (e) => {
+    e.stopPropagation();
+    if (!unlocked) return;
+    onDotClick(pack.id, 'bridge_builder');
+  };
+
+  const handleDot2Click = (e) => {
+    e.stopPropagation();
+    if (!unlocked) return;
+    onDotClick(pack.id, 'loose_planks');
+  };
+
   return (
     <button
       type="button"
@@ -43,6 +71,17 @@ function PackCard({ pack, progress, unlocked, selected, onSelect }) {
       onClick={() => unlocked && onSelect(pack.id)}
       disabled={!unlocked}
     >
+      {/* Progress dots — top-right corner, individually clickable */}
+      <div className="bbs-pack-dots">
+        <div className="bbs-pack-dot-col" onClick={handleDot1Click} role="button" tabIndex={unlocked ? 0 : -1}>
+          <span className="bbs-pack-dot-emoji">🪢</span>
+          <span className={dot1Cls} />
+        </div>
+        <div className="bbs-pack-dot-col" onClick={handleDot2Click} role="button" tabIndex={unlocked ? 0 : -1}>
+          <span className="bbs-pack-dot-emoji">🪵</span>
+          <span className={dot2Cls} />
+        </div>
+      </div>
       <div className="bbs-pack-icon">
         {!unlocked ? '🔒' : completed ? '✅' : '📦'}
       </div>
@@ -154,10 +193,13 @@ function ReviewCard({ eligibleCount, selected, onSelect }) {
 export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const [selection, setSelection] = useState(null); // { type: 'pack', packId } | { type: 'review' } | null
   const [expandedSection, setExpandedSection] = useState('foundations'); // start with first section open
+  // Per-pack mode override: { [packId]: 'bridge_builder' | 'loose_planks' }
+  const [modeOverrides, setModeOverrides] = useState({});
 
   const sections = useMemo(() => getSectionsInOrder(), []);
   const allProgress = useMemo(() => getAllWordProgress(), []);
   const reviewWordIds = useMemo(() => getReviewEligibleWordIds(), []);
+  const packCompletions = useMemo(() => getAllPackCompletions(), []);
 
   // Build section data with packs
   const sectionData = useMemo(() => {
@@ -170,10 +212,11 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
         pack,
         progress: getPackProgress(pack, allProgress),
         unlocked: unlocked && isPackUnlocked(pack, packs, allProgress),
+        completion: packCompletions[pack.id] || { bridgeBuilderComplete: false, loosePlanksComplete: false },
       }));
       return { section, sectionProgress, unlocked, packData };
     });
-  }, [sections, allProgress]);
+  }, [sections, allProgress, packCompletions]);
 
   const handleToggleSection = (sectionId) => {
     setExpandedSection(prev => prev === sectionId ? null : sectionId);
@@ -181,6 +224,20 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
 
   const handlePackSelect = (packId) => {
     setSelection({ type: 'pack', packId });
+  };
+
+  const handleDotClick = (packId, mode) => {
+    // Also select this pack when a dot is clicked
+    setSelection({ type: 'pack', packId });
+    setModeOverrides(prev => {
+      // Toggle: if same mode already set, clear it; otherwise set it
+      if (prev[packId] === mode) {
+        const next = { ...prev };
+        delete next[packId];
+        return next;
+      }
+      return { ...prev, [packId]: mode };
+    });
   };
 
   const handleReviewSelect = () => {
@@ -191,19 +248,35 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     if (!selection) return;
     if (selection.type === 'pack') {
       // Find the pack across all sections
-      const allPacks = sectionData.flatMap(sd => sd.packData.map(pd => pd.pack));
-      const pack = allPacks.find(p => p.id === selection.packId);
-      if (!pack) return;
+      const allPackData = sectionData.flatMap(sd => sd.packData);
+      const pd = allPackData.find(p => p.pack.id === selection.packId);
+      if (!pd) return;
+      const pack = pd.pack;
+      const { bridgeBuilderComplete, loosePlanksComplete } = pd.completion;
+
+      // Determine game mode: override takes priority, then completion state
+      const override = modeOverrides[pack.id];
+      let gameMode;
+      if (override) {
+        gameMode = override;
+      } else if (bridgeBuilderComplete && !loosePlanksComplete) {
+        gameMode = 'loose_planks';
+      } else {
+        gameMode = 'bridge_builder';
+      }
+
       onPlay({
         sessionType: 'guided_pack',
         packId: pack.id,
         selectedWordIds: pack.wordIds,
+        gameMode,
       });
     } else if (selection.type === 'review') {
       onPlay({
         sessionType: 'random_review',
         packId: null,
         selectedWordIds: reviewWordIds,
+        gameMode: 'bridge_builder',
       });
     }
   };
@@ -235,7 +308,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
             />
             {expandedSection === section.id && unlocked && (
               <div className="bbs-pack-list">
-                {packData.map(({ pack, progress, unlocked: packUnlocked }) => (
+                {packData.map(({ pack, progress, unlocked: packUnlocked, completion }) => (
                   <PackCard
                     key={pack.id}
                     pack={pack}
@@ -243,6 +316,9 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                     unlocked={packUnlocked}
                     selected={isPackSelected(pack.id)}
                     onSelect={handlePackSelect}
+                    completion={completion}
+                    modeOverride={modeOverrides[pack.id] || null}
+                    onDotClick={handleDotClick}
                   />
                 ))}
               </div>

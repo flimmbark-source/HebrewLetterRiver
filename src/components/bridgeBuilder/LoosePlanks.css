@@ -1,0 +1,419 @@
+/* ═══════════════════════════════════════════════════════════
+   Loose Planks — all planks float randomly on the river
+   ═══════════════════════════════════════════════════════════ */
+
+.lp-world {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Nunito', system-ui, sans-serif;
+  overflow: hidden;
+  background: linear-gradient(180deg, #c9e8f7 0%, #daf0fc 50%, #e4f6ee 100%);
+  z-index: 101;
+}
+
+/* ─── Top bar ──────────────────────────────────────────── */
+.lp-topbar {
+  flex-shrink: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  padding-top: env(safe-area-inset-top, 0);
+  z-index: 20;
+}
+
+.lp-back {
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(6px);
+  border: 2px solid rgba(255,255,255,0.5);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  color: #1a4a30;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.lp-back:active { transform: translateY(1px); }
+
+.lp-hud {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.lp-hud-stat {
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: #1a4a30;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+}
+.lp-hud-label { font-size: 10px; font-weight: 600; opacity: 0.6; }
+
+/* ─── Instruction ──────────────────────────────────────── */
+.lp-instruction {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #5a4428;
+  opacity: 0.7;
+}
+
+/* ─── Top bank ─────────────────────────────────────────── */
+.lp-bank { flex-shrink: 0; position: relative; z-index: 2; }
+.lp-bank-grass {
+  height: 14px;
+  background: linear-gradient(180deg, #6db86a 0%, #4a9e5a 60%, #3d8a4e 100%);
+  position: relative;
+}
+.lp-bank--top .lp-bank-grass::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  bottom: -3px;
+  height: 5px;
+  background:
+    radial-gradient(ellipse 12px 4px at 8% 50%, #4a9e5a 70%, transparent 71%),
+    radial-gradient(ellipse 14px 5px at 22% 50%, #3d8a4e 70%, transparent 71%),
+    radial-gradient(ellipse 10px 4px at 38% 50%, #4a9e5a 70%, transparent 71%),
+    radial-gradient(ellipse 16px 5px at 54% 50%, #3d8a4e 70%, transparent 71%),
+    radial-gradient(ellipse 11px 4px at 68% 50%, #4a9e5a 70%, transparent 71%),
+    radial-gradient(ellipse 13px 4px at 84% 50%, #3d8a4e 70%, transparent 71%);
+  z-index: 1;
+}
+.lp-bank-dirt {
+  height: 20px;
+  background: linear-gradient(180deg, #8B6F47 0%, #7a5e3a 100%);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+}
+
+/* ─── River — fills remaining space to bottom ──────────── */
+.lp-river {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.lp-water { position: absolute; inset: 0; }
+.lp-water-surface {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, #3694b8 0%, #49c5e0 20%, #5bd0e8 40%, #49c5e0 60%, #3cb4d5 80%, #2d8aaa 100%);
+}
+.lp-water-shimmer {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px, rgba(255,255,255,0.07) 40px,
+    transparent 80px, rgba(255,255,255,0.1) 140px, transparent 180px
+  );
+  background-size: 360px 100%;
+  animation: lp-shimmer 5s linear infinite;
+}
+@keyframes lp-shimmer {
+  0% { background-position: 0 0; }
+  100% { background-position: 360px 0; }
+}
+.lp-water-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px, rgba(255,255,255,0.04) 1px,
+    transparent 2px, transparent 18px
+  );
+  animation: lp-ripple 3s ease-in-out infinite alternate;
+}
+@keyframes lp-ripple {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+/* ─── Hebrew plank row — fixed at top, wraps ────────────── */
+.lp-hebrew-row {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px;
+  position: relative;
+  top: 75px;
+  margin-bottom: -55px;
+  z-index: 5;
+  animation: lp-planks-enter 0.35s ease-out;
+}
+
+/* Inline plank (flow layout, not absolute) */
+.lp-plank-inline {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: box-shadow 0.15s, border-color 0.2s;
+  transform-origin: center center;
+}
+
+/* ─── Floating area — all planks scattered here ────────── */
+.lp-floating-area {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  animation: lp-planks-enter 0.35s ease-out;
+}
+
+@keyframes lp-planks-enter {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ─── Unified plank base ──────────────────────────────── */
+.lp-plank {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: box-shadow 0.15s, border-color 0.2s;
+  transform-origin: center center;
+}
+
+/* Hebrew variant — darker wood */
+.lp-plank--hebrew {
+  background: linear-gradient(180deg, #8B6F47 0%, #7a5f3e 50%, #8B6F47 100%);
+  border: 3px solid #5a4428;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 3px 0 #3e2e16, 0 5px 12px rgba(0,0,0,0.2);
+}
+.lp-plank--hebrew .lp-plank-text { color: #f5e6cc; }
+
+/* Transliteration variant — lighter wood */
+.lp-plank--translit {
+  background: linear-gradient(
+    90deg,
+    #d4a76a 0%, #c99d5c 15%, #d4a76a 30%,
+    #c89b58 50%, #d4a76a 70%, #ccaa6a 85%, #d4a76a 100%
+  );
+  border: 3px solid #a07030;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.2),
+    inset 0 -2px 0 rgba(0,0,0,0.08),
+    0 4px 0 #8a5e28,
+    0 6px 12px rgba(0,0,0,0.18);
+}
+.lp-plank--translit .lp-plank-text { color: #3e1f04; }
+
+/* ─── Plank states ─────────────────────────────────────── */
+.lp-plank--selected {
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 0 3px rgba(251,191,36,0.4), 0 4px 0 #b8860b, 0 6px 16px rgba(251,191,36,0.3) !important;
+  z-index: 10;
+}
+
+.lp-plank--matched {
+  border-color: #22c55e !important;
+  background: linear-gradient(90deg, #86c77a 0%, #6db86a 40%, #86c77a 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 3px 0 #2d6b3a, 0 5px 14px rgba(34,197,94,0.2) !important;
+  opacity: 0.35;
+  cursor: default;
+  animation: none !important;
+}
+.lp-plank--matched .lp-plank-text { color: #1a3a0a !important; }
+
+.lp-plank--wrong {
+  border-color: #ef4444 !important;
+  animation: lp-shake 0.4s ease !important;
+}
+
+@keyframes lp-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+/* ─── Plank text ───────────────────────────────────────── */
+.lp-plank-text {
+  position: relative;
+  z-index: 1;
+  font-size: 20px;
+  font-weight: 800;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.15);
+}
+.lp-plank-text--rtl {
+  font-family: 'Heebo', 'Noto Sans Hebrew', sans-serif;
+  font-size: 22px;
+  direction: rtl;
+}
+
+/* Grain overlay */
+.lp-plank-grain {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent 0px, rgba(0,0,0,0.04) 1px,
+    transparent 2px, transparent 5px
+  );
+  pointer-events: none;
+}
+
+/* ─── Float animations — 6 variants for variety ───────── */
+.lp-plank--float-a { animation: lp-float-a 3.2s ease-in-out infinite; }
+.lp-plank--float-b { animation: lp-float-b 2.8s ease-in-out infinite; }
+.lp-plank--float-c { animation: lp-float-c 3.5s ease-in-out infinite; }
+.lp-plank--float-d { animation: lp-float-d 3.0s ease-in-out infinite; }
+.lp-plank--float-e { animation: lp-float-e 3.4s ease-in-out infinite; }
+.lp-plank--float-f { animation: lp-float-f 2.6s ease-in-out infinite; }
+
+@keyframes lp-float-a {
+  0%, 100% { transform: translateY(0) rotate(-0.5deg); }
+  50% { transform: translateY(-6px) rotate(0.5deg); }
+}
+@keyframes lp-float-b {
+  0%, 100% { transform: translateY(0) rotate(0.5deg); }
+  50% { transform: translateY(-5px) rotate(-0.5deg); }
+}
+@keyframes lp-float-c {
+  0%, 100% { transform: translateY(0) rotate(0.3deg); }
+  50% { transform: translateY(-7px) rotate(-0.3deg); }
+}
+@keyframes lp-float-d {
+  0%, 100% { transform: translateY(0) rotate(-0.3deg); }
+  50% { transform: translateY(-4px) rotate(0.4deg); }
+}
+@keyframes lp-float-e {
+  0%, 100% { transform: translateY(0) rotate(0.4deg); }
+  50% { transform: translateY(-8px) rotate(-0.4deg); }
+}
+@keyframes lp-float-f {
+  0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+  50% { transform: translateY(-5px) rotate(0.3deg); }
+}
+
+/* ─── Progress dots ────────────────────────────────────── */
+.lp-progress-bar {
+  flex-shrink: 0;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: rgba(30, 70, 100, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+.lp-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: background 0.3s, transform 0.3s;
+}
+.lp-dot--done {
+  background: #22c55e;
+  box-shadow: 0 0 4px rgba(34,197,94,0.4);
+}
+.lp-dot--active {
+  background: #fbbf24;
+  box-shadow: 0 0 6px rgba(251,191,36,0.5);
+  transform: scale(1.3);
+}
+
+/* ─── End Screen ───────────────────────────────────────── */
+.lp-end {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 12px;
+}
+.lp-end-card {
+  background: linear-gradient(135deg, #fffdf0 0%, #fff8e1 100%);
+  border: 3px solid #d4a76a;
+  border-radius: 24px;
+  padding: 40px 24px;
+  text-align: center;
+  box-shadow: 0 4px 0 #a07030, 0 8px 20px rgba(0,0,0,0.12);
+  max-width: 480px;
+  width: calc(100% - 24px);
+}
+.lp-end-title {
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: #3e1f04;
+  margin: 0 0 24px;
+}
+.lp-end-words {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.lp-end-word {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.lp-end-hebrew {
+  font-family: 'Heebo', 'Noto Sans Hebrew', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #3e1f04;
+  direction: rtl;
+}
+.lp-end-translit {
+  font-size: 16px;
+  font-weight: 700;
+  color: #5a4428;
+}
+.lp-end-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+}
+.lp-end-btn {
+  display: inline-block;
+  padding: 16px 48px;
+  border: none;
+  border-radius: 999px;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  width: 80%;
+  max-width: 300px;
+}
+.lp-end-btn--primary {
+  color: #4a1a06;
+  background: radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%);
+  box-shadow: 0 4px 0 #c85a24, 0 6px 10px rgba(200,90,36,0.4);
+}
+.lp-end-btn--primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #c85a24, 0 4px 6px rgba(200,90,36,0.4);
+}
