@@ -96,19 +96,25 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
     for (let i = 0; i < allWords.length; i += 3) {
       wordGroups.push(allWords.slice(i, i + 3));
     }
+    // Track which type each word has been assigned so far
+    const wordFirstType = {}; // wordId → 'translit' | 'translation'
     const roundList = [];
     for (const group of wordGroups) {
-      // Random type per word for pass 1
+      // Pass 1: random type per word, independently
       const pass1Types = {};
       for (const w of group) {
         pass1Types[w.id] = Math.random() < 0.5 ? 'translit' : 'translation';
-      }
-      // Pass 2 flips each word's type
-      const pass2Types = {};
-      for (const w of group) {
-        pass2Types[w.id] = pass1Types[w.id] === 'translit' ? 'translation' : 'translit';
+        wordFirstType[w.id] = pass1Types[w.id];
       }
       roundList.push({ words: group, plankTypes: pass1Types });
+    }
+    for (const group of wordGroups) {
+      // Pass 2: each word gets whichever type it didn't get in pass 1,
+      // but the per-word assignments are still mixed within the round
+      const pass2Types = {};
+      for (const w of group) {
+        pass2Types[w.id] = wordFirstType[w.id] === 'translit' ? 'translation' : 'translit';
+      }
       roundList.push({ words: group, plankTypes: pass2Types });
     }
     return shuffle(roundList);
