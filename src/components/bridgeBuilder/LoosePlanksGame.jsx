@@ -32,6 +32,19 @@ function generatePositions(count, containerEl) {
   const rangeY = maxY - edgeY;
   const centerX = edgeX + rangeX / 2;
   const centerY = edgeY + rangeY / 2;
+  const clusterSpreadX = Math.max(80, rangeX * 0.22);
+  const clusterSpreadY = Math.max(72, rangeY * 0.2);
+
+  // Keep cluster anchors near the center so planks feel grouped there,
+  // while still leaving enough variance to avoid a rigid pattern.
+  const clusterCount = Math.min(3, Math.max(1, Math.ceil(count / 2)));
+  const anchors = Array.from({ length: clusterCount }, (_, i) => {
+    const offset = clusterCount === 1 ? 0 : (i - (clusterCount - 1) / 2);
+    return {
+      x: centerX + offset * Math.min(96, rangeX * 0.16),
+      y: centerY + (Math.random() - 0.5) * Math.min(56, rangeY * 0.12),
+    };
+  });
 
   function centerRand(center, range) {
     const r = (Math.random() + Math.random()) / 2;
@@ -51,8 +64,9 @@ function generatePositions(count, containerEl) {
   for (let i = 0; i < count; i++) {
     let best = null;
     for (let attempt = 0; attempt < 300; attempt++) {
-      const x = Math.max(edgeX, Math.min(maxX, centerRand(centerX, rangeX)));
-      const y = Math.max(edgeY, Math.min(maxY, centerRand(centerY, rangeY)));
+      const anchor = anchors[i % anchors.length];
+      const x = Math.max(edgeX, Math.min(maxX, centerRand(anchor.x, clusterSpreadX)));
+      const y = Math.max(edgeY, Math.min(maxY, centerRand(anchor.y, clusterSpreadY)));
       if (!overlaps(x, y, placed)) {
         best = { x, y };
         break;
