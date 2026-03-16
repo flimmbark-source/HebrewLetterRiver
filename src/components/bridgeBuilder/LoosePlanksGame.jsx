@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { bridgeBuilderWords } from '../../data/bridgeBuilderWords.js';
 import { markLoosePlanksComplete } from '../../lib/bridgeBuilderStorage.js';
 import './LoosePlanks.css';
@@ -16,32 +16,44 @@ function shuffle(arr) {
  * Generate scattered positions for planks.
  * Returns an array of { top, left } percentage values.
  */
-function generatePositions(count) {
-  // Screen-edge buffer (percentage of the floating area)
-  const padX = 12; // left/right margin
-  const padY = 10; // top/bottom margin
-  const usableW = 100 - padX * 2;
-  const usableH = 100 - padY * 2;
+function generatePositions(count, containerEl) {
+  // Use actual container dimensions to calculate pixel-aware positions
+  const cw = containerEl?.offsetWidth || 360;
+  const ch = containerEl?.offsetHeight || 500;
 
-  // Grid-based approach: divide usable space into cells, jitter within each cell
+  // Plank approximate size in pixels (padding + text)
+  const plankW = 120;
+  const plankH = 50;
+
+  // Screen-edge buffer in pixels
+  const edgeX = 16;
+  const edgeY = 16;
+
+  // Usable area in pixels (account for plank size so they don't overflow)
+  const areaX = edgeX;
+  const areaY = edgeY;
+  const areaW = cw - plankW - edgeX * 2;
+  const areaH = ch - plankH - edgeY * 2;
+
+  // Grid-based: divide into cells, jitter within each
   const cols = Math.min(count, 3);
   const rows = Math.ceil(count / cols);
-  const cellW = usableW / cols;
-  const cellH = usableH / rows;
+  const cellW = areaW / cols;
+  const cellH = areaH / rows;
 
-  // Inner cell padding so planks don't crowd cell edges (and thus each other)
-  const cellPadX = cellW * 0.12;
-  const cellPadY = cellH * 0.10;
-  const innerW = cellW - cellPadX * 2;
-  const innerH = cellH - cellPadY * 2;
+  // Inner cell padding so planks don't crowd neighbors
+  const gapX = Math.min(cellW * 0.18, 20);
+  const gapY = Math.min(cellH * 0.15, 16);
+  const innerW = Math.max(cellW - gapX * 2, 0);
+  const innerH = Math.max(cellH - gapY * 2, 0);
 
   const positions = [];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (positions.length >= count) break;
-      const left = padX + cellW * c + cellPadX + Math.random() * innerW;
-      const top = padY + cellH * r + cellPadY + Math.random() * innerH;
-      positions.push({ top: `${top}%`, left: `${left}%` });
+      const px = areaX + cellW * c + gapX + Math.random() * innerW;
+      const py = areaY + cellH * r + gapY + Math.random() * innerH;
+      positions.push({ top: `${py}px`, left: `${px}px` });
     }
   }
   return shuffle(positions);
@@ -77,6 +89,20 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
   const [wrongPair, setWrongPair] = useState(null); // { wordId1, wordId2 }
   const [roundComplete, setRoundComplete] = useState(false);
 
+  const riverRef = useRef(null);
+  const [riverSize, setRiverSize] = useState(null);
+
+  // Measure the river container once it mounts (and on resize)
+  useEffect(() => {
+    const el = riverRef.current;
+    if (!el) return;
+    const measure = () => setRiverSize({ w: el.offsetWidth, h: el.offsetHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const currentGroup = groups[groupIndex] || [];
 
   // Generate all plank data for current group: Hebrew + transliteration, shuffled positions
@@ -96,10 +122,10 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
       isRtl: false,
     }));
     const allPlanks = shuffle([...hebrewPlanks, ...translitPlanks]);
-    const positions = generatePositions(allPlanks.length);
+    const positions = generatePositions(allPlanks.length, riverRef.current);
     return allPlanks.map((p, i) => ({ ...p, style: positions[i] }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupIndex, currentGroup.length]);
+  }, [groupIndex, currentGroup.length, riverSize]);
 
   // Float animation index (cycles through variants)
   const floatVariants = ['lp-plank--float-a', 'lp-plank--float-b', 'lp-plank--float-c',
@@ -211,7 +237,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
       </div>
 
       {/* Full river area with all planks floating */}
-      <div className="lp-river">
+      <div className="lp-river" ref={riverRef}>
         <div className="lp-water">
           <div className="lp-water-surface" />
           <div className="lp-water-shimmer" />
