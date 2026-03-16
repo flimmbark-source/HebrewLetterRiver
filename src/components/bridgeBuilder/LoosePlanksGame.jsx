@@ -177,7 +177,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
       riverRect && hebrewRect
         ? Math.max(0, hebrewRect.bottom - riverRect.top)
         : 0;
-    const minTopClearance = overlapIntoRiver + 20;
+    const minTopClearance = overlapIntoRiver + 50;
 
     const positions = generatePositions(planks.length, riverRef.current, minTopClearance);
     return planks.map((p, i) => ({ ...p, style: positions[i] }));
