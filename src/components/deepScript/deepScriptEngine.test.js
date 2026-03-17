@@ -30,13 +30,20 @@ describe('Deep Script Content Data', () => {
     }
   });
 
-  it('has at least 20 non-miniboss words', () => {
+  it('has at least 100 non-miniboss words', () => {
     const regular = deepScriptWords.filter(w => !w.isMiniboss);
-    expect(regular.length).toBeGreaterThanOrEqual(20);
+    expect(regular.length).toBeGreaterThanOrEqual(100);
   });
 
-  it('has at least 1 miniboss', () => {
-    expect(getMinibossWords().length).toBeGreaterThanOrEqual(1);
+  it('has at least 3 minibosses', () => {
+    expect(getMinibossWords().length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('has words across all 5 difficulty levels', () => {
+    for (let d = 1; d <= 5; d++) {
+      const words = deepScriptWords.filter(w => w.difficulty === d);
+      expect(words.length).toBeGreaterThan(0);
+    }
   });
 
   it('getWordsByDifficulty filters correctly', () => {

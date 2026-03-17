@@ -1,4 +1,4 @@
-import React, { useReducer, useCallback, useEffect, useMemo } from 'react';
+import React, { useReducer, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   combatReducer,
   createCombatState,
@@ -7,6 +7,12 @@ import {
   createLetterTile,
 } from './deepScriptEngine.js';
 import { getGearById } from '../../data/deepScript/gear.js';
+import { celebrate } from '../../lib/celebration.js';
+import {
+  playSelect, playCorrect, playWrong, playBurn,
+  playStow, playGear, playEndTurn, playVictory,
+  playDefeat, playPressureWarning,
+} from './dsSounds.js';
 import RunStatusBar from './RunStatusBar.jsx';
 
 /**
@@ -29,52 +35,131 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
   const [combat, dispatch] = useReducer(combatReducer, initialState);
 
-  // Handle combat end
+  // Track animation state
+  const [justCorrectSlot, setJustCorrectSlot] = useState(null);
+  const [justWrongSlot, setJustWrongSlot] = useState(null);
+  const [activatingGear, setActivatingGear] = useState(null);
+  const [pressureCritical, setPressureCritical] = useState(false);
+  const prevPhaseRef = useRef(combat?.phase);
+  const prevPressureRef = useRef(combat?.pressure ?? 0);
+
+  // Handle combat end with sounds
+  useEffect(() => {
+    if (!combat) return;
+    if (combat.phase === 'victory' && prevPhaseRef.current === 'active') {
+      playVictory();
+      celebrate({ particleCount: 100, spread: 80 });
+    }
+    if (combat.phase === 'defeat' && prevPhaseRef.current === 'active') {
+      playDefeat();
+    }
+    prevPhaseRef.current = combat.phase;
+  }, [combat?.phase]);
+
+  // Pressure warning sound
+  useEffect(() => {
+    if (!combat) return;
+    if (combat.pressure > prevPressureRef.current && combat.pressure >= combat.maxPressure - 1) {
+      playPressureWarning();
+      setPressureCritical(true);
+      const t = setTimeout(() => setPressureCritical(false), 300);
+      return () => clearTimeout(t);
+    }
+    prevPressureRef.current = combat.pressure;
+  }, [combat?.pressure, combat?.maxPressure]);
+
+  // Handle combat end navigation
   useEffect(() => {
     if (combat?.phase === 'victory') {
-      const timer = setTimeout(() => onEnd('victory', wordId), 1500);
+      const timer = setTimeout(() => onEnd('victory', wordId), 1800);
       return () => clearTimeout(timer);
     }
     if (combat?.phase === 'defeat') {
-      const timer = setTimeout(() => onEnd('defeat', wordId), 1500);
+      const timer = setTimeout(() => onEnd('defeat', wordId), 1800);
       return () => clearTimeout(timer);
     }
   }, [combat?.phase, onEnd, wordId]);
 
+  // Clear animation classes after they play
+  useEffect(() => {
+    if (justCorrectSlot !== null) {
+      const t = setTimeout(() => setJustCorrectSlot(null), 350);
+      return () => clearTimeout(t);
+    }
+  }, [justCorrectSlot]);
+
+  useEffect(() => {
+    if (justWrongSlot !== null) {
+      const t = setTimeout(() => setJustWrongSlot(null), 400);
+      return () => clearTimeout(t);
+    }
+  }, [justWrongSlot]);
+
+  useEffect(() => {
+    if (activatingGear !== null) {
+      const t = setTimeout(() => setActivatingGear(null), 300);
+      return () => clearTimeout(t);
+    }
+  }, [activatingGear]);
+
   const handleSlotClick = useCallback((slotIndex) => {
     if (!combat.selectedTrayTile && !combat.selectedSatchelTile) return;
+
+    // Determine if this placement will be correct
+    const tileId = combat.selectedTrayTile || combat.selectedSatchelTile;
+    const tile = combat.tray.find(t => t.id === tileId) || combat.satchel.find(t => t.id === tileId);
+    const slot = combat.answerTrack[slotIndex];
+    if (tile && slot && !slot.correct) {
+      if (tile.letter === slot.targetLetter) {
+        playCorrect();
+        setJustCorrectSlot(slotIndex);
+      } else {
+        playWrong();
+        setJustWrongSlot(slotIndex);
+      }
+    }
+
     dispatch({ type: ACTIONS.PLACE_LETTER, slotIndex });
-  }, [combat?.selectedTrayTile, combat?.selectedSatchelTile]);
+  }, [combat?.selectedTrayTile, combat?.selectedSatchelTile, combat?.tray, combat?.satchel, combat?.answerTrack]);
 
   const handleTrayClick = useCallback((tileId) => {
+    playSelect();
     dispatch({ type: ACTIONS.SELECT_TRAY_TILE, tileId });
   }, []);
 
   const handleSatchelClick = useCallback((tileId) => {
+    playSelect();
     dispatch({ type: ACTIONS.SELECT_SATCHEL_TILE, tileId });
   }, []);
 
   const handleStow = useCallback(() => {
+    playStow();
     dispatch({ type: ACTIONS.STOW_LETTER });
   }, []);
 
   const handleRetrieve = useCallback(() => {
+    playStow();
     dispatch({ type: ACTIONS.RETRIEVE_FROM_SATCHEL });
   }, []);
 
   const handleBurn = useCallback(() => {
+    playBurn();
     dispatch({ type: ACTIONS.BURN_LETTER, burnBonus: runState.upgrades?.burnBonus });
   }, [runState]);
 
   const handleEndTurn = useCallback(() => {
+    playEndTurn();
     dispatch({ type: ACTIONS.END_TURN, genAccuracy: runState.upgrades?.genAccuracy || 0 });
   }, [runState]);
 
   const handleUseGear = useCallback((gearId) => {
+    playGear();
+    setActivatingGear(gearId);
     dispatch({ type: ACTIONS.USE_GEAR, gearId, runState });
   }, [runState]);
 
   const handlePickChoice = useCallback((letter) => {
+    playSelect();
     dispatch({ type: ACTIONS.PICK_CHOICE, letter });
   }, []);
 
@@ -82,6 +167,8 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
   const word = combat.word;
   const pressurePercent = (combat.pressure / combat.maxPressure) * 100;
+  // Hint the end turn button when tray is getting full
+  const hintEndTurn = combat.tray.length >= (runState.traySize - 1) && combat.phase === 'active';
 
   return (
     <div className="ds-screen ds-combat">
@@ -95,7 +182,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       </div>
 
       {/* Pressure Track */}
-      <div className="ds-pressure-track">
+      <div className={`ds-pressure-track ${pressureCritical ? 'ds-pressure-track--critical' : ''}`}>
         <div className="ds-pressure-label">
           Pressure {combat.pressure}/{combat.maxPressure}
         </div>
@@ -110,15 +197,19 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       {/* Answer Track (RTL) */}
       <div className="ds-answer-track" dir="rtl">
         {combat.answerTrack.map((slot, index) => {
-          const placed = slot.placedTile;
           const revealed = slot.revealed;
           const correct = slot.correct;
           const hasSelection = combat.selectedTrayTile || combat.selectedSatchelTile;
 
           let slotCls = 'ds-answer-slot';
-          if (correct) slotCls += ' ds-answer-slot--correct';
-          else if (placed) slotCls += ' ds-answer-slot--wrong';
-          else if (hasSelection) slotCls += ' ds-answer-slot--target';
+          if (correct) {
+            slotCls += ' ds-answer-slot--correct';
+            if (justCorrectSlot === index) slotCls += ' ds-answer-slot--just-correct';
+          } else if (justWrongSlot === index) {
+            slotCls += ' ds-answer-slot--just-wrong';
+          } else if (hasSelection) {
+            slotCls += ' ds-answer-slot--target';
+          }
 
           return (
             <button
@@ -264,6 +355,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
           let gearCls = 'ds-gear-btn';
           if (onCooldown) gearCls += ' ds-gear-btn--cooldown';
           if (noUses) gearCls += ' ds-gear-btn--depleted';
+          if (activatingGear === gearId) gearCls += ' ds-gear-btn--activating';
 
           return (
             <button
@@ -289,7 +381,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       <div className="ds-turn-bar">
         <button
           type="button"
-          className="ds-end-turn-btn"
+          className={`ds-end-turn-btn ${hintEndTurn ? 'ds-end-turn-btn--hint' : ''}`}
           onClick={handleEndTurn}
           disabled={combat.phase !== 'active'}
         >
@@ -313,7 +405,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
       {/* Last log entry feedback */}
       {combat.log.length > 0 && (
-        <div className="ds-log-toast">
+        <div className="ds-log-toast" key={combat.log.length}>
           {combat.log[combat.log.length - 1].message || combat.log[combat.log.length - 1].type}
         </div>
       )}

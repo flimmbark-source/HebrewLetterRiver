@@ -857,6 +857,149 @@
   100% { opacity: 0; }
 }
 
+/* ─── Tile Animations ────────────────────────────────────── */
+
+/* Pop-in for newly generated tiles */
+.ds-tile--new {
+  animation: ds-tile-pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes ds-tile-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Correct placement celebration */
+.ds-answer-slot--just-correct {
+  animation: ds-correct-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes ds-correct-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.2); box-shadow: 0 0 16px rgba(34, 197, 94, 0.6); }
+  100% { transform: scale(1); }
+}
+
+/* Wrong placement shake + flash */
+.ds-answer-slot--just-wrong {
+  animation: ds-wrong-shake 0.4s ease-in-out;
+}
+
+@keyframes ds-wrong-shake {
+  0%   { transform: translateX(0); background: rgba(239, 68, 68, 0.1); }
+  15%  { transform: translateX(-6px); background: rgba(239, 68, 68, 0.25); }
+  30%  { transform: translateX(6px); }
+  45%  { transform: translateX(-4px); }
+  60%  { transform: translateX(4px); }
+  75%  { transform: translateX(-2px); }
+  100% { transform: translateX(0); background: rgba(239, 68, 68, 0.1); }
+}
+
+/* Burn effect — shrink + fade + red flash */
+.ds-tile--burning {
+  animation: ds-burn-out 0.3s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes ds-burn-out {
+  0% { transform: scale(1); opacity: 1; filter: none; }
+  50% { transform: scale(1.1); opacity: 0.8; filter: brightness(1.5) hue-rotate(-20deg); }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+/* Stow slide — tile slides down and fades */
+.ds-tile--stowing {
+  animation: ds-stow-slide 0.25s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes ds-stow-slide {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(20px); opacity: 0; }
+}
+
+/* Retrieve slide — tile slides up into tray */
+.ds-tile--retrieving {
+  animation: ds-retrieve-slide 0.25s ease-out;
+}
+
+@keyframes ds-retrieve-slide {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Gear activation flash */
+.ds-gear-btn--activating {
+  animation: ds-gear-flash 0.3s ease-out;
+}
+
+@keyframes ds-gear-flash {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(240, 198, 116, 0); }
+  50% { transform: scale(1.08); box-shadow: 0 0 16px rgba(240, 198, 116, 0.5); }
+  100% { transform: scale(1); box-shadow: 0 0 0 rgba(240, 198, 116, 0); }
+}
+
+/* Pressure bar shake when near max */
+.ds-pressure-track--critical {
+  animation: ds-pressure-shake 0.3s ease-in-out;
+}
+
+@keyframes ds-pressure-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+/* Victory overlay — scale in + glow */
+.ds-phase-victory {
+  animation: ds-victory-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes ds-victory-in {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+.ds-phase-victory .ds-phase-message {
+  animation: ds-victory-text 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes ds-victory-text {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Defeat overlay — fade + drop */
+.ds-phase-defeat .ds-phase-message {
+  animation: ds-defeat-text 0.5s ease-out;
+}
+
+@keyframes ds-defeat-text {
+  0% { transform: translateY(-20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* End turn button pulse hint */
+.ds-end-turn-btn--hint {
+  animation: ds-turn-hint 1.5s ease-in-out infinite;
+}
+
+@keyframes ds-turn-hint {
+  0%, 100% { box-shadow: 0 3px 0 #2563eb, 0 5px 10px rgba(37, 99, 235, 0.3); }
+  50% { box-shadow: 0 3px 0 #2563eb, 0 5px 18px rgba(37, 99, 235, 0.5); }
+}
+
+/* Choice bundle modal entrance */
+.ds-choice-modal {
+  animation: ds-choice-entrance 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes ds-choice-entrance {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 /* ─── Archive Screen ─────────────────────────────────────── */
 .ds-archive {
   align-items: center;
