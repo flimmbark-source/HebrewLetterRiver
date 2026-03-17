@@ -6,6 +6,7 @@ import { createRunState } from './deepScriptEngine.js';
 import { upgradeDefinitions } from '../../data/deepScript/upgrades.js';
 import KitSelectScreen from './KitSelectScreen.jsx';
 import ExplorationScreen from './ExplorationScreen.jsx';
+import BattleTransition from './BattleTransition.jsx';
 import CombatScreen from './CombatScreen.jsx';
 import ArchiveScreen from './ArchiveScreen.jsx';
 import ShrineScreen from './ShrineScreen.jsx';
@@ -80,14 +81,14 @@ export default function DeepScriptMode({ onBack }) {
     const chamber = floor.chambers.get(targetChamberId);
     if (chamber && !chamber.resolved) {
       if (chamber.type === CHAMBER_TYPES.COMBAT || chamber.type === CHAMBER_TYPES.MINIBOSS) {
-        // Small delay to let the room render first
+        // Small delay to let the room render first, then show battle transition
         setTimeout(() => {
           setActiveCombat({
             wordId: chamber.payload?.wordId,
             chamberId: targetChamberId,
             isMiniboss: chamber.type === CHAMBER_TYPES.MINIBOSS,
           });
-          setScreen('combat');
+          setScreen('battle_transition');
         }, 600);
       }
     }
@@ -110,8 +111,12 @@ export default function DeepScriptMode({ onBack }) {
       chamberId,
       isMiniboss: chamber?.type === CHAMBER_TYPES.MINIBOSS,
     });
-    setScreen('combat');
+    setScreen('battle_transition');
   }, [floor]);
+
+  const handleBattleTransitionComplete = useCallback(() => {
+    setScreen('combat');
+  }, []);
 
   const handleTriggerArchive = useCallback((rewardId, chamberId, interactableId) => {
     setActiveArchive({ rewardId, chamberId, interactableId });
@@ -355,6 +360,18 @@ export default function DeepScriptMode({ onBack }) {
   }
 
   if (!runState || !floor) return null;
+
+  // Battle transition
+  if (screen === 'battle_transition' && activeCombat) {
+    return (
+      <div className="ds-mode">
+        <BattleTransition
+          onComplete={handleBattleTransitionComplete}
+          isMiniboss={activeCombat.isMiniboss}
+        />
+      </div>
+    );
+  }
 
   // Combat screen
   if (screen === 'combat' && activeCombat) {

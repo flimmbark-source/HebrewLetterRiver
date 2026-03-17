@@ -3,6 +3,7 @@ import {
   DIRECTIONS, OPPOSITE, TURN_LEFT, TURN_RIGHT,
   getChamberDisplayName, getChamberIcon, CHAMBER_TYPES,
 } from '../../data/deepScript/floorGenerator.js';
+import { playFootstep } from './dsSounds.js';
 import InspectPanel from './InspectPanel.jsx';
 
 /**
@@ -62,16 +63,27 @@ export default function ExplorationScreen({
     return chamberId ? floor.chambers.get(chamberId) : null;
   }, [floor]);
 
-  // Handle forward movement with transition
+  // Walking state: 'walking' phase zooms toward exit, then 'arriving' fades in new room
+  const [walkPhase, setWalkPhase] = useState(null); // null | 'walking' | 'arriving'
+
+  // Handle forward movement with walk animation
   const handleForward = useCallback(() => {
     if (!relativeExits.forward || transitioning) return;
     setTransitioning(true);
     setTransDir('forward');
+    setWalkPhase('walking');
+    playFootstep();
+    // Phase 1: walk toward exit (600ms)
     setTimeout(() => {
       onMove(relativeExits.forward);
-      setTransitioning(false);
-      setTransDir(null);
-    }, 300);
+      setWalkPhase('arriving');
+      // Phase 2: new room fades in (400ms)
+      setTimeout(() => {
+        setTransitioning(false);
+        setTransDir(null);
+        setWalkPhase(null);
+      }, 400);
+    }, 600);
   }, [relativeExits.forward, transitioning, onMove]);
 
   // Click a door directly
@@ -79,11 +91,17 @@ export default function ExplorationScreen({
     if (transitioning) return;
     setTransitioning(true);
     setTransDir(direction);
+    setWalkPhase('walking');
+    playFootstep();
     setTimeout(() => {
       onMove(chamberId);
-      setTransitioning(false);
-      setTransDir(null);
-    }, 300);
+      setWalkPhase('arriving');
+      setTimeout(() => {
+        setTransitioning(false);
+        setTransDir(null);
+        setWalkPhase(null);
+      }, 400);
+    }, 600);
   }, [transitioning, onMove]);
 
   // Click an interactable
@@ -156,7 +174,7 @@ export default function ExplorationScreen({
   const rightChamber = getChamberAt(rightDoor);
 
   return (
-    <div className={`ds-explore-screen ${transitioning ? `ds-explore--trans-${transDir}` : ''}`}>
+    <div className={`ds-explore-screen ${transitioning ? `ds-explore--trans-${transDir}` : ''} ${walkPhase ? `ds-explore--${walkPhase}` : ''}`}>
       {/* ═══ TOP HUD ═══ */}
       <div className="ds-explore-top-hud">
         <div className="ds-hud-health">
