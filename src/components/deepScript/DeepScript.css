@@ -2408,9 +2408,9 @@
 
 @keyframes ds-walk-left {
   0%   { opacity: 1; transform: scale(1) translateX(0) rotate(0deg); }
-  40%  { opacity: 1; transform: scale(1.15) translateX(-12%) rotate(-2deg); }
-  70%  { opacity: 0.5; transform: scale(1.4) translateX(-25%) rotate(-4deg); }
-  100% { opacity: 0; transform: scale(1.8) translateX(-40%) rotate(-6deg); }
+  40%  { opacity: 1; transform: scale(1.15) translateX(12%) rotate(2deg); }
+  70%  { opacity: 0.5; transform: scale(1.4) translateX(25%) rotate(4deg); }
+  100% { opacity: 0; transform: scale(1.8) translateX(40%) rotate(6deg); }
 }
 
 .ds-explore--walking.ds-explore--trans-right .ds-explore-viewport {
@@ -2419,9 +2419,9 @@
 
 @keyframes ds-walk-right {
   0%   { opacity: 1; transform: scale(1) translateX(0) rotate(0deg); }
-  40%  { opacity: 1; transform: scale(1.15) translateX(12%) rotate(2deg); }
-  70%  { opacity: 0.5; transform: scale(1.4) translateX(25%) rotate(4deg); }
-  100% { opacity: 0; transform: scale(1.8) translateX(40%) rotate(6deg); }
+  40%  { opacity: 1; transform: scale(1.15) translateX(-12%) rotate(-2deg); }
+  70%  { opacity: 0.5; transform: scale(1.4) translateX(-25%) rotate(-4deg); }
+  100% { opacity: 0; transform: scale(1.8) translateX(-40%) rotate(-6deg); }
 }
 
 /* Phase 2: Arriving — new room fades/scales in from dark */
