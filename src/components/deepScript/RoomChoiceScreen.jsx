@@ -2,26 +2,51 @@ import React from 'react';
 import { getRoomDisplayInfo } from '../../data/deepScript/roomGenerator.js';
 import { getWordById } from '../../data/deepScript/words.js';
 import { ARCHIVE_REWARDS } from '../../data/deepScript/roomGenerator.js';
-import RunStatusBar from './RunStatusBar.jsx';
 
 export default function RoomChoiceScreen({ node, runState, onSelect, onBack }) {
   if (!node) return null;
 
   const isMiniboss = node.choices.length === 1 && node.choices[0].type === 'miniboss';
 
+  // Health pips
+  const healthPips = [];
+  for (let i = 0; i < runState.maxHealth; i++) {
+    healthPips.push(i < runState.health);
+  }
+
   return (
     <div className="ds-screen ds-room-choice">
-      <RunStatusBar runState={runState} />
+      {/* Dungeon corridor background */}
+      <div className="ds-corridor-bg">
+        <div className="ds-corridor-floor" />
+        <div className="ds-corridor-wall-l" />
+        <div className="ds-corridor-wall-r" />
+        <div className="ds-corridor-ceiling" />
+      </div>
 
+      {/* Top status */}
+      <div className="ds-rc-top-bar">
+        <div className="ds-hud-health">
+          {healthPips.map((full, i) => (
+            <span key={i} className={`ds-hud-pip ${full ? 'ds-hud-pip--full' : 'ds-hud-pip--empty'}`} />
+          ))}
+        </div>
+        <div className="ds-rc-depth">
+          Room {runState.roomIndex + 1} / {runState.runMap.length}
+        </div>
+        <div className="ds-hud-progress">
+          <span className="ds-hud-progress-text">{runState.combatsWon} won</span>
+        </div>
+      </div>
+
+      {/* Title */}
       <div className="ds-room-choice-header">
         <h2 className="ds-room-choice-title">
           {isMiniboss ? 'The Guardian Awaits' : 'Choose Your Path'}
         </h2>
-        <p className="ds-room-choice-depth">
-          Room {runState.roomIndex + 1} of {runState.runMap.length}
-        </p>
       </div>
 
+      {/* Room cards */}
       <div className="ds-room-choices">
         {node.choices.map(room => {
           const info = getRoomDisplayInfo(room.type);
