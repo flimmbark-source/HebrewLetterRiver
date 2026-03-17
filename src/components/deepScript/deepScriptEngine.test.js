@@ -13,6 +13,7 @@ import { getStarterKit, starterKits } from '../../data/deepScript/starterKits.js
 import { getSharedGear, gearDefinitions } from '../../data/deepScript/gear.js';
 import { deepScriptWords, getWordsByDifficulty, getMinibossWords } from '../../data/deepScript/words.js';
 import { generateRunMap, ROOM_TYPES } from '../../data/deepScript/roomGenerator.js';
+import { generateDungeonFloor, CHAMBER_TYPES, DIRECTIONS, OPPOSITE, TURN_LEFT, TURN_RIGHT } from '../../data/deepScript/floorGenerator.js';
 import { upgradeDefinitions, getRandomUpgrades } from '../../data/deepScript/upgrades.js';
 
 // ─── Content Data Validation ────────────────────────────────
@@ -144,6 +145,68 @@ describe('Room Generation', () => {
         }
       }
     }
+  });
+});
+
+// ─── Dungeon Floor Generation ──────────────────────────────
+
+describe('Dungeon Floor Generation', () => {
+  it('generates a floor with connected chambers', () => {
+    const floor = generateDungeonFloor();
+    expect(floor.chambers.size).toBeGreaterThanOrEqual(7);
+    expect(floor.startChamberId).toBeTruthy();
+    expect(floor.bossChamberId).toBeTruthy();
+  });
+
+  it('entrance chamber is marked as visited', () => {
+    const floor = generateDungeonFloor();
+    const entrance = floor.chambers.get(floor.startChamberId);
+    expect(entrance.visited).toBe(true);
+    expect(entrance.type).toBe(CHAMBER_TYPES.ENTRANCE);
+  });
+
+  it('miniboss chamber exists and has a wordId', () => {
+    const floor = generateDungeonFloor();
+    const boss = floor.chambers.get(floor.bossChamberId);
+    expect(boss.type).toBe(CHAMBER_TYPES.MINIBOSS);
+    expect(boss.payload.wordId).toBeTruthy();
+  });
+
+  it('all chambers have valid exits pointing to existing chambers', () => {
+    const floor = generateDungeonFloor();
+    for (const [id, chamber] of floor.chambers) {
+      for (const [dir, targetId] of Object.entries(chamber.exits)) {
+        expect(DIRECTIONS).toContain(dir);
+        expect(floor.chambers.has(targetId)).toBe(true);
+        // Reciprocal check: target should have exit back
+        const target = floor.chambers.get(targetId);
+        expect(target.exits[OPPOSITE[dir]]).toBe(id);
+      }
+    }
+  });
+
+  it('combat chambers have wordIds', () => {
+    const floor = generateDungeonFloor();
+    for (const [, chamber] of floor.chambers) {
+      if (chamber.type === CHAMBER_TYPES.COMBAT || chamber.type === CHAMBER_TYPES.MINIBOSS) {
+        expect(chamber.payload.wordId).toBeTruthy();
+      }
+    }
+  });
+
+  it('chambers have interactables', () => {
+    const floor = generateDungeonFloor();
+    for (const [, chamber] of floor.chambers) {
+      expect(chamber.interactables).toBeDefined();
+      expect(chamber.interactables.length).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('turn helpers work correctly', () => {
+    expect(TURN_LEFT['north']).toBe('west');
+    expect(TURN_LEFT['west']).toBe('south');
+    expect(TURN_RIGHT['north']).toBe('east');
+    expect(TURN_RIGHT['east']).toBe('south');
   });
 });
 

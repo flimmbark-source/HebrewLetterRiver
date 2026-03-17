@@ -1851,3 +1851,639 @@
   pointer-events: none;
   z-index: 2;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   EXPLORATION SCREEN — First-Person Dungeon Traversal
+   ═══════════════════════════════════════════════════════════ */
+
+.ds-explore-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: var(--ds-stone-darkest);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ─── Top HUD ────────────────────────────────────────────── */
+.ds-explore-top-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  background: linear-gradient(180deg,
+    rgba(13, 15, 20, 0.92) 0%,
+    rgba(13, 15, 20, 0.6) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.ds-explore-top-hud > * { pointer-events: auto; }
+
+.ds-explore-chamber-name {
+  font-family: var(--ds-font-display);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ds-gold);
+  text-shadow: 0 1px 4px var(--ds-gold-glow);
+  letter-spacing: 0.5px;
+}
+
+.ds-explore-compass {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ds-bronze-light);
+  background: var(--ds-stone-light);
+  border: 1px solid var(--ds-stone-lighter);
+  border-radius: 50%;
+}
+
+/* ─── Dungeon Viewport ───────────────────────────────────── */
+.ds-explore-viewport {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.ds-explore-room {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Back wall */
+.ds-explore-back-wall {
+  position: absolute;
+  top: 10%;
+  left: 16%;
+  right: 16%;
+  bottom: 32%;
+  background:
+    repeating-linear-gradient(
+      0deg, transparent, transparent 28px,
+      rgba(80, 80, 80, 0.07) 28px, rgba(80, 80, 80, 0.07) 30px
+    ),
+    repeating-linear-gradient(
+      90deg, transparent, transparent 48px,
+      rgba(80, 80, 80, 0.05) 48px, rgba(80, 80, 80, 0.05) 50px
+    ),
+    linear-gradient(180deg, #1a1d24 0%, #1e2128 40%, #22262e 100%);
+  border-radius: 4px 4px 0 0;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Theme variations */
+.ds-explore-room--library .ds-explore-back-wall {
+  background:
+    repeating-linear-gradient(
+      0deg, transparent, transparent 20px,
+      rgba(100, 80, 50, 0.06) 20px, rgba(100, 80, 50, 0.06) 22px
+    ),
+    linear-gradient(180deg, #1e1c18 0%, #22201a 40%, #26241e 100%);
+}
+
+.ds-explore-room--shrine .ds-explore-back-wall {
+  background:
+    linear-gradient(180deg, #1c1828 0%, #201c2e 40%, #242038 100%);
+  box-shadow: inset 0 0 40px rgba(155, 109, 219, 0.05);
+}
+
+.ds-explore-room--crypt .ds-explore-back-wall {
+  background:
+    linear-gradient(180deg, #1a1418 0%, #1e181c 40%, #221c20 100%);
+  box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.03);
+}
+
+/* Floor */
+.ds-explore-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38%;
+  background:
+    repeating-linear-gradient(
+      90deg, transparent, transparent 58px,
+      rgba(60, 60, 60, 0.08) 58px, rgba(60, 60, 60, 0.08) 60px
+    ),
+    repeating-linear-gradient(
+      0deg, transparent, transparent 38px,
+      rgba(60, 60, 60, 0.06) 38px, rgba(60, 60, 60, 0.06) 40px
+    ),
+    linear-gradient(180deg, #1a1e24 0%, #14171c 50%, #0f1114 100%);
+  transform: perspective(400px) rotateX(25deg);
+  transform-origin: center top;
+}
+
+/* Side walls */
+.ds-explore-wall-left,
+.ds-explore-wall-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+}
+
+.ds-explore-wall-left {
+  left: 0;
+  background: linear-gradient(90deg, #0d0f14 0%, #12151b 40%, rgba(18, 21, 27, 0.6) 80%, transparent 100%);
+  justify-content: center;
+  padding-left: 4px;
+}
+
+.ds-explore-wall-right {
+  right: 0;
+  background: linear-gradient(-90deg, #0d0f14 0%, #12151b 40%, rgba(18, 21, 27, 0.6) 80%, transparent 100%);
+  justify-content: center;
+  padding-right: 4px;
+}
+
+/* Ceiling */
+.ds-explore-ceiling {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 14%;
+  background: linear-gradient(180deg, #0a0c10 0%, #0d0f14 50%, transparent 100%);
+  z-index: 1;
+}
+
+/* ─── Doors / Exits ──────────────────────────────────────── */
+.ds-explore-door {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  padding: 0;
+  transition: transform 0.2s;
+}
+
+.ds-explore-door:hover { transform: scale(1.03); }
+.ds-explore-door:active { transform: scale(0.98); }
+
+/* Forward door — centered on back wall */
+.ds-explore-door--forward {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 28%;
+  height: 65%;
+  z-index: 2;
+}
+
+.ds-explore-door--forward:hover { transform: translateX(-50%) scale(1.02); }
+.ds-explore-door--forward:active { transform: translateX(-50%) scale(0.98); }
+
+.ds-explore-door--forward .ds-explore-door-arch {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg,
+    rgba(5, 5, 10, 0.95) 0%,
+    rgba(3, 3, 6, 0.98) 100%
+  );
+  border-radius: 50% 50% 0 0 / 25% 25% 0 0;
+  box-shadow:
+    inset 0 0 15px rgba(0, 0, 0, 0.8),
+    0 0 8px rgba(196, 149, 90, 0.1);
+  border: 2px solid rgba(196, 149, 90, 0.15);
+  border-bottom: none;
+  transition: box-shadow 0.3s;
+}
+
+.ds-explore-door--forward:hover .ds-explore-door-arch {
+  box-shadow:
+    inset 0 0 15px rgba(0, 0, 0, 0.8),
+    0 0 16px rgba(196, 149, 90, 0.25);
+  border-color: rgba(196, 149, 90, 0.35);
+}
+
+.ds-explore-door-label {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.ds-explore-door:hover .ds-explore-door-label {
+  opacity: 1;
+}
+
+/* Side doors */
+.ds-explore-door--side {
+  width: 70%;
+  max-width: 48px;
+  height: 50%;
+  max-height: 120px;
+}
+
+.ds-explore-door--side .ds-explore-door-arch {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(8, 8, 14, 0.9) 0%, rgba(5, 5, 8, 0.95) 100%);
+  border-radius: 40% 40% 0 0 / 20% 20% 0 0;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(196, 149, 90, 0.1);
+  border-bottom: none;
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.ds-explore-door--side:hover .ds-explore-door-arch {
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7), 0 0 8px rgba(196, 149, 90, 0.2);
+  border-color: rgba(196, 149, 90, 0.3);
+}
+
+.ds-explore-door--visited .ds-explore-door-arch {
+  border-color: rgba(196, 149, 90, 0.2);
+}
+
+/* ─── Interactable Hotspots ──────────────────────────────── */
+.ds-explore-hotspots {
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  right: 20%;
+  bottom: 35%;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.ds-hotspot {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 8px;
+  border: none;
+  background: rgba(30, 34, 40, 0.7);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.15s, box-shadow 0.3s, background 0.2s;
+  border: 1px solid transparent;
+  position: relative;
+}
+
+.ds-hotspot:hover {
+  transform: translateY(-2px);
+  background: rgba(40, 44, 52, 0.85);
+  border-color: rgba(196, 149, 90, 0.3);
+  box-shadow: 0 0 10px rgba(196, 149, 90, 0.15);
+}
+
+.ds-hotspot:active { transform: translateY(0); }
+
+.ds-hotspot--resolved {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ds-hotspot--resolved:hover {
+  transform: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Hotspot positions */
+.ds-hotspot--left { align-self: flex-end; margin-right: auto; }
+.ds-hotspot--right { align-self: flex-end; margin-left: auto; }
+.ds-hotspot--center { align-self: center; }
+.ds-hotspot--back-left { align-self: flex-start; margin-right: auto; }
+.ds-hotspot--back-right { align-self: flex-start; margin-left: auto; }
+
+/* Combat hotspots glow */
+.ds-hotspot--combat {
+  border-color: rgba(239, 68, 68, 0.25);
+  animation: ds-hotspot-combat-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ds-hotspot-combat-pulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(239, 68, 68, 0.15); }
+  50% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.3); }
+}
+
+.ds-hotspot--combat:hover {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
+}
+
+/* Archive hotspots */
+.ds-hotspot--archive {
+  border-color: rgba(91, 141, 217, 0.2);
+}
+
+.ds-hotspot--archive:hover {
+  border-color: rgba(91, 141, 217, 0.4);
+  box-shadow: 0 0 10px var(--ds-rune-blue-glow);
+}
+
+/* Shrine hotspots */
+.ds-hotspot--shrine {
+  border-color: rgba(155, 109, 219, 0.2);
+  animation: ds-hotspot-shrine-pulse 3s ease-in-out infinite;
+}
+
+@keyframes ds-hotspot-shrine-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(155, 109, 219, 0.1); }
+  50% { box-shadow: 0 0 12px rgba(155, 109, 219, 0.25); }
+}
+
+.ds-hotspot--shrine:hover {
+  border-color: rgba(155, 109, 219, 0.4);
+  box-shadow: 0 0 12px var(--ds-purple-glow);
+}
+
+.ds-hotspot-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.ds-hotspot-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--ds-parchment-dim);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.ds-hotspot:hover .ds-hotspot-label {
+  opacity: 1;
+}
+
+/* Cleared badge */
+.ds-explore-cleared-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ds-green);
+  background: rgba(13, 15, 20, 0.85);
+  padding: 6px 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(76, 175, 106, 0.3);
+  text-shadow: 0 0 6px var(--ds-green-glow);
+  pointer-events: none;
+}
+
+/* ─── Minimap ────────────────────────────────────────────── */
+.ds-minimap {
+  position: absolute;
+  top: 44px;
+  right: 8px;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  max-width: 80px;
+  padding: 4px;
+  background: rgba(13, 15, 20, 0.8);
+  border: 1px solid var(--ds-stone-lighter);
+  border-radius: 6px;
+}
+
+.ds-minimap-node {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: var(--ds-stone-mid);
+  border: 1px solid var(--ds-stone-lighter);
+  transition: border-color 0.2s;
+}
+
+.ds-minimap-node--current {
+  border-color: var(--ds-gold);
+  box-shadow: 0 0 4px var(--ds-gold-glow);
+}
+
+.ds-minimap-node--resolved {
+  opacity: 0.6;
+}
+
+.ds-minimap-node--combat { border-color: rgba(239, 68, 68, 0.3); }
+.ds-minimap-node--archive { border-color: rgba(91, 141, 217, 0.3); }
+.ds-minimap-node--shrine { border-color: rgba(155, 109, 219, 0.3); }
+.ds-minimap-node--miniboss { border-color: rgba(185, 28, 28, 0.3); }
+
+.ds-minimap-icon {
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* ─── Action Bar ─────────────────────────────────────────── */
+.ds-explore-action-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(13, 15, 20, 0.7) 30%,
+    rgba(13, 15, 20, 0.95) 100%
+  );
+}
+
+.ds-explore-act {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 1px solid var(--ds-stone-lighter);
+  border-radius: 8px;
+  background: var(--ds-stone-mid);
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.1s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  color: var(--ds-parchment);
+}
+
+.ds-explore-act:active:not(:disabled) { transform: scale(0.95); }
+.ds-explore-act:disabled, .ds-explore-act--disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.ds-explore-act--turn {
+  width: 48px;
+  height: 48px;
+}
+
+.ds-explore-act--turn:hover:not(:disabled) {
+  border-color: var(--ds-bronze);
+}
+
+.ds-explore-act--forward {
+  width: 64px;
+  height: 52px;
+  padding: 4px 0 2px;
+}
+
+.ds-explore-act--forward:not(:disabled):not(.ds-explore-act--disabled) {
+  border-color: rgba(196, 149, 90, 0.3);
+}
+
+.ds-explore-act--forward:not(:disabled):not(.ds-explore-act--disabled):hover {
+  border-color: var(--ds-bronze);
+  box-shadow: 0 0 8px var(--ds-gold-glow), 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+.ds-explore-act-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.ds-explore-act-label {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--ds-parchment-dim);
+}
+
+/* ─── Room Transitions ───────────────────────────────────── */
+.ds-explore--trans-forward .ds-explore-viewport {
+  animation: ds-trans-forward 0.3s ease-out;
+}
+
+@keyframes ds-trans-forward {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.ds-explore--trans-left .ds-explore-viewport {
+  animation: ds-trans-left 0.3s ease-out;
+}
+
+@keyframes ds-trans-left {
+  0% { opacity: 1; transform: translateX(0); }
+  50% { opacity: 0.3; transform: translateX(20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+.ds-explore--trans-right .ds-explore-viewport {
+  animation: ds-trans-right 0.3s ease-out;
+}
+
+@keyframes ds-trans-right {
+  0% { opacity: 1; transform: translateX(0); }
+  50% { opacity: 0.3; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Inspect Panel ──────────────────────────────────────── */
+.ds-inspect-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  animation: ds-fade-in 0.2s ease-out;
+}
+
+.ds-inspect-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 20px;
+  background: linear-gradient(135deg, var(--ds-stone-light) 0%, var(--ds-stone-mid) 100%);
+  border: 2px solid var(--ds-stone-lighter);
+  border-radius: 12px;
+  max-width: 300px;
+  width: 88%;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  animation: ds-choice-entrance 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ds-inspect-icon {
+  font-size: 36px;
+}
+
+.ds-inspect-title {
+  font-family: var(--ds-font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ds-gold);
+  margin: 0;
+}
+
+.ds-inspect-text {
+  font-size: 13px;
+  color: var(--ds-parchment-dim);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ds-inspect-close {
+  margin-top: 6px;
+  padding: 8px 24px;
+  border: 1px solid var(--ds-stone-lighter);
+  border-radius: 6px;
+  background: var(--ds-stone-mid);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ds-parchment-dim);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.ds-inspect-close:hover {
+  border-color: var(--ds-bronze);
+  color: var(--ds-parchment);
+}
+
+.ds-inspect-close:active { transform: translateY(1px); }

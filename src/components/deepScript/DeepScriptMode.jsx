@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { starterKits, getStarterKit } from '../../data/deepScript/starterKits.js';
+import React, { useState, useCallback, useEffect } from 'react';
+import { getStarterKit } from '../../data/deepScript/starterKits.js';
 import { getSharedGear } from '../../data/deepScript/gear.js';
-import { generateRunMap } from '../../data/deepScript/roomGenerator.js';
+import { generateDungeonFloor, TURN_LEFT, TURN_RIGHT, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
 import { upgradeDefinitions } from '../../data/deepScript/upgrades.js';
 import KitSelectScreen from './KitSelectScreen.jsx';
-import RoomChoiceScreen from './RoomChoiceScreen.jsx';
+import ExplorationScreen from './ExplorationScreen.jsx';
 import CombatScreen from './CombatScreen.jsx';
 import ArchiveScreen from './ArchiveScreen.jsx';
 import ShrineScreen from './ShrineScreen.jsx';
@@ -15,81 +15,229 @@ import './DeepScript.css';
 /**
  * DeepScriptMode — top-level orchestrator for the Deep Script game mode.
  *
- * Flow: Kit Select → Room Choice → Room (Combat/Archive/Shrine) → ... → Miniboss → End
+ * Flow: Kit Select → Exploration (move/turn/inspect/trigger) →
+ *       Combat/Archive/Shrine → back to Exploration → ... → Miniboss → End
  */
 export default function DeepScriptMode({ onBack }) {
-  const [screen, setScreen] = useState('kit_select'); // kit_select | running | end
+  const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | archive | shrine | end
   const [runState, setRunState] = useState(null);
-  const [endResult, setEndResult] = useState(null); // 'victory' | 'defeat'
+  const [endResult, setEndResult] = useState(null);
+
+  // Exploration state
+  const [floor, setFloor] = useState(null);
+  const [currentChamberId, setCurrentChamberId] = useState(null);
+  const [facing, setFacing] = useState('north');
+
+  // Active encounter context
+  const [activeCombat, setActiveCombat] = useState(null); // { wordId, chamberId, isMiniboss }
+  const [activeArchive, setActiveArchive] = useState(null); // { rewardId, chamberId, interactableId }
+  const [activeShrine, setActiveShrine] = useState(null); // { chamberId }
+
+  // Add/remove body class for nav bar hiding
+  useEffect(() => {
+    document.body.classList.add('in-deep-script');
+    return () => document.body.classList.remove('in-deep-script');
+  }, []);
+
+  // ─── Kit Selection ────────────────────────────────────────
 
   const handleKitSelect = useCallback((kitId) => {
     const kit = getStarterKit(kitId);
     if (!kit) return;
     const sharedGearIds = getSharedGear().map(g => g.id);
-    const runMap = generateRunMap(6);
-    const newRun = createRunState(kit, sharedGearIds, runMap);
+
+    // Generate dungeon floor
+    const newFloor = generateDungeonFloor({ combatCount: 3 });
+
+    // Create run state (pass a dummy runMap for backward compat)
+    const newRun = createRunState(kit, sharedGearIds, []);
+    // Add floor reference
+    newRun.floor = newFloor;
+
     setRunState(newRun);
-    setScreen('running');
+    setFloor(newFloor);
+    setCurrentChamberId(newFloor.startChamberId);
+    setFacing('north');
+    setScreen('exploring');
   }, []);
 
-  const handleRoomSelect = useCallback((room) => {
+  // ─── Exploration: Movement ────────────────────────────────
+
+  const handleMove = useCallback((targetChamberId) => {
+    if (!floor) return;
+
+    setCurrentChamberId(targetChamberId);
+
+    // Mark chamber as visited
+    setFloor(prev => {
+      const newChambers = new Map(prev.chambers);
+      const chamber = { ...newChambers.get(targetChamberId), visited: true };
+      newChambers.set(targetChamberId, chamber);
+      return { ...prev, chambers: newChambers };
+    });
+
+    // Auto-trigger combat in unresolved combat/miniboss chambers
+    const chamber = floor.chambers.get(targetChamberId);
+    if (chamber && !chamber.resolved) {
+      if (chamber.type === CHAMBER_TYPES.COMBAT || chamber.type === CHAMBER_TYPES.MINIBOSS) {
+        // Small delay to let the room render first
+        setTimeout(() => {
+          setActiveCombat({
+            wordId: chamber.payload?.wordId,
+            chamberId: targetChamberId,
+            isMiniboss: chamber.type === CHAMBER_TYPES.MINIBOSS,
+          });
+          setScreen('combat');
+        }, 600);
+      }
+    }
+  }, [floor]);
+
+  const handleTurnLeft = useCallback(() => {
+    setFacing(prev => TURN_LEFT[prev]);
+  }, []);
+
+  const handleTurnRight = useCallback(() => {
+    setFacing(prev => TURN_RIGHT[prev]);
+  }, []);
+
+  // ─── Exploration: Trigger encounters from hotspots ────────
+
+  const handleTriggerCombat = useCallback((wordId, chamberId) => {
+    const chamber = floor?.chambers.get(chamberId);
+    setActiveCombat({
+      wordId,
+      chamberId,
+      isMiniboss: chamber?.type === CHAMBER_TYPES.MINIBOSS,
+    });
+    setScreen('combat');
+  }, [floor]);
+
+  const handleTriggerArchive = useCallback((rewardId, chamberId, interactableId) => {
+    setActiveArchive({ rewardId, chamberId, interactableId });
+    setScreen('archive');
+  }, []);
+
+  const handleTriggerShrine = useCallback((chamberId) => {
+    setActiveShrine({ chamberId });
+    setScreen('shrine');
+  }, []);
+
+  const handleLoot = useCallback((chamberId, interactableId) => {
+    // Loot effect: heal 1 HP
     setRunState(prev => ({
       ...prev,
-      currentRoom: room,
-      phase: room.type,
+      health: Math.min(prev.maxHealth, prev.health + 1),
     }));
   }, []);
 
+  const handleResolveInteractable = useCallback((chamberId, interactableId) => {
+    setFloor(prev => {
+      const newChambers = new Map(prev.chambers);
+      const chamber = { ...newChambers.get(chamberId) };
+      chamber.interactables = chamber.interactables.map(obj =>
+        obj.id === interactableId ? { ...obj, resolved: true } : obj
+      );
+      newChambers.set(chamberId, chamber);
+      return { ...prev, chambers: newChambers };
+    });
+  }, []);
+
+  // ─── Combat End ───────────────────────────────────────────
+
   const handleCombatEnd = useCallback((result, wordId) => {
-    setRunState(prev => {
-      if (result === 'victory') {
-        const newState = {
-          ...prev,
-          combatsWon: prev.combatsWon + 1,
-          wordsCompleted: [...prev.wordsCompleted, wordId],
-          roomsCompleted: prev.roomsCompleted + 1,
-          roomIndex: prev.roomIndex + 1,
-          currentRoom: null,
-          phase: 'room_choice',
-        };
-        // Check if this was the last room (miniboss beaten)
-        if (prev.roomIndex >= prev.runMap.length - 1) {
-          newState.phase = 'victory';
-          setEndResult('victory');
-          setScreen('end');
-        }
-        return newState;
+    const { chamberId, isMiniboss } = activeCombat || {};
+
+    if (result === 'victory') {
+      // Mark chamber as resolved
+      setFloor(prev => {
+        const newChambers = new Map(prev.chambers);
+        const chamber = { ...newChambers.get(chamberId), resolved: true };
+        // Also resolve the sigil interactable
+        chamber.interactables = chamber.interactables.map(obj =>
+          obj.action === 'trigger-combat' ? { ...obj, resolved: true } : obj
+        );
+        newChambers.set(chamberId, chamber);
+        return { ...prev, chambers: newChambers };
+      });
+
+      setRunState(prev => ({
+        ...prev,
+        combatsWon: prev.combatsWon + 1,
+        wordsCompleted: [...prev.wordsCompleted, wordId],
+        roomsCompleted: prev.roomsCompleted + 1,
+      }));
+
+      // Check if miniboss was defeated = victory
+      if (isMiniboss) {
+        setEndResult('victory');
+        setScreen('end');
       } else {
-        // Defeat — lose health
+        setScreen('exploring');
+      }
+    } else {
+      // Defeat — lose health
+      setRunState(prev => {
         const newHealth = prev.health - 1;
         if (newHealth <= 0) {
           setEndResult('defeat');
           setScreen('end');
-          return { ...prev, health: 0, phase: 'defeat' };
+          return { ...prev, health: 0 };
         }
-        return {
-          ...prev,
-          health: newHealth,
-          roomsCompleted: prev.roomsCompleted + 1,
-          roomIndex: prev.roomIndex + 1,
-          currentRoom: null,
-          phase: 'room_choice',
-        };
-      }
-    });
-  }, []);
+        return { ...prev, health: newHealth };
+      });
+
+      // If still alive, return to exploration (retreat from combat)
+      setRunState(prev => {
+        if (prev.health > 0) {
+          // Don't mark chamber as resolved — they can try again
+          return prev;
+        }
+        return prev;
+      });
+
+      // Check health after state update
+      setTimeout(() => {
+        setRunState(prev => {
+          if (prev.health > 0) {
+            setScreen('exploring');
+          }
+          return prev;
+        });
+      }, 0);
+    }
+
+    setActiveCombat(null);
+  }, [activeCombat]);
+
+  // ─── Archive End ──────────────────────────────────────────
 
   const handleArchiveComplete = useCallback((rewardId) => {
-    setRunState(prev => {
-      const newState = {
-        ...prev,
-        roomsCompleted: prev.roomsCompleted + 1,
-        roomIndex: prev.roomIndex + 1,
-        currentRoom: null,
-        phase: 'room_choice',
-      };
+    const { chamberId, interactableId } = activeArchive || {};
 
-      // Apply archive reward
+    // Resolve the interactable
+    if (chamberId && interactableId) {
+      setFloor(prev => {
+        const newChambers = new Map(prev.chambers);
+        const chamber = { ...newChambers.get(chamberId) };
+        chamber.interactables = chamber.interactables.map(obj =>
+          obj.id === interactableId ? { ...obj, resolved: true } : obj
+        );
+        // Mark chamber resolved if all archive interactables are done
+        const unresolvedArchive = chamber.interactables.filter(
+          o => o.action === 'trigger-archive' && !o.resolved
+        );
+        if (unresolvedArchive.length === 0) {
+          chamber.resolved = true;
+        }
+        newChambers.set(chamberId, chamber);
+        return { ...prev, chambers: newChambers };
+      });
+    }
+
+    // Apply archive reward
+    setRunState(prev => {
+      const newState = { ...prev, roomsCompleted: prev.roomsCompleted + 1 };
       switch (rewardId) {
         case 'heal':
           newState.health = Math.min(prev.maxHealth, prev.health + 1);
@@ -97,27 +245,42 @@ export default function DeepScriptMode({ onBack }) {
         case 'clue-hint':
           newState.insightNextCombat = true;
           break;
-        // 'free-letter' and 'insight' are handled in the archive screen
         default:
           break;
       }
-
       return newState;
     });
-  }, []);
+
+    setActiveArchive(null);
+    setScreen('exploring');
+  }, [activeArchive]);
+
+  // ─── Shrine End ───────────────────────────────────────────
 
   const handleShrineComplete = useCallback((upgradeId) => {
+    const { chamberId } = activeShrine || {};
+
+    // Mark shrine chamber as resolved
+    if (chamberId) {
+      setFloor(prev => {
+        const newChambers = new Map(prev.chambers);
+        const chamber = { ...newChambers.get(chamberId), resolved: true };
+        chamber.interactables = chamber.interactables.map(obj =>
+          obj.action === 'trigger-shrine' ? { ...obj, resolved: true } : obj
+        );
+        newChambers.set(chamberId, chamber);
+        return { ...prev, chambers: newChambers };
+      });
+    }
+
+    // Apply upgrade
     setRunState(prev => {
       const newState = {
         ...prev,
         roomsCompleted: prev.roomsCompleted + 1,
-        roomIndex: prev.roomIndex + 1,
-        currentRoom: null,
-        phase: 'room_choice',
         upgrades: { ...prev.upgrades },
       };
 
-      // Apply upgrade
       const upgrade = upgradeDefinitions.find(u => u.id === upgradeId);
       if (upgrade) {
         switch (upgrade.effect) {
@@ -150,18 +313,26 @@ export default function DeepScriptMode({ onBack }) {
             break;
         }
       }
-
       return newState;
     });
-  }, []);
+
+    setActiveShrine(null);
+    setScreen('exploring');
+  }, [activeShrine]);
+
+  // ─── Restart / Back ───────────────────────────────────────
 
   const handleRestart = useCallback(() => {
     setScreen('kit_select');
     setRunState(null);
+    setFloor(null);
+    setCurrentChamberId(null);
     setEndResult(null);
+    setFacing('north');
   }, []);
 
-  // Determine what to render
+  // ─── Render ───────────────────────────────────────────────
+
   if (screen === 'kit_select') {
     return (
       <div className="ds-mode">
@@ -183,57 +354,63 @@ export default function DeepScriptMode({ onBack }) {
     );
   }
 
-  // Running state
-  if (!runState) return null;
+  if (!runState || !floor) return null;
 
-  const currentNode = runState.runMap[runState.roomIndex];
-  const currentRoom = runState.currentRoom;
-
-  if (currentRoom) {
-    switch (currentRoom.type) {
-      case 'combat':
-      case 'miniboss':
-        return (
-          <div className="ds-mode">
-            <CombatScreen
-              wordId={currentRoom.wordId}
-              runState={runState}
-              onEnd={handleCombatEnd}
-              isMiniboss={currentRoom.type === 'miniboss'}
-            />
-          </div>
-        );
-      case 'archive':
-        return (
-          <div className="ds-mode">
-            <ArchiveScreen
-              room={currentRoom}
-              runState={runState}
-              onComplete={handleArchiveComplete}
-            />
-          </div>
-        );
-      case 'shrine':
-        return (
-          <div className="ds-mode">
-            <ShrineScreen
-              runState={runState}
-              onComplete={handleShrineComplete}
-            />
-          </div>
-        );
-      default:
-        break;
-    }
+  // Combat screen
+  if (screen === 'combat' && activeCombat) {
+    return (
+      <div className="ds-mode">
+        <CombatScreen
+          wordId={activeCombat.wordId}
+          runState={runState}
+          onEnd={handleCombatEnd}
+          isMiniboss={activeCombat.isMiniboss}
+        />
+      </div>
+    );
   }
 
-  // Room choice phase
+  // Archive screen
+  if (screen === 'archive' && activeArchive) {
+    return (
+      <div className="ds-mode">
+        <ArchiveScreen
+          room={{ rewardId: activeArchive.rewardId }}
+          runState={runState}
+          onComplete={handleArchiveComplete}
+        />
+      </div>
+    );
+  }
+
+  // Shrine screen
+  if (screen === 'shrine') {
+    return (
+      <div className="ds-mode">
+        <ShrineScreen
+          runState={runState}
+          onComplete={handleShrineComplete}
+        />
+      </div>
+    );
+  }
+
+  // Exploration
   return (
     <div className="ds-mode">
-      <RoomChoiceScreen
-        node={currentNode}
+      <ExplorationScreen
+        floor={floor}
+        currentChamberId={currentChamberId}
+        facing={facing}
+        onMove={handleMove}
+        onTurnLeft={handleTurnLeft}
+        onTurnRight={handleTurnRight}
+        onTriggerCombat={handleTriggerCombat}
+        onTriggerArchive={handleTriggerArchive}
+        onTriggerShrine={handleTriggerShrine}
+        onLoot={handleLoot}
+        onResolveInteractable={handleResolveInteractable}
         runState={runState}
-        onSelect={handleRoomSelect}
         onBack={onBack}
       />
     </div>
