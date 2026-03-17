@@ -8,7 +8,7 @@
  *
  * Session word lifecycle (guided packs):
  *   pending   → word has not been seen this session
- *   learned   → word was introduced/played once this session (NOT completed yet)
+ *   learned   → word was successfully tested in meaning multiple-choice once this session
  *   completed → word was successfully recalled AFTER being learned
  *
  * For random review, words go directly pending → completed (one pass).
@@ -140,6 +140,7 @@ export default function useBridgeBuilderGame(sessionConfig) {
   const [choiceResult, setChoiceResult] = useState(null); // 'correct' | 'wrong' | null
 
   const timerRef = useRef(null);
+  const meaningOutcomeRef = useRef('untested'); // 'teach' | 'choice' | 'untested'
 
   const isRoundComplete = phase === 'roundComplete';
   const isGameOver = hearts <= 0;
@@ -199,9 +200,10 @@ export default function useBridgeBuilderGame(sessionConfig) {
         const prevState = sessionStatesRef.current[wordId];
         let nextState;
         if (isGuidedPack && prevState === 'pending') {
-          // Words already introduced in a prior session complete in one pass
-          const prog = getWordProgress(wordId);
-          nextState = prog.meaningIntroduced ? 'completed' : 'learned';
+          // In guided mode, a word is only "learned" after first successful
+          // multiple-choice meaning test. Intro-only encounters do not advance.
+          // (Random review still completes in one pass via branch below.)
+          nextState = meaningOutcomeRef.current === 'choice' ? 'learned' : 'pending';
         } else {
           // Recall in guided pack (learned → completed), or any encounter in review
           nextState = 'completed';
@@ -225,6 +227,7 @@ export default function useBridgeBuilderGame(sessionConfig) {
             setStepIndex(s => s + 1);
             setSelectedChoice(null);
             setChoiceResult(null);
+            meaningOutcomeRef.current = 'untested';
             setPhase('promptIntro');
           }
         }
@@ -270,6 +273,7 @@ export default function useBridgeBuilderGame(sessionConfig) {
     recordMeaningIntroduced(currentWord.id);
     recordMeaningAttempt(currentWord.id, true);
     setScore(s => s + 5);
+    meaningOutcomeRef.current = 'teach';
     setBridgeSegments(segs => {
       const updated = [...segs];
       const last = updated[updated.length - 1];
@@ -291,6 +295,7 @@ export default function useBridgeBuilderGame(sessionConfig) {
     if (correct) {
       setScore(s => s + 10);
       setStreak(s => s + 1);
+      meaningOutcomeRef.current = 'choice';
       setBridgeSegments(segs => {
         const updated = [...segs];
         const last = updated[updated.length - 1];
@@ -330,6 +335,7 @@ export default function useBridgeBuilderGame(sessionConfig) {
     setStreak(0);
     setHearts(MAX_HEARTS);
     setBridgeSegments([]);
+    meaningOutcomeRef.current = 'untested';
     setSelectedChoice(null);
     setChoiceResult(null);
     setPhase('promptIntro');
