@@ -3051,9 +3051,13 @@
   }
 
   .ds-energy-well {
+    position: fixed;
+    left: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    z-index: 20;
     align-items: flex-start;
-    width: 100%;
-    padding: 0 4px;
+    width: auto;
+    padding: 0;
   }
 
   .ds-tray-endturn-row {
@@ -3061,6 +3065,8 @@
     align-items: flex-end;
     gap: 8px;
     width: 100%;
+    justify-content: center;
+    position: relative;
   }
 
   /* Tile tray: larger touch targets */
@@ -3100,6 +3106,7 @@
     padding: 0 4px;
     justify-items: stretch;
     align-items: stretch;
+    transform: translateY(-10px);
   }
 
   .ds-ability-card-wrapper {
@@ -3107,7 +3114,7 @@
   }
 
   .ds-ability-cost-float {
-    font-size: 12px;
+    font-size: 13px;
     margin-bottom: 3px;
   }
 
@@ -3117,11 +3124,11 @@
   }
 
   .ds-ability-cooldown-num {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .ds-ability-cooldown-icon {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .ds-ability-card {
@@ -3134,17 +3141,17 @@
   }
 
   .ds-ability-icon-center {
-    font-size: 26px;
+    font-size: 28px;
   }
 
   .ds-ability-socket {
-    width: 30px;
-    height: 34px;
-    font-size: 16px;
+    width: 32px;
+    height: 36px;
+    font-size: 17px;
   }
 
   .ds-ability-effect {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 800;
     line-height: 1.15;
     white-space: normal;
@@ -3153,15 +3160,18 @@
   }
 
   .ds-ability-badge {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   /* End Turn button: larger touch target */
   .ds-endturn-btn {
-    min-width: 58px;
-    min-height: 58px;
+    min-width: 56px;
+    min-height: 56px;
     padding: 11px 12px;
     flex-shrink: 0;
+    position: absolute;
+    right: 0;
+    bottom: 0;
   }
 
   .ds-energy-pip {
