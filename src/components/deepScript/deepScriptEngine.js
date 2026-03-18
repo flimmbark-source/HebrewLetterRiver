@@ -646,6 +646,45 @@ export function combatReducer(state, action) {
           updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Revealed a letter position' }];
           break;
         }
+        case 'divine': {
+          // Interpreter's Lantern: reveal a slot AND produce the exact letter for it
+          const unrevealed = state.answerTrack.filter(s => !s.revealed && !s.correct);
+          if (unrevealed.length > 0) {
+            const slot = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+            const newTrack = state.answerTrack.map(s =>
+              s.index === slot.index ? { ...s, revealed: true } : s
+            );
+            updates.answerTrack = newTrack;
+            // Also generate the exact letter for the revealed slot
+            const tile = createLetterTile(slot.targetLetter, 'gear');
+            const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
+            if (updates.tray.length < trayMax) {
+              updates.tray = [...updates.tray, tile];
+            }
+          }
+          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Divined a letter and produced it' }];
+          break;
+        }
+        case 'root-sight': {
+          // Rootkeeper's Root Lens: reveal a slot AND produce a biased random tile
+          const unrevealed = state.answerTrack.filter(s => !s.revealed && !s.correct);
+          if (unrevealed.length > 0) {
+            const slot = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+            const newTrack = state.answerTrack.map(s =>
+              s.index === slot.index ? { ...s, revealed: true } : s
+            );
+            updates.answerTrack = newTrack;
+          }
+          // Generate 1 tile biased toward target (60% accuracy)
+          const rootAccuracy = 0.6 + (runState?.passives?.generateBonus || 0);
+          const newTiles = generateLetters(1, targetLetters, rootAccuracy);
+          const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
+          if (updates.tray.length < trayMax) {
+            updates.tray = [...updates.tray, ...newTiles];
+          }
+          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Revealed a root and produced a tile' }];
+          break;
+        }
         case 'choice': {
           const bonusCount = runState?.passives?.bonusChoiceCount || 0;
           const bundle = generateChoiceBundle(3, targetLetters, bonusCount);
