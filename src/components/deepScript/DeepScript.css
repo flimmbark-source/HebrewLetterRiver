@@ -2986,6 +2986,24 @@
     max-width: none;
   }
 
+  .ds-viewport {
+    min-height: 56vh;
+  }
+
+  .ds-dungeon-room {
+    transform: scale(1.06);
+    transform-origin: center 42%;
+  }
+
+  .ds-dungeon-back-wall {
+    top: 6%;
+    bottom: 26%;
+  }
+
+  .ds-dungeon-floor {
+    height: 42%;
+  }
+
   .ds-encounter-english {
     font-size: 24px;
   }
@@ -3095,6 +3113,11 @@
 
   .ds-inv-tiles {
     gap: 3px;
+  }
+
+  .ds-inv-label {
+    font-size: 10px;
+    letter-spacing: 1.2px;
   }
 
   /* Stow/retrieve buttons: meet 44px minimum */
