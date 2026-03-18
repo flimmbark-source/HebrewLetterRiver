@@ -764,7 +764,7 @@
   transform: translateX(-50%);
   z-index: 10;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 16px;
 }
 
@@ -904,7 +904,7 @@
 /* ─── Ability Cards Row (centered above tray) ───────────── */
 .ds-ability-row {
   position: absolute;
-  bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(102px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -975,7 +975,9 @@
   align-items: center;
   gap: 2px;
   width: 62px;
+  height: 62px;
   padding: 5px 4px 4px;
+  justify-content: center;
   border: 1.5px solid var(--ds-stone-lighter);
   border-radius: 8px;
   background: linear-gradient(180deg, var(--ds-stone-light) 0%, var(--ds-stone-dark) 100%);

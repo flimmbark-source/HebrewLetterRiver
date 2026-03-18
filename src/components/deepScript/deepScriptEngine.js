@@ -608,13 +608,15 @@ export function combatReducer(state, action) {
           break;
         }
         case 'duplicate': {
-          // Echo Mirror: duplicate the socketed tile
+          // Echo Mirror: produce 2 copies of the socketed tile
           const socketedTile = socketedTiles[0];
           if (socketedTile?.letter) {
-            const dupe = createLetterTile(socketedTile.letter, 'duplicate');
             const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-            if (updates.tray.length < trayMax) {
-              updates.tray = [...updates.tray, dupe];
+            for (let i = 0; i < 2; i++) {
+              const copy = createLetterTile(socketedTile.letter, 'duplicate');
+              if (updates.tray.length < trayMax) {
+                updates.tray = [...updates.tray, copy];
+              }
             }
             // Also return the original tile to tray
             const original = createLetterTile(socketedTile.letter, 'socketed');
@@ -622,7 +624,7 @@ export function combatReducer(state, action) {
               updates.tray = [...updates.tray, original];
             }
           }
-          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Duplicated letter' }];
+          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Produced 2 copies' }];
           break;
         }
         case 'reveal': {

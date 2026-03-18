@@ -478,8 +478,8 @@ describe('Energy System', () => {
       gearId: 'scribe-knife',
       runState,
     });
-    // Scribe knife costs 1 energy
-    expect(state.energy).toBe(2);
+    // Scribe knife costs 2 energy
+    expect(state.energy).toBe(1);
   });
 
   it('USE_GEAR fails with insufficient energy', () => {
