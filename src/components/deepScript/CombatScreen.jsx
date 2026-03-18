@@ -442,6 +442,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
               <div key={`e-${i}`} className="ds-inv-tile ds-inv-tile--empty" />
             ))}
           </div>
+          <div className="ds-inv-label">Tray</div>
         </div>
 
         {(combat.satchel.length > 0 || runState.satchelSize > 0) && (
@@ -467,6 +468,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                   <div key={`es-${i}`} className="ds-inv-tile ds-inv-tile--empty ds-inv-tile--satchel-empty" />
                 ))}
               </div>
+              <div className="ds-inv-label ds-inv-label--satchel">Satchel</div>
             </div>
 
             <div className="ds-inv-actions-compact">
