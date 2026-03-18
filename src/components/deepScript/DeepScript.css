@@ -3092,22 +3092,18 @@
 
   /* Ability cards: slightly smaller to fit, but keep touch target */
   .ds-ability-row {
-    gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     width: 100%;
     max-width: 100%;
-    padding: 0 4px 4px;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    gap: 8px;
+    padding: 0 4px;
+    justify-items: stretch;
+    align-items: stretch;
   }
 
-  .ds-ability-row::-webkit-scrollbar { display: none; }
-
   .ds-ability-card-wrapper {
-    flex: 0 0 auto;
+    width: 100%;
   }
 
   .ds-ability-cost-float {
@@ -3129,21 +3125,21 @@
   }
 
   .ds-ability-card {
-    width: 68px;
-    height: 72px;
-    padding: 5px 4px 4px;
+    width: 100%;
+    height: 84px;
+    padding: 6px 5px 5px;
     min-height: 44px;
-    min-width: 44px;
+    min-width: 0;
     border-width: 2px;
   }
 
   .ds-ability-icon-center {
-    font-size: 24px;
+    font-size: 26px;
   }
 
   .ds-ability-socket {
-    width: 28px;
-    height: 32px;
+    width: 30px;
+    height: 34px;
     font-size: 16px;
   }
 
@@ -3456,13 +3452,13 @@
   }
 
   .ds-ability-card {
-    width: 60px;
-    height: 64px;
+    width: 100%;
+    height: 76px;
   }
 
   .ds-ability-socket {
-    width: 25px;
-    height: 29px;
+    width: 27px;
+    height: 31px;
     font-size: 14px;
   }
 
