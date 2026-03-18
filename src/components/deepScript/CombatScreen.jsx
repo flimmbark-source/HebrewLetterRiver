@@ -316,225 +316,229 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
         </div>
       </div>
 
-      {/* ═══ ENERGY — bottom-left ═══ */}
-      <div className="ds-energy-well">
-        <div className="ds-energy-label">ENERGY</div>
-        <div className="ds-energy-pips">
-          {energyPips.map((full, i) => (
-            <span key={i} className={`ds-energy-pip ${full ? 'ds-energy-pip--full' : 'ds-energy-pip--empty'}`} />
-          ))}
+      <div className="ds-combat-controls">
+        {/* ═══ ENERGY — bottom-left ═══ */}
+        <div className="ds-energy-well">
+          <div className="ds-energy-label">ENERGY</div>
+          <div className="ds-energy-pips">
+            {energyPips.map((full, i) => (
+              <span key={i} className={`ds-energy-pip ${full ? 'ds-energy-pip--full' : 'ds-energy-pip--empty'}`} />
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* ═══ ABILITY CARDS — center-bottom, above tray ═══ */}
-      <div className="ds-ability-row">
-        {runState.gearIds.map(gearId => {
-          const gear = getGearById(gearId);
-          const gs = combat.gearStates[gearId];
-          if (!gear || !gs) return null;
+        {/* ═══ ABILITY CARDS — center-bottom, above tray ═══ */}
+        <div className="ds-ability-row">
+          {runState.gearIds.map(gearId => {
+            const gear = getGearById(gearId);
+            const gs = combat.gearStates[gearId];
+            if (!gear || !gs) return null;
 
-          const onCooldown = gs.currentCooldown > 0;
-          const noUses = gs.usesRemaining === 0;
-          const currentEnergyCost = gear.escalatingCost
-            ? gear.energyCost + (gs.turnUses || 0)
-            : gear.energyCost;
-          const notEnoughEnergy = combat.energy < currentEnergyCost;
-          const requiredSocketsFilled = gs.sockets
-            .filter(s => s.type === 'required')
-            .every(s => s.tileId !== null);
-          const hasSockets = gs.sockets.length > 0;
-          const needsSockets = hasSockets && gs.sockets.some(s => s.type === 'required');
-          const isReady = !onCooldown && !noUses && !notEnoughEnergy && (!needsSockets || requiredSocketsFilled);
-          const disabled = onCooldown || noUses || combat.phase !== 'active';
+            const onCooldown = gs.currentCooldown > 0;
+            const noUses = gs.usesRemaining === 0;
+            const currentEnergyCost = gear.escalatingCost
+              ? gear.energyCost + (gs.turnUses || 0)
+              : gear.energyCost;
+            const notEnoughEnergy = combat.energy < currentEnergyCost;
+            const requiredSocketsFilled = gs.sockets
+              .filter(s => s.type === 'required')
+              .every(s => s.tileId !== null);
+            const hasSockets = gs.sockets.length > 0;
+            const needsSockets = hasSockets && gs.sockets.some(s => s.type === 'required');
+            const isReady = !onCooldown && !noUses && !notEnoughEnergy && (!needsSockets || requiredSocketsFilled);
+            const disabled = onCooldown || noUses || combat.phase !== 'active';
 
-          let cardCls = 'ds-ability-card';
-          if (onCooldown) cardCls += ' ds-ability-card--cooldown';
-          if (noUses) cardCls += ' ds-ability-card--depleted';
-          if (notEnoughEnergy) cardCls += ' ds-ability-card--no-energy';
-          if (isReady) cardCls += ' ds-ability-card--ready';
-          if (activatingGear === gearId) cardCls += ' ds-ability-card--activating';
+            let cardCls = 'ds-ability-card';
+            if (onCooldown) cardCls += ' ds-ability-card--cooldown';
+            if (noUses) cardCls += ' ds-ability-card--depleted';
+            if (notEnoughEnergy) cardCls += ' ds-ability-card--no-energy';
+            if (isReady) cardCls += ' ds-ability-card--ready';
+            if (activatingGear === gearId) cardCls += ' ds-ability-card--activating';
 
-          return (
-            <div key={gearId} className="ds-ability-card-wrapper">
-              {/* Mana cost floats above card */}
-              <div className={`ds-ability-cost-float ${notEnoughEnergy ? 'ds-ability-cost-float--insufficient' : ''}`}>
-                {currentEnergyCost > 0 ? '◆'.repeat(currentEnergyCost) : '0'}
-              </div>
-
-              {/* Cooldown timer floats above card (replaces cost when on cooldown) */}
-              {onCooldown && (
-                <div className="ds-ability-cooldown-float">
-                  <span className="ds-ability-cooldown-num">{gs.currentCooldown}</span>
-                  <span className="ds-ability-cooldown-icon">⏳</span>
+            return (
+              <div key={gearId} className="ds-ability-card-wrapper">
+                {/* Mana cost floats above card */}
+                <div className={`ds-ability-cost-float ${notEnoughEnergy ? 'ds-ability-cost-float--insufficient' : ''}`}>
+                  {currentEnergyCost > 0 ? '◆'.repeat(currentEnergyCost) : '0'}
                 </div>
-              )}
 
-              <div
-                role="button"
-                tabIndex={combat.phase === 'active' ? 0 : -1}
-                className={cardCls}
-                title={gear.detailedDescription}
-                onClick={() => {
-                  if (isReady && combat.phase === 'active') {
-                    handleUseGear(gearId);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if ((e.key === 'Enter' || e.key === ' ') && isReady && combat.phase === 'active') {
-                    e.preventDefault();
-                    handleUseGear(gearId);
-                  }
-                }}
-                aria-disabled={combat.phase !== 'active'}
-              >
-                {/* Centered icon for non-socket abilities */}
-                {!hasSockets && <div className="ds-ability-icon-center">{gear.icon}</div>}
+                {/* Cooldown timer floats above card (replaces cost when on cooldown) */}
+                {onCooldown && (
+                  <div className="ds-ability-cooldown-float">
+                    <span className="ds-ability-cooldown-num">{gs.currentCooldown}</span>
+                    <span className="ds-ability-cooldown-icon">⏳</span>
+                  </div>
+                )}
 
-                {/* Tile sockets — icon shows inside empty socket */}
-                {hasSockets && (
-                  <div className="ds-ability-sockets">
-                    {gs.sockets.map((socket, si) => {
-                      const socketDisabled = combat.phase !== 'active' || (!socket.tileId && !hasSelection);
-                      return (
-                        <div
-                          key={si}
-                          role="button"
-                          tabIndex={socketDisabled ? -1 : 0}
-                          className={`ds-ability-socket ${socket.type === 'required' ? 'ds-ability-socket--required' : 'ds-ability-socket--empower'} ${socket.tileId ? 'ds-ability-socket--filled' : ''} ${!socket.tileId && hasSelection ? 'ds-ability-socket--ready' : ''}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (socketDisabled) return;
-                            if (socket.tileId) {
-                              handleUnsocketTile(gearId, si);
-                            } else if (hasSelection) {
-                              handleSocketTile(gearId, si);
-                            }
-                          }}
-                          onKeyDown={(e) => {
-                            if (socketDisabled) return;
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
+                <div
+                  role="button"
+                  tabIndex={combat.phase === 'active' ? 0 : -1}
+                  className={cardCls}
+                  title={gear.detailedDescription}
+                  onClick={() => {
+                    if (isReady && combat.phase === 'active') {
+                      handleUseGear(gearId);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && isReady && combat.phase === 'active') {
+                      e.preventDefault();
+                      handleUseGear(gearId);
+                    }
+                  }}
+                  aria-disabled={combat.phase !== 'active'}
+                >
+                  {/* Centered icon for non-socket abilities */}
+                  {!hasSockets && <div className="ds-ability-icon-center">{gear.icon}</div>}
+
+                  {/* Tile sockets — icon shows inside empty socket */}
+                  {hasSockets && (
+                    <div className="ds-ability-sockets">
+                      {gs.sockets.map((socket, si) => {
+                        const socketDisabled = combat.phase !== 'active' || (!socket.tileId && !hasSelection);
+                        return (
+                          <div
+                            key={si}
+                            role="button"
+                            tabIndex={socketDisabled ? -1 : 0}
+                            className={`ds-ability-socket ${socket.type === 'required' ? 'ds-ability-socket--required' : 'ds-ability-socket--empower'} ${socket.tileId ? 'ds-ability-socket--filled' : ''} ${!socket.tileId && hasSelection ? 'ds-ability-socket--ready' : ''}`}
+                            onClick={(e) => {
                               e.stopPropagation();
+                              if (socketDisabled) return;
                               if (socket.tileId) {
                                 handleUnsocketTile(gearId, si);
                               } else if (hasSelection) {
                                 handleSocketTile(gearId, si);
                               }
-                            }
-                          }}
-                          aria-disabled={socketDisabled}
-                        >
-                          {socket.tileLetter || <span className="ds-socket-icon">{gear.icon}</span>}
-                        </div>
-                      );
-                    })}
+                            }}
+                            onKeyDown={(e) => {
+                              if (socketDisabled) return;
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (socket.tileId) {
+                                  handleUnsocketTile(gearId, si);
+                                } else if (hasSelection) {
+                                  handleSocketTile(gearId, si);
+                                }
+                              }
+                            }}
+                            aria-disabled={socketDisabled}
+                          >
+                            {socket.tileLetter || <span className="ds-socket-icon">{gear.icon}</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Compact outcome text */}
+                  <div className="ds-ability-effect">{gear.shortDesc}</div>
+
+                  {/* Status badges (no cooldown here — it's above the card) */}
+                  <div className="ds-ability-badges">
+                    {gs.usesRemaining >= 0 && !noUses && <span className="ds-ability-badge ds-ability-badge--uses">{gs.usesRemaining}×</span>}
+                    {noUses && <span className="ds-ability-badge ds-ability-badge--spent">--</span>}
                   </div>
-                )}
-
-                {/* Compact outcome text */}
-                <div className="ds-ability-effect">{gear.shortDesc}</div>
-
-                {/* Status badges (no cooldown here — it's above the card) */}
-                <div className="ds-ability-badges">
-                  {gs.usesRemaining >= 0 && !noUses && <span className="ds-ability-badge ds-ability-badge--uses">{gs.usesRemaining}×</span>}
-                  {noUses && <span className="ds-ability-badge ds-ability-badge--spent">--</span>}
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* ═══ TILE TRAY — center-bottom ═══ */}
-      <div className="ds-tile-row">
-        <div className="ds-inv-tray">
-          <div className="ds-inv-tiles">
-            {combat.tray.map(tile => {
-              let tileCls = 'ds-inv-tile';
-              if (tile.faded) tileCls += ' ds-inv-tile--faded';
-              if (combat.selectedTrayTile === tile.id) tileCls += ' ds-inv-tile--selected';
-              return (
-                <button
-                  key={tile.id}
-                  type="button"
-                  className={tileCls}
-                  onClick={() => handleTrayClick(tile.id)}
-                  disabled={combat.phase !== 'active'}
-                >
-                  {tile.letter}
-                </button>
-              );
-            })}
-            {Array.from({ length: Math.max(0, runState.traySize - combat.tray.length) }).map((_, i) => (
-              <div key={`e-${i}`} className="ds-inv-tile ds-inv-tile--empty" />
-            ))}
-          </div>
-          <div className="ds-inv-label">Tray</div>
+            );
+          })}
         </div>
 
-        {(combat.satchel.length > 0 || runState.satchelSize > 0) && (
-          <div className="ds-inv-satchel-group">
-            <div className="ds-inv-satchel">
+        <div className="ds-tray-endturn-row">
+          {/* ═══ TILE TRAY — center-bottom ═══ */}
+          <div className="ds-tile-row">
+            <div className="ds-inv-tray">
               <div className="ds-inv-tiles">
-                {combat.satchel.map(tile => {
-                  let tileCls = 'ds-inv-tile ds-inv-tile--satchel';
-                  if (combat.selectedSatchelTile === tile.id) tileCls += ' ds-inv-tile--selected';
+                {combat.tray.map(tile => {
+                  let tileCls = 'ds-inv-tile';
+                  if (tile.faded) tileCls += ' ds-inv-tile--faded';
+                  if (combat.selectedTrayTile === tile.id) tileCls += ' ds-inv-tile--selected';
                   return (
                     <button
                       key={tile.id}
                       type="button"
                       className={tileCls}
-                      onClick={() => handleSatchelClick(tile.id)}
+                      onClick={() => handleTrayClick(tile.id)}
                       disabled={combat.phase !== 'active'}
                     >
                       {tile.letter}
                     </button>
                   );
                 })}
-                {Array.from({ length: Math.max(0, runState.satchelSize - combat.satchel.length) }).map((_, i) => (
-                  <div key={`es-${i}`} className="ds-inv-tile ds-inv-tile--empty ds-inv-tile--satchel-empty" />
+                {Array.from({ length: Math.max(0, runState.traySize - combat.tray.length) }).map((_, i) => (
+                  <div key={`e-${i}`} className="ds-inv-tile ds-inv-tile--empty" />
                 ))}
               </div>
-              <div className="ds-inv-label ds-inv-label--satchel">Satchel</div>
+              <div className="ds-inv-label">Tray</div>
             </div>
 
-            <div className="ds-inv-actions-compact">
-              <button
-                type="button"
-                className="ds-inv-act ds-inv-act--stow"
-                onClick={handleStow}
-                title="Stow to satchel"
-                style={{ visibility: canStow ? 'visible' : 'hidden' }}
-                disabled={!canStow}
-              >
-                <span className="ds-inv-act-icon">⬇</span>
-              </button>
-              <button
-                type="button"
-                className="ds-inv-act ds-inv-act--retrieve"
-                onClick={handleRetrieve}
-                title="Retrieve from satchel"
-                style={{ visibility: canRetrieve ? 'visible' : 'hidden' }}
-                disabled={!canRetrieve}
-              >
-                <span className="ds-inv-act-icon">⬆</span>
-              </button>
-            </div>
+            {(combat.satchel.length > 0 || runState.satchelSize > 0) && (
+              <div className="ds-inv-satchel-group">
+                <div className="ds-inv-satchel">
+                  <div className="ds-inv-tiles">
+                    {combat.satchel.map(tile => {
+                      let tileCls = 'ds-inv-tile ds-inv-tile--satchel';
+                      if (combat.selectedSatchelTile === tile.id) tileCls += ' ds-inv-tile--selected';
+                      return (
+                        <button
+                          key={tile.id}
+                          type="button"
+                          className={tileCls}
+                          onClick={() => handleSatchelClick(tile.id)}
+                          disabled={combat.phase !== 'active'}
+                        >
+                          {tile.letter}
+                        </button>
+                      );
+                    })}
+                    {Array.from({ length: Math.max(0, runState.satchelSize - combat.satchel.length) }).map((_, i) => (
+                      <div key={`es-${i}`} className="ds-inv-tile ds-inv-tile--empty ds-inv-tile--satchel-empty" />
+                    ))}
+                  </div>
+                  <div className="ds-inv-label ds-inv-label--satchel">Satchel</div>
+                </div>
+
+                <div className="ds-inv-actions-compact">
+                  <button
+                    type="button"
+                    className="ds-inv-act ds-inv-act--stow"
+                    onClick={handleStow}
+                    title="Stow to satchel"
+                    style={{ visibility: canStow ? 'visible' : 'hidden' }}
+                    disabled={!canStow}
+                  >
+                    <span className="ds-inv-act-icon">⬇</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="ds-inv-act ds-inv-act--retrieve"
+                    onClick={handleRetrieve}
+                    title="Retrieve from satchel"
+                    style={{ visibility: canRetrieve ? 'visible' : 'hidden' }}
+                    disabled={!canRetrieve}
+                  >
+                    <span className="ds-inv-act-icon">⬆</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      {/* ═══ END TURN — bottom-right ═══ */}
-      <button
-        type="button"
-        className="ds-endturn-btn"
-        onClick={handleEndTurn}
-        disabled={combat.phase !== 'active' || enemyActing}
-        title="End your turn — enemy will act"
-      >
-        <span className="ds-endturn-icon">⚔</span>
-        <span className="ds-endturn-label">End</span>
-      </button>
+          {/* ═══ END TURN — bottom-right ═══ */}
+          <button
+            type="button"
+            className="ds-endturn-btn"
+            onClick={handleEndTurn}
+            disabled={combat.phase !== 'active' || enemyActing}
+            title="End your turn — enemy will act"
+          >
+            <span className="ds-endturn-icon">⚔</span>
+            <span className="ds-endturn-label">End</span>
+          </button>
+        </div>
+      </div>
 
       {/* Choice Bundle Modal */}
       {combat.choiceBundle && (

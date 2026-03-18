@@ -623,6 +623,16 @@
   border-radius: 1px;
 }
 
+
+/* ─── Combat Controls Container ─────────────────────────── */
+.ds-combat-controls {
+  position: static;
+}
+
+.ds-tray-endturn-row {
+  position: static;
+}
+
 /* ─── Energy Well (bottom-left) ──────────────────────────── */
 .ds-energy-well {
   position: absolute;
@@ -3008,6 +3018,51 @@
     font-size: 16px;
   }
 
+  /* Combat controls: flow layout instead of absolute pile-up */
+  .ds-combat-controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    z-index: 14;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 0 8px;
+    pointer-events: none;
+  }
+
+  .ds-combat-controls > * {
+    pointer-events: auto;
+  }
+
+  .ds-energy-well,
+  .ds-ability-row,
+  .ds-tile-row,
+  .ds-endturn-btn {
+    position: static;
+    inset: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    top: auto;
+    transform: none;
+  }
+
+  .ds-energy-well {
+    align-items: flex-start;
+    width: 100%;
+    padding: 0 4px;
+  }
+
+  .ds-tray-endturn-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    width: 100%;
+  }
+
   /* Tile tray: larger touch targets */
   .ds-inv-tile {
     width: 42px;
@@ -3016,9 +3071,12 @@
   }
 
   .ds-tile-row {
-    gap: 10px;
+    flex: 1;
+    gap: 8px;
     max-width: 100%;
-    padding: 0 8px;
+    padding: 0;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .ds-inv-tiles {
@@ -3035,7 +3093,6 @@
   /* Ability cards: slightly smaller to fit, but keep touch target */
   .ds-ability-row {
     gap: 4px;
-    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
     max-width: 100%;
     padding: 0 4px;
     flex-wrap: wrap;
@@ -3065,12 +3122,7 @@
     min-width: 52px;
     min-height: 52px;
     padding: 10px 12px;
-    right: 8px;
-  }
-
-  /* Energy well */
-  .ds-energy-well {
-    left: 8px;
+    flex-shrink: 0;
   }
 
   .ds-energy-pip {
@@ -3117,7 +3169,7 @@
 
   /* Log toast: position above bottom controls */
   .ds-log-toast {
-    bottom: calc(170px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(190px + env(safe-area-inset-bottom, 0px));
     max-width: 80%;
     text-align: center;
   }
@@ -3371,10 +3423,6 @@
     font-size: 13px;
   }
 
-  .ds-ability-row {
-    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
-  }
-
   .ds-phase-message {
     font-size: 22px;
   }
@@ -3434,31 +3482,20 @@
     font-size: 18px;
   }
 
-  .ds-ability-row {
-    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
-  }
-
   .ds-ability-card {
     width: 54px;
     height: 54px;
   }
 
-  .ds-tile-row {
-    bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  .ds-combat-controls {
+    gap: 6px;
+    bottom: calc(4px + env(safe-area-inset-bottom, 0px));
   }
 
   .ds-inv-tile {
     width: 36px;
     height: 40px;
     font-size: 18px;
-  }
-
-  .ds-endturn-btn {
-    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-  }
-
-  .ds-energy-well {
-    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   }
 
   .ds-explore-action-bar {
