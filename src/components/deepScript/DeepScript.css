@@ -3196,11 +3196,21 @@
     text-align: center;
     flex-wrap: wrap;
     justify-content: center;
-    padding: 5px 12px;
+    padding: 7px 14px;
+    transform: translateX(calc(-50% - 10px));
+  }
+
+  .ds-intent-icon {
+    font-size: 22px;
   }
 
   .ds-intent-text {
-    font-size: 11px;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .ds-intent-ward {
+    font-size: 18px;
   }
 
   /* Phase overlay */
