@@ -774,6 +774,12 @@
   gap: 3px;
 }
 
+.ds-inv-satchel-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .ds-inv-satchel {
   display: flex;
   flex-direction: column;
@@ -1023,6 +1029,54 @@
   border-color: var(--ds-gold);
   box-shadow: 0 0 5px var(--ds-gold-glow);
 }
+
+.ds-ability-socket--ready {
+  animation: ds-socket-pulse 1.2s ease-in-out infinite alternate;
+}
+
+.ds-ability-socket--ready.ds-ability-socket--required {
+  border-color: var(--ds-ember);
+}
+
+@keyframes ds-socket-pulse {
+  from { box-shadow: 0 0 2px var(--ds-gold-glow); }
+  to { box-shadow: 0 0 8px var(--ds-gold-glow); }
+}
+
+.ds-ability-socket:disabled {
+  cursor: default;
+  opacity: 0.5;
+  animation: none;
+}
+
+/* Activate button (inside card) */
+.ds-ability-activate {
+  width: 100%;
+  padding: 3px 0;
+  border: 1px solid var(--ds-stone-lighter);
+  border-radius: 4px;
+  background: var(--ds-stone-mid);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--ds-parchment-dim);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  line-height: 1;
+}
+
+.ds-ability-card--ready .ds-ability-activate {
+  border-color: var(--ds-bronze);
+  color: var(--ds-gold);
+  background: linear-gradient(180deg, #2a2520 0%, #1e1a15 100%);
+}
+
+.ds-ability-card--ready .ds-ability-activate:hover {
+  box-shadow: 0 0 6px var(--ds-gold-glow);
+}
+
+.ds-ability-activate:active:not(:disabled) { transform: scale(0.94); }
+.ds-ability-activate:disabled { opacity: 0.35; cursor: not-allowed; }
 
 /* Compact effect text — icon+keyword tokens */
 .ds-ability-effect {

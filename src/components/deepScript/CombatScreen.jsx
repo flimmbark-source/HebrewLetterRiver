@@ -352,16 +352,9 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
           if (activatingGear === gearId) cardCls += ' ds-ability-card--activating';
 
           return (
-            <button
+            <div
               key={gearId}
-              type="button"
               className={cardCls}
-              onClick={() => {
-                if (!disabled && !notEnoughEnergy && (!needsSockets || requiredSocketsFilled)) {
-                  handleUseGear(gearId);
-                }
-              }}
-              disabled={disabled || notEnoughEnergy || (needsSockets && !requiredSocketsFilled)}
               title={gear.detailedDescription}
             >
               {/* Top row: icon + energy cost */}
@@ -372,15 +365,14 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                 </span>
               </div>
 
-              {/* Tile sockets (if any) */}
+              {/* Tile sockets (if any) — always interactive when phase is active */}
               {hasSockets && (
                 <div className="ds-ability-sockets">
                   {gs.sockets.map((socket, si) => (
-                    <span
+                    <button
                       key={si}
-                      role="button"
-                      tabIndex={0}
-                      className={`ds-ability-socket ${socket.type === 'required' ? 'ds-ability-socket--required' : 'ds-ability-socket--empower'} ${socket.tileId ? 'ds-ability-socket--filled' : ''}`}
+                      type="button"
+                      className={`ds-ability-socket ${socket.type === 'required' ? 'ds-ability-socket--required' : 'ds-ability-socket--empower'} ${socket.tileId ? 'ds-ability-socket--filled' : ''} ${!socket.tileId && hasSelection ? 'ds-ability-socket--ready' : ''}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (socket.tileId) {
@@ -389,22 +381,15 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                           handleSocketTile(gearId, si);
                         }
                       }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.stopPropagation();
-                          if (socket.tileId) handleUnsocketTile(gearId, si);
-                          else if (hasSelection) handleSocketTile(gearId, si);
-                        }
-                      }}
-                      title={socket.tileId ? `${socket.tileLetter} (unsocket)` : 'Socket a tile'}
+                      disabled={combat.phase !== 'active' || (!socket.tileId && !hasSelection)}
                     >
                       {socket.tileLetter || ''}
-                    </span>
+                    </button>
                   ))}
                 </div>
               )}
 
-              {/* Compact icon+keyword effect */}
+              {/* Compact outcome text */}
               <div className="ds-ability-effect">{gear.shortDesc}</div>
 
               {/* Status badges */}
@@ -413,7 +398,20 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                 {gs.usesRemaining >= 0 && !noUses && <span className="ds-ability-badge ds-ability-badge--uses">{gs.usesRemaining}×</span>}
                 {noUses && <span className="ds-ability-badge ds-ability-badge--spent">--</span>}
               </div>
-            </button>
+
+              {/* Activate — separate from card, only enabled when truly ready */}
+              <button
+                type="button"
+                className="ds-ability-activate"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleUseGear(gearId);
+                }}
+                disabled={!isReady || combat.phase !== 'active'}
+              >
+                {onCooldown ? `${gs.currentCooldown}` : noUses ? '—' : '▶'}
+              </button>
+            </div>
           );
         })}
       </div>
@@ -444,43 +442,45 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
           </div>
         </div>
 
-        <div className="ds-inv-actions-compact">
-          {canStow && (
-            <button type="button" className="ds-inv-act ds-inv-act--stow" onClick={handleStow} title="Stow to satchel">
-              <span className="ds-inv-act-icon">⬇</span>
-            </button>
-          )}
-          {canRetrieve && (
-            <button type="button" className="ds-inv-act ds-inv-act--retrieve" onClick={handleRetrieve} title="Retrieve from satchel">
-              <span className="ds-inv-act-icon">⬆</span>
-            </button>
-          )}
-        </div>
+        {(combat.satchel.length > 0 || runState.satchelSize > 0) && (
+          <div className="ds-inv-satchel-group">
+            <div className="ds-inv-satchel">
+              <div className="ds-inv-tiles">
+                {combat.satchel.map(tile => {
+                  let tileCls = 'ds-inv-tile ds-inv-tile--satchel';
+                  if (combat.selectedSatchelTile === tile.id) tileCls += ' ds-inv-tile--selected';
+                  return (
+                    <button
+                      key={tile.id}
+                      type="button"
+                      className={tileCls}
+                      onClick={() => handleSatchelClick(tile.id)}
+                      disabled={combat.phase !== 'active'}
+                    >
+                      {tile.letter}
+                    </button>
+                  );
+                })}
+                {Array.from({ length: Math.max(0, runState.satchelSize - combat.satchel.length) }).map((_, i) => (
+                  <div key={`es-${i}`} className="ds-inv-tile ds-inv-tile--empty ds-inv-tile--satchel-empty" />
+                ))}
+              </div>
+            </div>
 
-        {combat.satchel.length > 0 || runState.satchelSize > 0 ? (
-          <div className="ds-inv-satchel">
-            <div className="ds-inv-tiles">
-              {combat.satchel.map(tile => {
-                let tileCls = 'ds-inv-tile ds-inv-tile--satchel';
-                if (combat.selectedSatchelTile === tile.id) tileCls += ' ds-inv-tile--selected';
-                return (
-                  <button
-                    key={tile.id}
-                    type="button"
-                    className={tileCls}
-                    onClick={() => handleSatchelClick(tile.id)}
-                    disabled={combat.phase !== 'active'}
-                  >
-                    {tile.letter}
-                  </button>
-                );
-              })}
-              {Array.from({ length: Math.max(0, runState.satchelSize - combat.satchel.length) }).map((_, i) => (
-                <div key={`es-${i}`} className="ds-inv-tile ds-inv-tile--empty ds-inv-tile--satchel-empty" />
-              ))}
+            <div className="ds-inv-actions-compact">
+              {canStow && (
+                <button type="button" className="ds-inv-act ds-inv-act--stow" onClick={handleStow} title="Stow to satchel">
+                  <span className="ds-inv-act-icon">⬇</span>
+                </button>
+              )}
+              {canRetrieve && (
+                <button type="button" className="ds-inv-act ds-inv-act--retrieve" onClick={handleRetrieve} title="Retrieve from satchel">
+                  <span className="ds-inv-act-icon">⬆</span>
+                </button>
+              )}
             </div>
           </div>
-        ) : null}
+        )}
       </div>
 
       {/* ═══ END TURN — bottom-right ═══ */}
