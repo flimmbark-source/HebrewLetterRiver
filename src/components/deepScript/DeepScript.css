@@ -909,6 +909,48 @@
   gap: 5px;
 }
 
+.ds-ability-card-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Cooldown float above card */
+.ds-ability-cooldown-float {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 5px;
+  background: rgba(30, 34, 40, 0.92);
+  border: 1px solid var(--ds-stone-lighter);
+  border-radius: 8px;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.ds-ability-cooldown-num {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--ds-parchment-dim);
+}
+
+.ds-ability-cooldown-icon {
+  font-size: 9px;
+  line-height: 1;
+}
+
+/* Icon shown inside empty socket */
+.ds-socket-icon {
+  font-size: 14px;
+  opacity: 0.5;
+  line-height: 1;
+}
+
 .ds-ability-card {
   display: flex;
   flex-direction: column;
@@ -1048,35 +1090,6 @@
   opacity: 0.5;
   animation: none;
 }
-
-/* Activate button (inside card) */
-.ds-ability-activate {
-  width: 100%;
-  padding: 3px 0;
-  border: 1px solid var(--ds-stone-lighter);
-  border-radius: 4px;
-  background: var(--ds-stone-mid);
-  font-family: inherit;
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--ds-parchment-dim);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
-  line-height: 1;
-}
-
-.ds-ability-card--ready .ds-ability-activate {
-  border-color: var(--ds-bronze);
-  color: var(--ds-gold);
-  background: linear-gradient(180deg, #2a2520 0%, #1e1a15 100%);
-}
-
-.ds-ability-card--ready .ds-ability-activate:hover {
-  box-shadow: 0 0 6px var(--ds-gold-glow);
-}
-
-.ds-ability-activate:active:not(:disabled) { transform: scale(0.94); }
-.ds-ability-activate:disabled { opacity: 0.35; cursor: not-allowed; }
 
 /* Compact effect text — icon+keyword tokens */
 .ds-ability-effect {

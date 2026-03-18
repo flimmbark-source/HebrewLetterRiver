@@ -365,13 +365,27 @@ describe('Combat Reducer', () => {
     expect(state.phase).toBe('victory');
   });
 
-  it('max pressure sets phase to defeat', () => {
-    let state = { ...combat, pressure: combat.maxPressure - 1 };
+  it('max pressure triggers tension burst (damage + reset)', () => {
+    let state = { ...combat, pressure: combat.maxPressure - 1, health: 1 };
     const wrongTileId = state.tray[3].id;
     state = combatReducer(state, { type: ACTIONS.SELECT_TRAY_TILE, tileId: wrongTileId });
     state = combatReducer(state, { type: ACTIONS.PLACE_LETTER, slotIndex: 0 });
 
+    // Tension burst resets pressure to 0 and deals damage
+    expect(state.pressure).toBe(0);
+    // With 1 health and 1 damage, should be defeat
     expect(state.phase).toBe('defeat');
+  });
+
+  it('tension overflow deals damage but does not defeat if health remains', () => {
+    let state = { ...combat, pressure: combat.maxPressure - 1, health: 3 };
+    const wrongTileId = state.tray[3].id;
+    state = combatReducer(state, { type: ACTIONS.SELECT_TRAY_TILE, tileId: wrongTileId });
+    state = combatReducer(state, { type: ACTIONS.PLACE_LETTER, slotIndex: 0 });
+
+    expect(state.pressure).toBe(0);
+    expect(state.health).toBe(2);
+    expect(state.phase).toBe('active');
   });
 
   it('STOW_LETTER moves tile from tray to satchel', () => {
@@ -519,10 +533,13 @@ describe('Enemy Intent', () => {
     expect(display.description).toContain('2');
   });
 
-  it('END_TURN executes pressure intent', () => {
+  it('END_TURN executes pressure intent (overflow resets to 0 with damage)', () => {
     combat.enemyIntent = { type: INTENT_TYPES.PRESSURE, value: 2 };
+    combat.health = 3;
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
-    expect(state.pressure).toBe(2);
+    // maxPressure is 2, value is 2, so overflow triggers: pressure resets to 0, health -1
+    expect(state.pressure).toBe(0);
+    expect(state.health).toBe(2);
   });
 
   it('END_TURN executes burn_tile intent', () => {

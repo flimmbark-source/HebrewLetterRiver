@@ -16,7 +16,7 @@ import { getGearById } from '../../data/deepScript/gear.js';
 
 // ─── Constants ──────────────────────────────────────────────
 
-export const MAX_PRESSURE_DEFAULT = 5;
+export const MAX_PRESSURE_DEFAULT = 2;
 export const TRAY_SIZE_DEFAULT = 6;
 export const SATCHEL_SIZE_DEFAULT = 3;
 export const MAX_ENERGY_DEFAULT = 3;
@@ -203,6 +203,10 @@ export function createCombatState(wordId, runState) {
   // Roll first enemy intent
   const firstIntent = rollEnemyIntent(0, word.isMiniboss || false);
 
+  // Health tracked locally for tension attack damage
+  const health = runState.health || runState.maxHealth || 3;
+  const maxHealth = runState.maxHealth || 3;
+
   return {
     wordId: word.id,
     word,
@@ -211,6 +215,8 @@ export function createCombatState(wordId, runState) {
     satchel: [],
     pressure: 0,
     maxPressure: (runState.upgrades?.maxPressure || 0) + MAX_PRESSURE_DEFAULT,
+    health,
+    maxHealth,
     turn: 0,
     energy: maxEnergy,
     maxEnergy,
@@ -249,6 +255,23 @@ export const ACTIONS = {
   DISMISS_LOG: 'DISMISS_LOG',
 };
 
+// ─── Tension overflow — deals damage and resets pressure ─────
+
+function checkTensionOverflow(state) {
+  if (state.pressure < state.maxPressure) return state;
+  // Tension attack: deal 1 damage (miniboss deals 2), reset pressure
+  const damage = state.isMiniboss ? 2 : 1;
+  const newHealth = state.health - damage;
+  const defeated = newHealth <= 0;
+  return {
+    ...state,
+    pressure: 0,
+    health: Math.max(0, newHealth),
+    phase: defeated ? 'defeat' : state.phase,
+    log: [...state.log, { type: 'tension', message: `Tension burst! You take ${damage} damage!` }],
+  };
+}
+
 // ─── Execute enemy intent ───────────────────────────────────
 
 function executeEnemyIntent(state) {
@@ -270,13 +293,12 @@ function executeEnemyIntent(state) {
 
     case INTENT_TYPES.PRESSURE: {
       const newPressure = state.pressure + intent.value;
-      const defeated = newPressure >= state.maxPressure;
-      return {
+      const afterPressure = {
         ...state,
         pressure: newPressure,
-        phase: defeated ? 'defeat' : 'active',
         log: [...state.log, { type: 'enemy', message: `Enemy adds +${intent.value} tension!` }],
       };
+      return checkTensionOverflow(afterPressure);
     }
 
     case INTENT_TYPES.BURN_TILE: {
@@ -396,18 +418,17 @@ export function combatReducer(state, action) {
           ? state.tray.map(t => t.id === tileId ? fadedTile : t)
           : [...state.tray, fadedTile];
         const newSatchel = fromSatchel ? state.satchel.filter(t => t.id !== tileId) : state.satchel;
-        const defeated = newPressure >= state.maxPressure;
 
-        return {
+        const afterWrong = {
           ...state,
           tray: newTray,
           satchel: newSatchel,
           pressure: newPressure,
           selectedTrayTile: null,
           selectedSatchelTile: null,
-          phase: defeated ? 'defeat' : 'active',
           log: [...state.log, { type: 'wrong', letter: tile.letter, slot: slotIndex }],
         };
+        return checkTensionOverflow(afterWrong);
       }
     }
 
