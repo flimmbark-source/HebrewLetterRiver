@@ -5,11 +5,9 @@ import RunStatusBar from './RunStatusBar.jsx';
 export default function ShrineScreen({ runState, onComplete }) {
   const [selectedId, setSelectedId] = useState(null);
   const [confirmed, setConfirmed] = useState(false);
-
-  const ownedUpgradeIds = Object.keys(runState.upgrades || {});
   const options = useMemo(
-    () => getRandomUpgrades(3, ownedUpgradeIds),
-    [ownedUpgradeIds]
+    () => getRandomUpgrades(3, Object.keys(runState.upgrades || {})),
+    [runState.upgrades]
   );
 
   const handleConfirm = () => {
