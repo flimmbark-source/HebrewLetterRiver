@@ -735,3 +735,133 @@ describe('Ward Stone', () => {
     expect(state.warded).toBe(false); // consumed
   });
 });
+
+// ─── Satchel Auto-Fill ─────────────────────────────────────
+
+describe('Satchel Auto-Fill', () => {
+  let combat;
+  let runState;
+
+  beforeEach(() => {
+    const kit = getStarterKit('scribe');
+    const sharedGearIds = getSharedGear().map(g => g.id);
+    const map = generateRunMap(6);
+    runState = createRunState(kit, sharedGearIds, map);
+    combat = createCombatState('ds-sefer', runState);
+    combat.maxTraySize = runState.traySize;
+    combat.maxSatchelSize = runState.satchelSize;
+  });
+
+  it('START_TURN auto-stows non-faded tray tiles to satchel', () => {
+    combat.tray = [
+      createLetterTile('א', 'test'),
+      createLetterTile('ב', 'test'),
+    ];
+    combat.satchel = [];
+    const state = combatReducer(combat, { type: ACTIONS.START_TURN });
+    expect(state.satchel.length).toBe(2);
+    expect(state.tray.length).toBe(0);
+  });
+
+  it('START_TURN respects satchel capacity when auto-filling', () => {
+    combat.tray = [
+      createLetterTile('א', 'test'),
+      createLetterTile('ב', 'test'),
+      createLetterTile('ג', 'test'),
+      createLetterTile('ד', 'test'),
+    ];
+    combat.satchel = [createLetterTile('ה', 'test')];
+    // satchel capacity is 3, already has 1, so only 2 more should fit
+    const state = combatReducer(combat, { type: ACTIONS.START_TURN });
+    expect(state.satchel.length).toBe(3);
+    expect(state.tray.length).toBe(0);
+  });
+
+  it('START_TURN does not auto-stow faded tiles', () => {
+    combat.tray = [
+      createLetterTile('א', 'test', true), // faded
+      createLetterTile('ב', 'test'),
+    ];
+    combat.satchel = [];
+    const state = combatReducer(combat, { type: ACTIONS.START_TURN });
+    expect(state.satchel.length).toBe(1);
+    expect(state.satchel[0].letter).toBe('ב');
+  });
+
+  it('START_TURN logs auto-stow message', () => {
+    combat.tray = [createLetterTile('א', 'test')];
+    combat.satchel = [];
+    const state = combatReducer(combat, { type: ACTIONS.START_TURN });
+    expect(state.log.length).toBe(1);
+    expect(state.log[0].message).toContain('Auto-stowed');
+  });
+});
+
+// ─── Ash Brazier Escalating Cost ───────────────────────────
+
+describe('Ash Brazier Escalating Cost', () => {
+  let combat;
+  let runState;
+
+  beforeEach(() => {
+    const kit = getStarterKit('scribe');
+    const sharedGearIds = getSharedGear().map(g => g.id);
+    const map = generateRunMap(6);
+    runState = createRunState(kit, sharedGearIds, map);
+    combat = createCombatState('ds-sefer', runState);
+    combat.maxTraySize = runState.traySize;
+    combat.maxSatchelSize = runState.satchelSize;
+    combat.energy = 10; // plenty of energy for testing
+    combat.maxEnergy = 10;
+  });
+
+  it('ash brazier has no cooldown', () => {
+    // Socket a tile first
+    const tile = createLetterTile('א', 'test');
+    combat.tray = [tile];
+    combat.selectedTrayTile = tile.id;
+    let state = combatReducer(combat, { type: ACTIONS.SOCKET_TILE, gearId: 'ash-brazier', socketIndex: 0 });
+
+    // Use it
+    state = combatReducer(state, { type: ACTIONS.USE_GEAR, gearId: 'ash-brazier', runState });
+    expect(state.gearStates['ash-brazier'].currentCooldown).toBe(0);
+  });
+
+  it('ash brazier costs 1 energy on first use, 2 on second', () => {
+    // First use
+    const tile1 = createLetterTile('א', 'test');
+    combat.tray = [tile1];
+    combat.selectedTrayTile = tile1.id;
+    let state = combatReducer(combat, { type: ACTIONS.SOCKET_TILE, gearId: 'ash-brazier', socketIndex: 0 });
+    state = combatReducer(state, { type: ACTIONS.USE_GEAR, gearId: 'ash-brazier', runState });
+    expect(state.energy).toBe(9); // 10 - 1
+    expect(state.gearStates['ash-brazier'].turnUses).toBe(1);
+
+    // Second use
+    const tile2 = createLetterTile('ב', 'test');
+    state.tray = [...state.tray, tile2];
+    state.selectedTrayTile = tile2.id;
+    state = combatReducer(state, { type: ACTIONS.SOCKET_TILE, gearId: 'ash-brazier', socketIndex: 0 });
+    state = combatReducer(state, { type: ACTIONS.USE_GEAR, gearId: 'ash-brazier', runState });
+    expect(state.energy).toBe(7); // 9 - 2
+    expect(state.gearStates['ash-brazier'].turnUses).toBe(2);
+  });
+
+  it('ash brazier turnUses resets on START_TURN', () => {
+    combat.gearStates['ash-brazier'].turnUses = 3;
+    const state = combatReducer(combat, { type: ACTIONS.START_TURN });
+    expect(state.gearStates['ash-brazier'].turnUses).toBe(0);
+  });
+
+  it('ash brazier fails if escalated cost exceeds energy', () => {
+    combat.energy = 2;
+    combat.gearStates['ash-brazier'].turnUses = 2; // cost would be 1+2=3
+    const tile = createLetterTile('א', 'test');
+    combat.tray = [tile];
+    combat.selectedTrayTile = tile.id;
+    let state = combatReducer(combat, { type: ACTIONS.SOCKET_TILE, gearId: 'ash-brazier', socketIndex: 0 });
+    state = combatReducer(state, { type: ACTIONS.USE_GEAR, gearId: 'ash-brazier', runState });
+    // Should not have changed energy — cost 3 > energy 2
+    expect(state.energy).toBe(2);
+  });
+});

@@ -193,6 +193,7 @@ export function createCombatState(wordId, runState) {
         usesRemaining: gear.uses,
         effectiveCooldown: cd,
         sockets: (gear.tileSockets || []).map(s => ({ type: s.type, tileId: null })),
+        turnUses: 0,
       };
     }
   }
@@ -555,8 +556,13 @@ export function combatReducer(state, action) {
       if (gearState.currentCooldown > 0) return state;
       if (gearState.usesRemaining === 0) return state;
 
+      // Compute effective energy cost (escalating gear adds turnUses)
+      const effectiveEnergyCost = gearDef.escalatingCost
+        ? gearDef.energyCost + (gearState.turnUses || 0)
+        : gearDef.energyCost;
+
       // Check energy cost
-      if (state.energy < gearDef.energyCost) return state;
+      if (state.energy < effectiveEnergyCost) return state;
 
       // Check sockets are filled (required sockets must have tiles)
       const requiredSocketsFilled = gearState.sockets
@@ -565,7 +571,7 @@ export function combatReducer(state, action) {
       if (!requiredSocketsFilled && gearState.sockets.some(s => s.type === 'required')) return state;
 
       // Pay energy
-      let newEnergy = state.energy - gearDef.energyCost;
+      let newEnergy = state.energy - effectiveEnergyCost;
 
       // Collect socketed tiles (they've already been removed from tray)
       const socketedTiles = gearState.sockets
@@ -575,7 +581,7 @@ export function combatReducer(state, action) {
       // Clear sockets after use
       const newSockets = gearState.sockets.map(s => ({ ...s, tileId: null, tileLetter: null }));
 
-      // Update gear state
+      // Update gear state (track per-turn usage for escalating cost)
       const newGearStates = {
         ...state.gearStates,
         [gearId]: {
@@ -583,6 +589,7 @@ export function combatReducer(state, action) {
           currentCooldown: gearState.effectiveCooldown,
           usesRemaining: gearState.usesRemaining > 0 ? gearState.usesRemaining - 1 : -1,
           sockets: newSockets,
+          turnUses: (gearState.turnUses || 0) + 1,
         },
       };
 
@@ -721,15 +728,41 @@ export function combatReducer(state, action) {
     }
 
     case ACTIONS.START_TURN: {
-      // Gain energy, clear slot locks, and clear the tray (satchel persists)
+      // Gain energy, clear slot locks
       const newTrack = state.answerTrack.map(s => ({ ...s, locked: false }));
+
+      // Auto-fill satchel from tray before clearing it
+      const satchelMax = state.maxSatchelSize || SATCHEL_SIZE_DEFAULT;
+      let satchelSpace = satchelMax - state.satchel.length;
+      const autoStowed = [];
+      if (satchelSpace > 0) {
+        const stowable = state.tray.filter(t => !t.faded);
+        for (const tile of stowable) {
+          if (satchelSpace <= 0) break;
+          autoStowed.push(tile);
+          satchelSpace--;
+        }
+      }
+      const newSatchel = [...state.satchel, ...autoStowed];
+      const stowLog = autoStowed.length > 0
+        ? [{ type: 'stow', message: `Auto-stowed ${autoStowed.length} tile(s) to satchel.` }]
+        : [];
+
+      // Reset per-turn gear usage counters
+      const resetGearStates = {};
+      for (const [id, gs] of Object.entries(state.gearStates)) {
+        resetGearStates[id] = { ...gs, turnUses: 0 };
+      }
+
       return {
         ...state,
         energy: state.maxEnergy,
         tray: [],
+        satchel: newSatchel,
         selectedTrayTile: null,
         answerTrack: newTrack,
-        log: [],
+        gearStates: resetGearStates,
+        log: stowLog,
       };
     }
 

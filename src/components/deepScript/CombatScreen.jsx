@@ -335,7 +335,10 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
           const onCooldown = gs.currentCooldown > 0;
           const noUses = gs.usesRemaining === 0;
-          const notEnoughEnergy = combat.energy < gear.energyCost;
+          const currentEnergyCost = gear.escalatingCost
+            ? gear.energyCost + (gs.turnUses || 0)
+            : gear.energyCost;
+          const notEnoughEnergy = combat.energy < currentEnergyCost;
           const requiredSocketsFilled = gs.sockets
             .filter(s => s.type === 'required')
             .every(s => s.tileId !== null);
@@ -355,7 +358,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
             <div key={gearId} className="ds-ability-card-wrapper">
               {/* Mana cost floats above card */}
               <div className={`ds-ability-cost-float ${notEnoughEnergy ? 'ds-ability-cost-float--insufficient' : ''}`}>
-                {gear.energyCost > 0 ? '◆'.repeat(gear.energyCost) : '0'}
+                {currentEnergyCost > 0 ? '◆'.repeat(currentEnergyCost) : '0'}
               </div>
 
               {/* Cooldown timer floats above card (replaces cost when on cooldown) */}
