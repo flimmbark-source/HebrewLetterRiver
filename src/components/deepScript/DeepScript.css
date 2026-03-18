@@ -2982,40 +2982,40 @@
 
   /* Encounter: smaller text for narrow screens */
   .ds-encounter {
-    width: 80%;
+    width: 86%;
     max-width: none;
   }
 
   .ds-encounter-english {
-    font-size: 20px;
+    font-size: 24px;
   }
 
   .ds-encounter-translit {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .ds-encounter-sigil {
-    padding: 10px 16px 8px;
+    padding: 12px 18px 10px;
   }
 
   /* Inscription slots: slightly smaller, flex-wrap if too many */
   .ds-inscription {
-    gap: 4px;
+    gap: 6px;
     flex-wrap: wrap;
   }
 
   .ds-rune-slot {
-    width: 36px;
-    height: 42px;
-    font-size: 20px;
+    width: 42px;
+    height: 48px;
+    font-size: 24px;
   }
 
   .ds-rune-letter {
-    font-size: 20px;
+    font-size: 23px;
   }
 
   .ds-rune-hint {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   /* Combat controls: flow layout instead of absolute pile-up */
@@ -3086,7 +3086,7 @@
   }
 
   .ds-inv-satchel-group {
-    transform: translateX(10px);
+    transform: translateX(20px);
   }
 
   .ds-inv-tiles {
@@ -3456,13 +3456,13 @@
   }
 
   .ds-rune-slot {
-    width: 32px;
-    height: 38px;
-    font-size: 18px;
+    width: 36px;
+    height: 42px;
+    font-size: 20px;
   }
 
   .ds-rune-letter {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .ds-inv-tile {
