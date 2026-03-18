@@ -3092,42 +3092,85 @@
 
   /* Ability cards: slightly smaller to fit, but keep touch target */
   .ds-ability-row {
-    gap: 4px;
+    gap: 8px;
+    width: 100%;
     max-width: 100%;
-    padding: 0 4px;
-    flex-wrap: wrap;
-    justify-content: center;
+    padding: 0 4px 4px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .ds-ability-row::-webkit-scrollbar { display: none; }
+
+  .ds-ability-card-wrapper {
+    flex: 0 0 auto;
+  }
+
+  .ds-ability-cost-float {
+    font-size: 12px;
+    margin-bottom: 3px;
+  }
+
+  .ds-ability-cooldown-float {
+    top: -24px;
+    padding: 2px 6px;
+  }
+
+  .ds-ability-cooldown-num {
+    font-size: 11px;
+  }
+
+  .ds-ability-cooldown-icon {
+    font-size: 10px;
   }
 
   .ds-ability-card {
-    width: 58px;
-    height: 58px;
-    padding: 4px 3px 3px;
+    width: 68px;
+    height: 72px;
+    padding: 5px 4px 4px;
     min-height: 44px;
     min-width: 44px;
+    border-width: 2px;
+  }
+
+  .ds-ability-icon-center {
+    font-size: 24px;
   }
 
   .ds-ability-socket {
-    width: 24px;
-    height: 28px;
-    font-size: 14px;
+    width: 28px;
+    height: 32px;
+    font-size: 16px;
   }
 
   .ds-ability-effect {
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.15;
+    white-space: normal;
+    text-wrap: balance;
+    color: color-mix(in srgb, var(--ds-parchment) 82%, var(--ds-gold) 18%);
+  }
+
+  .ds-ability-badge {
     font-size: 9px;
   }
 
   /* End Turn button: larger touch target */
   .ds-endturn-btn {
-    min-width: 52px;
-    min-height: 52px;
-    padding: 10px 12px;
+    min-width: 58px;
+    min-height: 58px;
+    padding: 11px 12px;
     flex-shrink: 0;
   }
 
   .ds-energy-pip {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
   }
 
   /* Intent banner: allow wrapping */
@@ -3407,20 +3450,24 @@
   }
 
   .ds-inv-tile {
-    width: 38px;
-    height: 42px;
-    font-size: 18px;
+    width: 40px;
+    height: 44px;
+    font-size: 20px;
   }
 
   .ds-ability-card {
-    width: 52px;
-    height: 52px;
+    width: 60px;
+    height: 64px;
   }
 
   .ds-ability-socket {
-    width: 22px;
-    height: 26px;
-    font-size: 13px;
+    width: 25px;
+    height: 29px;
+    font-size: 14px;
+  }
+
+  .ds-ability-effect {
+    font-size: 10px;
   }
 
   .ds-phase-message {
@@ -3483,8 +3530,8 @@
   }
 
   .ds-ability-card {
-    width: 54px;
-    height: 54px;
+    width: 60px;
+    height: 64px;
   }
 
   .ds-combat-controls {
