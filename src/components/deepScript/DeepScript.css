@@ -2982,6 +2982,7 @@
 
   /* Encounter: smaller text for narrow screens */
   .ds-encounter {
+    top: calc(8% + 25px);
     width: 86%;
     max-width: none;
   }
@@ -3017,7 +3018,7 @@
   }
 
   .ds-hud-pressure {
-    transform: translateX(-10px);
+    margin-left: -10px;
   }
 
   /* Inscription slots: slightly smaller, flex-wrap if too many */
