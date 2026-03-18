@@ -2933,3 +2933,545 @@
   color: var(--ds-ember, #e84530);
   text-shadow: 0 0 30px rgba(232, 69, 48, 0.7), 0 0 60px rgba(232, 69, 48, 0.3), 0 2px 4px rgba(0, 0, 0, 0.8);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — Phones ≤ 480px
+   ═══════════════════════════════════════════════════════════ */
+
+/* Use dynamic viewport height on supporting browsers */
+@supports (height: 100dvh) {
+  .ds-mode {
+    height: 100dvh;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* ─── Mode container: prevent horizontal overflow ─────── */
+  .ds-mode {
+    overflow-x: hidden;
+  }
+
+  /* ─── Header ───────────────────────────────────────────── */
+  .ds-back-btn {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+
+  .ds-screen-title {
+    font-size: 22px;
+  }
+
+  /* ─── Combat Screen ────────────────────────────────────── */
+
+  /* Encounter: smaller text for narrow screens */
+  .ds-encounter {
+    width: 80%;
+    max-width: none;
+  }
+
+  .ds-encounter-english {
+    font-size: 20px;
+  }
+
+  .ds-encounter-translit {
+    font-size: 12px;
+  }
+
+  .ds-encounter-sigil {
+    padding: 10px 16px 8px;
+  }
+
+  /* Inscription slots: slightly smaller, flex-wrap if too many */
+  .ds-inscription {
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .ds-rune-slot {
+    width: 36px;
+    height: 42px;
+    font-size: 20px;
+  }
+
+  .ds-rune-letter {
+    font-size: 20px;
+  }
+
+  .ds-rune-hint {
+    font-size: 16px;
+  }
+
+  /* Tile tray: larger touch targets */
+  .ds-inv-tile {
+    width: 42px;
+    height: 46px;
+    font-size: 20px;
+  }
+
+  .ds-tile-row {
+    gap: 10px;
+    max-width: 100%;
+    padding: 0 8px;
+  }
+
+  .ds-inv-tiles {
+    gap: 3px;
+  }
+
+  /* Stow/retrieve buttons: meet 44px minimum */
+  .ds-inv-act {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+
+  /* Ability cards: slightly smaller to fit, but keep touch target */
+  .ds-ability-row {
+    gap: 4px;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    max-width: 100%;
+    padding: 0 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .ds-ability-card {
+    width: 58px;
+    height: 58px;
+    padding: 4px 3px 3px;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .ds-ability-socket {
+    width: 24px;
+    height: 28px;
+    font-size: 14px;
+  }
+
+  .ds-ability-effect {
+    font-size: 9px;
+  }
+
+  /* End Turn button: larger touch target */
+  .ds-endturn-btn {
+    min-width: 52px;
+    min-height: 52px;
+    padding: 10px 12px;
+    right: 8px;
+  }
+
+  /* Energy well */
+  .ds-energy-well {
+    left: 8px;
+  }
+
+  .ds-energy-pip {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Intent banner: allow wrapping */
+  .ds-intent-banner {
+    white-space: normal;
+    max-width: 80%;
+    text-align: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 5px 12px;
+  }
+
+  .ds-intent-text {
+    font-size: 11px;
+  }
+
+  /* Phase overlay */
+  .ds-phase-message {
+    font-size: 26px;
+    padding: 0 16px;
+    text-align: center;
+  }
+
+  .ds-phase-word {
+    font-size: 22px;
+  }
+
+  /* Choice bundle modal */
+  .ds-choice-modal {
+    max-width: 260px;
+    padding: 16px;
+  }
+
+  .ds-choice-btn {
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+  }
+
+  /* Log toast: position above bottom controls */
+  .ds-log-toast {
+    bottom: calc(170px + env(safe-area-inset-bottom, 0px));
+    max-width: 80%;
+    text-align: center;
+  }
+
+  /* ─── Exploration Screen ───────────────────────────────── */
+
+  /* Action bar: bigger touch targets */
+  .ds-explore-action-bar {
+    gap: 12px;
+    padding: 12px 20px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ds-explore-act--turn {
+    width: 52px;
+    height: 52px;
+  }
+
+  .ds-explore-act--forward {
+    width: 68px;
+    height: 56px;
+  }
+
+  .ds-explore-act-icon {
+    font-size: 22px;
+  }
+
+  .ds-explore-act-label {
+    font-size: 9px;
+  }
+
+  /* Compass: bigger touch target */
+  .ds-explore-compass {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  /* Hotspot labels: always visible on touch (no hover) */
+  .ds-hotspot-label {
+    opacity: 1;
+    font-size: 8px;
+  }
+
+  /* Hotspots area: use more width on mobile */
+  .ds-explore-hotspots {
+    left: 14%;
+    right: 14%;
+  }
+
+  .ds-hotspot {
+    padding: 8px 10px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .ds-hotspot-icon {
+    font-size: 20px;
+  }
+
+  /* Minimap: keep compact */
+  .ds-minimap {
+    top: calc(40px + env(safe-area-inset-top, 0px));
+    right: 6px;
+    max-width: 72px;
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .ds-minimap-node {
+    width: 18px;
+    height: 18px;
+  }
+
+  .ds-minimap-icon {
+    font-size: 9px;
+  }
+
+  /* Chamber name */
+  .ds-explore-chamber-name {
+    font-size: 12px;
+  }
+
+  /* Doors: bigger touch area on side doors */
+  .ds-explore-door--side {
+    max-width: 56px;
+    max-height: 130px;
+    width: 80%;
+  }
+
+  /* Forward door: adequate width on narrow screens */
+  .ds-explore-door--forward {
+    width: 32%;
+  }
+
+  .ds-explore-door-label {
+    font-size: 20px;
+  }
+
+  /* ─── Kit Select Screen ─────────────────────────────────── */
+  .ds-kit-intro {
+    padding: 6px 16px 12px;
+  }
+
+  .ds-kit-subtitle {
+    font-size: 14px;
+  }
+
+  .ds-kit-card {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .ds-kit-name {
+    font-size: 17px;
+  }
+
+  .ds-kit-desc {
+    font-size: 12px;
+  }
+
+  .ds-kit-stats {
+    gap: 8px;
+    font-size: 11px;
+    flex-wrap: wrap;
+  }
+
+  /* Footer/primary button: comfortable tap target */
+  .ds-primary-btn {
+    padding: 16px;
+    font-size: 17px;
+    min-height: 52px;
+  }
+
+  .ds-secondary-btn {
+    padding: 14px;
+    min-height: 48px;
+  }
+
+  /* ─── Shrine Screen ─────────────────────────────────────── */
+  .ds-shrine-title {
+    font-size: 20px;
+  }
+
+  .ds-shrine-card {
+    padding: 14px;
+    min-height: 52px;
+  }
+
+  .ds-shrine-card-icon {
+    font-size: 22px;
+  }
+
+  .ds-shrine-card-name {
+    font-size: 14px;
+  }
+
+  /* ─── Archive Screen ────────────────────────────────────── */
+  .ds-archive-title {
+    font-size: 20px;
+  }
+
+  .ds-archive-desc {
+    font-size: 13px;
+    max-width: 260px;
+  }
+
+  .ds-archive-letter-char {
+    font-size: 32px;
+  }
+
+  /* ─── Run End Screen ────────────────────────────────────── */
+  .ds-end-title {
+    font-size: 26px;
+  }
+
+  .ds-end-stats {
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .ds-end-word-tag {
+    font-size: 15px;
+    padding: 3px 8px;
+  }
+
+  .ds-end-actions {
+    max-width: 100%;
+    padding: 0 16px;
+  }
+
+  /* ─── Battle Transition ─────────────────────────────────── */
+  .ds-bt-text {
+    font-size: 24px;
+    letter-spacing: 2px;
+    padding: 0 16px;
+    text-align: center;
+  }
+
+  .ds-battle-transition--boss .ds-bt-text {
+    font-size: 26px;
+  }
+
+  /* ─── Inspect Panel ─────────────────────────────────────── */
+  .ds-inspect-panel {
+    max-width: 280px;
+    width: 90%;
+    padding: 20px 16px;
+  }
+
+  .ds-inspect-close {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 10px 28px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Very small phones (≤ 360px)
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 360px) {
+  .ds-encounter-english {
+    font-size: 18px;
+  }
+
+  .ds-rune-slot {
+    width: 32px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  .ds-rune-letter {
+    font-size: 18px;
+  }
+
+  .ds-inv-tile {
+    width: 38px;
+    height: 42px;
+    font-size: 18px;
+  }
+
+  .ds-ability-card {
+    width: 52px;
+    height: 52px;
+  }
+
+  .ds-ability-socket {
+    width: 22px;
+    height: 26px;
+    font-size: 13px;
+  }
+
+  .ds-ability-row {
+    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ds-phase-message {
+    font-size: 22px;
+  }
+
+  .ds-bt-text {
+    font-size: 20px;
+    letter-spacing: 1px;
+  }
+
+  .ds-battle-transition--boss .ds-bt-text {
+    font-size: 22px;
+  }
+
+  .ds-explore-hotspots {
+    left: 10%;
+    right: 10%;
+    gap: 4px;
+  }
+
+  .ds-hotspot {
+    padding: 6px 6px;
+  }
+
+  .ds-hotspot-icon {
+    font-size: 18px;
+  }
+
+  .ds-end-title {
+    font-size: 22px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Short landscape phones — combat needs less vertical space
+   ═══════════════════════════════════════════════════════════ */
+@media (max-height: 600px) {
+  .ds-encounter {
+    top: 4%;
+    gap: 6px;
+  }
+
+  .ds-encounter-sigil {
+    padding: 8px 16px 6px;
+  }
+
+  .ds-encounter-english {
+    font-size: 18px;
+  }
+
+  .ds-inscription {
+    gap: 3px;
+  }
+
+  .ds-rune-slot {
+    width: 34px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  .ds-ability-row {
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ds-ability-card {
+    width: 54px;
+    height: 54px;
+  }
+
+  .ds-tile-row {
+    bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ds-inv-tile {
+    width: 36px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .ds-endturn-btn {
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ds-energy-well {
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ds-explore-action-bar {
+    padding: 8px 16px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ds-explore-act--turn {
+    width: 46px;
+    height: 46px;
+  }
+
+  .ds-explore-act--forward {
+    width: 60px;
+    height: 48px;
+  }
+}
