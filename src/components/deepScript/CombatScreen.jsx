@@ -369,8 +369,9 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                 </div>
               )}
 
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={combat.phase === 'active' ? 0 : -1}
                 className={cardCls}
                 title={gear.detailedDescription}
                 onClick={() => {
@@ -378,7 +379,13 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                     handleUseGear(gearId);
                   }
                 }}
-                disabled={combat.phase !== 'active'}
+                onKeyDown={(e) => {
+                  if ((e.key === 'Enter' || e.key === ' ') && isReady && combat.phase === 'active') {
+                    e.preventDefault();
+                    handleUseGear(gearId);
+                  }
+                }}
+                aria-disabled={combat.phase !== 'active'}
               >
                 {/* Centered icon for non-socket abilities */}
                 {!hasSockets && <div className="ds-ability-icon-center">{gear.icon}</div>}
@@ -386,24 +393,41 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                 {/* Tile sockets — icon shows inside empty socket */}
                 {hasSockets && (
                   <div className="ds-ability-sockets">
-                    {gs.sockets.map((socket, si) => (
-                      <button
-                        key={si}
-                        type="button"
-                        className={`ds-ability-socket ${socket.type === 'required' ? 'ds-ability-socket--required' : 'ds-ability-socket--empower'} ${socket.tileId ? 'ds-ability-socket--filled' : ''} ${!socket.tileId && hasSelection ? 'ds-ability-socket--ready' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (socket.tileId) {
-                            handleUnsocketTile(gearId, si);
-                          } else if (hasSelection) {
-                            handleSocketTile(gearId, si);
-                          }
-                        }}
-                        disabled={combat.phase !== 'active' || (!socket.tileId && !hasSelection)}
-                      >
-                        {socket.tileLetter || <span className="ds-socket-icon">{gear.icon}</span>}
-                      </button>
-                    ))}
+                    {gs.sockets.map((socket, si) => {
+                      const socketDisabled = combat.phase !== 'active' || (!socket.tileId && !hasSelection);
+                      return (
+                        <div
+                          key={si}
+                          role="button"
+                          tabIndex={socketDisabled ? -1 : 0}
+                          className={`ds-ability-socket ${socket.type === 'required' ? 'ds-ability-socket--required' : 'ds-ability-socket--empower'} ${socket.tileId ? 'ds-ability-socket--filled' : ''} ${!socket.tileId && hasSelection ? 'ds-ability-socket--ready' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (socketDisabled) return;
+                            if (socket.tileId) {
+                              handleUnsocketTile(gearId, si);
+                            } else if (hasSelection) {
+                              handleSocketTile(gearId, si);
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (socketDisabled) return;
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (socket.tileId) {
+                                handleUnsocketTile(gearId, si);
+                              } else if (hasSelection) {
+                                handleSocketTile(gearId, si);
+                              }
+                            }
+                          }}
+                          aria-disabled={socketDisabled}
+                        >
+                          {socket.tileLetter || <span className="ds-socket-icon">{gear.icon}</span>}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
@@ -415,7 +439,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                   {gs.usesRemaining >= 0 && !noUses && <span className="ds-ability-badge ds-ability-badge--uses">{gs.usesRemaining}×</span>}
                   {noUses && <span className="ds-ability-badge ds-ability-badge--spent">--</span>}
                 </div>
-              </button>
+              </div>
             </div>
           );
         })}
