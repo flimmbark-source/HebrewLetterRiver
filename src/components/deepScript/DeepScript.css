@@ -3195,11 +3195,12 @@
 
   /* Intent banner: allow wrapping */
   .ds-intent-banner {
-    white-space: normal;
-    max-width: 80%;
+    white-space: nowrap;
+    max-width: 88%;
     text-align: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
+    gap: 8px;
     padding: 7px 14px;
     transform: translateX(-50%);
   }
@@ -3211,6 +3212,9 @@
   .ds-intent-text {
     font-size: 13px;
     font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .ds-intent-ward {
