@@ -353,7 +353,12 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
           return (
             <div key={gearId} className="ds-ability-card-wrapper">
-              {/* Cooldown timer floats above card */}
+              {/* Mana cost floats above card */}
+              <div className={`ds-ability-cost-float ${notEnoughEnergy ? 'ds-ability-cost-float--insufficient' : ''}`}>
+                {gear.energyCost > 0 ? '◆'.repeat(gear.energyCost) : '0'}
+              </div>
+
+              {/* Cooldown timer floats above card (replaces cost when on cooldown) */}
               {onCooldown && (
                 <div className="ds-ability-cooldown-float">
                   <span className="ds-ability-cooldown-num">{gs.currentCooldown}</span>
@@ -372,13 +377,8 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                 }}
                 disabled={combat.phase !== 'active'}
               >
-                {/* Top row: icon (only for non-socket abilities) + energy cost */}
-                <div className="ds-ability-top">
-                  {!hasSockets && <span className="ds-ability-icon">{gear.icon}</span>}
-                  <span className={`ds-ability-cost ${notEnoughEnergy ? 'ds-ability-cost--insufficient' : ''}`}>
-                    {gear.energyCost > 0 ? '◆'.repeat(gear.energyCost) : '0'}
-                  </span>
-                </div>
+                {/* Centered icon for non-socket abilities */}
+                {!hasSockets && <div className="ds-ability-icon-center">{gear.icon}</div>}
 
                 {/* Tile sockets — icon shows inside empty socket */}
                 {hasSockets && (

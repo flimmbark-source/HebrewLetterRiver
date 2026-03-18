@@ -917,6 +917,21 @@
 }
 
 /* Cooldown float above card */
+/* Mana cost float above card */
+.ds-ability-cost-float {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ds-rune-blue);
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin-bottom: 2px;
+  line-height: 1;
+}
+
+.ds-ability-cost-float--insufficient {
+  color: var(--ds-ember);
+}
+
 .ds-ability-cooldown-float {
   position: absolute;
   top: -20px;
@@ -1002,27 +1017,12 @@
   100% { transform: scale(1); }
 }
 
-/* Top row: icon + energy cost side by side */
-.ds-ability-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.ds-ability-icon {
-  font-size: 18px;
+/* Centered icon for non-socket abilities */
+.ds-ability-icon-center {
+  font-size: 20px;
   line-height: 1;
-}
-
-.ds-ability-cost {
-  font-size: 10px;
-  color: var(--ds-rune-blue);
-  letter-spacing: 0.5px;
-}
-
-.ds-ability-cost--insufficient {
-  color: var(--ds-ember);
+  text-align: center;
+  width: 100%;
 }
 
 /* Tile sockets */
