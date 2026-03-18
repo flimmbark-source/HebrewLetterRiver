@@ -2998,6 +2998,10 @@
     padding: 12px 18px 10px;
   }
 
+  .ds-hud-pressure {
+    transform: translateX(-10px);
+  }
+
   /* Inscription slots: slightly smaller, flex-wrap if too many */
   .ds-inscription {
     gap: 6px;
@@ -3197,7 +3201,7 @@
     flex-wrap: wrap;
     justify-content: center;
     padding: 7px 14px;
-    transform: translateX(calc(-50% - 10px));
+    transform: translateX(-50%);
   }
 
   .ds-intent-icon {
