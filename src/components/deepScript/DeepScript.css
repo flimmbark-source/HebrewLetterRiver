@@ -3085,6 +3085,10 @@
     flex-wrap: wrap;
   }
 
+  .ds-inv-satchel-group {
+    transform: translateX(10px);
+  }
+
   .ds-inv-tiles {
     gap: 3px;
   }
@@ -3142,6 +3146,11 @@
 
   .ds-ability-icon-center {
     font-size: 28px;
+    margin-bottom: 4px;
+  }
+
+  .ds-ability-sockets {
+    margin-bottom: 4px;
   }
 
   .ds-ability-socket {
@@ -3154,6 +3163,7 @@
     font-size: 12px;
     font-weight: 800;
     line-height: 1.15;
+    margin-top: 4px;
     white-space: normal;
     text-wrap: balance;
     color: color-mix(in srgb, var(--ds-parchment) 82%, var(--ds-gold) 18%);
