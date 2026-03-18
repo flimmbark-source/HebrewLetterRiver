@@ -721,11 +721,13 @@ export function combatReducer(state, action) {
     }
 
     case ACTIONS.START_TURN: {
-      // Gain energy and clear slot locks
+      // Gain energy, clear slot locks, and clear the tray (satchel persists)
       const newTrack = state.answerTrack.map(s => ({ ...s, locked: false }));
       return {
         ...state,
         energy: state.maxEnergy,
+        tray: [],
+        selectedTrayTile: null,
         answerTrack: newTrack,
         log: [],
       };
