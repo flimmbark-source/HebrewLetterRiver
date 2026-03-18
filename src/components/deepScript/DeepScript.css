@@ -623,6 +623,16 @@
   border-radius: 1px;
 }
 
+
+/* ─── Combat Controls Container ─────────────────────────── */
+.ds-combat-controls {
+  position: static;
+}
+
+.ds-tray-endturn-row {
+  position: static;
+}
+
 /* ─── Energy Well (bottom-left) ──────────────────────────── */
 .ds-energy-well {
   position: absolute;
@@ -2972,40 +2982,114 @@
 
   /* Encounter: smaller text for narrow screens */
   .ds-encounter {
-    width: 80%;
+    top: calc(8% + 25px);
+    width: 86%;
     max-width: none;
   }
 
+  .ds-viewport {
+    min-height: 56vh;
+  }
+
+  .ds-dungeon-room {
+    transform: scale(1.06);
+    transform-origin: center 42%;
+  }
+
+  .ds-dungeon-back-wall {
+    top: 6%;
+    bottom: 26%;
+  }
+
+  .ds-dungeon-floor {
+    height: 42%;
+  }
+
   .ds-encounter-english {
-    font-size: 20px;
+    font-size: 24px;
   }
 
   .ds-encounter-translit {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .ds-encounter-sigil {
-    padding: 10px 16px 8px;
+    padding: 12px 18px 10px;
+  }
+
+  .ds-hud-pressure {
+    margin-left: -25px;
   }
 
   /* Inscription slots: slightly smaller, flex-wrap if too many */
   .ds-inscription {
-    gap: 4px;
+    gap: 6px;
     flex-wrap: wrap;
   }
 
   .ds-rune-slot {
-    width: 36px;
-    height: 42px;
-    font-size: 20px;
+    width: 42px;
+    height: 48px;
+    font-size: 24px;
   }
 
   .ds-rune-letter {
-    font-size: 20px;
+    font-size: 23px;
   }
 
   .ds-rune-hint {
-    font-size: 16px;
+    font-size: 18px;
+  }
+
+  /* Combat controls: flow layout instead of absolute pile-up */
+  .ds-combat-controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    z-index: 14;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 0 8px;
+    pointer-events: none;
+  }
+
+  .ds-combat-controls > * {
+    pointer-events: auto;
+  }
+
+  .ds-energy-well,
+  .ds-ability-row,
+  .ds-tile-row,
+  .ds-endturn-btn {
+    position: static;
+    inset: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    top: auto;
+    transform: none;
+  }
+
+  .ds-energy-well {
+    position: fixed;
+    left: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    z-index: 20;
+    align-items: flex-start;
+    width: auto;
+    padding: 0;
+  }
+
+  .ds-tray-endturn-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+    position: relative;
   }
 
   /* Tile tray: larger touch targets */
@@ -3016,13 +3100,25 @@
   }
 
   .ds-tile-row {
-    gap: 10px;
+    flex: 1;
+    gap: 8px;
     max-width: 100%;
-    padding: 0 8px;
+    padding: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .ds-inv-satchel-group {
+    transform: translateX(20px);
   }
 
   .ds-inv-tiles {
     gap: 3px;
+  }
+
+  .ds-inv-label {
+    font-size: 10px;
+    letter-spacing: 1.2px;
   }
 
   /* Stow/retrieve buttons: meet 44px minimum */
@@ -3034,62 +3130,119 @@
 
   /* Ability cards: slightly smaller to fit, but keep touch target */
   .ds-ability-row {
-    gap: 4px;
-    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
     max-width: 100%;
+    gap: 8px;
     padding: 0 4px;
-    flex-wrap: wrap;
-    justify-content: center;
+    justify-items: stretch;
+    align-items: stretch;
+    transform: translateY(-10px);
+  }
+
+  .ds-ability-card-wrapper {
+    width: 100%;
+  }
+
+  .ds-ability-cost-float {
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+
+  .ds-ability-cooldown-float {
+    top: -24px;
+    padding: 2px 6px;
+  }
+
+  .ds-ability-cooldown-num {
+    font-size: 12px;
+  }
+
+  .ds-ability-cooldown-icon {
+    font-size: 11px;
   }
 
   .ds-ability-card {
-    width: 58px;
-    height: 58px;
-    padding: 4px 3px 3px;
+    width: 100%;
+    height: 84px;
+    padding: 6px 5px 5px;
     min-height: 44px;
-    min-width: 44px;
+    min-width: 0;
+    border-width: 2px;
+  }
+
+  .ds-ability-icon-center {
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+
+  .ds-ability-sockets {
+    margin-bottom: 4px;
   }
 
   .ds-ability-socket {
-    width: 24px;
-    height: 28px;
-    font-size: 14px;
+    width: 32px;
+    height: 36px;
+    font-size: 17px;
   }
 
   .ds-ability-effect {
-    font-size: 9px;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-top: 4px;
+    white-space: normal;
+    text-wrap: balance;
+    color: color-mix(in srgb, var(--ds-parchment) 82%, var(--ds-gold) 18%);
+  }
+
+  .ds-ability-badge {
+    font-size: 10px;
   }
 
   /* End Turn button: larger touch target */
   .ds-endturn-btn {
-    min-width: 52px;
-    min-height: 52px;
-    padding: 10px 12px;
-    right: 8px;
-  }
-
-  /* Energy well */
-  .ds-energy-well {
-    left: 8px;
+    min-width: 56px;
+    min-height: 56px;
+    padding: 11px 12px;
+    flex-shrink: 0;
+    position: absolute;
+    right: 0;
+    bottom: 0;
   }
 
   .ds-energy-pip {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
   }
 
   /* Intent banner: allow wrapping */
   .ds-intent-banner {
-    white-space: normal;
-    max-width: 80%;
+    white-space: nowrap;
+    max-width: 88%;
     text-align: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
-    padding: 5px 12px;
+    gap: 8px;
+    padding: 7px 14px;
+    transform: translateX(-50%);
+  }
+
+  .ds-intent-icon {
+    font-size: 22px;
   }
 
   .ds-intent-text {
-    font-size: 11px;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ds-intent-ward {
+    font-size: 18px;
   }
 
   /* Phase overlay */
@@ -3117,7 +3270,7 @@
 
   /* Log toast: position above bottom controls */
   .ds-log-toast {
-    bottom: calc(170px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(190px + env(safe-area-inset-bottom, 0px));
     max-width: 80%;
     text-align: center;
   }
@@ -3345,34 +3498,34 @@
   }
 
   .ds-rune-slot {
-    width: 32px;
-    height: 38px;
-    font-size: 18px;
+    width: 36px;
+    height: 42px;
+    font-size: 20px;
   }
 
   .ds-rune-letter {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .ds-inv-tile {
-    width: 38px;
-    height: 42px;
-    font-size: 18px;
+    width: 40px;
+    height: 44px;
+    font-size: 20px;
   }
 
   .ds-ability-card {
-    width: 52px;
-    height: 52px;
+    width: 100%;
+    height: 76px;
   }
 
   .ds-ability-socket {
-    width: 22px;
-    height: 26px;
-    font-size: 13px;
+    width: 27px;
+    height: 31px;
+    font-size: 14px;
   }
 
-  .ds-ability-row {
-    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  .ds-ability-effect {
+    font-size: 10px;
   }
 
   .ds-phase-message {
@@ -3434,31 +3587,20 @@
     font-size: 18px;
   }
 
-  .ds-ability-row {
-    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
-  }
-
   .ds-ability-card {
-    width: 54px;
-    height: 54px;
+    width: 60px;
+    height: 64px;
   }
 
-  .ds-tile-row {
-    bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  .ds-combat-controls {
+    gap: 6px;
+    bottom: calc(4px + env(safe-area-inset-bottom, 0px));
   }
 
   .ds-inv-tile {
     width: 36px;
     height: 40px;
     font-size: 18px;
-  }
-
-  .ds-endturn-btn {
-    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-  }
-
-  .ds-energy-well {
-    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   }
 
   .ds-explore-action-bar {
