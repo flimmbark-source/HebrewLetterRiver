@@ -16,7 +16,7 @@ import './BridgeBuilderSetup.css';
 
 function PackCard({ pack, progress, unlocked, selected, onSelect, completion, modeOverride, onDotClick }) {
   const { wordsIntroducedCount, wordsLearnedCount, totalWords, completed } = progress;
-  const { bridgeBuilderComplete, loosePlanksComplete } = completion;
+  const { bridgeBuilderComplete, loosePlanksComplete, deepScriptComplete } = completion;
 
   let statusLabel;
   let statusCls = 'bbs-pack-status';
@@ -38,11 +38,12 @@ function PackCard({ pack, progress, unlocked, selected, onSelect, completion, mo
   if (selected) cardCls += ' bbs-pack-card--selected';
   if (!unlocked) cardCls += ' bbs-pack-card--locked';
 
-  // Dot 1 = Bridge Builder, Dot 2 = Loose Planks
+  // Dot 1 = Bridge Builder, Dot 2 = Loose Planks, Dot 3 = Deep Script
   // Natural state: gray (incomplete) or green (complete)
   // Override state: yellow (this mode will be played)
   const dot1Override = modeOverride === 'bridge_builder';
   const dot2Override = modeOverride === 'loose_planks';
+  const dot3Override = modeOverride === 'deep_script';
 
   let dot1Cls = 'bbs-pack-dot';
   if (dot1Override) dot1Cls += ' bbs-pack-dot--override';
@@ -51,6 +52,10 @@ function PackCard({ pack, progress, unlocked, selected, onSelect, completion, mo
   let dot2Cls = 'bbs-pack-dot';
   if (dot2Override) dot2Cls += ' bbs-pack-dot--override';
   else if (loosePlanksComplete) dot2Cls += ' bbs-pack-dot--complete';
+
+  let dot3Cls = 'bbs-pack-dot';
+  if (dot3Override) dot3Cls += ' bbs-pack-dot--override';
+  else if (deepScriptComplete) dot3Cls += ' bbs-pack-dot--complete';
 
   const handleDot1Click = (e) => {
     e.stopPropagation();
@@ -62,6 +67,12 @@ function PackCard({ pack, progress, unlocked, selected, onSelect, completion, mo
     e.stopPropagation();
     if (!unlocked) return;
     onDotClick(pack.id, 'loose_planks');
+  };
+
+  const handleDot3Click = (e) => {
+    e.stopPropagation();
+    if (!unlocked) return;
+    onDotClick(pack.id, 'deep_script');
   };
 
   return (
@@ -80,6 +91,10 @@ function PackCard({ pack, progress, unlocked, selected, onSelect, completion, mo
         <div className="bbs-pack-dot-col" onClick={handleDot2Click} role="button" tabIndex={unlocked ? 0 : -1}>
           <span className="bbs-pack-dot-emoji">🪵</span>
           <span className={dot2Cls} />
+        </div>
+        <div className="bbs-pack-dot-col" onClick={handleDot3Click} role="button" tabIndex={unlocked ? 0 : -1}>
+          <span className="bbs-pack-dot-emoji">📜</span>
+          <span className={dot3Cls} />
         </div>
       </div>
       <div className="bbs-pack-icon">
@@ -212,7 +227,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack, onDeepScript }) {
         pack,
         progress: getPackProgress(pack, allProgress),
         unlocked: unlocked && isPackUnlocked(pack, packs, allProgress),
-        completion: packCompletions[pack.id] || { bridgeBuilderComplete: false, loosePlanksComplete: false },
+        completion: packCompletions[pack.id] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false },
       }));
       return { section, sectionProgress, unlocked, packData };
     });
@@ -255,10 +270,13 @@ export default function BridgeBuilderSetup({ onPlay, onBack, onDeepScript }) {
       const { bridgeBuilderComplete, loosePlanksComplete } = pd.completion;
 
       // Determine game mode: override takes priority, then completion state
+      const { deepScriptComplete } = pd.completion;
       const override = modeOverrides[pack.id];
       let gameMode;
       if (override) {
         gameMode = override;
+      } else if (bridgeBuilderComplete && loosePlanksComplete && !deepScriptComplete) {
+        gameMode = 'deep_script';
       } else if (bridgeBuilderComplete && !loosePlanksComplete) {
         gameMode = 'loose_planks';
       } else {

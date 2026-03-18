@@ -226,11 +226,11 @@ const PACK_COMPLETION_KEY = 'bridgeBuilderPackCompletion';
 
 /**
  * Get completion state for a pack.
- * @returns {{ bridgeBuilderComplete: boolean, loosePlanksComplete: boolean }}
+ * @returns {{ bridgeBuilderComplete: boolean, loosePlanksComplete: boolean, deepScriptComplete: boolean }}
  */
 export function getPackCompletion(packId) {
   const all = loadState(PACK_COMPLETION_KEY, {});
-  return all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false };
+  return all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
 }
 
 /**
@@ -246,7 +246,7 @@ export function getAllPackCompletions() {
  */
 export function markBridgeBuilderComplete(packId) {
   const all = loadState(PACK_COMPLETION_KEY, {});
-  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false };
+  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
   entry.bridgeBuilderComplete = true;
   all[packId] = entry;
   saveState(PACK_COMPLETION_KEY, all);
@@ -257,8 +257,19 @@ export function markBridgeBuilderComplete(packId) {
  */
 export function markLoosePlanksComplete(packId) {
   const all = loadState(PACK_COMPLETION_KEY, {});
-  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false };
+  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
   entry.loosePlanksComplete = true;
+  all[packId] = entry;
+  saveState(PACK_COMPLETION_KEY, all);
+}
+
+/**
+ * Mark a pack's Deep Script run as complete.
+ */
+export function markDeepScriptComplete(packId) {
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
+  entry.deepScriptComplete = true;
   all[packId] = entry;
   saveState(PACK_COMPLETION_KEY, all);
 }

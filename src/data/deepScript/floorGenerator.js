@@ -137,9 +137,10 @@ function connect(chambers, fromId, toId, direction) {
  *
  * @param {object} options
  * @param {number} options.combatCount — number of combat chambers (default 3)
+ * @param {Object[]} [options.customWords] — optional DS-compatible word pool (for pack-based runs)
  * @returns {DungeonFloor}
  */
-export function generateDungeonFloor({ combatCount = 3 } = {}) {
+export function generateDungeonFloor({ combatCount = 3, customWords = null } = {}) {
   chamberIdCounter = 0;
   const usedWordIds = new Set();
 
@@ -158,6 +159,17 @@ export function generateDungeonFloor({ combatCount = 3 } = {}) {
 
   // Pick words for combat chambers
   function pickWord(depth) {
+    // If using custom word pool, pick from it (ignoring difficulty tiers)
+    if (customWords && customWords.length > 0) {
+      const candidates = customWords.filter(w => !usedWordIds.has(w.id));
+      if (candidates.length === 0) {
+        return customWords[Math.floor(Math.random() * customWords.length)];
+      }
+      const word = candidates[Math.floor(Math.random() * candidates.length)];
+      usedWordIds.add(word.id);
+      return word;
+    }
+
     let minDiff, maxDiff;
     if (depth <= 1) { minDiff = 1; maxDiff = 2; }
     else if (depth <= 2) { minDiff = 2; maxDiff = 3; }
@@ -189,9 +201,18 @@ export function generateDungeonFloor({ combatCount = 3 } = {}) {
   const shrine = createChamber(CHAMBER_TYPES.SHRINE);
   const event = createChamber(CHAMBER_TYPES.EVENT, { eventId: 'chest' });
 
-  // Miniboss
-  const minibossWords = getMinibossWords();
-  const bossWord = minibossWords[Math.floor(Math.random() * minibossWords.length)];
+  // Miniboss — use longest unused custom word, or fall back to standard miniboss pool
+  let bossWord;
+  if (customWords && customWords.length > 0) {
+    const unusedCustom = customWords
+      .filter(w => !usedWordIds.has(w.id))
+      .sort((a, b) => b.letters.length - a.letters.length);
+    bossWord = unusedCustom[0] || customWords.sort((a, b) => b.letters.length - a.letters.length)[0];
+    if (bossWord) usedWordIds.add(bossWord.id);
+  } else {
+    const minibossWords = getMinibossWords();
+    bossWord = minibossWords[Math.floor(Math.random() * minibossWords.length)];
+  }
   const miniboss = createChamber(CHAMBER_TYPES.MINIBOSS, { wordId: bossWord?.id });
 
   // Build chambers map

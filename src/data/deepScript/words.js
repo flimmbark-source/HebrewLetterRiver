@@ -170,6 +170,48 @@ export function getMinibossWords() {
 /**
  * Get a word by ID.
  */
+// Registry for custom (pack-sourced) words injected at runtime
+let customWordRegistry = [];
+
+/**
+ * Register custom words so getWordById can resolve them.
+ * Call this before starting a pack-based Deep Script run.
+ */
+export function registerCustomWords(words) {
+  customWordRegistry = words || [];
+}
+
+/**
+ * Clear the custom word registry.
+ */
+export function clearCustomWords() {
+  customWordRegistry = [];
+}
+
 export function getWordById(id) {
-  return deepScriptWords.find(w => w.id === id) || null;
+  return deepScriptWords.find(w => w.id === id)
+    || customWordRegistry.find(w => w.id === id)
+    || null;
+}
+
+/**
+ * Convert Bridge Builder words into DS-compatible word objects for pack-based runs.
+ * Filters out multi-word phrases (containing spaces) since DS combat needs single words.
+ *
+ * @param {Object[]} bbWords — Bridge Builder word objects (with hebrew, transliteration, translation)
+ * @returns {Object[]} DS-compatible word objects with letters array
+ */
+export function convertBBWordsForDS(bbWords) {
+  return bbWords
+    .filter(w => !w.hebrew.includes(' ')) // skip multi-word phrases
+    .map(w => ({
+      id: w.id,
+      hebrew: w.hebrew,
+      letters: [...w.hebrew], // split into individual characters
+      transliteration: w.transliteration,
+      english: w.translation,
+      difficulty: w.difficulty || 1,
+      tags: w.tags || [],
+      isMiniboss: false,
+    }));
 }

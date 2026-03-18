@@ -4,6 +4,7 @@ import { getSharedGear } from '../../data/deepScript/gear.js';
 import { generateDungeonFloor, TURN_LEFT, TURN_RIGHT, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
 import { upgradeDefinitions } from '../../data/deepScript/upgrades.js';
+import { registerCustomWords, clearCustomWords } from '../../data/deepScript/words.js';
 import KitSelectScreen from './KitSelectScreen.jsx';
 import ExplorationScreen from './ExplorationScreen.jsx';
 import BattleTransition from './BattleTransition.jsx';
@@ -19,7 +20,7 @@ import './DeepScript.css';
  * Flow: Kit Select → Exploration (move/turn/inspect/trigger) →
  *       Combat/Archive/Shrine → back to Exploration → ... → Miniboss → End
  */
-export default function DeepScriptMode({ onBack }) {
+export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
   const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | archive | shrine | end
   const [runState, setRunState] = useState(null);
   const [endResult, setEndResult] = useState(null);
@@ -34,10 +35,13 @@ export default function DeepScriptMode({ onBack }) {
   const [activeArchive, setActiveArchive] = useState(null); // { rewardId, chamberId, interactableId }
   const [activeShrine, setActiveShrine] = useState(null); // { chamberId }
 
-  // Add/remove body class for nav bar hiding
+  // Add/remove body class for nav bar hiding; clean up custom words on unmount
   useEffect(() => {
     document.body.classList.add('in-deep-script');
-    return () => document.body.classList.remove('in-deep-script');
+    return () => {
+      document.body.classList.remove('in-deep-script');
+      clearCustomWords();
+    };
   }, []);
 
   // ─── Kit Selection ────────────────────────────────────────
@@ -47,8 +51,18 @@ export default function DeepScriptMode({ onBack }) {
     if (!kit) return;
     const sharedGearIds = getSharedGear().map(g => g.id);
 
-    // Generate dungeon floor
-    const newFloor = generateDungeonFloor({ combatCount: 3 });
+    // Register custom words if running a pack-based session
+    if (packWords && packWords.length > 0) {
+      registerCustomWords(packWords);
+    } else {
+      clearCustomWords();
+    }
+
+    // Generate dungeon floor (pass custom words if available)
+    const newFloor = generateDungeonFloor({
+      combatCount: 3,
+      customWords: packWords && packWords.length > 0 ? packWords : null,
+    });
 
     // Create run state (pass a dummy runMap for backward compat)
     const newRun = createRunState(kit, sharedGearIds, []);
@@ -60,7 +74,7 @@ export default function DeepScriptMode({ onBack }) {
     setCurrentChamberId(newFloor.startChamberId);
     setFacing('north');
     setScreen('exploring');
-  }, []);
+  }, [packWords]);
 
   // ─── Exploration: Movement ────────────────────────────────
 
@@ -177,6 +191,7 @@ export default function DeepScriptMode({ onBack }) {
       if (isMiniboss) {
         setEndResult('victory');
         setScreen('end');
+        if (onRunComplete) onRunComplete('victory');
       } else {
         setScreen('exploring');
       }
@@ -328,6 +343,7 @@ export default function DeepScriptMode({ onBack }) {
   // ─── Restart / Back ───────────────────────────────────────
 
   const handleRestart = useCallback(() => {
+    clearCustomWords();
     setScreen('kit_select');
     setRunState(null);
     setFloor(null);
