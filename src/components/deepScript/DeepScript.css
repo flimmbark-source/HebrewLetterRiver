@@ -623,18 +623,39 @@
   border-radius: 1px;
 }
 
-/* ─── Energy Pips (Top HUD) ──────────────────────────────── */
-.ds-hud-energy {
+/* ─── Energy Well (bottom-left) ──────────────────────────── */
+.ds-energy-well {
+  position: absolute;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  left: 14px;
+  z-index: 12;
   display: flex;
-  gap: 3px;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.ds-energy-label {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ds-rune-blue);
+  opacity: 0.7;
+}
+
+.ds-energy-pips {
+  display: flex;
+  gap: 4px;
 }
 
 .ds-energy-pip {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 3px;
-  border: 1px solid var(--ds-stone-lighter);
+  border: 1.5px solid var(--ds-stone-lighter);
   transform: rotate(45deg);
+  transition: background 0.2s, box-shadow 0.2s;
 }
 
 .ds-energy-pip--full {
@@ -735,36 +756,28 @@
   opacity: 0.7;
 }
 
-/* ─── Tile Inventory Row ─────────────────────────────────── */
+/* ─── Tile Tray Row (center-bottom) ──────────────────────── */
 .ds-tile-row {
   position: absolute;
-  bottom: 160px;
-  left: 0;
-  right: 0;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 6px;
-  padding: 6px 10px;
-  padding-bottom: 4px;
-  background: linear-gradient(180deg, transparent 0%, rgba(13, 15, 20, 0.7) 40%);
-  pointer-events: none;
 }
-
-.ds-tile-row > * { pointer-events: auto; }
 
 .ds-inv-tray {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  flex: 1;
 }
 
 .ds-inv-satchel {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  flex-shrink: 0;
 }
 
 .ds-inv-label {
@@ -879,51 +892,52 @@
 
 .ds-inv-act-icon { font-size: 14px; line-height: 1; }
 
-/* ─── Ability Cards Row ─────────────────────────────────── */
+/* ─── Ability Cards Row (centered above tray) ───────────── */
 .ds-ability-row {
   position: absolute;
-  bottom: calc(42px + env(safe-area-inset-bottom, 0px));
-  left: 0;
-  right: 0;
+  bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
   display: flex;
-  gap: 6px;
-  padding: 0 8px;
-  overflow-x: auto;
-  overflow-y: visible;
-  scrollbar-width: none;
-  pointer-events: none;
+  gap: 5px;
 }
-
-.ds-ability-row::-webkit-scrollbar { display: none; }
-.ds-ability-row > * { pointer-events: auto; }
 
 .ds-ability-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  min-width: 90px;
-  max-width: 110px;
-  padding: 6px 6px 5px;
-  border: 1px solid var(--ds-stone-lighter);
+  gap: 2px;
+  width: 62px;
+  padding: 5px 4px 4px;
+  border: 1.5px solid var(--ds-stone-lighter);
   border-radius: 8px;
   background: linear-gradient(180deg, var(--ds-stone-light) 0%, var(--ds-stone-dark) 100%);
-  flex-shrink: 0;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
+  color: var(--ds-parchment);
 }
 
+.ds-ability-card:active:not(:disabled) { transform: scale(0.94); }
+.ds-ability-card:disabled { cursor: not-allowed; }
+
 .ds-ability-card--ready {
-  border-color: rgba(196, 149, 90, 0.4);
+  border-color: rgba(196, 149, 90, 0.5);
   box-shadow: 0 0 6px rgba(196, 149, 90, 0.15);
 }
 
+.ds-ability-card--ready:hover:not(:disabled) {
+  border-color: var(--ds-bronze);
+  box-shadow: 0 0 10px var(--ds-gold-glow);
+}
+
 .ds-ability-card--cooldown {
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 .ds-ability-card--depleted {
-  opacity: 0.35;
+  opacity: 0.3;
 }
 
 .ds-ability-card--no-energy {
@@ -936,88 +950,49 @@
 
 @keyframes ds-gear-flash {
   0% { transform: scale(1); }
-  50% { transform: scale(1.04); box-shadow: 0 0 14px var(--ds-gold-glow); border-color: var(--ds-gold); }
+  50% { transform: scale(1.06); box-shadow: 0 0 14px var(--ds-gold-glow); border-color: var(--ds-gold); }
   100% { transform: scale(1); }
 }
 
-/* Card header */
-.ds-ability-header {
+/* Top row: icon + energy cost side by side */
+.ds-ability-top {
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: space-between;
   width: 100%;
 }
 
 .ds-ability-icon {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
-  flex-shrink: 0;
 }
 
-.ds-ability-name {
+.ds-ability-cost {
   font-size: 10px;
-  font-weight: 800;
-  color: var(--ds-parchment);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: 0.3px;
-}
-
-/* Cost badges */
-.ds-ability-costs {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-  justify-content: center;
-}
-
-.ds-ability-cost-energy {
-  font-size: 11px;
   color: var(--ds-rune-blue);
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .ds-ability-cost--insufficient {
   color: var(--ds-ember);
 }
 
-.ds-ability-cost--free {
-  font-size: 8px;
-  font-weight: 800;
-  color: var(--ds-green);
-  letter-spacing: 1px;
-}
-
-.ds-ability-cost-cd {
-  font-size: 9px;
-  color: var(--ds-parchment-dim);
-}
-
-.ds-ability-cost-uses {
-  font-size: 9px;
-  color: var(--ds-bronze);
-  font-weight: 700;
-}
-
 /* Tile sockets */
 .ds-ability-sockets {
   display: flex;
-  gap: 4px;
+  gap: 3px;
   justify-content: center;
-  padding: 2px 0;
 }
 
 .ds-ability-socket {
-  width: 32px;
-  height: 36px;
+  width: 28px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   font-family: inherit;
   color: var(--ds-parchment);
@@ -1041,96 +1016,68 @@
 
 .ds-ability-socket--required.ds-ability-socket--filled {
   border-color: var(--ds-ember);
-  box-shadow: 0 0 6px var(--ds-ember-glow);
+  box-shadow: 0 0 5px var(--ds-ember-glow);
 }
 
 .ds-ability-socket--empower.ds-ability-socket--filled {
   border-color: var(--ds-gold);
-  box-shadow: 0 0 6px var(--ds-gold-glow);
+  box-shadow: 0 0 5px var(--ds-gold-glow);
 }
 
-.ds-ability-socket:disabled {
-  cursor: default;
-  opacity: 0.5;
-}
-
-/* Effect text */
+/* Compact effect text — icon+keyword tokens */
 .ds-ability-effect {
-  font-size: 8px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   color: var(--ds-parchment-dim);
   text-align: center;
-  line-height: 1.3;
+  line-height: 1.2;
   width: 100%;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-/* Activate button */
-.ds-ability-activate {
-  width: 100%;
-  padding: 3px 0;
-  border: 1px solid var(--ds-stone-lighter);
-  border-radius: 4px;
-  background: var(--ds-stone-mid);
-  font-family: inherit;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--ds-parchment-dim);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
-}
-
-.ds-ability-card--ready .ds-ability-activate {
-  border-color: var(--ds-bronze);
-  color: var(--ds-gold);
-  background: linear-gradient(180deg, #2a2520 0%, #1e1a15 100%);
-}
-
-.ds-ability-card--ready .ds-ability-activate:hover {
-  box-shadow: 0 0 6px var(--ds-gold-glow);
-}
-
-.ds-ability-activate:active:not(:disabled) { transform: scale(0.96); }
-.ds-ability-activate:disabled { opacity: 0.4; cursor: not-allowed; }
-
-/* ─── End Turn Row ──────────────────────────────────────── */
-.ds-endturn-row {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
+/* Status badges */
+.ds-ability-badges {
   display: flex;
+  gap: 4px;
   justify-content: center;
-  padding: 6px 10px;
-  padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(180deg, transparent 0%, rgba(13, 15, 20, 0.95) 40%);
-  pointer-events: none;
 }
 
-.ds-endturn-row > * { pointer-events: auto; }
+.ds-ability-badge {
+  font-size: 8px;
+  font-weight: 800;
+}
 
+.ds-ability-badge--cd {
+  color: var(--ds-parchment-dim);
+}
+
+.ds-ability-badge--uses {
+  color: var(--ds-bronze);
+}
+
+.ds-ability-badge--spent {
+  color: #4a4e56;
+}
+
+/* ─── End Turn Button (bottom-right) ────────────────────── */
 .ds-endturn-btn {
+  position: absolute;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  right: 14px;
+  z-index: 12;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 8px 28px;
+  gap: 2px;
+  padding: 10px 14px;
   border: 2px solid rgba(239, 68, 68, 0.35);
-  border-radius: 8px;
+  border-radius: 10px;
   background: linear-gradient(180deg, #2a1a1a 0%, #1e1414 100%);
   font-family: inherit;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--ds-ember);
   cursor: pointer;
   transition: transform 0.1s, box-shadow 0.2s, border-color 0.2s;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+  color: var(--ds-ember);
 }
 
 .ds-endturn-btn:hover:not(:disabled) {
@@ -1138,15 +1085,19 @@
   box-shadow: 0 0 10px var(--ds-ember-glow), 0 2px 0 rgba(0, 0, 0, 0.5);
 }
 
-.ds-endturn-btn:active:not(:disabled) { transform: scale(0.96); }
+.ds-endturn-btn:active:not(:disabled) { transform: scale(0.94); }
 .ds-endturn-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .ds-endturn-icon {
-  font-size: 16px;
+  font-size: 20px;
   line-height: 1;
 }
 
 .ds-endturn-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   line-height: 1;
 }
 

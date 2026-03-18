@@ -3,18 +3,28 @@
  *
  * Each gear has an energy cost, optional tile sockets, cooldown, and effect type.
  *
+ * Descriptions use a modular keyword system for compact display:
+ *   - `shortDesc`: icon+keyword tokens that fit on ability cards (e.g. "🎲×2 tiles")
+ *   - `detailedDescription`: full rules shown on long-press / hover tooltip
+ *
+ * Keyword glossary (learned once, reused everywhere):
+ *   🎲 = random weighted    🎯 = exact / targeted
+ *   📋 = copy / duplicate   👁 = reveal slot
+ *   🔄 = transform          💀 = sacrifice / burn
+ *   🛡 = block / ward       📦 = pick / choose
+ *
  * @typedef {Object} GearDef
- * @property {string}   id          — Stable identifier
- * @property {string}   name        — Display name
- * @property {string}   icon        — Emoji icon
- * @property {string}   description — Short one-line effect text (always visible)
- * @property {string}   detailedDescription — Expanded rules (shown on hover/tap)
- * @property {string}   type        — Effect type: 'generate-random' | 'duplicate' | 'reveal' | 'choice' | 'transform' | 'burn' | 'defend' | 'generate-exact'
- * @property {number}   energyCost  — Energy to spend
- * @property {number}   cooldown    — Turns before reuse (0 = no cooldown)
- * @property {number}   uses        — Max uses per combat (-1 = unlimited)
- * @property {Object[]} tileSockets — Array of { type: 'required'|'empower' } sockets
- * @property {string}   [kitId]     — Starter kit this belongs to (null = shared)
+ * @property {string}   id
+ * @property {string}   name
+ * @property {string}   icon          — Gear identity emoji
+ * @property {string}   shortDesc     — Compact icon+keyword effect (fits ~12 chars)
+ * @property {string}   detailedDescription — Full rules (tooltip)
+ * @property {string}   type
+ * @property {number}   energyCost
+ * @property {number}   cooldown
+ * @property {number}   uses          — -1 = unlimited
+ * @property {Object[]} tileSockets
+ * @property {string}   [kitId]
  */
 
 export const gearDefinitions = [
@@ -23,8 +33,8 @@ export const gearDefinitions = [
     id: 'scribe-knife',
     name: 'Scribe Knife',
     icon: '🗡️',
-    description: 'Create 2 random tiles (weighted)',
-    detailedDescription: 'Generate 2 random consonant tiles. 30% chance each is from the target word.',
+    shortDesc: '🎲×2 tiles',
+    detailedDescription: 'Generate 2 random tiles. 30% chance each is from the target word.',
     type: 'generate-random',
     energyCost: 1,
     cooldown: 0,
@@ -36,8 +46,8 @@ export const gearDefinitions = [
     id: 'echo-mirror',
     name: 'Echo Mirror',
     icon: '🪞',
-    description: 'Duplicate a socketed tile',
-    detailedDescription: 'Place a tile in the socket, then activate to create an exact copy in your tray.',
+    shortDesc: '📋 socketed',
+    detailedDescription: 'Socket a tile, then activate to create an exact copy in your tray.',
     type: 'duplicate',
     energyCost: 1,
     cooldown: 2,
@@ -49,10 +59,10 @@ export const gearDefinitions = [
   // --- Interpreter gear ---
   {
     id: 'meaning-lantern',
-    name: 'Meaning Lantern',
+    name: 'Lantern',
     icon: '🏮',
-    description: 'Reveal one answer slot',
-    detailedDescription: 'Illuminate a random unrevealed letter position in the inscription. 3 uses per combat.',
+    shortDesc: '👁 slot',
+    detailedDescription: 'Reveal a random unrevealed letter position. 3 uses per combat.',
     type: 'reveal',
     energyCost: 2,
     cooldown: 0,
@@ -62,10 +72,10 @@ export const gearDefinitions = [
   },
   {
     id: 'choice-sigil',
-    name: 'Choice Sigil',
+    name: 'Sigil',
     icon: '⚜️',
-    description: 'Pick 1 from 3–4 letters',
-    detailedDescription: 'Conjure a bundle of 3 letters (4 with Interpreter bonus). At least 1 is a target letter. Choose one to keep.',
+    shortDesc: '📦 1 of 3',
+    detailedDescription: 'Conjure 3 letters (4 with bonus). At least 1 is from the target. Pick one.',
     type: 'choice',
     energyCost: 2,
     cooldown: 2,
@@ -79,8 +89,8 @@ export const gearDefinitions = [
     id: 'root-lens',
     name: 'Root Lens',
     icon: '🔍',
-    description: 'Reveal one answer slot',
-    detailedDescription: 'Focus on the root structure to reveal one unrevealed letter position. 3 uses per combat.',
+    shortDesc: '👁 slot',
+    detailedDescription: 'Reveal one unrevealed letter position. 3 uses per combat.',
     type: 'reveal',
     energyCost: 1,
     cooldown: 0,
@@ -90,10 +100,10 @@ export const gearDefinitions = [
   },
   {
     id: 'rune-tongs',
-    name: 'Rune Tongs',
+    name: 'Tongs',
     icon: '🔧',
-    description: 'Transform socketed tile toward target',
-    detailedDescription: 'Place a tile in the socket. It transforms into a random target letter (50% exact match, 50% any Hebrew letter).',
+    shortDesc: '🔄 → 🎯50%',
+    detailedDescription: 'Socket a tile. It transforms into a target letter (50%) or random Hebrew letter (50%).',
     type: 'transform',
     energyCost: 1,
     cooldown: 1,
@@ -105,10 +115,10 @@ export const gearDefinitions = [
   // --- Shared gear ---
   {
     id: 'ash-brazier',
-    name: 'Ash Brazier',
+    name: 'Brazier',
     icon: '🔥',
-    description: 'Burn socketed tile → 2 random tiles',
-    detailedDescription: 'Sacrifice a tile from the socket. Generate 2 random replacement tiles (40% target bias).',
+    shortDesc: '💀 → 🎲×2',
+    detailedDescription: 'Sacrifice socketed tile. Generate 2 random tiles (40% target bias).',
     type: 'burn',
     energyCost: 1,
     cooldown: 1,
@@ -118,10 +128,10 @@ export const gearDefinitions = [
   },
   {
     id: 'ward-stone',
-    name: 'Ward Stone',
+    name: 'Ward',
     icon: '🛡️',
-    description: 'Block next enemy intent',
-    detailedDescription: 'Raise a protective ward. The enemy\'s telegraphed action is negated or halved when your turn ends.',
+    shortDesc: '🛡 block',
+    detailedDescription: 'Block the enemy\'s next telegraphed action when your turn ends.',
     type: 'defend',
     energyCost: 1,
     cooldown: 2,
@@ -131,10 +141,10 @@ export const gearDefinitions = [
   },
   {
     id: 'reveal-scroll',
-    name: 'Reveal Scroll',
+    name: 'Scroll',
     icon: '📜',
-    description: 'Reveal one slot (single use)',
-    detailedDescription: 'Unroll an ancient scroll to reveal one correct answer slot. Consumed after use.',
+    shortDesc: '👁 slot',
+    detailedDescription: 'Reveal one correct answer slot. Single use per combat.',
     type: 'reveal',
     energyCost: 0,
     cooldown: 0,
@@ -144,10 +154,10 @@ export const gearDefinitions = [
   },
   {
     id: 'inscription-quill',
-    name: 'Inscription Quill',
+    name: 'Quill',
     icon: '🖋️',
-    description: 'Create 1 exact needed letter',
-    detailedDescription: 'Burn the socketed tile as ink. Precisely inscribe one letter you still need. Premium precision tool.',
+    shortDesc: '💀 → 🎯×1',
+    detailedDescription: 'Sacrifice socketed tile. Create 1 exact letter you still need.',
     type: 'generate-exact',
     energyCost: 3,
     cooldown: 3,
