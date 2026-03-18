@@ -240,20 +240,22 @@ function Shell() {
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
   const [inConversationPractice, setInConversationPractice] = React.useState(false);
+  const [inDeepScript, setInDeepScript] = React.useState(false);
   const location = useLocation();
 
 
-  // Check if we're in conversation practice mode
+  // Check if we're in conversation practice or deep script mode
   React.useEffect(() => {
-    const checkConversationMode = () => {
+    const checkBodyModes = () => {
       setInConversationPractice(document.body.classList.contains('in-conversation-practice'));
+      setInDeepScript(document.body.classList.contains('in-deep-script'));
     };
 
     // Check initially
-    checkConversationMode();
+    checkBodyModes();
 
     // Set up observer to watch for class changes
-    const observer = new MutationObserver(checkConversationMode);
+    const observer = new MutationObserver(checkBodyModes);
     observer.observe(document.body, {
       attributes: true,
       attributeFilter: ['class']
@@ -299,7 +301,7 @@ function Shell() {
           <Route path="/play" element={<Navigate to="/home" replace />} />
         </Routes>
       </main>
-      {!(isGameVisible && isGameRunning) && !inConversationPractice && (
+      {!(isGameVisible && isGameRunning) && !inConversationPractice && !inDeepScript && (
         <nav className="bottom-nav">
           <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">

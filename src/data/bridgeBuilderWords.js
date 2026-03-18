@@ -1250,6 +1250,16 @@ export const bridgeBuilderWords = [
 ];
 
 /**
+ * Get multiple words by their IDs.
+ * @param {string[]} ids
+ * @returns {Object[]}
+ */
+export function getWordsByIds(ids) {
+  const idSet = new Set(ids);
+  return bridgeBuilderWords.filter(w => idSet.has(w.id));
+}
+
+/**
  * Get distractor transliterations for a given word.
  * Returns transliterations from the pool excluding the correct one.
  */
