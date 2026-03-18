@@ -3,8 +3,7 @@ import {
   combatReducer,
   createCombatState,
   ACTIONS,
-  generateLetters,
-  createLetterTile,
+  getIntentDisplay,
 } from './deepScriptEngine.js';
 import { getGearById } from '../../data/deepScript/gear.js';
 import { celebrate } from '../../lib/celebration.js';
@@ -15,8 +14,15 @@ import {
 } from './dsSounds.js';
 
 /**
- * CombatScreen — immersive dungeon-crawler combat encounter.
- * Central viewport with first-person dungeon room, compact edge HUD.
+ * CombatScreen — roguelike dungeon-crawler combat encounter.
+ *
+ * Layout (top to bottom):
+ *   1. Top HUD: health, energy, tension, progress
+ *   2. Enemy intent banner
+ *   3. Dungeon viewport with encounter sigil + inscription slots
+ *   4. Tray + Satchel tile row
+ *   5. Ability cards row with tile sockets
+ *   6. End Turn button
  */
 export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   const initialState = useMemo(() => {
@@ -33,12 +39,14 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   }, [wordId, runState]);
 
   const [combat, dispatch] = useReducer(combatReducer, initialState);
+  const [turnStarted, setTurnStarted] = useState(true); // first turn auto-started
 
   // Animation state
   const [justCorrectSlot, setJustCorrectSlot] = useState(null);
   const [justWrongSlot, setJustWrongSlot] = useState(null);
   const [activatingGear, setActivatingGear] = useState(null);
   const [pressureCritical, setPressureCritical] = useState(false);
+  const [enemyActing, setEnemyActing] = useState(false);
   const prevPhaseRef = useRef(combat?.phase);
   const prevPressureRef = useRef(combat?.pressure ?? 0);
 
@@ -79,7 +87,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     }
   }, [combat?.phase, onEnd, wordId]);
 
-  // Clear animation classes
+  // Animation timeouts
   useEffect(() => {
     if (justCorrectSlot !== null) {
       const t = setTimeout(() => setJustCorrectSlot(null), 350);
@@ -101,12 +109,14 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     }
   }, [activatingGear]);
 
+  // ─── Handlers ─────────────────────────────────────────────
+
   const handleSlotClick = useCallback((slotIndex) => {
     if (!combat.selectedTrayTile && !combat.selectedSatchelTile) return;
     const tileId = combat.selectedTrayTile || combat.selectedSatchelTile;
     const tile = combat.tray.find(t => t.id === tileId) || combat.satchel.find(t => t.id === tileId);
     const slot = combat.answerTrack[slotIndex];
-    if (tile && slot && !slot.correct) {
+    if (tile && slot && !slot.correct && !slot.locked) {
       if (tile.letter === slot.targetLetter) {
         playCorrect();
         setJustCorrectSlot(slotIndex);
@@ -138,21 +148,37 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     dispatch({ type: ACTIONS.RETRIEVE_FROM_SATCHEL });
   }, []);
 
-  const handleBurn = useCallback(() => {
-    playBurn();
-    dispatch({ type: ACTIONS.BURN_LETTER, burnBonus: runState.upgrades?.burnBonus });
-  }, [runState]);
+  const handleSocketTile = useCallback((gearId, socketIndex) => {
+    playSelect();
+    dispatch({ type: ACTIONS.SOCKET_TILE, gearId, socketIndex });
+  }, []);
 
-  const handleEndTurn = useCallback(() => {
-    playEndTurn();
-    dispatch({ type: ACTIONS.END_TURN, genAccuracy: runState.upgrades?.genAccuracy || 0 });
-  }, [runState]);
+  const handleUnsocketTile = useCallback((gearId, socketIndex) => {
+    playSelect();
+    dispatch({ type: ACTIONS.UNSOCKET_TILE, gearId, socketIndex });
+  }, []);
 
   const handleUseGear = useCallback((gearId) => {
     playGear();
     setActivatingGear(gearId);
     dispatch({ type: ACTIONS.USE_GEAR, gearId, runState });
   }, [runState]);
+
+  const handleEndTurn = useCallback(() => {
+    playEndTurn();
+    setEnemyActing(true);
+    // Brief delay to show enemy acting animation
+    setTimeout(() => {
+      dispatch({ type: ACTIONS.END_TURN });
+      setEnemyActing(false);
+      setTurnStarted(false);
+      // Auto-start next turn after a moment
+      setTimeout(() => {
+        dispatch({ type: ACTIONS.START_TURN });
+        setTurnStarted(true);
+      }, 400);
+    }, 600);
+  }, []);
 
   const handlePickChoice = useCallback((letter) => {
     playSelect();
@@ -162,23 +188,29 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   if (!combat) return <div className="ds-screen">Loading...</div>;
 
   const word = combat.word;
-  const pressurePercent = (combat.pressure / combat.maxPressure) * 100;
-  const hintEndTurn = combat.tray.length >= (runState.traySize - 1) && combat.phase === 'active';
   const completedSlots = combat.answerTrack.filter(s => s.correct).length;
   const totalSlots = combat.answerTrack.length;
-  const progressPercent = (completedSlots / totalSlots) * 100;
 
-  // Health pips for top HUD
+  // Health pips
   const healthPips = [];
   for (let i = 0; i < runState.maxHealth; i++) {
     healthPips.push(i < runState.health);
   }
 
-  // Can the selected tile be stowed?
+  // Energy pips
+  const energyPips = [];
+  for (let i = 0; i < combat.maxEnergy; i++) {
+    energyPips.push(i < combat.energy);
+  }
+
+  // Tile action availability
   const selectedTrayTile = combat.tray.find(t => t.id === combat.selectedTrayTile);
   const canStow = selectedTrayTile && !selectedTrayTile.faded && combat.satchel.length < runState.satchelSize;
-  const canBurn = !!combat.selectedTrayTile;
   const canRetrieve = !!combat.selectedSatchelTile && combat.tray.length < runState.traySize;
+  const hasSelection = combat.selectedTrayTile || combat.selectedSatchelTile;
+
+  // Enemy intent display
+  const intentDisplay = getIntentDisplay(combat.enemyIntent);
 
   return (
     <div className="ds-combat-screen">
@@ -187,6 +219,12 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
         <div className="ds-hud-health">
           {healthPips.map((full, i) => (
             <span key={i} className={`ds-hud-pip ${full ? 'ds-hud-pip--full' : 'ds-hud-pip--empty'}`} />
+          ))}
+        </div>
+
+        <div className="ds-hud-energy">
+          {energyPips.map((full, i) => (
+            <span key={i} className={`ds-energy-pip ${full ? 'ds-energy-pip--full' : 'ds-energy-pip--empty'}`} />
           ))}
         </div>
 
@@ -207,21 +245,25 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
         </div>
       </div>
 
+      {/* ═══ ENEMY INTENT BANNER ═══ */}
+      <div className={`ds-intent-banner ${enemyActing ? 'ds-intent-banner--acting' : ''} ${combat.warded ? 'ds-intent-banner--warded' : ''} ds-intent-banner--${combat.enemyIntent?.type || 'idle'}`}>
+        <span className="ds-intent-icon">{intentDisplay.icon}</span>
+        <span className="ds-intent-text">{intentDisplay.description}</span>
+        {combat.warded && <span className="ds-intent-ward">🛡️</span>}
+      </div>
+
       {/* ═══ DUNGEON VIEWPORT ═══ */}
       <div className="ds-viewport">
-        {/* Dungeon room layers */}
         <div className="ds-dungeon-room">
           <div className="ds-dungeon-floor" />
           <div className="ds-dungeon-wall-left" />
           <div className="ds-dungeon-wall-right" />
           <div className="ds-dungeon-ceiling" />
           <div className="ds-dungeon-back-wall">
-            {/* Doorway arches to suggest passages */}
             <div className="ds-dungeon-doorway ds-dungeon-doorway--left" />
             <div className="ds-dungeon-doorway ds-dungeon-doorway--right" />
           </div>
 
-          {/* Torches */}
           <div className="ds-torch ds-torch--left">
             <div className="ds-torch-flame" />
           </div>
@@ -229,7 +271,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
             <div className="ds-torch-flame" />
           </div>
 
-          {/* ═══ ENCOUNTER — the enemy/word in the room ═══ */}
+          {/* ═══ ENCOUNTER ═══ */}
           <div className={`ds-encounter ${isMiniboss ? 'ds-encounter--boss' : ''}`}>
             {isMiniboss && <div className="ds-encounter-boss-glow" />}
             <div className="ds-encounter-sigil">
@@ -240,20 +282,18 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
               </div>
             </div>
 
-            {/* Answer track — inscription plates below the encounter */}
+            {/* Inscription slots */}
             <div className="ds-inscription" dir="rtl">
               {combat.answerTrack.map((slot, index) => {
-                const revealed = slot.revealed;
-                const correct = slot.correct;
-                const hasSelection = combat.selectedTrayTile || combat.selectedSatchelTile;
-
                 let slotCls = 'ds-rune-slot';
-                if (correct) {
+                if (slot.correct) {
                   slotCls += ' ds-rune-slot--correct';
                   if (justCorrectSlot === index) slotCls += ' ds-rune-slot--just-correct';
+                } else if (slot.locked) {
+                  slotCls += ' ds-rune-slot--locked';
                 } else if (justWrongSlot === index) {
                   slotCls += ' ds-rune-slot--just-wrong';
-                } else if (hasSelection && !correct) {
+                } else if (hasSelection && !slot.correct && !slot.locked) {
                   slotCls += ' ds-rune-slot--target';
                 }
 
@@ -263,11 +303,13 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                     type="button"
                     className={slotCls}
                     onClick={() => handleSlotClick(index)}
-                    disabled={correct || combat.phase !== 'active'}
+                    disabled={slot.correct || slot.locked || combat.phase !== 'active'}
                   >
-                    {correct ? (
+                    {slot.correct ? (
                       <span className="ds-rune-letter">{slot.targetLetter}</span>
-                    ) : revealed ? (
+                    ) : slot.locked ? (
+                      <span className="ds-rune-lock">🔒</span>
+                    ) : slot.revealed ? (
                       <span className="ds-rune-hint">{slot.targetLetter}</span>
                     ) : (
                       <span className="ds-rune-empty" />
@@ -280,129 +322,172 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
         </div>
       </div>
 
-      {/* ═══ BOTTOM HUD ═══ */}
-      <div className="ds-bottom-hud">
-        {/* Inventory panel — Tray + Satchel */}
-        <div className="ds-inventory">
-          <div className="ds-inv-tray">
-            <div className="ds-inv-label">Tray</div>
-            <div className="ds-inv-tiles">
-              {combat.tray.map(tile => {
-                let tileCls = 'ds-inv-tile';
-                if (tile.faded) tileCls += ' ds-inv-tile--faded';
-                if (combat.selectedTrayTile === tile.id) tileCls += ' ds-inv-tile--selected';
-                return (
-                  <button
-                    key={tile.id}
-                    type="button"
-                    className={tileCls}
-                    onClick={() => handleTrayClick(tile.id)}
-                    disabled={combat.phase !== 'active'}
-                  >
-                    {tile.letter}
-                  </button>
-                );
-              })}
-              {Array.from({ length: Math.max(0, runState.traySize - combat.tray.length) }).map((_, i) => (
-                <div key={`e-${i}`} className="ds-inv-tile ds-inv-tile--empty" />
-              ))}
-            </div>
-          </div>
-
-          <div className="ds-inv-satchel">
-            <div className="ds-inv-label ds-inv-label--satchel">Satchel</div>
-            <div className="ds-inv-tiles">
-              {combat.satchel.map(tile => {
-                let tileCls = 'ds-inv-tile ds-inv-tile--satchel';
-                if (combat.selectedSatchelTile === tile.id) tileCls += ' ds-inv-tile--selected';
-                return (
-                  <button
-                    key={tile.id}
-                    type="button"
-                    className={tileCls}
-                    onClick={() => handleSatchelClick(tile.id)}
-                    disabled={combat.phase !== 'active'}
-                  >
-                    {tile.letter}
-                  </button>
-                );
-              })}
-              {Array.from({ length: Math.max(0, runState.satchelSize - combat.satchel.length) }).map((_, i) => (
-                <div key={`es-${i}`} className="ds-inv-tile ds-inv-tile--empty ds-inv-tile--satchel-empty" />
-              ))}
-            </div>
-          </div>
-
-          {/* Tile actions — compact icons */}
-          <div className="ds-inv-actions">
-            {canStow && (
-              <button type="button" className="ds-inv-act ds-inv-act--stow" onClick={handleStow} title="Stow to satchel">
-                <span className="ds-inv-act-icon">⬇</span>
-              </button>
-            )}
-            {canBurn && (
-              <button type="button" className="ds-inv-act ds-inv-act--burn" onClick={handleBurn} title="Burn tile">
-                <span className="ds-inv-act-icon">🔥</span>
-              </button>
-            )}
-            {canRetrieve && (
-              <button type="button" className="ds-inv-act ds-inv-act--retrieve" onClick={handleRetrieve} title="Retrieve from satchel">
-                <span className="ds-inv-act-icon">⬆</span>
-              </button>
-            )}
+      {/* ═══ TILE INVENTORY ═══ */}
+      <div className="ds-tile-row">
+        <div className="ds-inv-tray">
+          <div className="ds-inv-label">Tray</div>
+          <div className="ds-inv-tiles">
+            {combat.tray.map(tile => {
+              let tileCls = 'ds-inv-tile';
+              if (tile.faded) tileCls += ' ds-inv-tile--faded';
+              if (combat.selectedTrayTile === tile.id) tileCls += ' ds-inv-tile--selected';
+              return (
+                <button
+                  key={tile.id}
+                  type="button"
+                  className={tileCls}
+                  onClick={() => handleTrayClick(tile.id)}
+                  disabled={combat.phase !== 'active'}
+                >
+                  {tile.letter}
+                </button>
+              );
+            })}
+            {Array.from({ length: Math.max(0, runState.traySize - combat.tray.length) }).map((_, i) => (
+              <div key={`e-${i}`} className="ds-inv-tile ds-inv-tile--empty" />
+            ))}
           </div>
         </div>
 
-        {/* Gear hotbar — compact relic icons */}
-        <div className="ds-hotbar">
-          {runState.gearIds.map(gearId => {
-            const gear = getGearById(gearId);
-            const gs = combat.gearStates[gearId];
-            if (!gear || !gs) return null;
+        <div className="ds-inv-actions-compact">
+          {canStow && (
+            <button type="button" className="ds-inv-act ds-inv-act--stow" onClick={handleStow} title="Stow to satchel">
+              <span className="ds-inv-act-icon">⬇</span>
+            </button>
+          )}
+          {canRetrieve && (
+            <button type="button" className="ds-inv-act ds-inv-act--retrieve" onClick={handleRetrieve} title="Retrieve from satchel">
+              <span className="ds-inv-act-icon">⬆</span>
+            </button>
+          )}
+        </div>
 
-            const onCooldown = gs.currentCooldown > 0;
-            const noUses = gs.usesRemaining === 0;
-            const disabled = onCooldown || noUses || combat.phase !== 'active';
-            const needsSelection = gear.invokeCost > 0 || gear.type === 'duplicate' || gear.type === 'transform';
-            const hasSelection = combat.selectedTrayTile || combat.selectedSatchelTile;
+        <div className="ds-inv-satchel">
+          <div className="ds-inv-label ds-inv-label--satchel">Satchel</div>
+          <div className="ds-inv-tiles">
+            {combat.satchel.map(tile => {
+              let tileCls = 'ds-inv-tile ds-inv-tile--satchel';
+              if (combat.selectedSatchelTile === tile.id) tileCls += ' ds-inv-tile--selected';
+              return (
+                <button
+                  key={tile.id}
+                  type="button"
+                  className={tileCls}
+                  onClick={() => handleSatchelClick(tile.id)}
+                  disabled={combat.phase !== 'active'}
+                >
+                  {tile.letter}
+                </button>
+              );
+            })}
+            {Array.from({ length: Math.max(0, runState.satchelSize - combat.satchel.length) }).map((_, i) => (
+              <div key={`es-${i}`} className="ds-inv-tile ds-inv-tile--empty ds-inv-tile--satchel-empty" />
+            ))}
+          </div>
+        </div>
+      </div>
 
-            let gearCls = 'ds-hotbar-slot';
-            if (onCooldown) gearCls += ' ds-hotbar-slot--cooldown';
-            if (noUses) gearCls += ' ds-hotbar-slot--depleted';
-            if (activatingGear === gearId) gearCls += ' ds-hotbar-slot--activating';
-            if (!disabled && !(needsSelection && !hasSelection)) gearCls += ' ds-hotbar-slot--ready';
+      {/* ═══ ABILITY CARDS ═══ */}
+      <div className="ds-ability-row">
+        {runState.gearIds.map(gearId => {
+          const gear = getGearById(gearId);
+          const gs = combat.gearStates[gearId];
+          if (!gear || !gs) return null;
 
-            return (
-              <button
-                key={gearId}
-                type="button"
-                className={gearCls}
-                onClick={() => handleUseGear(gearId)}
-                disabled={disabled || (needsSelection && !hasSelection)}
-                title={`${gear.name}: ${gear.description}`}
-              >
-                <span className="ds-hotbar-icon">{gear.icon}</span>
-                {onCooldown && <span className="ds-hotbar-cd">{gs.currentCooldown}</span>}
-                {gs.usesRemaining >= 0 && !noUses && (
-                  <span className="ds-hotbar-uses">{gs.usesRemaining}</span>
+          const onCooldown = gs.currentCooldown > 0;
+          const noUses = gs.usesRemaining === 0;
+          const notEnoughEnergy = combat.energy < gear.energyCost;
+          const requiredSocketsFilled = gs.sockets
+            .filter(s => s.type === 'required')
+            .every(s => s.tileId !== null);
+          const hasSockets = gs.sockets.length > 0;
+          const needsSockets = hasSockets && gs.sockets.some(s => s.type === 'required');
+          const isReady = !onCooldown && !noUses && !notEnoughEnergy && (!needsSockets || requiredSocketsFilled);
+          const disabled = onCooldown || noUses || combat.phase !== 'active';
+
+          let cardCls = 'ds-ability-card';
+          if (onCooldown) cardCls += ' ds-ability-card--cooldown';
+          if (noUses) cardCls += ' ds-ability-card--depleted';
+          if (notEnoughEnergy) cardCls += ' ds-ability-card--no-energy';
+          if (isReady) cardCls += ' ds-ability-card--ready';
+          if (activatingGear === gearId) cardCls += ' ds-ability-card--activating';
+
+          return (
+            <div key={gearId} className={cardCls}>
+              {/* Card header: icon + name */}
+              <div className="ds-ability-header">
+                <span className="ds-ability-icon">{gear.icon}</span>
+                <span className="ds-ability-name">{gear.name}</span>
+              </div>
+
+              {/* Cost badges */}
+              <div className="ds-ability-costs">
+                {gear.energyCost > 0 && (
+                  <span className={`ds-ability-cost-energy ${notEnoughEnergy ? 'ds-ability-cost--insufficient' : ''}`}>
+                    {'◆'.repeat(gear.energyCost)}
+                  </span>
                 )}
-                <span className="ds-hotbar-name">{gear.name}</span>
-              </button>
-            );
-          })}
+                {gear.energyCost === 0 && (
+                  <span className="ds-ability-cost-energy ds-ability-cost--free">FREE</span>
+                )}
+                {onCooldown && (
+                  <span className="ds-ability-cost-cd">{gs.currentCooldown}⏳</span>
+                )}
+                {gs.usesRemaining >= 0 && !noUses && (
+                  <span className="ds-ability-cost-uses">{gs.usesRemaining}×</span>
+                )}
+              </div>
 
-          {/* End Turn */}
-          <button
-            type="button"
-            className={`ds-hotbar-endturn ${hintEndTurn ? 'ds-hotbar-endturn--hint' : ''}`}
-            onClick={handleEndTurn}
-            disabled={combat.phase !== 'active'}
-            title="End turn — draw new letters"
-          >
-            <span className="ds-hotbar-endturn-icon">↻</span>
-            <span className="ds-hotbar-endturn-label">Draw</span>
-          </button>
-        </div>
+              {/* Tile sockets */}
+              {hasSockets && (
+                <div className="ds-ability-sockets">
+                  {gs.sockets.map((socket, si) => (
+                    <button
+                      key={si}
+                      type="button"
+                      className={`ds-ability-socket ${socket.type === 'required' ? 'ds-ability-socket--required' : 'ds-ability-socket--empower'} ${socket.tileId ? 'ds-ability-socket--filled' : ''}`}
+                      onClick={() => socket.tileId
+                        ? handleUnsocketTile(gearId, si)
+                        : hasSelection ? handleSocketTile(gearId, si) : null
+                      }
+                      disabled={combat.phase !== 'active' || (!socket.tileId && !hasSelection)}
+                      title={socket.tileId ? `${socket.tileLetter} (click to unsocket)` : 'Place a selected tile here'}
+                    >
+                      {socket.tileLetter || ''}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Effect text */}
+              <div className="ds-ability-effect">{gear.description}</div>
+
+              {/* Activate button */}
+              <button
+                type="button"
+                className="ds-ability-activate"
+                onClick={() => handleUseGear(gearId)}
+                disabled={disabled || notEnoughEnergy || (needsSockets && !requiredSocketsFilled)}
+              >
+                {onCooldown ? `CD ${gs.currentCooldown}` : noUses ? 'Used' : 'USE'}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ═══ END TURN ═══ */}
+      <div className="ds-endturn-row">
+        <button
+          type="button"
+          className="ds-endturn-btn"
+          onClick={handleEndTurn}
+          disabled={combat.phase !== 'active' || enemyActing}
+          title="End your turn — enemy will act"
+        >
+          <span className="ds-endturn-icon">⚔</span>
+          <span className="ds-endturn-label">End Turn</span>
+        </button>
       </div>
 
       {/* Choice Bundle Modal */}

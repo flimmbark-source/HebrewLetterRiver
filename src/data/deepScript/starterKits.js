@@ -3,21 +3,9 @@
  *
  * Each kit defines:
  * - identity (name, description, icon)
- * - starting stats (health, tray size, satchel size)
+ * - starting stats (health, tray size, satchel size, energy)
  * - starting gear (ability IDs)
  * - passive bonuses
- *
- * @typedef {Object} StarterKit
- * @property {string}   id          — Stable identifier
- * @property {string}   name        — Display name
- * @property {string}   icon        — Emoji icon
- * @property {string}   description — Short description
- * @property {string}   flavor      — Flavor text for character select
- * @property {number}   health      — Starting health
- * @property {number}   traySize    — Starting tray capacity
- * @property {number}   satchelSize — Starting satchel capacity
- * @property {string[]} gearIds     — Starting ability/gear IDs
- * @property {Object}   passives    — Passive bonuses
  */
 
 export const starterKits = [
@@ -30,10 +18,11 @@ export const starterKits = [
     health: 5,
     traySize: 6,
     satchelSize: 3,
+    maxEnergy: 3,
     gearIds: ['scribe-knife', 'echo-mirror'],
     passives: {
-      exactLetterBonus: true,    // generates exact letters more often
-      burnDrawChance: 0.4,       // 40% chance to draw after burn
+      generateBonus: 0.1,         // +10% target accuracy on random generation
+      burnDrawChance: 0.4,        // 40% chance for bonus tile on burn
     },
   },
   {
@@ -45,9 +34,10 @@ export const starterKits = [
     health: 6,
     traySize: 6,
     satchelSize: 3,
+    maxEnergy: 3,
     gearIds: ['meaning-lantern', 'choice-sigil'],
     passives: {
-      reducedPressurePenalty: true, // wrong placements give +1 pressure instead of +2
+      reducedPressurePenalty: true, // wrong placements give +1 pressure instead of +2 on miniboss
       bonusChoiceCount: 1,          // choice bundles offer 1 extra option
     },
   },
@@ -60,6 +50,7 @@ export const starterKits = [
     health: 4,
     traySize: 7,
     satchelSize: 3,
+    maxEnergy: 4,
     gearIds: ['root-lens', 'rune-tongs'],
     passives: {
       transformBonus: true,       // transforms have wider letter pool

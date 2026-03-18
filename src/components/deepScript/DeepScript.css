@@ -623,44 +623,149 @@
   border-radius: 1px;
 }
 
-/* ─── Bottom HUD ─────────────────────────────────────────── */
-.ds-bottom-hud {
+/* ─── Energy Pips (Top HUD) ──────────────────────────────── */
+.ds-hud-energy {
+  display: flex;
+  gap: 3px;
+}
+
+.ds-energy-pip {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--ds-stone-lighter);
+  transform: rotate(45deg);
+}
+
+.ds-energy-pip--full {
+  background: var(--ds-rune-blue);
+  border-color: #3a6ab5;
+  box-shadow: 0 0 6px var(--ds-rune-blue-glow);
+}
+
+.ds-energy-pip--empty {
+  background: var(--ds-stone-light);
+}
+
+/* ─── Enemy Intent Banner ────────────────────────────────── */
+.ds-intent-banner {
   position: absolute;
-  bottom: 0;
+  top: calc(42px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  background: rgba(30, 34, 40, 0.92);
+  border: 1px solid var(--ds-stone-lighter);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.3s, box-shadow 0.3s;
+  white-space: nowrap;
+}
+
+.ds-intent-banner--pressure {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+.ds-intent-banner--burn_tile {
+  border-color: rgba(239, 68, 68, 0.35);
+}
+.ds-intent-banner--corrupt_tile {
+  border-color: rgba(155, 109, 219, 0.35);
+}
+.ds-intent-banner--slot_lock {
+  border-color: rgba(91, 141, 217, 0.35);
+}
+.ds-intent-banner--satchel_raid {
+  border-color: rgba(168, 144, 112, 0.35);
+}
+.ds-intent-banner--idle {
+  border-color: rgba(54, 60, 72, 0.35);
+}
+
+.ds-intent-banner--acting {
+  animation: ds-intent-acting 0.6s ease-out;
+}
+
+@keyframes ds-intent-acting {
+  0% { transform: translateX(-50%) scale(1); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+  30% { transform: translateX(-50%) scale(1.08); box-shadow: 0 0 20px var(--ds-ember-glow); border-color: var(--ds-ember); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+.ds-intent-banner--warded {
+  border-color: rgba(91, 141, 217, 0.5);
+  box-shadow: 0 0 12px var(--ds-rune-blue-glow);
+}
+
+.ds-intent-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.ds-intent-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ds-parchment);
+  letter-spacing: 0.3px;
+}
+
+.ds-intent-ward {
+  font-size: 16px;
+  line-height: 1;
+  animation: ds-ward-pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes ds-ward-pulse {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+/* ─── Slot Lock ─────────────────────────────────────────── */
+.ds-rune-slot--locked {
+  border-color: rgba(91, 141, 217, 0.4);
+  background: linear-gradient(180deg, rgba(91, 141, 217, 0.1) 0%, rgba(91, 141, 217, 0.05) 100%);
+  cursor: not-allowed;
+}
+
+.ds-rune-lock {
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+/* ─── Tile Inventory Row ─────────────────────────────────── */
+.ds-tile-row {
+  position: absolute;
+  bottom: 160px;
   left: 0;
   right: 0;
   z-index: 10;
   display: flex;
-  flex-direction: column;
+  align-items: flex-end;
   gap: 6px;
-  padding: 8px 10px;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(180deg,
-    transparent 0%,
-    rgba(13, 15, 20, 0.75) 20%,
-    rgba(13, 15, 20, 0.95) 100%
-  );
+  padding: 6px 10px;
+  padding-bottom: 4px;
+  background: linear-gradient(180deg, transparent 0%, rgba(13, 15, 20, 0.7) 40%);
   pointer-events: none;
 }
 
-.ds-bottom-hud > * { pointer-events: auto; }
+.ds-tile-row > * { pointer-events: auto; }
 
-/* ─── Inventory Panel ────────────────────────────────────── */
-.ds-inventory {
+.ds-inv-tray {
   display: flex;
-  gap: 8px;
-  align-items: flex-end;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
 }
 
-.ds-inv-tray,
 .ds-inv-satchel {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+  flex-shrink: 0;
 }
-
-.ds-inv-tray { flex: 1; }
-.ds-inv-satchel { flex-shrink: 0; }
 
 .ds-inv-label {
   font-size: 9px;
@@ -742,8 +847,8 @@
   border-color: rgba(76, 175, 106, 0.12);
 }
 
-/* Tile action buttons */
-.ds-inv-actions {
+/* Compact tile actions between tray and satchel */
+.ds-inv-actions-compact {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -752,8 +857,8 @@
 }
 
 .ds-inv-act {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -770,160 +875,279 @@
 .ds-inv-act:active { transform: scale(0.9); }
 
 .ds-inv-act--stow { border-color: rgba(76, 175, 106, 0.3); }
-.ds-inv-act--burn { border-color: rgba(239, 68, 68, 0.3); }
 .ds-inv-act--retrieve { border-color: rgba(91, 141, 217, 0.3); }
 
 .ds-inv-act-icon { font-size: 14px; line-height: 1; }
 
-/* ─── Gear Hotbar ────────────────────────────────────────── */
-.ds-hotbar {
+/* ─── Ability Cards Row ─────────────────────────────────── */
+.ds-ability-row {
+  position: absolute;
+  bottom: calc(42px + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  right: 0;
+  z-index: 10;
   display: flex;
-  gap: 5px;
-  justify-content: center;
-  align-items: stretch;
+  gap: 6px;
+  padding: 0 8px;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+  pointer-events: none;
 }
 
-.ds-hotbar-slot {
-  position: relative;
+.ds-ability-row::-webkit-scrollbar { display: none; }
+.ds-ability-row > * { pointer-events: auto; }
+
+.ds-ability-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1px;
-  width: 50px;
-  padding: 5px 2px 3px;
+  gap: 3px;
+  min-width: 90px;
+  max-width: 110px;
+  padding: 6px 6px 5px;
   border: 1px solid var(--ds-stone-lighter);
-  border-radius: 6px;
-  background:
-    linear-gradient(180deg,
-      var(--ds-stone-light) 0%,
-      var(--ds-stone-dark) 100%
-    );
-  font-family: inherit;
-  cursor: pointer;
-  transition: transform 0.1s, border-color 0.2s, box-shadow 0.2s;
-  color: var(--ds-parchment-dim);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--ds-stone-light) 0%, var(--ds-stone-dark) 100%);
+  flex-shrink: 0;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.ds-hotbar-slot:active:not(:disabled) { transform: scale(0.95); }
-.ds-hotbar-slot:disabled { opacity: 0.3; cursor: not-allowed; }
-
-.ds-hotbar-slot--ready {
-  border-color: rgba(196, 149, 90, 0.3);
+.ds-ability-card--ready {
+  border-color: rgba(196, 149, 90, 0.4);
+  box-shadow: 0 0 6px rgba(196, 149, 90, 0.15);
 }
 
-.ds-hotbar-slot--ready:not(:disabled):hover {
-  border-color: var(--ds-bronze);
-  box-shadow: 0 0 6px var(--ds-gold-glow), 0 2px 0 rgba(0, 0, 0, 0.4);
+.ds-ability-card--cooldown {
+  opacity: 0.5;
 }
 
-.ds-hotbar-slot--cooldown {
-  border-color: var(--ds-stone-lighter);
-  color: #4a4e56;
+.ds-ability-card--depleted {
+  opacity: 0.35;
 }
 
-.ds-hotbar-slot--depleted {
-  border-color: rgba(54, 60, 72, 0.4);
-  color: #3a3e46;
+.ds-ability-card--no-energy {
+  border-color: rgba(239, 68, 68, 0.2);
 }
 
-.ds-hotbar-slot--activating {
+.ds-ability-card--activating {
   animation: ds-gear-flash 0.3s ease-out;
 }
 
 @keyframes ds-gear-flash {
-  0% { transform: scale(1); box-shadow: 0 2px 0 rgba(0,0,0,0.4); }
-  50% { transform: scale(1.05); box-shadow: 0 0 12px var(--ds-gold-glow); border-color: var(--ds-gold); }
-  100% { transform: scale(1); box-shadow: 0 2px 0 rgba(0,0,0,0.4); }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); box-shadow: 0 0 14px var(--ds-gold-glow); border-color: var(--ds-gold); }
+  100% { transform: scale(1); }
 }
 
-.ds-hotbar-icon {
-  font-size: 18px;
+/* Card header */
+.ds-ability-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.ds-ability-icon {
+  font-size: 20px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
-.ds-hotbar-name {
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
+.ds-ability-name {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--ds-parchment);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 46px;
-  text-align: center;
+  letter-spacing: 0.3px;
 }
 
-.ds-hotbar-cd {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 16px;
-  height: 16px;
+/* Cost badges */
+.ds-ability-costs {
   display: flex;
   align-items: center;
+  gap: 6px;
+  width: 100%;
   justify-content: center;
-  font-size: 9px;
-  font-weight: 800;
-  background: var(--ds-stone-lighter);
-  color: #ccc;
-  border-radius: 50%;
-  border: 1px solid var(--ds-stone-dark);
 }
 
-.ds-hotbar-uses {
-  position: absolute;
-  bottom: -3px;
-  right: -3px;
-  font-size: 8px;
-  font-weight: 800;
-  color: var(--ds-bronze);
-  background: var(--ds-stone-dark);
-  padding: 0 3px;
-  border-radius: 3px;
-}
-
-/* End Turn button in hotbar */
-.ds-hotbar-endturn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  width: 52px;
-  padding: 5px 4px 3px;
-  border: 1px solid rgba(91, 141, 217, 0.35);
-  border-radius: 6px;
-  background: linear-gradient(180deg, #1e2a3a 0%, #16202e 100%);
-  font-family: inherit;
-  cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.2s;
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+.ds-ability-cost-energy {
+  font-size: 11px;
   color: var(--ds-rune-blue);
+  letter-spacing: 1px;
 }
 
-.ds-hotbar-endturn:active:not(:disabled) { transform: scale(0.95); }
-.ds-hotbar-endturn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-.ds-hotbar-endturn-icon {
-  font-size: 18px;
-  line-height: 1;
+.ds-ability-cost--insufficient {
+  color: var(--ds-ember);
 }
 
-.ds-hotbar-endturn-label {
+.ds-ability-cost--free {
   font-size: 8px;
+  font-weight: 800;
+  color: var(--ds-green);
+  letter-spacing: 1px;
+}
+
+.ds-ability-cost-cd {
+  font-size: 9px;
+  color: var(--ds-parchment-dim);
+}
+
+.ds-ability-cost-uses {
+  font-size: 9px;
+  color: var(--ds-bronze);
+  font-weight: 700;
+}
+
+/* Tile sockets */
+.ds-ability-sockets {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  padding: 2px 0;
+}
+
+.ds-ability-socket {
+  width: 32px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--ds-parchment);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  background: rgba(13, 15, 20, 0.6);
+}
+
+.ds-ability-socket--required {
+  border: 2px dashed var(--ds-ember);
+}
+
+.ds-ability-socket--empower {
+  border: 2px dashed var(--ds-gold);
+}
+
+.ds-ability-socket--filled {
+  border-style: solid;
+  background: linear-gradient(180deg, var(--ds-stone-light) 0%, var(--ds-stone-mid) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.ds-ability-socket--required.ds-ability-socket--filled {
+  border-color: var(--ds-ember);
+  box-shadow: 0 0 6px var(--ds-ember-glow);
+}
+
+.ds-ability-socket--empower.ds-ability-socket--filled {
+  border-color: var(--ds-gold);
+  box-shadow: 0 0 6px var(--ds-gold-glow);
+}
+
+.ds-ability-socket:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* Effect text */
+.ds-ability-effect {
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--ds-parchment-dim);
+  text-align: center;
+  line-height: 1.3;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Activate button */
+.ds-ability-activate {
+  width: 100%;
+  padding: 3px 0;
+  border: 1px solid var(--ds-stone-lighter);
+  border-radius: 4px;
+  background: var(--ds-stone-mid);
+  font-family: inherit;
+  font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.5px;
   text-transform: uppercase;
+  color: var(--ds-parchment-dim);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
-.ds-hotbar-endturn--hint {
-  animation: ds-turn-hint 1.5s ease-in-out infinite;
+.ds-ability-card--ready .ds-ability-activate {
+  border-color: var(--ds-bronze);
+  color: var(--ds-gold);
+  background: linear-gradient(180deg, #2a2520 0%, #1e1a15 100%);
 }
 
-@keyframes ds-turn-hint {
-  0%, 100% { box-shadow: 0 2px 0 rgba(0,0,0,0.4); }
-  50% { box-shadow: 0 0 10px var(--ds-rune-blue-glow), 0 2px 0 rgba(0,0,0,0.4); border-color: var(--ds-rune-blue); }
+.ds-ability-card--ready .ds-ability-activate:hover {
+  box-shadow: 0 0 6px var(--ds-gold-glow);
+}
+
+.ds-ability-activate:active:not(:disabled) { transform: scale(0.96); }
+.ds-ability-activate:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─── End Turn Row ──────────────────────────────────────── */
+.ds-endturn-row {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding: 6px 10px;
+  padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, transparent 0%, rgba(13, 15, 20, 0.95) 40%);
+  pointer-events: none;
+}
+
+.ds-endturn-row > * { pointer-events: auto; }
+
+.ds-endturn-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 28px;
+  border: 2px solid rgba(239, 68, 68, 0.35);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #2a1a1a 0%, #1e1414 100%);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ds-ember);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s, border-color 0.2s;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.ds-endturn-btn:hover:not(:disabled) {
+  border-color: var(--ds-ember);
+  box-shadow: 0 0 10px var(--ds-ember-glow), 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.ds-endturn-btn:active:not(:disabled) { transform: scale(0.96); }
+.ds-endturn-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.ds-endturn-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.ds-endturn-label {
+  line-height: 1;
 }
 
 /* ─── Choice Bundle Modal ────────────────────────────────── */
