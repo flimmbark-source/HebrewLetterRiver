@@ -14,7 +14,7 @@
 import { getWordById, allDeepScriptLetters } from '../../data/deepScript/words.js';
 import { getGearById } from '../../data/deepScript/gear.js';
 import { getEnemyDef, ENEMY_TYPES } from '../../data/deepScript/enemies.js';
-import { nanoid } from 'nanoid';
+import { nanoid } from 'nanoid/non-secure';
 
 // ─── Constants ──────────────────────────────────────────────
 
