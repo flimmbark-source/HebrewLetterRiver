@@ -17,7 +17,7 @@ import {
  * CombatScreen — roguelike dungeon-crawler combat encounter.
  *
  * Layout (top to bottom):
- *   1. Top HUD: health, energy, enemy archetype, progress
+ *   1. Top HUD: health and progress
  *   2. Enemy intent banner
  *   3. Dungeon viewport with encounter sigil + inscription slots
  *   4. Tray + Satchel tile row
@@ -47,6 +47,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   const [activatingGear, setActivatingGear] = useState(null);
   const [enemyActing, setEnemyActing] = useState(false);
   const prevPhaseRef = useRef(combat?.phase);
+  const enemyActingTimerRef = useRef(null);
 
   // Handle combat end with sounds
   useEffect(() => {
@@ -95,6 +96,10 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     }
   }, [activatingGear]);
 
+  useEffect(() => () => {
+    if (enemyActingTimerRef.current) clearTimeout(enemyActingTimerRef.current);
+  }, []);
+
   // ─── Handlers ─────────────────────────────────────────────
 
   const handleSlotClick = useCallback((slotIndex) => {
@@ -109,6 +114,12 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       } else {
         playWrong();
         setJustWrongSlot(slotIndex);
+        setEnemyActing(true);
+        if (enemyActingTimerRef.current) clearTimeout(enemyActingTimerRef.current);
+        enemyActingTimerRef.current = setTimeout(() => {
+          setEnemyActing(false);
+          enemyActingTimerRef.current = null;
+        }, 600);
       }
     }
     dispatch({ type: ACTIONS.PLACE_LETTER, slotIndex });
@@ -152,11 +163,8 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
   const handleEndTurn = useCallback(() => {
     playEndTurn();
-    setEnemyActing(true);
-    // Brief delay to show enemy acting animation
     setTimeout(() => {
       dispatch({ type: ACTIONS.END_TURN, runState });
-      setEnemyActing(false);
       setTurnStarted(false);
       // Auto-start next turn after a moment
       setTimeout(() => {
@@ -200,17 +208,12 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
   return (
     <div className="ds-combat-screen">
-      {/* ═══ TOP HUD — health left, enemy center, progress right ═══ */}
+      {/* ═══ TOP HUD — health left, progress right ═══ */}
       <div className="ds-top-hud">
         <div className="ds-hud-health">
           {healthPips.map((full, i) => (
             <span key={i} className={`ds-hud-pip ${full ? 'ds-hud-pip--full' : 'ds-hud-pip--empty'}`} />
           ))}
-        </div>
-
-        <div className={`ds-hud-enemy ds-hud-enemy--${combat.enemyType || 'corruptor'}`}>
-          <span className="ds-hud-enemy-icon">{combat.enemyDef?.icon || '💀'}</span>
-          <span className="ds-hud-enemy-name">{combat.enemyDef?.name || 'Enemy'}</span>
         </div>
 
         <div className="ds-hud-progress">
@@ -358,7 +361,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                   role="button"
                   tabIndex={combat.phase === 'active' ? 0 : -1}
                   className={cardCls}
-                  title={gear.detailedDescription}
+                  title={`${gear.shortDesc}: ${gear.detailedDescription}`}
                   onClick={() => {
                     if (isReady && combat.phase === 'active') {
                       handleUseGear(gearId);

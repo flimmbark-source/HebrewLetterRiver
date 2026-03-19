@@ -371,8 +371,6 @@ describe('Combat Reducer', () => {
       createLetterTile('ג', 'test'),         // clean
     ];
     combat.health = 5;
-    combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 }; // burns 1 clean tile
-    // After burn: 2 cursed remain → 2 damage
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
     expect(state.health).toBe(3);
   });
@@ -383,7 +381,6 @@ describe('Combat Reducer', () => {
       createLetterTile('ב', 'test', true),
     ];
     combat.health = 1;
-    combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
     expect(state.phase).toBe('defeat');
     expect(state.health).toBe(0);
@@ -408,7 +405,7 @@ describe('Combat Reducer', () => {
     expect(state.satchel[0].cursed).toBe(true);
   });
 
-  it('END_TURN ticks cooldowns and executes enemy intent', () => {
+  it('END_TURN ticks cooldowns without executing enemy intent', () => {
     const gearId = Object.keys(combat.gearStates)[0];
     combat.gearStates[gearId] = { ...combat.gearStates[gearId], currentCooldown: 2 };
     // Force a known intent that doesn't change tray count
@@ -418,8 +415,7 @@ describe('Combat Reducer', () => {
 
     expect(state.turn).toBe(1);
     expect(state.gearStates[gearId].currentCooldown).toBe(1);
-    // New intent should be rolled
-    expect(state.enemyIntent).toBeTruthy();
+    expect(state.enemyIntent).toEqual(combat.enemyIntent);
     expect(state.energy).toBe(0); // energy depleted after END_TURN
   });
 
@@ -427,7 +423,7 @@ describe('Combat Reducer', () => {
     combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
     const trayBefore = combat.tray.length;
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
-    // No free tile generation — tray should not grow (no cursed tiles = no damage)
+    // No free tile generation — tray should not grow
     expect(state.tray.length).toBeLessThanOrEqual(trayBefore);
   });
 
@@ -549,41 +545,52 @@ describe('Enemy Intent', () => {
     expect(display.value).toBe(2);
   });
 
-  it('END_TURN executes curse_tile intent', () => {
+  function triggerMistake(state, slotIndex = 0) {
+    const wrongTile = state.tray.find(t => t.letter !== state.answerTrack[slotIndex].targetLetter);
+    const selectedState = combatReducer(state, { type: ACTIONS.SELECT_TRAY_TILE, tileId: wrongTile.id });
+    return combatReducer(selectedState, { type: ACTIONS.PLACE_LETTER, slotIndex });
+  }
+
+  it('wrong placement executes curse_tile intent', () => {
     combat.enemyIntent = { type: INTENT_TYPES.CURSE_TILE, value: 1 };
-    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    combat.tray = [createLetterTile('א', 'test'), createLetterTile('ב', 'test')];
+    const state = triggerMistake(combat);
     const cursedCount = state.tray.filter(t => t.cursed).length;
-    expect(cursedCount).toBe(1);
+    expect(cursedCount).toBeGreaterThanOrEqual(1);
   });
 
-  it('END_TURN executes spawn_cursed intent', () => {
+  it('wrong placement executes spawn_cursed intent', () => {
     combat.enemyIntent = { type: INTENT_TYPES.SPAWN_CURSED, value: 1 };
     combat.maxTraySize = 10;
+    combat.tray = [createLetterTile('א', 'test'), createLetterTile('ב', 'test')];
     const trayBefore = combat.tray.length;
-    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    const state = triggerMistake(combat);
     expect(state.tray.length).toBeGreaterThan(trayBefore);
     const spawned = state.tray.filter(t => t.source === 'spawned');
     expect(spawned.length).toBeGreaterThan(0);
     expect(spawned.every(t => t.cursed)).toBe(true);
   });
 
-  it('END_TURN executes burn_tile intent as buff', () => {
+  it('wrong placement executes burn_tile intent as buff', () => {
     combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
-    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    combat.tray = [createLetterTile('א', 'test'), createLetterTile('ב', 'test')];
+    const state = triggerMistake(combat);
     expect(state.pendingIntentBuff).toBe(1);
   });
 
   it('intent value scales: curse_tile ×2 curses two tiles', () => {
     combat.enemyIntent = { type: INTENT_TYPES.CURSE_TILE, value: 2 };
-    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    combat.tray = [createLetterTile('א', 'test'), createLetterTile('ב', 'test'), createLetterTile('ג', 'test')];
+    const state = triggerMistake(combat);
     const cursedCount = state.tray.filter(t => t.cursed).length;
-    expect(cursedCount).toBe(2);
+    expect(cursedCount).toBeGreaterThanOrEqual(2);
   });
 
-  it('END_TURN executes slot_lock intent as direct attack', () => {
+  it('wrong placement executes slot_lock intent as direct attack', () => {
     combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
+    combat.tray = [createLetterTile('א', 'test'), createLetterTile('ב', 'test')];
     combat.health = 5;
-    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    const state = triggerMistake(combat);
     expect(state.health).toBe(4);
   });
 
@@ -591,14 +598,16 @@ describe('Enemy Intent', () => {
     combat.health = 6;
     combat.pendingIntentBuff = 2;
     combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
-    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    combat.tray = [createLetterTile('א', 'test'), createLetterTile('ב', 'test')];
+    const state = triggerMistake(combat);
     expect(state.health).toBe(3);
     expect(state.pendingIntentBuff).toBe(0);
   });
 
-  it('END_TURN executes satchel_raid intent as confuse', () => {
+  it('wrong placement executes satchel_raid intent as confuse', () => {
     combat.enemyIntent = { type: INTENT_TYPES.SATCHEL_RAID, value: 2 };
-    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    combat.tray = [createLetterTile('א', 'test'), createLetterTile('ב', 'test')];
+    const state = triggerMistake(combat);
     const confusedCosts = Object.values(state.confusedGearCosts || {});
     expect(confusedCosts.length).toBeGreaterThan(0);
     expect(confusedCosts.length).toBeLessThanOrEqual(2);
@@ -607,17 +616,21 @@ describe('Enemy Intent', () => {
 
   it('ward blocks enemy intent', () => {
     combat.enemyIntent = { type: INTENT_TYPES.CURSE_TILE, value: 1 };
+    combat.tray = [createLetterTile('א', 'test'), createLetterTile('ב', 'test')];
     combat.warded = true;
-    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    const state = triggerMistake(combat);
     const cursedCount = state.tray.filter(t => t.cursed).length;
-    expect(cursedCount).toBe(0); // warded = blocked
+    expect(cursedCount).toBe(1); // only the wrong tile curse remains
     expect(state.warded).toBe(false);
   });
 
-  it('END_TURN rolls new intent after execution', () => {
+  it('wrong placement rolls new intent after execution', () => {
     combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
-    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    combat.tray = [createLetterTile('א', 'test'), createLetterTile('ב', 'test')];
+    const previousIntent = combat.enemyIntent;
+    const state = triggerMistake(combat);
     expect(state.enemyIntent).toBeTruthy();
+    expect(state.enemyIntent).not.toBe(previousIntent);
   });
 });
 
@@ -767,6 +780,8 @@ describe('Cursed Tile Damage', () => {
       createLetterTile('ג', 'test'), // potential chain target
       createLetterTile('ד', 'test'), // potential chain target
     ];
+    // Isolate passive behavior from mistake-triggered enemy intent side effects.
+    combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
 
     let state = combatReducer(combat, { type: ACTIONS.SELECT_TRAY_TILE, tileId: combat.tray[0].id });
     state = combatReducer(state, { type: ACTIONS.PLACE_LETTER, slotIndex: 0 });

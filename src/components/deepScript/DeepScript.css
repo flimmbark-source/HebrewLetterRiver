@@ -659,7 +659,7 @@
 /* ─── Enemy Intent Banner ────────────────────────────────── */
 .ds-intent-banner {
   position: absolute;
-  top: calc(42px + env(safe-area-inset-top, 0px));
+  top: calc(17px + env(safe-area-inset-top, 0px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 11;
