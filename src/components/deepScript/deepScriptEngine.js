@@ -14,6 +14,7 @@
 import { getWordById, allDeepScriptLetters } from '../../data/deepScript/words.js';
 import { getGearById } from '../../data/deepScript/gear.js';
 import { getEnemyDef, ENEMY_TYPES } from '../../data/deepScript/enemies.js';
+import { nanoid } from 'nanoid';
 
 // ─── Constants ──────────────────────────────────────────────
 
@@ -87,10 +88,9 @@ export { ENEMY_TYPES };
 
 // ─── Letter tile factory ────────────────────────────────────
 
-let tileIdCounter = 0;
 export function createLetterTile(letter, source = 'generated', cursed = false) {
   return {
-    id: `tile-${++tileIdCounter}`,
+    id: `tile-${nanoid(8)}`,
     letter,
     source,
     cursed,
