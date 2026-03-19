@@ -15,6 +15,37 @@ Add **3 enemy archetypes** that interact with this loop by adding threats (never
 
 ---
 
+## Design Intent: Class Identity & Enemy Matchups
+
+### What Makes Each Class's Combat *Feel* Different
+
+The core question for class design: **what is the player's mental model during combat?**
+
+**Scribe — "I am a factory."**
+Generate, generate, generate. Place when confident. The Scribe player's anxiety is *tray overflow* — too many tiles, not enough slots. Their turn planning is: "Which abilities generate the most tiles per energy? Do I have space?"
+
+**Interpreter — "I am a gambler with insurance."**
+Place aggressively, accept some wrong guesses, Salvage the cursed tiles back. The Interpreter's anxiety is *curse accumulation* — each wrong guess is calculated risk. Their turn planning is: "How many curses can I absorb? Is it worth guessing now to create salvage fuel?"
+
+**Rootkeeper — "I am a farmer."**
+Plant seeds, transform tiles, harvest next turn. The Rootkeeper's anxiety is *timing* — seeds need to survive until next turn, Tongs have a cooldown. Their turn planning is: "What's the enemy doing next? Is it safe to invest in seeds? Should I Tongs now or wait?"
+
+### Each Class's Answer to "What Do I Do With Cursed Tiles?"
+
+- **Scribe** — Outpace the curses. Generate so many tiles that you can afford to guess aggressively. Wrong guesses hurt, but you'll find the right letter eventually through volume. Against The Corruptor, Scribe races — against The Amplifier, Scribe struggles (volume means more wrong guesses means more chain-curses).
+
+- **Interpreter** — Recycle the curses. Salvage turns cursed tiles into fuel. The Lantern literally feeds on cursed tiles. Against The Corruptor, Interpreter thrives (more cursed tiles = more salvage material). Against The Spawner, Interpreter also thrives (junk cursed tiles are just more fuel).
+
+- **Rootkeeper** — Avoid the curses. Seeds and Transform let you be more precise with fewer guesses. Plant a seed, Transform a tile into something useful, place with confidence. Against The Amplifier, Rootkeeper thrives (fewer wrong guesses = fewer chain-curses). Against The Spawner, Rootkeeper struggles (precision doesn't help when junk floods your tray).
+
+### Design Constraint
+
+> **Enemies add threats. They never remove player tools.**
+
+Enemies interact with the cursed tile economy by adding problems — more curses, junk tiles, chain reactions. No enemy disables gear, hides reveals, or takes away the player's learning tools. The word is always the honest puzzle. The enemy is the clock.
+
+---
+
 ## Step-by-step Implementation
 
 ### Step 1: Create `src/data/deepScript/enemies.js` — Enemy archetype definitions
