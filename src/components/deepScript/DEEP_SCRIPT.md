@@ -104,7 +104,7 @@ Edit `src/data/deepScript/gear.js`. Add to `gearDefinitions`:
   name: 'Gear Name',
   icon: '⚡',
   description: 'What it does',
-  type: 'generate',  // generate | duplicate | reveal | divine | root-sight | choice | transform | utility
+  type: 'generate',  // generate | duplicate | reveal | scry | germinate | choice | transform | utility
   invokeCost: 0,     // letters to spend
   cooldown: 2,       // turns between uses
   uses: -1,          // -1 = unlimited
