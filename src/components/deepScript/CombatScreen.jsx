@@ -358,7 +358,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                   role="button"
                   tabIndex={combat.phase === 'active' ? 0 : -1}
                   className={cardCls}
-                  title={gear.detailedDescription}
+                  title={`${gear.shortDesc}: ${gear.detailedDescription}`}
                   onClick={() => {
                     if (isReady && combat.phase === 'active') {
                       handleUseGear(gearId);

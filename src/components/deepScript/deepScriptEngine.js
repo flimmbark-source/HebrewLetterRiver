@@ -4,8 +4,8 @@
  * Turn flow:
  *   START_TURN  → gain energy, clear slot locks
  *   Player acts → spend energy, manage tiles, place letters
- *   END_TURN    → enemy executes telegraphed intent, roll new intent,
- *                  tick cooldowns, increment turn, check defeat
+ *                → wrong letter placement triggers telegraphed enemy intent
+ *   END_TURN    → cursed damage, tick cooldowns, increment turn, check defeat
  *
  * All game logic is handled through dispatched actions.
  * The engine is framework-agnostic; React integration is via useReducer.
@@ -423,13 +423,25 @@ export function combatReducer(state, action) {
           }
         }
 
-        return {
+        const mistakeState = {
           ...state,
           tray: newTray,
           satchel: newSatchel,
           selectedTrayTile: null,
           selectedSatchelTile: null,
           log: logEntries,
+        };
+
+        // Enemy intent now triggers on player mistakes (wrong letter placements),
+        // not at END_TURN.
+        let newState = executeEnemyIntent(mistakeState);
+        if (newState.phase === 'defeat') return newState;
+
+        // Roll a fresh telegraphed intent after each triggered enemy action.
+        const nextIntent = rollEnemyIntent(newState.turn, newState.isMiniboss, newState.enemyType);
+        return {
+          ...newState,
+          enemyIntent: nextIntent,
         };
       }
     }
@@ -832,11 +844,8 @@ export function combatReducer(state, action) {
         confusedGearCosts: {},
       };
 
-      // 1. Enemy executes telegraphed intent
-      let newState = executeEnemyIntent(preTurnState);
-      if (newState.phase === 'defeat') return newState;
-
-      // 2. Cursed tile damage — each cursed tile in tray deals 1 damage
+      // 1. Cursed tile damage — each cursed tile in tray deals 1 damage
+      let newState = preTurnState;
       const cursedCount = newState.tray.filter(t => t.cursed).length;
       if (cursedCount > 0) {
         const reduction = action.runState?.upgrades?.curseDamageReduction || 0;
@@ -852,7 +861,7 @@ export function combatReducer(state, action) {
         if (newState.phase === 'defeat') return newState;
       }
 
-      // 3. Tick gear cooldowns
+      // 2. Tick gear cooldowns
       const newGearStates = {};
       for (const [id, gs] of Object.entries(newState.gearStates)) {
         // Also clear sockets on turn end
@@ -863,15 +872,11 @@ export function combatReducer(state, action) {
         };
       }
 
-      // 4. Roll new enemy intent based on archetype
-      const nextIntent = rollEnemyIntent(newState.turn + 1, newState.isMiniboss, newState.enemyType);
-
-      // 5. Increment turn
+      // 3. Increment turn
       return {
         ...newState,
         turn: newState.turn + 1,
         gearStates: newGearStates,
-        enemyIntent: nextIntent,
         energy: 0, // energy depleted; START_TURN will refill
         warded: false,
       };
