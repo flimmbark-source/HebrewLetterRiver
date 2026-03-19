@@ -224,6 +224,7 @@ export function createCombatState(wordId, runState) {
     enemyIntent: firstIntent,
     warded: false,
     gearStates,
+    pendingSeeds: [],
     choiceBundle: null,
     selectedTrayTile: null,
     selectedSatchelTile: null,
@@ -646,23 +647,48 @@ export function combatReducer(state, action) {
           updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Revealed a letter position' }];
           break;
         }
-        case 'scry': {
-          // Interpreter's Lantern: see 2 tiles, pick 1. At least 1 is a target letter.
-          // Uses choiceBundle with count=2 (bonusChoiceCount does NOT apply — that's for Sigil)
-          const bundle = generateChoiceBundle(2, targetLetters, 0);
-          updates.choiceBundle = bundle;
-          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Scrying — pick a tile' }];
+        case 'salvage': {
+          // Interpreter's Lantern: un-fade 1 faded tray tile + generate tile(s).
+          // If a faded tile was salvaged, generate 2 tiles; otherwise 1.
+          const fadedIdx = updates.tray.findIndex(t => t.faded);
+          let salvaged = false;
+          if (fadedIdx !== -1) {
+            updates.tray = updates.tray.map((t, i) =>
+              i === fadedIdx ? { ...t, faded: false } : t
+            );
+            salvaged = true;
+          }
+          const salvageCount = salvaged ? 2 : 1;
+          const salvageAccuracy = 0.4 + (runState?.passives?.generateBonus || 0);
+          const salvageTiles = generateLetters(salvageCount, targetLetters, salvageAccuracy);
+          const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
+          const space = trayMax - updates.tray.length;
+          updates.tray = [...updates.tray, ...salvageTiles.slice(0, space)];
+          updates.log = [...state.log, {
+            type: 'gear', name: gearDef.name,
+            message: salvaged
+              ? `Salvaged a faded tile + ${Math.min(salvageCount, space)} new tile(s)`
+              : `Generated ${Math.min(1, space)} tile(s)`,
+          }];
           break;
         }
         case 'germinate': {
-          // Rootkeeper's Root Lens: generate 1 tile at 70% target accuracy
-          const rootAccuracy = 0.7 + (runState?.passives?.generateBonus || 0);
-          const newTiles = generateLetters(1, targetLetters, rootAccuracy);
+          // Rootkeeper's Root Lens: generate 1 tile now (30%) + plant a seed
+          // that blooms into 1 tile (60%) at START of next turn.
+          // Tempo decision: delayed tile is vulnerable to enemy burn/corrupt.
+          const sproutAccuracy = 0.3 + (runState?.passives?.generateBonus || 0);
+          const sproutTiles = generateLetters(1, targetLetters, sproutAccuracy);
           const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
           if (updates.tray.length < trayMax) {
-            updates.tray = [...updates.tray, ...newTiles];
+            updates.tray = [...updates.tray, ...sproutTiles];
           }
-          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Cultivated a tile' }];
+          // Plant seed for next turn bloom
+          const seedAccuracy = 0.6 + (runState?.passives?.generateBonus || 0);
+          updates.pendingSeeds = [
+            ...(state.pendingSeeds || []),
+            { accuracy: seedAccuracy, targetLetters: [...targetLetters] },
+          ];
+          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: '+1 tile now, seed planted 🌱' }];
           break;
         }
         case 'choice': {
@@ -767,6 +793,20 @@ export function combatReducer(state, action) {
         ? [{ type: 'stow', message: `Auto-stowed ${autoStowed.length} tile(s) to satchel.` }]
         : [];
 
+      // Bloom pending seeds into tray tiles
+      const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
+      let bloomedTray = [];
+      const seedLog = [];
+      const seeds = state.pendingSeeds || [];
+      for (const seed of seeds) {
+        if (bloomedTray.length >= trayMax) break;
+        const bloomed = generateLetters(1, seed.targetLetters, seed.accuracy);
+        bloomedTray.push(...bloomed);
+        seedLog.push({ type: 'gear', message: `Seed bloomed → ${bloomed[0].letter} 🌱` });
+      }
+      // Cap bloomed tiles to tray max
+      bloomedTray = bloomedTray.slice(0, trayMax);
+
       // Reset per-turn gear usage counters
       const resetGearStates = {};
       for (const [id, gs] of Object.entries(state.gearStates)) {
@@ -776,12 +816,13 @@ export function combatReducer(state, action) {
       return {
         ...state,
         energy: state.maxEnergy,
-        tray: [],
+        tray: bloomedTray,
         satchel: newSatchel,
         selectedTrayTile: null,
         answerTrack: newTrack,
         gearStates: resetGearStates,
-        log: stowLog,
+        pendingSeeds: [],
+        log: [...stowLog, ...seedLog],
       };
     }
 
