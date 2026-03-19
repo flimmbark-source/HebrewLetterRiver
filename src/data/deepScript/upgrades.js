@@ -28,11 +28,11 @@ export const upgradeDefinitions = [
     value: 1,
   },
   {
-    id: 'pressure-relief',
-    name: 'Calm Focus',
+    id: 'curse-ward',
+    name: 'Thick Skin',
     icon: '🧘',
-    description: 'Max pressure increased by 1.',
-    effect: 'maxPressure',
+    description: 'Reduce end-of-turn curse damage by 1 (minimum 0).',
+    effect: 'curseDamageReduction',
     value: 1,
   },
   {

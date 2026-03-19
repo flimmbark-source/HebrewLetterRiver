@@ -27,18 +27,23 @@ Deep Script is a dungeon-crawler-inspired roguelike game mode where enemies appe
 - **Invoke** — Spend letters to power gear abilities
 - **End Turn** — Draw new letters, tick cooldowns
 
-### Pressure System
-- Wrong placements increase pressure (0→max, default max=5)
-- Correct placements decrease pressure by 1
-- At max pressure, the player loses the combat (loses 1 HP)
-- Wrong letters become "faded" (limited utility)
+### Cursed Tile System
+- Wrong placements **curse** the tile (still usable, but dangerous)
+- End of each turn, **every cursed tile in tray deals 1 damage**
+- Players manage cursed tiles through class abilities (Salvage consumes them, Stow moves them)
+- **Enemy archetypes** create curses in different ways:
+  - **Corruptor** — curses 1 clean tray tile per turn
+  - **Spawner** — adds junk cursed tiles to your tray
+  - **Amplifier** — wrong guesses chain-curse additional tiles (passive)
+- Enemies add threats; they never remove player tools
 
 ## File Structure
 
 ```
 src/
 ├── data/deepScript/
-│   ├── words.js          — Word content (25 words + 1 miniboss)
+│   ├── words.js          — Word content (100+ words + 3 minibosses, with enemyType)
+│   ├── enemies.js        — Enemy archetype definitions (Corruptor, Spawner, Amplifier)
 │   ├── starterKits.js    — 3 starter kit definitions
 │   ├── gear.js           — Gear/ability definitions
 │   ├── upgrades.js       — Shrine upgrade definitions
@@ -126,7 +131,7 @@ Then add the effect logic in `deepScriptEngine.js` under the `USE_GEAR` action h
 
 - No meta-progression between runs (in-session only)
 - No niqqud/vowel marks
-- 25 regular words + 1 miniboss (enough for demo, not a full curriculum)
+- Word set is sufficient for demo, not a full curriculum
 - No animation/sound effects (can reuse existing `celebration.js` and TTS)
 - The "Satchel Hook" gear uses the retrieve action rather than a custom mechanic
 - Archive "free-letter" and "insight" rewards are simplified

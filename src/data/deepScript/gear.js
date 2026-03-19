@@ -58,7 +58,7 @@ export const gearDefinitions = [
     name: 'Lantern',
     icon: '🏮',
     shortDesc: 'Salvage',
-    detailedDescription: 'Un-fade a faded tile + generate 1 tile (40%). Bonus tile if a tile was salvaged.',
+    detailedDescription: 'Consume a cursed tile + generate 1 tile (40%). Bonus tile if a cursed tile was consumed.',
     type: 'salvage',
     energyCost: 1,
     cooldown: 0,

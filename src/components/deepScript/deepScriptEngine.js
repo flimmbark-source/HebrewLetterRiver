@@ -13,10 +13,10 @@
 
 import { getWordById, allDeepScriptLetters } from '../../data/deepScript/words.js';
 import { getGearById } from '../../data/deepScript/gear.js';
+import { getEnemyDef, ENEMY_TYPES } from '../../data/deepScript/enemies.js';
 
 // ─── Constants ──────────────────────────────────────────────
 
-export const MAX_PRESSURE_DEFAULT = 2;
 export const TRAY_SIZE_DEFAULT = 6;
 export const SATCHEL_SIZE_DEFAULT = 3;
 export const MAX_ENERGY_DEFAULT = 3;
@@ -24,60 +24,47 @@ export const MAX_ENERGY_DEFAULT = 3;
 // ─── Enemy Intent Types ─────────────────────────────────────
 
 export const INTENT_TYPES = {
-  IDLE: 'idle',
-  PRESSURE: 'pressure',
+  CURSE_TILE: 'curse_tile',
+  SPAWN_CURSED: 'spawn_cursed',
   BURN_TILE: 'burn_tile',
-  CORRUPT_TILE: 'corrupt_tile',
   SLOT_LOCK: 'slot_lock',
   SATCHEL_RAID: 'satchel_raid',
 };
 
 const INTENT_DEFS = {
-  [INTENT_TYPES.IDLE]:         { icon: '💤', label: 'Idle',           description: 'The sigil rests.' },
-  [INTENT_TYPES.PRESSURE]:     { icon: '🗡️', label: 'Pressure',      description: (v) => `+${v} Tension` },
+  [INTENT_TYPES.CURSE_TILE]:   { icon: '💀', label: 'Curse',         description: 'Curse a random clean tray tile.' },
+  [INTENT_TYPES.SPAWN_CURSED]: { icon: '🕷️', label: 'Spawn',        description: 'Add junk cursed tiles to tray.' },
   [INTENT_TYPES.BURN_TILE]:    { icon: '🔥', label: 'Burn Tile',     description: 'Destroy a random tray tile.' },
-  [INTENT_TYPES.CORRUPT_TILE]: { icon: '💀', label: 'Corrupt',       description: 'Fade a random tray tile.' },
   [INTENT_TYPES.SLOT_LOCK]:    { icon: '🔒', label: 'Slot Lock',     description: 'Lock a random slot for 1 turn.' },
   [INTENT_TYPES.SATCHEL_RAID]: { icon: '💨', label: 'Satchel Raid',  description: 'Discard a random satchel tile.' },
 };
 
 export function getIntentDisplay(intent) {
   if (!intent) return { icon: '?', label: '?', description: '?' };
-  const def = INTENT_DEFS[intent.type] || INTENT_DEFS[INTENT_TYPES.IDLE];
+  const def = INTENT_DEFS[intent.type] || { icon: '?', label: '?', description: '?' };
   const desc = typeof def.description === 'function' ? def.description(intent.value) : def.description;
   return { icon: def.icon, label: def.label, description: desc };
 }
 
 /**
- * Roll a random enemy intent. Escalates with turn count.
+ * Roll a random enemy intent based on enemy archetype.
  */
-export function rollEnemyIntent(turn, isMiniboss) {
-  // Weight pools — later turns are harsher
+export function rollEnemyIntent(turn, isMiniboss, enemyType = ENEMY_TYPES.CORRUPTOR) {
+  const enemyDef = getEnemyDef(enemyType);
   const pool = [];
-  // Always possible
-  pool.push({ type: INTENT_TYPES.PRESSURE, value: 1, weight: 3 });
-  pool.push({ type: INTENT_TYPES.BURN_TILE, value: 1, weight: 2 });
-  pool.push({ type: INTENT_TYPES.CORRUPT_TILE, value: 1, weight: 2 });
 
-  if (turn >= 1) {
-    pool.push({ type: INTENT_TYPES.SLOT_LOCK, value: 1, weight: 1 });
-  }
-  if (turn >= 2) {
-    pool.push({ type: INTENT_TYPES.SATCHEL_RAID, value: 1, weight: 1 });
-    pool.push({ type: INTENT_TYPES.PRESSURE, value: 2, weight: 1 });
+  for (const [intentKey, config] of Object.entries(enemyDef.intentWeights)) {
+    if (config.minTurn && turn < config.minTurn) continue;
+    const type = INTENT_TYPES[intentKey];
+    if (!type) continue;
+    let weight = config.weight;
+    // Miniboss: boost all weights by 50%
+    if (isMiniboss) weight = Math.ceil(weight * 1.5);
+    pool.push({ type, value: 1, weight });
   }
 
-  // Breather turns — less likely as turns progress
-  if (turn < 3) {
-    pool.push({ type: INTENT_TYPES.IDLE, value: 0, weight: 2 });
-  } else {
-    pool.push({ type: INTENT_TYPES.IDLE, value: 0, weight: 1 });
-  }
-
-  // Miniboss: heavier attacks
-  if (isMiniboss) {
-    pool.push({ type: INTENT_TYPES.PRESSURE, value: 2, weight: 2 });
-    pool.push({ type: INTENT_TYPES.SLOT_LOCK, value: 1, weight: 2 });
+  if (pool.length === 0) {
+    return { type: INTENT_TYPES.CURSE_TILE, value: 1 };
   }
 
   // Weighted random selection
@@ -92,15 +79,18 @@ export function rollEnemyIntent(turn, isMiniboss) {
   return pool[0]; // fallback
 }
 
+// Re-export for external use
+export { ENEMY_TYPES };
+
 // ─── Letter tile factory ────────────────────────────────────
 
 let tileIdCounter = 0;
-export function createLetterTile(letter, source = 'generated', faded = false) {
+export function createLetterTile(letter, source = 'generated', cursed = false) {
   return {
     id: `tile-${++tileIdCounter}`,
     letter,
     source,
-    faded,
+    cursed,
   };
 }
 
@@ -201,10 +191,14 @@ export function createCombatState(wordId, runState) {
   // Energy
   const maxEnergy = runState.maxEnergy || MAX_ENERGY_DEFAULT;
 
-  // Roll first enemy intent
-  const firstIntent = rollEnemyIntent(0, word.isMiniboss || false);
+  // Determine enemy type
+  const enemyType = word.enemyType || ENEMY_TYPES.CORRUPTOR;
+  const enemyDef = getEnemyDef(enemyType);
 
-  // Health tracked locally for tension attack damage
+  // Roll first enemy intent
+  const firstIntent = rollEnemyIntent(0, word.isMiniboss || false, enemyType);
+
+  // Health tracked locally for curse damage
   const health = runState.health || runState.maxHealth || 3;
   const maxHealth = runState.maxHealth || 3;
 
@@ -214,13 +208,13 @@ export function createCombatState(wordId, runState) {
     answerTrack,
     tray: initialLetters,
     satchel: [],
-    pressure: 0,
-    maxPressure: (runState.upgrades?.maxPressure || 0) + MAX_PRESSURE_DEFAULT,
     health,
     maxHealth,
     turn: 0,
     energy: maxEnergy,
     maxEnergy,
+    enemyType,
+    enemyDef,
     enemyIntent: firstIntent,
     warded: false,
     gearStates,
@@ -231,11 +225,6 @@ export function createCombatState(wordId, runState) {
     phase: 'active',         // 'active' | 'victory' | 'defeat'
     log: [],
     isMiniboss: word.isMiniboss || false,
-    minibossModifiers: word.isMiniboss ? {
-      pressureRiseRate: 2,
-      firstWrongCorrupts: true,
-      hiddenSlot: true,
-    } : null,
   };
 }
 
@@ -257,23 +246,6 @@ export const ACTIONS = {
   DISMISS_LOG: 'DISMISS_LOG',
 };
 
-// ─── Tension overflow — deals damage and resets pressure ─────
-
-function checkTensionOverflow(state) {
-  if (state.pressure < state.maxPressure) return state;
-  // Tension attack: deal 1 damage (miniboss deals 2), reset pressure
-  const damage = state.isMiniboss ? 2 : 1;
-  const newHealth = state.health - damage;
-  const defeated = newHealth <= 0;
-  return {
-    ...state,
-    pressure: 0,
-    health: Math.max(0, newHealth),
-    phase: defeated ? 'defeat' : state.phase,
-    log: [...state.log, { type: 'tension', message: `Tension burst! You take ${damage} damage!` }],
-  };
-}
-
 // ─── Execute enemy intent ───────────────────────────────────
 
 function executeEnemyIntent(state) {
@@ -290,38 +262,42 @@ function executeEnemyIntent(state) {
   }
 
   switch (intent.type) {
-    case INTENT_TYPES.IDLE:
-      return state;
-
-    case INTENT_TYPES.PRESSURE: {
-      const newPressure = state.pressure + intent.value;
-      const afterPressure = {
+    case INTENT_TYPES.CURSE_TILE: {
+      const clean = state.tray.filter(t => !t.cursed);
+      if (clean.length === 0) return state;
+      const target = clean[Math.floor(Math.random() * clean.length)];
+      return {
         ...state,
-        pressure: newPressure,
-        log: [...state.log, { type: 'enemy', message: `Enemy adds +${intent.value} tension!` }],
+        tray: state.tray.map(t => t.id === target.id ? { ...t, cursed: true } : t),
+        log: [...state.log, { type: 'enemy', message: `Enemy cursed your ${target.letter} tile!` }],
       };
-      return checkTensionOverflow(afterPressure);
+    }
+
+    case INTENT_TYPES.SPAWN_CURSED: {
+      const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
+      const spawnCount = state.isMiniboss ? 2 : 1;
+      const spawned = [];
+      for (let i = 0; i < spawnCount; i++) {
+        if (state.tray.length + spawned.length >= trayMax) break;
+        const junkLetter = allDeepScriptLetters[Math.floor(Math.random() * allDeepScriptLetters.length)];
+        spawned.push(createLetterTile(junkLetter, 'spawned', true));
+      }
+      if (spawned.length === 0) return state;
+      return {
+        ...state,
+        tray: [...state.tray, ...spawned],
+        log: [...state.log, { type: 'enemy', message: `Enemy spawned ${spawned.length} cursed junk tile(s)!` }],
+      };
     }
 
     case INTENT_TYPES.BURN_TILE: {
-      const nonFaded = state.tray.filter(t => !t.faded);
-      if (nonFaded.length === 0) return state;
-      const target = nonFaded[Math.floor(Math.random() * nonFaded.length)];
+      const clean = state.tray.filter(t => !t.cursed);
+      if (clean.length === 0) return state;
+      const target = clean[Math.floor(Math.random() * clean.length)];
       return {
         ...state,
         tray: state.tray.filter(t => t.id !== target.id),
         log: [...state.log, { type: 'enemy', message: `Enemy burned your ${target.letter} tile!` }],
-      };
-    }
-
-    case INTENT_TYPES.CORRUPT_TILE: {
-      const nonFaded = state.tray.filter(t => !t.faded);
-      if (nonFaded.length === 0) return state;
-      const target = nonFaded[Math.floor(Math.random() * nonFaded.length)];
-      return {
-        ...state,
-        tray: state.tray.map(t => t.id === target.id ? { ...t, faded: true } : t),
-        log: [...state.log, { type: 'enemy', message: `Enemy corrupted your ${target.letter} tile!` }],
       };
     }
 
@@ -406,31 +382,36 @@ export function combatReducer(state, action) {
           satchel: newSatchel,
           selectedTrayTile: null,
           selectedSatchelTile: null,
-          pressure: Math.max(0, state.pressure - 1),
           phase: allPlaced ? 'victory' : 'active',
           log: [...state.log, { type: 'correct', letter: tile.letter, slot: slotIndex }],
         };
       } else {
-        const pressureInc = state.isMiniboss && state.minibossModifiers?.pressureRiseRate
-          ? state.minibossModifiers.pressureRiseRate
-          : 1;
-        const newPressure = state.pressure + pressureInc;
-        const fadedTile = { ...tile, faded: true };
+        const cursedTile = { ...tile, cursed: true };
         let newTray = fromTray
-          ? state.tray.map(t => t.id === tileId ? fadedTile : t)
-          : [...state.tray, fadedTile];
+          ? state.tray.map(t => t.id === tileId ? cursedTile : t)
+          : [...state.tray, cursedTile];
         const newSatchel = fromSatchel ? state.satchel.filter(t => t.id !== tileId) : state.satchel;
 
-        const afterWrong = {
+        const logEntries = [...state.log, { type: 'wrong', letter: tile.letter, slot: slotIndex }];
+
+        // Amplifier passive: chain-curse 1 additional clean tile on wrong guess
+        if (state.enemyDef?.passive === 'chainCurse') {
+          const cleanTiles = newTray.filter(t => !t.cursed);
+          if (cleanTiles.length > 0) {
+            const chainTarget = cleanTiles[Math.floor(Math.random() * cleanTiles.length)];
+            newTray = newTray.map(t => t.id === chainTarget.id ? { ...t, cursed: true } : t);
+            logEntries.push({ type: 'enemy', message: `Chain curse! ${chainTarget.letter} is also cursed!` });
+          }
+        }
+
+        return {
           ...state,
           tray: newTray,
           satchel: newSatchel,
-          pressure: newPressure,
           selectedTrayTile: null,
           selectedSatchelTile: null,
-          log: [...state.log, { type: 'wrong', letter: tile.letter, slot: slotIndex }],
+          log: logEntries,
         };
-        return checkTensionOverflow(afterWrong);
       }
     }
 
@@ -439,7 +420,7 @@ export function combatReducer(state, action) {
       if (!tileId) return state;
 
       const tile = state.tray.find(t => t.id === tileId);
-      if (!tile || tile.faded) return state;
+      if (!tile) return state;
 
       const satchelMax = state.maxSatchelSize || SATCHEL_SIZE_DEFAULT;
       if (state.satchel.length >= satchelMax) return state;
@@ -648,14 +629,12 @@ export function combatReducer(state, action) {
           break;
         }
         case 'salvage': {
-          // Interpreter's Lantern: un-fade 1 faded tray tile + generate tile(s).
-          // If a faded tile was salvaged, generate 2 tiles; otherwise 1.
-          const fadedIdx = updates.tray.findIndex(t => t.faded);
+          // Interpreter's Lantern: consume 1 cursed tray tile + generate tile(s).
+          // If a cursed tile was consumed, generate 2 tiles; otherwise 1.
+          const cursedIdx = updates.tray.findIndex(t => t.cursed);
           let salvaged = false;
-          if (fadedIdx !== -1) {
-            updates.tray = updates.tray.map((t, i) =>
-              i === fadedIdx ? { ...t, faded: false } : t
-            );
+          if (cursedIdx !== -1) {
+            updates.tray = updates.tray.filter((_, i) => i !== cursedIdx);
             salvaged = true;
           }
           const salvageCount = salvaged ? 2 : 1;
@@ -667,7 +646,7 @@ export function combatReducer(state, action) {
           updates.log = [...state.log, {
             type: 'gear', name: gearDef.name,
             message: salvaged
-              ? `Salvaged a faded tile + ${Math.min(salvageCount, space)} new tile(s)`
+              ? `Consumed a cursed tile + ${Math.min(salvageCount, space)} new tile(s)`
               : `Generated ${Math.min(1, space)} tile(s)`,
           }];
           break;
@@ -781,7 +760,7 @@ export function combatReducer(state, action) {
       let satchelSpace = satchelMax - state.satchel.length;
       const autoStowed = [];
       if (satchelSpace > 0) {
-        const stowable = state.tray.filter(t => !t.faded);
+        const stowable = state.tray;
         for (const tile of stowable) {
           if (satchelSpace <= 0) break;
           autoStowed.push(tile);
@@ -831,7 +810,23 @@ export function combatReducer(state, action) {
       let newState = executeEnemyIntent(state);
       if (newState.phase === 'defeat') return newState;
 
-      // 2. Tick gear cooldowns
+      // 2. Cursed tile damage — each cursed tile in tray deals 1 damage
+      const cursedCount = newState.tray.filter(t => t.cursed).length;
+      if (cursedCount > 0) {
+        const reduction = action.runState?.upgrades?.curseDamageReduction || 0;
+        const curseDamage = Math.max(0, cursedCount - reduction);
+        const newHealth = newState.health - curseDamage;
+        const defeated = newHealth <= 0;
+        newState = {
+          ...newState,
+          health: Math.max(0, newHealth),
+          phase: defeated ? 'defeat' : newState.phase,
+          log: [...newState.log, { type: 'curse_damage', message: `Cursed tiles deal ${curseDamage} damage!` }],
+        };
+        if (newState.phase === 'defeat') return newState;
+      }
+
+      // 3. Tick gear cooldowns
       const newGearStates = {};
       for (const [id, gs] of Object.entries(newState.gearStates)) {
         // Also clear sockets on turn end
@@ -842,10 +837,10 @@ export function combatReducer(state, action) {
         };
       }
 
-      // 3. Roll new enemy intent
-      const nextIntent = rollEnemyIntent(newState.turn + 1, newState.isMiniboss);
+      // 4. Roll new enemy intent based on archetype
+      const nextIntent = rollEnemyIntent(newState.turn + 1, newState.isMiniboss, newState.enemyType);
 
-      // 4. Increment turn
+      // 5. Increment turn
       return {
         ...newState,
         turn: newState.turn + 1,

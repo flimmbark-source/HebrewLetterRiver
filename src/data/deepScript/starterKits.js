@@ -37,7 +37,7 @@ export const starterKits = [
     maxEnergy: 3,
     gearIds: ['meaning-lantern', 'choice-sigil'],
     passives: {
-      reducedPressurePenalty: true, // wrong placements give +1 pressure instead of +2 on miniboss
+      curseFuel: true,             // Lantern consumes cursed tiles for bonus generation
       bonusChoiceCount: 1,          // choice bundles offer 1 extra option
     },
   },

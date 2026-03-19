@@ -10,14 +10,14 @@ import { celebrate } from '../../lib/celebration.js';
 import {
   playSelect, playCorrect, playWrong, playBurn,
   playStow, playGear, playEndTurn, playVictory,
-  playDefeat, playPressureWarning,
+  playDefeat,
 } from './dsSounds.js';
 
 /**
  * CombatScreen — roguelike dungeon-crawler combat encounter.
  *
  * Layout (top to bottom):
- *   1. Top HUD: health, energy, tension, progress
+ *   1. Top HUD: health, energy, enemy archetype, progress
  *   2. Enemy intent banner
  *   3. Dungeon viewport with encounter sigil + inscription slots
  *   4. Tray + Satchel tile row
@@ -45,10 +45,8 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   const [justCorrectSlot, setJustCorrectSlot] = useState(null);
   const [justWrongSlot, setJustWrongSlot] = useState(null);
   const [activatingGear, setActivatingGear] = useState(null);
-  const [pressureCritical, setPressureCritical] = useState(false);
   const [enemyActing, setEnemyActing] = useState(false);
   const prevPhaseRef = useRef(combat?.phase);
-  const prevPressureRef = useRef(combat?.pressure ?? 0);
 
   // Handle combat end with sounds
   useEffect(() => {
@@ -62,18 +60,6 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     }
     prevPhaseRef.current = combat.phase;
   }, [combat?.phase]);
-
-  // Pressure warning sound
-  useEffect(() => {
-    if (!combat) return;
-    if (combat.pressure > prevPressureRef.current && combat.pressure >= combat.maxPressure - 1) {
-      playPressureWarning();
-      setPressureCritical(true);
-      const t = setTimeout(() => setPressureCritical(false), 300);
-      return () => clearTimeout(t);
-    }
-    prevPressureRef.current = combat.pressure;
-  }, [combat?.pressure, combat?.maxPressure]);
 
   // Handle combat end navigation
   useEffect(() => {
@@ -169,7 +155,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     setEnemyActing(true);
     // Brief delay to show enemy acting animation
     setTimeout(() => {
-      dispatch({ type: ACTIONS.END_TURN });
+      dispatch({ type: ACTIONS.END_TURN, runState });
       setEnemyActing(false);
       setTurnStarted(false);
       // Auto-start next turn after a moment
@@ -178,7 +164,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
         setTurnStarted(true);
       }, 400);
     }, 600);
-  }, []);
+  }, [runState]);
 
   const handlePickChoice = useCallback((letter) => {
     playSelect();
@@ -191,7 +177,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   const completedSlots = combat.answerTrack.filter(s => s.correct).length;
   const totalSlots = combat.answerTrack.length;
 
-  // Health pips (use combat-local health for tension damage tracking)
+  // Health pips (use combat-local health for curse damage tracking)
   const healthPips = [];
   for (let i = 0; i < combat.maxHealth; i++) {
     healthPips.push(i < combat.health);
@@ -205,7 +191,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
   // Tile action availability
   const selectedTrayTile = combat.tray.find(t => t.id === combat.selectedTrayTile);
-  const canStow = selectedTrayTile && !selectedTrayTile.faded && combat.satchel.length < runState.satchelSize;
+  const canStow = selectedTrayTile && combat.satchel.length < runState.satchelSize;
   const canRetrieve = !!combat.selectedSatchelTile && combat.tray.length < runState.traySize;
   const hasSelection = combat.selectedTrayTile || combat.selectedSatchelTile;
 
@@ -214,7 +200,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
   return (
     <div className="ds-combat-screen">
-      {/* ═══ TOP HUD — health left, tension center, progress right ═══ */}
+      {/* ═══ TOP HUD — health left, enemy center, progress right ═══ */}
       <div className="ds-top-hud">
         <div className="ds-hud-health">
           {healthPips.map((full, i) => (
@@ -222,16 +208,9 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
           ))}
         </div>
 
-        <div className={`ds-hud-pressure ${pressureCritical ? 'ds-hud-pressure--critical' : ''}`}>
-          <div className="ds-hud-pressure-label">TENSION</div>
-          <div className="ds-hud-pressure-track">
-            {Array.from({ length: combat.maxPressure }).map((_, i) => (
-              <span
-                key={i}
-                className={`ds-hud-pressure-pip ${i < combat.pressure ? 'ds-hud-pressure-pip--filled' : ''} ${i === combat.maxPressure - 1 && combat.pressure >= combat.maxPressure - 1 ? 'ds-hud-pressure-pip--danger' : ''}`}
-              />
-            ))}
-          </div>
+        <div className={`ds-hud-enemy ds-hud-enemy--${combat.enemyType || 'corruptor'}`}>
+          <span className="ds-hud-enemy-icon">{combat.enemyDef?.icon || '💀'}</span>
+          <span className="ds-hud-enemy-name">{combat.enemyDef?.name || 'Enemy'}</span>
         </div>
 
         <div className="ds-hud-progress">
@@ -453,7 +432,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
               <div className="ds-inv-tiles">
                 {combat.tray.map(tile => {
                   let tileCls = 'ds-inv-tile';
-                  if (tile.faded) tileCls += ' ds-inv-tile--faded';
+                  if (tile.cursed) tileCls += ' ds-inv-tile--cursed';
                   if (combat.selectedTrayTile === tile.id) tileCls += ' ds-inv-tile--selected';
                   return (
                     <button

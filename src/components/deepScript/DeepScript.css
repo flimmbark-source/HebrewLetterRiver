@@ -184,59 +184,37 @@
   background: var(--ds-stone-light);
 }
 
-/* Pressure meter */
-.ds-hud-pressure {
+/* Enemy archetype indicator */
+.ds-hud-enemy {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
-.ds-hud-pressure-label {
+.ds-hud-enemy-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.ds-hud-enemy-name {
   font-size: 9px;
   font-weight: 800;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--ds-parchment-dim);
 }
 
-.ds-hud-pressure-track {
-  display: flex;
-  gap: 3px;
+.ds-hud-enemy--corruptor .ds-hud-enemy-name {
+  color: #a78bfa;
 }
 
-.ds-hud-pressure-pip {
-  width: 16px;
-  height: 6px;
-  border-radius: 1px;
-  background: var(--ds-stone-light);
-  border: 1px solid var(--ds-stone-lighter);
-  transition: background 0.3s, box-shadow 0.3s;
+.ds-hud-enemy--spawner .ds-hud-enemy-name {
+  color: #4ade80;
 }
 
-.ds-hud-pressure-pip--filled {
-  background: linear-gradient(180deg, #f59e0b, #ea580c);
-  border-color: #b45309;
-  box-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
-}
-
-.ds-hud-pressure-pip--danger {
-  animation: ds-danger-pulse 0.6s infinite alternate;
-}
-
-@keyframes ds-danger-pulse {
-  from { background: #ea580c; box-shadow: 0 0 4px rgba(234, 88, 12, 0.4); }
-  to { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
-}
-
-.ds-hud-pressure--critical {
-  animation: ds-pressure-shake 0.3s ease-in-out;
-}
-
-@keyframes ds-pressure-shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-3px); }
-  75% { transform: translateX(3px); }
+.ds-hud-enemy--amplifier .ds-hud-enemy-name {
+  color: #f87171;
 }
 
 /* Progress counter */
@@ -697,14 +675,14 @@
   white-space: nowrap;
 }
 
-.ds-intent-banner--pressure {
-  border-color: rgba(245, 158, 11, 0.35);
+.ds-intent-banner--curse_tile {
+  border-color: rgba(167, 139, 250, 0.35);
+}
+.ds-intent-banner--spawn_cursed {
+  border-color: rgba(74, 222, 128, 0.35);
 }
 .ds-intent-banner--burn_tile {
   border-color: rgba(239, 68, 68, 0.35);
-}
-.ds-intent-banner--corrupt_tile {
-  border-color: rgba(155, 109, 219, 0.35);
 }
 .ds-intent-banner--slot_lock {
   border-color: rgba(91, 141, 217, 0.35);
@@ -853,9 +831,15 @@
   background: linear-gradient(180deg, #3a3428 0%, #2e2820 100%);
 }
 
-.ds-inv-tile--faded {
-  opacity: 0.4;
-  border-style: dashed;
+.ds-inv-tile--cursed {
+  border-color: #7c3aed;
+  box-shadow: 0 0 6px rgba(124, 58, 237, 0.5), inset 0 0 4px rgba(124, 58, 237, 0.3);
+  animation: ds-cursed-pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes ds-cursed-pulse {
+  from { box-shadow: 0 0 4px rgba(124, 58, 237, 0.3), inset 0 0 3px rgba(124, 58, 237, 0.2); }
+  to { box-shadow: 0 0 8px rgba(124, 58, 237, 0.6), inset 0 0 5px rgba(124, 58, 237, 0.4); }
 }
 
 .ds-inv-tile--empty {
@@ -3017,7 +3001,7 @@
     padding: 12px 18px 10px;
   }
 
-  .ds-hud-pressure {
+  .ds-hud-enemy {
     margin-left: -25px;
   }
 

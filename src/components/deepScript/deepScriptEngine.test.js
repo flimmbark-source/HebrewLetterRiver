@@ -7,9 +7,9 @@ import {
   generateLetters,
   generateChoiceBundle,
   ACTIONS,
-  MAX_PRESSURE_DEFAULT,
   MAX_ENERGY_DEFAULT,
   INTENT_TYPES,
+  ENEMY_TYPES,
   rollEnemyIntent,
   getIntentDisplay,
 } from './deepScriptEngine.js';
@@ -266,12 +266,13 @@ describe('Combat State Creation', () => {
     expect(combat.word.hebrew).toBe('ספר');
     expect(combat.answerTrack.length).toBe(3);
     expect(combat.tray.length).toBe(3);
-    expect(combat.pressure).toBe(0);
     expect(combat.phase).toBe('active');
     expect(combat.energy).toBe(kit.maxEnergy);
     expect(combat.maxEnergy).toBe(kit.maxEnergy);
     expect(combat.enemyIntent).toBeTruthy();
     expect(combat.warded).toBe(false);
+    expect(combat.enemyType).toBeTruthy();
+    expect(combat.enemyDef).toBeTruthy();
   });
 
   it('combat state has gear states with sockets', () => {
@@ -329,19 +330,17 @@ describe('Combat Reducer', () => {
     expect(state.answerTrack[0].correct).toBe(true);
     expect(state.answerTrack[0].placedTile.letter).toBe('ס');
     expect(state.tray.find(t => t.id === tileId)).toBeUndefined();
-    expect(state.pressure).toBe(0);
   });
 
-  it('PLACE_LETTER with wrong letter increases pressure', () => {
+  it('PLACE_LETTER with wrong letter curses the tile', () => {
     const wrongTileId = combat.tray[3].id;
     let state = combatReducer(combat, { type: ACTIONS.SELECT_TRAY_TILE, tileId: wrongTileId });
     state = combatReducer(state, { type: ACTIONS.PLACE_LETTER, slotIndex: 0 });
 
     expect(state.answerTrack[0].correct).toBe(false);
     expect(state.answerTrack[0].placedTile).toBeNull();
-    expect(state.pressure).toBe(1);
-    const fadedTile = state.tray.find(t => t.id === wrongTileId);
-    expect(fadedTile.faded).toBe(true);
+    const cursedTile = state.tray.find(t => t.id === wrongTileId);
+    expect(cursedTile.cursed).toBe(true);
   });
 
   it('PLACE_LETTER on locked slot does nothing', () => {
@@ -365,27 +364,29 @@ describe('Combat Reducer', () => {
     expect(state.phase).toBe('victory');
   });
 
-  it('max pressure triggers tension burst (damage + reset)', () => {
-    let state = { ...combat, pressure: combat.maxPressure - 1, health: 1 };
-    const wrongTileId = state.tray[3].id;
-    state = combatReducer(state, { type: ACTIONS.SELECT_TRAY_TILE, tileId: wrongTileId });
-    state = combatReducer(state, { type: ACTIONS.PLACE_LETTER, slotIndex: 0 });
-
-    // Tension burst resets pressure to 0 and deals damage
-    expect(state.pressure).toBe(0);
-    // With 1 health and 1 damage, should be defeat
-    expect(state.phase).toBe('defeat');
+  it('END_TURN cursed tiles deal damage', () => {
+    combat.tray = [
+      createLetterTile('א', 'test', true),  // cursed
+      createLetterTile('ב', 'test', true),  // cursed
+      createLetterTile('ג', 'test'),         // clean
+    ];
+    combat.health = 5;
+    combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 }; // burns 1 clean tile
+    // After burn: 2 cursed remain → 2 damage
+    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    expect(state.health).toBe(3);
   });
 
-  it('tension overflow deals damage but does not defeat if health remains', () => {
-    let state = { ...combat, pressure: combat.maxPressure - 1, health: 3 };
-    const wrongTileId = state.tray[3].id;
-    state = combatReducer(state, { type: ACTIONS.SELECT_TRAY_TILE, tileId: wrongTileId });
-    state = combatReducer(state, { type: ACTIONS.PLACE_LETTER, slotIndex: 0 });
-
-    expect(state.pressure).toBe(0);
-    expect(state.health).toBe(2);
-    expect(state.phase).toBe('active');
+  it('END_TURN cursed tile damage can cause defeat', () => {
+    combat.tray = [
+      createLetterTile('א', 'test', true),
+      createLetterTile('ב', 'test', true),
+    ];
+    combat.health = 1;
+    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
+    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    expect(state.phase).toBe('defeat');
+    expect(state.health).toBe(0);
   });
 
   it('STOW_LETTER moves tile from tray to satchel', () => {
@@ -397,20 +398,21 @@ describe('Combat Reducer', () => {
     expect(state.satchel.find(t => t.id === tileId)).toBeTruthy();
   });
 
-  it('STOW_LETTER fails for faded tiles', () => {
-    combat.tray[0] = { ...combat.tray[0], faded: true };
+  it('STOW_LETTER works for cursed tiles', () => {
+    combat.tray[0] = { ...combat.tray[0], cursed: true };
     const tileId = combat.tray[0].id;
     let state = combatReducer(combat, { type: ACTIONS.SELECT_TRAY_TILE, tileId });
     state = combatReducer(state, { type: ACTIONS.STOW_LETTER });
 
-    expect(state.satchel.length).toBe(0);
+    expect(state.satchel.length).toBe(1);
+    expect(state.satchel[0].cursed).toBe(true);
   });
 
   it('END_TURN ticks cooldowns and executes enemy intent', () => {
     const gearId = Object.keys(combat.gearStates)[0];
     combat.gearStates[gearId] = { ...combat.gearStates[gearId], currentCooldown: 2 };
-    // Force a known intent
-    combat.enemyIntent = { type: INTENT_TYPES.IDLE, value: 0 };
+    // Force a known intent that doesn't change tray count
+    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
 
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
 
@@ -422,10 +424,10 @@ describe('Combat Reducer', () => {
   });
 
   it('END_TURN does not generate free tiles', () => {
-    combat.enemyIntent = { type: INTENT_TYPES.IDLE, value: 0 };
+    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
     const trayBefore = combat.tray.length;
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
-    // No free tile generation — tray should not grow
+    // No free tile generation — tray should not grow (no cursed tiles = no damage)
     expect(state.tray.length).toBeLessThanOrEqual(trayBefore);
   });
 
@@ -521,38 +523,42 @@ describe('Enemy Intent', () => {
     expect(combat.enemyIntent.type).toBeTruthy();
   });
 
-  it('rollEnemyIntent returns valid intent', () => {
-    const intent = rollEnemyIntent(0, false);
-    expect(intent.type).toBeTruthy();
-    expect(Object.values(INTENT_TYPES)).toContain(intent.type);
+  it('rollEnemyIntent returns valid intent for each archetype', () => {
+    for (const type of Object.values(ENEMY_TYPES)) {
+      const intent = rollEnemyIntent(0, false, type);
+      expect(intent.type).toBeTruthy();
+      expect(Object.values(INTENT_TYPES)).toContain(intent.type);
+    }
   });
 
   it('getIntentDisplay returns icon and description', () => {
-    const display = getIntentDisplay({ type: INTENT_TYPES.PRESSURE, value: 2 });
+    const display = getIntentDisplay({ type: INTENT_TYPES.CURSE_TILE, value: 1 });
     expect(display.icon).toBeTruthy();
-    expect(display.description).toContain('2');
+    expect(display.description).toBeTruthy();
   });
 
-  it('END_TURN executes pressure intent (overflow resets to 0 with damage)', () => {
-    combat.enemyIntent = { type: INTENT_TYPES.PRESSURE, value: 2 };
-    combat.health = 3;
+  it('END_TURN executes curse_tile intent', () => {
+    combat.enemyIntent = { type: INTENT_TYPES.CURSE_TILE, value: 1 };
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
-    // maxPressure is 2, value is 2, so overflow triggers: pressure resets to 0, health -1
-    expect(state.pressure).toBe(0);
-    expect(state.health).toBe(2);
+    const cursedCount = state.tray.filter(t => t.cursed).length;
+    expect(cursedCount).toBe(1);
+  });
+
+  it('END_TURN executes spawn_cursed intent', () => {
+    combat.enemyIntent = { type: INTENT_TYPES.SPAWN_CURSED, value: 1 };
+    combat.maxTraySize = 10;
+    const trayBefore = combat.tray.length;
+    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    expect(state.tray.length).toBeGreaterThan(trayBefore);
+    const spawned = state.tray.filter(t => t.source === 'spawned');
+    expect(spawned.length).toBeGreaterThan(0);
+    expect(spawned.every(t => t.cursed)).toBe(true);
   });
 
   it('END_TURN executes burn_tile intent', () => {
     combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
     expect(state.tray.length).toBe(2); // one removed
-  });
-
-  it('END_TURN executes corrupt_tile intent', () => {
-    combat.enemyIntent = { type: INTENT_TYPES.CORRUPT_TILE, value: 1 };
-    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
-    const fadedCount = state.tray.filter(t => t.faded).length;
-    expect(fadedCount).toBe(1);
   });
 
   it('END_TURN executes slot_lock intent', () => {
@@ -563,18 +569,18 @@ describe('Enemy Intent', () => {
   });
 
   it('ward blocks enemy intent', () => {
-    combat.enemyIntent = { type: INTENT_TYPES.PRESSURE, value: 2 };
+    combat.enemyIntent = { type: INTENT_TYPES.CURSE_TILE, value: 1 };
     combat.warded = true;
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
-    expect(state.pressure).toBe(0); // warded = blocked
+    const cursedCount = state.tray.filter(t => t.cursed).length;
+    expect(cursedCount).toBe(0); // warded = blocked
     expect(state.warded).toBe(false);
   });
 
   it('END_TURN rolls new intent after execution', () => {
-    combat.enemyIntent = { type: INTENT_TYPES.IDLE, value: 0 };
+    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
     expect(state.enemyIntent).toBeTruthy();
-    // New intent may differ (or may be same type, but it's a new roll)
   });
 });
 
@@ -677,22 +683,60 @@ describe('Letter Generation', () => {
   });
 });
 
-// ─── Pressure System ────────────────────────────────────────
+// ─── Cursed Tile Damage System ───────────────────────────────
 
-describe('Pressure System', () => {
-  it('correct placement reduces pressure', () => {
+describe('Cursed Tile Damage', () => {
+  it('no cursed tiles means no damage on END_TURN', () => {
     const kit = getStarterKit('scribe');
     const sharedGearIds = getSharedGear().map(g => g.id);
     const map = generateRunMap(6);
     const run = createRunState(kit, sharedGearIds, map);
-    let combat = createCombatState('ds-esh', run); // אש — 2 letters
+    let combat = createCombatState('ds-esh', run);
     combat.tray = [createLetterTile('א'), createLetterTile('ש')];
-    combat.pressure = 3;
+    combat.health = 3;
+    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
+
+    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    expect(state.health).toBe(3); // no cursed tiles, no damage
+  });
+
+  it('cursed tiles deal 1 damage each on END_TURN', () => {
+    const kit = getStarterKit('scribe');
+    const sharedGearIds = getSharedGear().map(g => g.id);
+    const map = generateRunMap(6);
+    const run = createRunState(kit, sharedGearIds, map);
+    let combat = createCombatState('ds-esh', run);
+    combat.tray = [
+      createLetterTile('א', 'test', true),
+      createLetterTile('ש', 'test', true),
+      createLetterTile('ב', 'test'),
+    ];
+    combat.health = 5;
+    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
+
+    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    expect(state.health).toBe(3); // 2 cursed tiles → 2 damage
+  });
+
+  it('amplifier passive chain-curses on wrong guess', () => {
+    const kit = getStarterKit('scribe');
+    const sharedGearIds = getSharedGear().map(g => g.id);
+    const map = generateRunMap(6);
+    const run = createRunState(kit, sharedGearIds, map);
+    // Use a word with amplifier enemy type
+    let combat = createCombatState('ds-ruach', run); // wind — amplifier
+    combat.tray = [
+      createLetterTile('ב', 'test'), // wrong letter
+      createLetterTile('ג', 'test'), // potential chain target
+      createLetterTile('ד', 'test'), // potential chain target
+    ];
 
     let state = combatReducer(combat, { type: ACTIONS.SELECT_TRAY_TILE, tileId: combat.tray[0].id });
     state = combatReducer(state, { type: ACTIONS.PLACE_LETTER, slotIndex: 0 });
 
-    expect(state.pressure).toBe(2);
+    const cursedCount = state.tray.filter(t => t.cursed).length;
+    // Wrong guess curses the placed tile (1) + amplifier chain-curse (1) = 2
+    expect(cursedCount).toBe(2);
   });
 });
 
@@ -726,12 +770,13 @@ describe('Ward Stone', () => {
     expect(state.energy).toBe(combat.energy - 1);
   });
 
-  it('warded state blocks pressure intent on END_TURN', () => {
+  it('warded state blocks curse intent on END_TURN', () => {
     combat.warded = true;
-    combat.enemyIntent = { type: INTENT_TYPES.PRESSURE, value: 2 };
+    combat.enemyIntent = { type: INTENT_TYPES.CURSE_TILE, value: 1 };
 
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
-    expect(state.pressure).toBe(0); // blocked
+    const cursedCount = state.tray.filter(t => t.cursed).length;
+    expect(cursedCount).toBe(0); // blocked
     expect(state.warded).toBe(false); // consumed
   });
 });
@@ -752,7 +797,7 @@ describe('Satchel Auto-Fill', () => {
     combat.maxSatchelSize = runState.satchelSize;
   });
 
-  it('START_TURN auto-stows non-faded tray tiles to satchel', () => {
+  it('START_TURN auto-stows tray tiles to satchel', () => {
     combat.tray = [
       createLetterTile('א', 'test'),
       createLetterTile('ב', 'test'),
@@ -777,15 +822,14 @@ describe('Satchel Auto-Fill', () => {
     expect(state.tray.length).toBe(0);
   });
 
-  it('START_TURN does not auto-stow faded tiles', () => {
+  it('START_TURN auto-stows cursed tiles too', () => {
     combat.tray = [
-      createLetterTile('א', 'test', true), // faded
+      createLetterTile('א', 'test', true), // cursed
       createLetterTile('ב', 'test'),
     ];
     combat.satchel = [];
     const state = combatReducer(combat, { type: ACTIONS.START_TURN });
-    expect(state.satchel.length).toBe(1);
-    expect(state.satchel[0].letter).toBe('ב');
+    expect(state.satchel.length).toBe(2); // both stowed, including cursed
   });
 
   it('START_TURN logs auto-stow message', () => {
