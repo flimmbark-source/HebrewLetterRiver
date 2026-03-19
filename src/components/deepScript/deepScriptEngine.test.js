@@ -383,7 +383,7 @@ describe('Combat Reducer', () => {
       createLetterTile('ב', 'test', true),
     ];
     combat.health = 1;
-    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
+    combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
     expect(state.phase).toBe('defeat');
     expect(state.health).toBe(0);
@@ -412,7 +412,7 @@ describe('Combat Reducer', () => {
     const gearId = Object.keys(combat.gearStates)[0];
     combat.gearStates[gearId] = { ...combat.gearStates[gearId], currentCooldown: 2 };
     // Force a known intent that doesn't change tray count
-    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
+    combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
 
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
 
@@ -424,7 +424,7 @@ describe('Combat Reducer', () => {
   });
 
   it('END_TURN does not generate free tiles', () => {
-    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
+    combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
     const trayBefore = combat.tray.length;
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
     // No free tile generation — tray should not grow (no cursed tiles = no damage)
@@ -495,6 +495,17 @@ describe('Energy System', () => {
     expect(state.energy).toBe(0);
     expect(state.tray.length).toBe(combat.tray.length);
   });
+
+  it('USE_GEAR uses confused mana cost override when present', () => {
+    combat.energy = 3;
+    combat.confusedGearCosts = { 'scribe-knife': 1 };
+    const state = combatReducer(combat, {
+      type: ACTIONS.USE_GEAR,
+      gearId: 'scribe-knife',
+      runState,
+    });
+    expect(state.energy).toBe(2);
+  });
 });
 
 // ─── Enemy Intent System ────────────────────────────────────
@@ -556,10 +567,10 @@ describe('Enemy Intent', () => {
     expect(spawned.every(t => t.cursed)).toBe(true);
   });
 
-  it('END_TURN executes burn_tile intent', () => {
+  it('END_TURN executes burn_tile intent as buff', () => {
     combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
-    expect(state.tray.length).toBe(2); // one removed
+    expect(state.pendingIntentBuff).toBe(1);
   });
 
   it('intent value scales: curse_tile ×2 curses two tiles', () => {
@@ -569,11 +580,29 @@ describe('Enemy Intent', () => {
     expect(cursedCount).toBe(2);
   });
 
-  it('END_TURN executes slot_lock intent', () => {
+  it('END_TURN executes slot_lock intent as direct attack', () => {
+    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
+    combat.health = 5;
+    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    expect(state.health).toBe(4);
+  });
+
+  it('burn buff increases next enemy action amount', () => {
+    combat.health = 6;
+    combat.pendingIntentBuff = 2;
     combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
-    const lockedCount = state.answerTrack.filter(s => s.locked).length;
-    expect(lockedCount).toBe(1);
+    expect(state.health).toBe(3);
+    expect(state.pendingIntentBuff).toBe(0);
+  });
+
+  it('END_TURN executes satchel_raid intent as confuse', () => {
+    combat.enemyIntent = { type: INTENT_TYPES.SATCHEL_RAID, value: 2 };
+    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    const confusedCosts = Object.values(state.confusedGearCosts || {});
+    expect(confusedCosts.length).toBeGreaterThan(0);
+    expect(confusedCosts.length).toBeLessThanOrEqual(2);
+    expect(confusedCosts.every(cost => cost >= 1 && cost <= 3)).toBe(true);
   });
 
   it('ward blocks enemy intent', () => {
@@ -586,7 +615,7 @@ describe('Enemy Intent', () => {
   });
 
   it('END_TURN rolls new intent after execution', () => {
-    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
+    combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
     expect(state.enemyIntent).toBeTruthy();
   });
@@ -702,7 +731,7 @@ describe('Cursed Tile Damage', () => {
     let combat = createCombatState('ds-esh', run);
     combat.tray = [createLetterTile('א'), createLetterTile('ש')];
     combat.health = 3;
-    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
+    combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
 
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
     expect(state.health).toBe(3); // no cursed tiles, no damage
@@ -720,7 +749,7 @@ describe('Cursed Tile Damage', () => {
       createLetterTile('ב', 'test'),
     ];
     combat.health = 5;
-    combat.enemyIntent = { type: INTENT_TYPES.SLOT_LOCK, value: 1 };
+    combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
 
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
     expect(state.health).toBe(3); // 2 cursed tiles → 2 damage

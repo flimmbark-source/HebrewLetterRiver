@@ -34,15 +34,15 @@ export const INTENT_TYPES = {
 const INTENT_DEFS = {
   [INTENT_TYPES.CURSE_TILE]:   { icon: '💀', label: 'Curse' },
   [INTENT_TYPES.SPAWN_CURSED]: { icon: '🕷️', label: 'Spawn' },
-  [INTENT_TYPES.BURN_TILE]:    { icon: '🔥', label: 'Burn' },
-  [INTENT_TYPES.SLOT_LOCK]:    { icon: '🔒', label: 'Lock' },
-  [INTENT_TYPES.SATCHEL_RAID]: { icon: '💨', label: 'Raid' },
+  [INTENT_TYPES.BURN_TILE]:    { icon: '🔥', label: 'Buff', description: 'Increases next action amount' },
+  [INTENT_TYPES.SLOT_LOCK]:    { icon: '⚔️', label: 'Attack', description: 'Deals damage' },
+  [INTENT_TYPES.SATCHEL_RAID]: { icon: '🌀', label: 'Confuse', description: 'Randomized mana cost (1-3) for abilities for the turn' },
 };
 
 export function getIntentDisplay(intent) {
-  if (!intent) return { icon: '?', label: '?', value: 0 };
-  const def = INTENT_DEFS[intent.type] || { icon: '?', label: '?' };
-  return { icon: def.icon, label: def.label, value: intent.value || 1 };
+  if (!intent) return { icon: '?', label: '?', value: 0, description: '' };
+  const def = INTENT_DEFS[intent.type] || { icon: '?', label: '?', description: '' };
+  return { icon: def.icon, label: def.label, value: intent.value || 1, description: def.description || '' };
 }
 
 /**
@@ -228,6 +228,8 @@ export function createCombatState(wordId, runState) {
     phase: 'active',         // 'active' | 'victory' | 'defeat'
     log: [],
     isMiniboss: word.isMiniboss || false,
+    pendingIntentBuff: 0,
+    confusedGearCosts: {},
   };
 }
 
@@ -254,12 +256,15 @@ export const ACTIONS = {
 function executeEnemyIntent(state) {
   const intent = state.enemyIntent;
   if (!intent) return state;
+  const pendingIntentBuff = state.pendingIntentBuff || 0;
+  const effectiveValue = Math.max(1, (intent.value || 1) + pendingIntentBuff);
 
   // If warded, negate/halve the intent
   if (state.warded) {
     return {
       ...state,
       warded: false,
+      pendingIntentBuff: 0,
       log: [...state.log, { type: 'ward', message: 'Ward Stone absorbed the enemy attack!' }],
     };
   }
@@ -268,7 +273,7 @@ function executeEnemyIntent(state) {
     case INTENT_TYPES.CURSE_TILE: {
       let tray = [...state.tray];
       let cursed = 0;
-      for (let i = 0; i < intent.value; i++) {
+      for (let i = 0; i < effectiveValue; i++) {
         const clean = tray.filter(t => !t.cursed);
         if (clean.length === 0) break;
         const target = clean[Math.floor(Math.random() * clean.length)];
@@ -279,6 +284,7 @@ function executeEnemyIntent(state) {
       return {
         ...state,
         tray,
+        pendingIntentBuff: 0,
         log: [...state.log, { type: 'enemy', message: `Cursed ${cursed} tile(s)!` }],
       };
     }
@@ -286,7 +292,7 @@ function executeEnemyIntent(state) {
     case INTENT_TYPES.SPAWN_CURSED: {
       const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
       const spawned = [];
-      for (let i = 0; i < intent.value; i++) {
+      for (let i = 0; i < effectiveValue; i++) {
         if (state.tray.length + spawned.length >= trayMax) break;
         const junkLetter = allDeepScriptLetters[Math.floor(Math.random() * allDeepScriptLetters.length)];
         spawned.push(createLetterTile(junkLetter, 'spawned', true));
@@ -295,60 +301,46 @@ function executeEnemyIntent(state) {
       return {
         ...state,
         tray: [...state.tray, ...spawned],
+        pendingIntentBuff: 0,
         log: [...state.log, { type: 'enemy', message: `Spawned ${spawned.length} cursed tile(s)!` }],
       };
     }
 
     case INTENT_TYPES.BURN_TILE: {
-      let tray = [...state.tray];
-      let burned = 0;
-      for (let i = 0; i < intent.value; i++) {
-        const clean = tray.filter(t => !t.cursed);
-        if (clean.length === 0) break;
-        const target = clean[Math.floor(Math.random() * clean.length)];
-        tray = tray.filter(t => t.id !== target.id);
-        burned++;
-      }
-      if (burned === 0) return state;
       return {
         ...state,
-        tray,
-        log: [...state.log, { type: 'enemy', message: `Burned ${burned} tile(s)!` }],
+        pendingIntentBuff: effectiveValue,
+        log: [...state.log, { type: 'enemy', message: `Buffed next action by +${effectiveValue}!` }],
       };
     }
 
     case INTENT_TYPES.SLOT_LOCK: {
-      let track = [...state.answerTrack];
-      let locked = 0;
-      for (let i = 0; i < intent.value; i++) {
-        const lockable = track.filter(s => !s.correct && !s.locked);
-        if (lockable.length === 0) break;
-        const target = lockable[Math.floor(Math.random() * lockable.length)];
-        track = track.map(s => s.index === target.index ? { ...s, locked: true } : s);
-        locked++;
-      }
-      if (locked === 0) return state;
+      const newHealth = state.health - effectiveValue;
+      const defeated = newHealth <= 0;
       return {
         ...state,
-        answerTrack: track,
-        log: [...state.log, { type: 'enemy', message: `Locked ${locked} slot(s)!` }],
+        health: Math.max(0, newHealth),
+        phase: defeated ? 'defeat' : state.phase,
+        pendingIntentBuff: 0,
+        log: [...state.log, { type: 'enemy', message: `Attacked for ${effectiveValue} damage!` }],
       };
     }
 
     case INTENT_TYPES.SATCHEL_RAID: {
-      let satchel = [...state.satchel];
-      let raided = 0;
-      for (let i = 0; i < intent.value; i++) {
-        if (satchel.length === 0) break;
-        const target = satchel[Math.floor(Math.random() * satchel.length)];
-        satchel = satchel.filter(t => t.id !== target.id);
-        raided++;
+      const gearIds = Object.keys(state.gearStates);
+      const targetedCount = Math.min(effectiveValue, gearIds.length);
+      if (targetedCount === 0) return { ...state, pendingIntentBuff: 0 };
+      const shuffled = [...gearIds].sort(() => Math.random() - 0.5);
+      const targeted = shuffled.slice(0, targetedCount);
+      const confusedGearCosts = { ...state.confusedGearCosts };
+      for (const gearId of targeted) {
+        confusedGearCosts[gearId] = Math.floor(Math.random() * 3) + 1;
       }
-      if (raided === 0) return state;
       return {
         ...state,
-        satchel,
-        log: [...state.log, { type: 'enemy', message: `Raided ${raided} satchel tile(s)!` }],
+        confusedGearCosts,
+        pendingIntentBuff: 0,
+        log: [...state.log, { type: 'enemy', message: `Confused ${targeted.length} abilit${targeted.length === 1 ? 'y' : 'ies'} this turn!` }],
       };
     }
 
@@ -566,9 +558,11 @@ export function combatReducer(state, action) {
       if (gearState.usesRemaining === 0) return state;
 
       // Compute effective energy cost (escalating gear adds turnUses)
-      const effectiveEnergyCost = gearDef.escalatingCost
+      const baseEnergyCost = gearDef.escalatingCost
         ? gearDef.energyCost + (gearState.turnUses || 0)
         : gearDef.energyCost;
+      const confusedCost = state.confusedGearCosts?.[gearId];
+      const effectiveEnergyCost = confusedCost ?? baseEnergyCost;
 
       // Check energy cost
       if (state.energy < effectiveEnergyCost) return state;
@@ -833,8 +827,13 @@ export function combatReducer(state, action) {
     }
 
     case ACTIONS.END_TURN: {
+      const preTurnState = {
+        ...state,
+        confusedGearCosts: {},
+      };
+
       // 1. Enemy executes telegraphed intent
-      let newState = executeEnemyIntent(state);
+      let newState = executeEnemyIntent(preTurnState);
       if (newState.phase === 'defeat') return newState;
 
       // 2. Cursed tile damage — each cursed tile in tray deals 1 damage

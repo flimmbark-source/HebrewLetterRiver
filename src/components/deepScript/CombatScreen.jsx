@@ -221,7 +221,9 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       {/* ═══ ENEMY INTENT BANNER ═══ */}
       <div
         className={`ds-intent-banner ${enemyActing ? 'ds-intent-banner--acting' : ''} ${combat.warded ? 'ds-intent-banner--warded' : ''} ds-intent-banner--${combat.enemyIntent?.type || 'idle'}`}
-        title={intentDisplay.label}
+        title={intentDisplay.description
+          ? `${intentDisplay.label}: ${intentDisplay.description} (Value: ${intentDisplay.value})`
+          : intentDisplay.label}
       >
         {combat.warded && <span className="ds-intent-ward">🛡️</span>}
         <span className="ds-intent-value">×{intentDisplay.value}</span>
