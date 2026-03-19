@@ -219,10 +219,13 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       </div>
 
       {/* ═══ ENEMY INTENT BANNER ═══ */}
-      <div className={`ds-intent-banner ${enemyActing ? 'ds-intent-banner--acting' : ''} ${combat.warded ? 'ds-intent-banner--warded' : ''} ds-intent-banner--${combat.enemyIntent?.type || 'idle'}`}>
-        <span className="ds-intent-icon">{intentDisplay.icon}</span>
-        <span className="ds-intent-text">{intentDisplay.description}</span>
+      <div
+        className={`ds-intent-banner ${enemyActing ? 'ds-intent-banner--acting' : ''} ${combat.warded ? 'ds-intent-banner--warded' : ''} ds-intent-banner--${combat.enemyIntent?.type || 'idle'}`}
+        title={intentDisplay.label}
+      >
         {combat.warded && <span className="ds-intent-ward">🛡️</span>}
+        <span className="ds-intent-value">×{intentDisplay.value}</span>
+        <span className="ds-intent-icon">{intentDisplay.icon}</span>
       </div>
 
       {/* ═══ DUNGEON VIEWPORT ═══ */}

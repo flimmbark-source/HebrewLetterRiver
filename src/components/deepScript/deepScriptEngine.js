@@ -32,18 +32,17 @@ export const INTENT_TYPES = {
 };
 
 const INTENT_DEFS = {
-  [INTENT_TYPES.CURSE_TILE]:   { icon: '💀', label: 'Curse',         description: 'Curse a random clean tray tile.' },
-  [INTENT_TYPES.SPAWN_CURSED]: { icon: '🕷️', label: 'Spawn',        description: 'Add junk cursed tiles to tray.' },
-  [INTENT_TYPES.BURN_TILE]:    { icon: '🔥', label: 'Burn Tile',     description: 'Destroy a random tray tile.' },
-  [INTENT_TYPES.SLOT_LOCK]:    { icon: '🔒', label: 'Slot Lock',     description: 'Lock a random slot for 1 turn.' },
-  [INTENT_TYPES.SATCHEL_RAID]: { icon: '💨', label: 'Satchel Raid',  description: 'Discard a random satchel tile.' },
+  [INTENT_TYPES.CURSE_TILE]:   { icon: '💀', label: 'Curse' },
+  [INTENT_TYPES.SPAWN_CURSED]: { icon: '🕷️', label: 'Spawn' },
+  [INTENT_TYPES.BURN_TILE]:    { icon: '🔥', label: 'Burn' },
+  [INTENT_TYPES.SLOT_LOCK]:    { icon: '🔒', label: 'Lock' },
+  [INTENT_TYPES.SATCHEL_RAID]: { icon: '💨', label: 'Raid' },
 };
 
 export function getIntentDisplay(intent) {
-  if (!intent) return { icon: '?', label: '?', description: '?' };
-  const def = INTENT_DEFS[intent.type] || { icon: '?', label: '?', description: '?' };
-  const desc = typeof def.description === 'function' ? def.description(intent.value) : def.description;
-  return { icon: def.icon, label: def.label, description: desc };
+  if (!intent) return { icon: '?', label: '?', value: 0 };
+  const def = INTENT_DEFS[intent.type] || { icon: '?', label: '?' };
+  return { icon: def.icon, label: def.label, value: intent.value || 1 };
 }
 
 /**
@@ -57,10 +56,14 @@ export function rollEnemyIntent(turn, isMiniboss, enemyType = ENEMY_TYPES.CORRUP
     if (config.minTurn && turn < config.minTurn) continue;
     const type = INTENT_TYPES[intentKey];
     if (!type) continue;
-    let weight = config.weight;
-    // Miniboss: boost all weights by 50%
-    if (isMiniboss) weight = Math.ceil(weight * 1.5);
-    pool.push({ type, value: 1, weight });
+    const weight = config.weight;
+
+    // Base value from archetype config, scaled up for miniboss or late turns
+    let value = config.value || 1;
+    if (isMiniboss) value += 1;
+    if (turn >= 4) value += 1;
+
+    pool.push({ type, value, weight });
   }
 
   if (pool.length === 0) {
@@ -263,21 +266,27 @@ function executeEnemyIntent(state) {
 
   switch (intent.type) {
     case INTENT_TYPES.CURSE_TILE: {
-      const clean = state.tray.filter(t => !t.cursed);
-      if (clean.length === 0) return state;
-      const target = clean[Math.floor(Math.random() * clean.length)];
+      let tray = [...state.tray];
+      let cursed = 0;
+      for (let i = 0; i < intent.value; i++) {
+        const clean = tray.filter(t => !t.cursed);
+        if (clean.length === 0) break;
+        const target = clean[Math.floor(Math.random() * clean.length)];
+        tray = tray.map(t => t.id === target.id ? { ...t, cursed: true } : t);
+        cursed++;
+      }
+      if (cursed === 0) return state;
       return {
         ...state,
-        tray: state.tray.map(t => t.id === target.id ? { ...t, cursed: true } : t),
-        log: [...state.log, { type: 'enemy', message: `Enemy cursed your ${target.letter} tile!` }],
+        tray,
+        log: [...state.log, { type: 'enemy', message: `Cursed ${cursed} tile(s)!` }],
       };
     }
 
     case INTENT_TYPES.SPAWN_CURSED: {
       const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-      const spawnCount = state.isMiniboss ? 2 : 1;
       const spawned = [];
-      for (let i = 0; i < spawnCount; i++) {
+      for (let i = 0; i < intent.value; i++) {
         if (state.tray.length + spawned.length >= trayMax) break;
         const junkLetter = allDeepScriptLetters[Math.floor(Math.random() * allDeepScriptLetters.length)];
         spawned.push(createLetterTile(junkLetter, 'spawned', true));
@@ -286,42 +295,60 @@ function executeEnemyIntent(state) {
       return {
         ...state,
         tray: [...state.tray, ...spawned],
-        log: [...state.log, { type: 'enemy', message: `Enemy spawned ${spawned.length} cursed junk tile(s)!` }],
+        log: [...state.log, { type: 'enemy', message: `Spawned ${spawned.length} cursed tile(s)!` }],
       };
     }
 
     case INTENT_TYPES.BURN_TILE: {
-      const clean = state.tray.filter(t => !t.cursed);
-      if (clean.length === 0) return state;
-      const target = clean[Math.floor(Math.random() * clean.length)];
+      let tray = [...state.tray];
+      let burned = 0;
+      for (let i = 0; i < intent.value; i++) {
+        const clean = tray.filter(t => !t.cursed);
+        if (clean.length === 0) break;
+        const target = clean[Math.floor(Math.random() * clean.length)];
+        tray = tray.filter(t => t.id !== target.id);
+        burned++;
+      }
+      if (burned === 0) return state;
       return {
         ...state,
-        tray: state.tray.filter(t => t.id !== target.id),
-        log: [...state.log, { type: 'enemy', message: `Enemy burned your ${target.letter} tile!` }],
+        tray,
+        log: [...state.log, { type: 'enemy', message: `Burned ${burned} tile(s)!` }],
       };
     }
 
     case INTENT_TYPES.SLOT_LOCK: {
-      const lockable = state.answerTrack.filter(s => !s.correct && !s.locked);
-      if (lockable.length === 0) return state;
-      const target = lockable[Math.floor(Math.random() * lockable.length)];
-      const newTrack = state.answerTrack.map(s =>
-        s.index === target.index ? { ...s, locked: true } : s
-      );
+      let track = [...state.answerTrack];
+      let locked = 0;
+      for (let i = 0; i < intent.value; i++) {
+        const lockable = track.filter(s => !s.correct && !s.locked);
+        if (lockable.length === 0) break;
+        const target = lockable[Math.floor(Math.random() * lockable.length)];
+        track = track.map(s => s.index === target.index ? { ...s, locked: true } : s);
+        locked++;
+      }
+      if (locked === 0) return state;
       return {
         ...state,
-        answerTrack: newTrack,
-        log: [...state.log, { type: 'enemy', message: 'Enemy locked a slot!' }],
+        answerTrack: track,
+        log: [...state.log, { type: 'enemy', message: `Locked ${locked} slot(s)!` }],
       };
     }
 
     case INTENT_TYPES.SATCHEL_RAID: {
-      if (state.satchel.length === 0) return state;
-      const target = state.satchel[Math.floor(Math.random() * state.satchel.length)];
+      let satchel = [...state.satchel];
+      let raided = 0;
+      for (let i = 0; i < intent.value; i++) {
+        if (satchel.length === 0) break;
+        const target = satchel[Math.floor(Math.random() * satchel.length)];
+        satchel = satchel.filter(t => t.id !== target.id);
+        raided++;
+      }
+      if (raided === 0) return state;
       return {
         ...state,
-        satchel: state.satchel.filter(t => t.id !== target.id),
-        log: [...state.log, { type: 'enemy', message: `Enemy raided your satchel! Lost ${target.letter}.` }],
+        satchel,
+        log: [...state.log, { type: 'enemy', message: `Raided ${raided} satchel tile(s)!` }],
       };
     }
 

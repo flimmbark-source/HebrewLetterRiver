@@ -665,33 +665,35 @@
   z-index: 11;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 16px;
-  border-radius: 20px;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 16px;
   background: rgba(30, 34, 40, 0.92);
-  border: 1px solid var(--ds-stone-lighter);
+  border: 2px solid var(--ds-stone-lighter);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   transition: border-color 0.3s, box-shadow 0.3s;
   white-space: nowrap;
 }
 
 .ds-intent-banner--curse_tile {
-  border-color: rgba(167, 139, 250, 0.35);
+  border-color: rgba(167, 139, 250, 0.6);
+  box-shadow: 0 0 8px rgba(167, 139, 250, 0.2);
 }
 .ds-intent-banner--spawn_cursed {
-  border-color: rgba(74, 222, 128, 0.35);
+  border-color: rgba(74, 222, 128, 0.6);
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.2);
 }
 .ds-intent-banner--burn_tile {
-  border-color: rgba(239, 68, 68, 0.35);
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
 }
 .ds-intent-banner--slot_lock {
-  border-color: rgba(91, 141, 217, 0.35);
+  border-color: rgba(91, 141, 217, 0.6);
+  box-shadow: 0 0 8px rgba(91, 141, 217, 0.2);
 }
 .ds-intent-banner--satchel_raid {
-  border-color: rgba(168, 144, 112, 0.35);
-}
-.ds-intent-banner--idle {
-  border-color: rgba(54, 60, 72, 0.35);
+  border-color: rgba(168, 144, 112, 0.6);
+  box-shadow: 0 0 8px rgba(168, 144, 112, 0.2);
 }
 
 .ds-intent-banner--acting {
@@ -699,31 +701,34 @@
 }
 
 @keyframes ds-intent-acting {
-  0% { transform: translateX(-50%) scale(1); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-  30% { transform: translateX(-50%) scale(1.08); box-shadow: 0 0 20px var(--ds-ember-glow); border-color: var(--ds-ember); }
+  0% { transform: translateX(-50%) scale(1); }
+  30% { transform: translateX(-50%) scale(1.15); box-shadow: 0 0 20px var(--ds-ember-glow); border-color: var(--ds-ember); }
   100% { transform: translateX(-50%) scale(1); }
 }
 
 .ds-intent-banner--warded {
-  border-color: rgba(91, 141, 217, 0.5);
+  border-color: rgba(91, 141, 217, 0.7);
   box-shadow: 0 0 12px var(--ds-rune-blue-glow);
 }
 
 .ds-intent-icon {
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1;
 }
 
-.ds-intent-text {
-  font-size: 12px;
-  font-weight: 700;
+.ds-intent-value {
+  font-size: 16px;
+  font-weight: 800;
   color: var(--ds-parchment);
-  letter-spacing: 0.3px;
+  font-family: var(--ds-font-ui, sans-serif);
+  min-width: 20px;
+  text-align: right;
 }
 
 .ds-intent-ward {
   font-size: 16px;
   line-height: 1;
+  margin-right: 2px;
   animation: ds-ward-pulse 1.5s ease-in-out infinite alternate;
 }
 
@@ -3201,28 +3206,18 @@
     height: 16px;
   }
 
-  /* Intent banner: allow wrapping */
+  /* Intent banner */
   .ds-intent-banner {
-    white-space: nowrap;
-    max-width: 88%;
-    text-align: center;
-    flex-wrap: nowrap;
-    justify-content: center;
-    gap: 8px;
-    padding: 7px 14px;
-    transform: translateX(-50%);
+    padding: 5px 10px;
+    gap: 4px;
   }
 
   .ds-intent-icon {
     font-size: 22px;
   }
 
-  .ds-intent-text {
-    font-size: 13px;
-    font-weight: 800;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .ds-intent-value {
+    font-size: 18px;
   }
 
   .ds-intent-ward {

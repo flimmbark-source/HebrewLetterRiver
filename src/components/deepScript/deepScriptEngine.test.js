@@ -531,10 +531,11 @@ describe('Enemy Intent', () => {
     }
   });
 
-  it('getIntentDisplay returns icon and description', () => {
-    const display = getIntentDisplay({ type: INTENT_TYPES.CURSE_TILE, value: 1 });
+  it('getIntentDisplay returns icon, label, and value', () => {
+    const display = getIntentDisplay({ type: INTENT_TYPES.CURSE_TILE, value: 2 });
     expect(display.icon).toBeTruthy();
-    expect(display.description).toBeTruthy();
+    expect(display.label).toBeTruthy();
+    expect(display.value).toBe(2);
   });
 
   it('END_TURN executes curse_tile intent', () => {
@@ -559,6 +560,13 @@ describe('Enemy Intent', () => {
     combat.enemyIntent = { type: INTENT_TYPES.BURN_TILE, value: 1 };
     const state = combatReducer(combat, { type: ACTIONS.END_TURN });
     expect(state.tray.length).toBe(2); // one removed
+  });
+
+  it('intent value scales: curse_tile ×2 curses two tiles', () => {
+    combat.enemyIntent = { type: INTENT_TYPES.CURSE_TILE, value: 2 };
+    const state = combatReducer(combat, { type: ACTIONS.END_TURN });
+    const cursedCount = state.tray.filter(t => t.cursed).length;
+    expect(cursedCount).toBe(2);
   });
 
   it('END_TURN executes slot_lock intent', () => {

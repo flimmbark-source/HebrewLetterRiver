@@ -26,10 +26,10 @@ export const enemyDefinitions = {
     // Signature action happens every turn via intent weights
     passive: null,
     intentWeights: {
-      CURSE_TILE:   { weight: 5 },
-      BURN_TILE:    { weight: 2 },
-      SLOT_LOCK:    { weight: 1, minTurn: 2 },
-      SATCHEL_RAID: { weight: 1, minTurn: 3 },
+      CURSE_TILE:   { weight: 5, value: 1 },
+      BURN_TILE:    { weight: 2, value: 1 },
+      SLOT_LOCK:    { weight: 1, value: 1, minTurn: 2 },
+      SATCHEL_RAID: { weight: 1, value: 1, minTurn: 3 },
     },
   },
 
@@ -40,10 +40,10 @@ export const enemyDefinitions = {
     description: 'Floods your tray with junk cursed tiles.',
     passive: null,
     intentWeights: {
-      SPAWN_CURSED: { weight: 5 },
-      SATCHEL_RAID: { weight: 2 },
-      BURN_TILE:    { weight: 2 },
-      SLOT_LOCK:    { weight: 1, minTurn: 3 },
+      SPAWN_CURSED: { weight: 5, value: 2 },
+      SATCHEL_RAID: { weight: 2, value: 1 },
+      BURN_TILE:    { weight: 2, value: 1 },
+      SLOT_LOCK:    { weight: 1, value: 1, minTurn: 3 },
     },
   },
 
@@ -55,10 +55,10 @@ export const enemyDefinitions = {
     // Passive: on wrong guess, also curse 1 additional random clean tile
     passive: 'chainCurse',
     intentWeights: {
-      BURN_TILE:    { weight: 3 },
-      SLOT_LOCK:    { weight: 3 },
-      CURSE_TILE:   { weight: 2 },
-      SATCHEL_RAID: { weight: 1, minTurn: 2 },
+      BURN_TILE:    { weight: 3, value: 1 },
+      SLOT_LOCK:    { weight: 3, value: 1 },
+      CURSE_TILE:   { weight: 2, value: 1 },
+      SATCHEL_RAID: { weight: 1, value: 1, minTurn: 2 },
     },
   },
 };
