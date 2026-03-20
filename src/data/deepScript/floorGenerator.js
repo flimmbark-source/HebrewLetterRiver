@@ -233,6 +233,100 @@ function attachSideChambers(chambers, anchorChambers, sideChambers) {
   }
 }
 
+function getChamberDegree(chamber) {
+  return Object.keys(chamber.exits).length;
+}
+
+function hasPathBetween(chambers, startId, targetId) {
+  if (startId === targetId) return true;
+  const queue = [startId];
+  const visited = new Set([startId]);
+
+  while (queue.length > 0) {
+    const chamberId = queue.shift();
+    const chamber = chambers.get(chamberId);
+    if (!chamber) continue;
+
+    for (const nextId of Object.values(chamber.exits)) {
+      if (nextId === targetId) return true;
+      if (!visited.has(nextId)) {
+        visited.add(nextId);
+        queue.push(nextId);
+      }
+    }
+  }
+
+  return false;
+}
+
+function shortestPathLength(chambers, startId, targetId) {
+  if (startId === targetId) return 0;
+  const queue = [{ id: startId, dist: 0 }];
+  const visited = new Set([startId]);
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    const chamber = chambers.get(current.id);
+    if (!chamber) continue;
+
+    for (const nextId of Object.values(chamber.exits)) {
+      if (nextId === targetId) return current.dist + 1;
+      if (!visited.has(nextId)) {
+        visited.add(nextId);
+        queue.push({ id: nextId, dist: current.dist + 1 });
+      }
+    }
+  }
+
+  return -1;
+}
+
+function reinforceNoDeadEnds(chambers, protectedIds = new Set(), routeConstraint = null) {
+  // Repeatedly patch cul-de-sacs by adding an extra connection where possible.
+  for (let pass = 0; pass < 5; pass++) {
+    let changed = false;
+
+    const leaves = Array.from(chambers.values()).filter(chamber => {
+      if (protectedIds.has(chamber.id)) return false;
+      return getChamberDegree(chamber) <= 1;
+    });
+
+    if (leaves.length === 0) break;
+
+    for (const leaf of shuffle(leaves)) {
+      if (getChamberDegree(leaf) > 1) continue;
+
+      const existingNeighbors = new Set(Object.values(leaf.exits));
+      const candidates = shuffle(Array.from(chambers.values()).filter(candidate => {
+        if (candidate.id === leaf.id) return false;
+        if (existingNeighbors.has(candidate.id)) return false;
+        if (getOpenDirections(candidate).length === 0) return false;
+        return true;
+      }));
+
+      for (const candidate of candidates) {
+        const connectedDir = connectWithRandomDirection(chambers, leaf.id, candidate.id);
+        if (!connectedDir) continue;
+
+        const routeStillValid = !routeConstraint
+          || shortestPathLength(chambers, routeConstraint.startId, routeConstraint.targetId) >= routeConstraint.minLength;
+
+        if (routeStillValid) {
+          changed = true;
+          break;
+        }
+
+        // Undo connection if it accidentally shortcuts the guaranteed route.
+        const oppositeDir = OPPOSITE[connectedDir];
+        delete leaf.exits[connectedDir];
+        delete candidate.exits[oppositeDir];
+      }
+    }
+
+    if (!changed) break;
+  }
+}
+
 // ─── Floor layout generation ────────────────────────────────
 
 /**
@@ -337,6 +431,23 @@ export function generateDungeonFloor({
 
   // Attach any unused chambers as branches/loops off the main path.
   attachSideChambers(chambers, mainPathMiddle.length > 0 ? mainPathMiddle : [entrance], sideChambers);
+
+  const baselineRouteLength = shortestPathLength(chambers, entrance.id, miniboss.id);
+
+  // Prevent soft-lock feeling in cul-de-sacs by giving every non-endpoint
+  // chamber at least one alternate exit whenever geometry allows.
+  reinforceNoDeadEnds(
+    chambers,
+    new Set([entrance.id, miniboss.id]),
+    { startId: entrance.id, targetId: miniboss.id, minLength: baselineRouteLength },
+  );
+
+  // Safety assertion: every generated chamber must still be able to reach the floor exit.
+  for (const chamber of chambers.values()) {
+    if (!hasPathBetween(chambers, chamber.id, miniboss.id)) {
+      throw new Error('Invalid floor: chamber cannot reach miniboss exit.');
+    }
+  }
 
   return {
     id: `floor-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
