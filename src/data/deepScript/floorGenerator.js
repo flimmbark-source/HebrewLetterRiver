@@ -327,6 +327,26 @@ function reinforceNoDeadEnds(chambers, protectedIds = new Set(), routeConstraint
   }
 }
 
+function assertFloorSafety(chambers, entranceId, minibossId, minRouteLength) {
+  const entranceToBoss = shortestPathLength(chambers, entranceId, minibossId);
+  if (entranceToBoss < minRouteLength) {
+    throw new Error('Invalid floor: entrance-to-exit route is shorter than required.');
+  }
+
+  for (const chamber of chambers.values()) {
+    if (!hasPathBetween(chambers, chamber.id, minibossId)) {
+      throw new Error('Invalid floor: chamber cannot reach miniboss exit.');
+    }
+  }
+
+  for (const chamber of chambers.values()) {
+    if (chamber.id === entranceId || chamber.id === minibossId) continue;
+    if (getChamberDegree(chamber) <= 1) {
+      throw new Error('Invalid floor: non-endpoint chamber is a dead end.');
+    }
+  }
+}
+
 // ─── Floor layout generation ────────────────────────────────
 
 /**
@@ -343,119 +363,126 @@ export function generateDungeonFloor({
   customWords = null,
   minRoomsBetweenStartAndExit = 4,
 } = {}) {
-  chamberIdCounter = 0;
-  const usedWordIds = new Set();
+  const minRouteLength = Math.max(1, minRoomsBetweenStartAndExit + 1);
+  let lastError = null;
 
-  function pickWord(depth) {
-    if (customWords && customWords.length > 0) {
-      const candidates = customWords.filter(w => !usedWordIds.has(w.id));
+  for (let attempt = 0; attempt < 20; attempt++) {
+    chamberIdCounter = 0;
+    const usedWordIds = new Set();
+
+    function pickWord(depth) {
+      if (customWords && customWords.length > 0) {
+        const candidates = customWords.filter(w => !usedWordIds.has(w.id));
+        if (candidates.length === 0) {
+          return customWords[Math.floor(Math.random() * customWords.length)];
+        }
+        const word = candidates[Math.floor(Math.random() * candidates.length)];
+        usedWordIds.add(word.id);
+        return word;
+      }
+
+      let minDiff;
+      let maxDiff;
+      if (depth <= 1) {
+        minDiff = 1;
+        maxDiff = 2;
+      } else if (depth <= 2) {
+        minDiff = 2;
+        maxDiff = 3;
+      } else {
+        minDiff = 3;
+        maxDiff = 4;
+      }
+
+      const candidates = getWordsByDifficulty(minDiff, maxDiff).filter(w => !usedWordIds.has(w.id));
       if (candidates.length === 0) {
-        return customWords[Math.floor(Math.random() * customWords.length)];
+        const fallback = getWordsByDifficulty(minDiff, maxDiff);
+        return fallback[Math.floor(Math.random() * fallback.length)];
       }
       const word = candidates[Math.floor(Math.random() * candidates.length)];
       usedWordIds.add(word.id);
       return word;
     }
 
-    let minDiff;
-    let maxDiff;
-    if (depth <= 1) {
-      minDiff = 1;
-      maxDiff = 2;
-    } else if (depth <= 2) {
-      minDiff = 2;
-      maxDiff = 3;
-    } else {
-      minDiff = 3;
-      maxDiff = 4;
-    }
+    try {
+      // Create all chambers
+      const entrance = createChamber(CHAMBER_TYPES.ENTRANCE);
+      entrance.visited = true;
 
-    const candidates = getWordsByDifficulty(minDiff, maxDiff).filter(w => !usedWordIds.has(w.id));
-    if (candidates.length === 0) {
-      const fallback = getWordsByDifficulty(minDiff, maxDiff);
-      return fallback[Math.floor(Math.random() * fallback.length)];
-    }
-    const word = candidates[Math.floor(Math.random() * candidates.length)];
-    usedWordIds.add(word.id);
-    return word;
-  }
+      const combatChambers = [];
+      for (let i = 0; i < combatCount; i++) {
+        const word = pickWord(i);
+        combatChambers.push(createChamber(CHAMBER_TYPES.COMBAT, { wordId: word?.id }));
+      }
 
-  // Create all chambers
-  const entrance = createChamber(CHAMBER_TYPES.ENTRANCE);
-  entrance.visited = true;
+      const archive = createChamber(CHAMBER_TYPES.ARCHIVE, { rewardId: 'clue-hint' });
+      const shrine = createChamber(CHAMBER_TYPES.SHRINE);
+      const event = createChamber(CHAMBER_TYPES.EVENT, { eventId: 'chest' });
 
-  const combatChambers = [];
-  for (let i = 0; i < combatCount; i++) {
-    const word = pickWord(i);
-    combatChambers.push(createChamber(CHAMBER_TYPES.COMBAT, { wordId: word?.id }));
-  }
+      let bossWord;
+      if (customWords && customWords.length > 0) {
+        const unusedCustom = customWords
+          .filter(w => !usedWordIds.has(w.id))
+          .sort((a, b) => b.letters.length - a.letters.length);
+        bossWord = unusedCustom[0] || [...customWords].sort((a, b) => b.letters.length - a.letters.length)[0];
+        if (bossWord) usedWordIds.add(bossWord.id);
+      } else {
+        const minibossWords = getMinibossWords();
+        bossWord = minibossWords[Math.floor(Math.random() * minibossWords.length)];
+      }
 
-  const archive = createChamber(CHAMBER_TYPES.ARCHIVE, { rewardId: 'clue-hint' });
-  const shrine = createChamber(CHAMBER_TYPES.SHRINE);
-  const event = createChamber(CHAMBER_TYPES.EVENT, { eventId: 'chest' });
+      const miniboss = createChamber(CHAMBER_TYPES.MINIBOSS, { wordId: bossWord?.id });
 
-  let bossWord;
-  if (customWords && customWords.length > 0) {
-    const unusedCustom = customWords
-      .filter(w => !usedWordIds.has(w.id))
-      .sort((a, b) => b.letters.length - a.letters.length);
-    bossWord = unusedCustom[0] || [...customWords].sort((a, b) => b.letters.length - a.letters.length)[0];
-    if (bossWord) usedWordIds.add(bossWord.id);
-  } else {
-    const minibossWords = getMinibossWords();
-    bossWord = minibossWords[Math.floor(Math.random() * minibossWords.length)];
-  }
+      const chambers = new Map();
+      const allChambers = [entrance, ...combatChambers, archive, shrine, event, miniboss];
+      for (const chamber of allChambers) {
+        chambers.set(chamber.id, chamber);
+      }
 
-  const miniboss = createChamber(CHAMBER_TYPES.MINIBOSS, { wordId: bossWord?.id });
+      // Build a randomized main path from entrance to miniboss.
+      const middleCandidates = shuffle([...combatChambers, archive, shrine, event]);
+      const desiredMinBetween = Math.max(3, minRoomsBetweenStartAndExit);
+      const maxBetween = Math.min(middleCandidates.length, desiredMinBetween + 2);
+      const betweenCount = Math.min(
+        middleCandidates.length,
+        desiredMinBetween + Math.floor(Math.random() * Math.max(1, maxBetween - desiredMinBetween + 1)),
+      );
 
-  const chambers = new Map();
-  const allChambers = [entrance, ...combatChambers, archive, shrine, event, miniboss];
-  for (const chamber of allChambers) {
-    chambers.set(chamber.id, chamber);
-  }
+      const mainPathMiddle = middleCandidates.slice(0, betweenCount);
+      const sideChambers = middleCandidates.slice(betweenCount);
 
-  // Build a randomized main path from entrance to miniboss.
-  const middleCandidates = shuffle([...combatChambers, archive, shrine, event]);
-  const desiredMinBetween = Math.max(3, minRoomsBetweenStartAndExit);
-  const maxBetween = Math.min(middleCandidates.length, desiredMinBetween + 2);
-  const betweenCount = Math.min(
-    middleCandidates.length,
-    desiredMinBetween + Math.floor(Math.random() * Math.max(1, maxBetween - desiredMinBetween + 1)),
-  );
+      const mainPath = [entrance, ...mainPathMiddle, miniboss];
+      buildRandomMainPath(chambers, mainPath);
 
-  const mainPathMiddle = middleCandidates.slice(0, betweenCount);
-  const sideChambers = middleCandidates.slice(betweenCount);
+      // Attach any unused chambers as branches/loops off the main path.
+      attachSideChambers(chambers, mainPathMiddle.length > 0 ? mainPathMiddle : [entrance], sideChambers);
 
-  const mainPath = [entrance, ...mainPathMiddle, miniboss];
-  buildRandomMainPath(chambers, mainPath);
+      const baselineRouteLength = shortestPathLength(chambers, entrance.id, miniboss.id);
 
-  // Attach any unused chambers as branches/loops off the main path.
-  attachSideChambers(chambers, mainPathMiddle.length > 0 ? mainPathMiddle : [entrance], sideChambers);
+      // Prevent soft-lock feeling in cul-de-sacs by giving every non-endpoint
+      // chamber at least one alternate exit whenever geometry allows.
+      reinforceNoDeadEnds(
+        chambers,
+        new Set([entrance.id, miniboss.id]),
+        { startId: entrance.id, targetId: miniboss.id, minLength: baselineRouteLength },
+      );
 
-  const baselineRouteLength = shortestPathLength(chambers, entrance.id, miniboss.id);
+      // Safety assertion: every chamber must reach exit and non-endpoints must not be dead ends.
+      assertFloorSafety(chambers, entrance.id, miniboss.id, minRouteLength);
 
-  // Prevent soft-lock feeling in cul-de-sacs by giving every non-endpoint
-  // chamber at least one alternate exit whenever geometry allows.
-  reinforceNoDeadEnds(
-    chambers,
-    new Set([entrance.id, miniboss.id]),
-    { startId: entrance.id, targetId: miniboss.id, minLength: baselineRouteLength },
-  );
-
-  // Safety assertion: every generated chamber must still be able to reach the floor exit.
-  for (const chamber of chambers.values()) {
-    if (!hasPathBetween(chambers, chamber.id, miniboss.id)) {
-      throw new Error('Invalid floor: chamber cannot reach miniboss exit.');
+      return {
+        id: `floor-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
+        chambers,
+        startChamberId: entrance.id,
+        bossChamberId: miniboss.id,
+        chamberCount: chambers.size,
+      };
+    } catch (error) {
+      lastError = error;
     }
   }
 
-  return {
-    id: `floor-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
-    chambers,
-    startChamberId: entrance.id,
-    bossChamberId: miniboss.id,
-    chamberCount: chambers.size,
-  };
+  throw new Error(lastError?.message || 'Failed to generate a safe dungeon floor.');
 }
 
 // ─── Helpers ────────────────────────────────────────────────
