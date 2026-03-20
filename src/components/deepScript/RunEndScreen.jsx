@@ -1,7 +1,7 @@
 import React from 'react';
 import { getWordById } from '../../data/deepScript/words.js';
 
-export default function RunEndScreen({ result, runState, onRestart, onBack }) {
+export default function RunEndScreen({ result, runState, floorNumber, onNextFloor, onRestart, onBack }) {
   const isVictory = result === 'victory';
 
   return (
@@ -9,11 +9,11 @@ export default function RunEndScreen({ result, runState, onRestart, onBack }) {
       <div className={`ds-end-banner ${isVictory ? 'ds-end-banner--victory' : 'ds-end-banner--defeat'}`}>
         <div className="ds-end-icon">{isVictory ? '🏆' : '💀'}</div>
         <h1 className="ds-end-title">
-          {isVictory ? 'Archive Cleared!' : 'Run Ended'}
+          {isVictory ? `Floor ${floorNumber} Cleared!` : 'Run Ended'}
         </h1>
         <p className="ds-end-subtitle">
           {isVictory
-            ? 'The guardian has been defeated. The deep script is yours.'
+            ? 'The guardian has fallen. Descend to the next floor or return to the bridge.'
             : 'The archive claimed another seeker...'}
         </p>
       </div>
@@ -50,11 +50,17 @@ export default function RunEndScreen({ result, runState, onRestart, onBack }) {
       )}
 
       <div className="ds-end-actions">
-        <button type="button" className="ds-primary-btn ds-primary-btn--active" onClick={onRestart}>
-          New Expedition
-        </button>
+        {isVictory ? (
+          <button type="button" className="ds-primary-btn ds-primary-btn--active" onClick={onNextFloor}>
+            Next Floor
+          </button>
+        ) : (
+          <button type="button" className="ds-primary-btn ds-primary-btn--active" onClick={onRestart}>
+            New Expedition
+          </button>
+        )}
         <button type="button" className="ds-secondary-btn" onClick={onBack}>
-          Return to Bridge
+          Back to Menu
         </button>
       </div>
     </div>

@@ -367,7 +367,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack, onDeepScript }) {
               <div className="bbs-deep-script-info">
                 <div className="bbs-deep-script-title">Deep Script</div>
                 <div className="bbs-deep-script-desc">
-                  Dungeon-crawl through Hebrew words — build letters, manage your tray, defeat word guardians
+                  Endless dungeon-crawl through Hebrew words — clear randomized floors, then descend or return to menu
                 </div>
                 <div className="bbs-deep-script-badge">Roguelike Mode</div>
               </div>
