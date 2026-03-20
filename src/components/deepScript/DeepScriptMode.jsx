@@ -24,6 +24,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
   const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | archive | shrine | end
   const [runState, setRunState] = useState(null);
   const [endResult, setEndResult] = useState(null);
+  const [floorNumber, setFloorNumber] = useState(1);
 
   // Exploration state
   const [floor, setFloor] = useState(null);
@@ -34,6 +35,14 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
   const [activeCombat, setActiveCombat] = useState(null); // { wordId, chamberId, isMiniboss }
   const [activeArchive, setActiveArchive] = useState(null); // { rewardId, chamberId, interactableId }
   const [activeShrine, setActiveShrine] = useState(null); // { chamberId }
+
+  const createFloorForNumber = useCallback((targetFloorNumber) => {
+    const combatCount = Math.min(6, 3 + Math.floor((targetFloorNumber - 1) / 2));
+    return generateDungeonFloor({
+      combatCount,
+      customWords: packWords && packWords.length > 0 ? packWords : null,
+    });
+  }, [packWords]);
 
   // Add/remove body class for nav bar hiding; clean up custom words on unmount
   useEffect(() => {
@@ -59,10 +68,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     }
 
     // Generate dungeon floor (pass custom words if available)
-    const newFloor = generateDungeonFloor({
-      combatCount: 3,
-      customWords: packWords && packWords.length > 0 ? packWords : null,
-    });
+    const newFloor = createFloorForNumber(1);
 
     // Create run state (pass a dummy runMap for backward compat)
     const newRun = createRunState(kit, sharedGearIds, []);
@@ -73,8 +79,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     setFloor(newFloor);
     setCurrentChamberId(newFloor.startChamberId);
     setFacing('north');
+    setFloorNumber(1);
     setScreen('exploring');
-  }, [packWords]);
+  }, [packWords, createFloorForNumber]);
 
   // ─── Exploration: Movement ────────────────────────────────
 
@@ -191,7 +198,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
       if (isMiniboss) {
         setEndResult('victory');
         setScreen('end');
-        if (onRunComplete) onRunComplete('victory');
+        if (onRunComplete && floorNumber === 1) onRunComplete('victory');
       } else {
         setScreen('exploring');
       }
@@ -228,7 +235,26 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     }
 
     setActiveCombat(null);
-  }, [activeCombat]);
+  }, [activeCombat, floorNumber, onRunComplete]);
+
+  const handleNextFloor = useCallback(() => {
+    const nextFloorNumber = floorNumber + 1;
+    const nextFloor = createFloorForNumber(nextFloorNumber);
+
+    setFloor(nextFloor);
+    setCurrentChamberId(nextFloor.startChamberId);
+    setFacing('north');
+    setActiveCombat(null);
+    setActiveArchive(null);
+    setActiveShrine(null);
+    setRunState(prev => ({
+      ...prev,
+      floor: nextFloor,
+      health: Math.min(prev.maxHealth, prev.health + 1),
+    }));
+    setFloorNumber(nextFloorNumber);
+    setScreen('exploring');
+  }, [createFloorForNumber, floorNumber]);
 
   // ─── Archive End ──────────────────────────────────────────
 
@@ -349,6 +375,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     setFloor(null);
     setCurrentChamberId(null);
     setEndResult(null);
+    setFloorNumber(1);
     setFacing('north');
   }, []);
 
@@ -368,6 +395,8 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
         <RunEndScreen
           result={endResult}
           runState={runState}
+          floorNumber={floorNumber}
+          onNextFloor={handleNextFloor}
           onRestart={handleRestart}
           onBack={onBack}
         />
