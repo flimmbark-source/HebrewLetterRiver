@@ -180,6 +180,29 @@ describe('Room Generation', () => {
 
 // ─── Dungeon Floor Generation ──────────────────────────────
 
+
+function shortestPathLength(floor, startId, targetId) {
+  const queue = [{ id: startId, dist: 0 }];
+  const visited = new Set([startId]);
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (current.id === targetId) return current.dist;
+
+    const chamber = floor.chambers.get(current.id);
+    if (!chamber) continue;
+
+    for (const nextId of Object.values(chamber.exits)) {
+      if (!visited.has(nextId)) {
+        visited.add(nextId);
+        queue.push({ id: nextId, dist: current.dist + 1 });
+      }
+    }
+  }
+
+  return -1;
+}
+
 describe('Dungeon Floor Generation', () => {
   it('generates a floor with connected chambers', () => {
     const floor = generateDungeonFloor();
@@ -229,6 +252,26 @@ describe('Dungeon Floor Generation', () => {
       expect(chamber.interactables).toBeDefined();
       expect(chamber.interactables.length).toBeGreaterThanOrEqual(0);
     }
+  });
+
+  it('guarantees a long enough route from entrance to floor exit', () => {
+    const floor = generateDungeonFloor();
+    const routeLength = shortestPathLength(floor, floor.startChamberId, floor.bossChamberId);
+    expect(routeLength).toBeGreaterThanOrEqual(5);
+  });
+
+  it('randomizes where the first step from the entrance leads', () => {
+    const firstStepDirections = new Set();
+
+    for (let i = 0; i < 20; i++) {
+      const floor = generateDungeonFloor();
+      const entrance = floor.chambers.get(floor.startChamberId);
+      const exits = Object.keys(entrance.exits);
+      expect(exits.length).toBeGreaterThan(0);
+      firstStepDirections.add(exits[0]);
+    }
+
+    expect(firstStepDirections.size).toBeGreaterThan(1);
   });
 
   it('turn helpers work correctly', () => {

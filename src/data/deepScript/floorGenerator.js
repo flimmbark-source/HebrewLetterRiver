@@ -1,11 +1,12 @@
 /**
  * Deep Script floor generator — chamber-based dungeon graph.
  *
- * Generates a small connected graph of chambers the player traverses
+ * Generates a connected graph of chambers the player traverses
  * in first-person, replacing the flat choice-node model.
  *
- * A floor has 7-9 chambers arranged in a grid-like graph with
- * N/E/S/W exits connecting them.
+ * Floors are assembled from a randomized "main path" plus optional
+ * side branches. The main path always guarantees a multi-room journey
+ * from spawn to floor exit (miniboss chamber).
  */
 
 import { getWordsByDifficulty, getMinibossWords } from './words.js';
@@ -112,19 +113,124 @@ function createChamber(type, payload = {}) {
     interactables,
     visited: false,
     resolved: false,
-    payload, // { wordId, rewardId, eventId }
+    payload,
   };
 }
 
-// ─── Connect two chambers ───────────────────────────────────
+function shuffle(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
 
 function connect(chambers, fromId, toId, direction) {
   const from = chambers.get(fromId);
   const to = chambers.get(toId);
-  if (!from || !to) return;
+  if (!from || !to) return false;
+  if (from.exits[direction]) return false;
+
+  const opposite = OPPOSITE[direction];
+  if (to.exits[opposite]) return false;
 
   from.exits[direction] = toId;
-  to.exits[OPPOSITE[direction]] = fromId;
+  to.exits[opposite] = fromId;
+  return true;
+}
+
+function getOpenDirections(chamber, exclude = null) {
+  return DIRECTIONS.filter(dir => !chamber.exits[dir] && dir !== exclude);
+}
+
+function connectWithRandomDirection(chambers, fromId, toId, options = {}) {
+  const from = chambers.get(fromId);
+  const to = chambers.get(toId);
+  if (!from || !to) return null;
+
+  const { preferred = null, avoid = null } = options;
+  const candidates = getOpenDirections(from, avoid);
+  if (candidates.length === 0) return null;
+
+  let order = shuffle(candidates);
+  if (preferred && order.includes(preferred)) {
+    order = [preferred, ...order.filter(d => d !== preferred)];
+  }
+
+  for (const dir of order) {
+    if (connect(chambers, fromId, toId, dir)) return dir;
+  }
+  return null;
+}
+
+function buildRandomMainPath(chambers, pathChambers) {
+  let previousDirection = null;
+  for (let i = 0; i < pathChambers.length - 1; i++) {
+    const from = pathChambers[i];
+    const to = pathChambers[i + 1];
+
+    // Prefer turning sometimes so the corridor shape varies.
+    const preferred = i === 0
+      ? DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)]
+      : shuffle(DIRECTIONS.filter(d => d !== OPPOSITE[previousDirection]))[0];
+
+    const chosen = connectWithRandomDirection(chambers, from.id, to.id, {
+      preferred,
+      avoid: previousDirection ? OPPOSITE[previousDirection] : null,
+    });
+
+    // Fallback: fully random open direction
+    if (!chosen) {
+      const fallback = connectWithRandomDirection(chambers, from.id, to.id);
+      if (!fallback) {
+        throw new Error('Failed to build main path: no available exits.');
+      }
+      previousDirection = fallback;
+    } else {
+      previousDirection = chosen;
+    }
+  }
+}
+
+function attachSideChambers(chambers, anchorChambers, sideChambers) {
+  for (const side of sideChambers) {
+    let placed = false;
+    const anchors = shuffle(anchorChambers);
+
+    for (const anchor of anchors) {
+      const dir = connectWithRandomDirection(chambers, anchor.id, side.id);
+      if (dir) {
+        // Occasionally add one extra loop edge from side chamber to another anchor.
+        if (Math.random() < 0.25) {
+          const loopCandidates = shuffle(anchorChambers.filter(c => c.id !== anchor.id));
+          for (const loopTarget of loopCandidates) {
+            if (Object.keys(side.exits).length >= DIRECTIONS.length) break;
+            const loopDir = connectWithRandomDirection(chambers, side.id, loopTarget.id);
+            if (loopDir) break;
+          }
+        }
+
+        placed = true;
+        break;
+      }
+    }
+
+    if (!placed) {
+      // Last-resort connection pass over every chamber.
+      const fallbackAnchors = shuffle(Array.from(chambers.values()).filter(c => c.id !== side.id));
+      for (const anchor of fallbackAnchors) {
+        if (connectWithRandomDirection(chambers, anchor.id, side.id)) {
+          placed = true;
+          break;
+        }
+      }
+    }
+
+    if (!placed) {
+      throw new Error('Failed to attach side chamber: no available exits.');
+    }
+  }
 }
 
 // ─── Floor layout generation ────────────────────────────────
@@ -132,34 +238,21 @@ function connect(chambers, fromId, toId, direction) {
 /**
  * Generate a dungeon floor with connected chambers.
  *
- * Layout strategy: place chambers on a small grid, then connect adjacent ones.
- * This creates a small explorable space with multiple paths.
- *
  * @param {object} options
  * @param {number} options.combatCount — number of combat chambers (default 3)
  * @param {Object[]} [options.customWords] — optional DS-compatible word pool (for pack-based runs)
+ * @param {number} [options.minRoomsBetweenStartAndExit] — minimum chambers between entrance and miniboss
  * @returns {DungeonFloor}
  */
-export function generateDungeonFloor({ combatCount = 3, customWords = null } = {}) {
+export function generateDungeonFloor({
+  combatCount = 3,
+  customWords = null,
+  minRoomsBetweenStartAndExit = 4,
+} = {}) {
   chamberIdCounter = 0;
   const usedWordIds = new Set();
 
-  // Define the floor layout on a 3x3 grid
-  // We'll place chambers at specific grid positions and connect them
-  //
-  // Grid positions (row, col):
-  //   (0,1) = top center
-  //   (1,0) = mid left    (1,1) = mid center    (1,2) = mid right
-  //   (2,0) = bot left    (2,1) = bot center     (2,2) = bot right
-  //
-  // Entrance is always at (2,1) — bottom center
-  // Miniboss is always at (0,1) — top center
-  //
-  // The player must navigate upward through the dungeon.
-
-  // Pick words for combat chambers
   function pickWord(depth) {
-    // If using custom word pool, pick from it (ignoring difficulty tiers)
     if (customWords && customWords.length > 0) {
       const candidates = customWords.filter(w => !usedWordIds.has(w.id));
       if (candidates.length === 0) {
@@ -170,10 +263,18 @@ export function generateDungeonFloor({ combatCount = 3, customWords = null } = {
       return word;
     }
 
-    let minDiff, maxDiff;
-    if (depth <= 1) { minDiff = 1; maxDiff = 2; }
-    else if (depth <= 2) { minDiff = 2; maxDiff = 3; }
-    else { minDiff = 3; maxDiff = 4; }
+    let minDiff;
+    let maxDiff;
+    if (depth <= 1) {
+      minDiff = 1;
+      maxDiff = 2;
+    } else if (depth <= 2) {
+      minDiff = 2;
+      maxDiff = 3;
+    } else {
+      minDiff = 3;
+      maxDiff = 4;
+    }
 
     const candidates = getWordsByDifficulty(minDiff, maxDiff).filter(w => !usedWordIds.has(w.id));
     if (candidates.length === 0) {
@@ -187,124 +288,58 @@ export function generateDungeonFloor({ combatCount = 3, customWords = null } = {
 
   // Create all chambers
   const entrance = createChamber(CHAMBER_TYPES.ENTRANCE);
-  entrance.visited = true; // player starts here
+  entrance.visited = true;
 
-  // Combat chambers
   const combatChambers = [];
   for (let i = 0; i < combatCount; i++) {
     const word = pickWord(i);
     combatChambers.push(createChamber(CHAMBER_TYPES.COMBAT, { wordId: word?.id }));
   }
 
-  // Special chambers
   const archive = createChamber(CHAMBER_TYPES.ARCHIVE, { rewardId: 'clue-hint' });
   const shrine = createChamber(CHAMBER_TYPES.SHRINE);
   const event = createChamber(CHAMBER_TYPES.EVENT, { eventId: 'chest' });
 
-  // Miniboss — use longest unused custom word, or fall back to standard miniboss pool
   let bossWord;
   if (customWords && customWords.length > 0) {
     const unusedCustom = customWords
       .filter(w => !usedWordIds.has(w.id))
       .sort((a, b) => b.letters.length - a.letters.length);
-    bossWord = unusedCustom[0] || customWords.sort((a, b) => b.letters.length - a.letters.length)[0];
+    bossWord = unusedCustom[0] || [...customWords].sort((a, b) => b.letters.length - a.letters.length)[0];
     if (bossWord) usedWordIds.add(bossWord.id);
   } else {
     const minibossWords = getMinibossWords();
     bossWord = minibossWords[Math.floor(Math.random() * minibossWords.length)];
   }
+
   const miniboss = createChamber(CHAMBER_TYPES.MINIBOSS, { wordId: bossWord?.id });
 
-  // Build chambers map
   const chambers = new Map();
   const allChambers = [entrance, ...combatChambers, archive, shrine, event, miniboss];
-  for (const c of allChambers) {
-    chambers.set(c.id, c);
+  for (const chamber of allChambers) {
+    chambers.set(chamber.id, chamber);
   }
 
-  // Assign grid positions and connect
-  // Layout (randomized within constraints):
-  //
-  //        [miniboss]
-  //     [c2] [shrine] [archive]
-  //     [c0] [event]  [c1]
-  //          [entrance]
-  //
-  // This gives a clear upward progression with branching
+  // Build a randomized main path from entrance to miniboss.
+  const middleCandidates = shuffle([...combatChambers, archive, shrine, event]);
+  const desiredMinBetween = Math.max(3, minRoomsBetweenStartAndExit);
+  const maxBetween = Math.min(middleCandidates.length, desiredMinBetween + 2);
+  const betweenCount = Math.min(
+    middleCandidates.length,
+    desiredMinBetween + Math.floor(Math.random() * Math.max(1, maxBetween - desiredMinBetween + 1)),
+  );
 
-  // Shuffle combat chambers for variety
-  const shuffled = [...combatChambers].sort(() => Math.random() - 0.5);
+  const mainPathMiddle = middleCandidates.slice(0, betweenCount);
+  const sideChambers = middleCandidates.slice(betweenCount);
 
-  // Grid assignment
-  const grid = {
-    '2,1': entrance,
-    '1,0': shuffled[0],
-    '1,1': event,
-    '1,2': shuffled[1] || archive,
-    '0,0': shuffled[2] || shrine,
-    '0,1': shrine.id === (shuffled[2] || shrine).id ? miniboss : shrine,
-    '0,2': archive.id === (shuffled[1] || archive).id ? event : archive,
-  };
+  const mainPath = [entrance, ...mainPathMiddle, miniboss];
+  buildRandomMainPath(chambers, mainPath);
 
-  // Simpler approach: deterministic layout with some shuffle
-  // Row 2 (bottom): entrance
-  // Row 1 (middle): combat0, event/standard, combat1
-  // Row 0 (top): combat2/archive, shrine, archive/miniboss
-
-  // Let's do a cleaner approach: place and connect explicitly
-  const layout = [];
-
-  // Bottom row
-  layout.push({ chamber: entrance, row: 2, col: 1 });
-
-  // Middle row
-  layout.push({ chamber: shuffled[0], row: 1, col: 0 });
-  layout.push({ chamber: event, row: 1, col: 1 });
-  layout.push({ chamber: shuffled[1], row: 1, col: 2 });
-
-  // Top row
-  layout.push({ chamber: archive, row: 0, col: 0 });
-  layout.push({ chamber: miniboss, row: 0, col: 1 });
-  layout.push({ chamber: shrine, row: 0, col: 2 });
-
-  // If we have a 3rd combat chamber, replace the event
-  if (shuffled[2]) {
-    // Add it somewhere — replace event position or add a connector
-    // For simplicity, make the event a sub-chamber connected to combat0
-    layout.push({ chamber: shuffled[2], row: 2, col: 0 });
-  }
-
-  // Build position lookup
-  const posMap = new Map();
-  for (const entry of layout) {
-    posMap.set(`${entry.row},${entry.col}`, entry.chamber);
-  }
-
-  // Connect adjacent chambers (N/S for rows, E/W for columns)
-  for (const entry of layout) {
-    const { chamber, row, col } = entry;
-
-    // North connection (row - 1, same col)
-    const north = posMap.get(`${row - 1},${col}`);
-    if (north && !chamber.exits.north) {
-      connect(chambers, chamber.id, north.id, 'north');
-    }
-
-    // East connection (same row, col + 1)
-    const east = posMap.get(`${row},${col + 1}`);
-    if (east && !chamber.exits.east) {
-      connect(chambers, chamber.id, east.id, 'east');
-    }
-  }
-
-  // Ensure miniboss is reachable — add a direct connection from event to miniboss
-  // if not already connected
-  if (!event.exits.north) {
-    connect(chambers, event.id, miniboss.id, 'north');
-  }
+  // Attach any unused chambers as branches/loops off the main path.
+  attachSideChambers(chambers, mainPathMiddle.length > 0 ? mainPathMiddle : [entrance], sideChambers);
 
   return {
-    id: `floor-${Date.now()}`,
+    id: `floor-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
     chambers,
     startChamberId: entrance.id,
     bossChamberId: miniboss.id,
