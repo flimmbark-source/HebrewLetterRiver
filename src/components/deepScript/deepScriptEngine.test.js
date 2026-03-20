@@ -277,6 +277,29 @@ describe('Dungeon Floor Generation', () => {
     }
   });
 
+  it('enforces route safety invariants for pack-based floors', () => {
+    const customWords = [
+      { id: 'pack-word-1', letters: ['א', 'ב'], hebrew: 'אב', english: 'father', transliteration: 'av', difficulty: 1 },
+      { id: 'pack-word-2', letters: ['א', 'ם'], hebrew: 'אם', english: 'mother', transliteration: 'em', difficulty: 1 },
+      { id: 'pack-word-3', letters: ['ש', 'ל', 'ו', 'ם'], hebrew: 'שלום', english: 'peace', transliteration: 'shalom', difficulty: 2 },
+      { id: 'pack-word-4', letters: ['מ', 'י', 'ם'], hebrew: 'מים', english: 'water', transliteration: 'mayim', difficulty: 2 },
+    ];
+
+    const floor = generateDungeonFloor({ customWords, combatCount: 4 });
+    const routeLength = shortestPathLength(floor, floor.startChamberId, floor.bossChamberId);
+    expect(routeLength).toBeGreaterThanOrEqual(5);
+
+    for (const [chamberId, chamber] of floor.chambers) {
+      const pathToExit = shortestPathLength(floor, chamberId, floor.bossChamberId);
+      expect(pathToExit).toBeGreaterThanOrEqual(0);
+
+      const degree = Object.keys(chamber.exits).length;
+      if (chamberId !== floor.startChamberId && chamberId !== floor.bossChamberId) {
+        expect(degree).toBeGreaterThanOrEqual(2);
+      }
+    }
+  });
+
   it('randomizes where the first step from the entrance leads', () => {
     const firstStepDirections = new Set();
 
