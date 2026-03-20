@@ -260,6 +260,23 @@ describe('Dungeon Floor Generation', () => {
     expect(routeLength).toBeGreaterThanOrEqual(5);
   });
 
+  it('ensures every chamber can route to the floor exit', () => {
+    const floor = generateDungeonFloor();
+    for (const [chamberId] of floor.chambers) {
+      const routeLength = shortestPathLength(floor, chamberId, floor.bossChamberId);
+      expect(routeLength).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('avoids dead-end chambers except entrance and miniboss', () => {
+    const floor = generateDungeonFloor();
+    for (const [chamberId, chamber] of floor.chambers) {
+      const degree = Object.keys(chamber.exits).length;
+      if (chamberId === floor.startChamberId || chamberId === floor.bossChamberId) continue;
+      expect(degree).toBeGreaterThanOrEqual(2);
+    }
+  });
+
   it('randomizes where the first step from the entrance leads', () => {
     const firstStepDirections = new Set();
 
