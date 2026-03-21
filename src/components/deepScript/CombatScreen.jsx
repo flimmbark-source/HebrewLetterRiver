@@ -424,6 +424,9 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
         <div className="ds-phase-overlay ds-phase-victory">
           <div className="ds-phase-message">Word Vanquished!</div>
           <div className="ds-phase-word" dir="rtl">{word.hebrew}</div>
+          {word.english && (
+            <div className="ds-phase-translation">{word.english}</div>
+          )}
           <button
             type="button"
             className="ds-phase-proceed-btn"
