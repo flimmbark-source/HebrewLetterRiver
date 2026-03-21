@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { getStarterKit } from '../../data/deepScript/starterKits.js';
-import { generateDungeonFloor, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
+import {
+  generateDungeonFloor, CHAMBER_TYPES, OPPOSITE,
+} from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
 import { upgradeDefinitions } from '../../data/deepScript/upgrades.js';
 import { registerCustomWords, clearCustomWords } from '../../data/deepScript/words.js';
@@ -12,6 +14,38 @@ import ArchiveScreen from './ArchiveScreen.jsx';
 import ShrineScreen from './ShrineScreen.jsx';
 import RunEndScreen from './RunEndScreen.jsx';
 import './DeepScript.css';
+
+const CLOCKWISE_DIRECTIONS = ['north', 'east', 'south', 'west'];
+
+function rotateDirection(direction, stepsClockwise) {
+  const index = CLOCKWISE_DIRECTIONS.indexOf(direction);
+  if (index === -1) return direction;
+  const normalizedSteps = ((stepsClockwise % 4) + 4) % 4;
+  return CLOCKWISE_DIRECTIONS[(index + normalizedSteps) % 4];
+}
+
+function orientRoomExitsForEntry(chamber, entryFromDirection) {
+  if (!chamber || !entryFromDirection) return chamber;
+  const currentBackDirection = OPPOSITE[entryFromDirection];
+  if (!currentBackDirection) return chamber;
+
+  const currentBackIndex = CLOCKWISE_DIRECTIONS.indexOf(currentBackDirection);
+  const targetBackIndex = CLOCKWISE_DIRECTIONS.indexOf('south');
+  if (currentBackIndex === -1 || targetBackIndex === -1) return chamber;
+
+  const rotationSteps = targetBackIndex - currentBackIndex;
+  if (rotationSteps === 0) return chamber;
+
+  const rotatedExits = {};
+  for (const [direction, chamberId] of Object.entries(chamber.exits || {})) {
+    rotatedExits[rotateDirection(direction, rotationSteps)] = chamberId;
+  }
+
+  return {
+    ...chamber,
+    exits: rotatedExits,
+  };
+}
 
 /**
  * DeepScriptMode — top-level orchestrator for the Deep Script game mode.
@@ -82,7 +116,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
 
   // ─── Exploration: Movement ────────────────────────────────
 
-  const handleMove = useCallback((targetChamberId) => {
+  const handleMove = useCallback((targetChamberId, viaDirection) => {
     if (!floor) return;
 
     setCurrentChamberId(targetChamberId);
@@ -90,21 +124,46 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     // Mark chamber as visited
     setFloor(prev => {
       const newChambers = new Map(prev.chambers);
-      const chamber = { ...newChambers.get(targetChamberId), visited: true };
-      newChambers.set(targetChamberId, chamber);
+      const chamber = newChambers.get(targetChamberId);
+      const oriented = orientRoomExitsForEntry(chamber, viaDirection);
+      const nextChamber = { ...oriented, visited: true };
+      newChambers.set(targetChamberId, nextChamber);
       return { ...prev, chambers: newChambers };
     });
 
-    // Auto-trigger combat in unresolved combat/miniboss chambers
+    // Keep run state's floor reference in sync with the same orientation update
+    setRunState(prev => {
+      if (!prev?.floor) return prev;
+      const newChambers = new Map(prev.floor.chambers);
+      const chamber = newChambers.get(targetChamberId);
+      if (!chamber) return prev;
+      const oriented = orientRoomExitsForEntry(chamber, viaDirection);
+      const nextChamber = { ...oriented, visited: true };
+      newChambers.set(targetChamberId, nextChamber);
+      return {
+        ...prev,
+        floor: {
+          ...prev.floor,
+          chambers: newChambers,
+        },
+      };
+    });
+
+    // Use current chamber snapshot to decide whether to trigger combat
     const chamber = floor.chambers.get(targetChamberId);
-    if (chamber && !chamber.resolved) {
-      if (chamber.type === CHAMBER_TYPES.COMBAT || chamber.type === CHAMBER_TYPES.MINIBOSS) {
+    if (!chamber) return;
+
+    const orientedForEntry = orientRoomExitsForEntry(chamber, viaDirection);
+
+    // Auto-trigger combat in unresolved combat/miniboss chambers
+    if (!orientedForEntry.resolved) {
+      if (orientedForEntry.type === CHAMBER_TYPES.COMBAT || orientedForEntry.type === CHAMBER_TYPES.MINIBOSS) {
         // Small delay to let the room render first, then show battle transition
         setTimeout(() => {
           setActiveCombat({
-            wordId: chamber.payload?.wordId,
+            wordId: orientedForEntry.payload?.wordId,
             chamberId: targetChamberId,
-            isMiniboss: chamber.type === CHAMBER_TYPES.MINIBOSS,
+            isMiniboss: orientedForEntry.type === CHAMBER_TYPES.MINIBOSS,
           });
           setScreen('battle_transition');
         }, 600);
