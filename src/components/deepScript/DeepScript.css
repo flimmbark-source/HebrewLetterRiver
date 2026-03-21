@@ -2208,7 +2208,7 @@
 
 .ds-pillar-proceed-btn {
   position: absolute;
-  top: 12px;
+  top: -38px;
   left: 50%;
   transform: translateX(-50%);
   padding: 7px 14px;
@@ -2226,7 +2226,7 @@
 }
 
 .ds-pillar-game--compact .ds-pillar-proceed-btn {
-  top: 4px;
+  top: -46px;
 }
 
 .ds-pillar-slat--rotating:disabled {
