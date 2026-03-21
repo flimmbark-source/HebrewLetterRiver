@@ -3,7 +3,7 @@
  *
  * Ensures all Cafe Talk reading texts are complete and valid.
  * Validates:
- * - All 7 categories exist for each practice language
+ * - All Cafe Talk categories exist for each practice language
  * - Token counts match canonical definition
  * - No __TODO__ placeholders remain
  * - meaningKeys exist for all word tokens
@@ -59,8 +59,8 @@ function validateCafeTalkText(text, language, categoryId) {
   const englishLookup = getEnglishLookup();
 
   // Check ID format
-  if (text.id !== `cafeTalk.${categoryId}`) {
-    errors.push(`Invalid ID: expected "cafeTalk.${categoryId}", got "${text.id}"`);
+  if (!text.id?.endsWith(`.${categoryId}`)) {
+    errors.push(`Invalid ID: expected a text ID ending with ".${categoryId}", got "${text.id}"`);
   }
 
   // Check practice language
@@ -181,18 +181,18 @@ export function validateCafeTalkForLanguage(cafeTalkTexts, language) {
   const errors = [];
   const warnings = [];
 
-  // Check all 7 categories exist
+  // Check all expected categories exist
   if (!Array.isArray(cafeTalkTexts)) {
     throw new ValidationError(language, 'all', 'Cafe Talk texts is not an array');
   }
 
-  if (cafeTalkTexts.length !== 7) {
-    errors.push(`Expected 7 Cafe Talk texts, got ${cafeTalkTexts.length}`);
+  if (cafeTalkTexts.length !== expectedCategoryIds.length) {
+    errors.push(`Expected ${expectedCategoryIds.length} Cafe Talk texts, got ${cafeTalkTexts.length}`);
   }
 
   // Check each category
   expectedCategoryIds.forEach(categoryId => {
-    const text = cafeTalkTexts.find(t => t.id === `cafeTalk.${categoryId}`);
+    const text = cafeTalkTexts.find(t => t.id?.endsWith(`.${categoryId}`));
 
     if (!text) {
       errors.push(`Missing Cafe Talk category: ${categoryId}`);

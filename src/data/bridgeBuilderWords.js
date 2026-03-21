@@ -1,3 +1,9 @@
+import { CAFE_TALK_WORDS } from './readingTexts/cafeTalk/cafeTalkCanonical.js';
+import {
+  cafeTalkLexicon as hebrewCafeTalkLexicon,
+  cafeTalkTransliterations as hebrewCafeTalkTransliterations,
+} from './readingTexts/cafeTalk/lexicon/hebrew.js';
+
 /**
  * Bridge Builder vocabulary data
  *
@@ -1248,6 +1254,20 @@ export const bridgeBuilderWords = [
     tags: ['nouns'],
   },
 ];
+
+const cafeTalkBridgeBuilderWords = CAFE_TALK_WORDS
+  .filter(word => hebrewCafeTalkLexicon[word.id] && hebrewCafeTalkTransliterations[word.id])
+  .map(word => ({
+    id: `bbct-${word.id}`,
+    hebrew: hebrewCafeTalkLexicon[word.id],
+    transliteration: hebrewCafeTalkTransliterations[word.id],
+    translation: word.en,
+    theme: 'cafe_talk',
+    difficulty: 3,
+    tags: ['cafe_talk'],
+  }));
+
+bridgeBuilderWords.push(...cafeTalkBridgeBuilderWords);
 
 /**
  * Get multiple words by their IDs.
