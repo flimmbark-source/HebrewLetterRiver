@@ -343,7 +343,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
               {Array.from({ length: Math.max(0, runState.traySize - combat.tray.length) }).map((_, i) => (
                 <div key={`e-${i}`} className="ds-inv-tile ds-inv-tile--empty" />
               ))}
-              <div class="spacer"></div>
+              <div className="spacer" />
             </div>
           </div>
         </div>
