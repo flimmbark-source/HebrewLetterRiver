@@ -2425,6 +2425,11 @@
   transform-origin: center top;
 }
 
+/* Visual seam where the back wall meets the floor plane. */
+:root {
+  --ds-explore-floor-seam: 38%;
+}
+
 /* Side walls */
 .ds-explore-wall-left,
 .ds-explore-wall-right {
@@ -2434,21 +2439,21 @@
   width: 18%;
   z-index: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .ds-explore-wall-left {
   left: 0;
   background: linear-gradient(90deg, #0d0f14 0%, #12151b 40%, rgba(18, 21, 27, 0.6) 80%, transparent 100%);
   justify-content: center;
-  padding-left: 4px;
+  padding: 0 0 var(--ds-explore-floor-seam) 4px;
 }
 
 .ds-explore-wall-right {
   right: 0;
   background: linear-gradient(-90deg, #0d0f14 0%, #12151b 40%, rgba(18, 21, 27, 0.6) 80%, transparent 100%);
   justify-content: center;
-  padding-right: 4px;
+  padding: 0 4px var(--ds-explore-floor-seam) 0;
 }
 
 /* Ceiling */
@@ -2483,7 +2488,7 @@
 .ds-explore-door--forward {
   position: absolute;
   left: 50%;
-  bottom: 0;
+  bottom: var(--ds-explore-floor-seam);
   transform: translateX(-50%);
   width: 28%;
   height: 65%;
@@ -2557,7 +2562,7 @@
 .ds-explore-door--back {
   position: absolute;
   left: 50%;
-  bottom: 3%;
+  bottom: calc(var(--ds-explore-floor-seam) + 3%);
   transform: translateX(-50%);
   width: 22%;
   max-width: 110px;
