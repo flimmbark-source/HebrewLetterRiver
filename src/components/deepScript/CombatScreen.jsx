@@ -46,6 +46,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   const [spawnFxCounter, setSpawnFxCounter] = useState(0);
   const [recentTrayTiles, setRecentTrayTiles] = useState([]);
   const [overflowBursts, setOverflowBursts] = useState([]);
+  const [nextCorrectBoost, setNextCorrectBoost] = useState(0);
   const prevPhaseRef = useRef(combat?.phase);
   const prevTrayIdsRef = useRef((combat?.tray || []).map(t => t.id));
   const prevLogLengthRef = useRef((combat?.log || []).length);
@@ -127,12 +128,38 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     const vowelPool = ['א', 'ה', 'ו', 'י', 'ע'];
     const consonantPool = allDeepScriptLetters.filter(letter => !vowelPool.includes(letter));
     const pool = kind === 'vowel' ? vowelPool : consonantPool;
-    const generated = Array.from({ length: 1 }, () => {
+
+    const remainingNeeded = combat.answerTrack
+      .filter(slot => !slot.correct)
+      .map(slot => slot.targetLetter)
+      .filter(letter => pool.includes(letter));
+
+    const generatedLetters = [];
+    let generatedCorrect = false;
+
+    const shouldForceCorrect = remainingNeeded.length > 0 && Math.random() < nextCorrectBoost;
+    if (shouldForceCorrect) {
+      const forced = remainingNeeded[Math.floor(Math.random() * remainingNeeded.length)];
+      generatedLetters.push(forced);
+      generatedCorrect = true;
+    }
+
+    while (generatedLetters.length < 2) {
       const letter = pool[Math.floor(Math.random() * pool.length)] || pool[0] || 'א';
-      return createLetterTile(letter, kind);
+      generatedLetters.push(letter);
+      if (!generatedCorrect && remainingNeeded.includes(letter)) {
+        generatedCorrect = true;
+      }
+    }
+
+    const generated = generatedLetters.map(letter => createLetterTile(letter, kind));
+    setNextCorrectBoost(prev => {
+      if (generatedCorrect) return 0;
+      return Math.min(1, prev + (0.25 * generated.length));
     });
+
     dispatch({ type: ACTIONS.GENERATE_LETTERS, letters: generated, runState });
-  }, [runState]);
+  }, [combat?.answerTrack, nextCorrectBoost, runState]);
 
   const handlePickChoice = useCallback((letter) => {
     playSelect();

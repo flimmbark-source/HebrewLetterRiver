@@ -20,6 +20,7 @@ import './DeepScript.css';
  *       Combat/Archive/Shrine → back to Exploration → ... → Miniboss → End
  */
 export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
+  const isPackRun = !!(packWords && packWords.length > 0);
   const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | archive | shrine | end
   const [runState, setRunState] = useState(null);
   const [endResult, setEndResult] = useState(null);
@@ -39,9 +40,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     const combatCount = Math.min(6, 3 + Math.floor((targetFloorNumber - 1) / 2));
     return generateDungeonFloor({
       combatCount,
-      customWords: packWords && packWords.length > 0 ? packWords : null,
+      customWords: isPackRun ? packWords : null,
     });
-  }, [packWords]);
+  }, [isPackRun, packWords]);
 
   // Add/remove body class for nav bar hiding; clean up custom words on unmount
   useEffect(() => {
@@ -59,7 +60,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     if (!kit) return;
 
     // Register custom words if running a pack-based session
-    if (packWords && packWords.length > 0) {
+    if (isPackRun) {
       registerCustomWords(packWords);
     } else {
       clearCustomWords();
@@ -79,7 +80,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     setFacing('north');
     setFloorNumber(1);
     setScreen('exploring');
-  }, [packWords, createFloorForNumber]);
+  }, [createFloorForNumber, isPackRun, packWords]);
 
   // ─── Exploration: Movement ────────────────────────────────
 
@@ -236,6 +237,11 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
   }, [activeCombat, floorNumber, onRunComplete]);
 
   const handleNextFloor = useCallback(() => {
+    if (isPackRun) {
+      setEndResult('victory');
+      setScreen('end');
+      return;
+    }
     const nextFloorNumber = floorNumber + 1;
     const nextFloor = createFloorForNumber(nextFloorNumber);
 
@@ -252,7 +258,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     }));
     setFloorNumber(nextFloorNumber);
     setScreen('exploring');
-  }, [createFloorForNumber, floorNumber]);
+  }, [createFloorForNumber, floorNumber, isPackRun]);
 
   // ─── Archive End ──────────────────────────────────────────
 
@@ -397,6 +403,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
           onNextFloor={handleNextFloor}
           onRestart={handleRestart}
           onBack={onBack}
+          canAdvanceFloor={!isPackRun}
         />
       </div>
     );
