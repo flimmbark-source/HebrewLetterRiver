@@ -144,7 +144,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       generatedCorrect = true;
     }
 
-    while (generatedLetters.length < 2) {
+    while (generatedLetters.length < 1) {
       const letter = pool[Math.floor(Math.random() * pool.length)] || pool[0] || 'א';
       generatedLetters.push(letter);
       if (!generatedCorrect && remainingNeeded.includes(letter)) {
