@@ -143,7 +143,12 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   }, []);
 
   const handleTriggerMiniGame = useCallback((chamberId, miniGameId) => {
-    setActiveMiniGame({ chamberId, miniGameId });
+    setActiveMiniGame(prev => {
+      if (prev?.chamberId === chamberId && prev?.miniGameId === miniGameId) {
+        return null;
+      }
+      return { chamberId, miniGameId };
+    });
   }, []);
 
   const handleLoot = useCallback((chamberId, interactableId) => {
