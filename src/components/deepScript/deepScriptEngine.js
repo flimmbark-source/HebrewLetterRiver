@@ -304,7 +304,9 @@ function pushTilesToTray(state, tiles, runState) {
   const overflowEvents = [];
   const removed = [];
   const reduction = runState?.upgrades?.curseDamageReduction || 0;
-  const isScribe = (runState?.kitId || state.kitId) === 'scribe';
+  const activeKitId = runState?.kitId || state.kitId;
+  const isScribe = activeKitId === 'scribe';
+  const isInterpreter = activeKitId === 'interpreter';
   const letterProductionCounts = { ...(state.letterProductionCounts || {}) };
 
   for (const tile of tiles) {
@@ -327,10 +329,21 @@ function pushTilesToTray(state, tiles, runState) {
             type: 'scribe_overflow_loss',
             letter: pushed.letter,
             damage: 1,
+            message: `A needed letter (${pushed.letter}) burst from the tray for 1 damage!`,
           });
         }
       } else if (pushed.cursed) {
-        cursedOverflowDamage += 1;
+        if (isInterpreter) {
+          overflowBurstDamage += 1;
+          overflowEvents.push({
+            type: 'cursed_overflow_break',
+            letter: pushed.letter,
+            damage: 1,
+            message: `A cursed letter (${pushed.letter}) burst from the tray for 1 damage!`,
+          });
+        } else {
+          cursedOverflowDamage += 1;
+        }
       }
     }
   }
@@ -582,7 +595,7 @@ export function combatReducer(state, action) {
           type: 'overflow_burst',
           letter: event.letter,
           damage: event.damage || 1,
-          message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
+          message: event.message || `A letter (${event.letter}) burst from the tray for ${event.damage || 1} damage!`,
         })));
       }
       if (pushResult.cursedOverflowDamage > 0) {
@@ -727,7 +740,7 @@ export function combatReducer(state, action) {
                 type: 'overflow_burst',
                 letter: event.letter,
                 damage: event.damage || 1,
-                message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
+                message: event.message || `A letter (${event.letter}) burst from the tray for ${event.damage || 1} damage!`,
               })));
             }
             if (pushResult.cursedOverflowDamage > 0) {
@@ -797,7 +810,7 @@ export function combatReducer(state, action) {
                 type: 'overflow_burst',
                 letter: event.letter,
                 damage: event.damage || 1,
-                message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
+                message: event.message || `A letter (${event.letter}) burst from the tray for ${event.damage || 1} damage!`,
               })));
             }
             if (pushResult.cursedOverflowDamage > 0) {
@@ -913,7 +926,7 @@ export function combatReducer(state, action) {
                 type: 'overflow_burst',
                 letter: event.letter,
                 damage: event.damage || 1,
-                message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
+                message: event.message || `A letter (${event.letter}) burst from the tray for ${event.damage || 1} damage!`,
               }))
               : [])
             : []),
