@@ -2210,7 +2210,7 @@
 }
 
 .ds-pillar-game--compact .ds-pillar-core {
-  inset: 9% 38%;
+  inset: -4% 26%;
 }
 
 .ds-pillar-game--compact .ds-pillar-slat {
@@ -2923,6 +2923,7 @@
 
 .ds-room-object--pillar {
   width: min(70%, 360px);
+  top: calc(58% + 100px);
 }
 
 .ds-room-object-close {
