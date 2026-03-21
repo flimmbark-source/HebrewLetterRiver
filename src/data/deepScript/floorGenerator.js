@@ -458,6 +458,134 @@ function buildFloorPlan(chambers, positions, startId, bossId) {
 
 // ─── Floor layout generation ────────────────────────────────
 
+const FLOOR_PLAN_TEMPLATES = {
+  8: {
+    start: 0,
+    boss: 5,
+    nodes: [
+      { x: 0, y: 0 }, // 0 start
+      { x: 1, y: 0 }, // 1
+      { x: 2, y: 0 }, // 2
+      { x: 2, y: 1 }, // 3
+      { x: 3, y: 1 }, // 4
+      { x: 4, y: 1 }, // 5 boss
+      { x: 1, y: 1 }, // 6
+      { x: 3, y: 0 }, // 7
+    ],
+    edges: [
+      [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], // main route
+      [1, 6], [6, 3], [2, 7], [7, 4], // side loops
+    ],
+  },
+  9: {
+    start: 0,
+    boss: 5,
+    nodes: [
+      { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 1 }, { x: 4, y: 1 }, { x: 1, y: 1 }, { x: 3, y: 0 }, { x: 4, y: 0 },
+    ],
+    edges: [
+      [0, 1], [1, 2], [2, 3], [3, 4], [4, 5],
+      [1, 6], [6, 3], [2, 7], [7, 4], [7, 8], [8, 5],
+    ],
+  },
+  10: {
+    start: 0,
+    boss: 5,
+    nodes: [
+      { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 1 }, { x: 4, y: 1 }, { x: 1, y: 1 }, { x: 3, y: 0 }, { x: 4, y: 0 }, { x: 0, y: 1 },
+    ],
+    edges: [
+      [0, 1], [1, 2], [2, 3], [3, 4], [4, 5],
+      [1, 6], [6, 3], [2, 7], [7, 4], [7, 8], [8, 5],
+      [0, 9], [9, 6],
+    ],
+  },
+  11: {
+    start: 0,
+    boss: 5,
+    nodes: [
+      { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 1 }, { x: 4, y: 1 }, { x: 1, y: 1 }, { x: 3, y: 0 }, { x: 4, y: 0 }, { x: 0, y: 1 }, { x: 3, y: -1 },
+    ],
+    edges: [
+      [0, 1], [1, 2], [2, 3], [3, 4], [4, 5],
+      [1, 6], [6, 3], [2, 7], [7, 4], [7, 8], [8, 5],
+      [0, 9], [9, 6], [2, 10], [10, 7],
+    ],
+  },
+};
+
+function directionBetween(fromPos, toPos) {
+  const dx = toPos.x - fromPos.x;
+  const dy = toPos.y - fromPos.y;
+  if (dx === 1 && dy === 0) return 'east';
+  if (dx === -1 && dy === 0) return 'west';
+  if (dx === 0 && dy === 1) return 'south';
+  if (dx === 0 && dy === -1) return 'north';
+  return null;
+}
+
+function buildTemplateLayout(chambers, entrance, miniboss) {
+  const template = FLOOR_PLAN_TEMPLATES[chambers.size];
+  if (!template) {
+    throw new Error(`No floor plan template defined for ${chambers.size} chambers.`);
+  }
+  const rotations = [0, 90, 180, 270];
+  const rotation = rotations[Math.floor(Math.random() * rotations.length)];
+  const mirrorX = Math.random() < 0.5;
+
+  const transformedNodes = template.nodes.map(node => {
+    let { x, y } = node;
+    if (mirrorX) x = -x;
+    switch (rotation) {
+      case 90:
+        return { x: -y, y: x };
+      case 180:
+        return { x: -x, y: -y };
+      case 270:
+        return { x: y, y: -x };
+      default:
+        return { x, y };
+    }
+  });
+
+  const middle = shuffle(Array.from(chambers.values()).filter(ch => ch.id !== entrance.id && ch.id !== miniboss.id));
+  const chamberByNode = new Map();
+  chamberByNode.set(template.start, entrance);
+  chamberByNode.set(template.boss, miniboss);
+
+  const assignableNodeIndices = template.nodes
+    .map((_, idx) => idx)
+    .filter(idx => idx !== template.start && idx !== template.boss);
+
+  assignableNodeIndices.forEach((nodeIdx, i) => {
+    chamberByNode.set(nodeIdx, middle[i]);
+  });
+
+  const positions = new Map();
+  for (const [nodeIdx, chamber] of chamberByNode.entries()) {
+    const pos = transformedNodes[nodeIdx];
+    chamber.position = { ...pos };
+    positions.set(chamber.id, { ...pos });
+  }
+
+  for (const [fromIdx, toIdx] of template.edges) {
+    const fromChamber = chamberByNode.get(fromIdx);
+    const toChamber = chamberByNode.get(toIdx);
+    const fromPos = transformedNodes[fromIdx];
+    const toPos = transformedNodes[toIdx];
+    const dir = directionBetween(fromPos, toPos);
+    if (!dir) {
+      throw new Error('Invalid floor plan template edge: nodes are not cardinally adjacent.');
+    }
+    const didConnect = connect(chambers, fromChamber.id, toChamber.id, dir);
+    if (!didConnect) {
+      throw new Error('Failed to connect chambers from floor plan template.');
+    }
+  }
+
+  return positions;
+}
+
 /**
  * Generate a dungeon floor with connected chambers.
  *
@@ -547,46 +675,8 @@ export function generateDungeonFloor({
       for (const chamber of allChambers) {
         chambers.set(chamber.id, chamber);
       }
-      const positions = new Map();
-      const occupied = new Map();
-      positions.set(entrance.id, { x: 0, y: 0 });
-      occupied.set(coordKey(0, 0), entrance.id);
-      entrance.position = { x: 0, y: 0 };
-
-      // Build a randomized main path from entrance to miniboss.
-      const middleCandidates = shuffle([...combatChambers, archive, shrine, event]);
-      const desiredMinBetween = Math.max(3, minRoomsBetweenStartAndExit);
-      const maxBetween = Math.min(middleCandidates.length, desiredMinBetween + 2);
-      const betweenCount = Math.min(
-        middleCandidates.length,
-        desiredMinBetween + Math.floor(Math.random() * Math.max(1, maxBetween - desiredMinBetween + 1)),
-      );
-
-      const mainPathMiddle = middleCandidates.slice(0, betweenCount);
-      const sideChambers = middleCandidates.slice(betweenCount);
-
-      const mainPath = [entrance, ...mainPathMiddle, miniboss];
-      buildRandomMainPath(chambers, mainPath, positions, occupied);
-
-      // Attach any unused chambers as branches/loops off the main path.
-      attachSideChambers(
-        chambers,
-        mainPathMiddle.length > 0 ? mainPathMiddle : [entrance],
-        sideChambers,
-        positions,
-        occupied,
-      );
-
-      const baselineRouteLength = shortestPathLength(chambers, entrance.id, miniboss.id);
-
-      // Prevent soft-lock feeling in cul-de-sacs by giving every non-endpoint
-      // chamber at least one alternate exit whenever geometry allows.
-      reinforceNoDeadEnds(
-        chambers,
-        new Set([entrance.id, miniboss.id]),
-        { startId: entrance.id, targetId: miniboss.id, minLength: baselineRouteLength },
-      );
-      ensureNoIsolatedChambers(chambers, entrance.id);
+      // Use shared authored floor-plan templates for both endless and pack runs.
+      const positions = buildTemplateLayout(chambers, entrance, miniboss);
 
       // Safety assertion: every chamber must reach exit and non-endpoints must not be dead ends.
       assertFloorSafety(chambers, entrance.id, miniboss.id, minRouteLength);
