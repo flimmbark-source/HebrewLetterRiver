@@ -339,6 +339,10 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
           <span className="ds-overflow-shot-letter">{burst.letter}</span>
           <span className="ds-overflow-shot-hit">-1</span>
           <span className="ds-overflow-shot-burst" />
+          <span className="ds-overflow-shot-shard ds-overflow-shot-shard--a" />
+          <span className="ds-overflow-shot-shard ds-overflow-shot-shard--b" />
+          <span className="ds-overflow-shot-shard ds-overflow-shot-shard--c" />
+          <span className="ds-overflow-shot-shard ds-overflow-shot-shard--d" />
         </div>
       ))}
 

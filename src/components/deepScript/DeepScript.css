@@ -787,7 +787,9 @@
   font-weight: 800;
   color: var(--ds-parchment);
   text-shadow: 0 0 10px rgba(255, 245, 214, 0.9);
-  animation: ds-overflow-shake 0.22s ease-in-out 2;
+  animation:
+    ds-overflow-shake 0.22s ease-in-out 2,
+    ds-overflow-letter-break 0.72s ease-out forwards;
 }
 
 .ds-overflow-shot-hit {
@@ -810,6 +812,51 @@
     inset 0 0 10px rgba(255, 245, 214, 0.55);
   opacity: 0;
   animation: ds-overflow-shot-burst 0.72s ease-out forwards;
+}
+
+.ds-overflow-shot-shard {
+  position: absolute;
+  top: 10px;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(180deg, #ffd7d7 0%, #ff6666 100%);
+  border-radius: 1px;
+  box-shadow: 0 0 8px rgba(255, 70, 70, 0.75);
+  opacity: 0;
+  transform: translate(0, 0) rotate(0deg) scale(0.2);
+  animation: ds-overflow-shard-fly 0.72s ease-out forwards;
+}
+
+.ds-overflow-shot-shard--a {
+  left: calc(50% - 4px);
+  animation-delay: 0.45s;
+  --ds-shard-x: -34px;
+  --ds-shard-y: -30px;
+  --ds-shard-r: -36deg;
+}
+
+.ds-overflow-shot-shard--b {
+  left: calc(50% - 4px);
+  animation-delay: 0.47s;
+  --ds-shard-x: 30px;
+  --ds-shard-y: -28px;
+  --ds-shard-r: 28deg;
+}
+
+.ds-overflow-shot-shard--c {
+  left: calc(50% - 4px);
+  animation-delay: 0.49s;
+  --ds-shard-x: -22px;
+  --ds-shard-y: -44px;
+  --ds-shard-r: -72deg;
+}
+
+.ds-overflow-shot-shard--d {
+  left: calc(50% - 4px);
+  animation-delay: 0.51s;
+  --ds-shard-x: 24px;
+  --ds-shard-y: -42px;
+  --ds-shard-r: 54deg;
 }
 
 @keyframes ds-overflow-shake {
@@ -851,6 +898,47 @@
   100% {
     transform: scale(1.95);
     opacity: 0;
+  }
+}
+
+@keyframes ds-overflow-letter-break {
+  0% {
+    color: var(--ds-parchment);
+    filter: saturate(1);
+    opacity: 1;
+  }
+  60% {
+    color: var(--ds-parchment);
+    text-shadow: 0 0 10px rgba(255, 245, 214, 0.9);
+    opacity: 1;
+  }
+  72% {
+    color: #ff9a9a;
+    text-shadow:
+      0 0 16px rgba(255, 90, 90, 0.9),
+      0 0 24px rgba(255, 50, 50, 0.7);
+    filter: saturate(1.35);
+    opacity: 1;
+  }
+  100% {
+    color: #ff4e4e;
+    text-shadow: 0 0 4px rgba(255, 40, 40, 0.2);
+    opacity: 0;
+  }
+}
+
+@keyframes ds-overflow-shard-fly {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg) scale(0.2);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--ds-shard-x), var(--ds-shard-y)) rotate(var(--ds-shard-r)) scale(1);
   }
 }
 
