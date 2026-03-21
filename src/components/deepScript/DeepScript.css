@@ -2367,7 +2367,7 @@
   top: 10%;
   left: 16%;
   right: 16%;
-  bottom: 32%;
+  bottom: 38%;
   background:
     repeating-linear-gradient(
       0deg, transparent, transparent 28px,
@@ -2434,7 +2434,7 @@
   width: 18%;
   z-index: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .ds-explore-wall-left {
@@ -2442,6 +2442,7 @@
   background: linear-gradient(90deg, #0d0f14 0%, #12151b 40%, rgba(18, 21, 27, 0.6) 80%, transparent 100%);
   justify-content: center;
   padding-left: 4px;
+  padding-bottom: 38%;
 }
 
 .ds-explore-wall-right {
@@ -2449,6 +2450,7 @@
   background: linear-gradient(-90deg, #0d0f14 0%, #12151b 40%, rgba(18, 21, 27, 0.6) 80%, transparent 100%);
   justify-content: center;
   padding-right: 4px;
+  padding-bottom: 38%;
 }
 
 /* Ceiling */
