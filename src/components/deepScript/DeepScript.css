@@ -3652,17 +3652,17 @@
 }
 
 .ds-ability-card--mega {
-  width: 210px;
-  height: 180px;
+  width: 140px;
+  height: 120px;
   border-width: 3px;
 }
 
 .ds-ability-card--mega .ds-ability-icon-center {
-  font-size: 46px;
+  font-size: 32px;
 }
 
 .ds-ability-card--mega .ds-ability-effect {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 900;
   letter-spacing: 0.8px;
 }

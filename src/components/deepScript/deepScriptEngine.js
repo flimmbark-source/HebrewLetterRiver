@@ -917,7 +917,7 @@ export function createRunState(kit, sharedGearIds, runMap) {
     kit,
     health: kit.health,
     maxHealth: kit.health,
-    traySize: kit.traySize,
+    traySize: kit.traySize * 2,
     satchelSize: 0,
     maxEnergy: 0,
     gearIds: [kit.gearIds[0]],
