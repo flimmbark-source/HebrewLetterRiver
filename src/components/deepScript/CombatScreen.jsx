@@ -309,6 +309,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
         </div>
         <div className="ds-tile-row ds-tile-row--solo">
           <div className="ds-inv-tray">
+            <div className="ds-inv-label">Letter Tray</div>
             <div className="ds-inv-tiles ds-inv-tiles--flow">
               {combat.tray.map(tile => {
                 let tileCls = 'ds-inv-tile';
@@ -330,8 +331,8 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
               {Array.from({ length: Math.max(0, runState.traySize - combat.tray.length) }).map((_, i) => (
                 <div key={`e-${i}`} className="ds-inv-tile ds-inv-tile--empty" />
               ))}
+              <div class="spacer"></div>
             </div>
-            <div className="ds-inv-label">Letter Tray</div>
           </div>
         </div>
 
