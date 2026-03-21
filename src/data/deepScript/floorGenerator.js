@@ -114,6 +114,7 @@ function createChamber(type, payload = {}) {
     visited: false,
     resolved: false,
     payload,
+    position: null, // { x, y } assigned during floor-plan construction
   };
 }
 
@@ -124,6 +125,21 @@ function shuffle(items) {
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy;
+}
+
+function coordKey(x, y) {
+  return `${x},${y}`;
+}
+
+function stepFrom(position, direction) {
+  if (!position) return null;
+  switch (direction) {
+    case 'north': return { x: position.x, y: position.y - 1 };
+    case 'south': return { x: position.x, y: position.y + 1 };
+    case 'east': return { x: position.x + 1, y: position.y };
+    case 'west': return { x: position.x - 1, y: position.y };
+    default: return null;
+  }
 }
 
 function connect(chambers, fromId, toId, direction) {
@@ -149,7 +165,14 @@ function connectWithRandomDirection(chambers, fromId, toId, options = {}) {
   const to = chambers.get(toId);
   if (!from || !to) return null;
 
-  const { preferred = null, avoid = null } = options;
+  const {
+    preferred = null,
+    avoid = null,
+    positions = null,
+    occupied = null,
+  } = options;
+
+  if (positions && !positions.has(fromId)) return null;
   const candidates = getOpenDirections(from, avoid);
   if (candidates.length === 0) return null;
 
@@ -159,12 +182,38 @@ function connectWithRandomDirection(chambers, fromId, toId, options = {}) {
   }
 
   for (const dir of order) {
+    if (positions) {
+      const fromPos = positions.get(fromId);
+      const targetPos = stepFrom(fromPos, dir);
+      if (!targetPos) continue;
+      const targetKey = coordKey(targetPos.x, targetPos.y);
+      const existingToPos = positions.get(toId);
+
+      if (existingToPos) {
+        if (existingToPos.x !== targetPos.x || existingToPos.y !== targetPos.y) {
+          continue;
+        }
+      } else if (occupied?.has(targetKey)) {
+        continue;
+      }
+
+      if (connect(chambers, fromId, toId, dir)) {
+        if (!existingToPos) {
+          positions.set(toId, targetPos);
+          occupied?.set(targetKey, toId);
+          to.position = targetPos;
+        }
+        return dir;
+      }
+      continue;
+    }
+
     if (connect(chambers, fromId, toId, dir)) return dir;
   }
   return null;
 }
 
-function buildRandomMainPath(chambers, pathChambers) {
+function buildRandomMainPath(chambers, pathChambers, positions, occupied) {
   let previousDirection = null;
   for (let i = 0; i < pathChambers.length - 1; i++) {
     const from = pathChambers[i];
@@ -178,11 +227,13 @@ function buildRandomMainPath(chambers, pathChambers) {
     const chosen = connectWithRandomDirection(chambers, from.id, to.id, {
       preferred,
       avoid: previousDirection ? OPPOSITE[previousDirection] : null,
+      positions,
+      occupied,
     });
 
     // Fallback: fully random open direction
     if (!chosen) {
-      const fallback = connectWithRandomDirection(chambers, from.id, to.id);
+      const fallback = connectWithRandomDirection(chambers, from.id, to.id, { positions, occupied });
       if (!fallback) {
         throw new Error('Failed to build main path: no available exits.');
       }
@@ -193,20 +244,20 @@ function buildRandomMainPath(chambers, pathChambers) {
   }
 }
 
-function attachSideChambers(chambers, anchorChambers, sideChambers) {
+function attachSideChambers(chambers, anchorChambers, sideChambers, positions, occupied) {
   for (const side of sideChambers) {
     let placed = false;
     const anchors = shuffle(anchorChambers);
 
     for (const anchor of anchors) {
-      const dir = connectWithRandomDirection(chambers, anchor.id, side.id);
+      const dir = connectWithRandomDirection(chambers, anchor.id, side.id, { positions, occupied });
       if (dir) {
         // Occasionally add one extra loop edge from side chamber to another anchor.
         if (Math.random() < 0.25) {
           const loopCandidates = shuffle(anchorChambers.filter(c => c.id !== anchor.id));
           for (const loopTarget of loopCandidates) {
             if (Object.keys(side.exits).length >= DIRECTIONS.length) break;
-            const loopDir = connectWithRandomDirection(chambers, side.id, loopTarget.id);
+            const loopDir = connectWithRandomDirection(chambers, side.id, loopTarget.id, { positions, occupied });
             if (loopDir) break;
           }
         }
@@ -220,7 +271,7 @@ function attachSideChambers(chambers, anchorChambers, sideChambers) {
       // Last-resort connection pass over every chamber.
       const fallbackAnchors = shuffle(Array.from(chambers.values()).filter(c => c.id !== side.id));
       for (const anchor of fallbackAnchors) {
-        if (connectWithRandomDirection(chambers, anchor.id, side.id)) {
+        if (connectWithRandomDirection(chambers, anchor.id, side.id, { positions, occupied })) {
           placed = true;
           break;
         }
@@ -373,6 +424,38 @@ function assertFloorSafety(chambers, entranceId, minibossId, minRouteLength) {
   }
 }
 
+function buildFloorPlan(chambers, positions, startId, bossId) {
+  const planRooms = [];
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+
+  for (const chamber of chambers.values()) {
+    const pos = positions.get(chamber.id);
+    if (!pos) continue;
+    minX = Math.min(minX, pos.x);
+    maxX = Math.max(maxX, pos.x);
+    minY = Math.min(minY, pos.y);
+    maxY = Math.max(maxY, pos.y);
+    chamber.position = { ...pos };
+    planRooms.push({
+      id: chamber.id,
+      type: chamber.type,
+      x: pos.x,
+      y: pos.y,
+      exits: { ...chamber.exits },
+      isStart: chamber.id === startId,
+      isBoss: chamber.id === bossId,
+    });
+  }
+
+  return {
+    rooms: planRooms,
+    bounds: { minX, maxX, minY, maxY },
+  };
+}
+
 // ─── Floor layout generation ────────────────────────────────
 
 /**
@@ -464,6 +547,11 @@ export function generateDungeonFloor({
       for (const chamber of allChambers) {
         chambers.set(chamber.id, chamber);
       }
+      const positions = new Map();
+      const occupied = new Map();
+      positions.set(entrance.id, { x: 0, y: 0 });
+      occupied.set(coordKey(0, 0), entrance.id);
+      entrance.position = { x: 0, y: 0 };
 
       // Build a randomized main path from entrance to miniboss.
       const middleCandidates = shuffle([...combatChambers, archive, shrine, event]);
@@ -478,10 +566,16 @@ export function generateDungeonFloor({
       const sideChambers = middleCandidates.slice(betweenCount);
 
       const mainPath = [entrance, ...mainPathMiddle, miniboss];
-      buildRandomMainPath(chambers, mainPath);
+      buildRandomMainPath(chambers, mainPath, positions, occupied);
 
       // Attach any unused chambers as branches/loops off the main path.
-      attachSideChambers(chambers, mainPathMiddle.length > 0 ? mainPathMiddle : [entrance], sideChambers);
+      attachSideChambers(
+        chambers,
+        mainPathMiddle.length > 0 ? mainPathMiddle : [entrance],
+        sideChambers,
+        positions,
+        occupied,
+      );
 
       const baselineRouteLength = shortestPathLength(chambers, entrance.id, miniboss.id);
 
@@ -496,10 +590,12 @@ export function generateDungeonFloor({
 
       // Safety assertion: every chamber must reach exit and non-endpoints must not be dead ends.
       assertFloorSafety(chambers, entrance.id, miniboss.id, minRouteLength);
+      const floorPlan = buildFloorPlan(chambers, positions, entrance.id, miniboss.id);
 
       return {
         id: `floor-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
         chambers,
+        floorPlan,
         startChamberId: entrance.id,
         bossChamberId: miniboss.id,
         chamberCount: chambers.size,
