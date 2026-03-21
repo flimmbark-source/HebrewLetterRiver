@@ -4,7 +4,6 @@ import {
   createCombatState,
   createLetterTile,
   ACTIONS,
-  getIntentDisplay,
 } from './deepScriptEngine.js';
 import { allDeepScriptLetters } from '../../data/deepScript/words.js';
 import { celebrate } from '../../lib/celebration.js';
@@ -19,11 +18,10 @@ import {
  *
  * Layout (top to bottom):
  *   1. Top HUD: health and progress
- *   2. Enemy intent banner
- *   3. Dungeon viewport with encounter sigil + inscription slots
- *   4. Tray + Satchel tile row
- *   5. Ability cards row with tile sockets
- *   6. End Turn button
+ *   2. Dungeon viewport with encounter sigil + inscription slots
+ *   3. Tray + Satchel tile row
+ *   4. Ability cards row with tile sockets
+ *   5. End Turn button
  */
 export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   const initialState = useMemo(() => {
@@ -45,12 +43,12 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   const [justCorrectSlot, setJustCorrectSlot] = useState(null);
   const [justWrongSlot, setJustWrongSlot] = useState(null);
   const [activatingGear, setActivatingGear] = useState(null);
-  const [enemyActing, setEnemyActing] = useState(false);
   const [spawnFxCounter, setSpawnFxCounter] = useState(0);
   const [recentTrayTiles, setRecentTrayTiles] = useState([]);
+  const [overflowBursts, setOverflowBursts] = useState([]);
   const prevPhaseRef = useRef(combat?.phase);
-  const enemyActingTimerRef = useRef(null);
   const prevTrayIdsRef = useRef((combat?.tray || []).map(t => t.id));
+  const prevLogLengthRef = useRef((combat?.log || []).length);
 
   // Handle combat end with sounds
   useEffect(() => {
@@ -99,10 +97,6 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     }
   }, [activatingGear]);
 
-  useEffect(() => () => {
-    if (enemyActingTimerRef.current) clearTimeout(enemyActingTimerRef.current);
-  }, []);
-
   // ─── Handlers ─────────────────────────────────────────────
 
   const handleSlotClick = useCallback((slotIndex) => {
@@ -117,16 +111,10 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       } else {
         playWrong();
         setJustWrongSlot(slotIndex);
-        setEnemyActing(true);
-        if (enemyActingTimerRef.current) clearTimeout(enemyActingTimerRef.current);
-        enemyActingTimerRef.current = setTimeout(() => {
-          setEnemyActing(false);
-          enemyActingTimerRef.current = null;
-        }, 600);
       }
     }
-    dispatch({ type: ACTIONS.PLACE_LETTER, slotIndex });
-  }, [combat?.selectedTrayTile, combat?.selectedSatchelTile, combat?.tray, combat?.satchel, combat?.answerTrack]);
+    dispatch({ type: ACTIONS.PLACE_LETTER, slotIndex, runState });
+  }, [combat?.selectedTrayTile, combat?.selectedSatchelTile, combat?.tray, combat?.satchel, combat?.answerTrack, runState]);
 
   const handleTrayClick = useCallback((tileId) => {
     playSelect();
@@ -166,6 +154,26 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     prevTrayIdsRef.current = nextIds;
   }, [combat?.tray]);
 
+  useEffect(() => {
+    if (!combat) return;
+    const prevLen = prevLogLengthRef.current || 0;
+    const nextLog = combat.log || [];
+    const newEntries = nextLog.slice(prevLen).filter(entry => entry.type === 'overflow_burst');
+    if (newEntries.length > 0) {
+      const burstItems = newEntries.map((entry, idx) => ({
+        id: `overflow-${Date.now()}-${idx}`,
+        letter: entry.letter,
+      }));
+      setOverflowBursts(prev => [...prev, ...burstItems]);
+      const timer = setTimeout(() => {
+        setOverflowBursts(prev => prev.filter(item => !burstItems.some(b => b.id === item.id)));
+      }, 700);
+      prevLogLengthRef.current = nextLog.length;
+      return () => clearTimeout(timer);
+    }
+    prevLogLengthRef.current = nextLog.length;
+  }, [combat?.log]);
+
   if (!combat) return <div className="ds-screen">Loading...</div>;
 
   const word = combat.word;
@@ -181,9 +189,6 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   // Tile action availability
   const hasSelection = combat.selectedTrayTile;
 
-  // Enemy intent display
-  const intentDisplay = getIntentDisplay(combat.enemyIntent);
-
   return (
     <div className="ds-combat-screen">
       {/* ═══ TOP HUD — health left, progress right ═══ */}
@@ -197,18 +202,6 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
         <div className="ds-hud-progress">
           <span className="ds-hud-progress-text">{completedSlots}/{totalSlots}</span>
         </div>
-      </div>
-
-      {/* ═══ ENEMY INTENT BANNER ═══ */}
-      <div
-        className={`ds-intent-banner ${enemyActing ? 'ds-intent-banner--acting' : ''} ${combat.warded ? 'ds-intent-banner--warded' : ''} ds-intent-banner--${combat.enemyIntent?.type || 'idle'}`}
-        title={intentDisplay.description
-          ? `${intentDisplay.label}: ${intentDisplay.description} (Value: ${intentDisplay.value})`
-          : intentDisplay.label}
-      >
-        {combat.warded && <span className="ds-intent-ward">🛡️</span>}
-        <span className="ds-intent-value">×{intentDisplay.value}</span>
-        <span className="ds-intent-icon">{intentDisplay.icon}</span>
       </div>
 
       {/* ═══ DUNGEON VIEWPORT ═══ */}
@@ -288,6 +281,12 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
         </div>
         <div className="ds-tile-row ds-tile-row--solo">
           <div className="ds-inv-tray">
+            {overflowBursts.map(burst => (
+              <div key={burst.id} className="ds-tray-overflow-burst" aria-hidden="true">
+                <span className="ds-tray-overflow-letter">{burst.letter}</span>
+                <span className="ds-tray-overflow-hit">-1</span>
+              </div>
+            ))}
             <div className="ds-inv-tiles ds-inv-tiles--flow">
               {combat.tray.map(tile => {
                 let tileCls = 'ds-inv-tile';

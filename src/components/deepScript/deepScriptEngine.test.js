@@ -814,6 +814,23 @@ describe('Letter Generation', () => {
     const bundle = generateChoiceBundle(3, ['ש', 'ל', 'ם'], 1);
     expect(bundle.length).toBe(4);
   });
+
+  it('tracks produced letters and reuses that history across generation', () => {
+    const kit = getStarterKit('scribe');
+    const sharedGearIds = getSharedGear().map(g => g.id);
+    const map = generateRunMap(6);
+    const run = createRunState(kit, sharedGearIds, map);
+    let combat = createCombatState('ds-sefer', run);
+
+    const generatedTile = createLetterTile('א', 'test');
+    const updated = combatReducer(combat, {
+      type: ACTIONS.GENERATE_LETTERS,
+      letters: [generatedTile],
+      runState: run,
+    });
+
+    expect(updated.letterProductionCounts['א']).toBeGreaterThanOrEqual(1);
+  });
 });
 
 // ─── Cursed Tile Damage System ───────────────────────────────
