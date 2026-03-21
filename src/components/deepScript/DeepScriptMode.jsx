@@ -29,6 +29,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
   // Exploration state
   const [floor, setFloor] = useState(null);
   const [currentChamberId, setCurrentChamberId] = useState(null);
+  const [previousChamberId, setPreviousChamberId] = useState(null);
 
   // Active encounter context
   const [activeCombat, setActiveCombat] = useState(null); // { wordId, chamberId, isMiniboss }
@@ -76,6 +77,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     setRunState(newRun);
     setFloor(newFloor);
     setCurrentChamberId(newFloor.startChamberId);
+    setPreviousChamberId(null);
     setFloorNumber(1);
     setScreen('exploring');
   }, [createFloorForNumber, isPackRun, packWords]);
@@ -85,6 +87,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
   const handleMove = useCallback((targetChamberId) => {
     if (!floor) return;
 
+    setPreviousChamberId(currentChamberId);
     setCurrentChamberId(targetChamberId);
 
     // Mark chamber as visited
@@ -110,7 +113,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
         }, 600);
       }
     }
-  }, [floor]);
+  }, [floor, currentChamberId]);
 
   // ─── Exploration: Trigger encounters from hotspots ────────
 
@@ -237,6 +240,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
 
     setFloor(nextFloor);
     setCurrentChamberId(nextFloor.startChamberId);
+    setPreviousChamberId(null);
     setActiveCombat(null);
     setActiveArchive(null);
     setActiveShrine(null);
@@ -456,6 +460,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
       <ExplorationScreen
         floor={floor}
         currentChamberId={currentChamberId}
+        previousChamberId={previousChamberId}
         onMove={handleMove}
         onTriggerCombat={handleTriggerCombat}
         onTriggerArchive={handleTriggerArchive}

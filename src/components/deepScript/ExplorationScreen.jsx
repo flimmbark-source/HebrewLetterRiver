@@ -14,6 +14,7 @@ import InspectPanel from './InspectPanel.jsx';
 export default function ExplorationScreen({
   floor,
   currentChamberId,
+  previousChamberId,
   onMove,
   onTriggerCombat,
   onTriggerArchive,
@@ -29,15 +30,22 @@ export default function ExplorationScreen({
   const chamber = floor.chambers.get(currentChamberId);
   if (!chamber) return null;
 
-  // Compute visible exits from a fixed forward-facing perspective.
-  const relativeExits = useMemo(() => {
+  // Show progression rooms in forward/side slots. Reserve "back" for retreating
+  // to the chamber the player just came from.
+  const visibleExits = useMemo(() => {
+    const connectedExits = [chamber.exits.north, chamber.exits.east, chamber.exits.west, chamber.exits.south]
+      .filter(Boolean);
+    const uniqueConnectedExits = [...new Set(connectedExits)];
+    const back = uniqueConnectedExits.includes(previousChamberId) ? previousChamberId : null;
+    const progressionTargets = uniqueConnectedExits.filter(id => id !== back);
+
     return {
-      forward: chamber.exits.north || null,
-      right: chamber.exits.east || null,
-      back: chamber.exits.south || null,
-      left: chamber.exits.west || null,
+      forward: progressionTargets[0] || null,
+      left: progressionTargets[1] || null,
+      right: progressionTargets[2] || null,
+      back,
     };
-  }, [chamber.exits]);
+  }, [chamber.exits, previousChamberId]);
 
   // Get chamber at an exit
   const getChamberAt = useCallback((chamberId) => {
@@ -125,10 +133,10 @@ export default function ExplorationScreen({
   }, [floor, currentChamberId]);
 
   // Determine what doors are visible
-  const forwardDoor = relativeExits.forward;
-  const leftDoor = relativeExits.left;
-  const rightDoor = relativeExits.right;
-  const backDoor = relativeExits.back;
+  const forwardDoor = visibleExits.forward;
+  const leftDoor = visibleExits.left;
+  const rightDoor = visibleExits.right;
+  const backDoor = visibleExits.back;
 
   // Chamber name for the chamber ahead (peeking)
   const forwardChamber = getChamberAt(forwardDoor);
@@ -202,7 +210,7 @@ export default function ExplorationScreen({
               type="button"
               className={`ds-explore-door ds-explore-door--back ${backChamber?.visited ? 'ds-explore-door--visited' : ''}`}
               onClick={() => handleDoorClick(backDoor, 'back')}
-              title={backChamber?.visited ? getChamberDisplayName(backChamber.type) : 'Unexplored passage behind you'}
+              title={backChamber?.visited ? getChamberDisplayName(backChamber.type) : 'Return to previous chamber'}
             >
               <div className="ds-explore-door-arch" />
               <div className="ds-explore-door-label">
