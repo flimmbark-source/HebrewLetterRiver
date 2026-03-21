@@ -136,7 +136,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   const handleProduceLetters = useCallback((kind) => {
     playGear();
     setActivatingGear(kind);
-    const vowelPool = ['א', 'ה', 'ו', 'י'];
+    const vowelPool = ['א', 'ה', 'ו', 'י', 'ע'];
     const consonantPool = allDeepScriptLetters.filter(letter => !vowelPool.includes(letter));
     const pool = kind === 'vowel' ? vowelPool : consonantPool;
     const generated = Array.from({ length: 2 }, () => {
@@ -323,7 +323,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
             onClick={() => handleProduceLetters('consonant')}
             disabled={combat.phase !== 'active'}
           >
-            <div className="ds-ability-icon-center">א</div>
+            <div className="ds-ability-icon-center">◌</div>
             <div className="ds-ability-effect">Consonants</div>
           </button>
 
@@ -333,7 +333,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
             onClick={() => handleProduceLetters('vowel')}
             disabled={combat.phase !== 'active'}
           >
-            <div className="ds-ability-icon-center">◌</div>
+            <div className="ds-ability-icon-center">א</div>
             <div className="ds-ability-effect">Vowels</div>
           </button>
         </div>
