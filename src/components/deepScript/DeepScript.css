@@ -2434,7 +2434,7 @@
   width: 18%;
   z-index: 1;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .ds-explore-wall-left {
@@ -2442,7 +2442,6 @@
   background: linear-gradient(90deg, #0d0f14 0%, #12151b 40%, rgba(18, 21, 27, 0.6) 80%, transparent 100%);
   justify-content: center;
   padding-left: 4px;
-  padding-bottom: 38%;
 }
 
 .ds-explore-wall-right {
@@ -2450,7 +2449,6 @@
   background: linear-gradient(-90deg, #0d0f14 0%, #12151b 40%, rgba(18, 21, 27, 0.6) 80%, transparent 100%);
   justify-content: center;
   padding-right: 4px;
-  padding-bottom: 38%;
 }
 
 /* Ceiling */
@@ -2536,10 +2534,16 @@
 
 /* Side doors */
 .ds-explore-door--side {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 38%;
+  margin-inline: auto;
   width: 70%;
   max-width: 48px;
   height: 50%;
   max-height: 120px;
+  z-index: 2;
 }
 
 .ds-explore-door--side .ds-explore-door-arch {
