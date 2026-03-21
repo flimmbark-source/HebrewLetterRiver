@@ -2912,6 +2912,33 @@
   padding: 10px 10px 12px;
 }
 
+.ds-room-object {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.ds-room-object--pillar {
+  width: min(70%, 360px);
+}
+
+.ds-room-object-close {
+  position: absolute;
+  right: 20%;
+  top: 32%;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(196, 149, 90, 0.35);
+  background: rgba(24, 28, 36, 0.92);
+  color: var(--ds-parchment);
+  cursor: pointer;
+  z-index: 7;
+}
+
 .ds-room-minigame-close {
   position: absolute;
   right: 8px;

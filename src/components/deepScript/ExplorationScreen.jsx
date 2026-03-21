@@ -266,20 +266,24 @@ export default function ExplorationScreen({
             })}
           </div>
 
-          {isMiniGameOpenInThisRoom && (
+          {isMiniGameOpenInThisRoom && activeMiniGame?.miniGameId === 'pillar' && (
+            <>
+              <div className="ds-room-object ds-room-object--pillar" aria-label="Pillar game object">
+                <PillarMiniGame onSolved={onCompleteMiniGame} compact />
+              </div>
+              <button type="button" className="ds-room-object-close" onClick={onCloseMiniGame}>✕</button>
+            </>
+          )}
+
+          {isMiniGameOpenInThisRoom && activeMiniGame?.miniGameId === 'capsules' && (
             <div className="ds-room-minigame" role="dialog" aria-label="Room minigame">
               <button type="button" className="ds-room-minigame-close" onClick={onCloseMiniGame}>✕</button>
-              {activeMiniGame?.miniGameId === 'pillar' && (
-                <PillarMiniGame onSolved={onCompleteMiniGame} compact />
-              )}
-              {activeMiniGame?.miniGameId === 'capsules' && (
-                <div className="ds-room-minigame-capsules">
-                  <FloatingCapsulesGame
-                    wordPairs={capsulePairs}
-                    onComplete={onCompleteMiniGame}
-                  />
-                </div>
-              )}
+              <div className="ds-room-minigame-capsules">
+                <FloatingCapsulesGame
+                  wordPairs={capsulePairs}
+                  onComplete={onCompleteMiniGame}
+                />
+              </div>
             </div>
           )}
 
