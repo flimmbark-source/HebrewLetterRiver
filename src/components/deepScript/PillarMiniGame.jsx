@@ -37,6 +37,8 @@ function buildPillarRows() {
 export default function PillarMiniGame({ onSolved, compact = false }) {
   const [rows, setRows] = useState(() => buildPillarRows());
   const [spinningRowId, setSpinningRowId] = useState(null);
+  const [showProceed, setShowProceed] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
   const pointerStartRef = React.useRef({});
 
   const solved = useMemo(
@@ -59,10 +61,17 @@ export default function PillarMiniGame({ onSolved, compact = false }) {
   };
 
   React.useEffect(() => {
-    if (!solved) return;
-    const timeout = setTimeout(() => onSolved(), 500);
-    return () => clearTimeout(timeout);
-  }, [solved, onSolved]);
+    if (solved && !isCompleting) {
+      setShowProceed(true);
+    }
+  }, [solved, isCompleting]);
+
+  const handleProceed = () => {
+    if (!solved || isCompleting) return;
+    setShowProceed(false);
+    setIsCompleting(true);
+    setTimeout(() => onSolved(), 600);
+  };
 
   const onPointerDown = (rowId, event) => {
     pointerStartRef.current[rowId] = event.clientX;
@@ -85,7 +94,7 @@ export default function PillarMiniGame({ onSolved, compact = false }) {
   };
 
   return (
-    <div className={`ds-pillar-game ${compact ? 'ds-pillar-game--compact' : ''}`}>
+    <div className={`ds-pillar-game ${compact ? 'ds-pillar-game--compact' : ''} ${isCompleting ? 'ds-pillar-game--completing' : ''}`}>
       <div className="ds-pillar-core" aria-hidden="true" />
       {rows.map((row) => (
         <React.Fragment key={row.id}>
@@ -105,7 +114,12 @@ export default function PillarMiniGame({ onSolved, compact = false }) {
         </React.Fragment>
       ))}
 
-      {solved && <div className="ds-pillar-solved">Pillar aligned</div>}
+      {solved && !showProceed && !isCompleting && <div className="ds-pillar-solved">Pillar aligned</div>}
+      {showProceed && (
+        <button type="button" className="ds-pillar-proceed-btn" onClick={handleProceed}>
+          Proceed
+        </button>
+      )}
     </div>
   );
 }

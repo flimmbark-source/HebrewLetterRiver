@@ -2206,6 +2206,35 @@
   letter-spacing: 0.8px;
 }
 
+.ds-pillar-proceed-btn {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(236, 191, 124, 0.55);
+  background: linear-gradient(180deg, #635438 0%, #4b3f2a 100%);
+  color: #f6efe1;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 0 14px rgba(196, 149, 90, 0.25);
+}
+
+.ds-pillar-game--completing {
+  animation: ds-pillar-complete 0.6s ease forwards;
+}
+
+@keyframes ds-pillar-complete {
+  0% { filter: brightness(1); transform: scale(1); }
+  45% { filter: brightness(1.22); transform: scale(1.02); }
+  100% { filter: brightness(0.86); transform: scale(0.97); opacity: 0.4; }
+}
+
 .ds-pillar-game--compact {
   min-height: 230px;
   gap: 4px;
