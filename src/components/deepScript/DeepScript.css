@@ -1493,6 +1493,31 @@
   text-shadow: 0 2px 8px var(--ds-gold-glow);
 }
 
+.ds-phase-proceed-btn {
+  margin-top: 16px;
+  padding: 10px 18px;
+  border: 2px solid var(--ds-gold);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #4a3b1f 0%, #2f2616 100%);
+  color: #fff3c4;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  box-shadow: 0 0 16px rgba(255, 214, 102, 0.25);
+}
+
+.ds-phase-proceed-btn:hover {
+  transform: translateY(-1px);
+  border-color: #ffe39d;
+  box-shadow: 0 0 20px rgba(255, 214, 102, 0.4);
+}
+
+.ds-phase-proceed-btn:active {
+  transform: translateY(0);
+}
+
 /* ─── Log Toast ──────────────────────────────────────────── */
 .ds-log-toast {
   position: fixed;

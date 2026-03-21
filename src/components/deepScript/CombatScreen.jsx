@@ -74,15 +74,15 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
   // Handle combat end navigation
   useEffect(() => {
-    if (combat?.phase === 'victory') {
-      const timer = setTimeout(() => onEnd('victory', wordId), 1800);
-      return () => clearTimeout(timer);
-    }
     if (combat?.phase === 'defeat') {
       const timer = setTimeout(() => onEnd('defeat', wordId), 1800);
       return () => clearTimeout(timer);
     }
   }, [combat?.phase, onEnd, wordId]);
+
+  const handleProceed = useCallback(() => {
+    onEnd('victory', wordId);
+  }, [onEnd, wordId]);
 
   // Animation timeouts
   useEffect(() => {
@@ -424,6 +424,13 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
         <div className="ds-phase-overlay ds-phase-victory">
           <div className="ds-phase-message">Word Vanquished!</div>
           <div className="ds-phase-word" dir="rtl">{word.hebrew}</div>
+          <button
+            type="button"
+            className="ds-phase-proceed-btn"
+            onClick={handleProceed}
+          >
+            Proceed
+          </button>
         </div>
       )}
       {combat.phase === 'defeat' && (
