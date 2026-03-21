@@ -405,7 +405,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                     </div>
                   )}
 
-                  <div className="ds-ability-effect">Basic Ability</div>
+                  <div className="ds-ability-effect">{gear.shortDesc || gear.name}</div>
 
                   {/* Status badges */}
                   <div className="ds-ability-badges">
