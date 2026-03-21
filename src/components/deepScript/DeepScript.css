@@ -2506,16 +2506,18 @@
   box-shadow:
     inset 0 0 15px rgba(0, 0, 0, 0.8),
     0 0 8px rgba(196, 149, 90, 0.1);
-  border: 2px solid rgba(196, 149, 90, 0.15);
+  border: 2px solid rgba(214, 169, 108, 0.55);
   border-bottom: none;
-  transition: box-shadow 0.3s;
+  outline: 1px solid rgba(255, 212, 145, 0.28);
+  transition: box-shadow 0.3s, border-color 0.3s, outline-color 0.3s;
 }
 
 .ds-explore-door--forward:hover .ds-explore-door-arch {
   box-shadow:
     inset 0 0 15px rgba(0, 0, 0, 0.8),
     0 0 16px rgba(196, 149, 90, 0.25);
-  border-color: rgba(196, 149, 90, 0.35);
+  border-color: rgba(236, 191, 124, 0.75);
+  outline-color: rgba(255, 218, 162, 0.45);
 }
 
 .ds-explore-door-label {
@@ -2546,14 +2548,16 @@
   background: linear-gradient(180deg, rgba(8, 8, 14, 0.9) 0%, rgba(5, 5, 8, 0.95) 100%);
   border-radius: 40% 40% 0 0 / 20% 20% 0 0;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
-  border: 1px solid rgba(196, 149, 90, 0.1);
+  border: 2px solid rgba(214, 169, 108, 0.46);
   border-bottom: none;
-  transition: box-shadow 0.3s, border-color 0.3s;
+  outline: 1px solid rgba(255, 212, 145, 0.22);
+  transition: box-shadow 0.3s, border-color 0.3s, outline-color 0.3s;
 }
 
 .ds-explore-door--side:hover .ds-explore-door-arch {
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7), 0 0 8px rgba(196, 149, 90, 0.2);
-  border-color: rgba(196, 149, 90, 0.3);
+  border-color: rgba(236, 191, 124, 0.65);
+  outline-color: rgba(255, 218, 162, 0.4);
 }
 
 .ds-explore-door--back {
@@ -2577,7 +2581,8 @@
   box-shadow:
     inset 0 0 14px rgba(0, 0, 0, 0.8),
     0 0 8px rgba(196, 149, 90, 0.18);
-  border: 1px solid rgba(196, 149, 90, 0.28);
+  border: 2px solid rgba(214, 169, 108, 0.58);
+  outline: 1px solid rgba(255, 212, 145, 0.3);
 }
 
 .ds-explore-door--back .ds-explore-door-label {
