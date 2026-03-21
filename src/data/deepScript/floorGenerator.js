@@ -327,6 +327,32 @@ function reinforceNoDeadEnds(chambers, protectedIds = new Set(), routeConstraint
   }
 }
 
+function ensureNoIsolatedChambers(chambers, preferredAnchorId = null) {
+  const isolated = Array.from(chambers.values()).filter(chamber => getChamberDegree(chamber) === 0);
+  if (isolated.length === 0) return;
+
+  for (const chamber of isolated) {
+    const candidates = shuffle(Array.from(chambers.values()).filter(candidate => {
+      if (candidate.id === chamber.id) return false;
+      if (getOpenDirections(candidate).length === 0) return false;
+      return true;
+    }));
+
+    if (preferredAnchorId) {
+      const preferred = candidates.find(c => c.id === preferredAnchorId);
+      if (preferred) {
+        const dir = connectWithRandomDirection(chambers, chamber.id, preferred.id);
+        if (dir) continue;
+      }
+    }
+
+    for (const candidate of candidates) {
+      const dir = connectWithRandomDirection(chambers, chamber.id, candidate.id);
+      if (dir) break;
+    }
+  }
+}
+
 function assertFloorSafety(chambers, entranceId, minibossId, minRouteLength) {
   const entranceToBoss = shortestPathLength(chambers, entranceId, minibossId);
   if (entranceToBoss < minRouteLength) {
@@ -466,6 +492,7 @@ export function generateDungeonFloor({
         new Set([entrance.id, miniboss.id]),
         { startId: entrance.id, targetId: miniboss.id, minLength: baselineRouteLength },
       );
+      ensureNoIsolatedChambers(chambers, entrance.id);
 
       // Safety assertion: every chamber must reach exit and non-endpoints must not be dead ends.
       assertFloorSafety(chambers, entrance.id, miniboss.id, minRouteLength);

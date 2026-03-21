@@ -2,10 +2,11 @@ import React, { useReducer, useCallback, useEffect, useMemo, useRef, useState } 
 import {
   combatReducer,
   createCombatState,
+  createLetterTile,
   ACTIONS,
   getIntentDisplay,
 } from './deepScriptEngine.js';
-import { getGearById } from '../../data/deepScript/gear.js';
+import { allDeepScriptLetters } from '../../data/deepScript/words.js';
 import { celebrate } from '../../lib/celebration.js';
 import {
   playSelect, playCorrect, playWrong,
@@ -132,20 +133,17 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     dispatch({ type: ACTIONS.SELECT_TRAY_TILE, tileId });
   }, []);
 
-  const handleSocketTile = useCallback((gearId, socketIndex) => {
-    playSelect();
-    dispatch({ type: ACTIONS.SOCKET_TILE, gearId, socketIndex });
-  }, []);
-
-  const handleUnsocketTile = useCallback((gearId, socketIndex) => {
-    playSelect();
-    dispatch({ type: ACTIONS.UNSOCKET_TILE, gearId, socketIndex });
-  }, []);
-
-  const handleUseGear = useCallback((gearId) => {
+  const handleProduceLetters = useCallback((kind) => {
     playGear();
-    setActivatingGear(gearId);
-    dispatch({ type: ACTIONS.USE_GEAR, gearId, runState });
+    setActivatingGear(kind);
+    const vowelPool = ['א', 'ה', 'ו', 'י'];
+    const consonantPool = allDeepScriptLetters.filter(letter => !vowelPool.includes(letter));
+    const pool = kind === 'vowel' ? vowelPool : consonantPool;
+    const generated = Array.from({ length: 2 }, () => {
+      const letter = pool[Math.floor(Math.random() * pool.length)] || pool[0] || 'א';
+      return createLetterTile(letter, kind);
+    });
+    dispatch({ type: ACTIONS.GENERATE_LETTERS, letters: generated, runState });
   }, [runState]);
 
   const handlePickChoice = useCallback((letter) => {
@@ -316,106 +314,28 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
           </div>
         </div>
 
-        {/* ═══ ABILITY — giant centered button ═══ */}
-        <div className="ds-ability-row ds-ability-row--single">
+        {/* ═══ ABILITIES — dual centered buttons ═══ */}
+        <div className="ds-ability-row ds-ability-row--dual">
           <div className="ds-ability-spawn-fx" key={`spawn-fx-${spawnFxCounter}`} />
-          {runState.gearIds.map(gearId => {
-            const gear = getGearById(gearId);
-            const gs = combat.gearStates[gearId];
-            if (!gear || !gs) return null;
+          <button
+            type="button"
+            className={`ds-ability-card ds-ability-card--mega ds-ability-card--ready ${activatingGear === 'vowel' ? 'ds-ability-card--activating' : ''}`}
+            onClick={() => handleProduceLetters('vowel')}
+            disabled={combat.phase !== 'active'}
+          >
+            <div className="ds-ability-icon-center">◌</div>
+            <div className="ds-ability-effect">Vowels</div>
+          </button>
 
-            const onCooldown = gs.currentCooldown > 0;
-            const noUses = gs.usesRemaining === 0;
-            const requiredSocketsFilled = gs.sockets
-              .filter(s => s.type === 'required')
-              .every(s => s.tileId !== null);
-            const hasSockets = gs.sockets.length > 0;
-            const needsSockets = hasSockets && gs.sockets.some(s => s.type === 'required');
-            const isReady = !onCooldown && !noUses && (!needsSockets || requiredSocketsFilled);
-            const disabled = onCooldown || noUses || combat.phase !== 'active';
-
-            let cardCls = 'ds-ability-card';
-            if (onCooldown) cardCls += ' ds-ability-card--cooldown';
-            if (noUses) cardCls += ' ds-ability-card--depleted';
-            if (isReady) cardCls += ' ds-ability-card--ready';
-            if (activatingGear === gearId) cardCls += ' ds-ability-card--activating';
-            cardCls += ' ds-ability-card--mega';
-
-            return (
-              <div key={gearId} className="ds-ability-card-wrapper">
-                <div
-                  role="button"
-                  tabIndex={combat.phase === 'active' ? 0 : -1}
-                  className={cardCls}
-                  title={`${gear.shortDesc}: ${gear.detailedDescription}`}
-                  onClick={() => {
-                    if (isReady && combat.phase === 'active') {
-                      handleUseGear(gearId);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if ((e.key === 'Enter' || e.key === ' ') && isReady && combat.phase === 'active') {
-                      e.preventDefault();
-                      handleUseGear(gearId);
-                    }
-                  }}
-                  aria-disabled={combat.phase !== 'active'}
-                >
-                  {/* Centered icon for non-socket abilities */}
-                  {!hasSockets && <div className="ds-ability-icon-center">{gear.icon}</div>}
-
-                  {/* Tile sockets — icon shows inside empty socket */}
-                  {hasSockets && (
-                    <div className="ds-ability-sockets">
-                      {gs.sockets.map((socket, si) => {
-                        const socketDisabled = combat.phase !== 'active' || (!socket.tileId && !hasSelection);
-                        return (
-                          <div
-                            key={si}
-                            role="button"
-                            tabIndex={socketDisabled ? -1 : 0}
-                            className={`ds-ability-socket ${socket.type === 'required' ? 'ds-ability-socket--required' : 'ds-ability-socket--empower'} ${socket.tileId ? 'ds-ability-socket--filled' : ''} ${!socket.tileId && hasSelection ? 'ds-ability-socket--ready' : ''}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (socketDisabled) return;
-                              if (socket.tileId) {
-                                handleUnsocketTile(gearId, si);
-                              } else if (hasSelection) {
-                                handleSocketTile(gearId, si);
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              if (socketDisabled) return;
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                if (socket.tileId) {
-                                  handleUnsocketTile(gearId, si);
-                                } else if (hasSelection) {
-                                  handleSocketTile(gearId, si);
-                                }
-                              }
-                            }}
-                            aria-disabled={socketDisabled}
-                          >
-                            {socket.tileLetter || <span className="ds-socket-icon">{gear.icon}</span>}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  <div className="ds-ability-effect">{gear.shortDesc || gear.name}</div>
-
-                  {/* Status badges */}
-                  <div className="ds-ability-badges">
-                    {gs.usesRemaining >= 0 && !noUses && <span className="ds-ability-badge ds-ability-badge--uses">{gs.usesRemaining}×</span>}
-                    {noUses && <span className="ds-ability-badge ds-ability-badge--spent">--</span>}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          <button
+            type="button"
+            className={`ds-ability-card ds-ability-card--mega ds-ability-card--ready ${activatingGear === 'consonant' ? 'ds-ability-card--activating' : ''}`}
+            onClick={() => handleProduceLetters('consonant')}
+            disabled={combat.phase !== 'active'}
+          >
+            <div className="ds-ability-icon-center">א</div>
+            <div className="ds-ability-effect">Consonants</div>
+          </button>
         </div>
       </div>
 
