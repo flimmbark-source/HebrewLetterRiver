@@ -304,8 +304,6 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
       <div className="ds-combat-controls">
         <div className="ds-tray-end-labels">
-          <span className="ds-tray-end-label ds-tray-end-label--left">End</span>
-          <span className="ds-tray-end-label ds-tray-end-label--right">Start</span>
         </div>
         <div className="ds-tile-row ds-tile-row--solo">
           <div className="ds-inv-tray">
