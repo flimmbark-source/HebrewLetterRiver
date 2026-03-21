@@ -361,17 +361,30 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       </div>
 
       {/* Choice Bundle Modal */}
-      {overflowBursts.map(burst => (
-        <div key={burst.id} className="ds-overflow-shot" aria-hidden="true">
-          <span className="ds-overflow-shot-letter">{burst.letter}</span>
-          <span className="ds-overflow-shot-hit"></span>
-          <span className="ds-overflow-shot-burst" />
-          <span className="ds-overflow-shot-shard ds-overflow-shot-shard--a" />
-          <span className="ds-overflow-shot-shard ds-overflow-shot-shard--b" />
-          <span className="ds-overflow-shot-shard ds-overflow-shot-shard--c" />
-          <span className="ds-overflow-shot-shard ds-overflow-shot-shard--d" />
-        </div>
-      ))}
+      {overflowBursts.map((burst, index) => {
+        const lane = (index % 5) - 2; // -2, -1, 0, 1, 2
+        const columnOffset = lane * 28;
+        const rowOffset = Math.floor(index / 5) * 24;
+        return (
+          <div
+            key={burst.id}
+            className="ds-overflow-shot"
+            style={{
+              left: `calc(50% + ${columnOffset}px)`,
+              bottom: `calc(70px + env(safe-area-inset-bottom, 0px) + ${rowOffset}px)`,
+            }}
+            aria-hidden="true"
+          >
+            <span className="ds-overflow-shot-letter">{burst.letter}</span>
+            <span className="ds-overflow-shot-hit"></span>
+            <span className="ds-overflow-shot-burst" />
+            <span className="ds-overflow-shot-shard ds-overflow-shot-shard--a" />
+            <span className="ds-overflow-shot-shard ds-overflow-shot-shard--b" />
+            <span className="ds-overflow-shot-shard ds-overflow-shot-shard--c" />
+            <span className="ds-overflow-shot-shard ds-overflow-shot-shard--d" />
+          </div>
+        );
+      })}
 
       {combat.choiceBundle && (
         <div className="ds-choice-overlay">
