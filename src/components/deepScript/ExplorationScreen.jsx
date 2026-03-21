@@ -16,8 +16,7 @@ export default function ExplorationScreen({
   currentChamberId,
   onMove,
   onTriggerCombat,
-  onTriggerArchive,
-  onTriggerShrine,
+  onTriggerMiniGame,
   onLoot,
   onResolveInteractable,
   runState,
@@ -76,11 +75,8 @@ export default function ExplorationScreen({
       case 'trigger-combat':
         onTriggerCombat(chamber.payload?.wordId, chamber.id);
         break;
-      case 'trigger-archive':
-        onTriggerArchive(interactable.archiveReward || 'insight', chamber.id, interactable.id);
-        break;
-      case 'trigger-shrine':
-        onTriggerShrine(chamber.id);
+      case 'trigger-minigame':
+        onTriggerMiniGame(chamber.id, interactable.minigameId);
         break;
       case 'loot':
         setInspecting({ ...interactable, isLoot: true });
@@ -91,7 +87,7 @@ export default function ExplorationScreen({
       default:
         setInspecting(interactable);
     }
-  }, [chamber, onTriggerCombat, onTriggerArchive, onTriggerShrine]);
+  }, [chamber, onTriggerCombat, onTriggerMiniGame]);
 
   const handleCloseInspect = useCallback(() => {
     if (inspecting?.isLoot && !inspecting.resolved) {
@@ -231,8 +227,7 @@ export default function ExplorationScreen({
                 `ds-hotspot--${obj.type}`,
                 obj.resolved ? 'ds-hotspot--resolved' : '',
                 obj.action === 'trigger-combat' ? 'ds-hotspot--combat' : '',
-                obj.action === 'trigger-shrine' ? 'ds-hotspot--shrine' : '',
-                obj.action === 'trigger-archive' ? 'ds-hotspot--archive' : '',
+                obj.action === 'trigger-minigame' ? 'ds-hotspot--minigame' : '',
               ].filter(Boolean).join(' ');
 
               return (
@@ -292,7 +287,8 @@ function getHotspotIcon(type) {
     case 'bookshelf': return '📚';
     case 'scroll-stand': return '📜';
     case 'mural': return '🖼️';
-    case 'altar': return '⛩️';
+    case 'pillar': return '🗿';
+    case 'capsule-orb': return '🫧';
     case 'brazier': return '🔥';
     case 'statue': return '🗿';
     case 'chest': return '📦';

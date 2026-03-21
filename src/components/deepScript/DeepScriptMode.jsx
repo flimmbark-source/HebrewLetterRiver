@@ -2,14 +2,12 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { getStarterKit } from '../../data/deepScript/starterKits.js';
 import { generateDungeonFloor, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
-import { upgradeDefinitions } from '../../data/deepScript/upgrades.js';
 import { registerCustomWords, clearCustomWords } from '../../data/deepScript/words.js';
 import KitSelectScreen from './KitSelectScreen.jsx';
 import ExplorationScreen from './ExplorationScreen.jsx';
 import BattleTransition from './BattleTransition.jsx';
 import CombatScreen from './CombatScreen.jsx';
-import ArchiveScreen from './ArchiveScreen.jsx';
-import ShrineScreen from './ShrineScreen.jsx';
+import MiniGameScreen from './MiniGameScreen.jsx';
 import RunEndScreen from './RunEndScreen.jsx';
 import './DeepScript.css';
 
@@ -33,7 +31,7 @@ function collectFloorWordIds(floor) {
 export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGuidedPackRun = false }) {
   const hasCustomWordPool = !!(packWords && packWords.length > 0);
   const previousFloorWordIdsRef = useRef(new Set());
-  const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | archive | shrine | end
+  const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | minigame | end
   const [runState, setRunState] = useState(null);
   const [endResult, setEndResult] = useState(null);
   const [floorNumber, setFloorNumber] = useState(1);
@@ -44,8 +42,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
 
   // Active encounter context
   const [activeCombat, setActiveCombat] = useState(null); // { wordId, chamberId, isMiniboss }
-  const [activeArchive, setActiveArchive] = useState(null); // { rewardId, chamberId, interactableId }
-  const [activeShrine, setActiveShrine] = useState(null); // { chamberId }
+  const [activeMiniGame, setActiveMiniGame] = useState(null); // { chamberId, miniGameId }
 
   const createFloorForNumber = useCallback((targetFloorNumber) => {
     const combatCount = Math.min(6, 3 + Math.floor((targetFloorNumber - 1) / 2));
@@ -146,14 +143,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setScreen('combat');
   }, []);
 
-  const handleTriggerArchive = useCallback((rewardId, chamberId, interactableId) => {
-    setActiveArchive({ rewardId, chamberId, interactableId });
-    setScreen('archive');
-  }, []);
-
-  const handleTriggerShrine = useCallback((chamberId) => {
-    setActiveShrine({ chamberId });
-    setScreen('shrine');
+  const handleTriggerMiniGame = useCallback((chamberId, miniGameId) => {
+    setActiveMiniGame({ chamberId, miniGameId });
+    setScreen('minigame');
   }, []);
 
   const handleLoot = useCallback((chamberId, interactableId) => {
@@ -256,8 +248,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setFloor(nextFloor);
     setCurrentChamberId(nextFloor.startChamberId);
     setActiveCombat(null);
-    setActiveArchive(null);
-    setActiveShrine(null);
+    setActiveMiniGame(null);
     setRunState(prev => ({
       ...prev,
       floor: nextFloor,
@@ -267,115 +258,30 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setScreen('exploring');
   }, [createFloorForNumber, floorNumber, isGuidedPackRun]);
 
-  // ─── Archive End ──────────────────────────────────────────
+  // ─── Mini-game End ────────────────────────────────────────
 
-  const handleArchiveComplete = useCallback((rewardId) => {
-    const { chamberId, interactableId } = activeArchive || {};
+  const handleMiniGameComplete = useCallback(() => {
+    const { chamberId } = activeMiniGame || {};
+    if (!chamberId) return;
 
-    // Resolve the interactable
-    if (chamberId && interactableId) {
-      setFloor(prev => {
-        const newChambers = new Map(prev.chambers);
-        const chamber = { ...newChambers.get(chamberId) };
-        chamber.interactables = chamber.interactables.map(obj =>
-          obj.id === interactableId ? { ...obj, resolved: true } : obj
-        );
-        // Mark chamber resolved if all archive interactables are done
-        const unresolvedArchive = chamber.interactables.filter(
-          o => o.action === 'trigger-archive' && !o.resolved
-        );
-        if (unresolvedArchive.length === 0) {
-          chamber.resolved = true;
-        }
-        newChambers.set(chamberId, chamber);
-        return { ...prev, chambers: newChambers };
-      });
-    }
-
-    // Apply archive reward
-    setRunState(prev => {
-      const newState = { ...prev, roomsCompleted: prev.roomsCompleted + 1 };
-      switch (rewardId) {
-        case 'heal':
-          newState.health = Math.min(prev.maxHealth, prev.health + 1);
-          break;
-        case 'clue-hint':
-          newState.insightNextCombat = true;
-          break;
-        default:
-          break;
-      }
-      return newState;
+    setFloor(prev => {
+      const newChambers = new Map(prev.chambers);
+      const chamber = { ...newChambers.get(chamberId), resolved: true };
+      chamber.interactables = chamber.interactables.map(obj =>
+        obj.action === 'trigger-minigame' ? { ...obj, resolved: true } : obj
+      );
+      newChambers.set(chamberId, chamber);
+      return { ...prev, chambers: newChambers };
     });
 
-    setActiveArchive(null);
+    setRunState(prev => ({
+      ...prev,
+      roomsCompleted: prev.roomsCompleted + 1,
+    }));
+
+    setActiveMiniGame(null);
     setScreen('exploring');
-  }, [activeArchive]);
-
-  // ─── Shrine End ───────────────────────────────────────────
-
-  const handleShrineComplete = useCallback((upgradeId) => {
-    const { chamberId } = activeShrine || {};
-
-    // Mark shrine chamber as resolved
-    if (chamberId) {
-      setFloor(prev => {
-        const newChambers = new Map(prev.chambers);
-        const chamber = { ...newChambers.get(chamberId), resolved: true };
-        chamber.interactables = chamber.interactables.map(obj =>
-          obj.action === 'trigger-shrine' ? { ...obj, resolved: true } : obj
-        );
-        newChambers.set(chamberId, chamber);
-        return { ...prev, chambers: newChambers };
-      });
-    }
-
-    // Apply upgrade
-    setRunState(prev => {
-      const newState = {
-        ...prev,
-        roomsCompleted: prev.roomsCompleted + 1,
-        upgrades: { ...prev.upgrades },
-      };
-
-      const upgrade = upgradeDefinitions.find(u => u.id === upgradeId);
-      if (upgrade) {
-        switch (upgrade.effect) {
-          case 'satchelSize':
-            newState.satchelSize = (prev.satchelSize || 3) + upgrade.value;
-            break;
-          case 'traySize':
-            newState.traySize = (prev.traySize || 6) + upgrade.value;
-            break;
-          case 'maxPressure':
-            newState.upgrades.maxPressure = (prev.upgrades.maxPressure || 0) + upgrade.value;
-            break;
-          case 'heal':
-            newState.health = Math.min(prev.maxHealth + upgrade.value, prev.health + upgrade.value);
-            newState.maxHealth = prev.maxHealth + upgrade.value;
-            break;
-          case 'genAccuracy':
-            newState.upgrades.genAccuracy = (prev.upgrades.genAccuracy || 0) + upgrade.value;
-            break;
-          case 'burnBonus':
-            newState.upgrades.burnBonus = true;
-            break;
-          case 'cooldownReduction':
-            newState.upgrades.cooldownReduction = (prev.upgrades.cooldownReduction || 0) + upgrade.value;
-            break;
-          case 'startReveal':
-            newState.upgrades.startReveal = (prev.upgrades.startReveal || 0) + upgrade.value;
-            break;
-          default:
-            break;
-        }
-      }
-      return newState;
-    });
-
-    setActiveShrine(null);
-    setScreen('exploring');
-  }, [activeShrine]);
+  }, [activeMiniGame]);
 
   // ─── Restart / Back ───────────────────────────────────────
 
@@ -385,6 +291,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setRunState(null);
     setFloor(null);
     setCurrentChamberId(null);
+    setActiveMiniGame(null);
     setEndResult(null);
     setFloorNumber(1);
     previousFloorWordIdsRef.current = new Set();
@@ -444,26 +351,14 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     );
   }
 
-  // Archive screen
-  if (screen === 'archive' && activeArchive) {
+  // Mini-game screen
+  if (screen === 'minigame' && activeMiniGame) {
     return (
       <div className="ds-mode">
-        <ArchiveScreen
-          room={{ rewardId: activeArchive.rewardId }}
+        <MiniGameScreen
+          miniGameId={activeMiniGame.miniGameId}
           runState={runState}
-          onComplete={handleArchiveComplete}
-        />
-      </div>
-    );
-  }
-
-  // Shrine screen
-  if (screen === 'shrine') {
-    return (
-      <div className="ds-mode">
-        <ShrineScreen
-          runState={runState}
-          onComplete={handleShrineComplete}
+          onComplete={handleMiniGameComplete}
         />
       </div>
     );
@@ -477,8 +372,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         currentChamberId={currentChamberId}
         onMove={handleMove}
         onTriggerCombat={handleTriggerCombat}
-        onTriggerArchive={handleTriggerArchive}
-        onTriggerShrine={handleTriggerShrine}
+        onTriggerMiniGame={handleTriggerMiniGame}
         onLoot={handleLoot}
         onResolveInteractable={handleResolveInteractable}
         runState={runState}
