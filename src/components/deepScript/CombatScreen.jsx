@@ -194,7 +194,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       setOverflowBursts(prev => [...prev, ...burstItems]);
       const timer = setTimeout(() => {
         setOverflowBursts(prev => prev.filter(item => !burstItems.some(b => b.id === item.id)));
-      }, 700);
+      }, 2400);
       prevLogLengthRef.current = nextLog.length;
       return () => clearTimeout(timer);
     }

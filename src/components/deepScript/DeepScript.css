@@ -778,18 +778,18 @@
   align-items: center;
   pointer-events: none;
   transform: translateX(-50%);
-  animation: ds-overflow-shot-rise 2.72s cubic-bezier(0.2, 0.78, 0.21, 1) forwards;
+  animation: ds-overflow-shot-rise 2.1s cubic-bezier(0.2, 0.78, 0.21, 1) forwards;
   z-index: 22;
 }
 
 .ds-overflow-shot-letter {
   font-size: 28px;
   font-weight: 800;
-  color: 0 0 10px rgba(237, 7, 7, 0.9);
-  text-shadow: var(--ds-parchment);
+  color: #ffb7b7;
+  text-shadow: 0 0 10px rgba(237, 7, 7, 0.9);
   animation:
-    ds-overflow-shake 1.22s ease-in-out 2,
-    ds-overflow-letter-break 3.72s ease-out forwards;
+    ds-overflow-shake 0.9s ease-in-out 1,
+    ds-overflow-letter-break 2.1s ease-out forwards;
 }
 
 .ds-overflow-shot-hit {
@@ -811,7 +811,8 @@
     0 0 16px rgba(255, 220, 120, 0.8),
     inset 0 0 10px rgba(255, 245, 214, 0.55);
   opacity: 0;
-  animation: ds-overflow-shot-burst 1.72s ease-out forwards;
+  animation: ds-overflow-shot-burst 1.05s ease-out forwards;
+  animation-delay: 0.85s;
 }
 
 .ds-overflow-shot-shard {
@@ -824,12 +825,12 @@
   box-shadow: 0 0 8px rgba(255, 70, 70, 0.75);
   opacity: 0;
   transform: translate(0, 0) rotate(0deg) scale(0.2);
-  animation: ds-overflow-shard-fly 0.72s ease-out forwards;
+  animation: ds-overflow-shard-fly 0.88s ease-out forwards;
 }
 
 .ds-overflow-shot-shard--a {
   left: calc(50% - 4px);
-  animation-delay: 0.45s;
+  animation-delay: 0.92s;
   --ds-shard-x: -34px;
   --ds-shard-y: -30px;
   --ds-shard-r: -36deg;
@@ -837,7 +838,7 @@
 
 .ds-overflow-shot-shard--b {
   left: calc(50% - 4px);
-  animation-delay: 0.47s;
+  animation-delay: 0.96s;
   --ds-shard-x: 30px;
   --ds-shard-y: -28px;
   --ds-shard-r: 28deg;
@@ -845,7 +846,7 @@
 
 .ds-overflow-shot-shard--c {
   left: calc(50% - 4px);
-  animation-delay: 0.49s;
+  animation-delay: 1s;
   --ds-shard-x: -22px;
   --ds-shard-y: -44px;
   --ds-shard-r: -72deg;
@@ -853,7 +854,7 @@
 
 .ds-overflow-shot-shard--d {
   left: calc(50% - 4px);
-  animation-delay: 0.51s;
+  animation-delay: 1.04s;
   --ds-shard-x: 24px;
   --ds-shard-y: -42px;
   --ds-shard-r: 54deg;
@@ -872,18 +873,22 @@
     transform: translate(-50%, 0) scale(1);
     opacity: 1;
   }
-  64% {
+  60% {
     transform: translate(-50%, -160px) scale(1.08);
     opacity: 1;
   }
   100% {
-    transform: translate(-50%, -200px) scale(1.34);
+    transform: translate(-50%, -200px) scale(1.28);
     opacity: 0;
   }
 }
 
 @keyframes ds-overflow-shot-burst {
   0% {
+    transform: scale(0.35);
+    opacity: 0;
+  }
+  10% {
     transform: scale(0.35);
     opacity: 0;
   }
