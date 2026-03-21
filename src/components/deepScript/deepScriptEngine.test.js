@@ -209,6 +209,8 @@ describe('Dungeon Floor Generation', () => {
     expect(floor.chambers.size).toBeGreaterThanOrEqual(7);
     expect(floor.startChamberId).toBeTruthy();
     expect(floor.bossChamberId).toBeTruthy();
+    expect(floor.floorPlan).toBeTruthy();
+    expect(floor.floorPlan.rooms.length).toBe(floor.chambers.size);
   });
 
   it('entrance chamber is marked as visited', () => {
@@ -297,6 +299,22 @@ describe('Dungeon Floor Generation', () => {
       if (chamberId !== floor.startChamberId && chamberId !== floor.bossChamberId) {
         expect(degree).toBeGreaterThanOrEqual(2);
       }
+    }
+  });
+
+  it('floor plan tracks unique room positions and mapped exits', () => {
+    const floor = generateDungeonFloor();
+    const seenCoords = new Set();
+
+    for (const room of floor.floorPlan.rooms) {
+      const key = `${room.x},${room.y}`;
+      expect(seenCoords.has(key)).toBe(false);
+      seenCoords.add(key);
+      expect(floor.chambers.has(room.id)).toBe(true);
+      const chamber = floor.chambers.get(room.id);
+      expect(chamber.position?.x).toBe(room.x);
+      expect(chamber.position?.y).toBe(room.y);
+      expect(Object.keys(room.exits).length).toBe(Object.keys(chamber.exits).length);
     }
   });
 
@@ -813,6 +831,23 @@ describe('Letter Generation', () => {
   it('generateChoiceBundle with bonus returns extra options', () => {
     const bundle = generateChoiceBundle(3, ['ש', 'ל', 'ם'], 1);
     expect(bundle.length).toBe(4);
+  });
+
+  it('tracks produced letters and reuses that history across generation', () => {
+    const kit = getStarterKit('scribe');
+    const sharedGearIds = getSharedGear().map(g => g.id);
+    const map = generateRunMap(6);
+    const run = createRunState(kit, sharedGearIds, map);
+    let combat = createCombatState('ds-sefer', run);
+
+    const generatedTile = createLetterTile('א', 'test');
+    const updated = combatReducer(combat, {
+      type: ACTIONS.GENERATE_LETTERS,
+      letters: [generatedTile],
+      runState: run,
+    });
+
+    expect(updated.letterProductionCounts['א']).toBeGreaterThanOrEqual(1);
   });
 });
 

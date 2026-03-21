@@ -21,6 +21,7 @@ import { nanoid } from 'nanoid/non-secure';
 export const TRAY_SIZE_DEFAULT = 6;
 export const SATCHEL_SIZE_DEFAULT = 3;
 export const MAX_ENERGY_DEFAULT = 3;
+const LETTER_REPEAT_DECAY_FACTOR = 0.25;
 
 // ─── Enemy Intent Types ─────────────────────────────────────
 
@@ -97,6 +98,36 @@ export function createLetterTile(letter, source = 'generated', cursed = false) {
   };
 }
 
+function pickWeightedLetter(pool, letterProductionCounts = {}) {
+  if (!pool || pool.length === 0) return allDeepScriptLetters[0] || 'א';
+
+  const weightedPool = pool.map((letter) => ({
+    letter,
+    weight: Math.pow(LETTER_REPEAT_DECAY_FACTOR, letterProductionCounts[letter] || 0),
+  }));
+  const totalWeight = weightedPool.reduce((sum, item) => sum + item.weight, 0);
+
+  if (totalWeight <= 0) {
+    return pool[Math.floor(Math.random() * pool.length)] || pool[0];
+  }
+
+  let roll = Math.random() * totalWeight;
+  for (const item of weightedPool) {
+    roll -= item.weight;
+    if (roll <= 0) return item.letter;
+  }
+  return weightedPool[weightedPool.length - 1]?.letter || pool[0];
+}
+
+function countProducedLetters(tiles, startingCounts = {}) {
+  const counts = { ...startingCounts };
+  for (const tile of tiles || []) {
+    if (!tile?.letter) continue;
+    counts[tile.letter] = (counts[tile.letter] || 0) + 1;
+  }
+  return counts;
+}
+
 // ─── Helper: generate letters ───────────────────────────────
 
 /**
@@ -106,14 +137,14 @@ export function createLetterTile(letter, source = 'generated', cursed = false) {
  * @param {number} accuracy — 0-1, chance each letter is from target
  * @returns {Object[]} array of LetterTile
  */
-export function generateLetters(count, targetLetters, accuracy = 0.3) {
+export function generateLetters(count, targetLetters, accuracy = 0.3, letterProductionCounts = {}) {
   const tiles = [];
   for (let i = 0; i < count; i++) {
     let letter;
     if (Math.random() < accuracy) {
-      letter = targetLetters[Math.floor(Math.random() * targetLetters.length)];
+      letter = pickWeightedLetter(targetLetters, letterProductionCounts);
     } else {
-      letter = allDeepScriptLetters[Math.floor(Math.random() * allDeepScriptLetters.length)];
+      letter = pickWeightedLetter(allDeepScriptLetters, letterProductionCounts);
     }
     tiles.push(createLetterTile(letter));
   }
@@ -123,16 +154,16 @@ export function generateLetters(count, targetLetters, accuracy = 0.3) {
 /**
  * Generate a choice bundle: N letters to choose from, biased toward useful ones.
  */
-export function generateChoiceBundle(count, targetLetters, bonusCount = 0) {
+export function generateChoiceBundle(count, targetLetters, bonusCount = 0, letterProductionCounts = {}) {
   const total = count + bonusCount;
   const options = [];
   // At least 1 useful letter
-  options.push(targetLetters[Math.floor(Math.random() * targetLetters.length)]);
+  options.push(pickWeightedLetter(targetLetters, letterProductionCounts));
   for (let i = 1; i < total; i++) {
     if (Math.random() < 0.5) {
-      options.push(targetLetters[Math.floor(Math.random() * targetLetters.length)]);
+      options.push(pickWeightedLetter(targetLetters, letterProductionCounts));
     } else {
-      options.push(allDeepScriptLetters[Math.floor(Math.random() * allDeepScriptLetters.length)]);
+      options.push(pickWeightedLetter(allDeepScriptLetters, letterProductionCounts));
     }
   }
   return options.sort(() => Math.random() - 0.5);
@@ -206,6 +237,7 @@ export function createCombatState(wordId, runState) {
   const maxHealth = runState.maxHealth || 3;
 
   return {
+    kitId: runState.kitId,
     wordId: word.id,
     word,
     answerTrack,
@@ -230,6 +262,7 @@ export function createCombatState(wordId, runState) {
     isMiniboss: word.isMiniboss || false,
     pendingIntentBuff: 0,
     confusedGearCosts: {},
+    letterProductionCounts: countProducedLetters(initialLetters),
   };
 }
 
@@ -250,6 +283,56 @@ export const ACTIONS = {
   END_TURN: 'END_TURN',
   DISMISS_LOG: 'DISMISS_LOG',
 };
+
+function pushTilesToTray(state, tiles, runState) {
+  if (!tiles || tiles.length === 0) {
+    return { tray: state.tray, overflowDamage: 0, overflowEvents: [], removed: [], letterProductionCounts: state.letterProductionCounts || {} };
+  }
+  const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
+  let nextTray = [...state.tray];
+  let overflowDamage = 0;
+  const overflowEvents = [];
+  const removed = [];
+  const reduction = runState?.upgrades?.curseDamageReduction || 0;
+  const isScribe = (runState?.kitId || state.kitId) === 'scribe';
+  const letterProductionCounts = { ...(state.letterProductionCounts || {}) };
+
+  for (const tile of tiles) {
+    nextTray.unshift(tile);
+    letterProductionCounts[tile.letter] = (letterProductionCounts[tile.letter] || 0) + 1;
+    while (nextTray.length > trayMax) {
+      const pushed = nextTray.pop();
+      if (!pushed) break;
+      removed.push(pushed);
+
+      if (isScribe) {
+        const requiredCount = (state.word?.letters || []).filter(letter => letter === pushed.letter).length;
+        const placedCount = (state.answerTrack || []).filter(slot =>
+          slot.correct && slot.placedTile?.letter === pushed.letter
+        ).length;
+        const isNeededLetter = requiredCount > placedCount;
+        if (isNeededLetter) {
+          overflowDamage += 1;
+          overflowEvents.push({
+            type: 'scribe_overflow_loss',
+            letter: pushed.letter,
+            damage: 1,
+          });
+        }
+      } else if (pushed.cursed) {
+        overflowDamage += 1;
+      }
+    }
+  }
+
+  return {
+    tray: nextTray,
+    removed,
+    overflowDamage: Math.max(0, overflowDamage - (isScribe ? 0 : reduction)),
+    overflowEvents,
+    letterProductionCounts,
+  };
+}
 
 // ─── Execute enemy intent ───────────────────────────────────
 
@@ -294,13 +377,17 @@ function executeEnemyIntent(state) {
       const spawned = [];
       for (let i = 0; i < effectiveValue; i++) {
         if (state.tray.length + spawned.length >= trayMax) break;
-        const junkLetter = allDeepScriptLetters[Math.floor(Math.random() * allDeepScriptLetters.length)];
+        const junkLetter = pickWeightedLetter(allDeepScriptLetters, state.letterProductionCounts || {});
         spawned.push(createLetterTile(junkLetter, 'spawned', true));
       }
       if (spawned.length === 0) return state;
       return {
         ...state,
         tray: [...state.tray, ...spawned],
+        letterProductionCounts: spawned.reduce((counts, tile) => {
+          counts[tile.letter] = (counts[tile.letter] || 0) + 1;
+          return counts;
+        }, { ...(state.letterProductionCounts || {}) }),
         pendingIntentBuff: 0,
         log: [...state.log, { type: 'enemy', message: `Spawned ${spawned.length} cursed tile(s)!` }],
       };
@@ -375,6 +462,7 @@ export function combatReducer(state, action) {
       const { slotIndex } = action;
       const tileId = state.selectedTrayTile || state.selectedSatchelTile;
       if (!tileId) return state;
+      const isScribe = (action.runState?.kitId || state.kitId) === 'scribe';
 
       const fromTray = state.tray.find(t => t.id === tileId);
       const fromSatchel = state.satchel.find(t => t.id === tileId);
@@ -405,7 +493,7 @@ export function combatReducer(state, action) {
           log: [...state.log, { type: 'correct', letter: tile.letter, slot: slotIndex }],
         };
       } else {
-        const cursedTile = { ...tile, cursed: true };
+        const cursedTile = isScribe ? { ...tile, cursed: false } : { ...tile, cursed: true };
         let newTray = fromTray
           ? state.tray.map(t => t.id === tileId ? cursedTile : t)
           : [...state.tray, cursedTile];
@@ -423,25 +511,13 @@ export function combatReducer(state, action) {
           }
         }
 
-        const mistakeState = {
+        return {
           ...state,
           tray: newTray,
           satchel: newSatchel,
           selectedTrayTile: null,
           selectedSatchelTile: null,
           log: logEntries,
-        };
-
-        // Enemy intent now triggers on player mistakes (wrong letter placements),
-        // not at END_TURN.
-        let newState = executeEnemyIntent(mistakeState);
-        if (newState.phase === 'defeat') return newState;
-
-        // Roll a fresh telegraphed intent after each triggered enemy action.
-        const nextIntent = rollEnemyIntent(newState.turn, newState.isMiniboss, newState.enemyType);
-        return {
-          ...newState,
-          enemyIntent: nextIntent,
         };
       }
     }
@@ -486,14 +562,26 @@ export function combatReducer(state, action) {
 
     case ACTIONS.GENERATE_LETTERS: {
       const { letters } = action;
-      const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-      const spaceLeft = trayMax - state.tray.length;
-      const toAdd = letters.slice(0, spaceLeft);
+      const pushResult = pushTilesToTray(state, letters, action.runState);
+      const newHealth = state.health - pushResult.overflowDamage;
+      const defeated = newHealth <= 0;
+      const overflowLog = pushResult.overflowDamage > 0
+        ? pushResult.overflowEvents.length > 0
+          ? pushResult.overflowEvents.map(event => ({
+            type: 'overflow_burst',
+            letter: event.letter,
+            message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
+          }))
+          : [{ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.overflowDamage} damage!` }]
+        : [];
 
       return {
         ...state,
-        tray: [...state.tray, ...toAdd],
-        log: state.log,
+        tray: pushResult.tray,
+        letterProductionCounts: pushResult.letterProductionCounts,
+        health: Math.max(0, newHealth),
+        phase: defeated ? 'defeat' : state.phase,
+        log: [...state.log, ...overflowLog],
       };
     }
 
@@ -569,24 +657,11 @@ export function combatReducer(state, action) {
       if (gearState.currentCooldown > 0) return state;
       if (gearState.usesRemaining === 0) return state;
 
-      // Compute effective energy cost (escalating gear adds turnUses)
-      const baseEnergyCost = gearDef.escalatingCost
-        ? gearDef.energyCost + (gearState.turnUses || 0)
-        : gearDef.energyCost;
-      const confusedCost = state.confusedGearCosts?.[gearId];
-      const effectiveEnergyCost = confusedCost ?? baseEnergyCost;
-
-      // Check energy cost
-      if (state.energy < effectiveEnergyCost) return state;
-
       // Check sockets are filled (required sockets must have tiles)
       const requiredSocketsFilled = gearState.sockets
         .filter(s => s.type === 'required')
         .every(s => s.tileId !== null);
       if (!requiredSocketsFilled && gearState.sockets.some(s => s.type === 'required')) return state;
-
-      // Pay energy
-      let newEnergy = state.energy - effectiveEnergyCost;
 
       // Collect socketed tiles (they've already been removed from tray)
       const socketedTiles = gearState.sockets
@@ -601,7 +676,7 @@ export function combatReducer(state, action) {
         ...state.gearStates,
         [gearId]: {
           ...gearState,
-          currentCooldown: gearState.effectiveCooldown,
+          currentCooldown: 0,
           usesRemaining: gearState.usesRemaining > 0 ? gearState.usesRemaining - 1 : -1,
           sockets: newSockets,
           turnUses: (gearState.turnUses || 0) + 1,
@@ -612,9 +687,10 @@ export function combatReducer(state, action) {
       const genAccuracy = 0.3 + (runState?.passives?.generateBonus || 0);
       let updates = {
         gearStates: newGearStates,
-        energy: newEnergy,
+        energy: state.energy,
         tray: [...state.tray],
         satchel: [...state.satchel],
+        letterProductionCounts: { ...(state.letterProductionCounts || {}) },
         selectedTrayTile: null,
         selectedSatchelTile: null,
       };
@@ -622,29 +698,41 @@ export function combatReducer(state, action) {
       switch (gearDef.type) {
         case 'generate-random': {
           // Scribe Knife: 2 random tiles, weighted toward target
-          const newTiles = generateLetters(2, targetLetters, genAccuracy);
-          const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-          const space = trayMax - updates.tray.length;
-          updates.tray = [...updates.tray, ...newTiles.slice(0, space)];
-          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: `Generated ${Math.min(newTiles.length, space)} random tile(s)` }];
+          const newTiles = generateLetters(2, targetLetters, genAccuracy, state.letterProductionCounts);
+          const pushResult = pushTilesToTray({ ...state, tray: updates.tray }, newTiles, runState);
+          updates.tray = pushResult.tray;
+          updates.letterProductionCounts = pushResult.letterProductionCounts;
+          updates.health = state.health - pushResult.overflowDamage;
+          updates.phase = updates.health <= 0 ? 'defeat' : state.phase;
+          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: `Generated ${newTiles.length} random tile(s)` }];
+          if (pushResult.overflowDamage > 0) {
+            if (pushResult.overflowEvents.length > 0) {
+              updates.log.push(...pushResult.overflowEvents.map(event => ({
+                type: 'overflow_burst',
+                letter: event.letter,
+                message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
+              })));
+            } else {
+              updates.log.push({ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.overflowDamage} damage!` });
+            }
+          }
           break;
         }
         case 'duplicate': {
           // Echo Mirror: produce 2 copies of the socketed tile
           const socketedTile = socketedTiles[0];
           if (socketedTile?.letter) {
-            const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
             for (let i = 0; i < 2; i++) {
               const copy = createLetterTile(socketedTile.letter, 'duplicate');
-              if (updates.tray.length < trayMax) {
-                updates.tray = [...updates.tray, copy];
-              }
+              const pushResult = pushTilesToTray({ ...state, tray: updates.tray, letterProductionCounts: updates.letterProductionCounts }, [copy], runState);
+              updates.tray = pushResult.tray;
+              updates.letterProductionCounts = pushResult.letterProductionCounts;
             }
             // Also return the original tile to tray
             const original = createLetterTile(socketedTile.letter, 'socketed');
-            if (updates.tray.length < trayMax) {
-              updates.tray = [...updates.tray, original];
-            }
+            const pushResult = pushTilesToTray({ ...state, tray: updates.tray, letterProductionCounts: updates.letterProductionCounts }, [original], runState);
+            updates.tray = pushResult.tray;
+            updates.letterProductionCounts = pushResult.letterProductionCounts;
           }
           updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Produced 2 copies' }];
           break;
@@ -672,16 +760,29 @@ export function combatReducer(state, action) {
           }
           const salvageCount = salvaged ? 2 : 1;
           const salvageAccuracy = 0.4 + (runState?.passives?.generateBonus || 0);
-          const salvageTiles = generateLetters(salvageCount, targetLetters, salvageAccuracy);
-          const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-          const space = trayMax - updates.tray.length;
-          updates.tray = [...updates.tray, ...salvageTiles.slice(0, space)];
+          const salvageTiles = generateLetters(salvageCount, targetLetters, salvageAccuracy, updates.letterProductionCounts);
+          const pushResult = pushTilesToTray({ ...state, tray: updates.tray, letterProductionCounts: updates.letterProductionCounts }, salvageTiles, runState);
+          updates.tray = pushResult.tray;
+          updates.letterProductionCounts = pushResult.letterProductionCounts;
           updates.log = [...state.log, {
             type: 'gear', name: gearDef.name,
             message: salvaged
-              ? `Consumed a cursed tile + ${Math.min(salvageCount, space)} new tile(s)`
-              : `Generated ${Math.min(1, space)} tile(s)`,
+              ? `Consumed a cursed tile + ${salvageCount} new tile(s)`
+              : 'Generated 1 tile',
           }];
+          if (pushResult.overflowDamage > 0) {
+            updates.health = state.health - pushResult.overflowDamage;
+            updates.phase = updates.health <= 0 ? 'defeat' : state.phase;
+            if (pushResult.overflowEvents.length > 0) {
+              updates.log.push(...pushResult.overflowEvents.map(event => ({
+                type: 'overflow_burst',
+                letter: event.letter,
+                message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
+              })));
+            } else {
+              updates.log.push({ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.overflowDamage} damage!` });
+            }
+          }
           break;
         }
         case 'germinate': {
@@ -689,11 +790,10 @@ export function combatReducer(state, action) {
           // that blooms into 1 tile (60%) at START of next turn.
           // Tempo decision: delayed tile is vulnerable to enemy burn/corrupt.
           const sproutAccuracy = 0.3 + (runState?.passives?.generateBonus || 0);
-          const sproutTiles = generateLetters(1, targetLetters, sproutAccuracy);
-          const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-          if (updates.tray.length < trayMax) {
-            updates.tray = [...updates.tray, ...sproutTiles];
-          }
+          const sproutTiles = generateLetters(1, targetLetters, sproutAccuracy, updates.letterProductionCounts);
+          const pushResult = pushTilesToTray({ ...state, tray: updates.tray, letterProductionCounts: updates.letterProductionCounts }, sproutTiles, runState);
+          updates.tray = pushResult.tray;
+          updates.letterProductionCounts = pushResult.letterProductionCounts;
           // Plant seed for next turn bloom
           const seedAccuracy = 0.6 + (runState?.passives?.generateBonus || 0);
           updates.pendingSeeds = [
@@ -705,7 +805,7 @@ export function combatReducer(state, action) {
         }
         case 'choice': {
           const bonusCount = runState?.passives?.bonusChoiceCount || 0;
-          const bundle = generateChoiceBundle(3, targetLetters, bonusCount);
+          const bundle = generateChoiceBundle(3, targetLetters, bonusCount, state.letterProductionCounts);
           updates.choiceBundle = bundle;
           updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Choose a letter' }];
           break;
@@ -720,13 +820,12 @@ export function combatReducer(state, action) {
             if (isExact && remaining.length > 0) {
               newLetter = remaining[Math.floor(Math.random() * remaining.length)];
             } else {
-              newLetter = allDeepScriptLetters[Math.floor(Math.random() * allDeepScriptLetters.length)];
+              newLetter = pickWeightedLetter(allDeepScriptLetters, updates.letterProductionCounts);
             }
             const transformedTile = createLetterTile(newLetter, 'transform');
-            const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-            if (updates.tray.length < trayMax) {
-              updates.tray = [...updates.tray, transformedTile];
-            }
+            const pushResult = pushTilesToTray({ ...state, tray: updates.tray, letterProductionCounts: updates.letterProductionCounts }, [transformedTile], runState);
+            updates.tray = pushResult.tray;
+            updates.letterProductionCounts = pushResult.letterProductionCounts;
           }
           updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Transformed letter' }];
           break;
@@ -734,11 +833,11 @@ export function combatReducer(state, action) {
         case 'burn': {
           // Ash Brazier: burn socketed tile, generate 2 random
           const burnAccuracy = 0.4 + (runState?.passives?.generateBonus || 0);
-          const newTiles = generateLetters(2, targetLetters, burnAccuracy);
-          const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-          const space = trayMax - updates.tray.length;
-          updates.tray = [...updates.tray, ...newTiles.slice(0, space)];
-          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: `Burned tile → ${Math.min(newTiles.length, space)} new tile(s)` }];
+          const newTiles = generateLetters(2, targetLetters, burnAccuracy, updates.letterProductionCounts);
+          const pushResult = pushTilesToTray({ ...state, tray: updates.tray, letterProductionCounts: updates.letterProductionCounts }, newTiles, runState);
+          updates.tray = pushResult.tray;
+          updates.letterProductionCounts = pushResult.letterProductionCounts;
+          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: `Burned tile → ${newTiles.length} new tile(s)` }];
           break;
         }
         case 'defend': {
@@ -753,10 +852,9 @@ export function combatReducer(state, action) {
           if (remaining.length > 0) {
             const exactLetter = remaining[Math.floor(Math.random() * remaining.length)];
             const tile = createLetterTile(exactLetter, 'gear');
-            const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-            if (updates.tray.length < trayMax) {
-              updates.tray = [...updates.tray, tile];
-            }
+            const pushResult = pushTilesToTray({ ...state, tray: updates.tray, letterProductionCounts: updates.letterProductionCounts }, [tile], runState);
+            updates.tray = pushResult.tray;
+            updates.letterProductionCounts = pushResult.letterProductionCounts;
           }
           updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Inscribed an exact letter' }];
           break;
@@ -773,14 +871,30 @@ export function combatReducer(state, action) {
       if (!state.choiceBundle) return state;
 
       const tile = createLetterTile(letter, 'choice');
-      const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-      const newTray = state.tray.length < trayMax ? [...state.tray, tile] : state.tray;
+      const pushResult = pushTilesToTray(state, [tile], action.runState);
+      const newHealth = state.health - pushResult.overflowDamage;
+      const defeated = newHealth <= 0;
 
       return {
         ...state,
-        tray: newTray,
+        tray: pushResult.tray,
+        letterProductionCounts: pushResult.letterProductionCounts,
+        health: Math.max(0, newHealth),
+        phase: defeated ? 'defeat' : state.phase,
         choiceBundle: null,
-        log: [...state.log, { type: 'choice', letter }],
+        log: [
+          ...state.log,
+          { type: 'choice', letter },
+          ...(pushResult.overflowDamage > 0
+            ? (pushResult.overflowEvents.length > 0
+              ? pushResult.overflowEvents.map(event => ({
+                type: 'overflow_burst',
+                letter: event.letter,
+                message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
+              }))
+              : [{ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.overflowDamage} damage!` }])
+            : []),
+        ],
       };
     }
 
@@ -808,12 +922,14 @@ export function combatReducer(state, action) {
       // Bloom pending seeds into tray tiles
       const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
       let bloomedTray = [];
+      let nextLetterProductionCounts = { ...(state.letterProductionCounts || {}) };
       const seedLog = [];
       const seeds = state.pendingSeeds || [];
       for (const seed of seeds) {
         if (bloomedTray.length >= trayMax) break;
-        const bloomed = generateLetters(1, seed.targetLetters, seed.accuracy);
+        const bloomed = generateLetters(1, seed.targetLetters, seed.accuracy, nextLetterProductionCounts);
         bloomedTray.push(...bloomed);
+        nextLetterProductionCounts = countProducedLetters(bloomed, nextLetterProductionCounts);
         seedLog.push({ type: 'gear', message: `Seed bloomed → ${bloomed[0].letter} 🌱` });
       }
       // Cap bloomed tiles to tray max
@@ -834,6 +950,7 @@ export function combatReducer(state, action) {
         answerTrack: newTrack,
         gearStates: resetGearStates,
         pendingSeeds: [],
+        letterProductionCounts: nextLetterProductionCounts,
         log: [...stowLog, ...seedLog],
       };
     }
@@ -899,10 +1016,10 @@ export function createRunState(kit, sharedGearIds, runMap) {
     kit,
     health: kit.health,
     maxHealth: kit.health,
-    traySize: kit.traySize,
-    satchelSize: kit.satchelSize,
-    maxEnergy: kit.maxEnergy || MAX_ENERGY_DEFAULT,
-    gearIds: [...kit.gearIds, ...sharedGearIds],
+    traySize: kit.traySize + 2,
+    satchelSize: 0,
+    maxEnergy: 0,
+    gearIds: [kit.gearIds[0]],
     passives: { ...kit.passives },
     upgrades: {},
     roomIndex: 0,

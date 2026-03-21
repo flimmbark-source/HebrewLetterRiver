@@ -1,6 +1,5 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
-  DIRECTIONS, OPPOSITE, TURN_LEFT, TURN_RIGHT,
   getChamberDisplayName, getChamberIcon, CHAMBER_TYPES,
 } from '../../data/deepScript/floorGenerator.js';
 import { playFootstep } from './dsSounds.js';
@@ -15,17 +14,13 @@ import InspectPanel from './InspectPanel.jsx';
 export default function ExplorationScreen({
   floor,
   currentChamberId,
-  facing,
   onMove,
-  onTurnLeft,
-  onTurnRight,
   onTriggerCombat,
   onTriggerArchive,
   onTriggerShrine,
   onLoot,
   onResolveInteractable,
   runState,
-  onBack,
 }) {
   const [inspecting, setInspecting] = useState(null);
   const [transitioning, setTransitioning] = useState(false);
@@ -34,29 +29,15 @@ export default function ExplorationScreen({
   const chamber = floor.chambers.get(currentChamberId);
   if (!chamber) return null;
 
-  // Compute visible exits relative to facing
+  // Compute visible exits from a fixed forward-facing perspective.
   const relativeExits = useMemo(() => {
-    // Map absolute directions to relative positions based on facing
-    const dirs = ['north', 'east', 'south', 'west'];
-    const facingIdx = dirs.indexOf(facing);
-
-    // forward = facing, right = facing+1, back = facing+2, left = facing+3
-    const forward = dirs[facingIdx];
-    const right = dirs[(facingIdx + 1) % 4];
-    const back = dirs[(facingIdx + 2) % 4];
-    const left = dirs[(facingIdx + 3) % 4];
-
     return {
-      forward: chamber.exits[forward] || null,
-      right: chamber.exits[right] || null,
-      back: chamber.exits[back] || null,
-      left: chamber.exits[left] || null,
-      forwardDir: forward,
-      rightDir: right,
-      backDir: back,
-      leftDir: left,
+      forward: chamber.exits.north || null,
+      right: chamber.exits.east || null,
+      back: chamber.exits.south || null,
+      left: chamber.exits.west || null,
     };
-  }, [chamber.exits, facing]);
+  }, [chamber.exits]);
 
   // Get chamber at an exit
   const getChamberAt = useCallback((chamberId) => {
@@ -65,26 +46,6 @@ export default function ExplorationScreen({
 
   // Walking state: 'walking' phase zooms toward exit, then 'arriving' fades in new room
   const [walkPhase, setWalkPhase] = useState(null); // null | 'walking' | 'arriving'
-
-  // Handle forward movement with walk animation
-  const handleForward = useCallback(() => {
-    if (!relativeExits.forward || transitioning) return;
-    setTransitioning(true);
-    setTransDir('forward');
-    setWalkPhase('walking');
-    playFootstep();
-    // Phase 1: walk toward exit (600ms)
-    setTimeout(() => {
-      onMove(relativeExits.forward);
-      setWalkPhase('arriving');
-      // Phase 2: new room fades in (400ms)
-      setTimeout(() => {
-        setTransitioning(false);
-        setTransDir(null);
-        setWalkPhase(null);
-      }, 400);
-    }, 600);
-  }, [relativeExits.forward, transitioning, onMove]);
 
   // Click a door directly
   const handleDoorClick = useCallback((chamberId, direction) => {
@@ -167,11 +128,13 @@ export default function ExplorationScreen({
   const forwardDoor = relativeExits.forward;
   const leftDoor = relativeExits.left;
   const rightDoor = relativeExits.right;
+  const backDoor = relativeExits.back;
 
   // Chamber name for the chamber ahead (peeking)
   const forwardChamber = getChamberAt(forwardDoor);
   const leftChamber = getChamberAt(leftDoor);
   const rightChamber = getChamberAt(rightDoor);
+  const backChamber = getChamberAt(backDoor);
 
   return (
     <div className={`ds-explore-screen ${transitioning ? `ds-explore--trans-${transDir}` : ''} ${walkPhase ? `ds-explore--${walkPhase}` : ''}`}>
@@ -185,7 +148,7 @@ export default function ExplorationScreen({
         <div className="ds-explore-chamber-name">
           {getChamberDisplayName(chamber.type)}
         </div>
-        <div className="ds-explore-compass">{facing[0].toUpperCase()}</div>
+        <div className="ds-explore-compass">N</div>
       </div>
 
       {/* ═══ DUNGEON VIEWPORT ═══ */}
@@ -234,6 +197,19 @@ export default function ExplorationScreen({
             )}
           </div>
           <div className="ds-explore-floor" />
+          {backDoor && (
+            <button
+              type="button"
+              className={`ds-explore-door ds-explore-door--back ${backChamber?.visited ? 'ds-explore-door--visited' : ''}`}
+              onClick={() => handleDoorClick(backDoor, 'back')}
+              title={backChamber?.visited ? getChamberDisplayName(backChamber.type) : 'Unexplored passage behind you'}
+            >
+              <div className="ds-explore-door-arch" />
+              <div className="ds-explore-door-label">
+                {backChamber?.visited ? getChamberIcon(backChamber.type) : '?'}
+              </div>
+            </button>
+          )}
 
           {/* Torches */}
           <div className="ds-torch ds-torch--left">
@@ -294,36 +270,6 @@ export default function ExplorationScreen({
             <span className="ds-minimap-icon">{getChamberIcon(ch.type)}</span>
           </div>
         ))}
-      </div>
-
-      {/* ═══ ACTION BAR ═══ */}
-      <div className="ds-explore-action-bar">
-        <button
-          type="button"
-          className="ds-explore-act ds-explore-act--turn"
-          onClick={onTurnLeft}
-          title="Turn Left"
-        >
-          <span className="ds-explore-act-icon">⟲</span>
-        </button>
-        <button
-          type="button"
-          className={`ds-explore-act ds-explore-act--forward ${!forwardDoor ? 'ds-explore-act--disabled' : ''}`}
-          onClick={handleForward}
-          disabled={!forwardDoor}
-          title={forwardDoor ? 'Move Forward' : 'No exit ahead'}
-        >
-          <span className="ds-explore-act-icon">⬆</span>
-          <span className="ds-explore-act-label">Forward</span>
-        </button>
-        <button
-          type="button"
-          className="ds-explore-act ds-explore-act--turn"
-          onClick={onTurnRight}
-          title="Turn Right"
-        >
-          <span className="ds-explore-act-icon">⟳</span>
-        </button>
       </div>
 
       {/* ═══ INSPECT PANEL ═══ */}
