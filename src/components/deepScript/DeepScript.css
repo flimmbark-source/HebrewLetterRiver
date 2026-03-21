@@ -2310,12 +2310,20 @@
 .ds-explore-top-hud > * { pointer-events: auto; }
 
 .ds-explore-chamber-name {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-family: var(--ds-font-display);
   font-size: 14px;
   font-weight: 800;
   color: var(--ds-gold);
   text-shadow: 0 1px 4px var(--ds-gold-glow);
   letter-spacing: 0.5px;
+  text-align: center;
+  white-space: nowrap;
+  max-width: calc(100% - 104px);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ds-explore-compass {

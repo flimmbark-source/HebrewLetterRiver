@@ -257,9 +257,10 @@ export default function useBridgeBuilderGame(sessionConfig) {
       }, 600);
     } else {
       setStreak(0);
-      setHearts(h => h - 1);
       // Wrong plank breaks — remove it from choices, let player retry
       setTimeout(() => {
+        // Apply damage when the break animation completes.
+        setHearts(h => h - 1);
         setTranslitChoices(prev => prev.filter(c => c !== choice));
         setSelectedChoice(null);
         setChoiceResult(null);
@@ -311,9 +312,10 @@ export default function useBridgeBuilderGame(sessionConfig) {
       }, 600);
     } else {
       setStreak(0);
-      setHearts(h => h - 1);
       // Wrong plank breaks — remove it from choices, let player retry
       setTimeout(() => {
+        // Apply damage when the break animation completes.
+        setHearts(h => h - 1);
         setMeaningChoices(prev => prev.filter(c => c !== choice));
         setSelectedChoice(null);
         setChoiceResult(null);
