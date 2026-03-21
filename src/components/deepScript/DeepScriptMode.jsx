@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { getStarterKit } from '../../data/deepScript/starterKits.js';
-import { generateDungeonFloor, TURN_LEFT, TURN_RIGHT, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
+import { generateDungeonFloor, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
 import { upgradeDefinitions } from '../../data/deepScript/upgrades.js';
 import { registerCustomWords, clearCustomWords } from '../../data/deepScript/words.js';
@@ -29,7 +29,6 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
   // Exploration state
   const [floor, setFloor] = useState(null);
   const [currentChamberId, setCurrentChamberId] = useState(null);
-  const [facing, setFacing] = useState('north');
 
   // Active encounter context
   const [activeCombat, setActiveCombat] = useState(null); // { wordId, chamberId, isMiniboss }
@@ -77,7 +76,6 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     setRunState(newRun);
     setFloor(newFloor);
     setCurrentChamberId(newFloor.startChamberId);
-    setFacing('north');
     setFloorNumber(1);
     setScreen('exploring');
   }, [createFloorForNumber, isPackRun, packWords]);
@@ -113,14 +111,6 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
       }
     }
   }, [floor]);
-
-  const handleTurnLeft = useCallback(() => {
-    setFacing(prev => TURN_LEFT[prev]);
-  }, []);
-
-  const handleTurnRight = useCallback(() => {
-    setFacing(prev => TURN_RIGHT[prev]);
-  }, []);
 
   // ─── Exploration: Trigger encounters from hotspots ────────
 
@@ -247,7 +237,6 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
 
     setFloor(nextFloor);
     setCurrentChamberId(nextFloor.startChamberId);
-    setFacing('north');
     setActiveCombat(null);
     setActiveArchive(null);
     setActiveShrine(null);
@@ -380,7 +369,6 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     setCurrentChamberId(null);
     setEndResult(null);
     setFloorNumber(1);
-    setFacing('north');
   }, []);
 
   // ─── Render ───────────────────────────────────────────────
@@ -468,17 +456,13 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
       <ExplorationScreen
         floor={floor}
         currentChamberId={currentChamberId}
-        facing={facing}
         onMove={handleMove}
-        onTurnLeft={handleTurnLeft}
-        onTurnRight={handleTurnRight}
         onTriggerCombat={handleTriggerCombat}
         onTriggerArchive={handleTriggerArchive}
         onTriggerShrine={handleTriggerShrine}
         onLoot={handleLoot}
         onResolveInteractable={handleResolveInteractable}
         runState={runState}
-        onBack={onBack}
       />
     </div>
   );

@@ -2539,6 +2539,40 @@
   border-color: rgba(196, 149, 90, 0.3);
 }
 
+.ds-explore-door--back {
+  position: absolute;
+  left: 50%;
+  bottom: 3%;
+  transform: translateX(-50%);
+  width: 22%;
+  max-width: 110px;
+  height: 26%;
+  max-height: 120px;
+  z-index: 4;
+  opacity: 0.82;
+}
+
+.ds-explore-door--back .ds-explore-door-arch {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(7, 9, 14, 0.96) 0%, rgba(3, 4, 7, 0.99) 100%);
+  border-radius: 45% 45% 8% 8% / 22% 22% 8% 8%;
+  box-shadow:
+    inset 0 0 14px rgba(0, 0, 0, 0.8),
+    0 0 8px rgba(196, 149, 90, 0.18);
+  border: 1px solid rgba(196, 149, 90, 0.28);
+}
+
+.ds-explore-door--back .ds-explore-door-label {
+  bottom: 4px;
+  font-size: 16px;
+}
+
+.ds-explore-door--back:hover {
+  transform: translateX(-50%) translateY(-2px) scale(1.02);
+  opacity: 1;
+}
+
 .ds-explore-door--visited .ds-explore-door-arch {
   border-color: rgba(196, 149, 90, 0.2);
 }
@@ -3532,6 +3566,10 @@
   /* Forward door: adequate width on narrow screens */
   .ds-explore-door--forward {
     width: 32%;
+  }
+
+  .ds-explore-door--back {
+    width: 28%;
   }
 
   .ds-explore-door-label {
