@@ -167,11 +167,13 @@ export default function ExplorationScreen({
   const forwardDoor = relativeExits.forward;
   const leftDoor = relativeExits.left;
   const rightDoor = relativeExits.right;
+  const backDoor = relativeExits.back;
 
   // Chamber name for the chamber ahead (peeking)
   const forwardChamber = getChamberAt(forwardDoor);
   const leftChamber = getChamberAt(leftDoor);
   const rightChamber = getChamberAt(rightDoor);
+  const backChamber = getChamberAt(backDoor);
 
   return (
     <div className={`ds-explore-screen ${transitioning ? `ds-explore--trans-${transDir}` : ''} ${walkPhase ? `ds-explore--${walkPhase}` : ''}`}>
@@ -305,6 +307,18 @@ export default function ExplorationScreen({
           title="Turn Left"
         >
           <span className="ds-explore-act-icon">⟲</span>
+        </button>
+        <button
+          type="button"
+          className={`ds-explore-act ds-explore-act--back ${!backDoor ? 'ds-explore-act--disabled' : ''}`}
+          onClick={() => handleDoorClick(backDoor, 'back')}
+          disabled={!backDoor}
+          title={backDoor
+            ? `Step Back${backChamber?.visited ? ` to ${getChamberDisplayName(backChamber.type)}` : ''}`
+            : 'No exit behind you'}
+        >
+          <span className="ds-explore-act-icon">⬇</span>
+          <span className="ds-explore-act-label">Back</span>
         </button>
         <button
           type="button"
