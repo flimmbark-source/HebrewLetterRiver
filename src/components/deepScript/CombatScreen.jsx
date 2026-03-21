@@ -188,6 +188,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
   // Tile action availability
   const hasSelection = combat.selectedTrayTile;
+  const latestLogEntry = [...combat.log].reverse().find(entry => entry.type !== 'overflow_burst');
 
   return (
     <div className="ds-combat-screen">
@@ -281,12 +282,6 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
         </div>
         <div className="ds-tile-row ds-tile-row--solo">
           <div className="ds-inv-tray">
-            {overflowBursts.map(burst => (
-              <div key={burst.id} className="ds-tray-overflow-burst" aria-hidden="true">
-                <span className="ds-tray-overflow-letter">{burst.letter}</span>
-                <span className="ds-tray-overflow-hit">-1</span>
-              </div>
-            ))}
             <div className="ds-inv-tiles ds-inv-tiles--flow">
               {combat.tray.map(tile => {
                 let tileCls = 'ds-inv-tile';
@@ -339,6 +334,14 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       </div>
 
       {/* Choice Bundle Modal */}
+      {overflowBursts.map(burst => (
+        <div key={burst.id} className="ds-overflow-shot" aria-hidden="true">
+          <span className="ds-overflow-shot-letter">{burst.letter}</span>
+          <span className="ds-overflow-shot-hit">-1</span>
+          <span className="ds-overflow-shot-burst" />
+        </div>
+      ))}
+
       {combat.choiceBundle && (
         <div className="ds-choice-overlay">
           <div className="ds-choice-modal">
@@ -374,9 +377,9 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       )}
 
       {/* Log toast */}
-      {combat.log.length > 0 && (
+      {latestLogEntry && (
         <div className="ds-log-toast" key={combat.log.length}>
-          {combat.log[combat.log.length - 1].message || combat.log[combat.log.length - 1].type}
+          {latestLogEntry.message || latestLogEntry.type}
         </div>
       )}
     </div>
