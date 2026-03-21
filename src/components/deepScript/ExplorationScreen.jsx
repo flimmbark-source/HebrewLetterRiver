@@ -4,6 +4,9 @@ import {
 } from '../../data/deepScript/floorGenerator.js';
 import { playFootstep } from './dsSounds.js';
 import InspectPanel from './InspectPanel.jsx';
+import PillarMiniGame from './PillarMiniGame.jsx';
+import FloatingCapsulesGame from '../FloatingCapsulesGame.jsx';
+import { deepScriptWords } from '../../data/deepScript/words.js';
 
 /**
  * ExplorationScreen — first-person dungeon traversal.
@@ -19,6 +22,9 @@ export default function ExplorationScreen({
   onTriggerMiniGame,
   onLoot,
   onResolveInteractable,
+  activeMiniGame,
+  onCompleteMiniGame,
+  onCloseMiniGame,
   runState,
 }) {
   const [inspecting, setInspecting] = useState(null);
@@ -132,6 +138,18 @@ export default function ExplorationScreen({
   const rightChamber = getChamberAt(rightDoor);
   const backChamber = getChamberAt(backDoor);
   const visibleBackDoor = backChamber?.visited ? backDoor : null;
+  const isMiniGameOpenInThisRoom = activeMiniGame?.chamberId === chamber.id;
+  const capsulePairs = useMemo(() => {
+    const words = [...deepScriptWords]
+      .filter(word => !word.isMiniboss && word.english)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3);
+    return words.map(word => ({
+      hebrew: word.hebrew,
+      transliteration: word.transliteration,
+      meaning: word.english,
+    }));
+  }, []);
 
   return (
     <div className={`ds-explore-screen ${transitioning ? `ds-explore--trans-${transDir}` : ''} ${walkPhase ? `ds-explore--${walkPhase}` : ''}`}>
@@ -247,6 +265,23 @@ export default function ExplorationScreen({
               );
             })}
           </div>
+
+          {isMiniGameOpenInThisRoom && (
+            <div className="ds-room-minigame" role="dialog" aria-label="Room minigame">
+              <button type="button" className="ds-room-minigame-close" onClick={onCloseMiniGame}>✕</button>
+              {activeMiniGame?.miniGameId === 'pillar' && (
+                <PillarMiniGame onSolved={onCompleteMiniGame} compact />
+              )}
+              {activeMiniGame?.miniGameId === 'capsules' && (
+                <div className="ds-room-minigame-capsules">
+                  <FloatingCapsulesGame
+                    wordPairs={capsulePairs}
+                    onComplete={onCompleteMiniGame}
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Chamber state indicator */}
           {chamber.resolved && chamber.type === CHAMBER_TYPES.COMBAT && (

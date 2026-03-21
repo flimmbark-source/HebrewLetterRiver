@@ -34,7 +34,7 @@ function buildPillarRows() {
   });
 }
 
-export default function PillarMiniGame({ onSolved }) {
+export default function PillarMiniGame({ onSolved, compact = false }) {
   const [rows, setRows] = useState(() => buildPillarRows());
   const [spinningRowId, setSpinningRowId] = useState(null);
   const pointerStartRef = React.useRef({});
@@ -85,7 +85,7 @@ export default function PillarMiniGame({ onSolved }) {
   };
 
   return (
-    <div className="ds-pillar-game">
+    <div className={`ds-pillar-game ${compact ? 'ds-pillar-game--compact' : ''}`}>
       <div className="ds-pillar-core" aria-hidden="true" />
       {rows.map((row) => (
         <React.Fragment key={row.id}>

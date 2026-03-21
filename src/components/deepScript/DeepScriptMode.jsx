@@ -7,7 +7,6 @@ import KitSelectScreen from './KitSelectScreen.jsx';
 import ExplorationScreen from './ExplorationScreen.jsx';
 import BattleTransition from './BattleTransition.jsx';
 import CombatScreen from './CombatScreen.jsx';
-import MiniGameScreen from './MiniGameScreen.jsx';
 import RunEndScreen from './RunEndScreen.jsx';
 import './DeepScript.css';
 
@@ -31,7 +30,7 @@ function collectFloorWordIds(floor) {
 export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGuidedPackRun = false }) {
   const hasCustomWordPool = !!(packWords && packWords.length > 0);
   const previousFloorWordIdsRef = useRef(new Set());
-  const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | minigame | end
+  const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | end
   const [runState, setRunState] = useState(null);
   const [endResult, setEndResult] = useState(null);
   const [floorNumber, setFloorNumber] = useState(1);
@@ -145,7 +144,6 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
 
   const handleTriggerMiniGame = useCallback((chamberId, miniGameId) => {
     setActiveMiniGame({ chamberId, miniGameId });
-    setScreen('minigame');
   }, []);
 
   const handleLoot = useCallback((chamberId, interactableId) => {
@@ -280,8 +278,11 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     }));
 
     setActiveMiniGame(null);
-    setScreen('exploring');
   }, [activeMiniGame]);
+
+  const handleCloseMiniGame = useCallback(() => {
+    setActiveMiniGame(null);
+  }, []);
 
   // ─── Restart / Back ───────────────────────────────────────
 
@@ -351,19 +352,6 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     );
   }
 
-  // Mini-game screen
-  if (screen === 'minigame' && activeMiniGame) {
-    return (
-      <div className="ds-mode">
-        <MiniGameScreen
-          miniGameId={activeMiniGame.miniGameId}
-          runState={runState}
-          onComplete={handleMiniGameComplete}
-        />
-      </div>
-    );
-  }
-
   // Exploration
   return (
     <div className="ds-mode">
@@ -375,6 +363,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         onTriggerMiniGame={handleTriggerMiniGame}
         onLoot={handleLoot}
         onResolveInteractable={handleResolveInteractable}
+        activeMiniGame={activeMiniGame}
+        onCompleteMiniGame={handleMiniGameComplete}
+        onCloseMiniGame={handleCloseMiniGame}
         runState={runState}
       />
     </div>

@@ -2204,6 +2204,29 @@
   letter-spacing: 0.8px;
 }
 
+.ds-pillar-game--compact {
+  min-height: 230px;
+  gap: 4px;
+}
+
+.ds-pillar-game--compact .ds-pillar-core {
+  inset: 9% 38%;
+}
+
+.ds-pillar-game--compact .ds-pillar-slat {
+  width: min(96%, 320px);
+  min-height: 34px;
+  font-size: 18px;
+}
+
+.ds-pillar-game--compact .ds-pillar-slat--rotating {
+  font-size: 13px;
+}
+
+.ds-pillar-game--compact .ds-pillar-gap {
+  height: 5px;
+}
+
 /* ═══════════════════════════════════════════════════════════
    RUN END SCREEN
    ═══════════════════════════════════════════════════════════ */
@@ -2872,6 +2895,40 @@
 
 .ds-hotspot:hover .ds-hotspot-label {
   opacity: 1;
+}
+
+.ds-room-minigame {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  transform: translate(-50%, -50%);
+  width: min(76%, 420px);
+  max-height: 68%;
+  z-index: 6;
+  background: rgba(18, 20, 26, 0.9);
+  border: 1px solid rgba(196, 149, 90, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  padding: 10px 10px 12px;
+}
+
+.ds-room-minigame-close {
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(196, 149, 90, 0.3);
+  background: rgba(35, 40, 48, 0.9);
+  color: var(--ds-parchment);
+  cursor: pointer;
+  z-index: 1;
+}
+
+.ds-room-minigame-capsules {
+  height: 255px;
+  padding-top: 14px;
 }
 
 /* Cleared badge */
