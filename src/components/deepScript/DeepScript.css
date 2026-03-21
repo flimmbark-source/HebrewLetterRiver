@@ -587,6 +587,11 @@
   text-shadow: 0 0 6px var(--ds-green-glow);
 }
 
+.spacer {
+  height: 15px; /* Adds a vertical space of 10px */
+  width: 100%;  /* Ensures it takes the full width */
+}
+
 .ds-rune-hint {
   font-size: 18px;
   color: rgba(240, 198, 116, 0.45);
@@ -3318,6 +3323,10 @@
     padding: 0;
     justify-content: center;
     flex-wrap: wrap;
+  }
+
+  .ds-tile-row--solo {
+    align-self: center;
   }
 
   .ds-inv-satchel-group {
