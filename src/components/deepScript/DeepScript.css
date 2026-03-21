@@ -2167,6 +2167,8 @@
 
 .ds-pillar-slat--fixed {
   cursor: default;
+  background: linear-gradient(180deg, #434854 0%, #2d323d 100%);
+  border-color: #5d6470;
 }
 
 .ds-pillar-slat--rotating {
