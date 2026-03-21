@@ -19,6 +19,8 @@
  * @property {string|null} unlockAfter  — Pack ID that must be completed to unlock this one (null = unlocked by default)
  */
 
+import { CAFE_TALK_CATEGORIES, getCafeTalkCategoryIds } from './readingTexts/cafeTalk/cafeTalkCanonical.js';
+
 export const bridgeBuilderPacks = [
   /* ═══════════════════════════════════════════════════════════
      Section 1: Foundations
@@ -356,6 +358,52 @@ export const bridgeBuilderPacks = [
     unlockAfter: 'useful_chunks_01',
   },
 ];
+
+const CAFE_TALK_CATEGORY_NAMES = {
+  vowelLayoutBootcamp: 'Vowel Layout Bootcamp',
+  basicConnectors: 'Basic Connectors',
+  discourseMarkers: 'Discourse Markers',
+  logicalConnectors: 'Logical Connectors',
+  qualifiersModifiers: 'Qualifiers & Modifiers',
+  presentTransitions: 'Present Transitions',
+  timeReferences: 'Time References',
+  frequencyTiming: 'Frequency & Timing',
+  personalPronouns: 'Personal Pronouns',
+  peopleReferences: 'People References',
+  socialRoles: 'Social Roles',
+  communicationPerception: 'Communication & Perception',
+  emotionsCreation: 'Emotions & Creation',
+  actionVerbs: 'Action Verbs',
+  dailyRoutines: 'Daily Routines',
+  timeResources: 'Time & Resources',
+  actionsMovement: 'Actions & Movement',
+  basicEmotions: 'Basic Emotions',
+  statesOfBeing: 'States of Being',
+  descriptions: 'Descriptions',
+  commonObjects: 'Common Objects',
+  placesConcepts: 'Places & Concepts',
+  abstractTerms: 'Abstract Terms',
+};
+
+const cafeTalkCategoryIds = getCafeTalkCategoryIds();
+const cafeTalkPacks = cafeTalkCategoryIds.map((categoryId, idx) => {
+  const category = CAFE_TALK_CATEGORIES[categoryId];
+  const title = CAFE_TALK_CATEGORY_NAMES[categoryId] || categoryId;
+  const snake = categoryId.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+
+  return {
+    id: `cafe_talk_${snake}_01`,
+    sectionId: 'cafe_talk',
+    title,
+    theme: 'cafe_talk',
+    description: `Cafe Talk: ${title.toLowerCase()}`,
+    wordIds: category.wordIds.map(wordId => `bbct-${wordId}`),
+    order: idx + 1,
+    unlockAfter: idx === 0 ? null : `cafe_talk_${cafeTalkCategoryIds[idx - 1].replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()}_01`,
+  };
+});
+
+bridgeBuilderPacks.push(...cafeTalkPacks);
 
 /**
  * Get a pack by ID.
