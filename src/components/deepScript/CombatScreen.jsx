@@ -50,6 +50,14 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   const prevPhaseRef = useRef(combat?.phase);
   const prevTrayIdsRef = useRef((combat?.tray || []).map(t => t.id));
   const prevLogLengthRef = useRef((combat?.log || []).length);
+  const overflowTimersRef = useRef([]);
+
+  useEffect(() => {
+    return () => {
+      overflowTimersRef.current.forEach(timerId => clearTimeout(timerId));
+      overflowTimersRef.current = [];
+    };
+  }, []);
 
   // Handle combat end with sounds
   useEffect(() => {
@@ -195,15 +203,14 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       setOverflowBursts(prev => [...prev, ...burstItems]);
       const damageTimer = setTimeout(() => {
         dispatch({ type: ACTIONS.RESOLVE_OVERFLOW_BURSTS, damage: burstDamage });
+        overflowTimersRef.current = overflowTimersRef.current.filter(id => id !== damageTimer);
       }, 2100);
       const timer = setTimeout(() => {
         setOverflowBursts(prev => prev.filter(item => !burstItems.some(b => b.id === item.id)));
+        overflowTimersRef.current = overflowTimersRef.current.filter(id => id !== timer);
       }, 2400);
+      overflowTimersRef.current.push(damageTimer, timer);
       prevLogLengthRef.current = nextLog.length;
-      return () => {
-        clearTimeout(timer);
-        clearTimeout(damageTimer);
-      };
     }
     prevLogLengthRef.current = nextLog.length;
   }, [combat?.log]);
