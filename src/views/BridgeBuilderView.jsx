@@ -5,7 +5,7 @@ import BridgeBuilderGame from '../components/bridgeBuilder/BridgeBuilderGame.jsx
 import LoosePlanksGame from '../components/bridgeBuilder/LoosePlanksGame.jsx';
 import DeepScriptMode from '../components/deepScript/DeepScriptMode.jsx';
 import { markBridgeBuilderComplete, markDeepScriptComplete } from '../lib/bridgeBuilderStorage.js';
-import { getWordsByIds } from '../data/bridgeBuilderWords.js';
+import { bridgeBuilderWords, getWordsByIds } from '../data/bridgeBuilderWords.js';
 import { convertBBWordsForDS } from '../data/deepScript/words.js';
 
 /**
@@ -69,9 +69,20 @@ export default function BridgeBuilderView() {
     return null;
   }, [sessionConfig?.gameMode, sessionConfig?.selectedWordIds]);
 
+  const endlessDSWords = useMemo(
+    () => convertBBWordsForDS(bridgeBuilderWords),
+    []
+  );
+
   // Standalone Deep Script (no pack)
   if (showDeepScript) {
-    return <DeepScriptMode onBack={handleBackToSetup} />;
+    return (
+      <DeepScriptMode
+        onBack={handleBackToSetup}
+        packWords={endlessDSWords}
+        isGuidedPackRun={false}
+      />
+    );
   }
 
   if (sessionConfig) {
@@ -82,6 +93,7 @@ export default function BridgeBuilderView() {
           onBack={handleBackToSetup}
           packWords={packDSWords}
           onRunComplete={handleDeepScriptRunComplete}
+          isGuidedPackRun={true}
         />
       );
     }
