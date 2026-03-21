@@ -48,14 +48,14 @@ export default function ExplorationScreen({
   const [walkPhase, setWalkPhase] = useState(null); // null | 'walking' | 'arriving'
 
   // Click a door directly
-  const handleDoorClick = useCallback((chamberId, direction, absoluteDirection) => {
+  const handleDoorClick = useCallback((chamberId, direction) => {
     if (transitioning) return;
     setTransitioning(true);
     setTransDir(direction);
     setWalkPhase('walking');
     playFootstep();
     setTimeout(() => {
-      onMove(chamberId, absoluteDirection);
+      onMove(chamberId);
       setWalkPhase('arriving');
       setTimeout(() => {
         setTransitioning(false);
@@ -135,6 +135,7 @@ export default function ExplorationScreen({
   const leftChamber = getChamberAt(leftDoor);
   const rightChamber = getChamberAt(rightDoor);
   const backChamber = getChamberAt(backDoor);
+  const visibleBackDoor = backChamber?.visited ? backDoor : null;
 
   return (
     <div className={`ds-explore-screen ${transitioning ? `ds-explore--trans-${transDir}` : ''} ${walkPhase ? `ds-explore--${walkPhase}` : ''}`}>
@@ -162,7 +163,7 @@ export default function ExplorationScreen({
               <button
                 type="button"
                 className={`ds-explore-door ds-explore-door--forward ${forwardChamber?.visited ? 'ds-explore-door--visited' : ''}`}
-                onClick={() => handleDoorClick(forwardDoor, 'forward', 'north')}
+                onClick={() => handleDoorClick(forwardDoor, 'forward')}
                 title={forwardChamber?.visited ? getChamberDisplayName(forwardChamber.type) : 'Unexplored passage'}
               >
                 <div className="ds-explore-door-arch" />
@@ -177,7 +178,7 @@ export default function ExplorationScreen({
               <button
                 type="button"
                 className={`ds-explore-door ds-explore-door--side ds-explore-door--left ${leftChamber?.visited ? 'ds-explore-door--visited' : ''}`}
-                onClick={() => handleDoorClick(leftDoor, 'left', 'west')}
+                onClick={() => handleDoorClick(leftDoor, 'left')}
                 title={leftChamber?.visited ? getChamberDisplayName(leftChamber.type) : 'Unexplored passage'}
               >
                 <div className="ds-explore-door-arch" />
@@ -189,7 +190,7 @@ export default function ExplorationScreen({
               <button
                 type="button"
                 className={`ds-explore-door ds-explore-door--side ds-explore-door--right ${rightChamber?.visited ? 'ds-explore-door--visited' : ''}`}
-                onClick={() => handleDoorClick(rightDoor, 'right', 'east')}
+                onClick={() => handleDoorClick(rightDoor, 'right')}
                 title={rightChamber?.visited ? getChamberDisplayName(rightChamber.type) : 'Unexplored passage'}
               >
                 <div className="ds-explore-door-arch" />
@@ -197,11 +198,11 @@ export default function ExplorationScreen({
             )}
           </div>
           <div className="ds-explore-floor" />
-          {backDoor && (
+          {visibleBackDoor && (
             <button
               type="button"
               className={`ds-explore-door ds-explore-door--back ${backChamber?.visited ? 'ds-explore-door--visited' : ''}`}
-              onClick={() => handleDoorClick(backDoor, 'back', 'south')}
+              onClick={() => handleDoorClick(visibleBackDoor, 'back')}
               title={backChamber?.visited ? getChamberDisplayName(backChamber.type) : 'Unexplored passage behind you'}
             >
               <div className="ds-explore-door-arch" />
