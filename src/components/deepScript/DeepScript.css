@@ -757,24 +757,11 @@
   transform: translateX(-50%);
   z-index: 10;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 16px;
 }
 
 .ds-inv-tray {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-}
-
-.ds-inv-satchel-group {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.ds-inv-satchel {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -798,7 +785,8 @@
 .ds-inv-tiles {
   display: flex;
   gap: 4px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: min(82vw, 620px);
 }
 
 .ds-inv-tile {
@@ -854,51 +842,28 @@
   box-shadow: none;
 }
 
-.ds-inv-tile--satchel {
-  border-color: rgba(76, 175, 106, 0.25);
-  background: linear-gradient(180deg, #1e2e22 0%, #1a261e 100%);
-}
-
-.ds-inv-tile--satchel.ds-inv-tile--selected {
-  border-color: var(--ds-green);
-  box-shadow: 0 0 8px var(--ds-green-glow), 0 2px 0 #2a5a3a;
-}
-
-.ds-inv-tile--satchel-empty {
-  border-color: rgba(76, 175, 106, 0.12);
-}
-
-/* Compact tile actions between tray and satchel */
-.ds-inv-actions-compact {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  align-self: flex-end;
-  margin-bottom: 2px;
-}
-
-.ds-inv-act {
-  width: 30px;
-  height: 30px;
+.ds-tray-boundary {
+  min-width: 52px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--ds-stone-lighter);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--ds-parchment-dim);
+  border: 1px dashed rgba(201, 166, 92, 0.4);
   border-radius: 6px;
-  background: var(--ds-stone-mid);
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 14px;
-  transition: transform 0.1s, border-color 0.15s;
-  color: var(--ds-parchment);
+  background: rgba(20, 24, 30, 0.55);
 }
 
-.ds-inv-act:active { transform: scale(0.9); }
+.ds-tray-boundary--start {
+  border-color: rgba(91, 141, 217, 0.45);
+}
 
-.ds-inv-act--stow { border-color: rgba(76, 175, 106, 0.3); }
-.ds-inv-act--retrieve { border-color: rgba(91, 141, 217, 0.3); }
-
-.ds-inv-act-icon { font-size: 14px; line-height: 1; }
+.ds-tray-boundary--end {
+  border-color: rgba(167, 63, 63, 0.55);
+}
 
 /* ─── Ability Cards Row (centered above tray) ───────────── */
 .ds-ability-row {
@@ -3094,15 +3059,14 @@
     max-width: 100%;
     padding: 0;
     justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .ds-inv-satchel-group {
-    transform: translateX(20px);
+    flex-wrap: nowrap;
   }
 
   .ds-inv-tiles {
     gap: 3px;
+    flex-wrap: wrap;
+    min-width: min(95vw, 460px);
+    max-width: min(95vw, 460px);
   }
 
   .ds-inv-label {
@@ -3110,11 +3074,10 @@
     letter-spacing: 1.2px;
   }
 
-  /* Stow/retrieve buttons: meet 44px minimum */
-  .ds-inv-act {
-    width: 38px;
+  .ds-tray-boundary {
+    min-width: 44px;
     height: 38px;
-    font-size: 16px;
+    font-size: 10px;
   }
 
   /* Ability cards: slightly smaller to fit, but keep touch target */

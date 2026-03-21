@@ -20,7 +20,7 @@ import { nanoid } from 'nanoid/non-secure';
 
 export const TRAY_SIZE_DEFAULT = 6;
 export const SATCHEL_SIZE_DEFAULT = 3;
-export const MAX_ENERGY_DEFAULT = 3;
+export const REALTIME_TICK_MS_DEFAULT = 250;
 
 // ─── Enemy Intent Types ─────────────────────────────────────
 
@@ -37,7 +37,7 @@ const INTENT_DEFS = {
   [INTENT_TYPES.SPAWN_CURSED]: { icon: '🕷️', label: 'Spawn' },
   [INTENT_TYPES.BURN_TILE]:    { icon: '🔥', label: 'Buff', description: 'Increases next action amount' },
   [INTENT_TYPES.SLOT_LOCK]:    { icon: '⚔️', label: 'Attack', description: 'Deals damage' },
-  [INTENT_TYPES.SATCHEL_RAID]: { icon: '🌀', label: 'Confuse', description: 'Randomized mana cost (1-3) for abilities for the turn' },
+  [INTENT_TYPES.SATCHEL_RAID]: { icon: '🌀', label: 'Jinx', description: 'Adds cooldown delay to random abilities' },
 };
 
 export function getIntentDisplay(intent) {
@@ -95,6 +95,24 @@ export function createLetterTile(letter, source = 'generated', cursed = false) {
     source,
     cursed,
   };
+}
+
+function addTilesToTrayWithOverflow(state, tilesToAdd = []) {
+  const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
+  let nextTray = [...state.tray];
+  let overflowCursed = 0;
+  const producedTileIds = [];
+
+  for (const tile of tilesToAdd) {
+    nextTray.push(tile);
+    producedTileIds.push(tile.id);
+    while (nextTray.length > trayMax) {
+      const pushedOff = nextTray.shift();
+      if (pushedOff?.cursed) overflowCursed += 1;
+    }
+  }
+
+  return { nextTray, overflowCursed, producedTileIds };
 }
 
 // ─── Helper: generate letters ───────────────────────────────
@@ -191,8 +209,8 @@ export function createCombatState(wordId, runState) {
     }
   }
 
-  // Energy
-  const maxEnergy = runState.maxEnergy || MAX_ENERGY_DEFAULT;
+  const weaponDef = runState.kit?.basicWeapon || null;
+  const weaponChargesMax = Math.max(1, weaponDef?.charges || 1);
 
   // Determine enemy type
   const enemyType = word.enemyType || ENEMY_TYPES.CORRUPTOR;
@@ -214,8 +232,6 @@ export function createCombatState(wordId, runState) {
     health,
     maxHealth,
     turn: 0,
-    energy: maxEnergy,
-    maxEnergy,
     enemyType,
     enemyDef,
     enemyIntent: firstIntent,
@@ -230,6 +246,19 @@ export function createCombatState(wordId, runState) {
     isMiniboss: word.isMiniboss || false,
     pendingIntentBuff: 0,
     confusedGearCosts: {},
+    cooldownReduction: runState.upgrades?.cooldownReduction || 0,
+    nowMs: 0,
+    basicWeapon: weaponDef
+      ? {
+          ...weaponDef,
+          chargeCount: weaponChargesMax,
+          chargeCountMax: weaponChargesMax,
+          cooldownRemainingMs: 0,
+          nextFireMs: weaponDef.cooldownMs || 2500,
+          powerUpRemainingMs: 0,
+        }
+      : null,
+    lastProducedTileIds: [],
   };
 }
 
@@ -246,8 +275,7 @@ export const ACTIONS = {
   SELECT_TRAY_TILE: 'SELECT_TRAY_TILE',
   SELECT_SATCHEL_TILE: 'SELECT_SATCHEL_TILE',
   PICK_CHOICE: 'PICK_CHOICE',
-  START_TURN: 'START_TURN',
-  END_TURN: 'END_TURN',
+  REALTIME_TICK: 'REALTIME_TICK',
   DISMISS_LOG: 'DISMISS_LOG',
 };
 
@@ -334,13 +362,13 @@ function executeEnemyIntent(state) {
       const targeted = shuffled.slice(0, targetedCount);
       const confusedGearCosts = { ...state.confusedGearCosts };
       for (const gearId of targeted) {
-        confusedGearCosts[gearId] = Math.floor(Math.random() * 3) + 1;
+        confusedGearCosts[gearId] = (Math.floor(Math.random() * 3) + 1) * 1000;
       }
       return {
         ...state,
         confusedGearCosts,
         pendingIntentBuff: 0,
-        log: [...state.log, { type: 'enemy', message: `Confused ${targeted.length} abilit${targeted.length === 1 ? 'y' : 'ies'} this turn!` }],
+        log: [...state.log, { type: 'enemy', message: `Jinxed ${targeted.length} abilit${targeted.length === 1 ? 'y' : 'ies'} with cooldown delay!` }],
       };
     }
 
@@ -486,13 +514,15 @@ export function combatReducer(state, action) {
 
     case ACTIONS.GENERATE_LETTERS: {
       const { letters } = action;
-      const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-      const spaceLeft = trayMax - state.tray.length;
-      const toAdd = letters.slice(0, spaceLeft);
+      const { nextTray, overflowCursed, producedTileIds } = addTilesToTrayWithOverflow(state, letters);
+      const health = Math.max(0, state.health - overflowCursed);
 
       return {
         ...state,
-        tray: [...state.tray, ...toAdd],
+        tray: nextTray,
+        health,
+        phase: health <= 0 ? 'defeat' : state.phase,
+        lastProducedTileIds: producedTileIds,
         log: state.log,
       };
     }
@@ -569,24 +599,11 @@ export function combatReducer(state, action) {
       if (gearState.currentCooldown > 0) return state;
       if (gearState.usesRemaining === 0) return state;
 
-      // Compute effective energy cost (escalating gear adds turnUses)
-      const baseEnergyCost = gearDef.escalatingCost
-        ? gearDef.energyCost + (gearState.turnUses || 0)
-        : gearDef.energyCost;
-      const confusedCost = state.confusedGearCosts?.[gearId];
-      const effectiveEnergyCost = confusedCost ?? baseEnergyCost;
-
-      // Check energy cost
-      if (state.energy < effectiveEnergyCost) return state;
-
       // Check sockets are filled (required sockets must have tiles)
       const requiredSocketsFilled = gearState.sockets
         .filter(s => s.type === 'required')
-        .every(s => s.tileId !== null);
+      .every(s => s.tileId !== null);
       if (!requiredSocketsFilled && gearState.sockets.some(s => s.type === 'required')) return state;
-
-      // Pay energy
-      let newEnergy = state.energy - effectiveEnergyCost;
 
       // Collect socketed tiles (they've already been removed from tray)
       const socketedTiles = gearState.sockets
@@ -601,10 +618,10 @@ export function combatReducer(state, action) {
         ...state.gearStates,
         [gearId]: {
           ...gearState,
-          currentCooldown: gearState.effectiveCooldown,
+          currentCooldown: gearState.effectiveCooldown + (state.confusedGearCosts?.[gearId] || 0) / 1000,
           usesRemaining: gearState.usesRemaining > 0 ? gearState.usesRemaining - 1 : -1,
           sockets: newSockets,
-          turnUses: (gearState.turnUses || 0) + 1,
+          turnUses: 0,
         },
       };
 
@@ -612,21 +629,22 @@ export function combatReducer(state, action) {
       const genAccuracy = 0.3 + (runState?.passives?.generateBonus || 0);
       let updates = {
         gearStates: newGearStates,
-        energy: newEnergy,
         tray: [...state.tray],
         satchel: [...state.satchel],
         selectedTrayTile: null,
         selectedSatchelTile: null,
+        lastProducedTileIds: [],
       };
 
       switch (gearDef.type) {
         case 'generate-random': {
           // Scribe Knife: 2 random tiles, weighted toward target
           const newTiles = generateLetters(2, targetLetters, genAccuracy);
-          const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-          const space = trayMax - updates.tray.length;
-          updates.tray = [...updates.tray, ...newTiles.slice(0, space)];
-          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: `Generated ${Math.min(newTiles.length, space)} random tile(s)` }];
+          const { nextTray, overflowCursed, producedTileIds } = addTilesToTrayWithOverflow({ ...state, tray: updates.tray }, newTiles);
+          updates.tray = nextTray;
+          updates.lastProducedTileIds = producedTileIds;
+          updates.health = Math.max(0, (state.health - overflowCursed));
+          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: `Generated ${newTiles.length} random tile(s)` }];
           break;
         }
         case 'duplicate': {
@@ -634,17 +652,18 @@ export function combatReducer(state, action) {
           const socketedTile = socketedTiles[0];
           if (socketedTile?.letter) {
             const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
+            const duplicateTiles = [];
             for (let i = 0; i < 2; i++) {
               const copy = createLetterTile(socketedTile.letter, 'duplicate');
-              if (updates.tray.length < trayMax) {
-                updates.tray = [...updates.tray, copy];
-              }
+              if (updates.tray.length < trayMax) duplicateTiles.push(copy);
             }
             // Also return the original tile to tray
             const original = createLetterTile(socketedTile.letter, 'socketed');
-            if (updates.tray.length < trayMax) {
-              updates.tray = [...updates.tray, original];
-            }
+            duplicateTiles.push(original);
+            const { nextTray, overflowCursed, producedTileIds } = addTilesToTrayWithOverflow({ ...state, tray: updates.tray }, duplicateTiles);
+            updates.tray = nextTray;
+            updates.lastProducedTileIds = producedTileIds;
+            updates.health = Math.max(0, (state.health - overflowCursed));
           }
           updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Produced 2 copies' }];
           break;
@@ -673,14 +692,15 @@ export function combatReducer(state, action) {
           const salvageCount = salvaged ? 2 : 1;
           const salvageAccuracy = 0.4 + (runState?.passives?.generateBonus || 0);
           const salvageTiles = generateLetters(salvageCount, targetLetters, salvageAccuracy);
-          const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-          const space = trayMax - updates.tray.length;
-          updates.tray = [...updates.tray, ...salvageTiles.slice(0, space)];
+          const { nextTray, overflowCursed, producedTileIds } = addTilesToTrayWithOverflow({ ...state, tray: updates.tray }, salvageTiles);
+          updates.tray = nextTray;
+          updates.lastProducedTileIds = producedTileIds;
+          updates.health = Math.max(0, (state.health - overflowCursed));
           updates.log = [...state.log, {
             type: 'gear', name: gearDef.name,
             message: salvaged
-              ? `Consumed a cursed tile + ${Math.min(salvageCount, space)} new tile(s)`
-              : `Generated ${Math.min(1, space)} tile(s)`,
+              ? `Consumed a cursed tile + ${salvageCount} new tile(s)`
+              : 'Generated 1 tile',
           }];
           break;
         }
@@ -690,10 +710,10 @@ export function combatReducer(state, action) {
           // Tempo decision: delayed tile is vulnerable to enemy burn/corrupt.
           const sproutAccuracy = 0.3 + (runState?.passives?.generateBonus || 0);
           const sproutTiles = generateLetters(1, targetLetters, sproutAccuracy);
-          const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-          if (updates.tray.length < trayMax) {
-            updates.tray = [...updates.tray, ...sproutTiles];
-          }
+          const { nextTray, overflowCursed, producedTileIds } = addTilesToTrayWithOverflow({ ...state, tray: updates.tray }, sproutTiles);
+          updates.tray = nextTray;
+          updates.lastProducedTileIds = producedTileIds;
+          updates.health = Math.max(0, (state.health - overflowCursed));
           // Plant seed for next turn bloom
           const seedAccuracy = 0.6 + (runState?.passives?.generateBonus || 0);
           updates.pendingSeeds = [
@@ -723,10 +743,10 @@ export function combatReducer(state, action) {
               newLetter = allDeepScriptLetters[Math.floor(Math.random() * allDeepScriptLetters.length)];
             }
             const transformedTile = createLetterTile(newLetter, 'transform');
-            const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-            if (updates.tray.length < trayMax) {
-              updates.tray = [...updates.tray, transformedTile];
-            }
+            const { nextTray, overflowCursed, producedTileIds } = addTilesToTrayWithOverflow({ ...state, tray: updates.tray }, [transformedTile]);
+            updates.tray = nextTray;
+            updates.lastProducedTileIds = producedTileIds;
+            updates.health = Math.max(0, (state.health - overflowCursed));
           }
           updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Transformed letter' }];
           break;
@@ -735,10 +755,11 @@ export function combatReducer(state, action) {
           // Ash Brazier: burn socketed tile, generate 2 random
           const burnAccuracy = 0.4 + (runState?.passives?.generateBonus || 0);
           const newTiles = generateLetters(2, targetLetters, burnAccuracy);
-          const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-          const space = trayMax - updates.tray.length;
-          updates.tray = [...updates.tray, ...newTiles.slice(0, space)];
-          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: `Burned tile → ${Math.min(newTiles.length, space)} new tile(s)` }];
+          const { nextTray, overflowCursed, producedTileIds } = addTilesToTrayWithOverflow({ ...state, tray: updates.tray }, newTiles);
+          updates.tray = nextTray;
+          updates.lastProducedTileIds = producedTileIds;
+          updates.health = Math.max(0, (state.health - overflowCursed));
+          updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: `Burned tile → ${newTiles.length} new tile(s)` }];
           break;
         }
         case 'defend': {
@@ -753,10 +774,10 @@ export function combatReducer(state, action) {
           if (remaining.length > 0) {
             const exactLetter = remaining[Math.floor(Math.random() * remaining.length)];
             const tile = createLetterTile(exactLetter, 'gear');
-            const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-            if (updates.tray.length < trayMax) {
-              updates.tray = [...updates.tray, tile];
-            }
+            const { nextTray, overflowCursed, producedTileIds } = addTilesToTrayWithOverflow({ ...state, tray: updates.tray }, [tile]);
+            updates.tray = nextTray;
+            updates.lastProducedTileIds = producedTileIds;
+            updates.health = Math.max(0, (state.health - overflowCursed));
           }
           updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Inscribed an exact letter' }];
           break;
@@ -765,7 +786,12 @@ export function combatReducer(state, action) {
           break;
       }
 
-      return { ...state, ...updates };
+      const merged = { ...state, ...updates };
+      if (typeof merged.health === 'number' && merged.health <= 0) {
+        merged.health = 0;
+        merged.phase = 'defeat';
+      }
+      return merged;
     }
 
     case ACTIONS.PICK_CHOICE: {
@@ -773,112 +799,84 @@ export function combatReducer(state, action) {
       if (!state.choiceBundle) return state;
 
       const tile = createLetterTile(letter, 'choice');
-      const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-      const newTray = state.tray.length < trayMax ? [...state.tray, tile] : state.tray;
+      const { nextTray, overflowCursed, producedTileIds } = addTilesToTrayWithOverflow(state, [tile]);
+      const health = Math.max(0, state.health - overflowCursed);
 
       return {
         ...state,
-        tray: newTray,
+        tray: nextTray,
+        health,
+        phase: health <= 0 ? 'defeat' : state.phase,
+        lastProducedTileIds: producedTileIds,
         choiceBundle: null,
         log: [...state.log, { type: 'choice', letter }],
       };
     }
 
-    case ACTIONS.START_TURN: {
-      // Gain energy, clear slot locks
-      const newTrack = state.answerTrack.map(s => ({ ...s, locked: false }));
-
-      // Auto-fill satchel from tray before clearing it
-      const satchelMax = state.maxSatchelSize || SATCHEL_SIZE_DEFAULT;
-      let satchelSpace = satchelMax - state.satchel.length;
-      const autoStowed = [];
-      if (satchelSpace > 0) {
-        const stowable = state.tray;
-        for (const tile of stowable) {
-          if (satchelSpace <= 0) break;
-          autoStowed.push(tile);
-          satchelSpace--;
-        }
-      }
-      const newSatchel = [...state.satchel, ...autoStowed];
-      const stowLog = autoStowed.length > 0
-        ? [{ type: 'stow', message: `Auto-stowed ${autoStowed.length} tile(s) to satchel.` }]
-        : [];
-
-      // Bloom pending seeds into tray tiles
-      const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
-      let bloomedTray = [];
-      const seedLog = [];
-      const seeds = state.pendingSeeds || [];
-      for (const seed of seeds) {
-        if (bloomedTray.length >= trayMax) break;
-        const bloomed = generateLetters(1, seed.targetLetters, seed.accuracy);
-        bloomedTray.push(...bloomed);
-        seedLog.push({ type: 'gear', message: `Seed bloomed → ${bloomed[0].letter} 🌱` });
-      }
-      // Cap bloomed tiles to tray max
-      bloomedTray = bloomedTray.slice(0, trayMax);
-
-      // Reset per-turn gear usage counters
-      const resetGearStates = {};
+    case ACTIONS.REALTIME_TICK: {
+      const dtMs = Math.max(1, action.dtMs || REALTIME_TICK_MS_DEFAULT);
+      const gearStates = {};
       for (const [id, gs] of Object.entries(state.gearStates)) {
-        resetGearStates[id] = { ...gs, turnUses: 0 };
-      }
-
-      return {
-        ...state,
-        energy: state.maxEnergy,
-        tray: bloomedTray,
-        satchel: newSatchel,
-        selectedTrayTile: null,
-        answerTrack: newTrack,
-        gearStates: resetGearStates,
-        pendingSeeds: [],
-        log: [...stowLog, ...seedLog],
-      };
-    }
-
-    case ACTIONS.END_TURN: {
-      const preTurnState = {
-        ...state,
-        confusedGearCosts: {},
-      };
-
-      // 1. Cursed tile damage — each cursed tile in tray deals 1 damage
-      let newState = preTurnState;
-      const cursedCount = newState.tray.filter(t => t.cursed).length;
-      if (cursedCount > 0) {
-        const reduction = action.runState?.upgrades?.curseDamageReduction || 0;
-        const curseDamage = Math.max(0, cursedCount - reduction);
-        const newHealth = newState.health - curseDamage;
-        const defeated = newHealth <= 0;
-        newState = {
-          ...newState,
-          health: Math.max(0, newHealth),
-          phase: defeated ? 'defeat' : newState.phase,
-          log: [...newState.log, { type: 'curse_damage', message: `Cursed tiles deal ${curseDamage} damage!` }],
-        };
-        if (newState.phase === 'defeat') return newState;
-      }
-
-      // 2. Tick gear cooldowns
-      const newGearStates = {};
-      for (const [id, gs] of Object.entries(newState.gearStates)) {
-        // Also clear sockets on turn end
-        newGearStates[id] = {
+        gearStates[id] = {
           ...gs,
-          currentCooldown: Math.max(0, gs.currentCooldown - 1),
-          sockets: gs.sockets.map(s => ({ ...s, tileId: null, tileLetter: null })),
+          currentCooldown: Math.max(0, gs.currentCooldown - (dtMs / 1000)),
         };
       }
 
-      // 3. Increment turn
+      let nextState = {
+        ...state,
+        nowMs: state.nowMs + dtMs,
+        gearStates,
+        lastProducedTileIds: [],
+      };
+
+      if (!state.basicWeapon) return nextState;
+
+      const weapon = { ...state.basicWeapon };
+      let timer = weapon.nextFireMs - dtMs;
+      let health = nextState.health;
+      let tray = [...nextState.tray];
+      let produced = [];
+
+      while (timer <= 0) {
+        if (weapon.chargeCount <= 0) {
+          weapon.cooldownRemainingMs = Math.max(0, weapon.cooldownRemainingMs + timer);
+          timer += weapon.cooldownMs;
+          if (weapon.cooldownRemainingMs <= 0) {
+            weapon.chargeCount = weapon.chargeCountMax;
+            weapon.cooldownRemainingMs = 0;
+          }
+          continue;
+        }
+
+        const boosted = weapon.powerUpRemainingMs > 0;
+        const lettersPerShot = weapon.lettersPerShot + (boosted ? (weapon.powerUp?.lettersBonus || 0) : 0);
+        const exactBoost = boosted ? (weapon.powerUp?.exactChanceBonus || 0) : 0;
+        const accuracy = Math.min(0.95, weapon.exactLetterChance + exactBoost);
+        const generated = generateLetters(lettersPerShot, state.word.letters, accuracy)
+          .map((tile) => ({ ...tile, source: 'weapon' }));
+        const trayResult = addTilesToTrayWithOverflow({ ...nextState, tray }, generated);
+        tray = trayResult.nextTray;
+        produced = [...produced, ...trayResult.producedTileIds];
+        health = Math.max(0, health - trayResult.overflowCursed);
+        weapon.chargeCount -= 1;
+
+        if (weapon.chargeCount <= 0) {
+          weapon.cooldownRemainingMs = weapon.cooldownMs;
+        }
+        timer += weapon.cooldownMs;
+      }
+
+      weapon.nextFireMs = timer;
+      weapon.powerUpRemainingMs = Math.max(0, weapon.powerUpRemainingMs - dtMs);
+
       return {
-        ...newState,
-        turn: newState.turn + 1,
-        gearStates: newGearStates,
-        energy: 0, // energy depleted; START_TURN will refill
-        warded: false,
+        ...nextState,
+        tray,
+        health,
+        phase: health <= 0 ? 'defeat' : nextState.phase,
+        basicWeapon: weapon,
+        lastProducedTileIds: produced,
       };
     }
 
@@ -901,7 +899,6 @@ export function createRunState(kit, sharedGearIds, runMap) {
     maxHealth: kit.health,
     traySize: kit.traySize,
     satchelSize: kit.satchelSize,
-    maxEnergy: kit.maxEnergy || MAX_ENERGY_DEFAULT,
     gearIds: [...kit.gearIds, ...sharedGearIds],
     passives: { ...kit.passives },
     upgrades: {},
