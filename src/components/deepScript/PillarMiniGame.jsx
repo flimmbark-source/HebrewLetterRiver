@@ -47,6 +47,7 @@ export default function PillarMiniGame({ onSolved, compact = false }) {
   );
 
   const cycleRow = (rowId, direction = 1) => {
+    if (showProceed || isCompleting) return;
     setRows(prev => {
       const next = prev.map(row => {
         if (row.id !== rowId) return row;
@@ -104,6 +105,7 @@ export default function PillarMiniGame({ onSolved, compact = false }) {
           <button
             type="button"
             className={`ds-pillar-slat ds-pillar-slat--rotating ${spinningRowId === row.id ? 'ds-pillar-slat--spinning' : ''}`}
+            disabled={showProceed || isCompleting}
             onClick={() => cycleRow(row.id, 1)}
             onPointerDown={(event) => onPointerDown(row.id, event)}
             onPointerUp={(event) => onPointerUp(row.id, event)}
