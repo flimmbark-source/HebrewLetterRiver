@@ -263,6 +263,7 @@ export function createCombatState(wordId, runState) {
     pendingIntentBuff: 0,
     confusedGearCosts: {},
     letterProductionCounts: countProducedLetters(initialLetters),
+    pendingOverflowDamage: 0,
   };
 }
 
@@ -281,16 +282,25 @@ export const ACTIONS = {
   PICK_CHOICE: 'PICK_CHOICE',
   START_TURN: 'START_TURN',
   END_TURN: 'END_TURN',
+  RESOLVE_OVERFLOW_BURSTS: 'RESOLVE_OVERFLOW_BURSTS',
   DISMISS_LOG: 'DISMISS_LOG',
 };
 
 function pushTilesToTray(state, tiles, runState) {
   if (!tiles || tiles.length === 0) {
-    return { tray: state.tray, overflowDamage: 0, overflowEvents: [], removed: [], letterProductionCounts: state.letterProductionCounts || {} };
+    return {
+      tray: state.tray,
+      overflowBurstDamage: 0,
+      cursedOverflowDamage: 0,
+      overflowEvents: [],
+      removed: [],
+      letterProductionCounts: state.letterProductionCounts || {},
+    };
   }
   const trayMax = state.maxTraySize || TRAY_SIZE_DEFAULT;
   let nextTray = [...state.tray];
-  let overflowDamage = 0;
+  let overflowBurstDamage = 0;
+  let cursedOverflowDamage = 0;
   const overflowEvents = [];
   const removed = [];
   const reduction = runState?.upgrades?.curseDamageReduction || 0;
@@ -312,7 +322,7 @@ function pushTilesToTray(state, tiles, runState) {
         ).length;
         const isNeededLetter = requiredCount > placedCount;
         if (isNeededLetter) {
-          overflowDamage += 1;
+          overflowBurstDamage += 1;
           overflowEvents.push({
             type: 'scribe_overflow_loss',
             letter: pushed.letter,
@@ -320,7 +330,7 @@ function pushTilesToTray(state, tiles, runState) {
           });
         }
       } else if (pushed.cursed) {
-        overflowDamage += 1;
+        cursedOverflowDamage += 1;
       }
     }
   }
@@ -328,7 +338,8 @@ function pushTilesToTray(state, tiles, runState) {
   return {
     tray: nextTray,
     removed,
-    overflowDamage: Math.max(0, overflowDamage - (isScribe ? 0 : reduction)),
+    overflowBurstDamage,
+    cursedOverflowDamage: Math.max(0, cursedOverflowDamage - (isScribe ? 0 : reduction)),
     overflowEvents,
     letterProductionCounts,
   };
@@ -563,17 +574,20 @@ export function combatReducer(state, action) {
     case ACTIONS.GENERATE_LETTERS: {
       const { letters } = action;
       const pushResult = pushTilesToTray(state, letters, action.runState);
-      const newHealth = state.health - pushResult.overflowDamage;
+      const newHealth = state.health - pushResult.cursedOverflowDamage;
       const defeated = newHealth <= 0;
-      const overflowLog = pushResult.overflowDamage > 0
-        ? pushResult.overflowEvents.length > 0
-          ? pushResult.overflowEvents.map(event => ({
-            type: 'overflow_burst',
-            letter: event.letter,
-            message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
-          }))
-          : [{ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.overflowDamage} damage!` }]
-        : [];
+      const overflowLog = [];
+      if (pushResult.overflowEvents.length > 0) {
+        overflowLog.push(...pushResult.overflowEvents.map(event => ({
+          type: 'overflow_burst',
+          letter: event.letter,
+          damage: event.damage || 1,
+          message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
+        })));
+      }
+      if (pushResult.cursedOverflowDamage > 0) {
+        overflowLog.push({ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.cursedOverflowDamage} damage!` });
+      }
 
       return {
         ...state,
@@ -581,6 +595,7 @@ export function combatReducer(state, action) {
         letterProductionCounts: pushResult.letterProductionCounts,
         health: Math.max(0, newHealth),
         phase: defeated ? 'defeat' : state.phase,
+        pendingOverflowDamage: (state.pendingOverflowDamage || 0) + pushResult.overflowBurstDamage,
         log: [...state.log, ...overflowLog],
       };
     }
@@ -702,18 +717,21 @@ export function combatReducer(state, action) {
           const pushResult = pushTilesToTray({ ...state, tray: updates.tray }, newTiles, runState);
           updates.tray = pushResult.tray;
           updates.letterProductionCounts = pushResult.letterProductionCounts;
-          updates.health = state.health - pushResult.overflowDamage;
+          updates.health = state.health - pushResult.cursedOverflowDamage;
           updates.phase = updates.health <= 0 ? 'defeat' : state.phase;
+          updates.pendingOverflowDamage = (state.pendingOverflowDamage || 0) + pushResult.overflowBurstDamage;
           updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: `Generated ${newTiles.length} random tile(s)` }];
-          if (pushResult.overflowDamage > 0) {
+          if (pushResult.overflowBurstDamage > 0 || pushResult.cursedOverflowDamage > 0) {
             if (pushResult.overflowEvents.length > 0) {
               updates.log.push(...pushResult.overflowEvents.map(event => ({
                 type: 'overflow_burst',
                 letter: event.letter,
+                damage: event.damage || 1,
                 message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
               })));
-            } else {
-              updates.log.push({ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.overflowDamage} damage!` });
+            }
+            if (pushResult.cursedOverflowDamage > 0) {
+              updates.log.push({ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.cursedOverflowDamage} damage!` });
             }
           }
           break;
@@ -770,17 +788,20 @@ export function combatReducer(state, action) {
               ? `Consumed a cursed tile + ${salvageCount} new tile(s)`
               : 'Generated 1 tile',
           }];
-          if (pushResult.overflowDamage > 0) {
-            updates.health = state.health - pushResult.overflowDamage;
+          if (pushResult.overflowBurstDamage > 0 || pushResult.cursedOverflowDamage > 0) {
+            updates.health = state.health - pushResult.cursedOverflowDamage;
             updates.phase = updates.health <= 0 ? 'defeat' : state.phase;
+            updates.pendingOverflowDamage = (state.pendingOverflowDamage || 0) + pushResult.overflowBurstDamage;
             if (pushResult.overflowEvents.length > 0) {
               updates.log.push(...pushResult.overflowEvents.map(event => ({
                 type: 'overflow_burst',
                 letter: event.letter,
+                damage: event.damage || 1,
                 message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
               })));
-            } else {
-              updates.log.push({ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.overflowDamage} damage!` });
+            }
+            if (pushResult.cursedOverflowDamage > 0) {
+              updates.log.push({ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.cursedOverflowDamage} damage!` });
             }
           }
           break;
@@ -872,7 +893,7 @@ export function combatReducer(state, action) {
 
       const tile = createLetterTile(letter, 'choice');
       const pushResult = pushTilesToTray(state, [tile], action.runState);
-      const newHealth = state.health - pushResult.overflowDamage;
+      const newHealth = state.health - pushResult.cursedOverflowDamage;
       const defeated = newHealth <= 0;
 
       return {
@@ -881,20 +902,41 @@ export function combatReducer(state, action) {
         letterProductionCounts: pushResult.letterProductionCounts,
         health: Math.max(0, newHealth),
         phase: defeated ? 'defeat' : state.phase,
+        pendingOverflowDamage: (state.pendingOverflowDamage || 0) + pushResult.overflowBurstDamage,
         choiceBundle: null,
         log: [
           ...state.log,
           { type: 'choice', letter },
-          ...(pushResult.overflowDamage > 0
+          ...((pushResult.overflowBurstDamage > 0 || pushResult.cursedOverflowDamage > 0)
             ? (pushResult.overflowEvents.length > 0
               ? pushResult.overflowEvents.map(event => ({
                 type: 'overflow_burst',
                 letter: event.letter,
+                damage: event.damage || 1,
                 message: `A needed letter (${event.letter}) burst from the tray for ${event.damage} damage!`,
               }))
-              : [{ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.overflowDamage} damage!` }])
+              : [])
+            : []),
+          ...(pushResult.cursedOverflowDamage > 0
+            ? [{ type: 'curse_damage', message: `Cursed letter broke off the tray for ${pushResult.cursedOverflowDamage} damage!` }]
             : []),
         ],
+      };
+    }
+
+    case ACTIONS.RESOLVE_OVERFLOW_BURSTS: {
+      const burstDamage = Math.max(0, action.damage || 0);
+      if (burstDamage <= 0) return state;
+      const available = state.pendingOverflowDamage || 0;
+      const appliedDamage = Math.min(available, burstDamage);
+      const pendingOverflowDamage = Math.max(0, available - burstDamage);
+      const newHealth = state.health - appliedDamage;
+      const defeated = newHealth <= 0;
+      return {
+        ...state,
+        health: Math.max(0, newHealth),
+        phase: defeated ? 'defeat' : state.phase,
+        pendingOverflowDamage,
       };
     }
 

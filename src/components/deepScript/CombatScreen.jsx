@@ -187,16 +187,23 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     const nextLog = combat.log || [];
     const newEntries = nextLog.slice(prevLen).filter(entry => entry.type === 'overflow_burst');
     if (newEntries.length > 0) {
+      const burstDamage = newEntries.reduce((sum, entry) => sum + (entry.damage || 1), 0);
       const burstItems = newEntries.map((entry, idx) => ({
         id: `overflow-${Date.now()}-${idx}`,
         letter: entry.letter,
       }));
       setOverflowBursts(prev => [...prev, ...burstItems]);
+      const damageTimer = setTimeout(() => {
+        dispatch({ type: ACTIONS.RESOLVE_OVERFLOW_BURSTS, damage: burstDamage });
+      }, 2100);
       const timer = setTimeout(() => {
         setOverflowBursts(prev => prev.filter(item => !burstItems.some(b => b.id === item.id)));
       }, 2400);
       prevLogLengthRef.current = nextLog.length;
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(damageTimer);
+      };
     }
     prevLogLengthRef.current = nextLog.length;
   }, [combat?.log]);
