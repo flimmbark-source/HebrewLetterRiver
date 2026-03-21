@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { getStarterKit } from '../../data/deepScript/starterKits.js';
 import { generateDungeonFloor, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
@@ -19,8 +19,20 @@ import './DeepScript.css';
  * Flow: Kit Select → Exploration (move/turn/inspect/trigger) →
  *       Combat/Archive/Shrine → back to Exploration → ... → Miniboss → End
  */
-export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
-  const isPackRun = !!(packWords && packWords.length > 0);
+function collectFloorWordIds(floor) {
+  if (!floor?.chambers) return new Set();
+  const wordIds = new Set();
+  for (const chamber of floor.chambers.values()) {
+    if (chamber?.payload?.wordId) {
+      wordIds.add(chamber.payload.wordId);
+    }
+  }
+  return wordIds;
+}
+
+export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGuidedPackRun = false }) {
+  const hasCustomWordPool = !!(packWords && packWords.length > 0);
+  const previousFloorWordIdsRef = useRef(new Set());
   const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | archive | shrine | end
   const [runState, setRunState] = useState(null);
   const [endResult, setEndResult] = useState(null);
@@ -37,11 +49,14 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
 
   const createFloorForNumber = useCallback((targetFloorNumber) => {
     const combatCount = Math.min(6, 3 + Math.floor((targetFloorNumber - 1) / 2));
-    return generateDungeonFloor({
+    const nextFloor = generateDungeonFloor({
       combatCount,
-      customWords: isPackRun ? packWords : null,
+      customWords: hasCustomWordPool ? packWords : null,
+      excludeWordIds: previousFloorWordIdsRef.current,
     });
-  }, [isPackRun, packWords]);
+    previousFloorWordIdsRef.current = collectFloorWordIds(nextFloor);
+    return nextFloor;
+  }, [hasCustomWordPool, packWords]);
 
   // Add/remove body class for nav bar hiding; clean up custom words on unmount
   useEffect(() => {
@@ -59,7 +74,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     if (!kit) return;
 
     // Register custom words if running a pack-based session
-    if (isPackRun) {
+    if (hasCustomWordPool) {
       registerCustomWords(packWords);
     } else {
       clearCustomWords();
@@ -78,7 +93,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     setCurrentChamberId(newFloor.startChamberId);
     setFloorNumber(1);
     setScreen('exploring');
-  }, [createFloorForNumber, isPackRun, packWords]);
+  }, [createFloorForNumber, hasCustomWordPool, packWords]);
 
   // ─── Exploration: Movement ────────────────────────────────
 
@@ -190,7 +205,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
       if (isMiniboss) {
         setEndResult('victory');
         setScreen('end');
-        if (onRunComplete && floorNumber === 1) onRunComplete('victory');
+        if (onRunComplete && isGuidedPackRun) onRunComplete('victory');
       } else {
         setScreen('exploring');
       }
@@ -227,10 +242,10 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     }
 
     setActiveCombat(null);
-  }, [activeCombat, floorNumber, onRunComplete]);
+  }, [activeCombat, isGuidedPackRun, onRunComplete]);
 
   const handleNextFloor = useCallback(() => {
-    if (isPackRun) {
+    if (isGuidedPackRun) {
       setEndResult('victory');
       setScreen('end');
       return;
@@ -250,7 +265,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     }));
     setFloorNumber(nextFloorNumber);
     setScreen('exploring');
-  }, [createFloorForNumber, floorNumber, isPackRun]);
+  }, [createFloorForNumber, floorNumber, isGuidedPackRun]);
 
   // ─── Archive End ──────────────────────────────────────────
 
@@ -372,6 +387,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     setCurrentChamberId(null);
     setEndResult(null);
     setFloorNumber(1);
+    previousFloorWordIdsRef.current = new Set();
   }, []);
 
   // ─── Render ───────────────────────────────────────────────
@@ -394,7 +410,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
           onNextFloor={handleNextFloor}
           onRestart={handleRestart}
           onBack={onBack}
-          canAdvanceFloor={!isPackRun}
+          canAdvanceFloor={!isGuidedPackRun}
         />
       </div>
     );

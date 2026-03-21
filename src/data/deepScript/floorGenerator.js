@@ -618,14 +618,17 @@ function buildTemplateLayout(chambers, entrance, miniboss) {
  * @param {object} options
  * @param {number} options.combatCount — number of combat chambers (default 3)
  * @param {Object[]} [options.customWords] — optional DS-compatible word pool (for pack-based runs)
+ * @param {Set<string>|string[]} [options.excludeWordIds] — optional word IDs to avoid on this floor when possible
  * @param {number} [options.minRoomsBetweenStartAndExit] — minimum chambers between entrance and miniboss
  * @returns {DungeonFloor}
  */
 export function generateDungeonFloor({
   combatCount = 3,
   customWords = null,
+  excludeWordIds = null,
   minRoomsBetweenStartAndExit = 4,
 } = {}) {
+  const excludedIds = excludeWordIds instanceof Set ? excludeWordIds : new Set(excludeWordIds || []);
   const minRouteLength = Math.max(1, minRoomsBetweenStartAndExit + 1);
   let lastError = null;
 
@@ -635,6 +638,13 @@ export function generateDungeonFloor({
 
     function pickWord(depth) {
       if (customWords && customWords.length > 0) {
+        const preferredCandidates = customWords.filter(w => !usedWordIds.has(w.id) && !excludedIds.has(w.id));
+        if (preferredCandidates.length > 0) {
+          const word = preferredCandidates[Math.floor(Math.random() * preferredCandidates.length)];
+          usedWordIds.add(word.id);
+          return word;
+        }
+
         const candidates = customWords.filter(w => !usedWordIds.has(w.id));
         if (candidates.length === 0) {
           return customWords[Math.floor(Math.random() * customWords.length)];
@@ -687,7 +697,11 @@ export function generateDungeonFloor({
         const unusedCustom = customWords
           .filter(w => !usedWordIds.has(w.id))
           .sort((a, b) => b.letters.length - a.letters.length);
-        bossWord = unusedCustom[0] || [...customWords].sort((a, b) => b.letters.length - a.letters.length)[0];
+
+        const preferredBoss = unusedCustom.filter(w => !excludedIds.has(w.id));
+        bossWord = preferredBoss[0]
+          || unusedCustom[0]
+          || [...customWords].sort((a, b) => b.letters.length - a.letters.length)[0];
         if (bossWord) usedWordIds.add(bossWord.id);
       } else {
         const minibossWords = getMinibossWords();
