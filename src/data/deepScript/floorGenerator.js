@@ -530,23 +530,49 @@ function buildTemplateLayout(chambers, entrance, miniboss) {
     throw new Error(`No floor plan template defined for ${chambers.size} chambers.`);
   }
   const rotations = [0, 90, 180, 270];
-  const rotation = rotations[Math.floor(Math.random() * rotations.length)];
-  const mirrorX = Math.random() < 0.5;
+  const transforms = [];
+  for (const rotation of rotations) {
+    for (const mirrorX of [false, true]) {
+      const transformedNodes = template.nodes.map(node => {
+        let { x, y } = node;
+        if (mirrorX) x = -x;
+        switch (rotation) {
+          case 90:
+            return { x: -y, y: x };
+          case 180:
+            return { x: -x, y: -y };
+          case 270:
+            return { x: y, y: -x };
+          default:
+            return { x, y };
+        }
+      });
 
-  const transformedNodes = template.nodes.map(node => {
-    let { x, y } = node;
-    if (mirrorX) x = -x;
-    switch (rotation) {
-      case 90:
-        return { x: -y, y: x };
-      case 180:
-        return { x: -x, y: -y };
-      case 270:
-        return { x: y, y: -x };
-      default:
-        return { x, y };
+      let score = 0;
+
+      // Strongly avoid forcing initial progression through the back exit.
+      const startDirections = template.edges
+        .filter(([from]) => from === template.start)
+        .map(([from, to]) => directionBetween(transformedNodes[from], transformedNodes[to]));
+      if (startDirections.length > 0 && startDirections.every(dir => dir === 'south')) {
+        score += 100;
+      }
+
+      // Prefer forward/side progression on the authored main route.
+      const MAIN_ROUTE_EDGE_COUNT = 5;
+      for (let i = 0; i < Math.min(MAIN_ROUTE_EDGE_COUNT, template.edges.length); i++) {
+        const [from, to] = template.edges[i];
+        const dir = directionBetween(transformedNodes[from], transformedNodes[to]);
+        if (dir === 'south') score += 10;
+      }
+
+      transforms.push({ transformedNodes, score });
     }
-  });
+  }
+
+  const minScore = Math.min(...transforms.map(t => t.score));
+  const bestTransforms = transforms.filter(t => t.score === minScore);
+  const transformedNodes = bestTransforms[Math.floor(Math.random() * bestTransforms.length)].transformedNodes;
 
   const middle = shuffle(Array.from(chambers.values()).filter(ch => ch.id !== entrance.id && ch.id !== miniboss.id));
   const chamberByNode = new Map();

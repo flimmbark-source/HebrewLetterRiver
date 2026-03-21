@@ -95,9 +95,12 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
       return { ...prev, chambers: newChambers };
     });
 
-    // Auto-trigger combat in unresolved combat/miniboss chambers
+    // Use current chamber snapshot to decide whether to trigger combat
     const chamber = floor.chambers.get(targetChamberId);
-    if (chamber && !chamber.resolved) {
+    if (!chamber) return;
+
+    // Auto-trigger combat in unresolved combat/miniboss chambers
+    if (!chamber.resolved) {
       if (chamber.type === CHAMBER_TYPES.COMBAT || chamber.type === CHAMBER_TYPES.MINIBOSS) {
         // Small delay to let the room render first, then show battle transition
         setTimeout(() => {
