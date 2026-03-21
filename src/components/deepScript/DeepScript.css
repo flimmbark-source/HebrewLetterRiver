@@ -3597,3 +3597,89 @@
     height: 48px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Combat revamp: no mana/turn UI, tray flow + mega basic ability
+   ═══════════════════════════════════════════════════════════ */
+.ds-combat-controls {
+  align-items: center;
+  gap: 12px;
+}
+
+.ds-tray-end-labels {
+  width: min(420px, 92vw);
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--ds-bronze-light);
+}
+
+.ds-tray-end-label--left {
+  color: var(--ds-ember);
+}
+
+.ds-tray-end-label--right {
+  color: var(--ds-green);
+}
+
+.ds-tile-row--solo {
+  width: min(420px, 92vw);
+  justify-content: center;
+}
+
+.ds-inv-tiles--flow {
+  flex-direction: row-reverse;
+}
+
+.ds-inv-tile--spawned {
+  animation: dsTileSpawnIn 420ms ease-out;
+  box-shadow: 0 0 14px rgba(94, 234, 212, 0.75);
+}
+
+@keyframes dsTileSpawnIn {
+  0% { transform: translateY(20px) scale(0.7); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.ds-ability-row--single {
+  position: relative;
+  width: 100%;
+  justify-content: center;
+  min-height: 120px;
+}
+
+.ds-ability-card--mega {
+  width: 210px;
+  height: 180px;
+  border-width: 3px;
+}
+
+.ds-ability-card--mega .ds-ability-icon-center {
+  font-size: 46px;
+}
+
+.ds-ability-card--mega .ds-ability-effect {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+}
+
+.ds-ability-spawn-fx {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(110, 231, 255, 0.55) 0%, rgba(110, 231, 255, 0) 68%);
+  transform: translateY(-70px) scale(0.2);
+  opacity: 0;
+  animation: dsAbilityEmit 520ms ease-out;
+}
+
+@keyframes dsAbilityEmit {
+  0% { transform: translateY(10px) scale(0.2); opacity: 0.9; }
+  100% { transform: translateY(-90px) scale(1.2); opacity: 0; }
+}

@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { getStarterKit } from '../../data/deepScript/starterKits.js';
-import { getSharedGear } from '../../data/deepScript/gear.js';
 import { generateDungeonFloor, TURN_LEFT, TURN_RIGHT, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
 import { upgradeDefinitions } from '../../data/deepScript/upgrades.js';
@@ -58,7 +57,6 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
   const handleKitSelect = useCallback((kitId) => {
     const kit = getStarterKit(kitId);
     if (!kit) return;
-    const sharedGearIds = getSharedGear().map(g => g.id);
 
     // Register custom words if running a pack-based session
     if (packWords && packWords.length > 0) {
@@ -71,7 +69,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete }) {
     const newFloor = createFloorForNumber(1);
 
     // Create run state (pass a dummy runMap for backward compat)
-    const newRun = createRunState(kit, sharedGearIds, []);
+    const newRun = createRunState(kit, [], []);
     // Add floor reference
     newRun.floor = newFloor;
 

@@ -8,8 +8,8 @@ import {
 import { getGearById } from '../../data/deepScript/gear.js';
 import { celebrate } from '../../lib/celebration.js';
 import {
-  playSelect, playCorrect, playWrong, playBurn,
-  playStow, playGear, playEndTurn, playVictory,
+  playSelect, playCorrect, playWrong,
+  playGear, playVictory,
   playDefeat,
 } from './dsSounds.js';
 
@@ -39,15 +39,17 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
   }, [wordId, runState]);
 
   const [combat, dispatch] = useReducer(combatReducer, initialState);
-  const [turnStarted, setTurnStarted] = useState(true); // first turn auto-started
 
   // Animation state
   const [justCorrectSlot, setJustCorrectSlot] = useState(null);
   const [justWrongSlot, setJustWrongSlot] = useState(null);
   const [activatingGear, setActivatingGear] = useState(null);
   const [enemyActing, setEnemyActing] = useState(false);
+  const [spawnFxCounter, setSpawnFxCounter] = useState(0);
+  const [recentTrayTiles, setRecentTrayTiles] = useState([]);
   const prevPhaseRef = useRef(combat?.phase);
   const enemyActingTimerRef = useRef(null);
+  const prevTrayIdsRef = useRef((combat?.tray || []).map(t => t.id));
 
   // Handle combat end with sounds
   useEffect(() => {
@@ -130,21 +132,6 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     dispatch({ type: ACTIONS.SELECT_TRAY_TILE, tileId });
   }, []);
 
-  const handleSatchelClick = useCallback((tileId) => {
-    playSelect();
-    dispatch({ type: ACTIONS.SELECT_SATCHEL_TILE, tileId });
-  }, []);
-
-  const handleStow = useCallback(() => {
-    playStow();
-    dispatch({ type: ACTIONS.STOW_LETTER });
-  }, []);
-
-  const handleRetrieve = useCallback(() => {
-    playStow();
-    dispatch({ type: ACTIONS.RETRIEVE_FROM_SATCHEL });
-  }, []);
-
   const handleSocketTile = useCallback((gearId, socketIndex) => {
     playSelect();
     dispatch({ type: ACTIONS.SOCKET_TILE, gearId, socketIndex });
@@ -161,23 +148,25 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     dispatch({ type: ACTIONS.USE_GEAR, gearId, runState });
   }, [runState]);
 
-  const handleEndTurn = useCallback(() => {
-    playEndTurn();
-    setTimeout(() => {
-      dispatch({ type: ACTIONS.END_TURN, runState });
-      setTurnStarted(false);
-      // Auto-start next turn after a moment
-      setTimeout(() => {
-        dispatch({ type: ACTIONS.START_TURN });
-        setTurnStarted(true);
-      }, 400);
-    }, 600);
-  }, [runState]);
-
   const handlePickChoice = useCallback((letter) => {
     playSelect();
-    dispatch({ type: ACTIONS.PICK_CHOICE, letter });
+    dispatch({ type: ACTIONS.PICK_CHOICE, letter, runState });
   }, []);
+
+  useEffect(() => {
+    if (!combat) return;
+    const prevIds = prevTrayIdsRef.current;
+    const nextIds = combat.tray.map(t => t.id);
+    const added = combat.tray.filter(t => !prevIds.includes(t.id)).map(t => t.id);
+    if (added.length > 0) {
+      setRecentTrayTiles(added);
+      setSpawnFxCounter(c => c + 1);
+      const timer = setTimeout(() => setRecentTrayTiles([]), 500);
+      prevTrayIdsRef.current = nextIds;
+      return () => clearTimeout(timer);
+    }
+    prevTrayIdsRef.current = nextIds;
+  }, [combat?.tray]);
 
   if (!combat) return <div className="ds-screen">Loading...</div>;
 
@@ -191,17 +180,8 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     healthPips.push(i < combat.health);
   }
 
-  // Energy pips
-  const energyPips = [];
-  for (let i = 0; i < combat.maxEnergy; i++) {
-    energyPips.push(i < combat.energy);
-  }
-
   // Tile action availability
-  const selectedTrayTile = combat.tray.find(t => t.id === combat.selectedTrayTile);
-  const canStow = selectedTrayTile && combat.satchel.length < runState.satchelSize;
-  const canRetrieve = !!combat.selectedSatchelTile && combat.tray.length < runState.traySize;
-  const hasSelection = combat.selectedTrayTile || combat.selectedSatchelTile;
+  const hasSelection = combat.selectedTrayTile;
 
   // Enemy intent display
   const intentDisplay = getIntentDisplay(combat.enemyIntent);
@@ -304,18 +284,41 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       </div>
 
       <div className="ds-combat-controls">
-        {/* ═══ ENERGY — bottom-left ═══ */}
-        <div className="ds-energy-well">
-          <div className="ds-energy-label">ENERGY</div>
-          <div className="ds-energy-pips">
-            {energyPips.map((full, i) => (
-              <span key={i} className={`ds-energy-pip ${full ? 'ds-energy-pip--full' : 'ds-energy-pip--empty'}`} />
-            ))}
+        <div className="ds-tray-end-labels">
+          <span className="ds-tray-end-label ds-tray-end-label--left">End</span>
+          <span className="ds-tray-end-label ds-tray-end-label--right">Start</span>
+        </div>
+        <div className="ds-tile-row ds-tile-row--solo">
+          <div className="ds-inv-tray">
+            <div className="ds-inv-tiles ds-inv-tiles--flow">
+              {combat.tray.map(tile => {
+                let tileCls = 'ds-inv-tile';
+                if (tile.cursed) tileCls += ' ds-inv-tile--cursed';
+                if (combat.selectedTrayTile === tile.id) tileCls += ' ds-inv-tile--selected';
+                if (recentTrayTiles.includes(tile.id)) tileCls += ' ds-inv-tile--spawned';
+                return (
+                  <button
+                    key={tile.id}
+                    type="button"
+                    className={tileCls}
+                    onClick={() => handleTrayClick(tile.id)}
+                    disabled={combat.phase !== 'active'}
+                  >
+                    {tile.letter}
+                  </button>
+                );
+              })}
+              {Array.from({ length: Math.max(0, runState.traySize - combat.tray.length) }).map((_, i) => (
+                <div key={`e-${i}`} className="ds-inv-tile ds-inv-tile--empty" />
+              ))}
+            </div>
+            <div className="ds-inv-label">Letter Tray</div>
           </div>
         </div>
 
-        {/* ═══ ABILITY CARDS — center-bottom, above tray ═══ */}
-        <div className="ds-ability-row">
+        {/* ═══ ABILITY — giant centered button ═══ */}
+        <div className="ds-ability-row ds-ability-row--single">
+          <div className="ds-ability-spawn-fx" key={`spawn-fx-${spawnFxCounter}`} />
           {runState.gearIds.map(gearId => {
             const gear = getGearById(gearId);
             const gs = combat.gearStates[gearId];
@@ -323,40 +326,23 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
 
             const onCooldown = gs.currentCooldown > 0;
             const noUses = gs.usesRemaining === 0;
-            const currentEnergyCost = gear.escalatingCost
-              ? gear.energyCost + (gs.turnUses || 0)
-              : gear.energyCost;
-            const notEnoughEnergy = combat.energy < currentEnergyCost;
             const requiredSocketsFilled = gs.sockets
               .filter(s => s.type === 'required')
               .every(s => s.tileId !== null);
             const hasSockets = gs.sockets.length > 0;
             const needsSockets = hasSockets && gs.sockets.some(s => s.type === 'required');
-            const isReady = !onCooldown && !noUses && !notEnoughEnergy && (!needsSockets || requiredSocketsFilled);
+            const isReady = !onCooldown && !noUses && (!needsSockets || requiredSocketsFilled);
             const disabled = onCooldown || noUses || combat.phase !== 'active';
 
             let cardCls = 'ds-ability-card';
             if (onCooldown) cardCls += ' ds-ability-card--cooldown';
             if (noUses) cardCls += ' ds-ability-card--depleted';
-            if (notEnoughEnergy) cardCls += ' ds-ability-card--no-energy';
             if (isReady) cardCls += ' ds-ability-card--ready';
             if (activatingGear === gearId) cardCls += ' ds-ability-card--activating';
+            cardCls += ' ds-ability-card--mega';
 
             return (
               <div key={gearId} className="ds-ability-card-wrapper">
-                {/* Mana cost floats above card */}
-                <div className={`ds-ability-cost-float ${notEnoughEnergy ? 'ds-ability-cost-float--insufficient' : ''}`}>
-                  {currentEnergyCost > 0 ? '◆'.repeat(currentEnergyCost) : '0'}
-                </div>
-
-                {/* Cooldown timer floats above card (replaces cost when on cooldown) */}
-                {onCooldown && (
-                  <div className="ds-ability-cooldown-float">
-                    <span className="ds-ability-cooldown-num">{gs.currentCooldown}</span>
-                    <span className="ds-ability-cooldown-icon">⏳</span>
-                  </div>
-                )}
-
                 <div
                   role="button"
                   tabIndex={combat.phase === 'active' ? 0 : -1}
@@ -419,10 +405,9 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                     </div>
                   )}
 
-                  {/* Compact outcome text */}
-                  <div className="ds-ability-effect">{gear.shortDesc}</div>
+                  <div className="ds-ability-effect">Basic Ability</div>
 
-                  {/* Status badges (no cooldown here — it's above the card) */}
+                  {/* Status badges */}
                   <div className="ds-ability-badges">
                     {gs.usesRemaining >= 0 && !noUses && <span className="ds-ability-badge ds-ability-badge--uses">{gs.usesRemaining}×</span>}
                     {noUses && <span className="ds-ability-badge ds-ability-badge--spent">--</span>}
@@ -431,99 +416,6 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
               </div>
             );
           })}
-        </div>
-
-        <div className="ds-tray-endturn-row">
-          {/* ═══ TILE TRAY — center-bottom ═══ */}
-          <div className="ds-tile-row">
-            <div className="ds-inv-tray">
-              <div className="ds-inv-tiles">
-                {combat.tray.map(tile => {
-                  let tileCls = 'ds-inv-tile';
-                  if (tile.cursed) tileCls += ' ds-inv-tile--cursed';
-                  if (combat.selectedTrayTile === tile.id) tileCls += ' ds-inv-tile--selected';
-                  return (
-                    <button
-                      key={tile.id}
-                      type="button"
-                      className={tileCls}
-                      onClick={() => handleTrayClick(tile.id)}
-                      disabled={combat.phase !== 'active'}
-                    >
-                      {tile.letter}
-                    </button>
-                  );
-                })}
-                {Array.from({ length: Math.max(0, runState.traySize - combat.tray.length) }).map((_, i) => (
-                  <div key={`e-${i}`} className="ds-inv-tile ds-inv-tile--empty" />
-                ))}
-              </div>
-              <div className="ds-inv-label">Tray</div>
-            </div>
-
-            {(combat.satchel.length > 0 || runState.satchelSize > 0) && (
-              <div className="ds-inv-satchel-group">
-                <div className="ds-inv-satchel">
-                  <div className="ds-inv-tiles">
-                    {combat.satchel.map(tile => {
-                      let tileCls = 'ds-inv-tile ds-inv-tile--satchel';
-                      if (combat.selectedSatchelTile === tile.id) tileCls += ' ds-inv-tile--selected';
-                      return (
-                        <button
-                          key={tile.id}
-                          type="button"
-                          className={tileCls}
-                          onClick={() => handleSatchelClick(tile.id)}
-                          disabled={combat.phase !== 'active'}
-                        >
-                          {tile.letter}
-                        </button>
-                      );
-                    })}
-                    {Array.from({ length: Math.max(0, runState.satchelSize - combat.satchel.length) }).map((_, i) => (
-                      <div key={`es-${i}`} className="ds-inv-tile ds-inv-tile--empty ds-inv-tile--satchel-empty" />
-                    ))}
-                  </div>
-                  <div className="ds-inv-label ds-inv-label--satchel">Satchel</div>
-                </div>
-
-                <div className="ds-inv-actions-compact">
-                  <button
-                    type="button"
-                    className="ds-inv-act ds-inv-act--stow"
-                    onClick={handleStow}
-                    title="Stow to satchel"
-                    style={{ visibility: canStow ? 'visible' : 'hidden' }}
-                    disabled={!canStow}
-                  >
-                    <span className="ds-inv-act-icon">⬇</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="ds-inv-act ds-inv-act--retrieve"
-                    onClick={handleRetrieve}
-                    title="Retrieve from satchel"
-                    style={{ visibility: canRetrieve ? 'visible' : 'hidden' }}
-                    disabled={!canRetrieve}
-                  >
-                    <span className="ds-inv-act-icon">⬆</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* ═══ END TURN — bottom-right ═══ */}
-          <button
-            type="button"
-            className="ds-endturn-btn"
-            onClick={handleEndTurn}
-            disabled={combat.phase !== 'active' || enemyActing}
-            title="End your turn — enemy will act"
-          >
-            <span className="ds-endturn-icon">⚔</span>
-            <span className="ds-endturn-label">End</span>
-          </button>
         </div>
       </div>
 
