@@ -319,22 +319,22 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
           <div className="ds-ability-spawn-fx" key={`spawn-fx-${spawnFxCounter}`} />
           <button
             type="button"
-            className={`ds-ability-card ds-ability-card--mega ds-ability-card--ready ${activatingGear === 'vowel' ? 'ds-ability-card--activating' : ''}`}
-            onClick={() => handleProduceLetters('vowel')}
-            disabled={combat.phase !== 'active'}
-          >
-            <div className="ds-ability-icon-center">◌</div>
-            <div className="ds-ability-effect">Vowels</div>
-          </button>
-
-          <button
-            type="button"
             className={`ds-ability-card ds-ability-card--mega ds-ability-card--ready ${activatingGear === 'consonant' ? 'ds-ability-card--activating' : ''}`}
             onClick={() => handleProduceLetters('consonant')}
             disabled={combat.phase !== 'active'}
           >
             <div className="ds-ability-icon-center">א</div>
             <div className="ds-ability-effect">Consonants</div>
+          </button>
+
+          <button
+            type="button"
+            className={`ds-ability-card ds-ability-card--mega ds-ability-card--ready ${activatingGear === 'vowel' ? 'ds-ability-card--activating' : ''}`}
+            onClick={() => handleProduceLetters('vowel')}
+            disabled={combat.phase !== 'active'}
+          >
+            <div className="ds-ability-icon-center">◌</div>
+            <div className="ds-ability-effect">Vowels</div>
           </button>
         </div>
       </div>
