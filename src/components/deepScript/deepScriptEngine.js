@@ -21,7 +21,7 @@ import { nanoid } from 'nanoid/non-secure';
 export const TRAY_SIZE_DEFAULT = 6;
 export const SATCHEL_SIZE_DEFAULT = 3;
 export const MAX_ENERGY_DEFAULT = 3;
-const LETTER_REPEAT_DECAY_FACTOR = 0.75;
+const LETTER_REPEAT_DECAY_FACTOR = 0.25;
 
 // ─── Enemy Intent Types ─────────────────────────────────────
 

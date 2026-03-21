@@ -127,7 +127,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     const vowelPool = ['א', 'ה', 'ו', 'י', 'ע'];
     const consonantPool = allDeepScriptLetters.filter(letter => !vowelPool.includes(letter));
     const pool = kind === 'vowel' ? vowelPool : consonantPool;
-    const generated = Array.from({ length: 2 }, () => {
+    const generated = Array.from({ length: 1 }, () => {
       const letter = pool[Math.floor(Math.random() * pool.length)] || pool[0] || 'א';
       return createLetterTile(letter, kind);
     });
@@ -337,7 +337,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       {overflowBursts.map(burst => (
         <div key={burst.id} className="ds-overflow-shot" aria-hidden="true">
           <span className="ds-overflow-shot-letter">{burst.letter}</span>
-          <span className="ds-overflow-shot-hit">-1</span>
+          <span className="ds-overflow-shot-hit"></span>
           <span className="ds-overflow-shot-burst" />
           <span className="ds-overflow-shot-shard ds-overflow-shot-shard--a" />
           <span className="ds-overflow-shot-shard ds-overflow-shot-shard--b" />

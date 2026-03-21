@@ -778,18 +778,18 @@
   align-items: center;
   pointer-events: none;
   transform: translateX(-50%);
-  animation: ds-overflow-shot-rise 0.72s cubic-bezier(0.2, 0.78, 0.21, 1) forwards;
+  animation: ds-overflow-shot-rise 2.72s cubic-bezier(0.2, 0.78, 0.21, 1) forwards;
   z-index: 22;
 }
 
 .ds-overflow-shot-letter {
   font-size: 28px;
   font-weight: 800;
-  color: var(--ds-parchment);
-  text-shadow: 0 0 10px rgba(255, 245, 214, 0.9);
+  color: 0 0 10px rgba(237, 7, 7, 0.9);
+  text-shadow: var(--ds-parchment);
   animation:
-    ds-overflow-shake 0.22s ease-in-out 2,
-    ds-overflow-letter-break 0.72s ease-out forwards;
+    ds-overflow-shake 1.22s ease-in-out 2,
+    ds-overflow-letter-break 3.72s ease-out forwards;
 }
 
 .ds-overflow-shot-hit {
@@ -806,12 +806,12 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 233, 170, 0.95);
+  border: 2px solid rgba(230, 1, 1, 0.95);
   box-shadow:
     0 0 16px rgba(255, 220, 120, 0.8),
     inset 0 0 10px rgba(255, 245, 214, 0.55);
   opacity: 0;
-  animation: ds-overflow-shot-burst 0.72s ease-out forwards;
+  animation: ds-overflow-shot-burst 1.72s ease-out forwards;
 }
 
 .ds-overflow-shot-shard {
@@ -819,7 +819,7 @@
   top: 10px;
   width: 8px;
   height: 8px;
-  background: linear-gradient(180deg, #ffd7d7 0%, #ff6666 100%);
+  background: linear-gradient(180deg, #f90000 0%, #ff6666 100%);
   border-radius: 1px;
   box-shadow: 0 0 8px rgba(255, 70, 70, 0.75);
   opacity: 0;
@@ -903,12 +903,12 @@
 
 @keyframes ds-overflow-letter-break {
   0% {
-    color: var(--ds-parchment);
+    color: rgba(255, 50, 50, 0.7);
     filter: saturate(1);
     opacity: 1;
   }
   60% {
-    color: var(--ds-parchment);
+    color: rgba(255, 50, 50, 0.7);
     text-shadow: 0 0 10px rgba(255, 245, 214, 0.9);
     opacity: 1;
   }
