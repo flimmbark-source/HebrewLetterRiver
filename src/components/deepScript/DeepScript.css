@@ -3281,6 +3281,10 @@
     flex-wrap: wrap;
   }
 
+  .ds-tile-row--solo {
+    align-self: center;
+  }
+
   .ds-inv-satchel-group {
     transform: translateX(20px);
   }
