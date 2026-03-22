@@ -12,7 +12,7 @@ const FADE_DURATION = 1000; // Fade lines over 1 second
 const CAPSULE_RADIUS = 40; // Hit detection radius
 const BOUNCE_DAMPING = 0.7; // Velocity reduction on bounce
 const LINE_OF_SIGHT_BUFFER = 65; // Clearance for matched capsules
-const CAPSULE_CLEARANCE_BUFFER = 14; // Extra spacing to avoid overlaps
+const CAPSULE_CLEARANCE_BUFFER = 19; // Extra spacing to avoid overlaps
 
 export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const canvasRef = useRef(null);
@@ -277,10 +277,24 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       return shuffled;
     };
 
-    // Create randomized orderings for each column
+    // Create column orderings that avoid triplets lining up on the same row.
     const hebrewOrder = shuffle([...Array(numPairs).keys()]);
-    const translitOrder = shuffle([...Array(numPairs).keys()]);
-    const meaningOrder = shuffle([...Array(numPairs).keys()]);
+    const rotateOrder = (order, shift) => order.map((_, i) => order[(i + shift) % order.length]);
+
+    let translitOrder = [...hebrewOrder];
+    let meaningOrder = [...hebrewOrder];
+    if (numPairs > 1) {
+      const translitShift = 1 + Math.floor(Math.random() * (numPairs - 1));
+      translitOrder = rotateOrder(hebrewOrder, translitShift);
+
+      let meaningShift = translitShift;
+      if (numPairs > 2) {
+        while (meaningShift === translitShift) {
+          meaningShift = 1 + Math.floor(Math.random() * (numPairs - 1));
+        }
+      }
+      meaningOrder = rotateOrder(hebrewOrder, meaningShift);
+    }
 
     // Create ALL Hebrew capsules in left column (grid positions, randomized order)
     uniquePairs.forEach((pair, pairIndex) => {
@@ -360,11 +374,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       });
     });
 
-    // NOTE: resolveSpawnOverlaps is disabled because:
-    // 1. It adds CAPSULE_CLEARANCE_BUFFER which we don't want for tight collisions
-    // 2. It moves entire pairs together, breaking the column-by-type layout
-    // 3. We already handle collision avoidance during initial placement with isTooClose()
-    // resolveSpawnOverlaps(capsules);
+    // Ensure a consistent spacing buffer between capsules so they do not overlap.
+    resolveSpawnOverlaps(capsules);
 
     capsulesRef.current = capsules;
 
