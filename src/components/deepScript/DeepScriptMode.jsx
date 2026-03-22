@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { getStarterKit } from '../../data/deepScript/starterKits.js';
 import { generateDungeonFloor, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
-import { registerCustomWords, clearCustomWords, convertBBWordsForDS, getWordById } from '../../data/deepScript/words.js';
+import { registerCustomWords, clearCustomWords, convertBBWordsForDS, getWordById, deepScriptWords } from '../../data/deepScript/words.js';
 import { bridgeBuilderPacks } from '../../data/bridgeBuilderPacks.js';
 import { getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import KitSelectScreen from './KitSelectScreen.jsx';
@@ -46,6 +46,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   const [activeCombat, setActiveCombat] = useState(null); // { wordId, chamberId, isMiniboss }
   const [activeMiniGame, setActiveMiniGame] = useState(null); // { chamberId, miniGameId }
   const [hasCompletedCapsulesMiniGameThisFloor, setHasCompletedCapsulesMiniGameThisFloor] = useState(false);
+  const [floorMiniGameWords, setFloorMiniGameWords] = useState(null); // 3 words shared by capsules + pillar per floor
 
   const getRandomPackWordsForFloor = useCallback(() => {
     if (bridgeBuilderPacks.length === 0) return [];
@@ -73,6 +74,17 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     previousFloorWordIdsRef.current = collectFloorWordIds(nextFloor);
     return nextFloor;
   }, [getRandomPackWordsForFloor, hasCustomWordPool, isGuidedPackRun, packWords, wordSourceMode]);
+
+  // Pick 3 random words for minigames when a new floor is created
+  const pickMiniGameWords = useCallback((newFloor) => {
+    const wordIds = collectFloorWordIds(newFloor);
+    const pool = wordIds.size > 0
+      ? Array.from(wordIds).map(id => getWordById(id)).filter(Boolean)
+      : [...deepScriptWords];
+    const candidates = pool.filter(w => !w.isMiniboss && w.english);
+    const shuffled = [...candidates].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 3);
+  }, []);
 
   // Add/remove body class for nav bar hiding; clean up custom words on unmount
   useEffect(() => {
@@ -102,8 +114,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setCurrentChamberId(newFloor.startChamberId);
     setFloorNumber(1);
     setHasCompletedCapsulesMiniGameThisFloor(false);
+    setFloorMiniGameWords(pickMiniGameWords(newFloor));
     setScreen('exploring');
-  }, [createFloorForNumber]);
+  }, [createFloorForNumber, pickMiniGameWords]);
 
   // ─── Exploration: Movement ────────────────────────────────
 
@@ -281,9 +294,10 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
       health: Math.min(prev.maxHealth, prev.health + 1),
     }));
     setHasCompletedCapsulesMiniGameThisFloor(false);
+    setFloorMiniGameWords(pickMiniGameWords(nextFloor));
     setFloorNumber(nextFloorNumber);
     setScreen('exploring');
-  }, [createFloorForNumber, floorNumber, isGuidedPackRun]);
+  }, [createFloorForNumber, floorNumber, isGuidedPackRun, pickMiniGameWords]);
 
   // ─── Mini-game End ────────────────────────────────────────
 
@@ -327,6 +341,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setCurrentChamberId(null);
     setActiveMiniGame(null);
     setHasCompletedCapsulesMiniGameThisFloor(false);
+    setFloorMiniGameWords(null);
     setEndResult(null);
     setFloorNumber(1);
     previousFloorWordIdsRef.current = new Set();
@@ -410,6 +425,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         onCompleteMiniGame={handleMiniGameComplete}
         onCloseMiniGame={handleCloseMiniGame}
         floorWordPool={floorWordPool}
+        floorMiniGameWords={floorMiniGameWords}
         runState={runState}
       />
     </div>

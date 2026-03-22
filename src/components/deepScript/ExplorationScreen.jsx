@@ -26,6 +26,7 @@ export default function ExplorationScreen({
   onCompleteMiniGame,
   onCloseMiniGame,
   floorWordPool = [],
+  floorMiniGameWords = null,
   runState,
 }) {
   const [inspecting, setInspecting] = useState(null);
@@ -141,12 +142,7 @@ export default function ExplorationScreen({
   const visibleBackDoor = backChamber?.visited ? backDoor : null;
   const isMiniGameOpenInThisRoom = activeMiniGame?.chamberId === chamber.id;
   const activeWordPool = floorWordPool.length > 0 ? floorWordPool : deepScriptWords;
-  const sharedMiniGameWords = useMemo(() => {
-    return [...activeWordPool]
-      .filter(word => !word.isMiniboss && word.english)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
-  }, [activeWordPool]);
+  const sharedMiniGameWords = floorMiniGameWords || [];
   const capsulePairs = useMemo(() => {
     return sharedMiniGameWords.map(word => ({
       hebrew: word.hebrew,
