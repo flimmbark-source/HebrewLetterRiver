@@ -768,11 +768,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
                 : 'rgba(168, 85, 247, 0.6)';
 
             // Determine animation class — only one active at a time
-            let animCls = 'ds-bubble--idle';
+            let animCls = 'ds-bubble--pop-on';
             if (isPopping) animCls = 'ds-bubble--pop-off';
             else if (capsule.shaking) animCls = 'ds-bubble--shake';
             else if (isDragging) animCls = 'ds-bubble--dragging';
-            else if (!capsule._hasPopped) animCls = 'ds-bubble--pop-on';
 
             return (
               <div
@@ -789,12 +788,6 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
                   '--bubble-glow': bubbleGlow,
                 }}
                 onPointerDown={(e) => handlePointerDown(e, capsule, index)}
-                onAnimationEnd={() => {
-                  if (!capsule._hasPopped) {
-                    capsule._hasPopped = true;
-                    forceUpdate(n => n + 1);
-                  }
-                }}
               >
                 <span className="ds-bubble-text" dir={isHebrew ? 'rtl' : 'ltr'}>
                   {isHebrew ? <span className="hebrew-font">{capsule.text}</span> : capsule.text}
