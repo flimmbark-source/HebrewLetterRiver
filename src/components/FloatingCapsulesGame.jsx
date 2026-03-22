@@ -864,7 +864,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
         </button>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes shake {
           0%, 100% { transform: translate(-50%, -50%) translateX(0); }
           25% { transform: translate(-50%, -50%) translateX(-10px); }
