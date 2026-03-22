@@ -477,7 +477,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       drag.rafId = null;
       const el = bubbleElsRef.current.get(capsule.id);
       if (el) {
-        el.style.transform = `translate(${capsule.x}px, ${capsule.y}px) translate(-50%, -50%)`;
+        el.style.left = `${capsule.x}px`;
+        el.style.top = `${capsule.y}px`;
       }
     });
   }, []);
@@ -782,7 +783,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
                 }}
                 className={`ds-bubble ${animCls}`}
                 style={{
-                  transform: `translate(${capsule.x}px, ${capsule.y}px) translate(-50%, -50%)${isDragging ? ' scale(1.12)' : ''}`,
+                  left: capsule.x,
+                  top: capsule.y,
                   touchAction: 'none',
                   '--bubble-color': bubbleColor,
                   '--bubble-glow': bubbleGlow,
