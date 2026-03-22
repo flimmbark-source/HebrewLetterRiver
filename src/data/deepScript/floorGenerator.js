@@ -17,8 +17,8 @@ export const CHAMBER_TYPES = {
   ENTRANCE: 'entrance',
   STANDARD: 'standard',
   COMBAT: 'combat',
-  ARCHIVE: 'archive',
-  SHRINE: 'shrine',
+  MINIGAME_PILLAR: 'minigame-pillar',
+  MINIGAME_CAPSULES: 'minigame-capsules',
   EVENT: 'event',
   MINIBOSS: 'miniboss',
 };
@@ -62,13 +62,11 @@ const INTERACTABLE_POOLS = {
   [CHAMBER_TYPES.COMBAT]: [
     { type: 'sigil', position: 'center', label: 'Glowing Sigil', action: 'trigger-combat' },
   ],
-  [CHAMBER_TYPES.ARCHIVE]: [
-    { type: 'bookshelf', position: 'left', label: 'Ancient Bookshelf', action: 'trigger-archive', archiveReward: 'insight' },
-    { type: 'scroll-stand', position: 'center', label: 'Scroll Stand', action: 'trigger-archive', archiveReward: 'clue-hint' },
-    { type: 'mural', position: 'right', label: 'Root Mural', action: 'trigger-archive', archiveReward: 'free-letter' },
+  [CHAMBER_TYPES.MINIGAME_PILLAR]: [
+    { type: 'pillar', position: 'center', label: 'Stone Pillar', action: 'trigger-minigame', minigameId: 'pillar' },
   ],
-  [CHAMBER_TYPES.SHRINE]: [
-    { type: 'altar', position: 'center', label: 'Ancient Altar', action: 'trigger-shrine' },
+  [CHAMBER_TYPES.MINIGAME_CAPSULES]: [
+    { type: 'capsule-orb', position: 'center', label: 'Floating Orbs', action: 'trigger-minigame', minigameId: 'capsules' },
   ],
   [CHAMBER_TYPES.EVENT]: [
     { type: 'chest', position: 'center', label: 'Dusty Chest', action: 'loot' },
@@ -84,8 +82,8 @@ export const CHAMBER_THEMES = {
   [CHAMBER_TYPES.ENTRANCE]: 'stone',
   [CHAMBER_TYPES.STANDARD]: 'stone',
   [CHAMBER_TYPES.COMBAT]: 'crypt',
-  [CHAMBER_TYPES.ARCHIVE]: 'library',
-  [CHAMBER_TYPES.SHRINE]: 'shrine',
+  [CHAMBER_TYPES.MINIGAME_PILLAR]: 'shrine',
+  [CHAMBER_TYPES.MINIGAME_CAPSULES]: 'library',
   [CHAMBER_TYPES.EVENT]: 'stone',
   [CHAMBER_TYPES.MINIBOSS]: 'crypt',
 };
@@ -688,8 +686,8 @@ export function generateDungeonFloor({
         combatChambers.push(createChamber(CHAMBER_TYPES.COMBAT, { wordId: word?.id }));
       }
 
-      const archive = createChamber(CHAMBER_TYPES.ARCHIVE, { rewardId: 'clue-hint' });
-      const shrine = createChamber(CHAMBER_TYPES.SHRINE);
+      const pillarMiniGame = createChamber(CHAMBER_TYPES.MINIGAME_PILLAR, { miniGameId: 'pillar' });
+      const capsuleMiniGame = createChamber(CHAMBER_TYPES.MINIGAME_CAPSULES, { miniGameId: 'capsules' });
       const event = createChamber(CHAMBER_TYPES.EVENT, { eventId: 'chest' });
 
       let bossWord;
@@ -711,7 +709,7 @@ export function generateDungeonFloor({
       const miniboss = createChamber(CHAMBER_TYPES.MINIBOSS, { wordId: bossWord?.id });
 
       const chambers = new Map();
-      const allChambers = [entrance, ...combatChambers, archive, shrine, event, miniboss];
+      const allChambers = [entrance, ...combatChambers, pillarMiniGame, capsuleMiniGame, event, miniboss];
       for (const chamber of allChambers) {
         chambers.set(chamber.id, chamber);
       }
@@ -745,8 +743,8 @@ export function getChamberDisplayName(type) {
     case CHAMBER_TYPES.ENTRANCE: return 'Entrance Hall';
     case CHAMBER_TYPES.STANDARD: return 'Stone Chamber';
     case CHAMBER_TYPES.COMBAT: return 'Dark Chamber';
-    case CHAMBER_TYPES.ARCHIVE: return 'Archive Chamber';
-    case CHAMBER_TYPES.SHRINE: return 'Shrine Chamber';
+    case CHAMBER_TYPES.MINIGAME_PILLAR: return 'Pillar Trial Chamber';
+    case CHAMBER_TYPES.MINIGAME_CAPSULES: return 'Capsule Trial Chamber';
     case CHAMBER_TYPES.EVENT: return 'Quiet Chamber';
     case CHAMBER_TYPES.MINIBOSS: return 'Guardian\'s Chamber';
     default: return 'Chamber';
@@ -758,8 +756,8 @@ export function getChamberIcon(type) {
     case CHAMBER_TYPES.ENTRANCE: return '🚪';
     case CHAMBER_TYPES.STANDARD: return '🪨';
     case CHAMBER_TYPES.COMBAT: return '⚔️';
-    case CHAMBER_TYPES.ARCHIVE: return '📚';
-    case CHAMBER_TYPES.SHRINE: return '🏛️';
+    case CHAMBER_TYPES.MINIGAME_PILLAR: return '🗿';
+    case CHAMBER_TYPES.MINIGAME_CAPSULES: return '🫧';
     case CHAMBER_TYPES.EVENT: return '✨';
     case CHAMBER_TYPES.MINIBOSS: return '👁️';
     default: return '❓';

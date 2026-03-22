@@ -4,6 +4,9 @@ import {
 } from '../../data/deepScript/floorGenerator.js';
 import { playFootstep } from './dsSounds.js';
 import InspectPanel from './InspectPanel.jsx';
+import PillarMiniGame from './PillarMiniGame.jsx';
+import FloatingCapsulesGame from '../FloatingCapsulesGame.jsx';
+import { deepScriptWords } from '../../data/deepScript/words.js';
 
 /**
  * ExplorationScreen — first-person dungeon traversal.
@@ -16,10 +19,13 @@ export default function ExplorationScreen({
   currentChamberId,
   onMove,
   onTriggerCombat,
-  onTriggerArchive,
-  onTriggerShrine,
+  onTriggerMiniGame,
   onLoot,
   onResolveInteractable,
+  activeMiniGame,
+  onCompleteMiniGame,
+  onCloseMiniGame,
+  floorWordPool = [],
   runState,
 }) {
   const [inspecting, setInspecting] = useState(null);
@@ -76,11 +82,8 @@ export default function ExplorationScreen({
       case 'trigger-combat':
         onTriggerCombat(chamber.payload?.wordId, chamber.id);
         break;
-      case 'trigger-archive':
-        onTriggerArchive(interactable.archiveReward || 'insight', chamber.id, interactable.id);
-        break;
-      case 'trigger-shrine':
-        onTriggerShrine(chamber.id);
+      case 'trigger-minigame':
+        onTriggerMiniGame(chamber.id, interactable.minigameId);
         break;
       case 'loot':
         setInspecting({ ...interactable, isLoot: true });
@@ -91,7 +94,7 @@ export default function ExplorationScreen({
       default:
         setInspecting(interactable);
     }
-  }, [chamber, onTriggerCombat, onTriggerArchive, onTriggerShrine]);
+  }, [chamber, onTriggerCombat, onTriggerMiniGame]);
 
   const handleCloseInspect = useCallback(() => {
     if (inspecting?.isLoot && !inspecting.resolved) {
@@ -136,6 +139,19 @@ export default function ExplorationScreen({
   const rightChamber = getChamberAt(rightDoor);
   const backChamber = getChamberAt(backDoor);
   const visibleBackDoor = backChamber?.visited ? backDoor : null;
+  const isMiniGameOpenInThisRoom = activeMiniGame?.chamberId === chamber.id;
+  const activeWordPool = floorWordPool.length > 0 ? floorWordPool : deepScriptWords;
+  const capsulePairs = useMemo(() => {
+    const words = [...activeWordPool]
+      .filter(word => !word.isMiniboss && word.english)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3);
+    return words.map(word => ({
+      hebrew: word.hebrew,
+      transliteration: word.transliteration,
+      meaning: word.english,
+    }));
+  }, [activeWordPool]);
 
   return (
     <div className={`ds-explore-screen ${transitioning ? `ds-explore--trans-${transDir}` : ''} ${walkPhase ? `ds-explore--${walkPhase}` : ''}`}>
@@ -231,8 +247,7 @@ export default function ExplorationScreen({
                 `ds-hotspot--${obj.type}`,
                 obj.resolved ? 'ds-hotspot--resolved' : '',
                 obj.action === 'trigger-combat' ? 'ds-hotspot--combat' : '',
-                obj.action === 'trigger-shrine' ? 'ds-hotspot--shrine' : '',
-                obj.action === 'trigger-archive' ? 'ds-hotspot--archive' : '',
+                obj.action === 'trigger-minigame' ? 'ds-hotspot--minigame' : '',
               ].filter(Boolean).join(' ');
 
               return (
@@ -252,6 +267,24 @@ export default function ExplorationScreen({
               );
             })}
           </div>
+
+          {isMiniGameOpenInThisRoom && activeMiniGame?.miniGameId === 'pillar' && (
+            <div className="ds-room-object ds-room-object--pillar" aria-label="Pillar game object">
+              <PillarMiniGame onSolved={onCompleteMiniGame} compact wordPool={activeWordPool} />
+            </div>
+          )}
+
+          {isMiniGameOpenInThisRoom && activeMiniGame?.miniGameId === 'capsules' && (
+            <div className="ds-room-minigame" role="dialog" aria-label="Room minigame">
+              <button type="button" className="ds-room-minigame-close" onClick={onCloseMiniGame}>✕</button>
+              <div className="ds-room-minigame-capsules">
+                <FloatingCapsulesGame
+                  wordPairs={capsulePairs}
+                  onComplete={onCompleteMiniGame}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Chamber state indicator */}
           {chamber.resolved && chamber.type === CHAMBER_TYPES.COMBAT && (
@@ -292,7 +325,8 @@ function getHotspotIcon(type) {
     case 'bookshelf': return '📚';
     case 'scroll-stand': return '📜';
     case 'mural': return '🖼️';
-    case 'altar': return '⛩️';
+    case 'pillar': return '🗿';
+    case 'capsule-orb': return '🫧';
     case 'brazier': return '🔥';
     case 'statue': return '🗿';
     case 'chest': return '📦';
