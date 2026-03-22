@@ -141,17 +141,19 @@ export default function ExplorationScreen({
   const visibleBackDoor = backChamber?.visited ? backDoor : null;
   const isMiniGameOpenInThisRoom = activeMiniGame?.chamberId === chamber.id;
   const activeWordPool = floorWordPool.length > 0 ? floorWordPool : deepScriptWords;
-  const capsulePairs = useMemo(() => {
-    const words = [...activeWordPool]
+  const sharedMiniGameWords = useMemo(() => {
+    return [...activeWordPool]
       .filter(word => !word.isMiniboss && word.english)
       .sort(() => Math.random() - 0.5)
       .slice(0, 3);
-    return words.map(word => ({
+  }, [activeWordPool]);
+  const capsulePairs = useMemo(() => {
+    return sharedMiniGameWords.map(word => ({
       hebrew: word.hebrew,
       transliteration: word.transliteration,
       meaning: word.english,
     }));
-  }, [activeWordPool]);
+  }, [sharedMiniGameWords]);
 
   return (
     <div className={`ds-explore-screen ${transitioning ? `ds-explore--trans-${transDir}` : ''} ${walkPhase ? `ds-explore--${walkPhase}` : ''}`}>
@@ -270,7 +272,12 @@ export default function ExplorationScreen({
 
           {isMiniGameOpenInThisRoom && activeMiniGame?.miniGameId === 'pillar' && (
             <div className="ds-room-object ds-room-object--pillar" aria-label="Pillar game object">
-              <PillarMiniGame onSolved={onCompleteMiniGame} compact wordPool={activeWordPool} />
+              <PillarMiniGame
+                onSolved={onCompleteMiniGame}
+                compact
+                wordPool={activeWordPool}
+                selectedWords={sharedMiniGameWords}
+              />
             </div>
           )}
 

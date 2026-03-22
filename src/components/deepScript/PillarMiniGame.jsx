@@ -10,9 +10,11 @@ function shuffle(items) {
   return copy;
 }
 
-function buildPillarRows(wordPool = deepScriptWords) {
+function buildPillarRows(wordPool = deepScriptWords, selectedWordsOverride = null) {
   const candidates = wordPool.filter(word => !word.isMiniboss && word.english);
-  const selectedWords = shuffle(candidates).slice(0, 3);
+  const selectedWords = selectedWordsOverride?.length
+    ? selectedWordsOverride.filter(word => word?.english && !word?.isMiniboss)
+    : shuffle(candidates).slice(0, 3);
 
   return selectedWords.map((word) => {
     const distractors = shuffle(
@@ -34,8 +36,13 @@ function buildPillarRows(wordPool = deepScriptWords) {
   });
 }
 
-export default function PillarMiniGame({ onSolved, compact = false, wordPool = deepScriptWords }) {
-  const [rows, setRows] = useState(() => buildPillarRows(wordPool));
+export default function PillarMiniGame({
+  onSolved,
+  compact = false,
+  wordPool = deepScriptWords,
+  selectedWords = null,
+}) {
+  const [rows, setRows] = useState(() => buildPillarRows(wordPool, selectedWords));
   const [spinningRowId, setSpinningRowId] = useState(null);
   const [showProceed, setShowProceed] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
