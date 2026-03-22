@@ -16,14 +16,13 @@ const CAPSULE_CLEARANCE_BUFFER = 19; // Extra spacing to avoid overlaps
 
 export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode = false }) {
   const canvasRef = useRef(null);
-  const animationRef = useRef(null);
   const [gameState, setGameState] = useState('playing'); // 'playing' | 'completed'
   const [mismatchCount, setMismatchCount] = useState(0);
   const [completionTime, setCompletionTime] = useState(0);
   const [showLines, setShowLines] = useState(true);
   const [currentHintPairIndex, setCurrentHintPairIndex] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
-  const [, forceUpdate] = useState(0);
+  const [renderTick, forceUpdate] = useState(0);
   const startTimeRef = useRef(Date.now());
 
   // Capsule state
@@ -31,12 +30,16 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
   const [ghostPairs, setGhostPairs] = useState([]);
   const initializedWordPairsRef = useRef(null);
 
+  // DOM refs for direct manipulation during drag (avoids re-renders)
+  const bubbleElsRef = useRef(new Map());
+
   // Drag state
   const dragStateRef = useRef({
     isDragging: false,
     capsuleIndex: -1,
     offsetX: 0,
-    offsetY: 0
+    offsetY: 0,
+    rafId: null,
   });
 
   const playAreaRef = useRef(null);
@@ -430,41 +433,9 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
     });
   }
 
-  // Animation loop - keep capsules moving even during drag
-  useEffect(() => {
-    if (gameState !== 'playing' || !gameStarted) return;
-
-    function animate() {
-      const capsules = capsulesRef.current;
-      const bounds = playAreaBounds;
-
-      const now = Date.now();
-      capsules.forEach((capsule, index) => {
-        // Skip matched or invisible capsules
-        if (capsule.matched || !capsule.visible) return;
-
-        // Clean up shake animation
-        if (capsule.shakeUntil && now >= capsule.shakeUntil) {
-          capsule.shaking = false;
-          capsule.shakeUntil = null;
-        }
-      });
-
-      animationRef.current = requestAnimationFrame(animate);
-    }
-
-    animationRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [gameState, gameStarted, playAreaBounds]);
-
   // Pointer event handlers - all capsule types are draggable
   const handlePointerDown = useCallback((e, capsule, index) => {
-    if (capsule.matched || !capsule.visible) return; // Prevent dragging if invisible or if already matched
+    if (capsule.matched || !capsule.visible) return;
 
     // Auto-start game on first capsule interaction
     if (!gameStarted) {
@@ -478,23 +449,37 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
     dragStateRef.current = {
       isDragging: true,
       capsuleIndex: index,
-      capsuleType: capsule.type, // Track which type we're dragging
+      capsuleType: capsule.type,
       offsetX: e.clientX - rect.left - capsule.x,
-      offsetY: e.clientY - rect.top - capsule.y
+      offsetY: e.clientY - rect.top - capsule.y,
+      rafId: null,
     };
 
     e.target.setPointerCapture(e.pointerId);
+    // Force one re-render so the dragging class is applied
+    forceUpdate(n => n + 1);
   }, [gameStarted]);
 
   const handlePointerMove = useCallback((e) => {
-    if (!dragStateRef.current.isDragging) return;
+    const drag = dragStateRef.current;
+    if (!drag.isDragging) return;
 
     const rect = playAreaRef.current.getBoundingClientRect();
-    const index = dragStateRef.current.capsuleIndex;
+    const index = drag.capsuleIndex;
     const capsule = capsulesRef.current[index];
 
-    capsule.x = e.clientX - rect.left - dragStateRef.current.offsetX;
-    capsule.y = e.clientY - rect.top - dragStateRef.current.offsetY;
+    capsule.x = e.clientX - rect.left - drag.offsetX;
+    capsule.y = e.clientY - rect.top - drag.offsetY;
+
+    // Direct DOM update — no React re-render needed
+    if (drag.rafId) return; // Already scheduled
+    drag.rafId = requestAnimationFrame(() => {
+      drag.rafId = null;
+      const el = bubbleElsRef.current.get(capsule.id);
+      if (el) {
+        el.style.transform = `translate(${capsule.x}px, ${capsule.y}px) translate(-50%, -50%)`;
+      }
+    });
   }, []);
 
   const handlePointerUp = useCallback((e) => {
@@ -528,6 +513,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
         if (removeTarget) {
           target.popping = true;
         }
+        forceUpdate(n => n + 1); // Show pop-off animation immediately
 
         setTimeout(() => {
           draggedCapsule.matched = true;
@@ -594,17 +580,22 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
         }]);
       } else {
         draggedCapsule.shaking = true;
-        draggedCapsule.shakeUntil = Date.now() + 500;
         setMismatchCount(prev => prev + 1);
+        // Clear shake after animation completes — no rAF loop needed
+        setTimeout(() => {
+          draggedCapsule.shaking = false;
+          forceUpdate(n => n + 1);
+        }, 450);
       }
     }
 
     dragStateRef.current.isDragging = false;
+    forceUpdate(n => n + 1);
   }, []);
 
-  // Draw canvas overlay for lines
+  // Draw canvas overlay for lines — draw ONCE per state change, no rAF loop
   useEffect(() => {
-    if (!canvasRef.current || !showLines) return;
+    if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -612,131 +603,70 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
 
     canvas.width = bounds.width;
     canvas.height = bounds.height;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Colors for hint lines - highly distinguishable colors with better contrast
+    if (!showLines) return;
+
     const hintColors = [
-      'rgba(239, 68, 68, 0.7)',     // Bright Red
-      'rgba(22, 163, 74, 0.7)',     // Deep Green
-      'rgba(255, 159, 28, 0.7)',    // Bright Orange
-      'rgba(59, 130, 246, 0.7)',    // Bright Blue
-      'rgba(236, 72, 153, 0.7)',    // Hot Pink
-      'rgba(168, 85, 247, 0.7)',    // Purple
-      'rgba(14, 165, 233, 0.7)',    // Sky Blue
-      'rgba(234, 179, 8, 0.7)',     // Gold/Yellow
-      'rgba(20, 184, 166, 0.7)',    // Teal
-      'rgba(248, 113, 113, 0.7)',   // Light Red
+      'rgba(239, 68, 68, 0.7)',
+      'rgba(22, 163, 74, 0.7)',
+      'rgba(255, 159, 28, 0.7)',
+      'rgba(59, 130, 246, 0.7)',
+      'rgba(236, 72, 153, 0.7)',
+      'rgba(168, 85, 247, 0.7)',
+      'rgba(14, 165, 233, 0.7)',
+      'rgba(234, 179, 8, 0.7)',
+      'rgba(20, 184, 166, 0.7)',
+      'rgba(248, 113, 113, 0.7)',
     ];
 
-    // Helper to calculate edge points for line connections
-    // Lines connect at far end points: right edge of left capsule, left edge of right capsule
-    const getEdgePoints = (capsuleA, capsuleB) => {
-      const radiusA = capsuleA.radius ?? CAPSULE_RADIUS;
-      const radiusB = capsuleB.radius ?? CAPSULE_RADIUS;
-
-      // Determine which capsule is on the left based on x position
-      const leftCapsule = capsuleA.x < capsuleB.x ? capsuleA : capsuleB;
-      const rightCapsule = capsuleA.x < capsuleB.x ? capsuleB : capsuleA;
-      const leftRadius = leftCapsule.radius ?? CAPSULE_RADIUS;
-      const rightRadius = rightCapsule.radius ?? CAPSULE_RADIUS;
-
-      // Start at right edge of left capsule
-      const startX = leftCapsule.x + leftRadius;
-      const startY = leftCapsule.y;
-
-      // End at left edge of right capsule
-      const endX = rightCapsule.x - rightRadius;
-      const endY = rightCapsule.y;
-
-      return { startX, startY, endX, endY };
+    const getEdgePoints = (a, b) => {
+      const left = a.x < b.x ? a : b;
+      const right = a.x < b.x ? b : a;
+      return {
+        startX: left.x + (left.radius ?? CAPSULE_RADIUS),
+        startY: left.y,
+        endX: right.x - (right.radius ?? CAPSULE_RADIUS),
+        endY: right.y,
+      };
     };
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (!showLines) return;
-
-      const capsules = capsulesRef.current;
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-
-      if (currentHintPairIndex === -1) {
-        // Show all hint lines initially
-        const pairs = new Map();
-        capsules.forEach(c => {
-          if (!c.matched && c.visible) {
-            if (!pairs.has(c.pairIndex)) {
-              pairs.set(c.pairIndex, []);
-            }
-            pairs.get(c.pairIndex).push(c);
-          }
-        });
-
-        pairs.forEach((pairCapsules, pairIndex) => {
-          // Use different color for each pair
-          ctx.strokeStyle = hintColors[pairIndex % hintColors.length];
-
-          // Draw lines connecting all capsules in this pair (except Hebrew-to-Meaning)
-          for (let i = 0; i < pairCapsules.length; i += 1) {
-            for (let j = i + 1; j < pairCapsules.length; j += 1) {
-              // Skip Hebrew-to-Meaning connection
-              const isHebrewToMeaning =
-                (pairCapsules[i].type === 'hebrew' && pairCapsules[j].type === 'meaning') ||
-                (pairCapsules[i].type === 'meaning' && pairCapsules[j].type === 'hebrew');
-
-              if (!isHebrewToMeaning) {
-                const { startX, startY, endX, endY } = getEdgePoints(pairCapsules[i], pairCapsules[j]);
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                ctx.lineTo(endX, endY);
-                ctx.stroke();
-              }
-            }
-          }
-        });
-      } else {
-        // Show lines for the current hint pair only (succession mode)
-        const pairCapsules = capsules.filter(
-          c => !c.matched && c.visible && c.pairIndex === currentHintPairIndex
-        );
-
-        // Use different color for each pair
-        ctx.strokeStyle = hintColors[currentHintPairIndex % hintColors.length];
-
-        // Draw lines connecting all capsules in this pair (except Hebrew-to-Meaning)
-        for (let i = 0; i < pairCapsules.length; i += 1) {
-          for (let j = i + 1; j < pairCapsules.length; j += 1) {
-            // Skip Hebrew-to-Meaning connection
-            const isHebrewToMeaning =
-              (pairCapsules[i].type === 'hebrew' && pairCapsules[j].type === 'meaning') ||
-              (pairCapsules[i].type === 'meaning' && pairCapsules[j].type === 'hebrew');
-
-            if (!isHebrewToMeaning) {
-              const { startX, startY, endX, endY } = getEdgePoints(pairCapsules[i], pairCapsules[j]);
-              ctx.beginPath();
-              ctx.moveTo(startX, startY);
-              ctx.lineTo(endX, endY);
-              ctx.stroke();
-            }
-          }
+    const drawPairLines = (pairCapsules, color) => {
+      ctx.strokeStyle = color;
+      for (let i = 0; i < pairCapsules.length; i++) {
+        for (let j = i + 1; j < pairCapsules.length; j++) {
+          const a = pairCapsules[i], b = pairCapsules[j];
+          if ((a.type === 'hebrew' && b.type === 'meaning') ||
+              (a.type === 'meaning' && b.type === 'hebrew')) continue;
+          const { startX, startY, endX, endY } = getEdgePoints(a, b);
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(endX, endY);
+          ctx.stroke();
         }
       }
+    };
 
-      requestAnimationFrame(draw);
-    }
+    const capsules = capsulesRef.current;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
 
-    draw();
-  }, [showLines, currentHintPairIndex, playAreaBounds]);
-
-  // Clean up ghosts after fade
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setGhostPairs(prev =>
-        prev.filter(ghost => Date.now() - ghost.timestamp < 2000)
+    if (currentHintPairIndex === -1) {
+      const pairs = new Map();
+      capsules.forEach(c => {
+        if (!c.matched && c.visible) {
+          if (!pairs.has(c.pairIndex)) pairs.set(c.pairIndex, []);
+          pairs.get(c.pairIndex).push(c);
+        }
+      });
+      pairs.forEach((group, idx) => drawPairLines(group, hintColors[idx % hintColors.length]));
+    } else {
+      const group = capsules.filter(
+        c => !c.matched && c.visible && c.pairIndex === currentHintPairIndex
       );
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, []);
+      drawPairLines(group, hintColors[currentHintPairIndex % hintColors.length]);
+    }
+  }, [showLines, currentHintPairIndex, playAreaBounds, renderTick]);
 
   if (gameState === 'completed') {
     return (
@@ -789,49 +719,32 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
-        {/* Ghost pairs (afterimages) - float upward with colored text */}
-        {ghostPairs.map((ghost, i) => {
-          const age = Date.now() - ghost.timestamp;
-          const duration = 2500; // Float for 2.5 seconds
-          const progress = Math.min(age / duration, 1);
-
-          // Float upward 150px over the duration
-          const floatDistance = 150;
-          const currentY = ghost.startY - (floatDistance * progress);
-
-          // Fade out gradually
-          const opacity = 1 - progress;
-
-          if (progress >= 1) return null; // Don't render if done
-
-          return (
-            <div
-              key={`ghost-${i}`}
-              className="absolute pointer-events-none flex flex-col items-center gap-1"
-              style={{
-                left: ghost.x,
-                top: currentY,
-                transform: 'translate(-50%, -50%)',
-                opacity
-              }}
-            >
-              {ghost.items.map((item, itemIndex) => {
-                const isHebrew = item.type === 'hebrew';
-                return (
-                  <span
-                    key={`${item.text}-${itemIndex}`}
-                    className={`font-semibold drop-shadow-lg ${
-                      isHebrew ? 'hebrew-font text-emerald-200' : 'text-slate-200'
-                    }`}
-                    dir={isHebrew ? 'rtl' : 'ltr'}
-                  >
-                    {item.text}
-                  </span>
-                );
-              })}
-            </div>
-          );
-        })}
+        {/* Ghost pairs — CSS-animated float-up, removed on animationend */}
+        {ghostPairs.map((ghost, i) => (
+          <div
+            key={`ghost-${ghost.timestamp}-${i}`}
+            className="ds-bubble-ghost"
+            style={{ left: ghost.x, top: ghost.y }}
+            onAnimationEnd={() => {
+              setGhostPairs(prev => prev.filter((_, idx) => idx !== i));
+            }}
+          >
+            {ghost.items.map((item, itemIndex) => {
+              const isHebrew = item.type === 'hebrew';
+              return (
+                <span
+                  key={`${item.text}-${itemIndex}`}
+                  className={`font-semibold ${
+                    isHebrew ? 'hebrew-font text-emerald-200' : 'text-slate-200'
+                  }`}
+                  dir={isHebrew ? 'rtl' : 'ltr'}
+                >
+                  {item.text}
+                </span>
+              );
+            })}
+          </div>
+        ))}
 
         {/* Capsules */}
         {capsulesRef.current.map((capsule, index) => {
@@ -854,22 +767,34 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
                 ? 'rgba(240, 198, 116, 0.6)'
                 : 'rgba(168, 85, 247, 0.6)';
 
+            // Determine animation class — only one active at a time
+            let animCls = 'ds-bubble--idle';
+            if (isPopping) animCls = 'ds-bubble--pop-off';
+            else if (capsule.shaking) animCls = 'ds-bubble--shake';
+            else if (isDragging) animCls = 'ds-bubble--dragging';
+            else if (!capsule._hasPopped) animCls = 'ds-bubble--pop-on';
+
             return (
               <div
                 key={capsule.id}
-                className={`ds-bubble ${
-                  capsule.shaking ? 'ds-bubble--shake' : ''
-                } ${isPopping ? 'ds-bubble--pop-off' : 'ds-bubble--pop-on'} ${
-                  isDragging ? 'ds-bubble--dragging' : ''
-                }`}
+                ref={el => {
+                  if (el) bubbleElsRef.current.set(capsule.id, el);
+                  else bubbleElsRef.current.delete(capsule.id);
+                }}
+                className={`ds-bubble ${animCls}`}
                 style={{
-                  left: capsule.x,
-                  top: capsule.y,
+                  transform: `translate(${capsule.x}px, ${capsule.y}px) translate(-50%, -50%)${isDragging ? ' scale(1.12)' : ''}`,
                   touchAction: 'none',
                   '--bubble-color': bubbleColor,
                   '--bubble-glow': bubbleGlow,
                 }}
                 onPointerDown={(e) => handlePointerDown(e, capsule, index)}
+                onAnimationEnd={() => {
+                  if (!capsule._hasPopped) {
+                    capsule._hasPopped = true;
+                    forceUpdate(n => n + 1);
+                  }
+                }}
               >
                 <span className="ds-bubble-text" dir={isHebrew ? 'rtl' : 'ltr'}>
                   {isHebrew ? <span className="hebrew-font">{capsule.text}</span> : capsule.text}
