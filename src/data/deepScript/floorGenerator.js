@@ -63,10 +63,10 @@ const INTERACTABLE_POOLS = {
     { type: 'sigil', position: 'center', label: 'Glowing Sigil', action: 'trigger-combat' },
   ],
   [CHAMBER_TYPES.MINIGAME_PILLAR]: [
-    { type: 'pillar', position: 'center', label: 'Stone Pillar', action: 'trigger-minigame', minigameId: 'pillar' },
+    { type: 'trial-pedestal', position: 'center', label: 'Trial Pedestal', action: 'trigger-minigame' },
   ],
   [CHAMBER_TYPES.MINIGAME_CAPSULES]: [
-    { type: 'capsule-orb', position: 'center', label: 'Floating Orbs', action: 'trigger-minigame', minigameId: 'capsules' },
+    { type: 'trial-pedestal', position: 'center', label: 'Trial Pedestal', action: 'trigger-minigame' },
   ],
   [CHAMBER_TYPES.EVENT]: [
     { type: 'chest', position: 'center', label: 'Dusty Chest', action: 'loot' },

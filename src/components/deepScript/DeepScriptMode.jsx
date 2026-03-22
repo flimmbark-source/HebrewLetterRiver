@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { getStarterKit } from '../../data/deepScript/starterKits.js';
 import { generateDungeonFloor, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
-import { registerCustomWords, clearCustomWords, convertBBWordsForDS, getWordById } from '../../data/deepScript/words.js';
+import { registerCustomWords, clearCustomWords, convertBBWordsForDS, getWordById, deepScriptWords } from '../../data/deepScript/words.js';
 import { bridgeBuilderPacks } from '../../data/bridgeBuilderPacks.js';
 import { getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import KitSelectScreen from './KitSelectScreen.jsx';
@@ -45,6 +45,8 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   // Active encounter context
   const [activeCombat, setActiveCombat] = useState(null); // { wordId, chamberId, isMiniboss }
   const [activeMiniGame, setActiveMiniGame] = useState(null); // { chamberId, miniGameId }
+  const [hasCompletedCapsulesMiniGameThisFloor, setHasCompletedCapsulesMiniGameThisFloor] = useState(false);
+  const [floorMiniGameWords, setFloorMiniGameWords] = useState(null); // 3 words shared by capsules + pillar per floor
 
   const getRandomPackWordsForFloor = useCallback(() => {
     if (bridgeBuilderPacks.length === 0) return [];
@@ -73,6 +75,17 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     return nextFloor;
   }, [getRandomPackWordsForFloor, hasCustomWordPool, isGuidedPackRun, packWords, wordSourceMode]);
 
+  // Pick 3 random words for minigames when a new floor is created
+  const pickMiniGameWords = useCallback((newFloor) => {
+    const wordIds = collectFloorWordIds(newFloor);
+    const pool = wordIds.size > 0
+      ? Array.from(wordIds).map(id => getWordById(id)).filter(Boolean)
+      : [...deepScriptWords];
+    const candidates = pool.filter(w => !w.isMiniboss && w.english);
+    const shuffled = [...candidates].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 3);
+  }, []);
+
   // Add/remove body class for nav bar hiding; clean up custom words on unmount
   useEffect(() => {
     document.body.classList.add('in-deep-script');
@@ -100,8 +113,10 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setFloor(newFloor);
     setCurrentChamberId(newFloor.startChamberId);
     setFloorNumber(1);
+    setHasCompletedCapsulesMiniGameThisFloor(false);
+    setFloorMiniGameWords(pickMiniGameWords(newFloor));
     setScreen('exploring');
-  }, [createFloorForNumber]);
+  }, [createFloorForNumber, pickMiniGameWords]);
 
   // ─── Exploration: Movement ────────────────────────────────
 
@@ -135,8 +150,16 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
           setScreen('battle_transition');
         }, 600);
       }
+
+      // Auto-trigger minigames in unresolved minigame chambers
+      if (chamber.type === CHAMBER_TYPES.MINIGAME_PILLAR || chamber.type === CHAMBER_TYPES.MINIGAME_CAPSULES) {
+        const nextMiniGameId = hasCompletedCapsulesMiniGameThisFloor ? 'pillar' : 'capsules';
+        setTimeout(() => {
+          setActiveMiniGame({ chamberId: targetChamberId, miniGameId: nextMiniGameId });
+        }, 600);
+      }
     }
-  }, [floor]);
+  }, [floor, hasCompletedCapsulesMiniGameThisFloor]);
 
   // ─── Exploration: Trigger encounters from hotspots ────────
 
@@ -154,14 +177,15 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setScreen('combat');
   }, []);
 
-  const handleTriggerMiniGame = useCallback((chamberId, miniGameId) => {
+  const handleTriggerMiniGame = useCallback((chamberId) => {
+    const nextMiniGameId = hasCompletedCapsulesMiniGameThisFloor ? 'pillar' : 'capsules';
     setActiveMiniGame(prev => {
-      if (prev?.chamberId === chamberId && prev?.miniGameId === miniGameId) {
+      if (prev?.chamberId === chamberId && prev?.miniGameId === nextMiniGameId) {
         return null;
       }
-      return { chamberId, miniGameId };
+      return { chamberId, miniGameId: nextMiniGameId };
     });
-  }, []);
+  }, [hasCompletedCapsulesMiniGameThisFloor]);
 
   const handleLoot = useCallback((chamberId, interactableId) => {
     // Loot effect: heal 1 HP
@@ -269,14 +293,16 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
       floor: nextFloor,
       health: Math.min(prev.maxHealth, prev.health + 1),
     }));
+    setHasCompletedCapsulesMiniGameThisFloor(false);
+    setFloorMiniGameWords(pickMiniGameWords(nextFloor));
     setFloorNumber(nextFloorNumber);
     setScreen('exploring');
-  }, [createFloorForNumber, floorNumber, isGuidedPackRun]);
+  }, [createFloorForNumber, floorNumber, isGuidedPackRun, pickMiniGameWords]);
 
   // ─── Mini-game End ────────────────────────────────────────
 
   const handleMiniGameComplete = useCallback(() => {
-    const { chamberId } = activeMiniGame || {};
+    const { chamberId, miniGameId } = activeMiniGame || {};
     if (!chamberId) return;
 
     setFloor(prev => {
@@ -294,6 +320,10 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
       roomsCompleted: prev.roomsCompleted + 1,
     }));
 
+    if (miniGameId === 'capsules') {
+      setHasCompletedCapsulesMiniGameThisFloor(true);
+    }
+
     setActiveMiniGame(null);
   }, [activeMiniGame]);
 
@@ -310,6 +340,8 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setFloor(null);
     setCurrentChamberId(null);
     setActiveMiniGame(null);
+    setHasCompletedCapsulesMiniGameThisFloor(false);
+    setFloorMiniGameWords(null);
     setEndResult(null);
     setFloorNumber(1);
     previousFloorWordIdsRef.current = new Set();
@@ -393,6 +425,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         onCompleteMiniGame={handleMiniGameComplete}
         onCloseMiniGame={handleCloseMiniGame}
         floorWordPool={floorWordPool}
+        floorMiniGameWords={floorMiniGameWords}
         runState={runState}
       />
     </div>

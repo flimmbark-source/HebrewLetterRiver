@@ -2169,12 +2169,23 @@
   gap: 6px;
 }
 
+/* Cylindrical core behind slats — warm stone with subtle glow */
 .ds-pillar-core {
   position: absolute;
-  inset: 8% 35%;
+  inset: 4% 33%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #2f3138 0%, #4b4f59 45%, #26292f 100%);
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.45);
+  background:
+    linear-gradient(
+      90deg,
+      #282c34 0%,
+      #3e4250 20%,
+      #525766 45%,
+      #3e4250 80%,
+      #282c34 100%
+    );
+  box-shadow:
+    inset 0 0 24px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(196, 149, 90, 0.06);
   z-index: 0;
 }
 
@@ -2184,7 +2195,7 @@
   width: min(92%, 420px);
   min-height: 52px;
   border-radius: 999px;
-  border: 1px solid #737983;
+  border: 1px solid rgba(115, 121, 131, 0.6);
   background: linear-gradient(180deg, #545966 0%, #3e434e 100%);
   color: #f6efe1;
   font-size: 24px;
@@ -2192,21 +2203,36 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.15), 0 3px 10px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.12),
+    0 3px 10px rgba(0, 0, 0, 0.35);
 }
 
+/* Fixed Hebrew slat — darker with warm text glow */
 .ds-pillar-slat--fixed {
   cursor: default;
-  background: linear-gradient(180deg, #434854 0%, #2d323d 100%);
-  border-color: #5d6470;
+  background: linear-gradient(180deg, #3a3f4c 0%, #282d38 100%);
+  border-color: rgba(93, 100, 112, 0.5);
+  color: #ecdcc4;
+  text-shadow: 0 0 10px rgba(196, 149, 90, 0.25);
 }
 
+/* Rotating answer slat — lighter, interactive feel */
 .ds-pillar-slat--rotating {
   font-size: 18px;
   font-weight: 700;
   font-family: inherit;
   cursor: grab;
-  transition: transform 0.2s ease;
+  background: linear-gradient(180deg, #5c6170 0%, #474c58 100%);
+  border-color: rgba(130, 136, 148, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
+}
+
+.ds-pillar-slat--rotating:hover {
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.12),
+    0 3px 10px rgba(0, 0, 0, 0.35),
+    0 0 12px rgba(196, 149, 90, 0.12);
 }
 
 .ds-pillar-slat--rotating:active {
@@ -2225,7 +2251,7 @@
 }
 
 .ds-pillar-gap {
-  height: 10px;
+  height: 18px;
 }
 
 .ds-pillar-solved {
@@ -2237,26 +2263,26 @@
 }
 
 .ds-pillar-proceed-btn {
-  position: absolute;
-  top: -38px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 7px 14px;
+  position: relative;
+  z-index: 2;
+  margin-top: 8px;
+  padding: 10px 22px;
   border-radius: 999px;
   border: 1px solid rgba(236, 191, 124, 0.55);
   background: linear-gradient(180deg, #635438 0%, #4b3f2a 100%);
   color: #f6efe1;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.4px;
   text-transform: uppercase;
   cursor: pointer;
-  z-index: 2;
   box-shadow: 0 0 14px rgba(196, 149, 90, 0.25);
+  animation: ds-pillar-proceed-pulse 1.8s ease-in-out infinite;
 }
 
-.ds-pillar-game--compact .ds-pillar-proceed-btn {
-  top: -46px;
+@keyframes ds-pillar-proceed-pulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(196, 149, 90, 0.25); }
+  50% { box-shadow: 0 0 22px rgba(196, 149, 90, 0.45); }
 }
 
 .ds-pillar-slat--rotating:disabled {
@@ -2294,7 +2320,7 @@
 }
 
 .ds-pillar-game--compact .ds-pillar-gap {
-  height: 5px;
+  height: 10px;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -2967,21 +2993,7 @@
   opacity: 1;
 }
 
-.ds-room-minigame {
-  position: absolute;
-  left: 50%;
-  top: 54%;
-  transform: translate(-50%, -50%);
-  width: min(76%, 420px);
-  max-height: 68%;
-  z-index: 6;
-  background: rgba(18, 20, 26, 0.9);
-  border: 1px solid rgba(196, 149, 90, 0.35);
-  border-radius: 14px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  padding: 10px 10px 12px;
-}
-
+/* Pillar object in the room */
 .ds-room-object {
   position: absolute;
   left: 50%;
@@ -2996,23 +3008,191 @@
   top: calc(58% + 100px);
 }
 
-.ds-room-minigame-close {
+/* ═══════════════════════════════════════════════════════════
+   BUBBLE OVERLAY — Full-screen magical bubble minigame
+   ═══════════════════════════════════════════════════════════ */
+
+.ds-bubbles-overlay {
   position: absolute;
-  right: 8px;
-  top: 6px;
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  border: 1px solid rgba(196, 149, 90, 0.3);
-  background: rgba(35, 40, 48, 0.9);
-  color: var(--ds-parchment);
-  cursor: pointer;
-  z-index: 1;
+  inset: 0;
+  z-index: 10;
+  background: radial-gradient(ellipse at 50% 40%, rgba(13, 15, 20, 0.75) 0%, rgba(13, 15, 20, 0.92) 100%);
+  animation: ds-bubbles-fade-in 0.5s ease-out;
 }
 
-.ds-room-minigame-capsules {
-  height: 255px;
-  padding-top: 14px;
+@keyframes ds-bubbles-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ds-bubbles-complete {
+  animation: ds-bubbles-fade-in 0.3s ease-out;
+}
+
+/* Individual magical bubble */
+.ds-bubble {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  user-select: none;
+  z-index: 1;
+
+  /* Circular bubble shape */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  min-height: 72px;
+  padding: 10px 16px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      rgba(255, 255, 255, 0.18) 0%,
+      var(--bubble-color) 40%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 20px var(--bubble-glow);
+
+  animation: ds-bubble-float 4s ease-in-out infinite;
+}
+
+.ds-bubble:active {
+  cursor: grabbing;
+}
+
+/* Floating idle animation */
+@keyframes ds-bubble-float {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+  50% { transform: translate(-50%, -50%) translateY(-6px); }
+}
+
+/* Shine highlight */
+.ds-bubble-shine {
+  position: absolute;
+  top: 14%;
+  left: 22%;
+  width: 30%;
+  height: 20%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
+  transform: rotate(-25deg);
+}
+
+.ds-bubble-text {
+  position: relative;
+  z-index: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f6efe1;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Pop-on: bubble materializes */
+.ds-bubble--pop-on {
+  animation:
+    ds-bubble-pop-on 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+    ds-bubble-float 4s ease-in-out 0.45s infinite;
+}
+
+@keyframes ds-bubble-pop-on {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Pop-off: bubble bursts */
+.ds-bubble--pop-off {
+  animation: ds-bubble-pop-off 0.4s ease-out forwards !important;
+  pointer-events: none;
+}
+
+@keyframes ds-bubble-pop-off {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(1.35);
+    opacity: 0.8;
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 40px var(--bubble-glow);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Dragging state */
+.ds-bubble--dragging {
+  animation: none !important;
+  transform: translate(-50%, -50%) scale(1.12);
+  box-shadow: 0 0 30px var(--bubble-glow);
+  z-index: 10;
+}
+
+/* Shake on mismatch */
+.ds-bubble--shake {
+  animation: ds-bubble-shake 0.4s ease-in-out !important;
+}
+
+@keyframes ds-bubble-shake {
+  0%, 100% { transform: translate(-50%, -50%) translateX(0); }
+  20% { transform: translate(-50%, -50%) translateX(-8px); }
+  40% { transform: translate(-50%, -50%) translateX(8px); }
+  60% { transform: translate(-50%, -50%) translateX(-5px); }
+  80% { transform: translate(-50%, -50%) translateX(5px); }
+}
+
+/* Ghost pair — pure CSS float-up animation, no JS interval needed */
+.ds-bubble-ghost {
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transform: translate(-50%, -50%);
+  animation: ds-ghost-float 2s ease-out forwards;
+}
+
+@keyframes ds-ghost-float {
+  0%   { transform: translate(-50%, -50%); opacity: 1; }
+  100% { transform: translate(-50%, calc(-50% - 120px)); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MOVEMENT BLOCKED DURING MINIGAMES
+   ═══════════════════════════════════════════════════════════ */
+
+.ds-explore--minigame-active .ds-explore-door {
+  pointer-events: none;
+  opacity: 0.4;
+  filter: grayscale(0.5);
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.ds-explore--minigame-active .ds-hotspot {
+  pointer-events: none;
+  opacity: 0.3;
 }
 
 /* Cleared badge */
@@ -4015,6 +4195,24 @@
     min-width: 44px;
     padding: 10px 28px;
   }
+
+  /* ─── Floating Bubbles: smaller on mobile ────────────────── */
+  .ds-bubble {
+    min-width: 52px;
+    min-height: 52px;
+    padding: 6px 10px;
+  }
+
+  .ds-bubble-text {
+    font-size: 12px;
+  }
+
+  .ds-bubble-shine {
+    top: 12%;
+    left: 20%;
+    width: 28%;
+    height: 18%;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -4085,6 +4283,17 @@
 
   .ds-end-title {
     font-size: 22px;
+  }
+
+  /* ─── Floating Bubbles: even smaller on tiny phones ──── */
+  .ds-bubble {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 5px 8px;
+  }
+
+  .ds-bubble-text {
+    font-size: 11px;
   }
 }
 

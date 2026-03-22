@@ -26,6 +26,7 @@ export default function ExplorationScreen({
   onCompleteMiniGame,
   onCloseMiniGame,
   floorWordPool = [],
+  floorMiniGameWords = null,
   runState,
 }) {
   const [inspecting, setInspecting] = useState(null);
@@ -55,7 +56,7 @@ export default function ExplorationScreen({
 
   // Click a door directly
   const handleDoorClick = useCallback((chamberId, direction) => {
-    if (transitioning) return;
+    if (transitioning || activeMiniGame?.chamberId === currentChamberId) return;
     setTransitioning(true);
     setTransDir(direction);
     setWalkPhase('walking');
@@ -69,7 +70,7 @@ export default function ExplorationScreen({
         setWalkPhase(null);
       }, 400);
     }, 600);
-  }, [transitioning, onMove]);
+  }, [transitioning, onMove, activeMiniGame, currentChamberId]);
 
   // Click an interactable
   const handleHotspotClick = useCallback((interactable) => {
@@ -141,20 +142,17 @@ export default function ExplorationScreen({
   const visibleBackDoor = backChamber?.visited ? backDoor : null;
   const isMiniGameOpenInThisRoom = activeMiniGame?.chamberId === chamber.id;
   const activeWordPool = floorWordPool.length > 0 ? floorWordPool : deepScriptWords;
+  const sharedMiniGameWords = floorMiniGameWords || [];
   const capsulePairs = useMemo(() => {
-    const words = [...activeWordPool]
-      .filter(word => !word.isMiniboss && word.english)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
-    return words.map(word => ({
+    return sharedMiniGameWords.map(word => ({
       hebrew: word.hebrew,
       transliteration: word.transliteration,
       meaning: word.english,
     }));
-  }, [activeWordPool]);
+  }, [sharedMiniGameWords]);
 
   return (
-    <div className={`ds-explore-screen ${transitioning ? `ds-explore--trans-${transDir}` : ''} ${walkPhase ? `ds-explore--${walkPhase}` : ''}`}>
+    <div className={`ds-explore-screen ${transitioning ? `ds-explore--trans-${transDir}` : ''} ${walkPhase ? `ds-explore--${walkPhase}` : ''} ${isMiniGameOpenInThisRoom ? 'ds-explore--minigame-active' : ''}`}>
       {/* ═══ TOP HUD ═══ */}
       <div className="ds-explore-top-hud">
         <div className="ds-hud-health">
@@ -270,19 +268,22 @@ export default function ExplorationScreen({
 
           {isMiniGameOpenInThisRoom && activeMiniGame?.miniGameId === 'pillar' && (
             <div className="ds-room-object ds-room-object--pillar" aria-label="Pillar game object">
-              <PillarMiniGame onSolved={onCompleteMiniGame} compact wordPool={activeWordPool} />
+              <PillarMiniGame
+                onSolved={onCompleteMiniGame}
+                compact
+                wordPool={activeWordPool}
+                selectedWords={sharedMiniGameWords}
+              />
             </div>
           )}
 
           {isMiniGameOpenInThisRoom && activeMiniGame?.miniGameId === 'capsules' && (
-            <div className="ds-room-minigame" role="dialog" aria-label="Room minigame">
-              <button type="button" className="ds-room-minigame-close" onClick={onCloseMiniGame}>✕</button>
-              <div className="ds-room-minigame-capsules">
-                <FloatingCapsulesGame
-                  wordPairs={capsulePairs}
-                  onComplete={onCompleteMiniGame}
-                />
-              </div>
+            <div className="ds-bubbles-overlay" role="dialog" aria-label="Bubble matching minigame">
+              <FloatingCapsulesGame
+                wordPairs={capsulePairs}
+                onComplete={onCompleteMiniGame}
+                bubbleMode
+              />
             </div>
           )}
 
@@ -327,6 +328,7 @@ function getHotspotIcon(type) {
     case 'mural': return '🖼️';
     case 'pillar': return '🗿';
     case 'capsule-orb': return '🫧';
+    case 'trial-pedestal': return '🧩';
     case 'brazier': return '🔥';
     case 'statue': return '🗿';
     case 'chest': return '📦';
