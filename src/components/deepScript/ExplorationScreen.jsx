@@ -55,7 +55,7 @@ export default function ExplorationScreen({
 
   // Click a door directly
   const handleDoorClick = useCallback((chamberId, direction) => {
-    if (transitioning || isMiniGameOpenInThisRoom) return;
+    if (transitioning || activeMiniGame?.chamberId === currentChamberId) return;
     setTransitioning(true);
     setTransDir(direction);
     setWalkPhase('walking');
@@ -69,7 +69,7 @@ export default function ExplorationScreen({
         setWalkPhase(null);
       }, 400);
     }, 600);
-  }, [transitioning, onMove, isMiniGameOpenInThisRoom]);
+  }, [transitioning, onMove, activeMiniGame, currentChamberId]);
 
   // Click an interactable
   const handleHotspotClick = useCallback((interactable) => {
