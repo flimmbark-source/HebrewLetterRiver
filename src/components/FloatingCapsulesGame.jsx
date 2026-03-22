@@ -169,74 +169,45 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       );
     };
 
+    // Resolve overlaps by only pushing capsules vertically (preserves column X)
     const resolveSpawnOverlaps = (capsulesToResolve) => {
-      const minX = padding;
-      const maxX = bounds.width - padding;
       const minY = padding;
-      const maxY = bounds.height - padding;
+      const maxY = bounds.height - bottomReservedSpace - padding;
       const maxIterations = 30;
-      const pairGroups = new Map();
 
-      capsulesToResolve.forEach(capsule => {
-        if (!pairGroups.has(capsule.pairIndex)) {
-          pairGroups.set(capsule.pairIndex, []);
-        }
-        pairGroups.get(capsule.pairIndex).push(capsule);
-      });
-
-      const clampCapsule = (capsule) => {
-        capsule.x = Math.max(minX, Math.min(maxX, capsule.x));
+      const clampY = (capsule) => {
         capsule.y = Math.max(minY, Math.min(maxY, capsule.y));
-      };
-
-      const applyPairOffset = (pairIndex, offsetX, offsetY) => {
-        const group = pairGroups.get(pairIndex) || [];
-        group.forEach(member => {
-          member.x += offsetX;
-          member.y += offsetY;
-          clampCapsule(member);
-        });
       };
 
       for (let iteration = 0; iteration < maxIterations; iteration += 1) {
         let moved = false;
 
+        // Only resolve overlaps between capsules in the same column (same type)
         for (let i = 0; i < capsulesToResolve.length; i += 1) {
           for (let j = i + 1; j < capsulesToResolve.length; j += 1) {
             const first = capsulesToResolve[i];
             const second = capsulesToResolve[j];
-            const dx = second.x - first.x;
+            if (first.type !== second.type) continue; // different columns can't overlap
+
             const dy = second.y - first.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            const verticalDistance = Math.abs(dy);
             const minDistance = (first.radius ?? rc.capsuleRadius) +
               (second.radius ?? rc.capsuleRadius) +
               rc.capsuleClearanceBuffer;
 
-            if (distance < minDistance) {
-              const overlap = minDistance - distance;
-              const angle = distance === 0 ? Math.random() * Math.PI * 2 : Math.atan2(dy, dx);
-              const offsetX = Math.cos(angle) * (overlap / 2);
-              const offsetY = Math.sin(angle) * (overlap / 2);
-
-              if (first.pairIndex === second.pairIndex) {
-                first.x -= offsetX;
-                first.y -= offsetY;
-                second.x += offsetX;
-                second.y += offsetY;
-                clampCapsule(first);
-                clampCapsule(second);
-              } else {
-                applyPairOffset(first.pairIndex, -offsetX, -offsetY);
-                applyPairOffset(second.pairIndex, offsetX, offsetY);
-              }
+            if (verticalDistance < minDistance) {
+              const overlap = minDistance - verticalDistance;
+              const direction = dy >= 0 ? 1 : -1;
+              first.y -= direction * (overlap / 2);
+              second.y += direction * (overlap / 2);
+              clampY(first);
+              clampY(second);
               moved = true;
             }
           }
         }
 
-        if (!moved) {
-          break;
-        }
+        if (!moved) break;
       }
     };
 
