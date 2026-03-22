@@ -9,10 +9,21 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 const PREVIEW_DURATION = 3000; // Show lines for 3 seconds
 const FADE_DURATION = 1000; // Fade lines over 1 second
-const CAPSULE_RADIUS = 40; // Hit detection radius
 const BOUNCE_DAMPING = 0.7; // Velocity reduction on bounce
-const LINE_OF_SIGHT_BUFFER = 65; // Clearance for matched capsules
-const CAPSULE_CLEARANCE_BUFFER = 19; // Extra spacing to avoid overlaps
+
+// Responsive constants — scale down for narrow screens
+function getResponsiveConstants(width) {
+  const isNarrow = width < 420;
+  return {
+    capsuleRadius: isNarrow ? 30 : 40,
+    lineOfSightBuffer: isNarrow ? 40 : 65,
+    capsuleClearanceBuffer: isNarrow ? 10 : 19,
+    edgePadding: isNarrow ? 20 : 2,
+    bottomReservedSpace: isNarrow ? 56 : 68,
+    minEdgePadding: isNarrow ? 30 : 60,
+    targetSpacing: isNarrow ? 72 : 100,
+  };
+}
 
 export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode = false }) {
   const canvasRef = useRef(null);
@@ -81,25 +92,28 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
     // Ensure we have unique pairs (handle duplicates by adding disambiguation)
     const uniquePairs = ensureUniquePairs(wordPairs);
 
+    const rc = getResponsiveConstants(bounds.width);
     const capsules = [];
-    const padding = 2; // Very minimal padding at edges
-    const bottomReservedSpace = 68; // Space for hint button (16px bottom + ~44px button height + 8px padding)
+    const padding = rc.edgePadding;
+    const bottomReservedSpace = rc.bottomReservedSpace;
     const usableWidth = bounds.width - padding * 2;
     const usableHeight = bounds.height - padding - bottomReservedSpace;
+    const isNarrow = bounds.width < 420;
 
     const measurementCanvas = document.createElement('canvas');
     const measurementContext = measurementCanvas.getContext('2d');
     const getCapsuleRadius = (text, isHebrew) => {
       if (!measurementContext) {
-        return CAPSULE_RADIUS;
+        return rc.capsuleRadius;
       }
-      const fontSize = isHebrew ? 18 : 16;
+      const fontSize = isNarrow ? (isHebrew ? 14 : 12) : (isHebrew ? 18 : 16);
       const fontFamily = isHebrew ? '"Noto Sans Hebrew", "Arial", sans-serif' : '"Inter", "Arial", sans-serif';
       measurementContext.font = `600 ${fontSize}px ${fontFamily}`;
       const textWidth = measurementContext.measureText(text).width;
-      const width = textWidth + 32;
-      const height = fontSize + 16;
-      // Use actual visual size without extra buffer
+      const paddingH = isNarrow ? 20 : 32;
+      const paddingV = isNarrow ? 10 : 16;
+      const width = textWidth + paddingH;
+      const height = fontSize + paddingV;
       return Math.max(width, height) / 2;
     };
 
@@ -108,8 +122,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       return existingCapsules.some(cap => {
         const dx = cap.x - x;
         const dy = cap.y - y;
-        // Just use the actual radii, no extra buffer
-        const minDistance = radius + (cap.radius ?? CAPSULE_RADIUS);
+        const minDistance = radius + (cap.radius ?? rc.capsuleRadius);
         return Math.sqrt(dx * dx + dy * dy) < minDistance;
       });
     };
@@ -151,7 +164,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       return segments.every(([start, end]) =>
         existingCapsules.every(cap => {
           const distance = distanceToSegment({ x: cap.x, y: cap.y }, start, end);
-          return distance >= LINE_OF_SIGHT_BUFFER;
+          return distance >= rc.lineOfSightBuffer;
         })
       );
     };
@@ -195,9 +208,9 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
             const dx = second.x - first.x;
             const dy = second.y - first.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            const minDistance = (first.radius ?? CAPSULE_RADIUS) +
-              (second.radius ?? CAPSULE_RADIUS) +
-              CAPSULE_CLEARANCE_BUFFER;
+            const minDistance = (first.radius ?? rc.capsuleRadius) +
+              (second.radius ?? rc.capsuleRadius) +
+              rc.capsuleClearanceBuffer;
 
             if (distance < minDistance) {
               const overlap = minDistance - distance;
@@ -244,8 +257,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       gridYPositions.push(availableCenter);
     } else {
       // Multiple pairs - calculate centered grid based on number of capsules
-      const targetSpacing = 100; // Target spacing between capsule centers
-      const minEdgePadding = 60; // Minimum padding from edges
+      const targetSpacing = rc.targetSpacing;
+      const minEdgePadding = rc.minEdgePadding;
       const totalGridHeight = targetSpacing * (numPairs - 1);
       const maxAvailableHeight = usableHeight - 2 * minEdgePadding;
 
@@ -498,7 +511,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
         const distance = Math.sqrt(dx * dx + dy * dy);
         return { capsule, distance };
       })
-      .filter(({ distance }) => distance < CAPSULE_RADIUS * 2)
+      .filter(({ distance }) => {
+        const hitRadius = playAreaBounds.width < 420 ? 30 : 40;
+        return distance < hitRadius * 2;
+      })
       .sort((a, b) => a.distance - b.distance);
 
     const target = candidates[0]?.capsule;
@@ -621,13 +637,14 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       'rgba(248, 113, 113, 0.7)',
     ];
 
+    const fallbackRadius = bounds.width < 420 ? 30 : 40;
     const getEdgePoints = (a, b) => {
       const left = a.x < b.x ? a : b;
       const right = a.x < b.x ? b : a;
       return {
-        startX: left.x + (left.radius ?? CAPSULE_RADIUS),
+        startX: left.x + (left.radius ?? fallbackRadius),
         startY: left.y,
-        endX: right.x - (right.radius ?? CAPSULE_RADIUS),
+        endX: right.x - (right.radius ?? fallbackRadius),
         endY: right.y,
       };
     };

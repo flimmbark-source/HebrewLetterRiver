@@ -4195,6 +4195,24 @@
     min-width: 44px;
     padding: 10px 28px;
   }
+
+  /* ─── Floating Bubbles: smaller on mobile ────────────────── */
+  .ds-bubble {
+    min-width: 52px;
+    min-height: 52px;
+    padding: 6px 10px;
+  }
+
+  .ds-bubble-text {
+    font-size: 12px;
+  }
+
+  .ds-bubble-shine {
+    top: 12%;
+    left: 20%;
+    width: 28%;
+    height: 18%;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -4265,6 +4283,17 @@
 
   .ds-end-title {
     font-size: 22px;
+  }
+
+  /* ─── Floating Bubbles: even smaller on tiny phones ──── */
+  .ds-bubble {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 5px 8px;
+  }
+
+  .ds-bubble-text {
+    font-size: 11px;
   }
 }
 
