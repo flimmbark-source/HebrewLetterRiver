@@ -3227,13 +3227,14 @@
 /* Pop-on: bubble materializes then floats */
 .ds-bubble--pop-on {
   animation:
-    ds-bubble-pop-on 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+    ds-bubble-pop-on 0.45s ease-out forwards,
     ds-bubble-float 4s ease-in-out 0.45s infinite;
 }
 
 @keyframes ds-bubble-pop-on {
   0%   { scale: 0; opacity: 0; }
-  60%  { scale: 1.2; opacity: 1; }
+  50%  { scale: 1.15; opacity: 1; }
+  75%  { scale: 0.95; opacity: 1; }
   100% { scale: 1; opacity: 1; }
 }
 
