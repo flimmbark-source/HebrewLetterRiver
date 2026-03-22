@@ -137,8 +137,16 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
           setScreen('battle_transition');
         }, 600);
       }
+
+      // Auto-trigger minigames in unresolved minigame chambers
+      if (chamber.type === CHAMBER_TYPES.MINIGAME_PILLAR || chamber.type === CHAMBER_TYPES.MINIGAME_CAPSULES) {
+        const nextMiniGameId = hasCompletedCapsulesMiniGameThisFloor ? 'pillar' : 'capsules';
+        setTimeout(() => {
+          setActiveMiniGame({ chamberId: targetChamberId, miniGameId: nextMiniGameId });
+        }, 600);
+      }
     }
-  }, [floor]);
+  }, [floor, hasCompletedCapsulesMiniGameThisFloor]);
 
   // ─── Exploration: Trigger encounters from hotspots ────────
 
