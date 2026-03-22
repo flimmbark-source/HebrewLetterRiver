@@ -14,7 +14,7 @@ const BOUNCE_DAMPING = 0.7; // Velocity reduction on bounce
 const LINE_OF_SIGHT_BUFFER = 65; // Clearance for matched capsules
 const CAPSULE_CLEARANCE_BUFFER = 19; // Extra spacing to avoid overlaps
 
-export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
+export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode = false }) {
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
   const [gameState, setGameState] = useState('playing'); // 'playing' | 'completed'
@@ -740,7 +740,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
 
   if (gameState === 'completed') {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-6 p-8">
+      <div className={`flex flex-col items-center justify-center h-full gap-6 p-8 ${bubbleMode ? 'ds-bubbles-complete' : ''}`}>
         <div className="text-center space-y-4">
           <div className="text-5xl">✓</div>
           <h2 className="text-2xl font-bold text-white">Completed!</h2>
@@ -841,6 +841,43 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
           const isTransliteration = capsule.type === 'transliteration';
           const isDragging = dragStateRef.current.isDragging && dragStateRef.current.capsuleIndex === index;
           const isPopping = capsule.popping;
+
+          if (bubbleMode) {
+            const bubbleColor = isHebrew
+              ? 'rgba(91, 141, 217, 0.35)'
+              : isTransliteration
+                ? 'rgba(196, 149, 90, 0.35)'
+                : 'rgba(168, 85, 247, 0.35)';
+            const bubbleGlow = isHebrew
+              ? 'rgba(91, 141, 217, 0.6)'
+              : isTransliteration
+                ? 'rgba(240, 198, 116, 0.6)'
+                : 'rgba(168, 85, 247, 0.6)';
+
+            return (
+              <div
+                key={capsule.id}
+                className={`ds-bubble ${
+                  capsule.shaking ? 'ds-bubble--shake' : ''
+                } ${isPopping ? 'ds-bubble--pop-off' : 'ds-bubble--pop-on'} ${
+                  isDragging ? 'ds-bubble--dragging' : ''
+                }`}
+                style={{
+                  left: capsule.x,
+                  top: capsule.y,
+                  touchAction: 'none',
+                  '--bubble-color': bubbleColor,
+                  '--bubble-glow': bubbleGlow,
+                }}
+                onPointerDown={(e) => handlePointerDown(e, capsule, index)}
+              >
+                <span className="ds-bubble-text" dir={isHebrew ? 'rtl' : 'ltr'}>
+                  {isHebrew ? <span className="hebrew-font">{capsule.text}</span> : capsule.text}
+                </span>
+                <span className="ds-bubble-shine" />
+              </div>
+            );
+          }
 
           return (
             <div

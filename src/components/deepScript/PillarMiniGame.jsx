@@ -103,27 +103,43 @@ export default function PillarMiniGame({
 
   return (
     <div className={`ds-pillar-game ${compact ? 'ds-pillar-game--compact' : ''} ${isCompleting ? 'ds-pillar-game--completing' : ''}`}>
-      <div className="ds-pillar-core" aria-hidden="true" />
-      {rows.map((row) => (
-        <React.Fragment key={row.id}>
-          <div className="ds-pillar-slat ds-pillar-slat--fixed" aria-label={`Hebrew word ${row.hebrew}`}>
-            {row.hebrew}
-          </div>
-          <button
-            type="button"
-            className={`ds-pillar-slat ds-pillar-slat--rotating ${spinningRowId === row.id ? 'ds-pillar-slat--spinning' : ''}`}
-            disabled={showProceed || isCompleting}
-            onClick={() => cycleRow(row.id, 1)}
-            onPointerDown={(event) => onPointerDown(row.id, event)}
-            onPointerUp={(event) => onPointerUp(row.id, event)}
-          >
-            <span className="ds-pillar-slat-text">{row.options[row.currentIndex]}</span>
-          </button>
-          <div className="ds-pillar-gap" aria-hidden="true" />
-        </React.Fragment>
-      ))}
+      {/* Stone pillar body */}
+      <div className="ds-pillar-body" aria-hidden="true">
+        <div className="ds-pillar-cap ds-pillar-cap--top" />
+        <div className="ds-pillar-shaft">
+          <div className="ds-pillar-core" />
+        </div>
+        <div className="ds-pillar-cap ds-pillar-cap--bottom" />
+      </div>
 
-      {solved && !showProceed && !isCompleting && <div className="ds-pillar-solved">Pillar aligned</div>}
+      {/* Slats carved into the pillar */}
+      <div className="ds-pillar-slats">
+        {rows.map((row) => {
+          const isCorrect = row.options[row.currentIndex] === row.correctTranslation;
+          return (
+            <React.Fragment key={row.id}>
+              <div className="ds-pillar-slat ds-pillar-slat--fixed" aria-label={`Hebrew word ${row.hebrew}`}>
+                <span className="ds-pillar-rune">{row.hebrew}</span>
+              </div>
+              <button
+                type="button"
+                className={`ds-pillar-slat ds-pillar-slat--rotating ${spinningRowId === row.id ? 'ds-pillar-slat--spinning' : ''} ${isCorrect && !isCompleting ? 'ds-pillar-slat--aligned' : ''}`}
+                disabled={showProceed || isCompleting}
+                onClick={() => cycleRow(row.id, 1)}
+                onPointerDown={(event) => onPointerDown(row.id, event)}
+                onPointerUp={(event) => onPointerUp(row.id, event)}
+              >
+                <span className="ds-pillar-slat-text">{row.options[row.currentIndex]}</span>
+              </button>
+              <div className="ds-pillar-gap" aria-hidden="true" />
+            </React.Fragment>
+          );
+        })}
+      </div>
+
+      {solved && !showProceed && !isCompleting && (
+        <div className="ds-pillar-solved">Pillar aligned</div>
+      )}
       {showProceed && (
         <button type="button" className="ds-pillar-proceed-btn" onClick={handleProceed}>
           Proceed
