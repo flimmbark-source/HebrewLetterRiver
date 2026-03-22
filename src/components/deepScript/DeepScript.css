@@ -84,6 +84,36 @@
   color: var(--ds-gold);
   margin: 0;
   text-shadow: 0 2px 8px var(--ds-gold-glow);
+  flex: 1;
+}
+
+.ds-source-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--ds-stone-lighter);
+  border-radius: 999px;
+  background: rgba(34, 38, 46, 0.85);
+  color: var(--ds-parchment-dim);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.ds-source-toggle-knob {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #6f737d 0%, #565a63 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.ds-source-toggle-knob--random {
+  transform: translateX(10px);
+  background: linear-gradient(180deg, #d4a763 0%, #b38036 100%);
 }
 
 /* ─── Run Status Bar ─────────────────────────────────────── */

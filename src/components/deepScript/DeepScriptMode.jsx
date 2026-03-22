@@ -2,7 +2,9 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { getStarterKit } from '../../data/deepScript/starterKits.js';
 import { generateDungeonFloor, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
-import { registerCustomWords, clearCustomWords } from '../../data/deepScript/words.js';
+import { registerCustomWords, clearCustomWords, convertBBWordsForDS, getWordById } from '../../data/deepScript/words.js';
+import { bridgeBuilderPacks } from '../../data/bridgeBuilderPacks.js';
+import { getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import KitSelectScreen from './KitSelectScreen.jsx';
 import ExplorationScreen from './ExplorationScreen.jsx';
 import BattleTransition from './BattleTransition.jsx';
@@ -30,6 +32,7 @@ function collectFloorWordIds(floor) {
 export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGuidedPackRun = false }) {
   const hasCustomWordPool = !!(packWords && packWords.length > 0);
   const previousFloorWordIdsRef = useRef(new Set());
+  const [wordSourceMode, setWordSourceMode] = useState('pack'); // pack | random (standalone only)
   const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | end
   const [runState, setRunState] = useState(null);
   const [endResult, setEndResult] = useState(null);
@@ -43,16 +46,32 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   const [activeCombat, setActiveCombat] = useState(null); // { wordId, chamberId, isMiniboss }
   const [activeMiniGame, setActiveMiniGame] = useState(null); // { chamberId, miniGameId }
 
+  const getRandomPackWordsForFloor = useCallback(() => {
+    if (bridgeBuilderPacks.length === 0) return [];
+    const pack = bridgeBuilderPacks[Math.floor(Math.random() * bridgeBuilderPacks.length)];
+    return convertBBWordsForDS(getWordsByIds(pack.wordIds));
+  }, []);
+
   const createFloorForNumber = useCallback((targetFloorNumber) => {
     const combatCount = Math.min(6, 3 + Math.floor((targetFloorNumber - 1) / 2));
+    const floorWordPool = isGuidedPackRun
+      ? (hasCustomWordPool ? packWords : null)
+      : (wordSourceMode === 'pack' ? getRandomPackWordsForFloor() : null);
+
+    if (floorWordPool && floorWordPool.length > 0) {
+      registerCustomWords(floorWordPool);
+    } else {
+      clearCustomWords();
+    }
+
     const nextFloor = generateDungeonFloor({
       combatCount,
-      customWords: hasCustomWordPool ? packWords : null,
+      customWords: floorWordPool,
       excludeWordIds: previousFloorWordIdsRef.current,
     });
     previousFloorWordIdsRef.current = collectFloorWordIds(nextFloor);
     return nextFloor;
-  }, [hasCustomWordPool, packWords]);
+  }, [getRandomPackWordsForFloor, hasCustomWordPool, isGuidedPackRun, packWords, wordSourceMode]);
 
   // Add/remove body class for nav bar hiding; clean up custom words on unmount
   useEffect(() => {
@@ -69,13 +88,6 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     const kit = getStarterKit(kitId);
     if (!kit) return;
 
-    // Register custom words if running a pack-based session
-    if (hasCustomWordPool) {
-      registerCustomWords(packWords);
-    } else {
-      clearCustomWords();
-    }
-
     // Generate dungeon floor (pass custom words if available)
     const newFloor = createFloorForNumber(1);
 
@@ -89,7 +101,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setCurrentChamberId(newFloor.startChamberId);
     setFloorNumber(1);
     setScreen('exploring');
-  }, [createFloorForNumber, hasCustomWordPool, packWords]);
+  }, [createFloorForNumber]);
 
   // ─── Exploration: Movement ────────────────────────────────
 
@@ -308,7 +320,13 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   if (screen === 'kit_select') {
     return (
       <div className="ds-mode">
-        <KitSelectScreen onSelect={handleKitSelect} onBack={onBack} />
+        <KitSelectScreen
+          onSelect={handleKitSelect}
+          onBack={onBack}
+          wordSourceMode={wordSourceMode}
+          onWordSourceModeChange={setWordSourceMode}
+          showWordSourceToggle={!isGuidedPackRun}
+        />
       </div>
     );
   }
@@ -330,6 +348,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   }
 
   if (!runState || !floor) return null;
+  const floorWordPool = Array.from(collectFloorWordIds(floor))
+    .map(id => getWordById(id))
+    .filter(Boolean);
 
   // Battle transition
   if (screen === 'battle_transition' && activeCombat) {
@@ -371,6 +392,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         activeMiniGame={activeMiniGame}
         onCompleteMiniGame={handleMiniGameComplete}
         onCloseMiniGame={handleCloseMiniGame}
+        floorWordPool={floorWordPool}
         runState={runState}
       />
     </div>

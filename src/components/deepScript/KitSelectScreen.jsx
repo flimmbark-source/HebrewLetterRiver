@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { starterKits } from '../../data/deepScript/starterKits.js';
 import { getGearById } from '../../data/deepScript/gear.js';
 
-export default function KitSelectScreen({ onSelect, onBack }) {
+export default function KitSelectScreen({
+  onSelect,
+  onBack,
+  wordSourceMode = 'pack',
+  onWordSourceModeChange = () => {},
+  showWordSourceToggle = false,
+}) {
   const [selectedKit, setSelectedKit] = useState(null);
 
   return (
@@ -10,6 +16,18 @@ export default function KitSelectScreen({ onSelect, onBack }) {
       <div className="ds-header">
         <button className="ds-back-btn" onClick={onBack} type="button">Back</button>
         <h1 className="ds-screen-title">Deep Script</h1>
+        {showWordSourceToggle && (
+          <button
+            type="button"
+            className="ds-source-toggle"
+            onClick={() => onWordSourceModeChange(wordSourceMode === 'pack' ? 'random' : 'pack')}
+            aria-label="Toggle floor word source"
+          >
+            <span>Pack</span>
+            <span className={`ds-source-toggle-knob ${wordSourceMode === 'random' ? 'ds-source-toggle-knob--random' : ''}`} />
+            <span>Random</span>
+          </button>
+        )}
       </div>
 
       <div className="ds-kit-intro">
