@@ -396,7 +396,7 @@ const cafeTalkPacks = cafeTalkCategoryIds.map((categoryId, idx) => {
     sectionId: 'cafe_talk',
     title,
     theme: 'cafe_talk',
-    description: `Cafe Talk: ${title.toLowerCase()}`,
+    description: category.wordIds.join(', '),
     wordIds: category.wordIds.map(wordId => `bbct-${wordId}`),
     order: idx + 1,
     unlockAfter: idx === 0 ? null : `cafe_talk_${cafeTalkCategoryIds[idx - 1].replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()}_01`,
