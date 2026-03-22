@@ -327,6 +327,7 @@ function getHotspotIcon(type) {
     case 'mural': return '🖼️';
     case 'pillar': return '🗿';
     case 'capsule-orb': return '🫧';
+    case 'trial-pedestal': return '🧩';
     case 'brazier': return '🔥';
     case 'statue': return '🗿';
     case 'chest': return '📦';

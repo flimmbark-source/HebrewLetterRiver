@@ -12,7 +12,7 @@ const FADE_DURATION = 1000; // Fade lines over 1 second
 const CAPSULE_RADIUS = 40; // Hit detection radius
 const BOUNCE_DAMPING = 0.7; // Velocity reduction on bounce
 const LINE_OF_SIGHT_BUFFER = 65; // Clearance for matched capsules
-const CAPSULE_CLEARANCE_BUFFER = 14; // Extra spacing to avoid overlaps
+const CAPSULE_CLEARANCE_BUFFER = 24; // Extra spacing to avoid overlaps
 
 export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
   const canvasRef = useRef(null);
@@ -360,11 +360,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete }) {
       });
     });
 
-    // NOTE: resolveSpawnOverlaps is disabled because:
-    // 1. It adds CAPSULE_CLEARANCE_BUFFER which we don't want for tight collisions
-    // 2. It moves entire pairs together, breaking the column-by-type layout
-    // 3. We already handle collision avoidance during initial placement with isTooClose()
-    // resolveSpawnOverlaps(capsules);
+    // Ensure a consistent spacing buffer between capsules so they do not overlap.
+    resolveSpawnOverlaps(capsules);
 
     capsulesRef.current = capsules;
 

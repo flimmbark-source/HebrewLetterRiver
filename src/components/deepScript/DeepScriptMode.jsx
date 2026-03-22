@@ -45,6 +45,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   // Active encounter context
   const [activeCombat, setActiveCombat] = useState(null); // { wordId, chamberId, isMiniboss }
   const [activeMiniGame, setActiveMiniGame] = useState(null); // { chamberId, miniGameId }
+  const [floorMiniGameTriggerCount, setFloorMiniGameTriggerCount] = useState(0);
 
   const getRandomPackWordsForFloor = useCallback(() => {
     if (bridgeBuilderPacks.length === 0) return [];
@@ -100,6 +101,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setFloor(newFloor);
     setCurrentChamberId(newFloor.startChamberId);
     setFloorNumber(1);
+    setFloorMiniGameTriggerCount(0);
     setScreen('exploring');
   }, [createFloorForNumber]);
 
@@ -154,14 +156,16 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setScreen('combat');
   }, []);
 
-  const handleTriggerMiniGame = useCallback((chamberId, miniGameId) => {
+  const handleTriggerMiniGame = useCallback((chamberId) => {
+    const nextMiniGameId = floorMiniGameTriggerCount === 0 ? 'capsules' : 'pillar';
     setActiveMiniGame(prev => {
-      if (prev?.chamberId === chamberId && prev?.miniGameId === miniGameId) {
+      if (prev?.chamberId === chamberId && prev?.miniGameId === nextMiniGameId) {
         return null;
       }
-      return { chamberId, miniGameId };
+      return { chamberId, miniGameId: nextMiniGameId };
     });
-  }, []);
+    setFloorMiniGameTriggerCount(count => count + 1);
+  }, [floorMiniGameTriggerCount]);
 
   const handleLoot = useCallback((chamberId, interactableId) => {
     // Loot effect: heal 1 HP
@@ -269,6 +273,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
       floor: nextFloor,
       health: Math.min(prev.maxHealth, prev.health + 1),
     }));
+    setFloorMiniGameTriggerCount(0);
     setFloorNumber(nextFloorNumber);
     setScreen('exploring');
   }, [createFloorForNumber, floorNumber, isGuidedPackRun]);
@@ -310,6 +315,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setFloor(null);
     setCurrentChamberId(null);
     setActiveMiniGame(null);
+    setFloorMiniGameTriggerCount(0);
     setEndResult(null);
     setFloorNumber(1);
     previousFloorWordIdsRef.current = new Set();
