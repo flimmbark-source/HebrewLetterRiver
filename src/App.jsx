@@ -305,8 +305,7 @@ function Shell() {
       </main>
       {!(isGameVisible && isGameRunning) && !inConversationPractice && !inDeepScript && (
         <nav className="bottom-nav">
-          <div />
-          <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
+          <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick} style={{ gridColumn: '1 / 3', justifySelf: 'center' }}>
             <div className="nav-icon-shell">
               <span>🏠</span>
             </div>
