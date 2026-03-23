@@ -311,12 +311,6 @@ function Shell() {
             </div>
             <span className="label">{t('app.nav.home')}</span>
           </NavLink>
-          <NavLink to="/bridge" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
-            <div className="nav-icon-shell">
-              <span>🌉</span>
-            </div>
-            <span className="label">Bridge</span>
-          </NavLink>
           <button
             type="button"
             onClick={handlePlay}

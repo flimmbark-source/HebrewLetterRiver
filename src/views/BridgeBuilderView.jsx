@@ -83,7 +83,7 @@ export default function BridgeBuilderView() {
   if (showDeepScript) {
     return (
       <DeepScriptMode
-        onBack={handleBackToSetup}
+        onBack={handleBackToHome}
         packWords={endlessDSWords}
         isGuidedPackRun={false}
       />
