@@ -1056,6 +1056,7 @@ function startClickMode(itemEl, payload) {
   let lastUsedFont = null; // Track last used font to prevent consecutive repeats
   let recentSpawnPositions = []; // Track recent spawn positions to prevent clumping
   let selectedLetter = null; // For click mode
+  let startingLettersCount = 2;
   let goalValue = 10;
   let hasReachedGoal = false; // Track if goal level was reached
   let waveCorrectCount = 0;
@@ -1069,6 +1070,10 @@ function startClickMode(itemEl, payload) {
   const GOAL_MIN = 5;
   const GOAL_MAX = 25;
   const GOAL_STEP = 1;
+
+  function getLettersToIntroduceCount() {
+    return level === 1 ? startingLettersCount : 1;
+  }
 
   function clonePool(items = []) {
     return items.map((item) => ({ ...item }));
@@ -1609,7 +1614,7 @@ function startClickMode(itemEl, payload) {
           forcedStartItem = null;
         } else {
           // At level 1: introduce 2 letters, at higher levels: introduce 1 letter
-          const lettersToIntroduce = level === 1 ? 2 : 1;
+          const lettersToIntroduce = getLettersToIntroduceCount();
           const unseenItems = itemPool.filter((item) => !seenItems.has(item.id));
 
           if (selectedModeIds.size > 1 && unseenItems.length > 0) {
@@ -1627,7 +1632,7 @@ function startClickMode(itemEl, payload) {
         hasIntroducedForItemInLevel = true;
       } else if (seenItems.size === 0) {
         // Safety check: if no items have been seen yet, introduce new letters
-        const lettersToIntroduce = level === 1 ? 2 : 1;
+        const lettersToIntroduce = getLettersToIntroduceCount();
         const unseenItems = itemPool.filter((item) => !seenItems.has(item.id));
         const shuffled = [...unseenItems].sort(() => Math.random() - 0.5);
         for (let i = 0; i < lettersToIntroduce && i < shuffled.length; i++) {
@@ -1670,7 +1675,7 @@ function startClickMode(itemEl, payload) {
       } else {
         // Introduce new letters for the first wave
         // At level 1: introduce 2 letters, at higher levels: introduce 1 letter
-        const lettersToIntroduce = level === 1 ? 2 : 1;
+        const lettersToIntroduce = getLettersToIntroduceCount();
         for (let i = 0; i < lettersToIntroduce && learningOrder.length > 0; i++) {
           roundItems.push(learningOrder.shift());
         }
@@ -1679,7 +1684,7 @@ function startClickMode(itemEl, payload) {
     } else if (seenItems.size === 0 && learningOrder.length > 0) {
       // Safety check: if no items have been seen yet, introduce new letters instead of spawning empty wave
       // This handles edge cases where first wave might be skipped
-      const lettersToIntroduce = level === 1 ? 2 : 1;
+      const lettersToIntroduce = getLettersToIntroduceCount();
       for (let i = 0; i < lettersToIntroduce && learningOrder.length > 0; i++) {
         roundItems.push(learningOrder.shift());
       }
@@ -2289,7 +2294,8 @@ function startClickMode(itemEl, payload) {
         fontShuffle: fontShuffleToggle?.checked ?? false,
         slowRiver: slowRiverToggle?.checked ?? false,
         clickMode: clickModeToggle?.checked ?? false,
-        associationMode: associationModeToggle?.checked ?? false
+        associationMode: associationModeToggle?.checked ?? false,
+        startingLetters: startingLettersCount
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
       // Dispatch custom event to notify other components
@@ -2308,6 +2314,7 @@ function startClickMode(itemEl, payload) {
         const normalizedFont = settings.gameFont === 'opendyslexic'
           ? 'lexend'
           : (settings.gameFont ?? 'default');
+        const normalizedStartingLetters = Math.min(10, Math.max(1, settings.startingLetters ?? 2));
         const introductionsToggle = document.getElementById('toggle-introductions');
         if (introductionsToggle) introductionsToggle.checked = settings.showIntroductions ?? true;
         if (highContrastToggle) highContrastToggle.checked = settings.highContrast ?? false;
@@ -2326,6 +2333,7 @@ function startClickMode(itemEl, payload) {
         fontShuffleEnabled = settings.fontShuffle ?? false;
         clickModeEnabled = settings.clickMode ?? false;
         associationModeEnabled = settings.associationMode ?? false;
+        startingLettersCount = normalizedStartingLetters;
         selectedFont = normalizedFont;
 
         // Apply high contrast
