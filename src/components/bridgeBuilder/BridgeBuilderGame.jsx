@@ -83,7 +83,7 @@ function ChoicePlank({ text, onClick, state, disabled, variant, exiting }) {
 
 /* ─── End Screen ───────────────────────────────────────── */
 
-function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack }) {
+function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack, onNext }) {
   // Deduplicate segments by wordId — words may appear multiple times
   // during a session (learn + recall), but show each only once on results
   const uniqueSegments = [];
@@ -113,7 +113,12 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack }) {
         </div>
         <p className="bb-end-score">{score} points</p>
         <div className="bb-end-actions">
-          <button className="bb-end-btn bb-end-btn--primary" onClick={onRestart} type="button">
+          {onNext && !isGameOver && (
+            <button className="bb-end-btn bb-end-btn--primary" onClick={onNext} type="button">
+              Next
+            </button>
+          )}
+          <button className={`bb-end-btn ${onNext && !isGameOver ? 'bb-end-btn--secondary' : 'bb-end-btn--primary'}`} onClick={onRestart} type="button">
             Build Again
           </button>
           <button className="bb-end-btn bb-end-btn--secondary" onClick={onBack} type="button">
@@ -127,7 +132,7 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack }) {
 
 /* ─── Main ─────────────────────────────────────────────── */
 
-export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComplete }) {
+export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComplete, onNext }) {
   const {
     phase,
     currentWord,
@@ -209,6 +214,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComple
           isGameOver={isGameOver}
           onRestart={restartGame}
           onBack={onBack}
+          onNext={onNext}
         />
       </div>
     );

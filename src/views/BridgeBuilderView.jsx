@@ -65,6 +65,22 @@ export default function BridgeBuilderView() {
     }
   }, [sessionConfig?.packId]);
 
+  /**
+   * Advance to the next game mode in the pack sequence.
+   * bridge_builder → loose_planks → deep_script
+   */
+  const handleNextFromBridgeBuilder = useCallback(() => {
+    if (sessionConfig?.sessionType === 'guided_pack') {
+      setSessionConfig(prev => ({ ...prev, gameMode: 'loose_planks' }));
+    }
+  }, [sessionConfig?.sessionType]);
+
+  const handleNextFromLoosePlanks = useCallback(() => {
+    if (sessionConfig?.sessionType === 'guided_pack') {
+      setSessionConfig(prev => ({ ...prev, gameMode: 'deep_script' }));
+    }
+  }, [sessionConfig?.sessionType]);
+
   // Convert pack words to DS format for deep_script mode
   const packDSWords = useMemo(() => {
     if (sessionConfig?.gameMode === 'deep_script' && sessionConfig.selectedWordIds?.length > 0) {
@@ -109,6 +125,7 @@ export default function BridgeBuilderView() {
           key={sessionConfig.packId || 'loose-planks'}
           sessionConfig={sessionConfig}
           onBack={handleBackToSetup}
+          onNext={sessionConfig.sessionType === 'guided_pack' ? handleNextFromLoosePlanks : undefined}
         />
       );
     }
@@ -119,6 +136,7 @@ export default function BridgeBuilderView() {
         sessionConfig={sessionConfig}
         onBack={handleBackToSetup}
         onRoundComplete={handleBridgeBuilderComplete}
+        onNext={sessionConfig.sessionType === 'guided_pack' ? handleNextFromBridgeBuilder : undefined}
       />
     );
   }

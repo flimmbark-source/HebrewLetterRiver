@@ -422,3 +422,13 @@
   transform: translateY(2px);
   box-shadow: 0 2px 0 #c85a24, 0 4px 6px rgba(200,90,36,0.4);
 }
+.lp-end-btn--secondary {
+  color: #5a4428;
+  background: rgba(255,255,255,0.6);
+  border: 2px solid #d4a76a;
+  box-shadow: 0 2px 0 #a07030;
+}
+.lp-end-btn--secondary:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #a07030;
+}

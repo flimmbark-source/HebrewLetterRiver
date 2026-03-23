@@ -83,7 +83,7 @@ function generatePositions(count, containerEl, minTopClearance = 0) {
  * Hebrew planks sit in a row at the top. Floating planks on the water are
  * randomly either transliteration or translation per word per round.
  */
-export default function LoosePlanksGame({ sessionConfig, onBack }) {
+export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
   const { packId, selectedWordIds } = sessionConfig;
 
   const allWords = useMemo(() => {
@@ -253,7 +253,12 @@ export default function LoosePlanksGame({ sessionConfig, onBack }) {
               ))}
             </div>
             <div className="lp-end-actions">
-              <button className="lp-end-btn lp-end-btn--primary" onClick={onBack} type="button">
+              {onNext && (
+                <button className="lp-end-btn lp-end-btn--primary" onClick={onNext} type="button">
+                  Next
+                </button>
+              )}
+              <button className={`lp-end-btn ${onNext ? 'lp-end-btn--secondary' : 'lp-end-btn--primary'}`} onClick={onBack} type="button">
                 Done
               </button>
             </div>
