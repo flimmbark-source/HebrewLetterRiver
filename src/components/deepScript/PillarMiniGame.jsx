@@ -51,6 +51,8 @@ export default function PillarMiniGame({
   const [showProceed, setShowProceed] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const pointerStartRef = React.useRef({});
+  const ignoreClickRef = React.useRef({});
+  const proceedTriggeredRef = React.useRef(false);
 
   const solved = useMemo(
     () => rows.every(row => row.options[row.currentIndex] === row.correctTranslation),
@@ -79,7 +81,9 @@ export default function PillarMiniGame({
   }, [solved, isCompleting]);
 
   const handleProceed = () => {
-    if (!solved || isCompleting) return;
+    if (!solved || isCompleting || proceedTriggeredRef.current) return;
+
+    proceedTriggeredRef.current = true;
     setShowProceed(false);
     setIsCompleting(true);
     setTimeout(() => onSolved(), 600);
@@ -90,6 +94,11 @@ export default function PillarMiniGame({
   };
 
   const onPointerUp = (rowId, event) => {
+    ignoreClickRef.current[rowId] = true;
+    setTimeout(() => {
+      delete ignoreClickRef.current[rowId];
+    }, 0);
+
     const startX = pointerStartRef.current[rowId];
     if (typeof startX !== 'number') {
       cycleRow(rowId, 1);
@@ -117,7 +126,10 @@ export default function PillarMiniGame({
             type="button"
             className={`ds-pillar-slat ds-pillar-slat--rotating ${spinningRowId === row.id ? 'ds-pillar-slat--spinning' : ''} ${solved ? 'ds-pillar-slat--solved' : ''}`}
             disabled={showProceed || isCompleting}
-            onClick={() => cycleRow(row.id, 1)}
+            onClick={() => {
+              if (ignoreClickRef.current[row.id]) return;
+              cycleRow(row.id, 1);
+            }}
             onPointerDown={(event) => onPointerDown(row.id, event)}
             onPointerUp={(event) => onPointerUp(row.id, event)}
           >
@@ -129,7 +141,12 @@ export default function PillarMiniGame({
 
       {solved && !showProceed && !isCompleting && <div className="ds-pillar-solved">Pillar aligned</div>}
       {showProceed && (
-        <button type="button" className="ds-pillar-proceed-btn" onClick={handleProceed}>
+        <button
+          type="button"
+          className="ds-pillar-proceed-btn"
+          onClick={handleProceed}
+          onPointerUp={handleProceed}
+        >
           Proceed
         </button>
       )}
