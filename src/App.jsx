@@ -305,13 +305,13 @@ function Shell() {
       </main>
       {!(isGameVisible && isGameRunning) && !inConversationPractice && !inDeepScript && (
         <nav className="bottom-nav">
+          <div />
           <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
               <span>🏠</span>
             </div>
             <span className="label">{t('app.nav.home')}</span>
           </NavLink>
-          <div />
           <button
             type="button"
             onClick={handlePlay}
