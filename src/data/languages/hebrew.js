@@ -28,7 +28,6 @@ export const hebrewConsonants = [
   { id: 'kuf', symbol: 'ק', sound: 'K', name: 'Kuf' },
   { id: 'resh', symbol: 'ר', sound: 'R', name: 'Resh' },
   { id: 'shin', symbol: 'שׁ', sound: 'Sh', name: 'Shin' },
-  { id: 'sin', symbol: 'שׂ', sound: 'S', name: 'Sin' },
   { id: 'tav', symbol: 'ת', sound: 'T', name: 'Tav' }
 ];
 
