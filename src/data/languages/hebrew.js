@@ -18,7 +18,7 @@ export const hebrewConsonants = [
   { id: 'final-mem', symbol: 'ם', sound: 'M', name: 'Final Mem' },
   { id: 'nun', symbol: 'נ', sound: 'N', name: 'Nun' },
   { id: 'final-nun', symbol: 'ן', sound: 'N', name: 'Final Nun' },
-  { id: 'samech', symbol: 'ס', sound: 'S', name: 'Samech' },
+  { id: 'samekh', symbol: 'ס', sound: 'S', name: 'Samekh' },
   { id: 'ayin', symbol: 'ע', sound: '(Ah)', name: 'Ayin' },
   { id: 'pei-dagesh', symbol: 'פּ', sound: 'P', name: 'Pei' },
   { id: 'fei', symbol: 'פ', sound: 'F', name: 'Fei' },
@@ -28,7 +28,6 @@ export const hebrewConsonants = [
   { id: 'kuf', symbol: 'ק', sound: 'K', name: 'Kuf' },
   { id: 'resh', symbol: 'ר', sound: 'R', name: 'Resh' },
   { id: 'shin', symbol: 'שׁ', sound: 'Sh', name: 'Shin' },
-  { id: 'sin', symbol: 'שׂ', sound: 'S', name: 'Sin' },
   { id: 'tav', symbol: 'ת', sound: 'T', name: 'Tav' }
 ];
 
@@ -45,7 +44,7 @@ export const hebrewVowelGroups = [
 ];
 
 export const hebrewSyllableBases = [
-  { id: 'bet', symbol: 'ב', name: 'Bet', baseSound: 'B' },
+  { id: 'vet-base', symbol: 'ב', name: 'Vet', baseSound: 'V' },
   { id: 'gimel-base', symbol: 'ג', name: 'Gimel', baseSound: 'G' },
   { id: 'dalet-base', symbol: 'ד', name: 'Dalet', baseSound: 'D' },
   { id: 'heh-base', symbol: 'ה', name: 'Heh', baseSound: 'H' },
@@ -54,12 +53,12 @@ export const hebrewSyllableBases = [
   { id: 'chet-base', symbol: 'ח', name: 'Chet', baseSound: 'Ch' },
   { id: 'tet-base', symbol: 'ט', name: 'Tet', baseSound: 'T' },
   { id: 'yud-base', symbol: 'י', name: 'Yud', baseSound: 'Y' },
-  { id: 'kaf-base', symbol: 'כ', name: 'Kaf/Chaf', baseSound: 'K' },
+  { id: 'chaf-base', symbol: 'כ', name: 'Chaf', baseSound: 'Ch' },
   { id: 'lamed-base', symbol: 'ל', name: 'Lamed', baseSound: 'L' },
   { id: 'mem-base', symbol: 'מ', name: 'Mem', baseSound: 'M' },
   { id: 'nun-base', symbol: 'נ', name: 'Nun', baseSound: 'N' },
-  { id: 'samech-base', symbol: 'ס', name: 'Samech', baseSound: 'S' },
-  { id: 'pei-base', symbol: 'פ', name: 'Pei/Fei', baseSound: 'P' },
+  { id: 'samekh-base', symbol: 'ס', name: 'Samekh', baseSound: 'S' },
+  { id: 'fei-base', symbol: 'פ', name: 'Fei', baseSound: 'F' },
   { id: 'tzadi-base', symbol: 'צ', name: 'Tzadi', baseSound: 'Tz' },
   { id: 'kuf-base', symbol: 'ק', name: 'Kuf', baseSound: 'K' },
   { id: 'resh-base', symbol: 'ר', name: 'Resh', baseSound: 'R' },
