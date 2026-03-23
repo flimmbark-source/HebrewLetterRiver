@@ -22,7 +22,13 @@ function buildPillarRows(wordPool = deepScriptWords, selectedWordsOverride = nul
 
   return selectedWords.map((word) => {
     const options = shuffle(sharedAnswers);
-    const startIndex = Math.floor(Math.random() * options.length);
+    const correctIndex = options.findIndex(option => option === word.english);
+    const availableStartIndexes = options
+      .map((_, index) => index)
+      .filter(index => index !== correctIndex);
+    const startIndex = availableStartIndexes.length
+      ? availableStartIndexes[Math.floor(Math.random() * availableStartIndexes.length)]
+      : 0;
 
     return {
       id: word.id,
@@ -109,7 +115,7 @@ export default function PillarMiniGame({
           </div>
           <button
             type="button"
-            className={`ds-pillar-slat ds-pillar-slat--rotating ${spinningRowId === row.id ? 'ds-pillar-slat--spinning' : ''}`}
+            className={`ds-pillar-slat ds-pillar-slat--rotating ${spinningRowId === row.id ? 'ds-pillar-slat--spinning' : ''} ${solved ? 'ds-pillar-slat--solved' : ''}`}
             disabled={showProceed || isCompleting}
             onClick={() => cycleRow(row.id, 1)}
             onPointerDown={(event) => onPointerDown(row.id, event)}
