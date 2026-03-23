@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import BridgeBuilderSetup from '../components/bridgeBuilder/BridgeBuilderSetup.jsx';
 import BridgeBuilderGame from '../components/bridgeBuilder/BridgeBuilderGame.jsx';
 import LoosePlanksGame from '../components/bridgeBuilder/LoosePlanksGame.jsx';
@@ -20,8 +20,18 @@ import { convertBBWordsForDS } from '../data/deepScript/words.js';
  */
 export default function BridgeBuilderView() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [sessionConfig, setSessionConfig] = useState(null);
   const [showDeepScript, setShowDeepScript] = useState(false);
+
+  // Open Deep Script directly when navigated with state
+  useEffect(() => {
+    if (location.state?.deepScript) {
+      setShowDeepScript(true);
+      // Clear the state so refreshing doesn't re-trigger
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state?.deepScript, navigate, location.pathname]);
 
   const handlePlay = (config) => {
     setSessionConfig(config);
@@ -34,11 +44,6 @@ export default function BridgeBuilderView() {
 
   const handleBackToHome = () => {
     navigate('/home');
-  };
-
-  const handleDeepScriptOpen = () => {
-    setSessionConfig(null); // clear any pack session
-    setShowDeepScript(true);
   };
 
   /**
@@ -60,6 +65,22 @@ export default function BridgeBuilderView() {
     }
   }, [sessionConfig?.packId]);
 
+  /**
+   * Advance to the next game mode in the pack sequence.
+   * bridge_builder → loose_planks → deep_script
+   */
+  const handleNextFromBridgeBuilder = useCallback(() => {
+    if (sessionConfig?.sessionType === 'guided_pack') {
+      setSessionConfig(prev => ({ ...prev, gameMode: 'loose_planks' }));
+    }
+  }, [sessionConfig?.sessionType]);
+
+  const handleNextFromLoosePlanks = useCallback(() => {
+    if (sessionConfig?.sessionType === 'guided_pack') {
+      setSessionConfig(prev => ({ ...prev, gameMode: 'deep_script' }));
+    }
+  }, [sessionConfig?.sessionType]);
+
   // Convert pack words to DS format for deep_script mode
   const packDSWords = useMemo(() => {
     if (sessionConfig?.gameMode === 'deep_script' && sessionConfig.selectedWordIds?.length > 0) {
@@ -78,7 +99,7 @@ export default function BridgeBuilderView() {
   if (showDeepScript) {
     return (
       <DeepScriptMode
-        onBack={handleBackToSetup}
+        onBack={handleBackToHome}
         packWords={endlessDSWords}
         isGuidedPackRun={false}
       />
@@ -104,6 +125,7 @@ export default function BridgeBuilderView() {
           key={sessionConfig.packId || 'loose-planks'}
           sessionConfig={sessionConfig}
           onBack={handleBackToSetup}
+          onNext={sessionConfig.sessionType === 'guided_pack' ? handleNextFromLoosePlanks : undefined}
         />
       );
     }
@@ -114,6 +136,7 @@ export default function BridgeBuilderView() {
         sessionConfig={sessionConfig}
         onBack={handleBackToSetup}
         onRoundComplete={handleBridgeBuilderComplete}
+        onNext={sessionConfig.sessionType === 'guided_pack' ? handleNextFromBridgeBuilder : undefined}
       />
     );
   }
@@ -122,7 +145,6 @@ export default function BridgeBuilderView() {
     <BridgeBuilderSetup
       onPlay={handlePlay}
       onBack={handleBackToHome}
-      onDeepScript={handleDeepScriptOpen}
     />
   );
 }

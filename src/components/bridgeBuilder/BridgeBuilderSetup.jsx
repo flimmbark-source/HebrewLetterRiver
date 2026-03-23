@@ -205,7 +205,7 @@ function ReviewCard({ eligibleCount, selected, onSelect }) {
 
 /* ─── Main Setup Screen ──────────────────────────────────── */
 
-export default function BridgeBuilderSetup({ onPlay, onBack, onDeepScript }) {
+export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const [selection, setSelection] = useState(null); // { type: 'pack', packId } | { type: 'review' } | null
   const [expandedSection, setExpandedSection] = useState('foundations'); // start with first section open
   // Per-pack mode override: { [packId]: 'bridge_builder' | 'loose_planks' }
@@ -354,26 +354,6 @@ export default function BridgeBuilderSetup({ onPlay, onBack, onDeepScript }) {
           />
         </section>
 
-        {/* Deep Script Mode */}
-        {onDeepScript && (
-          <section className="bbs-section">
-            <h2 className="bbs-section-title">Adventure</h2>
-            <button
-              type="button"
-              className="bbs-deep-script-card"
-              onClick={onDeepScript}
-            >
-              <div className="bbs-deep-script-icon">📜</div>
-              <div className="bbs-deep-script-info">
-                <div className="bbs-deep-script-title">Deep Script</div>
-                <div className="bbs-deep-script-desc">
-                  Endless dungeon-crawl through Hebrew words — clear randomized floors, then descend or return to menu
-                </div>
-                <div className="bbs-deep-script-badge">Roguelike Mode</div>
-              </div>
-            </button>
-          </section>
-        )}
       </div>
 
       {/* Play Button — pinned to bottom */}
