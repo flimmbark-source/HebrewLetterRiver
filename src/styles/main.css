@@ -843,7 +843,7 @@ body.no-scroll {
   background: #FFFFFF;
   padding: 6px 12px 8px;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0,1fr));
+  grid-template-columns: repeat(3, minmax(0,1fr));
   align-items: center;
   gap: 2px;
   box-shadow: 0 -2px 8px 0 rgba(0, 0, 0, 0.1);
@@ -916,10 +916,16 @@ body.no-scroll {
   font-weight: 700;
 }
 
-/* FAB button - no label, elevated style */
+/* FAB button - no label, elevated style, centered in nav */
 .nav-item-fab {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
   padding: 0;
   background: transparent;
+  border: none;
+  z-index: 2;
 }
 
 .nav-item-fab:hover {
