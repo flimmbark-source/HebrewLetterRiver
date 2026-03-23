@@ -311,6 +311,18 @@ function Shell() {
             </div>
             <span className="label">{t('app.nav.home')}</span>
           </NavLink>
+          <div />
+          <button
+            type="button"
+            onClick={handlePlay}
+            className="nav-item nav-item-fab"
+            disabled={isPlayDisabled}
+            style={isPlayDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+          >
+            <div className="play-fab">
+              <span>▶</span>
+            </div>
+          </button>
           <NavLink to="/achievements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
             <div className="nav-icon-shell">
               <span>🏆</span>
@@ -323,17 +335,6 @@ function Shell() {
             </div>
             <span className="label">{t('app.nav.settings')}</span>
           </NavLink>
-          <button
-            type="button"
-            onClick={handlePlay}
-            className="nav-item nav-item-fab"
-            disabled={isPlayDisabled}
-            style={isPlayDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-          >
-            <div className="play-fab">
-              <span>▶</span>
-            </div>
-          </button>
         </nav>
       )}
     </div>
