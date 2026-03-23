@@ -74,7 +74,7 @@ function QuestCard({ task, onClaim, claimingTaskId, t }) {
 export default function HomeView() {
   const { player, streak, daily, starLevelSize, claimDailyReward } = useProgress();
 
-  const { openGame } = useGame();
+  const { setShowPlayModal } = useGame();
   const { startTutorial, currentTutorial, currentStepIndex } = useTutorial();
   const { t } = useLocalization();
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
@@ -322,7 +322,7 @@ export default function HomeView() {
         </div>
         <button
           className="hero-cta"
-          onClick={() => !isPlayDisabled && openGame({ autostart: false })}
+          onClick={() => !isPlayDisabled && setShowPlayModal(true)}
           disabled={isPlayDisabled}
           style={isPlayDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
         >

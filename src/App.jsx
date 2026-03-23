@@ -18,6 +18,7 @@ import ErrorBoundary from './components/ErrorBoundary.jsx';
 import OfflineIndicator from './components/OfflineIndicator.jsx';
 import MigrationInitializer from './components/MigrationInitializer.jsx';
 import PWAInstallPrompt from './components/PWAInstallPrompt.jsx';
+import PlayModeModal from './components/PlayModeModal.jsx';
 
 function HomeIcon(props) {
   return (
@@ -234,7 +235,7 @@ function LanguageOnboardingModal() {
 }
 
 function Shell() {
-  const { openGame, closeGame, isVisible: isGameVisible, isGameRunning } = useGame();
+  const { openGame, closeGame, isVisible: isGameVisible, isGameRunning, setShowPlayModal } = useGame();
   const { t, interfaceLanguagePack } = useLocalization();
   const { currentTutorial, currentStepIndex } = useTutorial();
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
@@ -271,10 +272,10 @@ function Shell() {
     (event) => {
       event.preventDefault();
       if (!isPlayDisabled) {
-        openGame({ autostart: false });
+        setShowPlayModal(true);
       }
     },
-    [openGame, isPlayDisabled]
+    [setShowPlayModal, isPlayDisabled]
   );
 
   const handleNavClick = React.useCallback(() => {
@@ -289,6 +290,7 @@ function Shell() {
       <LanguageOnboardingModal />
       <OfflineIndicator />
       <PWAInstallPrompt />
+      <PlayModeModal />
       <main className="flex-1 main-content">
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />

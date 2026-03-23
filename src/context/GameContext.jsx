@@ -15,7 +15,7 @@ import { ErrorBoundary } from '../ErrorBoundary.jsx';
 import { on } from '../lib/eventBus.js';
 import PostGameReview from '../components/PostGameReview.jsx';
 
-const GameContext = createContext({ openGame: () => {}, closeGame: () => {} });
+const GameContext = createContext({ openGame: () => {}, closeGame: () => {}, showPlayModal: false, setShowPlayModal: () => {} });
 
 export function GameProvider({ children }) {
   const [isVisible, setIsVisible] = useState(false);
@@ -23,6 +23,7 @@ export function GameProvider({ children }) {
   const [options, setOptions] = useState(null);
   const [sessionData, setSessionData] = useState(null);
   const [showPostGameReview, setShowPostGameReview] = useState(false);
+  const [showPlayModal, setShowPlayModal] = useState(false);
   const containerRef = useRef(null);
   const gameApiRef = useRef(null);
   const [hasMounted, setHasMounted] = useState(false);
@@ -214,8 +215,8 @@ export function GameProvider({ children }) {
   }, []);
 
   const contextValue = useMemo(
-    () => ({ openGame, closeGame, isVisible, isGameRunning }),
-    [openGame, closeGame, isVisible, isGameRunning],
+    () => ({ openGame, closeGame, isVisible, isGameRunning, showPlayModal, setShowPlayModal }),
+    [openGame, closeGame, isVisible, isGameRunning, showPlayModal],
   );
 
   return (

@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import BridgeBuilderSetup from '../components/bridgeBuilder/BridgeBuilderSetup.jsx';
 import BridgeBuilderGame from '../components/bridgeBuilder/BridgeBuilderGame.jsx';
 import LoosePlanksGame from '../components/bridgeBuilder/LoosePlanksGame.jsx';
@@ -20,8 +20,18 @@ import { convertBBWordsForDS } from '../data/deepScript/words.js';
  */
 export default function BridgeBuilderView() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [sessionConfig, setSessionConfig] = useState(null);
   const [showDeepScript, setShowDeepScript] = useState(false);
+
+  // Open Deep Script directly when navigated with state
+  useEffect(() => {
+    if (location.state?.deepScript) {
+      setShowDeepScript(true);
+      // Clear the state so refreshing doesn't re-trigger
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state?.deepScript, navigate, location.pathname]);
 
   const handlePlay = (config) => {
     setSessionConfig(config);
@@ -34,11 +44,6 @@ export default function BridgeBuilderView() {
 
   const handleBackToHome = () => {
     navigate('/home');
-  };
-
-  const handleDeepScriptOpen = () => {
-    setSessionConfig(null); // clear any pack session
-    setShowDeepScript(true);
   };
 
   /**
@@ -122,7 +127,6 @@ export default function BridgeBuilderView() {
     <BridgeBuilderSetup
       onPlay={handlePlay}
       onBack={handleBackToHome}
-      onDeepScript={handleDeepScriptOpen}
     />
   );
 }
