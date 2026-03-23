@@ -18,6 +18,7 @@ export default function SettingsView() {
   const [slowRiver, setSlowRiver] = useState(false);
   const [clickMode, setClickMode] = useState(false);
   const [associationMode, setAssociationMode] = useState(false);
+  const [startingLetters, setStartingLetters] = useState(2);
 
   // Info popup state
   const [showInfoPopup, setShowInfoPopup] = useState(false);
@@ -44,6 +45,7 @@ export default function SettingsView() {
           setSlowRiver(settings.slowRiver ?? false);
           setClickMode(settings.clickMode ?? false);
           setAssociationMode(settings.associationMode ?? false);
+          setStartingLetters(Math.min(10, Math.max(1, settings.startingLetters ?? 2)));
         }
         setHasLoadedSettings(true);
       } catch (e) {
@@ -76,7 +78,8 @@ export default function SettingsView() {
         fontShuffle,
         slowRiver,
         clickMode,
-        associationMode
+        associationMode,
+        startingLetters
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
 
@@ -92,7 +95,7 @@ export default function SettingsView() {
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
-  }, [hasLoadedSettings, showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, fontShuffle, slowRiver, clickMode, associationMode]);
+  }, [hasLoadedSettings, showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, fontShuffle, slowRiver, clickMode, associationMode, startingLetters]);
 
   const getSpeedLabel = (speed) => {
     if (speed < 14) return t('game.accessibility.speedSlow');
@@ -141,6 +144,10 @@ export default function SettingsView() {
     associationMode: {
       title: 'Association Mode',
       description: 'Buckets display images, drag to the image which starts with the letter sound.'
+    },
+    startingLetters: {
+      title: 'Starting Letters',
+      description: 'Choose how many letters are introduced at the beginning of level 1.'
     }
   };
 
@@ -425,6 +432,31 @@ const showInfo = (settingKey, event) => {
                 className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
               />
             </label>
+
+            <div>
+              <label htmlFor="settings-starting-letters-select" className="block text-sm text-arcade-text-main mb-2">
+                <span
+                  className="cursor-pointer hover:text-arcade-accent-orange"
+                  onClick={(e) => showInfo('startingLetters', e)}
+                  onMouseEnter={(e) => showInfo('startingLetters', e)}
+                  onMouseLeave={() => setShowInfoPopup(false)}
+                >
+                  Starting Letters
+                </span>
+              </label>
+              <select
+                id="settings-starting-letters-select"
+                value={startingLetters}
+                onChange={(e) => setStartingLetters(parseInt(e.target.value, 10))}
+                className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
+              >
+                {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <div>
               <label htmlFor="settings-game-speed-slider" className="block text-sm text-arcade-text-main mb-2">
