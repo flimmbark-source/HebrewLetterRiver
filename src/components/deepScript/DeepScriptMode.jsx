@@ -5,6 +5,7 @@ import { createRunState } from './deepScriptEngine.js';
 import { registerCustomWords, clearCustomWords, convertBBWordsForDS, getWordById, deepScriptWords } from '../../data/deepScript/words.js';
 import { bridgeBuilderPacks } from '../../data/bridgeBuilderPacks.js';
 import { getWordsByIds } from '../../data/bridgeBuilderWords.js';
+import { emit } from '../../lib/eventBus.js';
 import KitSelectScreen from './KitSelectScreen.jsx';
 import ExplorationScreen from './ExplorationScreen.jsx';
 import BattleTransition from './BattleTransition.jsx';
@@ -225,17 +226,37 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         return { ...prev, chambers: newChambers };
       });
 
-      setRunState(prev => ({
-        ...prev,
-        combatsWon: prev.combatsWon + 1,
-        wordsCompleted: [...prev.wordsCompleted, wordId],
-        roomsCompleted: prev.roomsCompleted + 1,
-      }));
+      setRunState(prev => {
+        const updated = {
+          ...prev,
+          combatsWon: prev.combatsWon + 1,
+          wordsCompleted: [...prev.wordsCompleted, wordId],
+          roomsCompleted: prev.roomsCompleted + 1,
+        };
+
+        emit('deep-script:combat-won', {
+          wordId,
+          isMiniboss,
+          combatsWon: updated.combatsWon,
+          floorNumber,
+        });
+
+        return updated;
+      });
 
       // Check if miniboss was defeated = victory
       if (isMiniboss) {
         setEndResult('victory');
         setScreen('end');
+        setRunState(prev => {
+          emit('deep-script:run-end', {
+            result: 'victory',
+            floorNumber,
+            combatsWon: prev.combatsWon,
+            wordsCompleted: prev.wordsCompleted,
+          });
+          return prev;
+        });
         if (onRunComplete && isGuidedPackRun) onRunComplete('victory');
       } else {
         setScreen('exploring');
@@ -247,6 +268,12 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         if (newHealth <= 0) {
           setEndResult('defeat');
           setScreen('end');
+          emit('deep-script:run-end', {
+            result: 'defeat',
+            floorNumber,
+            combatsWon: prev.combatsWon,
+            wordsCompleted: prev.wordsCompleted,
+          });
           return { ...prev, health: 0 };
         }
         return { ...prev, health: newHealth };

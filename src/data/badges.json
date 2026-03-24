@@ -614,5 +614,71 @@
       { "tier": 2, "labelKey": "badges.consistencyKing.tiers.2", "goal": 30, "stars": 110 },
       { "tier": 3, "labelKey": "badges.consistencyKing.tiers.3", "goal": 60, "stars": 260 }
     ]
+  },
+  {
+    "id": "bridge-architect",
+    "section": "bridgeBuilder",
+    "nameKey": "badges.bridgeArchitect.name",
+    "summaryKey": "badges.bridgeArchitect.summary",
+    "tiers": [
+      { "tier": 1, "labelKey": "badges.bridgeArchitect.tiers.1", "goal": 3, "stars": 20 },
+      { "tier": 2, "labelKey": "badges.bridgeArchitect.tiers.2", "goal": 10, "stars": 55 },
+      { "tier": 3, "labelKey": "badges.bridgeArchitect.tiers.3", "goal": 25, "stars": 130 }
+    ]
+  },
+  {
+    "id": "bridge-perfectionist",
+    "section": "bridgeBuilder",
+    "nameKey": "badges.bridgePerfectionist.name",
+    "summaryKey": "badges.bridgePerfectionist.summary",
+    "tiers": [
+      { "tier": 1, "labelKey": "badges.bridgePerfectionist.tiers.1", "goal": 1, "stars": 30 },
+      { "tier": 2, "labelKey": "badges.bridgePerfectionist.tiers.2", "goal": 5, "stars": 80 },
+      { "tier": 3, "labelKey": "badges.bridgePerfectionist.tiers.3", "goal": 15, "stars": 190 }
+    ]
+  },
+  {
+    "id": "word-collector",
+    "section": "bridgeBuilder",
+    "nameKey": "badges.wordCollector.name",
+    "summaryKey": "badges.wordCollector.summary",
+    "tiers": [
+      { "tier": 1, "labelKey": "badges.wordCollector.tiers.1", "goal": 10, "stars": 20 },
+      { "tier": 2, "labelKey": "badges.wordCollector.tiers.2", "goal": 30, "stars": 60 },
+      { "tier": 3, "labelKey": "badges.wordCollector.tiers.3", "goal": 75, "stars": 150 }
+    ]
+  },
+  {
+    "id": "dungeon-delver",
+    "section": "deepScript",
+    "nameKey": "badges.dungeonDelver.name",
+    "summaryKey": "badges.dungeonDelver.summary",
+    "tiers": [
+      { "tier": 1, "labelKey": "badges.dungeonDelver.tiers.1", "goal": 10, "stars": 20 },
+      { "tier": 2, "labelKey": "badges.dungeonDelver.tiers.2", "goal": 30, "stars": 60 },
+      { "tier": 3, "labelKey": "badges.dungeonDelver.tiers.3", "goal": 75, "stars": 150 }
+    ]
+  },
+  {
+    "id": "rune-vanquisher",
+    "section": "deepScript",
+    "nameKey": "badges.runeVanquisher.name",
+    "summaryKey": "badges.runeVanquisher.summary",
+    "tiers": [
+      { "tier": 1, "labelKey": "badges.runeVanquisher.tiers.1", "goal": 3, "stars": 30 },
+      { "tier": 2, "labelKey": "badges.runeVanquisher.tiers.2", "goal": 10, "stars": 80 },
+      { "tier": 3, "labelKey": "badges.runeVanquisher.tiers.3", "goal": 25, "stars": 190 }
+    ]
+  },
+  {
+    "id": "iron-will",
+    "section": "deepScript",
+    "nameKey": "badges.ironWill.name",
+    "summaryKey": "badges.ironWill.summary",
+    "tiers": [
+      { "tier": 1, "labelKey": "badges.ironWill.tiers.1", "goal": 1, "stars": 25 },
+      { "tier": 2, "labelKey": "badges.ironWill.tiers.2", "goal": 5, "stars": 65 },
+      { "tier": 3, "labelKey": "badges.ironWill.tiers.3", "goal": 15, "stars": 150 }
+    ]
   }
 ]

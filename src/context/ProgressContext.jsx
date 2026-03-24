@@ -211,8 +211,12 @@ function createLanguageAssets(languagePack, localization = {}) {
         nextTask.rewardClaimable ?? (Boolean(nextTask.completed) && !rewardClaimed);
       const claimedAt = nextTask.claimedAt ?? null;
 
+      // Backfill mode from template if missing (migration from older cached data)
+      const mode = nextTask.mode ?? template.mode ?? 'letterRiver';
+
       return {
         ...nextTask,
+        mode,
         title,
         description,
         rewardStars,
@@ -243,8 +247,18 @@ function createLanguageAssets(languagePack, localization = {}) {
     const focusLetter = focusLetterInfo ?? fallbackLetterInfo;
     const selectedConstraint = constraint ?? pickConstraint();
 
-    const shuffled = [...dailyTemplates].sort(() => Math.random() - 0.5);
-    const selectedTemplates = shuffled.slice(0, 3);
+    // Pick one quest per mode: letterRiver, bridgeBuilder, deepScript
+    const byMode = { letterRiver: [], bridgeBuilder: [], deepScript: [] };
+    for (const tmpl of dailyTemplates) {
+      const m = tmpl.mode ?? 'letterRiver';
+      if (byMode[m]) byMode[m].push(tmpl);
+    }
+    const selectedTemplates = Object.values(byMode).map(
+      (pool) => {
+        const shuffled = [...pool].sort(() => Math.random() - 0.5);
+        return shuffled[0];
+      }
+    ).filter(Boolean);
 
     const rewardDistribution = distributeRewardStars(DAILY_REWARD_STARS, selectedTemplates.length);
     const tasks = selectedTemplates.map((template, index) => {
@@ -472,11 +486,17 @@ export function ProgressProvider({ children }) {
         }
       }
       if (source && source.dateKey === todayKey) {
-        const normalized = assets.normalizeDailyData(source);
-        if (!stored) {
-          saveState(`${storagePrefix}.daily`, normalized);
+        // Check if cached quests cover all 3 modes; regenerate if not (migration)
+        const taskModes = new Set((source.tasks ?? []).map(t => t.mode).filter(Boolean));
+        const hasAllModes = taskModes.has('letterRiver') && taskModes.has('bridgeBuilder') && taskModes.has('deepScript');
+        if (hasAllModes || (source.tasks ?? []).some(t => t.rewardClaimed)) {
+          const normalized = assets.normalizeDailyData(source);
+          if (!stored) {
+            saveState(`${storagePrefix}.daily`, normalized);
+          }
+          return normalized;
         }
-        return normalized;
+        // Fall through to regenerate with all 3 modes
       }
       const weakest = assets.getWeakestLetter(currentPlayer?.letters);
       return assets.generateDaily(todayKey, weakest, pickConstraint());
@@ -1222,10 +1242,70 @@ export function ProgressProvider({ children }) {
       }
     });
 
+    // ─── Bridge Builder events ──────────────────────────────
+    const offBridgeComplete = on('bridge:session-complete', (payload) => {
+      const { completedCount = 0, isFullClear, isPerfect } = payload ?? {};
+
+      // Track completed sessions (only full clears count)
+      if (isFullClear) {
+        trackBadgeProgress('bridge-architect', 1);
+      }
+
+      // Track perfect sessions (no hearts lost)
+      if (isPerfect) {
+        trackBadgeProgress('bridge-perfectionist', 1);
+      }
+
+      // Track words completed in session
+      if (completedCount > 0) {
+        trackBadgeProgress('word-collector', completedCount);
+      }
+
+      // Daily quests
+      if (isFullClear) {
+        markDailyProgress((task) => task.type === 'bridgeSession');
+      }
+      if (isPerfect) {
+        markDailyProgress((task) => task.type === 'bridgePerfect');
+      }
+      if (completedCount > 0) {
+        markDailyProgress((task) => {
+          if (task.type !== 'bridgeWords') return false;
+          return completedCount >= task.goal;
+        });
+      }
+    });
+
+    // ─── Deep Script events ───────────────────────────────
+    const offDSCombat = on('deep-script:combat-won', (payload) => {
+      const { isMiniboss } = payload ?? {};
+
+      trackBadgeProgress('dungeon-delver', 1);
+
+      if (isMiniboss) {
+        trackBadgeProgress('rune-vanquisher', 1);
+      }
+
+      // Daily quest: combat wins
+      markDailyProgress((task) => task.type === 'deepScriptCombat');
+    });
+
+    const offDSRunEnd = on('deep-script:run-end', (payload) => {
+      const { result } = payload ?? {};
+
+      if (result === 'victory') {
+        trackBadgeProgress('iron-will', 1);
+        markDailyProgress((task) => task.type === 'deepScriptRun');
+      }
+    });
+
     return () => {
       offSessionStart();
       offSessionComplete();
       offLetter();
+      offBridgeComplete();
+      offDSCombat();
+      offDSRunEnd();
     };
   }, [assets]);
 

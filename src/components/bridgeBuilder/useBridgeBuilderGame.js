@@ -36,6 +36,7 @@ import {
   recordMeaningIntroduced,
   recordMeaningAttempt,
 } from '../../lib/bridgeBuilderStorage.js';
+import { emit } from '../../lib/eventBus.js';
 
 const MAX_HEARTS = 3;
 const TRANSLIT_CHOICES = 3;
@@ -144,6 +145,30 @@ export default function useBridgeBuilderGame(sessionConfig) {
 
   const isRoundComplete = phase === 'roundComplete';
   const isGameOver = hearts <= 0;
+
+  // Emit session-complete event when the round ends
+  const hasEmittedRef = useRef(false);
+  useEffect(() => {
+    if (phase === 'roundComplete' && !hasEmittedRef.current) {
+      hasEmittedRef.current = true;
+      const allCompleted = allSessionWords.every(w => sessionStatesRef.current[w.id] === 'completed');
+      emit('bridge:session-complete', {
+        score,
+        streak,
+        hearts,
+        maxHearts: MAX_HEARTS,
+        completedCount,
+        totalWords: allSessionWords.length,
+        isGameOver: hearts <= 0,
+        isFullClear: allCompleted && hearts > 0,
+        isPerfect: allCompleted && hearts === MAX_HEARTS,
+        sessionType,
+      });
+    }
+    if (phase === 'promptIntro') {
+      hasEmittedRef.current = false;
+    }
+  }, [phase, score, streak, hearts, completedCount, allSessionWords, sessionType]);
 
   // Start the intro animation timer
   useEffect(() => {

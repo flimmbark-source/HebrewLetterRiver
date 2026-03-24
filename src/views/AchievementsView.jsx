@@ -141,6 +141,7 @@ export default function AchievementsView() {
   const { t } = useLocalization();
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
+  const [expandedModeSections, setExpandedModeSections] = useState({ letterRiver: false, bridgeBuilder: false, deepScript: false });
   const languageSelectorRef = useRef(null);
   const gameName = t('app.title');
   const sectionBannerVariant = 'aurora';
@@ -368,40 +369,82 @@ export default function AchievementsView() {
         </div>
         <section className="section" style={{ marginTop: '10px' }}></section>
 
-        {/* Group badges by section */}
-        {['classic', 'special', 'polyglot', 'dedication'].map((sectionId) => {
-          const sectionCatalog = badgesCatalog.filter((badge) => badge.section === sectionId);
-          const activeSectionBadges = sectionCatalog.filter((badge) => activeBadges.includes(badge.id));
-          const additionalBadges = sectionCatalog.filter((badge) => !activeBadges.includes(badge.id));
-          // Only show sections with at least 3 achievements
-          const displayBadges = [...activeSectionBadges, ...additionalBadges].slice(
-            0,
-            Math.max(3, activeSectionBadges.length)
-          );
+        {/* Mode-based achievement sections — content always rendered for stable layout */}
+        {[
+          { modeId: 'letterRiver', subSections: ['classic', 'special', 'polyglot', 'dedication'] },
+          { modeId: 'bridgeBuilder', subSections: ['bridgeBuilder'] },
+          { modeId: 'deepScript', subSections: ['deepScript'] },
+        ].map(({ modeId, subSections }) => {
+          const modeBadges = badgesCatalog.filter((badge) => subSections.includes(badge.section));
+          if (modeBadges.length === 0) return null;
 
-          if (displayBadges.length === 0) return null;
+          const modeLabel = t(`achievementSections.${modeId}`, modeId);
+          const isExpanded = expandedModeSections[modeId] ?? false;
 
           return (
-                        <div key={sectionId} className="achievement-section" style={{ marginBottom: '32px' }}>
-              <div className="section-header mb-3">
-                <div className="section-title">
-                  <div className={`section-banner section-banner--${sectionBannerVariant} text-sm`}>
-                    {t(`achievementSections.${sectionId}`, sectionId.charAt(0).toUpperCase() + sectionId.slice(1))}
+            <div key={modeId} style={{ marginBottom: isExpanded ? '28px' : '8px' }}>
+              <button
+                type="button"
+                onClick={() => setExpandedModeSections(prev => ({ ...prev, [modeId]: !isExpanded }))}
+                className={`section-banner section-banner--${sectionBannerVariant} text-sm`}
+                style={{
+                  width: '100%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 16px',
+                  marginBottom: isExpanded ? '16px' : '0',
+                  border: 'none',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                }}
+              >
+                <span>{modeLabel}</span>
+                <span style={{ fontSize: '0.8em', opacity: 0.7 }}>{isExpanded ? '▲' : '▼'}</span>
+              </button>
+
+              <div style={isExpanded ? {} : { height: 0, overflow: 'hidden' }}>
+              {subSections.map((sectionId) => {
+                const sectionCatalog = badgesCatalog.filter((badge) => badge.section === sectionId);
+                const activeSectionBadges = sectionCatalog.filter((badge) => activeBadges.includes(badge.id));
+                const additionalBadges = sectionCatalog.filter((badge) => !activeBadges.includes(badge.id));
+                const displayBadges = [...activeSectionBadges, ...additionalBadges].slice(
+                  0,
+                  Math.max(3, activeSectionBadges.length)
+                );
+
+                if (displayBadges.length === 0) return null;
+
+                const showSubHeader = subSections.length > 1;
+
+                return (
+                  <div key={sectionId} className="achievement-section" style={{ marginBottom: '24px' }}>
+                    {showSubHeader && (
+                      <div className="section-header mb-3">
+                        <div className="section-title">
+                          <div className={`section-banner section-banner--${sectionBannerVariant} text-sm`} style={{ opacity: 0.8, fontSize: '0.85rem' }}>
+                            {t(`achievementSections.${sectionId}`, sectionId.charAt(0).toUpperCase() + sectionId.slice(1))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
+                      {displayBadges.map((badge, index) => (
+                        <BadgeCard
+                          key={badge.id}
+                          badge={badge}
+                          progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
+                          className={index === 0 ? 'badge-tier-example' : ''}
+                          translate={t}
+                          gameName={gameName}
+                          onClaim={handleBadgeClaim}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
-                {displayBadges.map((badge, index) => (
-                  <BadgeCard
-                    key={badge.id}
-                    badge={badge}
-                    progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
-                    className={index === 0 ? 'badge-tier-example' : ''}
-                    translate={t}
-                    gameName={gameName}
-                    onClaim={handleBadgeClaim}
-                  />
-                ))}
+                );
+              })}
               </div>
             </div>
           );
