@@ -142,6 +142,20 @@ export default function AchievementsView() {
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
   const [expandedModeSections, setExpandedModeSections] = useState({ letterRiver: false, bridgeBuilder: false, deepScript: false });
+  const badgeSectionRef = useRef(null);
+  const maxBadgeHeightRef = useRef(0);
+  useEffect(() => {
+    if (!badgeSectionRef.current) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const h = entry.contentRect.height;
+      if (h > maxBadgeHeightRef.current) {
+        maxBadgeHeightRef.current = h;
+        badgeSectionRef.current.style.minHeight = `${h}px`;
+      }
+    });
+    observer.observe(badgeSectionRef.current);
+    return () => observer.disconnect();
+  }, []);
   const languageSelectorRef = useRef(null);
   const gameName = t('app.title');
   const sectionBannerVariant = 'aurora';
@@ -363,7 +377,7 @@ export default function AchievementsView() {
         </div>
       </header>
 
-      <section className="section badge-tabs" style={{ marginTop: '20px', minHeight: '300px' }}>
+      <section ref={badgeSectionRef} className="section badge-tabs" style={{ marginTop: '20px' }}>
         <div className="section-header">
           <div className="wood-header">{t('achievements.title')}</div>
         </div>
