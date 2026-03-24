@@ -382,7 +382,7 @@ export default function AchievementsView() {
           const isExpanded = expandedModeSections[modeId] ?? false;
 
           return (
-            <div key={modeId} style={{ marginBottom: '28px' }}>
+            <div key={modeId} style={{ marginBottom: isExpanded ? '28px' : '8px' }}>
               <button
                 type="button"
                 onClick={() => setExpandedModeSections(prev => ({ ...prev, [modeId]: !isExpanded }))}
@@ -394,7 +394,7 @@ export default function AchievementsView() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '10px 16px',
-                  marginBottom: '16px',
+                  marginBottom: isExpanded ? '16px' : '0',
                   border: 'none',
                   fontWeight: 600,
                   fontSize: '1rem',
@@ -404,7 +404,7 @@ export default function AchievementsView() {
                 <span style={{ fontSize: '0.8em', opacity: 0.7 }}>{isExpanded ? '▲' : '▼'}</span>
               </button>
 
-              <div style={isExpanded ? {} : { visibility: 'hidden', pointerEvents: 'none' }}>
+              <div style={isExpanded ? {} : { height: 0, overflow: 'hidden' }}>
               {subSections.map((sectionId) => {
                 const sectionCatalog = badgesCatalog.filter((badge) => badge.section === sectionId);
                 const activeSectionBadges = sectionCatalog.filter((badge) => activeBadges.includes(badge.id));
