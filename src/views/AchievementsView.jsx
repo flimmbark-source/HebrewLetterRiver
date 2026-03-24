@@ -248,7 +248,7 @@ export default function AchievementsView() {
         </section>
 
         <section className="mt-10 space-y-3">
-          <h3 className="text-lg font-bold text-[#1b6b4f]">All Achievement Tracks</h3>
+          <h3 className="text-lg font-bold text-[#1b6b4f]">All Awards by Mode</h3>
           {allByGroup.map((group) => (
             <div key={group.key} className="space-y-2">
               <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
