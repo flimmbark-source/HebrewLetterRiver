@@ -57,52 +57,30 @@ export default function AchievementsView() {
     return badge ?? null;
   }, [player.latestBadge]);
 
-  const allBadges = useMemo(
-    () => badgesCatalog.map((badge) => ({ badge, state: badges?.[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] } })),
-    [badges]
-  );
-
-  const activeBadgeSpecs = useMemo(
-    () =>
-      (activeBadges ?? [])
-        .map((id) => badgesCatalog.find((badge) => badge.id === id))
-        .filter(Boolean),
-    [activeBadges]
-  );
+  const activeBadgeSpecs = useMemo(() => {
+    return (activeBadges ?? [])
+      .map((id) => badgesCatalog.find((badge) => badge.id === id))
+      .filter(Boolean);
+  }, [activeBadges]);
 
   const milestones = activeBadgeSpecs.slice(1, 3);
-
-  const sectionGroups = useMemo(
-    () => [
-      { key: 'letterRiver', label: 'Letter River', sections: ['classic', 'special', 'polyglot', 'dedication'] },
-      { key: 'bridgeBuilder', label: 'Bridge Builder', sections: ['bridgeBuilder'] },
-      { key: 'deepScript', label: 'Deep Script', sections: ['deepScript'] }
-    ],
-    []
+  const claimableAwards = useMemo(
+    () =>
+      allBadges
+        .filter(({ state }) => Array.isArray(state.unclaimed) && state.unclaimed.length > 0)
+        .map(({ badge }) => badge),
+    [allBadges]
   );
 
-  const claimableBySection = useMemo(() => {
-    const sectionMap = {};
-    for (const group of sectionGroups) {
-      const claimable = allBadges.filter(({ badge, state }) => {
-        if (!group.sections.includes(badge.section)) return false;
-        return Array.isArray(state.unclaimed) && state.unclaimed.length > 0;
-      });
-      sectionMap[group.key] = claimable;
-    }
-    return sectionMap;
-  }, [allBadges, sectionGroups]);
-
-  const upcoming = useMemo(() => {
-    return allBadges
-      .filter(({ state }) => {
-        const unclaimed = Array.isArray(state.unclaimed) ? state.unclaimed.length : 0;
-        return (state.progress ?? 0) > 0 && unclaimed === 0;
-      })
-      .sort((a, b) => (b.state.progress ?? 0) - (a.state.progress ?? 0))
-      .map(({ badge, state }) => ({ badge, state }))
-      .slice(0, 8);
-  }, [allBadges]);
+  const upcoming = useMemo(
+    () =>
+      allBadges
+        .filter(({ state }) => (state.progress ?? 0) > 0 && (!Array.isArray(state.unclaimed) || state.unclaimed.length === 0))
+        .sort((a, b) => (b.state.progress ?? 0) - (a.state.progress ?? 0))
+        .map(({ badge }) => badge)
+        .slice(0, 6),
+    [allBadges]
+  );
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
@@ -170,7 +148,8 @@ export default function AchievementsView() {
 
         <h3 className="mb-6 text-xl font-extrabold text-[#1b6b4f]">Upcoming Milestones</h3>
         <div className="mb-10 space-y-4">
-          {upcoming.map(({ badge, state }, index) => {
+          {upcoming.map((badge, index) => {
+            const state = badges?.[badge.id];
             const goal = badge.tiers[Math.min(state?.tier ?? 0, badge.tiers.length - 1)]?.goal ?? 1;
             const current = Math.min(state?.progress ?? 0, goal);
             const pct = Math.round((current / goal) * 100);
@@ -193,25 +172,11 @@ export default function AchievementsView() {
           })}
         </div>
 
-        <section className="space-y-4">
+        <section className="space-y-3">
           <h3 className="text-lg font-bold text-[#1b6b4f]">Claimable Awards</h3>
-          {sectionGroups.map((group) => {
-            const claimable = claimableBySection[group.key] ?? [];
-            return (
-              <div key={group.key} className="space-y-2">
-                <h4 className="text-sm font-extrabold uppercase tracking-wide text-[#4a6365]">{group.label}</h4>
-                {claimable.length > 0 ? (
-                  <div className="space-y-2">
-                    {claimable.map(({ badge, state }) => (
-                      <AwardCard key={badge.id} badge={badge} progress={state} onClaim={handleClaim} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No claimable awards in this section yet.</div>
-                )}
-              </div>
-            );
-          })}
+          {(claimableAwards.length > 0 ? claimableAwards : activeBadgeSpecs).map((badge) => (
+            <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} />
+          ))}
           {claiming ? <p className="text-xs font-semibold text-[#4a6365]">Claiming reward...</p> : null}
         </section>
       </main>
