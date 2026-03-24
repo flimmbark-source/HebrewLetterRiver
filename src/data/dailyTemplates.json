@@ -173,5 +173,40 @@
     "descriptionKey": "daily.tasks.doubleSession.description",
     "goal": 2,
     "type": "completeSessions"
+  },
+  {
+    "id": "bridge-session",
+    "titleKey": "daily.tasks.bridgeSession.title",
+    "descriptionKey": "daily.tasks.bridgeSession.description",
+    "goal": 1,
+    "type": "bridgeSession"
+  },
+  {
+    "id": "bridge-perfect",
+    "titleKey": "daily.tasks.bridgePerfect.title",
+    "descriptionKey": "daily.tasks.bridgePerfect.description",
+    "goal": 1,
+    "type": "bridgePerfect"
+  },
+  {
+    "id": "bridge-words",
+    "titleKey": "daily.tasks.bridgeWords.title",
+    "descriptionKey": "daily.tasks.bridgeWords.description",
+    "goal": 5,
+    "type": "bridgeWords"
+  },
+  {
+    "id": "deep-script-combat",
+    "titleKey": "daily.tasks.deepScriptCombat.title",
+    "descriptionKey": "daily.tasks.deepScriptCombat.description",
+    "goal": 3,
+    "type": "deepScriptCombat"
+  },
+  {
+    "id": "deep-script-run",
+    "titleKey": "daily.tasks.deepScriptRun.title",
+    "descriptionKey": "daily.tasks.deepScriptRun.description",
+    "goal": 1,
+    "type": "deepScriptRun"
   }
 ]

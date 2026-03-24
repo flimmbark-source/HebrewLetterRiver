@@ -1139,6 +1139,60 @@
         "2": "30 Day Streak",
         "3": "60 Day Streak"
       }
+    },
+    "bridgeArchitect": {
+      "name": "Bridge Architect",
+      "summary": "Complete {{goal}} Bridge Builder sessions.",
+      "tiers": {
+        "1": "Plank Layer",
+        "2": "Bridge Builder",
+        "3": "Master Architect"
+      }
+    },
+    "bridgePerfectionist": {
+      "name": "Bridge Perfectionist",
+      "summary": "Complete {{goal}} Bridge Builder sessions without losing hearts.",
+      "tiers": {
+        "1": "Sturdy Foundation",
+        "2": "Flawless Construction",
+        "3": "Unbreakable Bridge"
+      }
+    },
+    "wordCollector": {
+      "name": "Word Collector",
+      "summary": "Complete {{goal}} words in Bridge Builder.",
+      "tiers": {
+        "1": "Novice Collector",
+        "2": "Word Enthusiast",
+        "3": "Lexicon Master"
+      }
+    },
+    "dungeonDelver": {
+      "name": "Dungeon Delver",
+      "summary": "Win {{goal}} combats in Deep Script.",
+      "tiers": {
+        "1": "Apprentice Scribe",
+        "2": "Rune Fighter",
+        "3": "Dungeon Master"
+      }
+    },
+    "runeVanquisher": {
+      "name": "Rune Vanquisher",
+      "summary": "Defeat {{goal}} minibosses in Deep Script.",
+      "tiers": {
+        "1": "Boss Slayer",
+        "2": "Rune Breaker",
+        "3": "Vanquisher Supreme"
+      }
+    },
+    "ironWill": {
+      "name": "Iron Will",
+      "summary": "Complete {{goal}} Deep Script runs with victory.",
+      "tiers": {
+        "1": "First Conquest",
+        "2": "Seasoned Warrior",
+        "3": "Legendary Champion"
+      }
     }
   },
   "achievementSections": {
@@ -1256,6 +1310,26 @@
       "doubleSession": {
         "title": "Double Session",
         "description": "Complete two sessions today."
+      },
+      "bridgeSession": {
+        "title": "Bridge Crossing",
+        "description": "Complete a Bridge Builder session."
+      },
+      "bridgePerfect": {
+        "title": "Perfect Bridge",
+        "description": "Complete a Bridge Builder session without losing any hearts."
+      },
+      "bridgeWords": {
+        "title": "Word Builder",
+        "description": "Complete 5 words in Bridge Builder."
+      },
+      "deepScriptCombat": {
+        "title": "Dungeon Warrior",
+        "description": "Win 3 combats in Deep Script."
+      },
+      "deepScriptRun": {
+        "title": "Dungeon Conqueror",
+        "description": "Complete a Deep Script run with victory."
       }
     },
     "constraints": {

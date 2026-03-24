@@ -1222,10 +1222,70 @@ export function ProgressProvider({ children }) {
       }
     });
 
+    // ─── Bridge Builder events ──────────────────────────────
+    const offBridgeComplete = on('bridge:session-complete', (payload) => {
+      const { completedCount = 0, isFullClear, isPerfect } = payload ?? {};
+
+      // Track completed sessions (only full clears count)
+      if (isFullClear) {
+        trackBadgeProgress('bridge-architect', 1);
+      }
+
+      // Track perfect sessions (no hearts lost)
+      if (isPerfect) {
+        trackBadgeProgress('bridge-perfectionist', 1);
+      }
+
+      // Track words completed in session
+      if (completedCount > 0) {
+        trackBadgeProgress('word-collector', completedCount);
+      }
+
+      // Daily quests
+      if (isFullClear) {
+        markDailyProgress((task) => task.type === 'bridgeSession');
+      }
+      if (isPerfect) {
+        markDailyProgress((task) => task.type === 'bridgePerfect');
+      }
+      if (completedCount > 0) {
+        markDailyProgress((task) => {
+          if (task.type !== 'bridgeWords') return false;
+          return completedCount >= task.goal;
+        });
+      }
+    });
+
+    // ─── Deep Script events ───────────────────────────────
+    const offDSCombat = on('deep-script:combat-won', (payload) => {
+      const { isMiniboss } = payload ?? {};
+
+      trackBadgeProgress('dungeon-delver', 1);
+
+      if (isMiniboss) {
+        trackBadgeProgress('rune-vanquisher', 1);
+      }
+
+      // Daily quest: combat wins
+      markDailyProgress((task) => task.type === 'deepScriptCombat');
+    });
+
+    const offDSRunEnd = on('deep-script:run-end', (payload) => {
+      const { result } = payload ?? {};
+
+      if (result === 'victory') {
+        trackBadgeProgress('iron-will', 1);
+        markDailyProgress((task) => task.type === 'deepScriptRun');
+      }
+    });
+
     return () => {
       offSessionStart();
       offSessionComplete();
       offLetter();
+      offBridgeComplete();
+      offDSCombat();
+      offDSRunEnd();
     };
   }, [assets]);
 
