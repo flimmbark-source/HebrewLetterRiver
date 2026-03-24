@@ -10,6 +10,8 @@ const SECTION_GROUPS = [
   { key: 'deepScript', label: 'Deep Script', sections: ['deepScript'] }
 ];
 
+const DEFAULT_FALLBACK_GROUP = { key: 'moreAchievements', label: 'More Achievements', sections: [] };
+
 function Icon({ children, className = '', filled = false }) {
   return (
     <span className={`material-symbols-outlined ${className}`} style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}>
@@ -98,6 +100,21 @@ export default function AchievementsView() {
     [badges]
   );
 
+
+  const sectionGroups = useMemo(() => {
+    const knownSections = new Set(SECTION_GROUPS.flatMap((group) => group.sections));
+    const discoveredSections = new Set(allBadges.map(({ badge }) => badge.section).filter(Boolean));
+    const extraSections = Array.from(discoveredSections).filter((section) => !knownSections.has(section));
+    if (extraSections.length === 0) return SECTION_GROUPS;
+    return [
+      ...SECTION_GROUPS,
+      {
+        ...DEFAULT_FALLBACK_GROUP,
+        sections: extraSections
+      }
+    ];
+  }, [allBadges]);
+
   const milestones = useMemo(() => {
     const active = activeBadgeSpecs.slice(1, 3);
     if (active.length > 0) return active;
@@ -112,16 +129,16 @@ export default function AchievementsView() {
   );
 
   const claimableByGroup = useMemo(() => {
-    return SECTION_GROUPS.map((group) => ({
+    return sectionGroups.map((group) => ({
       ...group,
       badges: allBadges
         .filter(({ badge, state }) => group.sections.includes(badge.section) && Array.isArray(state.unclaimed) && state.unclaimed.length > 0)
         .map(({ badge }) => badge)
     }));
-  }, [allBadges]);
+  }, [allBadges, sectionGroups]);
 
   const upcomingByGroup = useMemo(() => {
-    return SECTION_GROUPS.map((group) => ({
+    return sectionGroups.map((group) => ({
       ...group,
       badges: (() => {
         const candidates = allBadges
@@ -136,7 +153,7 @@ export default function AchievementsView() {
         return source.map(({ badge }) => badge);
       })()
     }));
-  }, [allBadges]);
+  }, [allBadges, sectionGroups]);
 
   const upcoming = useMemo(
     () =>
@@ -147,13 +164,13 @@ export default function AchievementsView() {
   );
 
   const allByGroup = useMemo(() => {
-    return SECTION_GROUPS.map((group) => ({
+    return sectionGroups.map((group) => ({
       ...group,
       badges: allBadges
         .filter(({ badge }) => group.sections.includes(badge.section))
         .map(({ badge }) => badge)
     }));
-  }, [allBadges]);
+  }, [allBadges, sectionGroups]);
   const totalAchievementCount = allBadges.length;
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
@@ -294,6 +311,9 @@ export default function AchievementsView() {
               </div>
             </div>
           ))}
+          {totalAchievementCount === 0 ? (
+            <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No achievements available yet.</div>
+          ) : null}
         </section>
       </main>
     </div>
