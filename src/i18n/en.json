@@ -1141,7 +1141,7 @@
       }
     },
     "bridgeArchitect": {
-      "name": "Bridge Architect",
+      "name": "Vocab Architect",
       "summary": "Complete {{goal}} Vocab Builder sessions.",
       "tiers": {
         "1": "Plank Layer",
@@ -1150,12 +1150,12 @@
       }
     },
     "bridgePerfectionist": {
-      "name": "Bridge Perfectionist",
+      "name": "Vocab Perfectionist",
       "summary": "Complete {{goal}} Vocab Builder sessions without losing hearts.",
       "tiers": {
         "1": "Sturdy Foundation",
         "2": "Flawless Construction",
-        "3": "Unbreakable Bridge"
+        "3": "Unbreakable Vocab"
       }
     },
     "wordCollector": {
@@ -1315,11 +1315,11 @@
         "description": "Complete two sessions today."
       },
       "bridgeSession": {
-        "title": "Bridge Crossing",
+        "title": "Vocab Crossing",
         "description": "Complete a Vocab Builder session."
       },
       "bridgePerfect": {
-        "title": "Perfect Bridge",
+        "title": "Perfect Vocab",
         "description": "Complete a Vocab Builder session without losing any hearts."
       },
       "bridgeWords": {
