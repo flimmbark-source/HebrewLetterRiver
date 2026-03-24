@@ -326,7 +326,7 @@ function ReviewCard({ eligibleCount, onPlay }) {
 /* ─── Main Setup Screen ──────────────────────────────────── */
 
 export default function BridgeBuilderSetup({ onPlay, onBack }) {
-  const [expandedSection, setExpandedSection] = useState('foundations');
+  const [expandedSection, setExpandedSection] = useState(null);
   const [drawerSectionId, setDrawerSectionId] = useState(null);
   const [modeOverrides, setModeOverrides] = useState({});
 
