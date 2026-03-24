@@ -1,455 +1,305 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
-import { useTutorial } from '../context/TutorialContext.jsx';
+import { DEFAULT_PROFILE_NAME } from '../data/profileAvatars.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
-import { useLanguage } from '../context/LanguageContext.jsx';
-import { on } from '../lib/eventBus.js';
-import { getPlayerTitle } from '../utils/playerTitles.js';
-import { getFormattedLanguageName } from '../lib/languageUtils.js';
 
-function XIcon({ className = '' }) {
+const SECTION_GROUPS = [
+  { key: 'letterRiver', label: 'Letter River', sections: ['classic', 'special', 'polyglot', 'dedication'] },
+  { key: 'bridgeBuilder', label: 'Bridge Builder', sections: ['bridgeBuilder'] },
+  { key: 'deepScript', label: 'Deep Script', sections: ['deepScript'] }
+];
+
+const DEFAULT_FALLBACK_GROUP = { key: 'moreAchievements', label: 'More Achievements', sections: [] };
+
+function Icon({ children, className = '', filled = false }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
+    <span className={`material-symbols-outlined ${className}`} style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}>
+      {children}
+    </span>
   );
 }
 
-function BadgeCard({ badge, progress, translate, gameName, onClaim, className = '' }) {
+function formatBadgeNameFromId(id = '') {
+  return id
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function getBadgeCopy(badge, t, gameName, goal) {
+  const localizedName = badge.nameKey ? t(badge.nameKey) : '';
+  const localizedSummary = badge.summaryKey ? t(badge.summaryKey, { gameName, goal }) : '';
+  const name = typeof localizedName === 'string' && localizedName.trim().length > 0
+    ? localizedName
+    : (badge.name || formatBadgeNameFromId(badge.id));
+  const summary = typeof localizedSummary === 'string' && localizedSummary.trim().length > 0
+    ? localizedSummary
+    : (badge.summary || `Complete ${goal} milestone${goal === 1 ? '' : 's'}.`);
+  return { name, summary };
+}
+
+function AwardCard({ badge, progress, onClaim, t }) {
   const totalTiers = badge.tiers.length;
   const unclaimed = Array.isArray(progress?.unclaimed) ? progress.unclaimed : [];
-  const hasUnclaimed = unclaimed.length > 0;
-  const claimedTiers = Math.max((progress?.tier ?? 0) - unclaimed.length, 0);
-  const isMaxed = claimedTiers >= totalTiers && !hasUnclaimed;
-  const activeTier = hasUnclaimed
-    ? badge.tiers.find((tier) => tier.tier === unclaimed[0].tier) ?? badge.tiers[Math.min(unclaimed[0].tier - 1, totalTiers - 1)]
-    : badge.tiers[Math.min(claimedTiers, totalTiers - 1)];
-  const nextGoal = activeTier.goal;
-  const currentProgressValue = hasUnclaimed
-    ? nextGoal
-    : isMaxed
-    ? nextGoal
-    : Math.min(progress?.progress ?? 0, nextGoal);
-  const percent = isMaxed ? 100 : Math.min((currentProgressValue / nextGoal) * 100, 100);
-  const tierLabel = translate(activeTier.labelKey);
-  const badgeName = translate(badge.nameKey);
-  const badgeSummary = translate(badge.summaryKey, { gameName, goal: nextGoal });
-  const tierProgressLabel = translate('achievements.tierProgress', {
-    current: Math.min((hasUnclaimed ? unclaimed[0].tier : claimedTiers + 1) || 1, totalTiers),
-    total: totalTiers
-  });
-  const [claimingTier, setClaimingTier] = useState(null);
-  const [celebratingTier, setCelebratingTier] = useState(null);
-  const celebrationTimer = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (celebrationTimer.current) {
-        clearTimeout(celebrationTimer.current);
-      }
-    };
-  }, []);
-
-  const triggerCelebration = useCallback((tier) => {
-    setCelebratingTier(tier);
-    if (celebrationTimer.current) {
-      clearTimeout(celebrationTimer.current);
-    }
-    celebrationTimer.current = setTimeout(() => {
-      setCelebratingTier(null);
-      celebrationTimer.current = null;
-    }, 1200);
-  }, []);
-
-  const handleClaim = useCallback(
-    (reward) => {
-      if (!onClaim) return;
-      setClaimingTier(reward.tier);
-      Promise.resolve(onClaim(badge.id, reward.tier)).then((result) => {
-        if (result?.success) {
-          triggerCelebration(reward.tier);
-        }
-      }).finally(() => {
-        setClaimingTier(null);
-      });
-    },
-    [badge.id, onClaim, triggerCelebration]
-  );
-
-  const currentDisplay = hasUnclaimed || isMaxed ? `${nextGoal} / ${nextGoal}` : `${currentProgressValue} / ${nextGoal}`;
-
-  const canClaim = hasUnclaimed && unclaimed.length > 0;
-  const firstUnclaimed = canClaim ? unclaimed[0] : null;
-  const isClaiming = firstUnclaimed && claimingTier === firstUnclaimed.tier;
-
-  const handleCardClick = () => {
-    if (!canClaim || isClaiming) return;
-    handleClaim(firstUnclaimed);
-  };
-
-  const handleCardKeyDown = (event) => {
-    if (!canClaim || isClaiming) return;
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleClaim(firstUnclaimed);
-    }
-  };
-
-  const cardClass = canClaim
-    ? 'cursor-pointer hover:scale-[1.02] border-arcade-accent-gold/50 shadow-arcade-button animate-pulse hover:border-arcade-accent-gold/70'
-    : 'cursor-default border-arcade-panel-border hover:border-arcade-accent-orange/40';
-
-  const highlightClass = celebratingTier !== null ? 'ring-2 ring-arcade-accent-gold/70 shadow-arcade-button animate-pulse' : '';
+  const nextReward = unclaimed[0] ?? null;
+  const tier = Math.max(progress?.tier ?? 0, 0);
+  const tierIndex = Math.min(tier, totalTiers - 1);
+  const tierSpec = badge.tiers[tierIndex];
+  const goal = tierSpec?.goal ?? 1;
+  const current = nextReward ? goal : Math.min(progress?.progress ?? 0, goal);
+  const pct = Math.min((current / goal) * 100, 100);
+  const { name, summary } = getBadgeCopy(badge, t, t('app.title'), goal);
 
   return (
-    <div
-      className={`progress-card-small p-5 transition sm:p-6 ${cardClass} ${highlightClass} ${className}`}
-      onClick={handleCardClick}
-      onKeyDown={handleCardKeyDown}
-      role={canClaim ? 'button' : undefined}
-      tabIndex={canClaim ? 0 : undefined}
-      aria-label={canClaim ? translate('achievements.claimStarsAria', { stars: firstUnclaimed.stars, label: tierProgressLabel }) : undefined}
+    <button
+      type="button"
+      onClick={() => nextReward && onClaim(badge.id, nextReward.tier)}
+      disabled={!nextReward}
+      className={`w-full rounded-xl p-4 text-left shadow-sm transition ${nextReward ? 'bg-[#f9f1fd] hover:scale-[1.01]' : 'bg-white'}`}
     >
-      <div className="flex items-start justify-between gap-4">
-        <h3 className="text-base font-semibold text-arcade-text-main sm:text-lg">{badgeSummary}</h3>
-        <span className="pill-counter">
-          <span className="value">{isClaiming ? translate('achievements.claiming') : tierProgressLabel}</span>
-        </span>
+      <div className="mb-2 flex items-center justify-between">
+        <h4 className="font-bold text-[#1d1a22]">{name}</h4>
+        {nextReward ? <span className="rounded-full bg-[#1b6b4f] px-2 py-1 text-[10px] font-black text-white">CLAIM +{nextReward.stars}</span> : null}
       </div>
-      <div className="mt-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-arcade-text-soft">{currentDisplay}</span>
-          {activeTier?.stars > 0 && (
-            <span className={`text-sm font-semibold ${canClaim ? 'text-arcade-accent-gold animate-pulse' : 'text-arcade-text-soft'}`}>
-              {canClaim && '✨ '}+{activeTier.stars} ⭐{canClaim && ' ✨'}
-            </span>
-          )}
-        </div>
-        <div className="progress-bar-shell mt-2">
-          <div className="progress-bar-fill transition-all duration-300" style={{ width: `${percent}%` }} />
-        </div>
+      <p className="text-xs text-[#4a6365]">{summary}</p>
+      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#bec9c2]/30">
+        <div className="h-full bg-[#1b6b4f]" style={{ width: `${pct}%` }}></div>
       </div>
-    </div>
+    </button>
   );
 }
 
 export default function AchievementsView() {
-  const { player, badges, activeBadges, daily, claimBadgeReward, claimDailyReward, starLevelSize } = useProgress();
-  const { startTutorial } = useTutorial();
+  const { player, badges, activeBadges, starLevelSize, claimBadgeReward } = useProgress();
   const { t } = useLocalization();
-  const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
-  const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
-  const [expandedModeSections, setExpandedModeSections] = useState({ letterRiver: false, bridgeBuilder: false, deepScript: false });
-  const languageSelectorRef = useRef(null);
-  const gameName = t('app.title');
-  const sectionBannerVariant = 'aurora';
-
-  const latestBadge = useMemo(() => {
-    if (!player.latestBadge) return null;
-    const badge = badgesCatalog.find((item) => item.id === player.latestBadge.id);
-    const tierSpec = badge?.tiers?.find((item) => item.tier === player.latestBadge.tier);
-
-    const nameKey = player.latestBadge.nameKey ?? badge?.nameKey;
-    const labelKey = player.latestBadge.labelKey ?? tierSpec?.labelKey;
-    const summaryKey = player.latestBadge.summaryKey ?? badge?.summaryKey;
-
-    const name = nameKey ? t(nameKey) : player.latestBadge.name ?? badge?.name ?? player.latestBadge.id;
-    const label = labelKey ? t(labelKey) : player.latestBadge.label ?? tierSpec?.label ?? '';
-    const summary = summaryKey ? t(summaryKey, { gameName }) : player.latestBadge.summary ?? badge?.summary ?? '';
-
-    return {
-      ...player.latestBadge,
-      name,
-      label,
-      summary
-    };
-  }, [player.latestBadge, t, gameName]);
-
-  // Close language selector when clicking outside
-  useEffect(() => {
-    if (!appLanguageSelectorExpanded) return;
-
-    const handleClickOutside = (event) => {
-      if (languageSelectorRef.current && !languageSelectorRef.current.contains(event.target)) {
-        setAppLanguageSelectorExpanded(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [appLanguageSelectorExpanded]);
+  const [claiming, setClaiming] = useState(false);
+  const [isAllAchievementsExpanded, setIsAllAchievementsExpanded] = useState(false);
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
-  const playerStars = Math.max(0, Math.floor(player?.stars ?? 0));
-  const totalStarsEarned = Math.max(0, Math.floor(player?.totalStarsEarned ?? playerStars));
+  const totalStarsEarned = Math.max(0, Math.floor(player?.totalStarsEarned ?? player?.stars ?? 0));
   const level = Math.max(1, player?.level ?? Math.floor(totalStarsEarned / starsPerLevel) + 1);
-  const levelProgress = Math.max(
-    0,
-    Math.min(player?.levelProgress ?? (totalStarsEarned % starsPerLevel), starsPerLevel)
-  );
-  const levelPercent = starsPerLevel > 0 ? Math.min((levelProgress / starsPerLevel) * 100, 100) : 0;
-  const unclaimedBadgeStars = useMemo(
-    () =>
-      Object.values(badges ?? {}).reduce((sum, badgeState) => {
-        const rewards = Array.isArray(badgeState?.unclaimed) ? badgeState.unclaimed : [];
-        return (
-          sum +
-          rewards.reduce((inner, reward) => inner + (Number.isFinite(reward?.stars) ? reward.stars : 0), 0)
-        );
-      }, 0),
+  const levelProgress = Math.max(0, Math.min(player?.levelProgress ?? (totalStarsEarned % starsPerLevel), starsPerLevel));
+  const levelPercent = starsPerLevel > 0 ? Math.round((levelProgress / starsPerLevel) * 100) : 0;
+
+  const recentBadge = useMemo(() => {
+    if (!player.latestBadge) return null;
+    const badge = badgesCatalog.find((item) => item.id === player.latestBadge.id);
+    return badge ?? null;
+  }, [player.latestBadge]);
+  const gameName = t('app.title');
+
+  const activeBadgeSpecs = useMemo(() => {
+    return (activeBadges ?? [])
+      .map((id) => badgesCatalog.find((badge) => badge.id === id))
+      .filter(Boolean);
+  }, [activeBadges]);
+
+  const allBadges = useMemo(
+    () => badgesCatalog.map((badge) => ({ badge, state: badges?.[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] } })),
     [badges]
   );
-  const dailyTasks = daily?.tasks ?? [];
-  const unclaimedDailyStars = dailyTasks.reduce((sum, task) => {
-    if (!task.rewardClaimable || task.rewardClaimed) return sum;
-    const rewardStars = Number.isFinite(task.rewardStars) ? task.rewardStars : 0;
-    return sum + rewardStars;
-  }, 0);
-  const canClaimDaily = unclaimedDailyStars > 0;
-  const unclaimedTotal = unclaimedBadgeStars + unclaimedDailyStars;
 
-  const [profileCelebrating, setProfileCelebrating] = useState(false);
-  const [dailyClaiming, setDailyClaiming] = useState(false);
-  const profileTimer = useRef(null);
 
-  useEffect(() => {
-    return () => {
-      if (profileTimer.current) {
-        clearTimeout(profileTimer.current);
+  const sectionGroups = useMemo(() => {
+    const knownSections = new Set(SECTION_GROUPS.flatMap((group) => group.sections));
+    const discoveredSections = new Set(allBadges.map(({ badge }) => badge.section).filter(Boolean));
+    const extraSections = Array.from(discoveredSections).filter((section) => !knownSections.has(section));
+    if (extraSections.length === 0) return SECTION_GROUPS;
+    return [
+      ...SECTION_GROUPS,
+      {
+        ...DEFAULT_FALLBACK_GROUP,
+        sections: extraSections
       }
-    };
-  }, []);
+    ];
+  }, [allBadges]);
 
-  const triggerProfileCelebration = useCallback(() => {
-    setProfileCelebrating(true);
-    if (profileTimer.current) {
-      clearTimeout(profileTimer.current);
-    }
-    profileTimer.current = setTimeout(() => {
-      setProfileCelebrating(false);
-      profileTimer.current = null;
-    }, 1200);
-  }, []);
-
-  useEffect(() => {
-    const off = on('progress:stars-awarded', (payload) => {
-      if (!payload || !Number.isFinite(payload.stars) || payload.stars <= 0) {
-        return;
-      }
-      triggerProfileCelebration();
-    });
-    return () => {
-      if (typeof off === 'function') {
-        off();
-      }
-    };
-  }, [triggerProfileCelebration]);
-
-  const handleBadgeClaim = useCallback(
-    (badgeId, tier) =>
-      Promise.resolve(claimBadgeReward(badgeId, tier)).then((result) => {
-        if (result?.success) {
-          triggerProfileCelebration();
-        }
-        return result;
-      }),
-    [claimBadgeReward, triggerProfileCelebration]
+  const milestones = useMemo(() => {
+    const active = activeBadgeSpecs.slice(1, 3);
+    if (active.length > 0) return active;
+    return badgesCatalog.slice(0, 2);
+  }, [activeBadgeSpecs]);
+  const claimableAwards = useMemo(
+    () =>
+      allBadges
+        .filter(({ state }) => Array.isArray(state.unclaimed) && state.unclaimed.length > 0)
+        .map(({ badge }) => badge),
+    [allBadges]
   );
 
-  const handleDailyClaim = useCallback(() => {
-    if (!canClaimDaily || dailyClaiming) return;
-    setDailyClaiming(true);
-    Promise.resolve(claimDailyReward()).finally(() => {
-      setDailyClaiming(false);
-    });
-  }, [canClaimDaily, dailyClaiming, claimDailyReward]);
+  const upcomingByGroup = useMemo(() => {
+    return sectionGroups.map((group) => ({
+      ...group,
+      badges: (() => {
+        const candidates = allBadges
+          .filter(({ badge, state }) => {
+            if (!group.sections.includes(badge.section)) return false;
+            return !Array.isArray(state.unclaimed) || state.unclaimed.length === 0;
+          })
+          .sort((a, b) => (b.state.progress ?? 0) - (a.state.progress ?? 0));
 
-  const profileHighlightClass = profileCelebrating ? 'ring-2 ring-amber-400/70 shadow-amber-300/30 animate-pulse' : '';
+        const inProgress = candidates.filter(({ state }) => (state.progress ?? 0) > 0);
+        const source = inProgress.length > 0 ? inProgress : candidates.slice(0, 3);
+        return source.map(({ badge }) => badge);
+      })()
+    }));
+  }, [allBadges, sectionGroups]);
 
-  const formatNumber = (value) => Math.max(0, Math.floor(value ?? 0)).toLocaleString();
+  const upcoming = useMemo(
+    () =>
+      upcomingByGroup
+        .flatMap((group) => group.badges)
+        .slice(0, 6),
+    [upcomingByGroup]
+  );
 
-  const levelName = t(`achievements.levelNames.${Math.min(level, 10)}`, { defaultValue: t('achievements.levelNames.10') });
+  const allByGroup = useMemo(() => {
+    return sectionGroups.map((group) => ({
+      ...group,
+      badges: allBadges
+        .filter(({ badge }) => group.sections.includes(badge.section))
+        .map(({ badge }) => badge)
+    }));
+  }, [allBadges, sectionGroups]);
+  const totalAchievementCount = allBadges.length;
+  const playerName = player?.name || DEFAULT_PROFILE_NAME;
+
+  const handleClaim = (badgeId, tier) => {
+    if (claiming) return;
+    setClaiming(true);
+    Promise.resolve(claimBadgeReward(badgeId, tier)).finally(() => setClaiming(false));
+  };
 
   return (
-    <div className="achievements-view">
-      {/* Player Header */}
-      <header className="player-header">
-        <div className="player-meta">
-          <div className="avatar"></div>
-          <div className="player-text">
-            <div className="player-name">{t('common.player')}</div>
-            <div className="player-level-row">
-              <div className="player-level">{t('home.progress.level', { level })}</div>
-              <div className="player-level-progress">
-                <div className="player-level-progress-fill" style={{ width: `${levelPercent}%` }}></div>
-              </div>
-              <div className="player-stars-badge">
-                <span className="star-icon">⭐</span>
-                <span className="star-value">{formatNumber(totalStarsEarned)}</span>
+    <div className="min-h-screen bg-[#fef7ff] px-6 pb-36 pt-8" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+      <main className="mx-auto max-w-2xl">
+        <section className="relative mb-10">
+          <div className="relative overflow-hidden rounded-xl bg-[#1b6b4f] p-8 text-white shadow-lg">
+            <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-[#a7f3d0]/20 blur-3xl"></div>
+            <div className="relative z-10">
+              <p className="mb-1 text-sm font-bold opacity-80">CURRENT MILESTONE • {playerName}</p>
+              <h2 className="mb-4 text-3xl font-extrabold tracking-tight">Level {level}</h2>
+              <div className="mb-2 h-4 w-full overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-[#a7f3d0]" style={{ width: `${levelPercent}%` }}></div></div>
+              <div className="flex justify-between text-xs font-bold">
+                <span>{levelProgress} / {starsPerLevel} XP TO LEVEL {Math.min(level + 1, 15)}</span>
+                <span className="text-[#a7f3d0]">{levelPercent}% COMPLETED</span>
               </div>
             </div>
-            <div className="player-rank">{getPlayerTitle(level)}</div>
           </div>
-        </div>
-        <div className="top-counters">
-          <button
-            onClick={() => startTutorial('tour')}
-            className="tiny-pill"
-            aria-label="Show tutorial"
-            title="Show tutorial"
-          >
-            ?
-          </button>
-          <div ref={languageSelectorRef} style={{ position: 'relative' }}>
-            <button
-              onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
-              className="tiny-pill"
-              aria-label={t('app.languagePicker.label')}
-            >
-              🌎
-            </button>
+        </section>
 
-            {/* App Language Selector Popup */}
-            {appLanguageSelectorExpanded && (
-              <div className="language-selector-popup">
-                <button
-                  onClick={() => setAppLanguageSelectorExpanded(false)}
-                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-arcade-accent-red text-white shadow-arcade-sm z-10"
-                  aria-label={t('common.close')}
-                >
-                  <XIcon className="h-3 w-3" />
-                </button>
+        <section className="mb-10 grid grid-cols-2 gap-4">
+          <div className="col-span-2 flex items-center justify-between overflow-hidden rounded-lg bg-[#f9f1fd] p-6">
+            <div className="flex-1">
+              <span className="mb-3 inline-block rounded-full bg-[#fcb972] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#774708]">Most Recent</span>
+              <h3 className="mb-1 text-xl font-bold">
+                {recentBadge ? getBadgeCopy(recentBadge, t, gameName, recentBadge?.tiers?.[0]?.goal ?? 1).name : 'Polyglot Pioneer'}
+              </h3>
+              <p className="text-sm text-[#3f4943]">
+                {recentBadge ? getBadgeCopy(recentBadge, t, gameName, recentBadge?.tiers?.[0]?.goal ?? 1).summary : 'Completed 5 different language paths.'}
+              </p>
+            </div>
+            <div className="ml-4 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-sm"><Icon className="text-4xl text-[#855315]" filled>emoji_events</Icon></div>
+          </div>
 
-                <h3 className="mb-3 text-center font-heading text-sm font-bold text-arcade-text-main">
-                  {t('app.languagePicker.label')}
-                </h3>
-
-                <select
-                  id="achievements-app-language-select"
-                  value={appLanguageId}
-                  onChange={(event) => selectAppLanguage(event.target.value)}
-                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
-                >
-                  {languageOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {getFormattedLanguageName(option, t)}
-                    </option>
-                  ))}
-                </select>
-
-                <h3 className="mb-2 mt-4 text-center font-heading text-sm font-bold text-arcade-text-main">
-                  {t('home.languagePicker.label')}
-                </h3>
-
-                <select
-                  id="achievements-practice-language-select"
-                  value={languageId}
-                  onChange={(event) => selectLanguage(event.target.value)}
-                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
-                >
-                  {languageOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {getFormattedLanguageName(option, t)}
-                    </option>
-                  ))}
-                </select>
+          {milestones.map((badge, index) => {
+            const state = badges?.[badge.id];
+            const goal = badge.tiers[Math.min(state?.tier ?? 0, badge.tiers.length - 1)]?.goal ?? 1;
+            const current = Math.min(state?.progress ?? 0, goal);
+            const pct = Math.round((current / goal) * 100);
+            return (
+              <div key={badge.id} className={`flex flex-col rounded-lg p-5 ${index === 0 ? 'bg-[#e7e0eb]' : 'bg-[#f9f1fd]'}`}>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#1b6b4f]/10"><Icon className="text-[#1b6b4f]" filled>{index === 0 ? 'history_edu' : 'auto_awesome'}</Icon></div>
+                <div>
+                  <h4 className="mb-1 text-lg font-bold leading-tight">{getBadgeCopy(badge, t, gameName, goal).name}</h4>
+                  <p className="text-xs text-[#3f4943]">{getBadgeCopy(badge, t, gameName, goal).summary}</p>
+                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#bec9c2]/30"><div className="h-full bg-[#1b6b4f]" style={{ width: `${pct}%` }}></div></div>
+                </div>
               </div>
-            )}
-          </div>
-        </div>
-      </header>
+            );
+          })}
+        </section>
 
-      <section className="section badge-tabs" style={{ marginTop: '20px' }}>
-        <div className="section-header">
-          <div className="wood-header">{t('achievements.title')}</div>
-        </div>
-        <section className="section" style={{ marginTop: '10px' }}></section>
-
-        {/* Mode-based achievement sections — content always rendered for stable layout */}
-        {[
-          { modeId: 'letterRiver', subSections: ['classic', 'special', 'polyglot', 'dedication'] },
-          { modeId: 'bridgeBuilder', subSections: ['bridgeBuilder'] },
-          { modeId: 'deepScript', subSections: ['deepScript'] },
-        ].map(({ modeId, subSections }) => {
-          const modeBadges = badgesCatalog.filter((badge) => subSections.includes(badge.section));
-          if (modeBadges.length === 0) return null;
-
-          const modeLabel = t(`achievementSections.${modeId}`, modeId);
-          const isExpanded = expandedModeSections[modeId] ?? false;
-
-          return (
-            <div key={modeId} style={{ marginBottom: isExpanded ? '28px' : '8px' }}>
-              <button
-                type="button"
-                onClick={() => setExpandedModeSections(prev => ({ ...prev, [modeId]: !isExpanded }))}
-                className={`section-banner section-banner--${sectionBannerVariant} text-sm`}
-                style={{
-                  width: '100%',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px 16px',
-                  marginBottom: isExpanded ? '16px' : '0',
-                  border: 'none',
-                  fontWeight: 600,
-                  fontSize: '1rem',
-                }}
-              >
-                <span>{modeLabel}</span>
-                <span style={{ fontSize: '0.8em', opacity: 0.7 }}>{isExpanded ? '▲' : '▼'}</span>
-              </button>
-
-              <div style={isExpanded ? {} : { height: 0, overflow: 'hidden' }}>
-              {subSections.map((sectionId) => {
-                const sectionCatalog = badgesCatalog.filter((badge) => badge.section === sectionId);
-                const activeSectionBadges = sectionCatalog.filter((badge) => activeBadges.includes(badge.id));
-                const additionalBadges = sectionCatalog.filter((badge) => !activeBadges.includes(badge.id));
-                const displayBadges = [...activeSectionBadges, ...additionalBadges].slice(
-                  0,
-                  Math.max(3, activeSectionBadges.length)
-                );
-
-                if (displayBadges.length === 0) return null;
-
-                const showSubHeader = subSections.length > 1;
-
-                return (
-                  <div key={sectionId} className="achievement-section" style={{ marginBottom: '24px' }}>
-                    {showSubHeader && (
-                      <div className="section-header mb-3">
-                        <div className="section-title">
-                          <div className={`section-banner section-banner--${sectionBannerVariant} text-sm`} style={{ opacity: 0.8, fontSize: '0.85rem' }}>
-                            {t(`achievementSections.${sectionId}`, sectionId.charAt(0).toUpperCase() + sectionId.slice(1))}
-                          </div>
-                        </div>
+        <h3 className="mb-6 text-xl font-extrabold text-[#1b6b4f]">Upcoming Milestones</h3>
+        <div className="mb-10 space-y-4">
+          {upcomingByGroup.map((group) => (
+            <div key={group.key} className="space-y-2">
+              <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
+              {group.badges.length > 0 ? (
+                group.badges.map((badge, index) => {
+                  const state = badges?.[badge.id];
+                  const goal = badge.tiers[Math.min(state?.tier ?? 0, badge.tiers.length - 1)]?.goal ?? 1;
+                  const current = Math.min(state?.progress ?? 0, goal);
+                  const pct = Math.round((current / goal) * 100);
+                  return (
+                    <div key={badge.id} className="flex items-center gap-5 rounded-xl p-4 transition-all hover:bg-[#f9f1fd]">
+                      <div className="relative">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#e7e0eb]"><Icon className="text-[#6f7973]">workspace_premium</Icon></div>
+                        <div className="absolute -bottom-1 -right-1 rounded-full bg-white p-1 shadow-sm"><Icon className="text-[14px] text-[#1b6b4f]">lock</Icon></div>
                       </div>
-                    )}
-                    <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
-                      {displayBadges.map((badge, index) => (
-                        <BadgeCard
-                          key={badge.id}
-                          badge={badge}
-                          progress={badges[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] }}
-                          className={index === 0 ? 'badge-tier-example' : ''}
-                          translate={t}
-                          gameName={gameName}
-                          onClaim={handleBadgeClaim}
-                        />
-                      ))}
+                      <div className="flex-1">
+                        <div className="mb-1 flex items-end justify-between">
+                          <h4 className="font-bold">{getBadgeCopy(badge, t, gameName, goal).name}</h4>
+                          <span className="text-[10px] font-bold text-[#3f4943]">STEP {10 + index}</span>
+                        </div>
+                        <p className="mb-2 text-xs text-[#3f4943]">{getBadgeCopy(badge, t, gameName, goal).summary}</p>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-[#e7e0eb]"><div className="h-full bg-[#1b6b4f]/30" style={{ width: `${pct}%` }}></div></div>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-              </div>
+                  );
+                })
+              ) : (
+                <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No in-progress milestones in this section.</div>
+              )}
             </div>
-          );
-        })}
-      </section>
+          ))}
+          {upcoming.length === 0 ? (
+            <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No milestones in progress yet.</div>
+          ) : null}
+        </div>
+
+        <section className="space-y-3">
+          <h3 className="text-lg font-bold text-[#1b6b4f]">Claimable Awards</h3>
+          {claimableAwards.map((badge) => (
+            <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
+          ))}
+          {claimableAwards.length === 0 ? (
+            <p className="text-xs font-semibold text-[#6f7973]">No currently claimable achievements.</p>
+          ) : null}
+          {claiming ? <p className="text-xs font-semibold text-[#4a6365]">Claiming reward...</p> : null}
+        </section>
+
+        <section className="mt-10 space-y-3">
+          <button
+            type="button"
+            onClick={() => setIsAllAchievementsExpanded((prev) => !prev)}
+            className="flex w-full items-center justify-between rounded-xl bg-white px-4 py-3 text-left shadow-sm"
+            aria-expanded={isAllAchievementsExpanded}
+          >
+            <h3 className="text-lg font-bold text-[#1b6b4f]">All Achievements ({totalAchievementCount})</h3>
+            <Icon className="text-[#1b6b4f]">{isAllAchievementsExpanded ? 'expand_less' : 'expand_more'}</Icon>
+          </button>
+
+          {isAllAchievementsExpanded ? (
+            allByGroup.map((group) => (
+              <div key={group.key} className="space-y-2">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
+                <div className="space-y-2">
+                  {group.badges.map((badge) => (
+                    <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : null}
+
+          {isAllAchievementsExpanded && totalAchievementCount === 0 ? (
+            <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No achievements available yet.</div>
+          ) : null}
+        </section>
+      </main>
     </div>
   );
 }

@@ -1,394 +1,170 @@
-import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
-import badgesCatalog from '../data/badges.json';
+import React, { useMemo } from 'react';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
-import { useTutorial } from '../context/TutorialContext.jsx';
-import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
 import { getFormattedLanguageName } from '../lib/languageUtils.js';
-import { classNames } from '../lib/classNames.js';
-import { getPlayerTitle } from '../utils/playerTitles.js';
-import { loadLanguage } from '../lib/languageLoader.js';
-import { useCardUpdates } from '../hooks/useCardUpdates.js';
+import { useLocalization } from '../context/LocalizationContext.jsx';
+import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
+import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 
-function GlobeIcon({ className = '' }) {
+const topAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBIzHWOoiXw0a1BU87o2LewTUl8n-_HZC92abDxxI91uQwUGpDDtDgWHkTor7IjvjQUcxU7G-n8vr_x7LsbbX6UCGbzaOGQiMHvD0X0hLDyDkwxenmzAxbV13d80mSxIEbzburnmpLQI0pGLrCNFySYaPuV-i4du-NITzYGpCAUfJ6_xI-xPhTpvL3foKAaOrn9l0TeZ1FkLoJDs6MmFvm0sYR4IaDSqzapogXZiRaJ6Vtk8P5f_5-7mlXebxZLoP1TEu4n2VyOKKDq';
+function Icon({ children, className = '', filled = false }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <circle cx="12" cy="12" r="10" />
-      <line x1="2" y1="12" x2="22" y2="12" />
-      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-    </svg>
+    <span
+      className={`material-symbols-outlined ${className}`}
+      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
+      aria-hidden="true"
+    >
+      {children}
+    </span>
   );
 }
 
-function XIcon({ className = '' }) {
+function LanguageCard({ id, label, value, onChange, options, leading, trailing }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
-}
-
-function QuestCard({ task, onClaim, claimingTaskId, t }) {
-  const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
-  const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
-  const canClaimReward = Boolean(task.rewardClaimable) && !task.rewardClaimed;
-  const currentProgress = Math.min(task.progress ?? 0, task.goal);
-
-  // Track quest progress for green stroke
-  const questUpdate = useCardUpdates(`quest-${task.id}`, task.progress ?? 0);
-
-  return (
-    <div className={classNames('quest-card', questUpdate.isUpdated && 'card-updated')}>
-      <div className="quest-top-row">
-        <div className="quest-left">
-          <div className="quest-title">{task.description}</div>
-          <div className="quest-progress-meta">
-            {currentProgress} / {task.goal}
+    <label htmlFor={id} className="group relative block rounded-full bg-[#f9f1fd] p-6 transition-colors hover:bg-[#ede6f1]">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-4">
+          {leading}
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#4a6365]">{label}</p>
+            <p className="text-lg font-bold">{options.find((option) => option.id === value)?.name ?? value}</p>
           </div>
         </div>
-        <div className="quest-right">
-          {rewardValue > 0 && (
-            <div className="quest-reward-inline">
-              +{rewardValue} <span className="star-inline">★</span>
-            </div>
-          )}
-          <button
-            className={`quest-cta ${canClaimReward ? 'active' : ''}`}
-            onClick={() => canClaimReward && onClaim(task.id)}
-            disabled={!canClaimReward || claimingTaskId === task.id}
-          >
-            {task.rewardClaimed ? t('home.quest.claimed') : canClaimReward ? t('home.quest.claim') : t('home.quest.locked')}
-          </button>
-        </div>
+        {trailing}
       </div>
-      <div className="quest-progress-bar">
-        <div className="quest-progress-fill" style={{ width: `${percentage}%` }}></div>
-      </div>
-    </div>
+      <select
+        id={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        aria-label={label}
+      >
+        {options.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.name}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 
 export default function HomeView() {
-  const { player, streak, daily, starLevelSize, claimDailyReward } = useProgress();
-
+  const { player, starLevelSize, updatePlayerProfile } = useProgress();
   const { setShowPlayModal } = useGame();
-  const { startTutorial, currentTutorial, currentStepIndex } = useTutorial();
+  const { languageId, appLanguageId, languageOptions, selectLanguage, selectAppLanguage } = useLanguage();
   const { t } = useLocalization();
-  const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
-  const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
-  const [hoveredLetter, setHoveredLetter] = useState(null);
-  const languageSelectorRef = useRef(null);
 
-  const latestBadge = useMemo(() => {
-    if (!player.latestBadge) return null;
-    const badge = badgesCatalog.find((item) => item.id === player.latestBadge.id);
-    const tierSpec = badge?.tiers?.find((item) => item.tier === player.latestBadge.tier);
-
-    const nameKey = player.latestBadge.nameKey ?? badge?.nameKey;
-    const labelKey = player.latestBadge.labelKey ?? tierSpec?.labelKey;
-    const summaryKey = player.latestBadge.summaryKey ?? badge?.summaryKey;
-
-    const name = nameKey ? t(nameKey) : player.latestBadge.name ?? badge?.name ?? player.latestBadge.id;
-    const label = labelKey ? t(labelKey) : player.latestBadge.label ?? tierSpec?.label ?? '';
-    const summary = summaryKey ? t(summaryKey, { gameName: t('app.title'), goal: tierSpec?.goal ?? player.latestBadge.goal }) : player.latestBadge.summary ?? badge?.summary ?? '';
-
-    return {
-      ...player.latestBadge,
-      name,
-      label,
-      summary
-    };
-  }, [player.latestBadge, t]);
+  const displayLanguageOptions = useMemo(
+    () => languageOptions.map((option) => ({ ...option, name: getFormattedLanguageName(option, t) })),
+    [languageOptions, t]
+  );
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
   const totalStarsEarned = player.totalStarsEarned ?? player.stars ?? 0;
   const level = player.level ?? Math.floor(totalStarsEarned / starsPerLevel) + 1;
   const levelProgress = player.levelProgress ?? (totalStarsEarned % starsPerLevel);
-  const starsProgress = starsPerLevel > 0 ? Math.min(levelProgress / starsPerLevel, 1) : 0;
-  const formatNumber = useCallback((value) => Math.max(0, Math.floor(value ?? 0)).toLocaleString(), []);
-  const [claimingTaskId, setClaimingTaskId] = useState(null);
-
-  // Get recently encountered letters
-  const recentLetters = useMemo(() => {
-    try {
-      const languagePack = loadLanguage(languageId);
-      const letters = player.letters || {};
-      const itemsById = languagePack.itemsById || {};
-
-      // Get letters with activity, sorted by total interactions
-      const activeLetters = Object.entries(letters)
-        .filter(([id, stats]) => (stats.correct || 0) + (stats.incorrect || 0) > 0)
-        .map(([id, stats]) => ({
-          id,
-          symbol: itemsById[id]?.symbol || id,
-          name: itemsById[id]?.name || id,
-          sound: itemsById[id]?.sound || '',
-          total: (stats.correct || 0) + (stats.incorrect || 0)
-        }))
-        .sort((a, b) => b.total - a.total)
-        .slice(0, 5);
-
-      return activeLetters.length > 0 ? activeLetters : [
-        { symbol: 'ק', name: 'Qof', sound: 'k' },
-        { symbol: 'ר', name: 'Resh', sound: 'r' },
-        { symbol: 'ט', name: 'Tet', sound: 't' },
-        { symbol: 'ו', name: 'Vav', sound: 'v' },
-        { symbol: 'ב', name: 'Bet', sound: 'b' }
-      ];
-    } catch (e) {
-      // Fallback to default letters
-      return [
-        { symbol: 'ק', name: 'Qof', sound: 'k' },
-        { symbol: 'ר', name: 'Resh', sound: 'r' },
-        { symbol: 'ט', name: 'Tet', sound: 't' },
-        { symbol: 'ו', name: 'Vav', sound: 'v' },
-        { symbol: 'ב', name: 'Bet', sound: 'b' }
-      ];
-    }
-  }, [player.letters, languageId]);
-
-  // Track card updates for green stroke
-  const heroCardUpdate = useCardUpdates('hero-card', recentLetters.map(l => l.symbol).join(','));
-  const streakCardUpdate = useCardUpdates('streak-card', player.streakCount ?? 0);
-  const levelCardUpdate = useCardUpdates('level-card', level);
-  const badgeCardUpdate = useCardUpdates('badge-card', player.latestBadge?.id ?? '');
-
-  // Check if play button should be disabled during tutorial
-  const isPlayDisabled = currentTutorial?.id === 'firstTime' && currentStepIndex < 4;
-
-  // Close language selector when clicking outside
-  useEffect(() => {
-    if (!appLanguageSelectorExpanded) return;
-
-    const handleClickOutside = (event) => {
-      if (languageSelectorRef.current && !languageSelectorRef.current.contains(event.target)) {
-        setAppLanguageSelectorExpanded(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [appLanguageSelectorExpanded]);
-
-  const handleDailyClaim = useCallback(
-    (taskId) => {
-      if (!taskId || claimingTaskId) return;
-      setClaimingTaskId(taskId);
-      Promise.resolve(claimDailyReward(taskId)).finally(() => {
-        setClaimingTaskId(null);
-      });
-    },
-    [claimingTaskId, claimDailyReward]
-  );
-
-  if (!daily) {
-    return (
-      <div className="rounded-3xl border-4 border-slate-700 bg-slate-800 p-8 text-center font-semibold text-slate-300 shadow-2xl">
-        Loading daily quests…
-      </div>
-    );
-  }
-
-  const nextResetDate = useMemo(() => new Date(Date.now() + millisUntilNextJerusalemMidnight()), [daily?.dateKey]);
-  const nextResetTime = formatJerusalemTime(nextResetDate, { timeZoneName: 'short' });
-  const totalQuests = daily?.tasks?.length ?? 0;
+  const progressPct = starsPerLevel > 0 ? Math.round(Math.min((levelProgress / starsPerLevel) * 100, 100)) : 0;
+  const [isProfileEditorOpen, setIsProfileEditorOpen] = React.useState(false);
+  const playerName = player?.name || DEFAULT_PROFILE_NAME;
+  const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
   return (
-    <>
-      {/* Player Header */}
-      <header className="player-header">
-        <div className="player-meta">
-          <div className="avatar"></div>
-          <div className="player-text">
-            <div className="player-name">{t('common.player')}</div>
-            <div className="player-level-row">
-              <div className="player-level">{t('home.progress.level', { level })}</div>
-              <div className="player-level-progress">
-                <div className="player-level-progress-fill" style={{ width: `${starsProgress * 100}%` }}></div>
+    <div className="relative min-h-screen bg-[#fef7ff] text-[#1d1a22]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+      <main className="mx-auto max-w-2xl space-y-8 px-6 pb-48 pt-8">
+        <section>
+          <div className="flex flex-col items-center space-y-4 rounded-2xl border border-[#1b6b4f]/5 bg-white p-8 text-center shadow-sm">
+            <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#f9f1fd]">
+              <img alt="Avatar Large" className="h-20 w-20 rounded-full object-cover" src={playerAvatar || topAvatar} />
+              <button onClick={() => setIsProfileEditorOpen(true)} className="absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 border-white bg-[#1b6b4f] p-2 text-white shadow-lg" type="button">
+                <Icon className="text-sm">edit</Icon>
+              </button>
+            </div>
+            <div>
+              <h1 className="text-2xl font-extrabold tracking-tight">{playerName}</h1>
+              <p className="text-sm text-[#4a6365]">Learning since January 2024</p>
+            </div>
+            <div className="mt-4 w-full space-y-2">
+              <div className="flex justify-between text-xs font-bold text-[#1b6b4f]">
+                <span>LEVEL {level}</span>
+                <span>{levelProgress.toLocaleString()} / {starsPerLevel.toLocaleString()} XP</span>
               </div>
-              <div className="player-stars-badge">
-                <span className="star-icon">⭐</span>
-                <span className="star-value">{formatNumber(totalStarsEarned)}</span>
+              <div className="h-3 w-full overflow-hidden rounded-full bg-[#a7f3d0]">
+                <div className="h-full rounded-full bg-[#1b6b4f]" style={{ width: `${progressPct}%` }}></div>
               </div>
             </div>
-            <div className="player-rank">{getPlayerTitle(level)}</div>
           </div>
-        </div>
-        <div className="top-counters">
-          <button
-            onClick={() => startTutorial('tour')}
-            className="tiny-pill"
-            aria-label="Show tutorial"
-            title="Show tutorial"
-          >
-            ?
-          </button>
-          <div ref={languageSelectorRef} style={{ position: 'relative' }}>
-            <button
-              onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
-              className="tiny-pill"
-              aria-label={t('app.languagePicker.label')}
-            >
-              🌎
-            </button>
-
-            {/* App Language Selector Popup */}
-            {appLanguageSelectorExpanded && (
-              <div className="language-selector-popup">
-                <button
-                  onClick={() => setAppLanguageSelectorExpanded(false)}
-                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-arcade-accent-red text-white shadow-arcade-sm z-10"
-                  aria-label={t('common.close')}
-                >
-                  <XIcon className="h-3 w-3" />
-                </button>
-
-                <h3 className="mb-3 text-center font-heading text-sm font-bold text-arcade-text-main">
-                  {t('app.languagePicker.label')}
-                </h3>
-
-                <select
-                  id="home-app-language-select"
-                  value={appLanguageId}
-                  onChange={(event) => selectAppLanguage(event.target.value)}
-                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
-                >
-                  {languageOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {getFormattedLanguageName(option, t)}
-                    </option>
-                  ))}
-                </select>
-
-                <h3 className="mb-2 mt-4 text-center font-heading text-sm font-bold text-arcade-text-main">
-                  {t('home.languagePicker.label')}
-                </h3>
-
-                <select
-                  id="home-practice-language-select"
-                  value={languageId}
-                  onChange={(event) => selectLanguage(event.target.value)}
-                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
-                >
-                  {languageOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {getFormattedLanguageName(option, t)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Card */}
-      <section className="section" style={{ marginTop: '20px',  }}></section>
-      <section className={classNames('hero-card', heroCardUpdate.isUpdated && 'card-updated')} style={{ position: 'relative' }}>
-        <h1 className="hero-title">{t('home.recentLetters.title')}</h1>
-        <div className="hero-body" style={{ display: 'flex', gap: '12px', fontSize: '24px', flexWrap: 'wrap' }}>
-          {recentLetters.map((letter, index) => (
-            <span
-              key={index}
-              className="hebrew-text"
-              style={{
-                cursor: 'pointer',
-                position: 'relative',
-                fontFamily: 'Heebo, sans-serif',
-                transition: 'transform 0.2s ease'
-              }}
-              onMouseEnter={() => setHoveredLetter(index)}
-              onMouseLeave={() => setHoveredLetter(null)}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'scale(1.15)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
-              {letter.symbol}
-              {hoveredLetter === index && (
-                <span className="letter-tooltip">
-                  {letter.name} ({letter.sound})
-                </span>
-              )}
-            </span>
-          ))}
-        </div>
-        <button
-          className="hero-cta"
-          onClick={() => !isPlayDisabled && setShowPlayModal(true)}
-          disabled={isPlayDisabled}
-          style={isPlayDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-        >
-          {t('home.cta.play')}
-        </button>
-      </section>
-
-      {/* Progress Section */}
-      <section className="section">
-        <section className="section" style={{ marginTop: '20px',  }}></section>
-        <div className="section-header">
-          <div className="section-title">
-            <div className="wood-header">{t('home.progress.heading')}</div>
-          </div>
-          <div className="section-link">{t('common.viewDetails')}</div>
-        </div>
-        <section className="section" style={{ marginTop: '5px',  }}></section>
-        <div className="progress-row">
-          <div className={classNames('progress-card-small', streakCardUpdate.isUpdated && 'card-updated')}>
-            <div className="progress-icon red">🔥</div>
-            <div className="progress-label">{t('home.progress.streak')}</div>
-            <div className="progress-value">{t('home.progress.days', { count: streak.current })}</div>
-            <div className="progress-sub">{t('home.progress.resetsAt', { time: nextResetTime })}</div>
-          </div>
-          <div className={classNames('progress-card-small', levelCardUpdate.isUpdated && 'card-updated')}>
-            <div className="progress-icon gold">★</div>
-            <div className="progress-label">{t('home.progress.starLevel')}</div>
-            <div className="progress-value">{t('home.progress.level', { level })}</div>
-            <div className="progress-bar-shell">
-              <div className="progress-bar-fill" style={{ width: `${starsProgress * 100}%` }}></div>
-            </div>
-            <div className="progress-sub">
-              {t('home.progress.toNextLevel', { current: formatNumber(levelProgress), total: formatNumber(starsPerLevel) })}
-            </div>
-          </div>
-          <div className={classNames('progress-card-small', badgeCardUpdate.isUpdated && 'card-updated')}>
-            <div className="progress-icon cyan">🏅</div>
-            <div className="progress-label">{t('home.progress.latestBadge')}</div>
-            <div className="progress-value">{latestBadge?.name || t('common.noneYet')}</div>
-            <div className="progress-sub">{latestBadge ? latestBadge.summary : t('home.progress.playToUnlock')}</div>
-          </div>
-        </div>
-      </section>
-
-      {/* Daily Quests Section */}
-      <section className="section" style={{ marginTop: '20px',  }}></section>
-      {daily?.tasks && daily.tasks.length > 0 && (
-        <section className="section">
-          <div className="section-header">
-            <div className="section-title">
-              <div className="wood-header">{t('home.dailyQuests.title')}</div>
-            </div>
-            <div className="section-link">{t('home.dailyQuests.resetsAt', { time: nextResetTime })}</div>
-          </div>
-          <section className="section" style={{ marginTop: '5px',  }}></section>
-          {daily.tasks.map((task) => (
-            <QuestCard
-              key={task.id}
-              task={task}
-              onClaim={handleDailyClaim}
-              claimingTaskId={claimingTaskId}
-              t={t}
-            />
-          ))}
         </section>
-      )}
-    </>
+
+        <section className="space-y-4">
+          <h2 className="px-2 text-xl font-bold">Language Learning</h2>
+          <div className="space-y-4">
+            <LanguageCard
+              id="home-app-language-select"
+              label="App Language"
+              value={appLanguageId}
+              onChange={selectAppLanguage}
+              options={displayLanguageOptions}
+              leading={<div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm"><Icon className="text-[#1b6b4f]">language</Icon></div>}
+              trailing={<Icon className="text-[#6f7973]">expand_more</Icon>}
+            />
+
+            <LanguageCard
+              id="home-practice-language-select"
+              label="I'm Learning"
+              value={languageId}
+              onChange={selectLanguage}
+              options={displayLanguageOptions}
+              leading={<div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white text-2xl shadow-sm">🇮🇱</div>}
+              trailing={<div className="flex items-center gap-3"><span className="rounded-full bg-[#1b6b4f]/10 px-3 py-1 text-[10px] font-black text-[#1b6b4f]">ACTIVE</span><Icon className="text-[#6f7973]">swap_horiz</Icon></div>}
+            />
+          </div>
+        </section>
+
+        <section className="grid grid-cols-2 gap-4">
+          <div className="space-y-3 rounded-2xl bg-[#f9f1fd] p-6">
+            <Icon className="text-3xl text-[#855315]" filled>bolt</Icon>
+            <div>
+              <h3 className="leading-tight font-bold">Daily Goal</h3>
+              <p className="text-sm text-[#4a6365]">15 mins / day</p>
+            </div>
+          </div>
+          <div className="space-y-3 rounded-2xl bg-[#f9f1fd] p-6">
+            <Icon className="text-3xl text-[#1b6b4f]" filled>notifications</Icon>
+            <div>
+              <h3 className="leading-tight font-bold">Reminders</h3>
+              <p className="text-sm text-[#4a6365]">8:00 PM Daily</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="pt-4">
+          <button
+            onClick={() => setShowPlayModal(true)}
+            className="flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-br from-[#1b6b4f] to-[#1b6b4f]/80 py-5 text-lg font-bold text-white shadow-lg shadow-[#1b6b4f]/20 transition-all hover:scale-[1.02] active:scale-95"
+            type="button"
+          >
+            Start learning
+            <Icon>arrow_forward</Icon>
+          </button>
+          <p className="mt-6 px-8 text-center text-xs leading-relaxed text-[#4a6365]">
+            Your progress is automatically synced with your cloud account.
+            {' '}
+            <a className="font-bold text-[#1b6b4f] underline underline-offset-4" href="#">Privacy Policy</a>
+          </p>
+        </section>
+      </main>
+      <ProfileEditorModal
+        isOpen={isProfileEditorOpen}
+        initialName={playerName}
+        initialAvatar={playerAvatar}
+        onClose={() => setIsProfileEditorOpen(false)}
+        onSave={(profile) => {
+          updatePlayerProfile(profile);
+          setIsProfileEditorOpen(false);
+        }}
+      />
+    </div>
   );
 }

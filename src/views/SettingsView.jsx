@@ -1,33 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { getFormattedLanguageName } from '../lib/languageUtils.js';
+import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
+import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
+
+function Icon({ children, className = '', filled = false }) {
+  return (
+    <span
+      className={`material-symbols-outlined ${className}`}
+      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
+      aria-hidden="true"
+    >
+      {children}
+    </span>
+  );
+}
+
+function Toggle({ id, label, icon, checked, onChange }) {
+  return (
+    <label htmlFor={id} className="group flex cursor-pointer items-center justify-between">
+      <div className="flex items-center gap-4">
+        <Icon className="text-[#4a6365] transition-colors group-hover:text-[#1b6b4f]">{icon}</Icon>
+        <span className="font-semibold text-[#1d1a22]">{label}</span>
+      </div>
+      <div className="relative inline-flex items-center">
+        <input id={id} type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="peer sr-only" />
+        <div className="h-6 w-11 rounded-full bg-[#e7e0eb] transition peer-checked:bg-[#1b6b4f] after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition peer-checked:after:translate-x-full"></div>
+      </div>
+    </label>
+  );
+}
 
 export default function SettingsView() {
+  const navigate = useNavigate();
   const { t } = useLocalization();
+  const { player, starLevelSize, updatePlayerProfile } = useProgress();
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
 
-  // Game accessibility settings - these mirror the game settings
   const [showIntroductions, setShowIntroductions] = useState(true);
   const [highContrast, setHighContrast] = useState(false);
   const [randomLetters, setRandomLetters] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [gameSpeed, setGameSpeed] = useState(17);
   const [gameFont, setGameFont] = useState('default');
   const [fontShuffle, setFontShuffle] = useState(false);
   const [slowRiver, setSlowRiver] = useState(false);
   const [clickMode, setClickMode] = useState(false);
   const [associationMode, setAssociationMode] = useState(false);
   const [startingLetters, setStartingLetters] = useState(2);
-
-  // Info popup state
-  const [showInfoPopup, setShowInfoPopup] = useState(false);
-  const [infoPopupContent, setInfoPopupContent] = useState({ title: '', description: '' });
-  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-
   const [hasLoadedSettings, setHasLoadedSettings] = useState(false);
+  const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
 
-  // Load settings from localStorage on mount
   useEffect(() => {
     const loadSettings = () => {
       try {
@@ -38,7 +63,6 @@ export default function SettingsView() {
           setHighContrast(settings.highContrast ?? false);
           setRandomLetters(settings.randomLetters ?? false);
           setReducedMotion(settings.reducedMotion ?? false);
-          setGameSpeed(settings.gameSpeed ?? 17);
           const savedFont = settings.gameFont === 'opendyslexic' ? 'lexend' : (settings.gameFont ?? 'default');
           setGameFont(savedFont);
           setFontShuffle(settings.fontShuffle ?? false);
@@ -54,26 +78,18 @@ export default function SettingsView() {
     };
 
     loadSettings();
-
-    // Listen for settings changes from other sources (like game.js)
     window.addEventListener('gameSettingsChanged', loadSettings);
-
-    return () => {
-      window.removeEventListener('gameSettingsChanged', loadSettings);
-    };
+    return () => window.removeEventListener('gameSettingsChanged', loadSettings);
   }, []);
 
-  // Save settings to localStorage whenever they change
   useEffect(() => {
     if (!hasLoadedSettings) return;
-
     try {
       const settings = {
         showIntroductions,
         highContrast,
         randomLetters,
         reducedMotion,
-        gameSpeed,
         gameFont,
         fontShuffle,
         slowRiver,
@@ -82,435 +98,180 @@ export default function SettingsView() {
         startingLetters
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
-
-      // Dispatch event to notify other components (like game.js)
       window.dispatchEvent(new Event('gameSettingsChanged'));
-
-      // Apply high contrast to body
-      if (highContrast) {
-        document.body.classList.add('high-contrast');
-      } else {
-        document.body.classList.remove('high-contrast');
-      }
+      if (highContrast) document.body.classList.add('high-contrast');
+      else document.body.classList.remove('high-contrast');
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
-  }, [hasLoadedSettings, showIntroductions, highContrast, randomLetters, reducedMotion, gameSpeed, gameFont, fontShuffle, slowRiver, clickMode, associationMode, startingLetters]);
+  }, [hasLoadedSettings, showIntroductions, highContrast, randomLetters, reducedMotion, gameFont, fontShuffle, slowRiver, clickMode, associationMode, startingLetters]);
 
-  const getSpeedLabel = (speed) => {
-    if (speed < 14) return t('game.accessibility.speedSlow');
-    if (speed > 20) return t('game.accessibility.speedFast');
-    return t('game.accessibility.speedNormal');
-  };
-
-  // Setting descriptions for info popup
-  const settingInfo = {
-    showIntroductions: {
-      title: t('game.accessibility.showIntroductions'),
-      description: 'Shows an introduction screen for each new letter before it appears in the game, helping you learn the letter before playing.'
-    },
-    highContrast: {
-      title: t('game.accessibility.highContrast'),
-      description: 'Increases the contrast between text and background colors to make letters easier to see and distinguish.'
-    },
-    randomLetters: {
-      title: t('game.accessibility.randomLetters'),
-      description: 'Letters appear in random order instead of the standard alphabetical sequence, providing varied practice.'
-    },
-    reducedMotion: {
-      title: t('game.accessibility.reducedMotion'),
-      description: 'Simplifies animations by removing rotation and complex movement patterns, making letters move in straight lines for easier tracking.'
-    },
-    gameSpeed: {
-      title: t('game.accessibility.speed'),
-      description: 'Controls how quickly letters move across the screen. Slower speeds give you more time to recognize and drag letters.'
-    },
-    gameFont: {
-      title: 'Game Font',
-      description: 'Choose from different fonts including dyslexia-friendly options. Some fonts are specially designed to make letters easier to distinguish.'
-    },
-    fontShuffle: {
-      title: 'Font Shuffle',
-      description: 'Each letter appears in a different random font from the previous one. This helps you recognize letters in various typefaces.'
-    },
-    slowRiver: {
-      title: 'Slow River Mode',
-      description: 'Letters move to the center of the screen and stay there instead of flowing off the edge. This gives you unlimited time to identify and place each letter.'
-    },
-    clickMode: {
-      title: 'Click Mode',
-      description: 'Click on a letter to select it, then click on a bucket to place it, instead of dragging. This makes the game easier to play if you have difficulty with dragging.'
-    },
-    associationMode: {
-      title: 'Association Mode',
-      description: 'Buckets display images, drag to the image which starts with the letter sound.'
-    },
-    startingLetters: {
-      title: 'Starting Letters',
-      description: 'Choose how many letters are introduced at the beginning of level 1.'
-    }
-  };
-
-const showInfo = (settingKey, event) => {
-  if (settingInfo[settingKey]) {
-    setInfoPopupContent(settingInfo[settingKey]);
-    setShowInfoPopup(true);
-
-    if (event) {
-      const clientX = event.clientX || event.touches?.[0]?.clientX || 0;
-      const clientY = event.clientY || event.touches?.[0]?.clientY || 0;
-
-      const viewportWidth  = window.innerWidth  || document.documentElement.clientWidth  || 0;
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-
-      const horizontalPadding    = 16;   // px from left/right
-      const verticalOffset       = 15;   // px below cursor when possible
-      const bottomBuffer         = 24;   // px from bottom of screen
-      const estimatedPopupHeight = 200;  // rough max popup height
-      const maxPopupWidth        = 320;  // matches your maxWidth style
-
-      // X: sit a bit to the right of the cursor, but not off the screen
-      const rawX = clientX + 15;
-      const x = Math.min(
-        Math.max(rawX, horizontalPadding),
-        viewportWidth - maxPopupWidth - horizontalPadding
-      );
-
-      // Y: prefer below the cursor, but clamp so there's a bottom buffer
-      const rawY = clientY + verticalOffset;
-      const maxY = viewportHeight - estimatedPopupHeight - bottomBuffer;
-      const y = Math.min(rawY, maxY);
-
-      setPopupPosition({ x, y });
-    }
-  }
-};
-
+  const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
+  const totalStarsEarned = player.totalStarsEarned ?? player.stars ?? 0;
+  const level = player.level ?? Math.floor(totalStarsEarned / starsPerLevel) + 1;
+  const levelProgress = player.levelProgress ?? (totalStarsEarned % starsPerLevel);
+  const progressPct = starsPerLevel > 0 ? Math.round(Math.min((levelProgress / starsPerLevel) * 100, 100)) : 0;
+  const playerName = player?.name || DEFAULT_PROFILE_NAME;
+  const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
   const fontOptions = [
     { value: 'default', label: 'Default' },
-    { value: 'lexend', label: 'Lexend / Noto Sans (dyslexia-friendly)' },
+    { value: 'lexend', label: 'Lexend / Noto Sans' },
     { value: 'comic-sans', label: 'Comic Sans' },
     { value: 'arial', label: 'Arial' },
     { value: 'verdana', label: 'Verdana' }
   ];
 
+  const displayLanguageOptions = useMemo(
+    () => languageOptions.map((option) => ({ ...option, name: getFormattedLanguageName(option, t) })),
+    [languageOptions, t]
+  );
+
   return (
-    <>
-      {/* Language Settings */}
-      <section className="section">
-        <div className="section-header">
-          <div className="section-title">
-            <div className="wood-header">{t('settings.languageSettings')}</div>
+    <div className="min-h-screen bg-[#fef7ff] pb-36 text-[#1d1a22]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+      <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between bg-[#fef7ff]/80 px-6 backdrop-blur-xl">
+        <div className="flex items-center gap-4">
+          <button className="text-[#1b6b4f] transition hover:opacity-80 active:scale-95" onClick={() => navigate('/')} type="button" aria-label="Back to Home">
+            <Icon>arrow_back</Icon>
+          </button>
+          <h1 className="text-lg font-bold text-[#1b6b4f]">Settings</h1>
+        </div>
+        <div className="w-10"></div>
+      </header>
+
+      <main className="mx-auto max-w-2xl space-y-8 px-6 pt-20">
+        <section className="relative flex items-center gap-6 overflow-hidden rounded-xl bg-[#f9f1fd] p-6">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#1b6b4f]/10 blur-2xl"></div>
+          <div className="relative">
+            <div className="h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg">
+              <img src={playerAvatar} alt="Profile avatar" className="h-full w-full object-cover" />
+            </div>
+            <button type="button" onClick={() => setIsProfileEditorOpen(true)} className="absolute -bottom-1 -right-1 rounded-full border border-white bg-[#1b6b4f] p-1 text-white">
+              <Icon className="text-[14px]">edit</Icon>
+            </button>
+            <div className="absolute -bottom-1 left-0 rounded-full bg-[#855315] px-2 py-0.5 text-[10px] font-bold text-white shadow-md">LVL {level}</div>
           </div>
-        </div>
-
-        <div className="progress-card-small p-4">
-          <h3 className="mb-3 font-heading text-sm font-bold text-arcade-text-main">
-            {t('app.languagePicker.label')}
-          </h3>
-          <select
-            id="settings-app-language-select"
-            value={appLanguageId}
-            onChange={(event) => selectAppLanguage(event.target.value)}
-            className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
-          >
-            {languageOptions.map((option) => (
-              <option key={option.id} value={option.id}>
-                {getFormattedLanguageName(option, t)}
-              </option>
-            ))}
-          </select>
-          <p className="mt-2 text-xs text-arcade-text-muted">
-            {t('app.languagePicker.helper')}
-          </p>
-        </div>
-
-        <div className="progress-card-small p-4 mt-3">
-          <h3 className="mb-3 font-heading text-sm font-bold text-arcade-text-main">
-            {t('home.languagePicker.label')}
-          </h3>
-          <select
-            id="settings-practice-language-select"
-            value={languageId}
-            onChange={(event) => selectLanguage(event.target.value)}
-            className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
-          >
-            {languageOptions.map((option) => (
-              <option key={option.id} value={option.id}>
-                {getFormattedLanguageName(option, t)}
-              </option>
-            ))}
-          </select>
-          <p className="mt-2 text-xs text-arcade-text-muted">
-            {t('home.languagePicker.helper')}
-          </p>
-        </div>
-      </section>
-
-      {/* Game Accessibility Settings */}
-      <section className="section" style={{ marginTop: '20px' }}>
-        <div className="section-header">
-          <div className="section-title">
-            <div className="wood-header">{t('settings.gameSettings')}</div>
+          <div className="flex-1 space-y-2">
+            <h2 className="text-2xl font-extrabold tracking-tight">{playerName}</h2>
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-semibold text-[#4a6365]">
+                <span>Progress</span>
+                <span>{levelProgress.toLocaleString()} / {starsPerLevel.toLocaleString()} XP</span>
+              </div>
+              <div className="h-3 w-full overflow-hidden rounded-full bg-[#a7f3d0]">
+                <div className="h-full rounded-full bg-[#1b6b4f]" style={{ width: `${progressPct}%` }}></div>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="progress-card-small p-4 relative">
-          {/* Info icon */}
-          <div className="absolute right-3 top-3 text-arcade-text-muted text-xl">
-            ⓘ
-          </div>
-
-          <div className="space-y-4 mt-2">
-            {/* Font Dropdown */}
-            <div className="border-b border-arcade-panel-border pb-4">
-              <label htmlFor="settings-font-select" className="block text-sm text-arcade-text-main mb-2">
-                <span
-                  className="cursor-pointer hover:text-arcade-accent-orange"
-                  onClick={(e) => showInfo('gameFont', e)}
-                  onMouseEnter={(e) => showInfo('gameFont', e)}
-                  onMouseLeave={() => setShowInfoPopup(false)}
-                >
-                  Game Font
-                </span>
+        <section className="space-y-4">
+          <h3 className="px-2 text-sm font-bold uppercase tracking-widest text-[#4a6365]">Language Preferences</h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <label htmlFor="settings-app-language-select" className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <Icon className="text-[#1b6b4f]">language</Icon>
+                  <div>
+                    <p className="text-xs font-medium text-[#4a6365]">App Language</p>
+                    <p className="font-bold">{displayLanguageOptions.find((option) => option.id === appLanguageId)?.name}</p>
+                  </div>
+                </div>
+                <Icon className="text-[#bec9c2]">expand_more</Icon>
               </label>
-              <select
-                id="settings-font-select"
-                value={gameFont}
-                onChange={(e) => setGameFont(e.target.value)}
-                className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
-              >
-                {fontOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
+              <select id="settings-app-language-select" value={appLanguageId} onChange={(event) => selectAppLanguage(event.target.value)} className="mt-3 w-full rounded-lg border border-[#bec9c2]/60 bg-white px-3 py-2 text-sm font-semibold text-[#1d1a22]">
+                {displayLanguageOptions.map((option) => (
+                  <option key={option.id} value={option.id}>{option.name}</option>
                 ))}
               </select>
             </div>
 
-            <label className="flex items-center justify-between border-b border-arcade-panel-border pb-4">
-              <span
-                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={(e) => showInfo('fontShuffle', e)}
-                onMouseEnter={(e) => showInfo('fontShuffle', e)}
-                onMouseLeave={() => setShowInfoPopup(false)}
-              >
-                Font Shuffle
-              </span>
-              <input
-                id="settings-font-shuffle-toggle"
-                type="checkbox"
-                checked={fontShuffle}
-                onChange={(e) => setFontShuffle(e.target.checked)}
-                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
-              />
-            </label>
-
-            <label className="flex items-center justify-between">
-              <span
-                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={(e) => showInfo('showIntroductions', e)}
-                onMouseEnter={(e) => showInfo('showIntroductions', e)}
-                onMouseLeave={() => setShowInfoPopup(false)}
-              >
-                {t('game.accessibility.showIntroductions')}
-              </span>
-              <input
-                id="settings-toggle-introductions"
-                type="checkbox"
-                checked={showIntroductions}
-                onChange={(e) => setShowIntroductions(e.target.checked)}
-                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
-              />
-            </label>
-
-            <label className="flex items-center justify-between">
-              <span
-                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={(e) => showInfo('highContrast', e)}
-                onMouseEnter={(e) => showInfo('highContrast', e)}
-                onMouseLeave={() => setShowInfoPopup(false)}
-              >
-                {t('game.accessibility.highContrast')}
-              </span>
-              <input
-                id="settings-high-contrast-toggle"
-                type="checkbox"
-                checked={highContrast}
-                onChange={(e) => setHighContrast(e.target.checked)}
-                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
-              />
-            </label>
-
-            <label className="flex items-center justify-between">
-              <span
-                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={(e) => showInfo('randomLetters', e)}
-                onMouseEnter={(e) => showInfo('randomLetters', e)}
-                onMouseLeave={() => setShowInfoPopup(false)}
-              >
-                {t('game.accessibility.randomLetters')}
-              </span>
-              <input
-                id="settings-random-letters-toggle"
-                type="checkbox"
-                checked={randomLetters}
-                onChange={(e) => setRandomLetters(e.target.checked)}
-                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
-              />
-            </label>
-
-            <label className="flex items-center justify-between">
-              <span
-                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={(e) => showInfo('reducedMotion', e)}
-                onMouseEnter={(e) => showInfo('reducedMotion', e)}
-                onMouseLeave={() => setShowInfoPopup(false)}
-              >
-                {t('game.accessibility.reducedMotion')}
-              </span>
-              <input
-                id="settings-reduced-motion-toggle"
-                type="checkbox"
-                checked={reducedMotion}
-                onChange={(e) => setReducedMotion(e.target.checked)}
-                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
-              />
-            </label>
-
-            <label className="flex items-center justify-between">
-              <span
-                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={(e) => showInfo('slowRiver', e)}
-                onMouseEnter={(e) => showInfo('slowRiver', e)}
-                onMouseLeave={() => setShowInfoPopup(false)}
-              >
-                Slow River Mode
-              </span>
-              <input
-                id="settings-slow-river-toggle"
-                type="checkbox"
-                checked={slowRiver}
-                onChange={(e) => setSlowRiver(e.target.checked)}
-                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
-              />
-            </label>
-
-            <label className="flex items-center justify-between">
-              <span
-                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={(e) => showInfo('clickMode', e)}
-                onMouseEnter={(e) => showInfo('clickMode', e)}
-                onMouseLeave={() => setShowInfoPopup(false)}
-              >
-                Click Mode
-              </span>
-              <input
-                id="settings-click-mode-toggle"
-                type="checkbox"
-                checked={clickMode}
-                onChange={(e) => setClickMode(e.target.checked)}
-                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
-              />
-            </label>
-
-            <label className="flex items-center justify-between">
-              <span
-                className="text-sm text-arcade-text-main cursor-pointer hover:text-arcade-accent-orange"
-                onClick={(e) => showInfo('associationMode', e)}
-                onMouseEnter={(e) => showInfo('associationMode', e)}
-                onMouseLeave={() => setShowInfoPopup(false)}
-              >
-                Association Mode
-              </span>
-              <input
-                id="settings-association-mode-toggle"
-                type="checkbox"
-                checked={associationMode}
-                onChange={(e) => setAssociationMode(e.target.checked)}
-                className="h-5 w-5 rounded border-arcade-panel-border bg-arcade-panel-light text-arcade-accent-orange focus:ring-arcade-accent-orange"
-              />
-            </label>
-
-            <div>
-              <label htmlFor="settings-starting-letters-select" className="block text-sm text-arcade-text-main mb-2">
-                <span
-                  className="cursor-pointer hover:text-arcade-accent-orange"
-                  onClick={(e) => showInfo('startingLetters', e)}
-                  onMouseEnter={(e) => showInfo('startingLetters', e)}
-                  onMouseLeave={() => setShowInfoPopup(false)}
-                >
-                  Starting Letters
-                </span>
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <label htmlFor="settings-practice-language-select" className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-6 w-8 items-center justify-center overflow-hidden rounded border border-[#bec9c2]/20 bg-slate-100 text-xs font-bold">IL</div>
+                  <div>
+                    <p className="text-xs font-medium text-[#4a6365]">I'm Learning</p>
+                    <p className="font-bold">{displayLanguageOptions.find((option) => option.id === languageId)?.name}</p>
+                  </div>
+                </div>
+                <span className="rounded-md bg-[#1b6b4f] px-2 py-1 text-[10px] font-black text-white">ACTIVE</span>
               </label>
-              <select
-                id="settings-starting-letters-select"
-                value={startingLetters}
-                onChange={(e) => setStartingLetters(parseInt(e.target.value, 10))}
-                className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
-              >
-                {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
+              <select id="settings-practice-language-select" value={languageId} onChange={(event) => selectLanguage(event.target.value)} className="mt-3 w-full rounded-lg border border-[#bec9c2]/60 bg-white px-3 py-2 text-sm font-semibold text-[#1d1a22]">
+                {displayLanguageOptions.map((option) => (
+                  <option key={option.id} value={option.id}>{option.name}</option>
                 ))}
               </select>
             </div>
+          </div>
+        </section>
 
-            <div>
-              <label htmlFor="settings-game-speed-slider" className="block text-sm text-arcade-text-main mb-2">
-                <span
-                  className="cursor-pointer hover:text-arcade-accent-orange"
-                  onClick={(e) => showInfo('gameSpeed', e)}
-                  onMouseEnter={(e) => showInfo('gameSpeed', e)}
-                  onMouseLeave={() => setShowInfoPopup(false)}
-                >
-                  {t('game.accessibility.speed')} (<span id="settings-speed-label">{getSpeedLabel(gameSpeed)}</span>)
-                </span>
+        <section className="space-y-4">
+          <h3 className="px-2 text-sm font-bold uppercase tracking-widest text-[#4a6365]">Game Settings</h3>
+          <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+            <div className="divide-y divide-[#bec9c2]/20">
+              <div className="flex items-center justify-between p-4 hover:bg-[#f9f1fd]">
+                <div className="flex items-center gap-4">
+                  <Icon className="text-[#4a6365]">text_fields</Icon>
+                  <span className="font-semibold">Game Font</span>
+                </div>
+                <select id="settings-font-select" value={gameFont} onChange={(event) => setGameFont(event.target.value)} className="rounded-md border border-[#bec9c2]/50 px-2 py-1 font-bold text-[#1b6b4f]">
+                  {fontOptions.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center justify-between p-4 hover:bg-[#f9f1fd]">
+                <div className="flex items-center gap-4">
+                  <Icon className="text-[#4a6365]">format_list_numbered</Icon>
+                  <span className="font-semibold">Starting Letters</span>
+                </div>
+                <select id="settings-starting-letters-select" value={startingLetters} onChange={(event) => setStartingLetters(parseInt(event.target.value, 10))} className="rounded-md border border-[#bec9c2]/50 pl-2 pr-8 py-1 font-bold text-[#1b6b4f]">
+                  {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => (
+                    <option key={value} value={value}>{value}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-6 p-4">
+              <label htmlFor="settings-toggle-introductions" className="flex cursor-pointer items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Icon className="text-[#4a6365]">info</Icon>
+                  <span className="font-semibold">{t('game.accessibility.showIntroductions')}</span>
+                </div>
+                <input id="settings-toggle-introductions" type="checkbox" checked={showIntroductions} onChange={(event) => setShowIntroductions(event.target.checked)} className="h-5 w-5 rounded border-[#6f7973] text-[#1b6b4f]" />
               </label>
-              <input
-                id="settings-game-speed-slider"
-                type="range"
-                min="10"
-                max="24"
-                value={gameSpeed}
-                onChange={(e) => setGameSpeed(parseInt(e.target.value, 10))}
-                className="w-full h-2 bg-black rounded-lg appearance-none cursor-pointer"
-              />
+
+              <Toggle id="settings-font-shuffle-toggle" label="Font Shuffle" icon="shuffle" checked={fontShuffle} onChange={setFontShuffle} />
+              <Toggle id="settings-high-contrast-toggle" label={t('game.accessibility.highContrast')} icon="contrast" checked={highContrast} onChange={setHighContrast} />
+              <Toggle id="settings-random-letters-toggle" label={t('game.accessibility.randomLetters')} icon="casino" checked={randomLetters} onChange={setRandomLetters} />
+              <Toggle id="settings-reduced-motion-toggle" label={t('game.accessibility.reducedMotion')} icon="motion_photos_off" checked={reducedMotion} onChange={setReducedMotion} />
+              <Toggle id="settings-slow-river-toggle" label="Slow River Mode" icon="waves" checked={slowRiver} onChange={setSlowRiver} />
+              <Toggle id="settings-click-mode-toggle" label="Click Mode" icon="ads_click" checked={clickMode} onChange={setClickMode} />
+              <Toggle id="settings-association-mode-toggle" label="Association Mode" icon="hub" checked={associationMode} onChange={setAssociationMode} />
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Info Popup Tooltip */}
-      {showInfoPopup && (
-        <div
-          className="fixed z-50 pointer-events-none"
-          style={{
-            left: `${popupPosition.x + 15}px`,
-            top: `${popupPosition.y + 15}px`,
-            maxWidth: '320px'
-          }}
-        >
-          <div
-            className="progress-card-small p-4 shadow-lg pointer-events-auto"
-            style={{
-              border: '2px solid rgba(235, 179, 105, 0.95)',
-              boxShadow: '0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6)'
-            }}
-            onMouseEnter={() => setShowInfoPopup(true)}
-            onMouseLeave={() => setShowInfoPopup(false)}
-          >
-            <h3 className="font-heading text-sm font-bold text-arcade-text-main mb-2">
-              {infoPopupContent.title}
-            </h3>
-            <p className="text-xs text-arcade-text-main">
-              {infoPopupContent.description}
-            </p>
-          </div>
-        </div>
-      )}
-    </>
+        <section className="pb-12 pt-4">
+          <button className="w-full rounded-xl bg-[#ffdad6]/20 py-4 text-sm font-extrabold uppercase tracking-widest text-[#ba1a1a] transition-colors hover:bg-[#ffdad6]/40" type="button">
+            Log Out
+          </button>
+          <p className="mt-8 text-center text-[10px] font-medium text-[#4a6365]">River Mint Language App — Version 2.4.0</p>
+        </section>
+      </main>
+      <ProfileEditorModal
+        isOpen={isProfileEditorOpen}
+        initialName={playerName}
+        initialAvatar={playerAvatar}
+        onClose={() => setIsProfileEditorOpen(false)}
+        onSave={(profile) => {
+          updatePlayerProfile(profile);
+          setIsProfileEditorOpen(false);
+        }}
+      />
+    </div>
   );
 }

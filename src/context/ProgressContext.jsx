@@ -7,6 +7,7 @@ import { loadState, saveState, removeState } from '../lib/storage.js';
 import { differenceInJerusalemDays, getJerusalemDateKey, millisUntilNextJerusalemMidnight } from '../lib/time.js';
 import { useToast } from './ToastContext.jsx';
 import { useLocalization } from './LocalizationContext.jsx';
+import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 
 export const STAR_LEVEL_SIZE = 50;
 export const DAILY_REWARD_STARS = 30;
@@ -45,7 +46,8 @@ function calculateLevelInfo(totalStars) {
 }
 
 const defaultPlayer = {
-  name: 'River Explorer',
+  name: DEFAULT_PROFILE_NAME,
+  avatar: PROFILE_AVATARS[0],
   stars: 0,
   level: 1,
   levelProgress: 0,
@@ -1321,7 +1323,14 @@ export function ProgressProvider({ children }) {
       getWeakestLetter: () => assets.getWeakestLetter(player.letters),
       lastSession,
       claimBadgeReward,
-      claimDailyReward
+      claimDailyReward,
+      updatePlayerProfile: ({ name, avatar }) => {
+        setPlayer((prev) => ({
+          ...prev,
+          name: typeof name === 'string' && name.trim() ? name.trim() : (prev.name ?? DEFAULT_PROFILE_NAME),
+          avatar: avatar || prev.avatar || PROFILE_AVATARS[0]
+        }));
+      }
     }),
     [assets, player, badges, activeBadges, streak, daily, lastSession, claimBadgeReward, claimDailyReward]
   );
