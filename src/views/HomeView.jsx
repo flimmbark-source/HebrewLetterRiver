@@ -13,33 +13,59 @@ function Icon({ children, className = '', filled = false }) {
     <span
       className={`material-symbols-outlined ${className}`}
       style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
+      aria-hidden="true"
     >
       {children}
     </span>
   );
 }
 
+function LanguageCard({ id, label, value, onChange, options, leading, trailing }) {
+  return (
+    <label htmlFor={id} className="group relative block rounded-full bg-[#f9f1fd] p-6 transition-colors hover:bg-[#ede6f1]">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-4">
+          {leading}
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#4a6365]">{label}</p>
+            <p className="text-lg font-bold">{options.find((option) => option.id === value)?.name ?? value}</p>
+          </div>
+        </div>
+        {trailing}
+      </div>
+      <select
+        id={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        aria-label={label}
+      >
+        {options.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.name}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 export default function HomeView() {
   const { player, starLevelSize } = useProgress();
   const { setShowPlayModal } = useGame();
-  const { languageId, appLanguageId, languageOptions } = useLanguage();
+  const { languageId, appLanguageId, languageOptions, selectLanguage, selectAppLanguage } = useLanguage();
   const { t } = useLocalization();
+
+  const displayLanguageOptions = useMemo(
+    () => languageOptions.map((option) => ({ ...option, name: getFormattedLanguageName(option, t) })),
+    [languageOptions, t]
+  );
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
   const totalStarsEarned = player.totalStarsEarned ?? player.stars ?? 0;
   const level = player.level ?? Math.floor(totalStarsEarned / starsPerLevel) + 1;
   const levelProgress = player.levelProgress ?? (totalStarsEarned % starsPerLevel);
   const progressPct = starsPerLevel > 0 ? Math.round(Math.min((levelProgress / starsPerLevel) * 100, 100)) : 0;
-
-  const appLanguage = useMemo(
-    () => languageOptions.find((option) => option.id === appLanguageId),
-    [languageOptions, appLanguageId]
-  );
-
-  const practiceLanguage = useMemo(
-    () => languageOptions.find((option) => option.id === languageId),
-    [languageOptions, languageId]
-  );
 
   return (
     <div className="relative min-h-screen bg-[#fef7ff] text-[#1d1a22]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
@@ -50,7 +76,7 @@ export default function HomeView() {
           </div>
           <span className="text-lg font-bold tracking-tight text-[#1b6b4f]">Level {level} • {totalStarsEarned.toLocaleString()} XP</span>
         </div>
-        <button className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-[#1b6b4f]/10">
+        <button className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-[#1b6b4f]/10" type="button">
           <Icon className="text-[#1b6b4f]" filled>local_fire_department</Icon>
         </button>
       </header>
@@ -60,7 +86,7 @@ export default function HomeView() {
           <div className="flex flex-col items-center space-y-4 rounded-2xl border border-[#1b6b4f]/5 bg-white p-8 text-center shadow-sm">
             <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#f9f1fd]">
               <img alt="Avatar Large" className="h-20 w-20 rounded-full object-cover" src={profileAvatar} />
-              <button className="absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 border-white bg-[#1b6b4f] p-2 text-white shadow-lg">
+              <button className="absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 border-white bg-[#1b6b4f] p-2 text-white shadow-lg" type="button">
                 <Icon className="text-sm">edit</Icon>
               </button>
             </div>
@@ -83,32 +109,25 @@ export default function HomeView() {
         <section className="space-y-4">
           <h2 className="px-2 text-xl font-bold">Language Learning</h2>
           <div className="space-y-4">
-            <div className="flex items-center justify-between rounded-full bg-[#f9f1fd] p-6 transition-colors hover:bg-[#ede6f1]">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
-                  <Icon className="text-[#1b6b4f]">language</Icon>
-                </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#4a6365]">App Language</p>
-                  <p className="text-lg font-bold">{appLanguage ? getFormattedLanguageName(appLanguage, t) : 'English (US)'}</p>
-                </div>
-              </div>
-              <Icon className="text-[#6f7973]">expand_more</Icon>
-            </div>
+            <LanguageCard
+              id="home-app-language-select"
+              label="App Language"
+              value={appLanguageId}
+              onChange={selectAppLanguage}
+              options={displayLanguageOptions}
+              leading={<div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm"><Icon className="text-[#1b6b4f]">language</Icon></div>}
+              trailing={<Icon className="text-[#6f7973]">expand_more</Icon>}
+            />
 
-            <div className="flex items-center justify-between rounded-full bg-[#f9f1fd] p-6 transition-colors hover:bg-[#ede6f1]">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white text-2xl shadow-sm">🇮🇱</div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#4a6365]">I'm Learning</p>
-                  <p className="text-lg font-bold">{practiceLanguage ? getFormattedLanguageName(practiceLanguage, t) : 'Hebrew'}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="rounded-full bg-[#1b6b4f]/10 px-3 py-1 text-[10px] font-black text-[#1b6b4f]">ACTIVE</span>
-                <Icon className="text-[#6f7973]">swap_horiz</Icon>
-              </div>
-            </div>
+            <LanguageCard
+              id="home-practice-language-select"
+              label="I'm Learning"
+              value={languageId}
+              onChange={selectLanguage}
+              options={displayLanguageOptions}
+              leading={<div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white text-2xl shadow-sm">🇮🇱</div>}
+              trailing={<div className="flex items-center gap-3"><span className="rounded-full bg-[#1b6b4f]/10 px-3 py-1 text-[10px] font-black text-[#1b6b4f]">ACTIVE</span><Icon className="text-[#6f7973]">swap_horiz</Icon></div>}
+            />
           </div>
         </section>
 
@@ -133,6 +152,7 @@ export default function HomeView() {
           <button
             onClick={() => setShowPlayModal(true)}
             className="flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-br from-[#1b6b4f] to-[#1b6b4f]/80 py-5 text-lg font-bold text-white shadow-lg shadow-[#1b6b4f]/20 transition-all hover:scale-[1.02] active:scale-95"
+            type="button"
           >
             Start learning
             <Icon>arrow_forward</Icon>
