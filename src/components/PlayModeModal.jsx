@@ -46,10 +46,10 @@ export default function PlayModeModal() {
           </button>
 
           <button type="button" className="play-mode-card play-mode-card--bridge" onClick={handleBridgeBuilder}>
-            <div className="play-mode-icon">🌉</div>
+            <div className="play-mode-icon">🛠️</div>
             <div className="play-mode-info">
-              <div className="play-mode-name">Bridge Builder</div>
-              <div className="play-mode-desc">Build bridges by matching Hebrew words</div>
+              <div className="play-mode-name">Vocab Builder</div>
+              <div className="play-mode-desc">Play games to learn and practice vocabulary</div>
             </div>
           </button>
 

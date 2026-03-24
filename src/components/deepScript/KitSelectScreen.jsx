@@ -17,16 +17,26 @@ export default function KitSelectScreen({
         <button className="ds-back-btn" onClick={onBack} type="button">Back</button>
         <h1 className="ds-screen-title">Deep Script</h1>
         {showWordSourceToggle && (
-          <button
-            type="button"
-            className="ds-source-toggle"
-            onClick={() => onWordSourceModeChange(wordSourceMode === 'pack' ? 'random' : 'pack')}
-            aria-label="Toggle floor word source"
-          >
-            <span>Pack</span>
-            <span className={`ds-source-toggle-knob ${wordSourceMode === 'random' ? 'ds-source-toggle-knob--random' : ''}`} />
-            <span>Random</span>
-          </button>
+<button
+  type="button"
+  className={`ds-source-toggle ${wordSourceMode === 'random' ? 'is-random' : 'is-pack'}`}
+  onClick={() => onWordSourceModeChange(wordSourceMode === 'pack' ? 'random' : 'pack')}
+  aria-label="Toggle floor word source"
+  role="switch"
+  aria-checked={wordSourceMode === 'random'}
+>
+  <span className={`ds-source-toggle-label ${wordSourceMode === 'pack' ? 'is-active' : ''}`}>
+    Pack
+  </span>
+
+  <span className="ds-source-toggle-track" aria-hidden="true">
+    <span className="ds-source-toggle-knob" />
+  </span>
+
+  <span className={`ds-source-toggle-label ${wordSourceMode === 'random' ? 'is-active' : ''}`}>
+    Random
+  </span>
+</button>
         )}
       </div>
 

@@ -88,32 +88,96 @@
 }
 
 .ds-source-toggle {
-  margin-left: auto;
+  --toggle-bg: rgba(255, 255, 255, 0.06);
+  --toggle-border: rgba(255, 255, 255, 0.12);
+  --toggle-text: rgba(255, 255, 255, 0.68);
+  --toggle-text-active: #ffffff;
+  --track-bg: rgba(255, 255, 255, 0.08);
+  --knob-bg: linear-gradient(180deg, #ffffff 0%, #dfe7f3 100%);
+  --knob-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 4px 10px rgba(0, 0, 0, 0.18);
+
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  border: 1px solid var(--ds-stone-lighter);
+  gap: 0.7rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--toggle-border);
   border-radius: 999px;
-  background: rgba(34, 38, 46, 0.85);
-  color: var(--ds-parchment-dim);
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 8px;
+  background: var(--toggle-bg);
+  backdrop-filter: blur(10px);
+  color: var(--toggle-text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 120ms ease;
+}
+
+.ds-source-toggle:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+}
+
+.ds-source-toggle:active {
+  transform: translateY(1px);
+}
+
+.ds-source-toggle:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.12),
+    0 0 0 4px rgba(100, 180, 255, 0.35);
+}
+
+.ds-source-toggle-label {
+  min-width: 3.4rem;
+  text-align: center;
+  color: var(--toggle-text);
+  transition:
+    color 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.ds-source-toggle-label.is-active {
+  color: var(--toggle-text-active);
+}
+
+.ds-source-toggle-track {
+  position: relative;
+  width: 2.8rem;
+  height: 1.55rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--track-bg);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.28),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.04);
 }
 
 .ds-source-toggle-knob {
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #6f737d 0%, #565a63 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.2s ease, background 0.2s ease;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--knob-bg);
+  box-shadow: var(--knob-shadow);
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 180ms ease;
 }
 
-.ds-source-toggle-knob--random {
-  transform: translateX(10px);
-  background: linear-gradient(180deg, #d4a763 0%, #b38036 100%);
+.ds-source-toggle.is-random .ds-source-toggle-knob {
+  transform: translateX(1.25rem);
 }
 
 /* ─── Run Status Bar ─────────────────────────────────────── */

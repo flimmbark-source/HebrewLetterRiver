@@ -308,8 +308,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     <div className="bbs-screen">
       {/* Header */}
       <div className="bbs-header">
-        <button className="bbs-back" onClick={onBack} type="button">Back</button>
-        <h1 className="bbs-title">Bridge Builder</h1>
+        <h1 className="bbs-title">Vocab Builder</h1>
       </div>
 
       {/* Scrollable content */}
