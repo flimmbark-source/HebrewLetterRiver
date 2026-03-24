@@ -75,6 +75,7 @@ export default function AchievementsView() {
   const { player, badges, activeBadges, starLevelSize, claimBadgeReward } = useProgress();
   const { t } = useLocalization();
   const [claiming, setClaiming] = useState(false);
+  const [isAllAchievementsExpanded, setIsAllAchievementsExpanded] = useState(false);
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
   const totalStarsEarned = Math.max(0, Math.floor(player?.totalStarsEarned ?? player?.stars ?? 0));
@@ -300,18 +301,30 @@ export default function AchievementsView() {
         </section>
 
         <section className="mt-10 space-y-3">
-          <h3 className="text-lg font-bold text-[#1b6b4f]">All Achievements ({totalAchievementCount})</h3>
-          {allByGroup.map((group) => (
-            <div key={group.key} className="space-y-2">
-              <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
-              <div className="space-y-2">
-                {group.badges.map((badge) => (
-                  <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
-                ))}
+          <button
+            type="button"
+            onClick={() => setIsAllAchievementsExpanded((prev) => !prev)}
+            className="flex w-full items-center justify-between rounded-xl bg-white px-4 py-3 text-left shadow-sm"
+            aria-expanded={isAllAchievementsExpanded}
+          >
+            <h3 className="text-lg font-bold text-[#1b6b4f]">All Achievements ({totalAchievementCount})</h3>
+            <Icon className="text-[#1b6b4f]">{isAllAchievementsExpanded ? 'expand_less' : 'expand_more'}</Icon>
+          </button>
+
+          {isAllAchievementsExpanded ? (
+            allByGroup.map((group) => (
+              <div key={group.key} className="space-y-2">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
+                <div className="space-y-2">
+                  {group.badges.map((badge) => (
+                    <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-          {totalAchievementCount === 0 ? (
+            ))
+          ) : null}
+
+          {isAllAchievementsExpanded && totalAchievementCount === 0 ? (
             <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No achievements available yet.</div>
           ) : null}
         </section>
