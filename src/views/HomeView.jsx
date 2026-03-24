@@ -4,10 +4,10 @@ import { useGame } from '../context/GameContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { getFormattedLanguageName } from '../lib/languageUtils.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
+import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
+import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 
 const topAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBIzHWOoiXw0a1BU87o2LewTUl8n-_HZC92abDxxI91uQwUGpDDtDgWHkTor7IjvjQUcxU7G-n8vr_x7LsbbX6UCGbzaOGQiMHvD0X0hLDyDkwxenmzAxbV13d80mSxIEbzburnmpLQI0pGLrCNFySYaPuV-i4du-NITzYGpCAUfJ6_xI-xPhTpvL3foKAaOrn9l0TeZ1FkLoJDs6MmFvm0sYR4IaDSqzapogXZiRaJ6Vtk8P5f_5-7mlXebxZLoP1TEu4n2VyOKKDq';
-const profileAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUTTlpXlJpi8-Vk87830ZwbM-fJhAO47D9hfkSQBnl1p6Hww4mSE_bzbvN9Lo8f8AP1eAwPAqFpy2-nXYjelbRyeF54cpnDvycpZF4V4Du0VLJgPluxjp1YcYvn6LeyVAr3h_1RmgSaMdo5jWg7MuGmxVf3aIkbz--_Jua05GJSwIZdmTNceXvxlptxvlMNY-9jXF_7nXHTWBwfpUCxVA4eP_2i57C-XXLDQdA8yho5MU09xFBPqi371uT-Sw_Gn1IxrmfmWVw000q';
-
 function Icon({ children, className = '', filled = false }) {
   return (
     <span
@@ -51,7 +51,7 @@ function LanguageCard({ id, label, value, onChange, options, leading, trailing }
 }
 
 export default function HomeView() {
-  const { player, starLevelSize } = useProgress();
+  const { player, starLevelSize, updatePlayerProfile } = useProgress();
   const { setShowPlayModal } = useGame();
   const { languageId, appLanguageId, languageOptions, selectLanguage, selectAppLanguage } = useLanguage();
   const { t } = useLocalization();
@@ -66,13 +66,16 @@ export default function HomeView() {
   const level = player.level ?? Math.floor(totalStarsEarned / starsPerLevel) + 1;
   const levelProgress = player.levelProgress ?? (totalStarsEarned % starsPerLevel);
   const progressPct = starsPerLevel > 0 ? Math.round(Math.min((levelProgress / starsPerLevel) * 100, 100)) : 0;
+  const [isProfileEditorOpen, setIsProfileEditorOpen] = React.useState(false);
+  const playerName = player?.name || DEFAULT_PROFILE_NAME;
+  const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
   return (
     <div className="relative min-h-screen bg-[#fef7ff] text-[#1d1a22]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
       <header className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between bg-[#fef7ff]/80 px-6 py-4 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-[#1b6b4f] bg-[#e7e0eb]">
-            <img alt="User Profile" src={topAvatar} className="h-full w-full object-cover" />
+            <img alt="User Profile" src={playerAvatar || topAvatar} className="h-full w-full object-cover" />
           </div>
           <span className="text-lg font-bold tracking-tight text-[#1b6b4f]">Level {level} • {totalStarsEarned.toLocaleString()} XP</span>
         </div>
@@ -85,13 +88,13 @@ export default function HomeView() {
         <section>
           <div className="flex flex-col items-center space-y-4 rounded-2xl border border-[#1b6b4f]/5 bg-white p-8 text-center shadow-sm">
             <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#f9f1fd]">
-              <img alt="Avatar Large" className="h-20 w-20 rounded-full object-cover" src={profileAvatar} />
-              <button className="absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 border-white bg-[#1b6b4f] p-2 text-white shadow-lg" type="button">
+              <img alt="Avatar Large" className="h-20 w-20 rounded-full object-cover" src={playerAvatar || topAvatar} />
+              <button onClick={() => setIsProfileEditorOpen(true)} className="absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 border-white bg-[#1b6b4f] p-2 text-white shadow-lg" type="button">
                 <Icon className="text-sm">edit</Icon>
               </button>
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold tracking-tight">Alex River</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight">{playerName}</h1>
               <p className="text-sm text-[#4a6365]">Learning since January 2024</p>
             </div>
             <div className="mt-4 w-full space-y-2">
@@ -164,6 +167,16 @@ export default function HomeView() {
           </p>
         </section>
       </main>
+      <ProfileEditorModal
+        isOpen={isProfileEditorOpen}
+        initialName={playerName}
+        initialAvatar={playerAvatar}
+        onClose={() => setIsProfileEditorOpen(false)}
+        onSave={(profile) => {
+          updatePlayerProfile(profile);
+          setIsProfileEditorOpen(false);
+        }}
+      />
     </div>
   );
 }

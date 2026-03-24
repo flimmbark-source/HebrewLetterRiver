@@ -4,8 +4,8 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { getFormattedLanguageName } from '../lib/languageUtils.js';
-
-const settingsAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDUjBvQAnHlZBktrT9o1W3YJUpW42Dva-kXRxJ36vz9skzw42LyTlGdmdnqDsNY-wYCeEDTDpl-jJdXbgMy6C_SSnUVdNfzsuPwS_o1ErMYKXeTWpZupeNxNKb4qeTbgc2Y4Xw8cXVuaU7HMVKBfeYDB2vehJLu2laKpGjx14gjcCdSRmMzkdbqlmIsFfw6zQ-up1LViUOct0bGeXOQjQ6CvJBc2bKowsO61lic47tlxkLQtzAzX7BuqQv1uCxs2EXNNhNzWvmNH055';
+import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
+import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 
 function Icon({ children, className = '', filled = false }) {
   return (
@@ -37,7 +37,7 @@ function Toggle({ id, label, icon, checked, onChange }) {
 export default function SettingsView() {
   const navigate = useNavigate();
   const { t } = useLocalization();
-  const { player, starLevelSize } = useProgress();
+  const { player, starLevelSize, updatePlayerProfile } = useProgress();
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
 
   const [showIntroductions, setShowIntroductions] = useState(true);
@@ -51,6 +51,7 @@ export default function SettingsView() {
   const [associationMode, setAssociationMode] = useState(false);
   const [startingLetters, setStartingLetters] = useState(2);
   const [hasLoadedSettings, setHasLoadedSettings] = useState(false);
+  const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
 
   useEffect(() => {
     const loadSettings = () => {
@@ -110,6 +111,8 @@ export default function SettingsView() {
   const level = player.level ?? Math.floor(totalStarsEarned / starsPerLevel) + 1;
   const levelProgress = player.levelProgress ?? (totalStarsEarned % starsPerLevel);
   const progressPct = starsPerLevel > 0 ? Math.round(Math.min((levelProgress / starsPerLevel) * 100, 100)) : 0;
+  const playerName = player?.name || DEFAULT_PROFILE_NAME;
+  const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
   const fontOptions = [
     { value: 'default', label: 'Default' },
@@ -141,12 +144,15 @@ export default function SettingsView() {
           <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#1b6b4f]/10 blur-2xl"></div>
           <div className="relative">
             <div className="h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg">
-              <img src={settingsAvatar} alt="Profile avatar" className="h-full w-full object-cover" />
+              <img src={playerAvatar} alt="Profile avatar" className="h-full w-full object-cover" />
             </div>
-            <div className="absolute -bottom-1 -right-1 rounded-full bg-[#855315] px-2 py-0.5 text-[10px] font-bold text-white shadow-md">LVL {level}</div>
+            <button type="button" onClick={() => setIsProfileEditorOpen(true)} className="absolute -bottom-1 -right-1 rounded-full border border-white bg-[#1b6b4f] p-1 text-white">
+              <Icon className="text-[14px]">edit</Icon>
+            </button>
+            <div className="absolute -bottom-1 left-0 rounded-full bg-[#855315] px-2 py-0.5 text-[10px] font-bold text-white shadow-md">LVL {level}</div>
           </div>
           <div className="flex-1 space-y-2">
-            <h2 className="text-2xl font-extrabold tracking-tight">Alex River</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight">{playerName}</h2>
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-semibold text-[#4a6365]">
                 <span>Progress</span>
@@ -256,6 +262,16 @@ export default function SettingsView() {
           <p className="mt-8 text-center text-[10px] font-medium text-[#4a6365]">River Mint Language App — Version 2.4.0</p>
         </section>
       </main>
+      <ProfileEditorModal
+        isOpen={isProfileEditorOpen}
+        initialName={playerName}
+        initialAvatar={playerAvatar}
+        onClose={() => setIsProfileEditorOpen(false)}
+        onSave={(profile) => {
+          updatePlayerProfile(profile);
+          setIsProfileEditorOpen(false);
+        }}
+      />
     </div>
   );
 }
