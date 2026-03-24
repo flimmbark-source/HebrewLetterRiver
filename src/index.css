@@ -3,71 +3,110 @@
 @tailwind utilities;
 
 :root {
-  /* === 8px SPACING SYSTEM === */
+  /* === DESIGN SYSTEM: "The Fluid Sanctuary" === */
+
+  /* Core palette */
+  --ds-primary: #1b6b4f;
+  --ds-primary-container: #a8f0cd;
+  --ds-on-primary: #ffffff;
+  --ds-on-primary-container: #0d3b2a;
+
+  --ds-secondary: #855315;
+  --ds-secondary-container: #ffddb3;
+  --ds-on-secondary: #ffffff;
+  --ds-on-secondary-container: #4a2e08;
+
+  --ds-tertiary: #4a6365;
+  --ds-tertiary-container: #cce8ea;
+  --ds-on-tertiary: #ffffff;
+
+  /* Surfaces */
+  --ds-background: #fef7ff;
+  --ds-on-background: #1d1b20;
+  --ds-surface: #fef7ff;
+  --ds-on-surface: #1d1b20;
+  --ds-on-surface-variant: #49454f;
+  --ds-surface-container-lowest: #ffffff;
+  --ds-surface-container-low: #f7f2fa;
+  --ds-surface-container: #f1ecf4;
+  --ds-surface-container-high: #ece6f0;
+  --ds-surface-container-highest: #e6e0e9;
+
+  /* Utility */
+  --ds-outline: #79747e;
+  --ds-outline-variant: #cac4d0;
+
+  /* === SPACING === */
   --space-0: 0;
-  --space-1: 8px;
-  --space-2: 16px;
-  --space-3: 24px;
-  --space-4: 32px;
-  --space-5: 40px;
-  --space-6: 48px;
-  --space-8: 64px;
-  --space-10: 80px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
 
   /* === BORDER RADIUS === */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --radius-sm: 0.5rem;
+  --radius-md: 1.5rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
   --radius-full: 9999px;
 
-  /* === TYPOGRAPHY SYSTEM === */
+  /* === TYPOGRAPHY === */
+  --font-family: 'Plus Jakarta Sans', 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  /* Font Sizes */
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-base: 16px;
-  --text-lg: 18px;
-  --text-xl: 20px;
-  --text-2xl: 24px;
-  --text-3xl: 32px;
-  --text-4xl: 40px;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
 
-  /* Line Heights */
-  --line-height-tight: 1.2;   /* For headings */
-  --line-height-normal: 1.5;  /* For body text */
-  --line-height-loose: 1.7;   /* For small text */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-loose: 1.7;
 
-  /* Font Weights */
   --font-normal: 400;
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
+  --font-extrabold: 800;
+
+  /* === SHADOWS (diffused, tinted) === */
+  --shadow-sm: 0 2px 8px -2px rgba(29, 27, 32, 0.04);
+  --shadow: 0 4px 16px -4px rgba(29, 27, 32, 0.06);
+  --shadow-md: 0 8px 24px -6px rgba(29, 27, 32, 0.06);
+  --shadow-lg: 0 12px 48px -8px rgba(29, 27, 32, 0.08);
+  --shadow-float: 0 16px 48px -12px rgba(29, 27, 32, 0.08);
 }
 
 html,
 body {
-  @apply min-h-screen font-sans;
-  color: #064E3B;
-  font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  @apply min-h-screen;
+  color: var(--ds-on-background);
+  font-family: var(--font-family);
+  background: var(--ds-background);
 }
 
 .arcade-bg {
-  background: linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%);
+  background: var(--ds-background);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.hebrew-font {
-  @apply font-hebrew;
-}
-
+.hebrew-font,
 .language-font-hebrew {
   @apply font-hebrew;
 }
 
 .language-font-latin {
-  @apply font-sans;
+  font-family: var(--font-family);
 }
 
 .language-font-han {

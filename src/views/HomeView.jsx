@@ -200,55 +200,34 @@ export default function HomeView() {
 
   return (
     <>
-      {/* Player Header */}
-      <header className="player-header">
-        <div className="player-meta">
-          <div className="avatar"></div>
-          <div className="player-text">
-            <div className="player-name">{t('common.player')}</div>
-            <div className="player-level-row">
-              <div className="player-level">{t('home.progress.level', { level })}</div>
-              <div className="player-level-progress">
-                <div className="player-level-progress-fill" style={{ width: `${starsProgress * 100}%` }}></div>
-              </div>
-              <div className="player-stars-badge">
-                <span className="star-icon">⭐</span>
-                <span className="star-value">{formatNumber(totalStarsEarned)}</span>
-              </div>
-            </div>
-            <div className="player-rank">{getPlayerTitle(level)}</div>
+      {/* Profile Card */}
+      <div className="profile-card">
+        <div className="profile-card-top-row">
+          <div className="profile-level-pill">
+            <span className="profile-level-dot"></span>
+            {t('home.progress.level', { level })}
           </div>
-        </div>
-        <div className="top-counters">
-          <button
-            onClick={() => startTutorial('tour')}
-            className="tiny-pill"
-            aria-label="Show tutorial"
-            title="Show tutorial"
-          >
-            ?
-          </button>
           <div ref={languageSelectorRef} style={{ position: 'relative' }}>
             <button
+              className="profile-gear-btn"
               onClick={() => setAppLanguageSelectorExpanded(!appLanguageSelectorExpanded)}
-              className="tiny-pill"
               aria-label={t('app.languagePicker.label')}
             >
-              🌎
+              <GlobeIcon className="h-5 w-5" />
             </button>
 
-            {/* App Language Selector Popup */}
+            {/* Language Selector Popup */}
             {appLanguageSelectorExpanded && (
               <div className="language-selector-popup">
                 <button
                   onClick={() => setAppLanguageSelectorExpanded(false)}
-                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-arcade-accent-red text-white shadow-arcade-sm z-10"
+                  className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full text-ds-on-surface-variant hover:text-ds-on-surface z-10"
                   aria-label={t('common.close')}
                 >
-                  <XIcon className="h-3 w-3" />
+                  <XIcon className="h-3.5 w-3.5" />
                 </button>
 
-                <h3 className="mb-3 text-center font-heading text-sm font-bold text-arcade-text-main">
+                <h3 className="mb-3 text-center text-sm font-bold text-ds-on-surface">
                   {t('app.languagePicker.label')}
                 </h3>
 
@@ -256,7 +235,7 @@ export default function HomeView() {
                   id="home-app-language-select"
                   value={appLanguageId}
                   onChange={(event) => selectAppLanguage(event.target.value)}
-                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
+                  className="w-full rounded-ds-md border border-ds-outline-variant bg-ds-surface-container-lowest px-3 py-2 text-xs font-semibold text-ds-on-surface"
                 >
                   {languageOptions.map((option) => (
                     <option key={option.id} value={option.id}>
@@ -265,7 +244,7 @@ export default function HomeView() {
                   ))}
                 </select>
 
-                <h3 className="mb-2 mt-4 text-center font-heading text-sm font-bold text-arcade-text-main">
+                <h3 className="mb-2 mt-4 text-center text-sm font-bold text-ds-on-surface">
                   {t('home.languagePicker.label')}
                 </h3>
 
@@ -273,7 +252,7 @@ export default function HomeView() {
                   id="home-practice-language-select"
                   value={languageId}
                   onChange={(event) => selectLanguage(event.target.value)}
-                  className="w-full rounded-xl border-2 border-arcade-panel-border bg-arcade-panel-light px-3 py-2 text-xs font-semibold text-arcade-text-main shadow-inner"
+                  className="w-full rounded-ds-md border border-ds-outline-variant bg-ds-surface-container-lowest px-3 py-2 text-xs font-semibold text-ds-on-surface"
                 >
                   {languageOptions.map((option) => (
                     <option key={option.id} value={option.id}>
@@ -285,21 +264,33 @@ export default function HomeView() {
             )}
           </div>
         </div>
-      </header>
+
+        <div className="profile-avatar-wrapper">
+          <div className="profile-avatar"></div>
+        </div>
+        <div className="profile-name">{t('common.player')}</div>
+        <div className="profile-subtitle">{getPlayerTitle(level)}</div>
+
+        <div className="profile-xp-row">
+          <span className="profile-xp-label">{t('home.progress.starLevel')}</span>
+          <span className="profile-xp-value">{formatNumber(levelProgress)} / {formatNumber(starsPerLevel)}</span>
+        </div>
+        <div className="profile-xp-bar">
+          <div className="profile-xp-bar-fill" style={{ width: `${starsProgress * 100}%` }}></div>
+        </div>
+      </div>
 
       {/* Hero Card */}
-      <section className="section" style={{ marginTop: '20px',  }}></section>
       <section className={classNames('hero-card', heroCardUpdate.isUpdated && 'card-updated')} style={{ position: 'relative' }}>
         <h1 className="hero-title">{t('home.recentLetters.title')}</h1>
         <div className="hero-body" style={{ display: 'flex', gap: '12px', fontSize: '24px', flexWrap: 'wrap' }}>
           {recentLetters.map((letter, index) => (
             <span
               key={index}
-              className="hebrew-text"
+              className="hebrew-text hebrew-font"
               style={{
                 cursor: 'pointer',
                 position: 'relative',
-                fontFamily: 'Heebo, sans-serif',
                 transition: 'transform 0.2s ease'
               }}
               onMouseEnter={() => setHoveredLetter(index)}
@@ -332,14 +323,12 @@ export default function HomeView() {
 
       {/* Progress Section */}
       <section className="section">
-        <section className="section" style={{ marginTop: '20px',  }}></section>
         <div className="section-header">
           <div className="section-title">
             <div className="wood-header">{t('home.progress.heading')}</div>
           </div>
           <div className="section-link">{t('common.viewDetails')}</div>
         </div>
-        <section className="section" style={{ marginTop: '5px',  }}></section>
         <div className="progress-row">
           <div className={classNames('progress-card-small', streakCardUpdate.isUpdated && 'card-updated')}>
             <div className="progress-icon red">🔥</div>
@@ -368,7 +357,6 @@ export default function HomeView() {
       </section>
 
       {/* Daily Quests Section */}
-      <section className="section" style={{ marginTop: '20px',  }}></section>
       {daily?.tasks && daily.tasks.length > 0 && (
         <section className="section">
           <div className="section-header">
@@ -377,7 +365,6 @@ export default function HomeView() {
             </div>
             <div className="section-link">{t('home.dailyQuests.resetsAt', { time: nextResetTime })}</div>
           </div>
-          <section className="section" style={{ marginTop: '5px',  }}></section>
           {daily.tasks.map((task) => (
             <QuestCard
               key={task.id}
