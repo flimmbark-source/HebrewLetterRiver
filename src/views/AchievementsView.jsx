@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
-import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
+import { DEFAULT_PROFILE_NAME } from '../data/profileAvatars.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 
 const SECTION_GROUPS = [
@@ -174,7 +174,6 @@ export default function AchievementsView() {
   }, [allBadges, sectionGroups]);
   const totalAchievementCount = allBadges.length;
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
-  const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
   const handleClaim = (badgeId, tier) => {
     if (claiming) return;
@@ -183,17 +182,7 @@ export default function AchievementsView() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fef7ff] px-6 pb-36 pt-24" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-      <header className="fixed left-0 right-0 top-0 z-40 bg-[#fef7ff]/80 backdrop-blur-xl">
-        <div className="flex w-full items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 overflow-hidden rounded-full bg-[#a7f3d0]"><img alt="Profile" src={playerAvatar} className="h-full w-full object-cover" /></div>
-            <h1 className="text-lg font-bold tracking-tight text-[#1b6b4f]">Level {level} • {totalStarsEarned.toLocaleString()} XP</h1>
-          </div>
-          <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-[#1b6b4f]/10"><Icon className="text-[#1b6b4f]" filled>local_fire_department</Icon></button>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-[#fef7ff] px-6 pb-36 pt-8" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
       <main className="mx-auto max-w-2xl">
         <section className="relative mb-10">
           <div className="relative overflow-hidden rounded-xl bg-[#1b6b4f] p-8 text-white shadow-lg">
