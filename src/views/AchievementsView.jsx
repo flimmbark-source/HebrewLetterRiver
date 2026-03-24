@@ -142,20 +142,6 @@ export default function AchievementsView() {
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
   const [expandedModeSections, setExpandedModeSections] = useState({ letterRiver: false, bridgeBuilder: false, deepScript: false });
-  const badgeSectionRef = useRef(null);
-  const maxBadgeHeightRef = useRef(0);
-  useEffect(() => {
-    if (!badgeSectionRef.current) return;
-    const observer = new ResizeObserver(([entry]) => {
-      const h = entry.contentRect.height;
-      if (h > maxBadgeHeightRef.current) {
-        maxBadgeHeightRef.current = h;
-        badgeSectionRef.current.style.minHeight = `${h}px`;
-      }
-    });
-    observer.observe(badgeSectionRef.current);
-    return () => observer.disconnect();
-  }, []);
   const languageSelectorRef = useRef(null);
   const gameName = t('app.title');
   const sectionBannerVariant = 'aurora';
@@ -377,13 +363,13 @@ export default function AchievementsView() {
         </div>
       </header>
 
-      <section ref={badgeSectionRef} className="section badge-tabs" style={{ marginTop: '20px' }}>
+      <section className="section badge-tabs" style={{ marginTop: '20px' }}>
         <div className="section-header">
           <div className="wood-header">{t('achievements.title')}</div>
         </div>
         <section className="section" style={{ marginTop: '10px' }}></section>
 
-        {/* Mode-based achievement sections */}
+        {/* Mode-based achievement sections — content always rendered for stable layout */}
         {[
           { modeId: 'letterRiver', subSections: ['classic', 'special', 'polyglot', 'dedication'] },
           { modeId: 'bridgeBuilder', subSections: ['bridgeBuilder'] },
@@ -393,7 +379,7 @@ export default function AchievementsView() {
           if (modeBadges.length === 0) return null;
 
           const modeLabel = t(`achievementSections.${modeId}`, modeId);
-          const isExpanded = expandedModeSections[modeId] ?? (modeId === 'letterRiver');
+          const isExpanded = expandedModeSections[modeId] ?? false;
 
           return (
             <div key={modeId} style={{ marginBottom: '28px' }}>
@@ -408,7 +394,7 @@ export default function AchievementsView() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '10px 16px',
-                  marginBottom: isExpanded ? '16px' : '0',
+                  marginBottom: '16px',
                   border: 'none',
                   fontWeight: 600,
                   fontSize: '1rem',
@@ -418,7 +404,8 @@ export default function AchievementsView() {
                 <span style={{ fontSize: '0.8em', opacity: 0.7 }}>{isExpanded ? '▲' : '▼'}</span>
               </button>
 
-              {isExpanded && subSections.map((sectionId) => {
+              <div style={isExpanded ? {} : { visibility: 'hidden', pointerEvents: 'none' }}>
+              {subSections.map((sectionId) => {
                 const sectionCatalog = badgesCatalog.filter((badge) => badge.section === sectionId);
                 const activeSectionBadges = sectionCatalog.filter((badge) => activeBadges.includes(badge.id));
                 const additionalBadges = sectionCatalog.filter((badge) => !activeBadges.includes(badge.id));
@@ -429,7 +416,6 @@ export default function AchievementsView() {
 
                 if (displayBadges.length === 0) return null;
 
-                // Only show sub-section header for letter river (which has multiple sub-sections)
                 const showSubHeader = subSections.length > 1;
 
                 return (
@@ -459,6 +445,7 @@ export default function AchievementsView() {
                   </div>
                 );
               })}
+              </div>
             </div>
           );
         })}
