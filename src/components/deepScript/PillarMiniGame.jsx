@@ -16,9 +16,21 @@ function buildPillarRows(wordPool = deepScriptWords, selectedWordsOverride = nul
     ? selectedWordsOverride.filter(word => word?.english && !word?.isMiniboss)
     : shuffle(candidates).slice(0, 3);
 
+  const selectedAnswerSet = new Set(selectedWords.map(word => word.english).filter(Boolean));
+
   const sharedAnswers = Array.from(
     new Set(selectedWords.map(word => word.english).filter(Boolean))
   );
+
+    const extraDistractors = shuffle(
+    candidates
+      .map(word => word.english)
+      .filter(Boolean)
+      .filter(answer => !selectedAnswerSet.has(answer))
+  );
+  if (extraDistractors.length > 0) {
+    sharedAnswers.push(extraDistractors[0]);
+  }
 
   return selectedWords.map((word) => {
     const options = shuffle(sharedAnswers);
