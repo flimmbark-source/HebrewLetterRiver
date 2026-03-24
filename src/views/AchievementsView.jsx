@@ -265,6 +265,9 @@ export default function AchievementsView() {
           {claimableAwards.map((badge) => (
             <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
           ))}
+          {claimableAwards.length === 0 ? (
+            <p className="text-xs font-semibold text-[#6f7973]">No currently claimable achievements.</p>
+          ) : null}
           {claiming ? <p className="text-xs font-semibold text-[#4a6365]">Claiming reward...</p> : null}
         </section>
 
