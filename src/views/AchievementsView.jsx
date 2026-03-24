@@ -129,15 +129,6 @@ export default function AchievementsView() {
     [allBadges]
   );
 
-  const claimableByGroup = useMemo(() => {
-    return sectionGroups.map((group) => ({
-      ...group,
-      badges: allBadges
-        .filter(({ badge, state }) => group.sections.includes(badge.section) && Array.isArray(state.unclaimed) && state.unclaimed.length > 0)
-        .map(({ badge }) => badge)
-    }));
-  }, [allBadges, sectionGroups]);
-
   const upcomingByGroup = useMemo(() => {
     return sectionGroups.map((group) => ({
       ...group,
@@ -271,21 +262,9 @@ export default function AchievementsView() {
 
         <section className="space-y-3">
           <h3 className="text-lg font-bold text-[#1b6b4f]">Claimable Awards</h3>
-          {claimableByGroup.map((group) => (
-            <div key={group.key} className="space-y-2">
-              <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
-              {group.badges.length > 0 ? (
-                group.badges.map((badge) => (
-                  <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
-                ))
-              ) : (
-                <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No claimable awards in this section yet.</div>
-              )}
-            </div>
+          {claimableAwards.map((badge) => (
+            <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
           ))}
-          {claimableAwards.length === 0 ? (
-            <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No claimable awards right now.</div>
-          ) : null}
           {claiming ? <p className="text-xs font-semibold text-[#4a6365]">Claiming reward...</p> : null}
         </section>
 
