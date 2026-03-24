@@ -213,7 +213,7 @@
   border-left: 3px solid rgba(122,159,90,0.3);
 }
 
-/* ─── Pack Card ───────────────────────────────────────────── */
+/* ─── Pack Card (full, used in drawer & main list) ────────── */
 .bbs-pack-card {
   display: flex;
   align-items: center;
@@ -223,29 +223,15 @@
   background: linear-gradient(135deg, #fffdf0 0%, #fff8e1 100%);
   border: 3px solid #d4a76a;
   border-radius: 16px;
-  cursor: pointer;
   text-align: left;
   font-family: inherit;
   box-shadow: 0 3px 0 #a07030, 0 5px 12px rgba(0,0,0,0.08);
-  transition: transform 0.15s, box-shadow 0.15s, border-color 0.2s;
   position: relative;
   overflow: hidden;
 }
 
-.bbs-pack-card:active:not(:disabled) {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 #a07030, 0 3px 6px rgba(0,0,0,0.08);
-}
-
-.bbs-pack-card--selected {
-  border-color: #22c55e;
-  box-shadow: 0 3px 0 #16a34a, 0 5px 14px rgba(34,197,94,0.2);
-  background: linear-gradient(135deg, #f0fdf4 0%, #e8fce8 100%);
-}
-
 .bbs-pack-card--locked {
   opacity: 0.5;
-  cursor: not-allowed;
   filter: grayscale(30%);
 }
 
@@ -310,6 +296,38 @@
 .bbs-pack-status--locked {
   color: #6b7280;
   background: rgba(107,114,128,0.1);
+}
+
+/* ─── Pack Action Button (Play / Continue) ────────────────── */
+.bbs-pack-action {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #4a1a06;
+  background: radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%);
+  box-shadow: 0 2px 0 #c85a24, 0 4px 8px rgba(200,90,36,0.2);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  z-index: 1;
+}
+
+.bbs-pack-action:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 #c85a24, 0 2px 4px rgba(200,90,36,0.2);
+}
+
+.bbs-pack-action--compact {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.bbs-pack-action--featured {
+  padding: 10px 20px;
+  font-size: 16px;
 }
 
 /* ─── Pack completion dots (top-right) ────────────────────── */
@@ -382,6 +400,239 @@
   transition: width 0.3s ease;
 }
 
+/* ─── Quick Start Card (featured pack) ───────────────────── */
+.bbs-quickstart {
+  position: relative;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #e8fce8 60%, #dcf5dc 100%);
+  border: 3px solid #4ade80;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 3px 0 #16a34a, 0 5px 12px rgba(34,197,94,0.15);
+}
+
+.bbs-quickstart-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #166534;
+  background: rgba(34,197,94,0.15);
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+}
+
+.bbs-quickstart-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bbs-quickstart-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.bbs-quickstart-title {
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a4a30;
+  line-height: 1.2;
+}
+
+.bbs-quickstart-desc {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a7a5a;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+/* ─── Compact Pack Row (preview) ─────────────────────────── */
+.bbs-compact-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #fffdf0 0%, #fff8e1 100%);
+  border: 2px solid #d4a76a;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 0 #a07030, 0 3px 8px rgba(0,0,0,0.06);
+}
+
+.bbs-compact-row--locked {
+  opacity: 0.5;
+  filter: grayscale(30%);
+}
+
+.bbs-compact-row-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: rgba(212,167,106,0.15);
+  border-radius: 10px;
+}
+
+.bbs-compact-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.bbs-compact-row-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #3e1f04;
+  line-height: 1.2;
+}
+
+/* ─── Up Next label ──────────────────────────────────────── */
+.bbs-upnext {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bbs-upnext-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #7a6040;
+  margin-left: 4px;
+  margin-top: 2px;
+}
+
+/* ─── Show All Button ────────────────────────────────────── */
+.bbs-show-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(4px);
+  border: 2px dashed rgba(122,159,90,0.4);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #3e6a24;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.bbs-show-all:hover {
+  background: rgba(255,255,255,0.8);
+  border-color: rgba(122,159,90,0.6);
+}
+
+.bbs-show-all:active {
+  transform: translateY(1px);
+}
+
+.bbs-show-all-badge {
+  font-size: 12px;
+  font-weight: 800;
+  color: #166534;
+  background: rgba(34,197,94,0.15);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* ─── Bottom Drawer / Sheet ──────────────────────────────── */
+.bbs-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  animation: bbs-fade-in 0.2s ease;
+}
+
+@keyframes bbs-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.bbs-drawer {
+  width: 100%;
+  max-height: 80vh;
+  background: linear-gradient(180deg, #f5f0e5 0%, #ede6d6 100%);
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+  animation: bbs-slide-up 0.25s ease;
+}
+
+@keyframes bbs-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.bbs-drawer-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.bbs-drawer-title {
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #3e1f04;
+  margin: 0;
+}
+
+.bbs-drawer-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  font-size: 18px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.bbs-drawer-close:hover {
+  background: rgba(255,255,255,0.9);
+}
+
+.bbs-drawer-close:active {
+  transform: scale(0.95);
+}
+
+.bbs-drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 /* ─── Review Card ─────────────────────────────────────────── */
 .bbs-review-card {
   display: flex;
@@ -446,45 +697,4 @@
   color: #5a7fba;
   margin-top: 2px;
   line-height: 1.3;
-}
-
-/* ─── Footer — Play button ────────────────────────────────── */
-.bbs-footer {
-  flex-shrink: 0;
-  padding: 12px 20px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(180deg, transparent, rgba(208,236,200,0.6) 30%);
-}
-
-.bbs-play {
-  display: block;
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 16px;
-  font-family: 'Baloo 2', system-ui, sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s;
-
-  color: #fff;
-  background: #94a3b8;
-  box-shadow: 0 4px 0 #64748b, 0 6px 12px rgba(0,0,0,0.1);
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.bbs-play--active {
-  opacity: 1;
-  cursor: pointer;
-  color: #4a1a06;
-  background: radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%);
-  box-shadow: 0 4px 0 #c85a24, 0 7px 14px rgba(200,90,36,0.35);
-}
-
-.bbs-play--active:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #c85a24, 0 4px 8px rgba(200,90,36,0.35);
 }
