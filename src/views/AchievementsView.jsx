@@ -63,6 +63,11 @@ export default function AchievementsView() {
       .filter(Boolean);
   }, [activeBadges]);
 
+  const allBadges = useMemo(
+    () => badgesCatalog.map((badge) => ({ badge, state: badges?.[badge.id] ?? { tier: 0, progress: 0, unclaimed: [] } })),
+    [badges]
+  );
+
   const milestones = activeBadgeSpecs.slice(1, 3);
   const claimableAwards = useMemo(
     () =>
