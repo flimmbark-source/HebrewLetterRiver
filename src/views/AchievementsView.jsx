@@ -141,7 +141,7 @@ export default function AchievementsView() {
   const { t } = useLocalization();
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
   const [appLanguageSelectorExpanded, setAppLanguageSelectorExpanded] = useState(false);
-  const [expandedModeSections, setExpandedModeSections] = useState({ letterRiver: true, bridgeBuilder: false, deepScript: false });
+  const [expandedModeSections, setExpandedModeSections] = useState({ letterRiver: false, bridgeBuilder: false, deepScript: false });
   const languageSelectorRef = useRef(null);
   const gameName = t('app.title');
   const sectionBannerVariant = 'aurora';
@@ -363,7 +363,7 @@ export default function AchievementsView() {
         </div>
       </header>
 
-      <section className="section badge-tabs" style={{ marginTop: '20px' }}>
+      <section className="section badge-tabs" style={{ marginTop: '20px', minHeight: '300px' }}>
         <div className="section-header">
           <div className="wood-header">{t('achievements.title')}</div>
         </div>

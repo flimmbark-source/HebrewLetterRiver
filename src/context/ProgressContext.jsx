@@ -211,8 +211,12 @@ function createLanguageAssets(languagePack, localization = {}) {
         nextTask.rewardClaimable ?? (Boolean(nextTask.completed) && !rewardClaimed);
       const claimedAt = nextTask.claimedAt ?? null;
 
+      // Backfill mode from template if missing (migration from older cached data)
+      const mode = nextTask.mode ?? template.mode ?? 'letterRiver';
+
       return {
         ...nextTask,
+        mode,
         title,
         description,
         rewardStars,
@@ -482,11 +486,17 @@ export function ProgressProvider({ children }) {
         }
       }
       if (source && source.dateKey === todayKey) {
-        const normalized = assets.normalizeDailyData(source);
-        if (!stored) {
-          saveState(`${storagePrefix}.daily`, normalized);
+        // Check if cached quests cover all 3 modes; regenerate if not (migration)
+        const taskModes = new Set((source.tasks ?? []).map(t => t.mode).filter(Boolean));
+        const hasAllModes = taskModes.has('letterRiver') && taskModes.has('bridgeBuilder') && taskModes.has('deepScript');
+        if (hasAllModes || (source.tasks ?? []).some(t => t.rewardClaimed)) {
+          const normalized = assets.normalizeDailyData(source);
+          if (!stored) {
+            saveState(`${storagePrefix}.daily`, normalized);
+          }
+          return normalized;
         }
-        return normalized;
+        // Fall through to regenerate with all 3 modes
       }
       const weakest = assets.getWeakestLetter(currentPlayer?.letters);
       return assets.generateDaily(todayKey, weakest, pickConstraint());
