@@ -230,7 +230,7 @@ export default function AchievementsView() {
             const current = Math.min(state?.progress ?? 0, goal);
             const pct = Math.round((current / goal) * 100);
             return (
-              <div key={badge.id} className={`flex aspect-square flex-col justify-between rounded-lg p-5 ${index === 0 ? 'bg-[#e7e0eb]' : 'bg-[#f9f1fd]'}`}>
+              <div key={badge.id} className={`flex flex-col rounded-lg p-5 ${index === 0 ? 'bg-[#e7e0eb]' : 'bg-[#f9f1fd]'}`}>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#1b6b4f]/10"><Icon className="text-[#1b6b4f]" filled>{index === 0 ? 'history_edu' : 'auto_awesome'}</Icon></div>
                 <div>
                   <h4 className="mb-1 text-lg font-bold leading-tight">{getBadgeCopy(badge, t, gameName, goal).name}</h4>
