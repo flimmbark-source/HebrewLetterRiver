@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
+import { useLocalization } from '../context/LocalizationContext.jsx';
 
 const SECTION_GROUPS = [
   { key: 'letterRiver', label: 'Letter River', sections: ['classic', 'special', 'polyglot', 'dedication'] },
@@ -17,7 +18,27 @@ function Icon({ children, className = '', filled = false }) {
   );
 }
 
-function AwardCard({ badge, progress, onClaim }) {
+function formatBadgeNameFromId(id = '') {
+  return id
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function getBadgeCopy(badge, t, gameName, goal) {
+  const localizedName = badge.nameKey ? t(badge.nameKey) : '';
+  const localizedSummary = badge.summaryKey ? t(badge.summaryKey, { gameName, goal }) : '';
+  const name = typeof localizedName === 'string' && localizedName.trim().length > 0
+    ? localizedName
+    : (badge.name || formatBadgeNameFromId(badge.id));
+  const summary = typeof localizedSummary === 'string' && localizedSummary.trim().length > 0
+    ? localizedSummary
+    : (badge.summary || `Complete ${goal} milestone${goal === 1 ? '' : 's'}.`);
+  return { name, summary };
+}
+
+function AwardCard({ badge, progress, onClaim, t }) {
   const totalTiers = badge.tiers.length;
   const unclaimed = Array.isArray(progress?.unclaimed) ? progress.unclaimed : [];
   const nextReward = unclaimed[0] ?? null;
@@ -27,6 +48,7 @@ function AwardCard({ badge, progress, onClaim }) {
   const goal = tierSpec?.goal ?? 1;
   const current = nextReward ? goal : Math.min(progress?.progress ?? 0, goal);
   const pct = Math.min((current / goal) * 100, 100);
+  const { name, summary } = getBadgeCopy(badge, t, t('app.title'), goal);
 
   return (
     <button
@@ -36,10 +58,10 @@ function AwardCard({ badge, progress, onClaim }) {
       className={`w-full rounded-xl p-4 text-left shadow-sm transition ${nextReward ? 'bg-[#f9f1fd] hover:scale-[1.01]' : 'bg-white'}`}
     >
       <div className="mb-2 flex items-center justify-between">
-        <h4 className="font-bold text-[#1d1a22]">{badge.name}</h4>
+        <h4 className="font-bold text-[#1d1a22]">{name}</h4>
         {nextReward ? <span className="rounded-full bg-[#1b6b4f] px-2 py-1 text-[10px] font-black text-white">CLAIM +{nextReward.stars}</span> : null}
       </div>
-      <p className="text-xs text-[#4a6365]">{badge.summary}</p>
+      <p className="text-xs text-[#4a6365]">{summary}</p>
       <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#bec9c2]/30">
         <div className="h-full bg-[#1b6b4f]" style={{ width: `${pct}%` }}></div>
       </div>
@@ -49,6 +71,7 @@ function AwardCard({ badge, progress, onClaim }) {
 
 export default function AchievementsView() {
   const { player, badges, activeBadges, starLevelSize, claimBadgeReward } = useProgress();
+  const { t } = useLocalization();
   const [claiming, setClaiming] = useState(false);
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
@@ -62,6 +85,7 @@ export default function AchievementsView() {
     const badge = badgesCatalog.find((item) => item.id === player.latestBadge.id);
     return badge ?? null;
   }, [player.latestBadge]);
+  const gameName = t('app.title');
 
   const activeBadgeSpecs = useMemo(() => {
     return (activeBadges ?? [])
@@ -166,8 +190,12 @@ export default function AchievementsView() {
           <div className="col-span-2 flex items-center justify-between overflow-hidden rounded-lg bg-[#f9f1fd] p-6">
             <div className="flex-1">
               <span className="mb-3 inline-block rounded-full bg-[#fcb972] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#774708]">Most Recent</span>
-              <h3 className="mb-1 text-xl font-bold">{recentBadge?.name ?? 'Polyglot Pioneer'}</h3>
-              <p className="text-sm text-[#3f4943]">{recentBadge?.summary ?? 'Completed 5 different language paths.'}</p>
+              <h3 className="mb-1 text-xl font-bold">
+                {recentBadge ? getBadgeCopy(recentBadge, t, gameName, recentBadge?.tiers?.[0]?.goal ?? 1).name : 'Polyglot Pioneer'}
+              </h3>
+              <p className="text-sm text-[#3f4943]">
+                {recentBadge ? getBadgeCopy(recentBadge, t, gameName, recentBadge?.tiers?.[0]?.goal ?? 1).summary : 'Completed 5 different language paths.'}
+              </p>
             </div>
             <div className="ml-4 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-sm"><Icon className="text-4xl text-[#855315]" filled>emoji_events</Icon></div>
           </div>
@@ -181,8 +209,8 @@ export default function AchievementsView() {
               <div key={badge.id} className={`flex aspect-square flex-col justify-between rounded-lg p-5 ${index === 0 ? 'bg-[#e7e0eb]' : 'bg-[#f9f1fd]'}`}>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#1b6b4f]/10"><Icon className="text-[#1b6b4f]" filled>{index === 0 ? 'history_edu' : 'auto_awesome'}</Icon></div>
                 <div>
-                  <h4 className="mb-1 text-lg font-bold leading-tight">{badge.name}</h4>
-                  <p className="text-xs text-[#3f4943]">{badge.summary}</p>
+                  <h4 className="mb-1 text-lg font-bold leading-tight">{getBadgeCopy(badge, t, gameName, goal).name}</h4>
+                  <p className="text-xs text-[#3f4943]">{getBadgeCopy(badge, t, gameName, goal).summary}</p>
                   <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#bec9c2]/30"><div className="h-full bg-[#1b6b4f]" style={{ width: `${pct}%` }}></div></div>
                 </div>
               </div>
@@ -209,10 +237,10 @@ export default function AchievementsView() {
                       </div>
                       <div className="flex-1">
                         <div className="mb-1 flex items-end justify-between">
-                          <h4 className="font-bold">{badge.name}</h4>
+                          <h4 className="font-bold">{getBadgeCopy(badge, t, gameName, goal).name}</h4>
                           <span className="text-[10px] font-bold text-[#3f4943]">STEP {10 + index}</span>
                         </div>
-                        <p className="mb-2 text-xs text-[#3f4943]">{badge.summary}</p>
+                        <p className="mb-2 text-xs text-[#3f4943]">{getBadgeCopy(badge, t, gameName, goal).summary}</p>
                         <div className="h-2 w-full overflow-hidden rounded-full bg-[#e7e0eb]"><div className="h-full bg-[#1b6b4f]/30" style={{ width: `${pct}%` }}></div></div>
                       </div>
                     </div>
@@ -235,7 +263,7 @@ export default function AchievementsView() {
               <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
               {group.badges.length > 0 ? (
                 group.badges.map((badge) => (
-                  <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} />
+                  <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
                 ))
               ) : (
                 <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No claimable awards in this section yet.</div>
@@ -255,7 +283,7 @@ export default function AchievementsView() {
               <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
               <div className="space-y-2">
                 {group.badges.map((badge) => (
-                  <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} />
+                  <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
                 ))}
               </div>
             </div>
