@@ -98,7 +98,11 @@ export default function AchievementsView() {
     [badges]
   );
 
-  const milestones = activeBadgeSpecs.slice(1, 3);
+  const milestones = useMemo(() => {
+    const active = activeBadgeSpecs.slice(1, 3);
+    if (active.length > 0) return active;
+    return badgesCatalog.slice(0, 2);
+  }, [activeBadgeSpecs]);
   const claimableAwards = useMemo(
     () =>
       allBadges
@@ -116,29 +120,31 @@ export default function AchievementsView() {
     }));
   }, [allBadges]);
 
-  const upcoming = useMemo(
-    () =>
-      allBadges
-        .filter(({ state }) => (state.progress ?? 0) > 0 && (!Array.isArray(state.unclaimed) || state.unclaimed.length === 0))
-        .sort((a, b) => (b.state.progress ?? 0) - (a.state.progress ?? 0))
-        .map(({ badge }) => badge)
-        .slice(0, 6),
-    [allBadges]
-  );
-
   const upcomingByGroup = useMemo(() => {
     return SECTION_GROUPS.map((group) => ({
       ...group,
-      badges: allBadges
-        .filter(({ badge, state }) => {
-          if (!group.sections.includes(badge.section)) return false;
-          const hasUnclaimed = Array.isArray(state.unclaimed) && state.unclaimed.length > 0;
-          return (state.progress ?? 0) > 0 && !hasUnclaimed;
-        })
-        .sort((a, b) => (b.state.progress ?? 0) - (a.state.progress ?? 0))
-        .map(({ badge }) => badge)
+      badges: (() => {
+        const candidates = allBadges
+          .filter(({ badge, state }) => {
+            if (!group.sections.includes(badge.section)) return false;
+            return !Array.isArray(state.unclaimed) || state.unclaimed.length === 0;
+          })
+          .sort((a, b) => (b.state.progress ?? 0) - (a.state.progress ?? 0));
+
+        const inProgress = candidates.filter(({ state }) => (state.progress ?? 0) > 0);
+        const source = inProgress.length > 0 ? inProgress : candidates.slice(0, 3);
+        return source.map(({ badge }) => badge);
+      })()
     }));
   }, [allBadges]);
+
+  const upcoming = useMemo(
+    () =>
+      upcomingByGroup
+        .flatMap((group) => group.badges)
+        .slice(0, 6),
+    [upcomingByGroup]
+  );
 
   const allByGroup = useMemo(() => {
     return SECTION_GROUPS.map((group) => ({
