@@ -200,10 +200,10 @@ export default function AchievementsView() {
             <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-[#a7f3d0]/20 blur-3xl"></div>
             <div className="relative z-10">
               <p className="mb-1 text-sm font-bold opacity-80">CURRENT MILESTONE • {playerName}</p>
-              <h2 className="mb-4 text-3xl font-extrabold tracking-tight">Step {Math.min(level + 3, 15)} of 15</h2>
+              <h2 className="mb-4 text-3xl font-extrabold tracking-tight">Level {level}</h2>
               <div className="mb-2 h-4 w-full overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-[#a7f3d0]" style={{ width: `${levelPercent}%` }}></div></div>
               <div className="flex justify-between text-xs font-bold">
-                <span>{levelProgress} / {starsPerLevel} XP TO STEP {Math.min(level + 1, 15)}</span>
+                <span>{levelProgress} / {starsPerLevel} XP TO LEVEL {Math.min(level + 1, 15)}</span>
                 <span className="text-[#a7f3d0]">{levelPercent}% COMPLETED</span>
               </div>
             </div>
