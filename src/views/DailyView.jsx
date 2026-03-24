@@ -4,10 +4,17 @@ import { useGame } from '../context/GameContext.jsx';
 import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 
+const MODE_LABELS = {
+  letterRiver: 'Letter River',
+  bridgeBuilder: 'Vocab Builder',
+  deepScript: 'Deep Script',
+};
+
 function TaskCard({ task, accent, onClaim, claiming }) {
   const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
   const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
   const formattedReward = rewardValue.toLocaleString();
+  const modeLabel = MODE_LABELS[task.mode] ?? null;
   const claimable = Boolean(task.rewardClaimable) && !task.rewardClaimed;
   const statusLabel = task.rewardClaimed
     ? 'Reward collected'
@@ -24,7 +31,23 @@ function TaskCard({ task, accent, onClaim, claiming }) {
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="quest-category text-slate-400">{task.title}</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <p className="quest-category text-slate-400" style={{ margin: 0 }}>{task.title}</p>
+            {modeLabel && (
+              <span style={{
+                fontSize: '0.65rem',
+                padding: '1px 7px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(99,102,241,0.2)',
+                color: '#a5b4fc',
+                border: '1px solid rgba(99,102,241,0.3)',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+              }}>
+                {modeLabel}
+              </span>
+            )}
+          </div>
           <h3 className="quest-title text-white">{task.description}</h3>
         </div>
         <span

@@ -4,209 +4,239 @@
     "titleKey": "daily.tasks.warmup.title",
     "descriptionKey": "daily.tasks.warmup.description",
     "goal": 2,
-    "type": "sessions"
+    "type": "sessions",
+    "mode": "letterRiver"
   },
   {
     "id": "focus",
     "titleKey": "daily.tasks.focus.title",
     "descriptionKey": "daily.tasks.focus.description",
     "goal": 5,
-    "type": "letterPerfect"
+    "type": "letterPerfect",
+    "mode": "letterRiver"
   },
   {
     "id": "spice",
     "titleKey": "daily.tasks.spice.title",
     "descriptionKey": "daily.tasks.spice.description",
     "goal": 1,
-    "type": "constraint"
+    "type": "constraint",
+    "mode": "letterRiver"
   },
   {
     "id": "accuracy-challenge",
     "titleKey": "daily.tasks.accuracyChallenge.title",
     "descriptionKey": "daily.tasks.accuracyChallenge.description",
     "goal": 1,
-    "type": "highAccuracy"
+    "type": "highAccuracy",
+    "mode": "letterRiver"
   },
   {
     "id": "gem-collector",
     "titleKey": "daily.tasks.gemCollector.title",
     "descriptionKey": "daily.tasks.gemCollector.description",
     "goal": 2,
-    "type": "bonusRounds"
+    "type": "bonusRounds",
+    "mode": "letterRiver"
   },
   {
     "id": "variety-pack",
     "titleKey": "daily.tasks.varietyPack.title",
     "descriptionKey": "daily.tasks.varietyPack.description",
     "goal": 8,
-    "type": "uniqueLetters"
+    "type": "uniqueLetters",
+    "mode": "letterRiver"
   },
   {
     "id": "power-session",
     "titleKey": "daily.tasks.powerSession.title",
     "descriptionKey": "daily.tasks.powerSession.description",
     "goal": 25,
-    "type": "totalCatches"
+    "type": "totalCatches",
+    "mode": "letterRiver"
   },
   {
     "id": "perfect-run",
     "titleKey": "daily.tasks.perfectRun.title",
     "descriptionKey": "daily.tasks.perfectRun.description",
     "goal": 1,
-    "type": "flawlessSession"
+    "type": "flawlessSession",
+    "mode": "letterRiver"
   },
   {
     "id": "speed-practice",
     "titleKey": "daily.tasks.speedPractice.title",
     "descriptionKey": "daily.tasks.speedPractice.description",
     "goal": 1,
-    "type": "fastMode"
+    "type": "fastMode",
+    "mode": "letterRiver"
   },
   {
     "id": "triple-threat",
     "titleKey": "daily.tasks.tripleThread.title",
     "descriptionKey": "daily.tasks.tripleThread.description",
     "goal": 3,
-    "type": "sessions"
+    "type": "sessions",
+    "mode": "letterRiver"
   },
   {
     "id": "wave-challenge",
     "titleKey": "daily.tasks.waveChallenge.title",
     "descriptionKey": "daily.tasks.waveChallenge.description",
     "goal": 8,
-    "type": "waveStreak"
+    "type": "waveStreak",
+    "mode": "letterRiver"
   },
   {
     "id": "flame-builder",
     "titleKey": "daily.tasks.flameBuilder.title",
     "descriptionKey": "daily.tasks.flameBuilder.description",
     "goal": 15,
-    "type": "catchStreak"
+    "type": "catchStreak",
+    "mode": "letterRiver"
   },
   {
     "id": "slow-river-zen",
     "titleKey": "daily.tasks.slowRiverZen.title",
     "descriptionKey": "daily.tasks.slowRiverZen.description",
     "goal": 1,
-    "type": "slowRiverPerfect"
+    "type": "slowRiverPerfect",
+    "mode": "letterRiver"
   },
   {
     "id": "click-master",
     "titleKey": "daily.tasks.clickMaster.title",
     "descriptionKey": "daily.tasks.clickMaster.description",
     "goal": 1,
-    "type": "clickModeWin"
+    "type": "clickModeWin",
+    "mode": "letterRiver"
   },
   {
     "id": "level-climber",
     "titleKey": "daily.tasks.levelClimber.title",
     "descriptionKey": "daily.tasks.levelClimber.description",
     "goal": 12,
-    "type": "reachLevel"
+    "type": "reachLevel",
+    "mode": "letterRiver"
   },
   {
     "id": "no-lives-lost",
     "titleKey": "daily.tasks.noLivesLost.title",
     "descriptionKey": "daily.tasks.noLivesLost.description",
     "goal": 1,
-    "type": "fullLivesWin"
+    "type": "fullLivesWin",
+    "mode": "letterRiver"
   },
   {
     "id": "association-practice",
     "titleKey": "daily.tasks.associationPractice.title",
     "descriptionKey": "daily.tasks.associationPractice.description",
     "goal": 1,
-    "type": "associationMode"
+    "type": "associationMode",
+    "mode": "letterRiver"
   },
   {
     "id": "multi-mode-master",
     "titleKey": "daily.tasks.multiModeMaster.title",
     "descriptionKey": "daily.tasks.multiModeMaster.description",
     "goal": 1,
-    "type": "mixedModes"
+    "type": "mixedModes",
+    "mode": "letterRiver"
   },
   {
     "id": "font-flexibility",
     "titleKey": "daily.tasks.fontFlexibility.title",
     "descriptionKey": "daily.tasks.fontFlexibility.description",
     "goal": 1,
-    "type": "fontShuffle"
+    "type": "fontShuffle",
+    "mode": "letterRiver"
   },
   {
     "id": "random-challenge",
     "titleKey": "daily.tasks.randomChallenge.title",
     "descriptionKey": "daily.tasks.randomChallenge.description",
     "goal": 1,
-    "type": "randomLetters"
+    "type": "randomLetters",
+    "mode": "letterRiver"
   },
   {
     "id": "vowel-focus",
     "titleKey": "daily.tasks.vowelFocus.title",
     "descriptionKey": "daily.tasks.vowelFocus.description",
     "goal": 1,
-    "type": "vowelMode"
+    "type": "vowelMode",
+    "mode": "letterRiver"
   },
   {
     "id": "final-forms-practice",
     "titleKey": "daily.tasks.finalFormsPractice.title",
     "descriptionKey": "daily.tasks.finalFormsPractice.description",
     "goal": 1,
-    "type": "finalFormsMode"
+    "type": "finalFormsMode",
+    "mode": "letterRiver"
   },
   {
     "id": "language-explorer",
     "titleKey": "daily.tasks.languageExplorer.title",
     "descriptionKey": "daily.tasks.languageExplorer.description",
     "goal": 1,
-    "type": "newLanguage"
+    "type": "newLanguage",
+    "mode": "letterRiver"
   },
   {
     "id": "point-surge",
     "titleKey": "daily.tasks.pointSurge.title",
     "descriptionKey": "daily.tasks.pointSurge.description",
     "goal": 400,
-    "type": "scorePoints"
+    "type": "scorePoints",
+    "mode": "letterRiver"
   },
   {
     "id": "double-session",
     "titleKey": "daily.tasks.doubleSession.title",
     "descriptionKey": "daily.tasks.doubleSession.description",
     "goal": 2,
-    "type": "completeSessions"
+    "type": "completeSessions",
+    "mode": "letterRiver"
   },
   {
     "id": "bridge-session",
     "titleKey": "daily.tasks.bridgeSession.title",
     "descriptionKey": "daily.tasks.bridgeSession.description",
     "goal": 1,
-    "type": "bridgeSession"
+    "type": "bridgeSession",
+    "mode": "bridgeBuilder"
   },
   {
     "id": "bridge-perfect",
     "titleKey": "daily.tasks.bridgePerfect.title",
     "descriptionKey": "daily.tasks.bridgePerfect.description",
     "goal": 1,
-    "type": "bridgePerfect"
+    "type": "bridgePerfect",
+    "mode": "bridgeBuilder"
   },
   {
     "id": "bridge-words",
     "titleKey": "daily.tasks.bridgeWords.title",
     "descriptionKey": "daily.tasks.bridgeWords.description",
     "goal": 5,
-    "type": "bridgeWords"
+    "type": "bridgeWords",
+    "mode": "bridgeBuilder"
   },
   {
     "id": "deep-script-combat",
     "titleKey": "daily.tasks.deepScriptCombat.title",
     "descriptionKey": "daily.tasks.deepScriptCombat.description",
     "goal": 3,
-    "type": "deepScriptCombat"
+    "type": "deepScriptCombat",
+    "mode": "deepScript"
   },
   {
     "id": "deep-script-run",
     "titleKey": "daily.tasks.deepScriptRun.title",
     "descriptionKey": "daily.tasks.deepScriptRun.description",
     "goal": 1,
-    "type": "deepScriptRun"
+    "type": "deepScriptRun",
+    "mode": "deepScript"
   }
 ]

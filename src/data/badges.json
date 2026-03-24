@@ -617,7 +617,7 @@
   },
   {
     "id": "bridge-architect",
-    "section": "special",
+    "section": "bridgeBuilder",
     "nameKey": "badges.bridgeArchitect.name",
     "summaryKey": "badges.bridgeArchitect.summary",
     "tiers": [
@@ -628,7 +628,7 @@
   },
   {
     "id": "bridge-perfectionist",
-    "section": "special",
+    "section": "bridgeBuilder",
     "nameKey": "badges.bridgePerfectionist.name",
     "summaryKey": "badges.bridgePerfectionist.summary",
     "tiers": [
@@ -639,7 +639,7 @@
   },
   {
     "id": "word-collector",
-    "section": "polyglot",
+    "section": "bridgeBuilder",
     "nameKey": "badges.wordCollector.name",
     "summaryKey": "badges.wordCollector.summary",
     "tiers": [
@@ -650,7 +650,7 @@
   },
   {
     "id": "dungeon-delver",
-    "section": "special",
+    "section": "deepScript",
     "nameKey": "badges.dungeonDelver.name",
     "summaryKey": "badges.dungeonDelver.summary",
     "tiers": [
@@ -661,7 +661,7 @@
   },
   {
     "id": "rune-vanquisher",
-    "section": "special",
+    "section": "deepScript",
     "nameKey": "badges.runeVanquisher.name",
     "summaryKey": "badges.runeVanquisher.summary",
     "tiers": [
@@ -672,7 +672,7 @@
   },
   {
     "id": "iron-will",
-    "section": "special",
+    "section": "deepScript",
     "nameKey": "badges.ironWill.name",
     "summaryKey": "badges.ironWill.summary",
     "tiers": [

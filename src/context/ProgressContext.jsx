@@ -243,8 +243,18 @@ function createLanguageAssets(languagePack, localization = {}) {
     const focusLetter = focusLetterInfo ?? fallbackLetterInfo;
     const selectedConstraint = constraint ?? pickConstraint();
 
-    const shuffled = [...dailyTemplates].sort(() => Math.random() - 0.5);
-    const selectedTemplates = shuffled.slice(0, 3);
+    // Pick one quest per mode: letterRiver, bridgeBuilder, deepScript
+    const byMode = { letterRiver: [], bridgeBuilder: [], deepScript: [] };
+    for (const tmpl of dailyTemplates) {
+      const m = tmpl.mode ?? 'letterRiver';
+      if (byMode[m]) byMode[m].push(tmpl);
+    }
+    const selectedTemplates = Object.values(byMode).map(
+      (pool) => {
+        const shuffled = [...pool].sort(() => Math.random() - 0.5);
+        return shuffled[0];
+      }
+    ).filter(Boolean);
 
     const rewardDistribution = distributeRewardStars(DAILY_REWARD_STARS, selectedTemplates.length);
     const tasks = selectedTemplates.map((template, index) => {

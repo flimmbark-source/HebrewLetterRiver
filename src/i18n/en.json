@@ -1199,7 +1199,10 @@
     "classic": "Classic",
     "special": "Special",
     "polyglot": "Polyglot",
-    "dedication": "Dedication"
+    "dedication": "Dedication",
+    "letterRiver": "Letter River",
+    "bridgeBuilder": "Vocab Builder",
+    "deepScript": "Deep Script"
   },
   "daily": {
     "badge": {
