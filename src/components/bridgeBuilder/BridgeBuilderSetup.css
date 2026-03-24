@@ -8,7 +8,7 @@
   bottom: 64px;
   display: flex;
   flex-direction: column;
-  font-family: 'Nunito', system-ui, sans-serif;
+  font-family: var(--font-family);
   background: linear-gradient(180deg, #c9e8f7 0%, #daf0fc 30%, #e4f6ee 60%, #d0ecc8 100%);
   overflow: hidden;
 }
@@ -265,7 +265,7 @@
   font-size: 14px;
   font-weight: 800;
   color: #fff;
-  background: #059669;
+  background: var(--ds-primary, #1b6b4f);
   box-shadow: 0 4px 12px rgba(5,150,105,0.22);
   cursor: pointer;
   transition: transform 0.1s, background 0.15s;
@@ -480,7 +480,7 @@
 }
 
 .bbs-show-all-link:hover {
-  color: #059669;
+  color: var(--ds-primary, #1b6b4f);
 }
 
 .bbs-upnext-list {

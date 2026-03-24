@@ -8,7 +8,7 @@
   inset: 0;
   display: flex;
   flex-direction: column;
-  font-family: 'Nunito', system-ui, sans-serif;
+  font-family: var(--font-family);
   overflow: hidden;
   background: linear-gradient(180deg, #c9e8f7 0%, #daf0fc 30%, #e4f6ee 60%, #d0ecc8 100%);
   z-index: 101;
@@ -430,7 +430,7 @@
 .bb-choice-text {
   position: relative;
   z-index: 1;
-  font-family: 'Nunito', system-ui, sans-serif;
+  font-family: var(--font-family);
   font-size: 22px;
   font-weight: 800;
   color: #3e1f04;
@@ -600,7 +600,7 @@
   padding: 16px 48px;
   border: none;
   border-radius: 999px;
-  font-family: 'Nunito', system-ui, sans-serif;
+  font-family: var(--font-family);
   font-size: 22px;
   font-weight: 800;
   cursor: pointer;

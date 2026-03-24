@@ -60,7 +60,7 @@
 }
 
 .play-mode-title {
-  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-family: var(--font-family);
   font-size: 24px;
   font-weight: 800;
   color: #3e1f04;
@@ -84,7 +84,7 @@
   border: 3px solid #d4a76a;
   cursor: pointer;
   text-align: left;
-  font-family: 'Nunito', system-ui, sans-serif;
+  font-family: var(--font-family);
   transition: transform 0.15s, box-shadow 0.15s, border-color 0.2s;
 }
 

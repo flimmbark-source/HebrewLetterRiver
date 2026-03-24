@@ -26,8 +26,8 @@
   --ds-purple: #9b6ddb;
   --ds-purple-glow: rgba(155, 109, 219, 0.3);
   --ds-shadow: rgba(0, 0, 0, 0.6);
-  --ds-font-body: 'Nunito', system-ui, sans-serif;
-  --ds-font-display: 'Baloo 2', system-ui, sans-serif;
+  --ds-font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --ds-font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 /* ─── Mode Container ─────────────────────────────────────── */
