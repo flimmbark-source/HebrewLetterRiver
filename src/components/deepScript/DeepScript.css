@@ -94,56 +94,28 @@
   --toggle-text-active: #ffffff;
   --track-bg: rgba(255, 255, 255, 0.08);
   --knob-bg: linear-gradient(180deg, #ffffff 0%, #dfe7f3 100%);
-  --knob-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.35),
-    0 4px 10px rgba(0, 0, 0, 0.18);
 
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.4rem 0.7rem;
+  gap: 0.38rem;
+  padding: 0.22rem 0.42rem;
   border: 1px solid var(--toggle-border);
   border-radius: 999px;
   background: var(--toggle-bg);
-  backdrop-filter: blur(10px);
   color: var(--toggle-text);
   font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
   cursor: pointer;
-  transition:
-    background 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease,
-    transform 120ms ease;
-}
-
-.ds-source-toggle:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
-}
-
-.ds-source-toggle:active {
-  transform: translateY(1px);
-}
-
-.ds-source-toggle:focus-visible {
-  outline: none;
-  box-shadow:
-    0 0 0 2px rgba(255, 255, 255, 0.12),
-    0 0 0 4px rgba(100, 180, 255, 0.35);
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .ds-source-toggle-label {
-  min-width: 3.4rem;
+  min-width: 2.1rem;
   text-align: center;
   color: var(--toggle-text);
-  transition:
-    color 160ms ease,
-    opacity 160ms ease,
-    transform 160ms ease;
+  transition: color 160ms ease;
 }
 
 .ds-source-toggle-label.is-active {
@@ -152,32 +124,28 @@
 
 .ds-source-toggle-track {
   position: relative;
-  width: 2.8rem;
-  height: 1.55rem;
+  width: 2rem;
+  height: 1.1rem;
   flex: 0 0 auto;
   border-radius: 999px;
   background: var(--track-bg);
-  box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.28),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .ds-source-toggle-knob {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 0.85rem;
+  height: 0.85rem;
   border-radius: 50%;
   background: var(--knob-bg);
-  box-shadow: var(--knob-shadow);
-  transition:
-    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
-    background 180ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .ds-source-toggle.is-random .ds-source-toggle-knob {
-  transform: translateX(1.25rem);
+  transform: translateX(0.9rem);
 }
 
 /* ─── Run Status Bar ─────────────────────────────────────── */
