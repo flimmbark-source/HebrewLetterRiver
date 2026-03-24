@@ -3,6 +3,12 @@ import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 
+const SECTION_GROUPS = [
+  { key: 'letterRiver', label: 'Letter River', sections: ['classic', 'special', 'polyglot', 'dedication'] },
+  { key: 'bridgeBuilder', label: 'Bridge Builder', sections: ['bridgeBuilder'] },
+  { key: 'deepScript', label: 'Deep Script', sections: ['deepScript'] }
+];
+
 function Icon({ children, className = '', filled = false }) {
   return (
     <span className={`material-symbols-outlined ${className}`} style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}>
@@ -77,6 +83,15 @@ export default function AchievementsView() {
     [allBadges]
   );
 
+  const claimableByGroup = useMemo(() => {
+    return SECTION_GROUPS.map((group) => ({
+      ...group,
+      badges: allBadges
+        .filter(({ badge, state }) => group.sections.includes(badge.section) && Array.isArray(state.unclaimed) && state.unclaimed.length > 0)
+        .map(({ badge }) => badge)
+    }));
+  }, [allBadges]);
+
   const upcoming = useMemo(
     () =>
       allBadges
@@ -86,6 +101,29 @@ export default function AchievementsView() {
         .slice(0, 6),
     [allBadges]
   );
+
+  const upcomingByGroup = useMemo(() => {
+    return SECTION_GROUPS.map((group) => ({
+      ...group,
+      badges: allBadges
+        .filter(({ badge, state }) => {
+          if (!group.sections.includes(badge.section)) return false;
+          const hasUnclaimed = Array.isArray(state.unclaimed) && state.unclaimed.length > 0;
+          return (state.progress ?? 0) > 0 && !hasUnclaimed;
+        })
+        .sort((a, b) => (b.state.progress ?? 0) - (a.state.progress ?? 0))
+        .map(({ badge }) => badge)
+    }));
+  }, [allBadges]);
+
+  const allByGroup = useMemo(() => {
+    return SECTION_GROUPS.map((group) => ({
+      ...group,
+      badges: allBadges
+        .filter(({ badge }) => group.sections.includes(badge.section))
+        .map(({ badge }) => badge)
+    }));
+  }, [allBadges]);
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
@@ -153,36 +191,74 @@ export default function AchievementsView() {
 
         <h3 className="mb-6 text-xl font-extrabold text-[#1b6b4f]">Upcoming Milestones</h3>
         <div className="mb-10 space-y-4">
-          {upcoming.map((badge, index) => {
-            const state = badges?.[badge.id];
-            const goal = badge.tiers[Math.min(state?.tier ?? 0, badge.tiers.length - 1)]?.goal ?? 1;
-            const current = Math.min(state?.progress ?? 0, goal);
-            const pct = Math.round((current / goal) * 100);
-            return (
-              <div key={badge.id} className="flex items-center gap-5 rounded-xl p-4 transition-all hover:bg-[#f9f1fd]">
-                <div className="relative">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#e7e0eb]"><Icon className="text-[#6f7973]">workspace_premium</Icon></div>
-                  <div className="absolute -bottom-1 -right-1 rounded-full bg-white p-1 shadow-sm"><Icon className="text-[14px] text-[#1b6b4f]">lock</Icon></div>
-                </div>
-                <div className="flex-1">
-                  <div className="mb-1 flex items-end justify-between">
-                    <h4 className="font-bold">{badge.name}</h4>
-                    <span className="text-[10px] font-bold text-[#3f4943]">STEP {10 + index}</span>
-                  </div>
-                  <p className="mb-2 text-xs text-[#3f4943]">{badge.summary}</p>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-[#e7e0eb]"><div className="h-full bg-[#1b6b4f]/30" style={{ width: `${pct}%` }}></div></div>
-                </div>
-              </div>
-            );
-          })}
+          {upcomingByGroup.map((group) => (
+            <div key={group.key} className="space-y-2">
+              <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
+              {group.badges.length > 0 ? (
+                group.badges.map((badge, index) => {
+                  const state = badges?.[badge.id];
+                  const goal = badge.tiers[Math.min(state?.tier ?? 0, badge.tiers.length - 1)]?.goal ?? 1;
+                  const current = Math.min(state?.progress ?? 0, goal);
+                  const pct = Math.round((current / goal) * 100);
+                  return (
+                    <div key={badge.id} className="flex items-center gap-5 rounded-xl p-4 transition-all hover:bg-[#f9f1fd]">
+                      <div className="relative">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#e7e0eb]"><Icon className="text-[#6f7973]">workspace_premium</Icon></div>
+                        <div className="absolute -bottom-1 -right-1 rounded-full bg-white p-1 shadow-sm"><Icon className="text-[14px] text-[#1b6b4f]">lock</Icon></div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="mb-1 flex items-end justify-between">
+                          <h4 className="font-bold">{badge.name}</h4>
+                          <span className="text-[10px] font-bold text-[#3f4943]">STEP {10 + index}</span>
+                        </div>
+                        <p className="mb-2 text-xs text-[#3f4943]">{badge.summary}</p>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-[#e7e0eb]"><div className="h-full bg-[#1b6b4f]/30" style={{ width: `${pct}%` }}></div></div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No in-progress milestones in this section.</div>
+              )}
+            </div>
+          ))}
+          {upcoming.length === 0 ? (
+            <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No milestones in progress yet.</div>
+          ) : null}
         </div>
 
         <section className="space-y-3">
           <h3 className="text-lg font-bold text-[#1b6b4f]">Claimable Awards</h3>
-          {(claimableAwards.length > 0 ? claimableAwards : activeBadgeSpecs).map((badge) => (
-            <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} />
+          {claimableByGroup.map((group) => (
+            <div key={group.key} className="space-y-2">
+              <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
+              {group.badges.length > 0 ? (
+                group.badges.map((badge) => (
+                  <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} />
+                ))
+              ) : (
+                <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No claimable awards in this section yet.</div>
+              )}
+            </div>
           ))}
+          {claimableAwards.length === 0 ? (
+            <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No claimable awards right now.</div>
+          ) : null}
           {claiming ? <p className="text-xs font-semibold text-[#4a6365]">Claiming reward...</p> : null}
+        </section>
+
+        <section className="mt-10 space-y-3">
+          <h3 className="text-lg font-bold text-[#1b6b4f]">All Achievement Tracks</h3>
+          {allByGroup.map((group) => (
+            <div key={group.key} className="space-y-2">
+              <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
+              <div className="space-y-2">
+                {group.badges.map((badge) => (
+                  <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} />
+                ))}
+              </div>
+            </div>
+          ))}
         </section>
       </main>
     </div>
