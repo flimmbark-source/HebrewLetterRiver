@@ -1142,16 +1142,16 @@
     },
     "bridgeArchitect": {
       "name": "Bridge Architect",
-      "summary": "Complete {{goal}} Bridge Builder sessions.",
+      "summary": "Complete {{goal}} Vocab Builder sessions.",
       "tiers": {
         "1": "Plank Layer",
-        "2": "Bridge Builder",
+        "2": "Vocab Builder",
         "3": "Master Architect"
       }
     },
     "bridgePerfectionist": {
       "name": "Bridge Perfectionist",
-      "summary": "Complete {{goal}} Bridge Builder sessions without losing hearts.",
+      "summary": "Complete {{goal}} Vocab Builder sessions without losing hearts.",
       "tiers": {
         "1": "Sturdy Foundation",
         "2": "Flawless Construction",
@@ -1160,7 +1160,7 @@
     },
     "wordCollector": {
       "name": "Word Collector",
-      "summary": "Complete {{goal}} words in Bridge Builder.",
+      "summary": "Complete {{goal}} words in Vocab Builder.",
       "tiers": {
         "1": "Novice Collector",
         "2": "Word Enthusiast",
@@ -1316,15 +1316,15 @@
       },
       "bridgeSession": {
         "title": "Bridge Crossing",
-        "description": "Complete a Bridge Builder session."
+        "description": "Complete a Vocab Builder session."
       },
       "bridgePerfect": {
         "title": "Perfect Bridge",
-        "description": "Complete a Bridge Builder session without losing any hearts."
+        "description": "Complete a Vocab Builder session without losing any hearts."
       },
       "bridgeWords": {
         "title": "Word Builder",
-        "description": "Complete 5 words in Bridge Builder."
+        "description": "Complete 5 words in Vocab Builder."
       },
       "deepScriptCombat": {
         "title": "Dungeon Warrior",
