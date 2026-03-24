@@ -236,7 +236,7 @@ function LanguageOnboardingModal() {
 
 function Shell() {
   const { openGame, closeGame, isVisible: isGameVisible, isGameRunning, setShowPlayModal } = useGame();
-  const { t, interfaceLanguagePack } = useLocalization();
+  const { interfaceLanguagePack } = useLocalization();
   const { currentTutorial, currentStepIndex } = useTutorial();
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
@@ -304,36 +304,47 @@ function Shell() {
         </Routes>
       </main>
       {!(isGameVisible && isGameRunning) && !inConversationPractice && !inDeepScript && (
-        <nav className="bottom-nav">
-          <NavLink to="/home" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick} style={{ gridColumn: '1 / 3', justifySelf: 'center' }}>
-            <div className="nav-icon-shell">
-              <span>🏠</span>
-            </div>
-            <span className="label">{t('app.nav.home')}</span>
-          </NavLink>
-          <button
-            type="button"
-            onClick={handlePlay}
-            className="nav-item nav-item-fab"
-            disabled={isPlayDisabled}
-            style={isPlayDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-          >
-            <div className="play-fab">
-              <span>▶</span>
-            </div>
-          </button>
-          <NavLink to="/achievements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
-            <div className="nav-icon-shell">
-              <span>🏆</span>
-            </div>
-            <span className="label">{t('app.nav.achievements')}</span>
-          </NavLink>
-          <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={handleNavClick}>
-            <div className="nav-icon-shell">
-              <span>⚙️</span>
-            </div>
-            <span className="label">{t('app.nav.settings')}</span>
-          </NavLink>
+        <nav className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around bg-[#fef7ff]/80 px-4 pb-8 pt-2 backdrop-blur-2xl">
+          <div className="fixed bottom-6 left-6 right-6 flex h-16 items-center justify-around rounded-full border border-white/20 bg-[#fef7ff]/90 px-4 shadow-[0_24px_48px_rgba(0,0,0,0.06)]">
+            <NavLink
+              to="/home"
+              onClick={handleNavClick}
+              className={({ isActive }) => `flex flex-col items-center justify-center px-4 py-2 transition-colors duration-200 active:scale-90 ${isActive ? 'text-[#1b6b4f]' : 'text-[#4a6365] hover:text-[#1b6b4f]'}`}
+            >
+              <span className="material-symbols-outlined">home</span>
+              <span className="text-[12px] font-semibold">Home</span>
+            </NavLink>
+
+            <button
+              type="button"
+              onClick={handlePlay}
+              disabled={isPlayDisabled}
+              className="flex flex-col items-center justify-center px-4 py-2 text-[#4a6365] transition-colors duration-200 hover:text-[#1b6b4f] active:scale-90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined">videogame_asset</span>
+              <span className="text-[12px] font-semibold">Play</span>
+            </button>
+
+            <NavLink
+              to="/achievements"
+              onClick={handleNavClick}
+              className={({ isActive }) => `flex flex-col items-center justify-center px-4 py-2 transition-colors duration-200 active:scale-90 ${isActive ? 'text-[#1b6b4f]' : 'text-[#4a6365] hover:text-[#1b6b4f]'}`}
+            >
+              <span className="material-symbols-outlined">emoji_events</span>
+              <span className="text-[12px] font-semibold">Awards</span>
+            </NavLink>
+
+            <NavLink
+              to="/settings"
+              onClick={handleNavClick}
+              className={({ isActive }) =>
+                `flex flex-col items-center justify-center px-5 py-2 text-[12px] font-semibold transition-all duration-200 active:scale-90 ${isActive ? 'scale-110 rounded-full bg-[#1b6b4f] text-white shadow-lg' : 'text-[#4a6365] hover:text-[#1b6b4f]'}`
+              }
+            >
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>settings</span>
+              <span className="text-[12px] font-semibold">Settings</span>
+            </NavLink>
+          </div>
         </nav>
       )}
     </div>

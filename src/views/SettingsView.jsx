@@ -221,7 +221,7 @@ export default function SettingsView() {
                   <Icon className="text-[#4a6365]">format_list_numbered</Icon>
                   <span className="font-semibold">Starting Letters</span>
                 </div>
-                <select id="settings-starting-letters-select" value={startingLetters} onChange={(event) => setStartingLetters(parseInt(event.target.value, 10))} className="rounded-md border border-[#bec9c2]/50 px-2 py-1 font-bold text-[#1b6b4f]">
+                <select id="settings-starting-letters-select" value={startingLetters} onChange={(event) => setStartingLetters(parseInt(event.target.value, 10))} className="rounded-md border border-[#bec9c2]/50 pl-2 pr-8 py-1 font-bold text-[#1b6b4f]">
                   {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => (
                     <option key={value} value={value}>{value}</option>
                   ))}
