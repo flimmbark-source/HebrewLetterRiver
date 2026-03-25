@@ -107,7 +107,7 @@
   align-items: flex-start;
   width: 100%;
   padding: 24px;
-  background: var(--m3-surface-container-low);
+  background: var(--m3-surface-container-high);
   border: none;
   border-radius: 16px;
   cursor: pointer;
@@ -120,7 +120,7 @@
 }
 
 .bbs-section-card:hover:not(:disabled) {
-  background: var(--m3-surface-container-lowest);
+  background: var(--m3-surface-container);
   box-shadow: 0 8px 24px rgba(27, 107, 79, 0.05);
 }
 
@@ -292,7 +292,7 @@
   border: 1px solid var(--m3-outline-variant-30);
   border-top: none;
   border-radius: 0 0 16px 16px;
-  background: var(--m3-surface-container-low);
+  background: var(--m3-surface-container-high);
   padding: 16px;
   display: flex;
   flex-direction: column;
