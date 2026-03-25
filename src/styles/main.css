@@ -2838,17 +2838,13 @@ body.dark-mode .module-card {
 
 /* Letter River dark-mode readability */
 body.dark-mode #modal-content {
-  background: #020617;
-  border: 1px solid #1e293b;
-}
-
-body.dark-mode .goal-column {
-  background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
-  border-color: #1e293b;
+  background: linear-gradient(180deg, #0b1220 0%, #0f172a 50%, #111827 100%) !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 20px 45px rgba(2, 6, 23, 0.6) !important;
 }
 
 body.dark-mode .mode-card {
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(15, 23, 42, 0.7);
   border-color: #334155;
 }
 
@@ -2869,9 +2865,7 @@ body.dark-mode .setup-label input:checked ~ .mode-card > span {
 }
 
 body.dark-mode .catcher-box {
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-  border-color: #334155;
-  color: #f8fafc;
+  color: #0f172a;
 }
 
 #main-menu-view {
