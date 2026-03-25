@@ -55,8 +55,7 @@
 
 /* ─── Header ──────────────────────────────────────────────── */
 .bbs-header {
-  flex-shrink: 0;
-  padding: 48px 24px 0;
+  padding: 16px 0 8px;
 }
 
 .bbs-title {
@@ -81,7 +80,7 @@
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 32px 24px 24px;
+  padding: 24px 24px 24px;
 }
 
 /* ─── Section spacing ────────────────────────────────────── */

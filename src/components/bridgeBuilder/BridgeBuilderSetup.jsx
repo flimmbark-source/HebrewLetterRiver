@@ -415,14 +415,13 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
 
   return (
     <div className="bbs-screen">
-      {/* Header */}
-      <div className="bbs-header">
-        <h1 className="bbs-title">Vocab Builder</h1>
-        <p className="bbs-subtitle">Master your Hebrew journey through themed categories.</p>
-      </div>
-
       {/* Scrollable content */}
       <div className="bbs-content">
+        {/* Header */}
+        <div className="bbs-header">
+          <h1 className="bbs-title">Vocab Builder</h1>
+          <p className="bbs-subtitle">Master your Hebrew journey through themed categories.</p>
+        </div>
         {sectionData.map(({ section, sectionProgress, unlocked, packData }) => {
           const recommended = getRecommendedPack(packData);
           const isExpanded = expandedSection === section.id && unlocked;
