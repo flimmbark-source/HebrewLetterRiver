@@ -93,7 +93,19 @@ export default function HomeView() {
   const recentLetters = useMemo(() => {
     const letterIds = Object.keys(player?.letters ?? {});
     const currentPack = languagePacks[languageId];
-    const itemsById = currentPack?.itemsById ?? {};
+    const candidateItems = [
+      ...(currentPack?.items ?? []),
+      ...(currentPack?.allItems ?? []),
+      ...(currentPack?.consonants ?? []),
+      ...(currentPack?.basicConsonants ?? []),
+      ...(currentPack?.finalForms ?? []),
+      ...(currentPack?.niqqudWithCarrier ?? []),
+      ...(currentPack?.vowels?.syllableBases ?? []),
+    ];
+    const itemsById = candidateItems.reduce((acc, item) => {
+      if (item?.id) acc[item.id] = item;
+      return acc;
+    }, {});
 
     return letterIds
       .slice(-5)
@@ -102,7 +114,7 @@ export default function HomeView() {
         const item = itemsById[letterId];
         return {
           id: letterId,
-          symbol: item?.symbol ?? letterId,
+          symbol: item?.symbol ?? item?.hebrew ?? item?.character ?? item?.glyph ?? letterId,
           name: item?.name ?? letterId
         };
       });
@@ -135,7 +147,22 @@ export default function HomeView() {
   }), []);
 
   const recentModes = useMemo(
-    () => (player?.modesPlayed ?? []).slice(-4).reverse().map((modeId) => modeLabelById[modeId] ?? modeId),
+    () => (player?.modesPlayed ?? []).slice(-4).reverse().map((modeId) => {
+      const explicitLabel = modeLabelById[modeId];
+      if (explicitLabel) return explicitLabel;
+
+      // Letter River practice submodes should display as the parent game name.
+      if (
+        modeId?.includes('consonants') ||
+        modeId?.includes('forms') ||
+        modeId?.includes('niqqud') ||
+        modeId?.includes('vowel')
+      ) {
+        return 'Letter River';
+      }
+
+      return modeId;
+    }),
     [player?.modesPlayed, modeLabelById]
   );
 
