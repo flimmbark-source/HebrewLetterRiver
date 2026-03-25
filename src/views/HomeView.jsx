@@ -223,53 +223,50 @@ export default function HomeView() {
           </div>
         </section>
 
-        <section className="space-y-6 rounded-xl bg-[#f6f0ff] p-4">
-          <div className="mb-1 flex items-center justify-between">
-            <h3 className="text-xl font-bold">Profile Overview</h3>
-            <Icon className="text-[#4a6365]">account_circle</Icon>
-          </div>
+        <section className="space-y-4">
+          <h2 className="px-2 text-xl font-bold">Profile Overview</h2>
 
-          <div className="space-y-3">
-            <p className="mb-1 text-xs font-black uppercase tracking-wide text-[#4a6365]">Recent Mastery</p>
-            {recentLetters.length > 0 ? (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {recentLetters.map((letter) => (
-                  <div key={letter.id} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-emerald-200 bg-emerald-100 font-serif text-lg font-bold text-[#1b6b4f]" title={letter.name}>
-                    {letter.symbol}
-                  </div>
-                ))}
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#1b6b4f]/25 bg-[#1b6b4f]/10 text-[#1b6b4f]">
-                  <Icon className="text-xs">add</Icon>
+          <div className="space-y-4 rounded-2xl bg-[#f9f1fd] p-5">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-bold text-[#4a6365]">Recent Mastery</p>
+                <Icon className="text-[#6f7973]">account_circle</Icon>
+              </div>
+              {recentLetters.length > 0 ? (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {recentLetters.map((letter) => (
+                    <div key={letter.id} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-lg font-bold text-[#1b6b4f] shadow-sm" title={letter.name}>
+                      {letter.symbol}
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ) : (
-              <p className="text-sm text-[#4a6365]">Catch a few letters to unlock your mastery row.</p>
-            )}
-            {recentWords.length > 0 && (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {recentWords.map((word) => (
-                  <span key={word.id} className="shrink-0 rounded-full border border-[#1b6b4f]/20 bg-white px-3 py-1 text-xs font-semibold text-[#1d1a22]">
-                    {word.hebrew} · {word.translation}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
+              ) : (
+                <p className="text-sm text-[#4a6365]">Catch a few letters to unlock your mastery row.</p>
+              )}
+              {recentWords.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {recentWords.map((word) => (
+                    <span key={word.id} className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#1d1a22] shadow-sm">
+                      {word.hebrew}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          <div className="space-y-3">
-            <p className="mb-1 text-xs font-black uppercase tracking-wide text-[#4a6365]">Game Activity</p>
             <div className="space-y-2">
+              <p className="text-sm font-bold text-[#4a6365]">Game Activity</p>
               {recentModes.length > 0 ? (
                 recentModes.slice(0, 3).map((modeName) => {
                   const modeUi = modeDisplayByName[modeName] ?? { icon: 'sports_esports', iconClass: 'text-[#1b6b4f]', bgClass: 'bg-[#1b6b4f]/10', badgeClass: 'text-[#1b6b4f]' };
                   return (
-                    <div key={modeName} className="flex items-center gap-3 rounded-lg bg-white p-2 shadow-sm">
-                      <div className={`flex h-8 w-8 items-center justify-center rounded-full ${modeUi.bgClass}`}>
+                    <div key={modeName} className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm">
+                      <div className={`flex h-9 w-9 items-center justify-center rounded-full ${modeUi.bgClass}`}>
                         <Icon className={`text-lg ${modeUi.iconClass}`}>{modeUi.icon}</Icon>
                       </div>
                       <div className="flex flex-1 items-center justify-between">
-                        <p className="text-xs font-bold">{modeName}</p>
-                        <span className={`text-[10px] font-black ${modeUi.badgeClass}`}>Played</span>
+                        <p className="text-sm font-bold">{modeName}</p>
+                        <span className={`text-xs font-bold ${modeUi.badgeClass}`}>Played</span>
                       </div>
                     </div>
                   );
@@ -278,15 +275,15 @@ export default function HomeView() {
                 <p className="text-sm text-[#4a6365]">Start a game and your latest activity will appear here.</p>
               )}
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <div className="mb-1 flex items-end justify-between">
-              <p className="text-xs font-black uppercase tracking-wide text-[#4a6365]">Total Progress</p>
-              <p className="text-[10px] font-black text-[#1b6b4f]">{totalWordsLearned} / {totalWordTarget} Words</p>
-            </div>
-            <div className="h-1 w-full overflow-hidden rounded-full bg-[#1b6b4f]/20">
-              <div className="h-full rounded-full bg-[#1b6b4f]" style={{ width: `${wordProgressPct}%` }}></div>
+            <div className="space-y-2">
+              <div className="flex items-end justify-between">
+                <p className="text-sm font-bold text-[#4a6365]">Total Progress</p>
+                <p className="text-xs font-bold text-[#1b6b4f]">{totalWordsLearned} / {totalWordTarget} Words</p>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-white">
+                <div className="h-full rounded-full bg-[#1b6b4f]" style={{ width: `${wordProgressPct}%` }}></div>
+              </div>
             </div>
           </div>
         </section>
