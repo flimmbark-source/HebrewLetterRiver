@@ -18,6 +18,20 @@ const LANGUAGE_FLAGS = {
 };
 
 const topAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBIzHWOoiXw0a1BU87o2LewTUl8n-_HZC92abDxxI91uQwUGpDDtDgWHkTor7IjvjQUcxU7G-n8vr_x7LsbbX6UCGbzaOGQiMHvD0X0hLDyDkwxenmzAxbV13d80mSxIEbzburnmpLQI0pGLrCNFySYaPuV-i4du-NITzYGpCAUfJ6_xI-xPhTpvL3foKAaOrn9l0TeZ1FkLoJDs6MmFvm0sYR4IaDSqzapogXZiRaJ6Vtk8P5f_5-7mlXebxZLoP1TEu4n2VyOKKDq';
+function formatReminderTime(reminderTime) {
+  if (typeof reminderTime !== 'string') return 'Daily';
+  const [hoursRaw, minutesRaw] = reminderTime.split(':');
+  const hours = Number(hoursRaw);
+  const minutes = Number(minutesRaw);
+
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return 'Daily';
+
+  const safeDate = new Date(2000, 0, 1, hours, minutes, 0);
+  if (Number.isNaN(safeDate.getTime())) return 'Daily';
+
+  return `${safeDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })} Daily`;
+}
+
 function Icon({ children, className = '', filled = false }) {
   return (
     <span
@@ -388,7 +402,7 @@ export default function HomeView() {
                 </div>
               ) : (
                 <p className="text-sm text-[#4a6365]">
-                  {new Date(`2000-01-01T${reminderTime}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })} Daily
+                  {formatReminderTime(reminderTime)}
                 </p>
               )}
             </div>
