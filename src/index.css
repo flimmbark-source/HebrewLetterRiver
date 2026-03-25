@@ -42,6 +42,317 @@
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
+
+  /* === APP THEME TOKENS (Light) === */
+  --app-bg: #fef7ff;
+  --app-surface: #f9f1fd;
+  --app-surface-high: #ede6f1;
+  --app-surface-highest: #e7e0eb;
+  --app-on-surface: #1d1a22;
+  --app-on-surface-variant: #3f4943;
+  --app-muted: #4a6365;
+  --app-primary: #1b6b4f;
+  --app-primary-light: #10b981;
+  --app-on-primary: #ffffff;
+  --app-primary-container: #a7f3d0;
+  --app-secondary: #855315;
+  --app-secondary-container: #fcb972;
+  --app-outline: #6f7973;
+  --app-outline-variant: #bec9c2;
+  --app-card-bg: #ffffff;
+  --app-card-border: rgba(190, 201, 194, 0.3);
+  --app-nav-bg: rgba(254, 247, 255, 0.9);
+  --app-nav-border: rgba(255, 255, 255, 0.2);
+  --app-nav-shadow: rgba(0, 0, 0, 0.06);
+  --app-active-text: #ffffff;
+  --app-active-bg: #1b6b4f;
+  --app-hover-text: #1b6b4f;
+  --app-badge-bg: #1b6b4f;
+  --app-badge-text: #ffffff;
+  --app-progress-bg: #a7f3d0;
+  --app-progress-fill: #1b6b4f;
+  --app-error-bg: rgba(255, 218, 214, 0.2);
+  --app-error-text: #ba1a1a;
+  --app-input-border: rgba(190, 201, 194, 0.6);
+  --app-input-bg: #ffffff;
+  --app-popup-bg: rgba(255, 255, 255, 0.95);
+  --app-popup-border: rgba(190, 201, 194, 0.4);
+}
+
+/* === DARK MODE OVERRIDES === */
+body.dark-mode {
+  --app-bg: #020617;
+  --app-surface: #0f172a;
+  --app-surface-high: #1e293b;
+  --app-surface-highest: #334155;
+  --app-on-surface: #f8fafc;
+  --app-on-surface-variant: #94a3b8;
+  --app-muted: #94a3b8;
+  --app-primary: #10b981;
+  --app-primary-light: #34d399;
+  --app-on-primary: #020617;
+  --app-primary-container: rgba(16, 185, 129, 0.15);
+  --app-secondary: #fcb972;
+  --app-secondary-container: rgba(252, 185, 114, 0.2);
+  --app-outline: #475569;
+  --app-outline-variant: #334155;
+  --app-card-bg: #0f172a;
+  --app-card-border: #1e293b;
+  --app-nav-bg: rgba(2, 6, 23, 0.9);
+  --app-nav-border: rgba(30, 41, 59, 0.5);
+  --app-nav-shadow: rgba(0, 0, 0, 0.3);
+  --app-active-text: #020617;
+  --app-active-bg: #10b981;
+  --app-hover-text: #34d399;
+  --app-badge-bg: #10b981;
+  --app-badge-text: #020617;
+  --app-progress-bg: rgba(16, 185, 129, 0.2);
+  --app-progress-fill: #10b981;
+  --app-error-bg: rgba(255, 218, 214, 0.1);
+  --app-error-text: #fca5a5;
+  --app-input-border: #334155;
+  --app-input-bg: #1e293b;
+  --app-popup-bg: rgba(15, 23, 42, 0.95);
+  --app-popup-border: rgba(51, 65, 85, 0.5);
+}
+
+/* Dark mode: override common hardcoded Tailwind colors in JSX views */
+body.dark-mode,
+body.dark-mode.arcade-bg {
+  background: #020617 !important;
+  color: #f8fafc;
+}
+
+html:has(body.dark-mode) {
+  background: #020617;
+}
+
+/* Backgrounds */
+body.dark-mode .bg-\[\#fef7ff\],
+body.dark-mode .bg-\[\#fef7ff\]\/80 {
+  background: #020617 !important;
+}
+body.dark-mode .bg-\[\#f9f1fd\] {
+  background: #0f172a !important;
+}
+body.dark-mode .bg-\[\#ede6f1\] {
+  background: #1e293b !important;
+}
+body.dark-mode .bg-white,
+body.dark-mode .bg-\[\#fef7ff\]\/90 {
+  background: #0f172a !important;
+}
+
+/* Text colors */
+body.dark-mode .text-\[\#1d1a22\] {
+  color: #f8fafc !important;
+}
+body.dark-mode .text-\[\#4a6365\] {
+  color: #94a3b8 !important;
+}
+body.dark-mode .text-\[\#3f4943\] {
+  color: #94a3b8 !important;
+}
+body.dark-mode .text-\[\#1b6b4f\] {
+  color: #10b981 !important;
+}
+
+/* Primary backgrounds */
+body.dark-mode .bg-\[\#1b6b4f\] {
+  background: #10b981 !important;
+}
+
+/* Progress bars */
+body.dark-mode .bg-\[\#a7f3d0\] {
+  background: rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Cards and containers */
+body.dark-mode .shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Borders */
+body.dark-mode .border-\[\#bec9c2\]\/60,
+body.dark-mode .border-\[\#bec9c2\]\/20,
+body.dark-mode .border-\[\#bec9c2\]\/40 {
+  border-color: #334155 !important;
+}
+body.dark-mode .border-white\/20 {
+  border-color: rgba(30, 41, 59, 0.5) !important;
+}
+
+/* Inputs & selects */
+body.dark-mode select,
+body.dark-mode input[type="checkbox"] {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+/* Hover states */
+body.dark-mode .hover\:bg-\[\#f9f1fd\]:hover {
+  background: #1e293b !important;
+}
+body.dark-mode .hover\:bg-\[\#ede6f1\]:hover {
+  background: #334155 !important;
+}
+
+/* Error/logout section */
+body.dark-mode .bg-\[\#ffdad6\]\/20 {
+  background: rgba(255, 218, 214, 0.1) !important;
+}
+body.dark-mode .text-\[\#ba1a1a\] {
+  color: #fca5a5 !important;
+}
+
+/* Info popup */
+body.dark-mode .bg-white\/95 {
+  background: rgba(15, 23, 42, 0.95) !important;
+}
+
+/* Toggle component */
+body.dark-mode .peer-checked\:bg-\[\#1b6b4f\]:checked ~ div,
+body.dark-mode .peer:checked ~ .peer-checked\:bg-\[\#1b6b4f\] {
+  background: #10b981 !important;
+}
+body.dark-mode .bg-\[\#e7e0eb\] {
+  background: #334155 !important;
+}
+
+/* Active badge */
+body.dark-mode .bg-\[\#855315\] {
+  background: #b45309 !important;
+}
+
+/* ─── White / light card backgrounds ─────────────────────── */
+body.dark-mode .bg-white {
+  background: #0f172a !important;
+}
+body.dark-mode .bg-white\/20 {
+  background: rgba(15, 23, 42, 0.3) !important;
+}
+body.dark-mode .bg-white\/60 {
+  background: rgba(15, 23, 42, 0.6) !important;
+}
+
+/* ─── Light surface variants ─────────────────────────────── */
+body.dark-mode .bg-\[\#f3ebf7\] {
+  background: #1e293b !important;
+}
+body.dark-mode .bg-\[\#e7e0eb\] {
+  background: #334155 !important;
+}
+body.dark-mode .hover\:bg-\[\#f3ebf7\]:hover {
+  background: #334155 !important;
+}
+
+/* ─── Additional text color overrides ────────────────────── */
+body.dark-mode .text-\[\#6f7973\] {
+  color: #64748b !important;
+}
+body.dark-mode .text-\[\#292524\] {
+  color: #f1f5f9 !important;
+}
+body.dark-mode .text-\[\#57534e\] {
+  color: #94a3b8 !important;
+}
+body.dark-mode .text-\[\#047857\] {
+  color: #34d399 !important;
+}
+
+/* ─── Border overrides ───────────────────────────────────── */
+body.dark-mode .border-white,
+body.dark-mode .border-white\/20,
+body.dark-mode .border-4.border-white {
+  border-color: #1e293b !important;
+}
+body.dark-mode .border-\[\#6f7973\] {
+  border-color: #475569 !important;
+}
+body.dark-mode .divide-\[\#bec9c2\]\/20 > * + * {
+  border-color: #334155 !important;
+}
+
+/* ─── Shadows in dark mode ───────────────────────────────── */
+body.dark-mode .shadow-lg {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+body.dark-mode .shadow-md {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+body.dark-mode .shadow-xl {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ─── Inline style backgrounds (App.jsx modals, etc.) ────── */
+body.dark-mode [style*="background: linear-gradient(135deg, #fffcea"] {
+  background: #0f172a !important;
+}
+body.dark-mode [style*="background: '#fff5dd'"],
+body.dark-mode [style*="background: #fff5dd"] {
+  background: #1e293b !important;
+}
+body.dark-mode [style*="background: 'white'"],
+body.dark-mode [style*="background: white"] {
+  background: #0f172a !important;
+}
+
+/* ─── Slate utility overrides ────────────────────────────── */
+body.dark-mode .bg-slate-100 {
+  background: #1e293b !important;
+}
+body.dark-mode .border-slate-200 {
+  border-color: #334155 !important;
+}
+body.dark-mode .text-slate-600 {
+  color: #94a3b8 !important;
+}
+body.dark-mode .text-slate-500 {
+  color: #94a3b8 !important;
+}
+body.dark-mode .text-slate-900 {
+  color: #f8fafc !important;
+}
+body.dark-mode .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* ─── PostGameReview & modals with inline styles ─────────── */
+body.dark-mode .bg-\[\#fffaf0\],
+body.dark-mode .bg-\[\#fff9eb\],
+body.dark-mode .bg-\[\#ffe9c9\],
+body.dark-mode .bg-\[\#ffe5bd\],
+body.dark-mode .bg-\[\#fff5dd\] {
+  background: #0f172a !important;
+}
+
+/* ─── Font color for dark mode body ──────────────────────── */
+body.dark-mode .font-semibold.text-\[\#1d1a22\],
+body.dark-mode .font-bold.text-\[\#1d1a22\],
+body.dark-mode .font-extrabold {
+  color: #f8fafc;
+}
+
+/* ─── Active pill in settings ────────────────────────────── */
+body.dark-mode .text-\[\#10b981\] {
+  color: #10b981 !important;
+}
+
+/* ─── HomeView language cards ────────────────────────────── */
+body.dark-mode .bg-\[\#f9f1fd\]\/80,
+body.dark-mode .hover\:bg-\[\#ede6f1\] {
+  background: #0f172a !important;
+}
+
+/* ─── Rounded cards in HomeView ──────────────────────────── */
+body.dark-mode .rounded-full.bg-\[\#f9f1fd\] {
+  background: #0f172a !important;
+}
+
+/* ─── AchievementsView milestone cards ───────────────────── */
+body.dark-mode .bg-\[\#e7e0eb\] {
+  background: #334155 !important;
 }
 
 html,

@@ -2816,20 +2816,26 @@ body.no-scroll {
 .setup-label input:checked ~ .mode-card > span {
   color: #67e8f9;
 }
+/* Legacy high-contrast (kept for compat, dark-mode is primary) */
 body.high-contrast { background: #000; color: #fff; }
-.high-contrast #play-area,
-.high-contrast .bg-slate-800,
-.high-contrast .bg-slate-700,
-.high-contrast #modal-content,
-.high-contrast #accessibility-view {
-  background: #111;
-  border-color: #fff;
+
+/* ─── Dark Mode: shell & component overrides ───────────── */
+body.dark-mode .app-shell {
+  background: #020617 !important;
 }
-.high-contrast .text-cyan-400 { color: #ffff00; }
-.high-contrast .text-slate-400,
-.high-contrast .text-slate-300 {
-  color: #ddd;
+body.dark-mode .main-content {
+  background: #020617 !important;
 }
+
+body.dark-mode .hero-card,
+body.dark-mode .progress-card-small,
+body.dark-mode .quest-card,
+body.dark-mode .daily-quest-card,
+body.dark-mode .module-card {
+  background: #0f172a !important;
+  border-color: #1e293b !important;
+}
+
 #main-menu-view {
   min-height: 100vh;
 }

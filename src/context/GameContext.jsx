@@ -50,7 +50,7 @@ export function GameProvider({ children }) {
     // Return defaults if no saved settings
     return {
       showIntroductions: true,
-      highContrast: false,
+      darkMode: false,
       randomLetters: false,
       reducedMotion: false,
       gameSpeed: 17,
@@ -319,10 +319,10 @@ function GameCanvas({ fontClass, loadedSettings }) {
       description:
         'Shows an introduction screen for each new letter before it appears in the game, helping you learn the letter before playing.',
     },
-    highContrast: {
-      title: t('game.accessibility.highContrast'),
+    darkMode: {
+      title: 'Dark Mode',
       description:
-        'Increases the contrast between text and background colors to make letters easier to see and distinguish.',
+        'Switch to a dark color scheme that is easier on the eyes in low-light environments.',
     },
     randomLetters: {
       title: t('game.accessibility.randomLetters'),
@@ -995,16 +995,16 @@ function GameCanvas({ fontClass, loadedSettings }) {
             <label className="flex items-center justify-between">
               <span
                 className="cursor-pointer hover:text-amber-700"
-                onClick={(e) => showInfo('highContrast', e)}
-                onMouseEnter={(e) => showInfo('highContrast', e)}
+                onClick={(e) => showInfo('darkMode', e)}
+                onMouseEnter={(e) => showInfo('darkMode', e)}
                 onMouseLeave={() => setShowInfoPopup(false)}
               >
-                {t('game.accessibility.highContrast')}
+                Dark Mode
               </span>
               <input
                 id="high-contrast-toggle"
                 type="checkbox"
-                defaultChecked={loadedSettings.highContrast}
+                defaultChecked={loadedSettings.darkMode ?? loadedSettings.highContrast}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
                 style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
               />
