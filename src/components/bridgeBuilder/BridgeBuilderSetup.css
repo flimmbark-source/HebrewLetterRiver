@@ -41,6 +41,246 @@
   --m3-font: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
+/* Dark mode overrides for Bridge Builder Setup */
+body.dark-mode .bbs-screen {
+  background: #020617;
+}
+
+body.dark-mode .bbs-title {
+  color: #10b981;
+}
+
+body.dark-mode .bbs-subtitle {
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-section-card {
+  background: #1e293b;
+}
+
+body.dark-mode .bbs-section-card:hover:not(:disabled) {
+  background: #0f172a;
+}
+
+body.dark-mode .bbs-section-card-title {
+  color: #f8fafc;
+}
+
+body.dark-mode .bbs-section-desc {
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-section-icon--primary {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+body.dark-mode .bbs-section-icon--secondary {
+  background: rgba(252, 185, 114, 0.15);
+  color: #fcb972;
+}
+
+body.dark-mode .bbs-section-icon--tertiary {
+  background: rgba(205, 232, 234, 0.15);
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-pack-count-pill--primary {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+}
+
+body.dark-mode .bbs-pack-count-pill--secondary {
+  color: #fcb972;
+  background: rgba(252, 185, 114, 0.15);
+}
+
+body.dark-mode .bbs-pack-count-pill--tertiary {
+  color: #94a3b8;
+  background: rgba(205, 232, 234, 0.15);
+}
+
+body.dark-mode .bbs-progress-track {
+  background: rgba(51, 65, 85, 0.5);
+}
+
+body.dark-mode .bbs-progress-fill--primary {
+  background: #10b981;
+}
+
+body.dark-mode .bbs-progress-fill--secondary {
+  background: #fcb972;
+}
+
+body.dark-mode .bbs-progress-fill--tertiary {
+  background: #94a3b8;
+}
+
+body.dark-mode .bbs-continue-link--primary {
+  color: #10b981;
+}
+
+body.dark-mode .bbs-continue-link--secondary {
+  color: #fcb972;
+}
+
+body.dark-mode .bbs-continue-link--tertiary {
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-expanded-area {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-mode .bbs-quickstart {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, #0f172a 100%);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+body.dark-mode .bbs-quickstart-label {
+  color: #34d399;
+}
+
+body.dark-mode .bbs-quickstart-title {
+  color: #f8fafc;
+}
+
+body.dark-mode .bbs-quickstart-desc {
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-quickstart-icon-wrap {
+  background: rgba(16, 185, 129, 0.15);
+}
+
+body.dark-mode .bbs-action-btn {
+  background: #10b981;
+  color: #020617;
+}
+
+body.dark-mode .bbs-pack-row {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.dark-mode .bbs-pack-row-title {
+  color: #f8fafc;
+}
+
+body.dark-mode .bbs-pack-row-subtitle {
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-pack-row-icon {
+  background: #1e293b;
+}
+
+body.dark-mode .bbs-upnext-wrapper {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.dark-mode .bbs-upnext-label {
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-show-all-link {
+  color: #10b981;
+  text-decoration-color: rgba(16, 185, 129, 0.3);
+}
+
+body.dark-mode .bbs-more-packs-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-dot {
+  background: #334155;
+  border-color: #475569;
+}
+
+body.dark-mode .bbs-dot--complete {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+body.dark-mode .bbs-status-pill--new {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+}
+
+body.dark-mode .bbs-status-pill--progress {
+  color: #fcb972;
+  background: rgba(252, 185, 114, 0.15);
+}
+
+body.dark-mode .bbs-status-pill--completed {
+  color: #94a3b8;
+  background: #1e293b;
+}
+
+body.dark-mode .bbs-status-pill--locked {
+  color: #64748b;
+  background: rgba(100, 116, 139, 0.15);
+}
+
+body.dark-mode .bbs-review-wrap {
+  background: linear-gradient(135deg, #10b981, #b45309, #4a6365);
+}
+
+body.dark-mode .bbs-review-card {
+  background: #020617;
+}
+
+body.dark-mode .bbs-review-title {
+  color: #f8fafc;
+}
+
+body.dark-mode .bbs-review-desc {
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-review-icon-wrap {
+  background: #1e293b;
+}
+
+body.dark-mode .bbs-review-btn {
+  background: #10b981;
+  color: #020617;
+}
+
+body.dark-mode .bbs-drawer-backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .bbs-drawer {
+  background: #020617;
+  border-color: #334155;
+}
+
+body.dark-mode .bbs-drawer-title {
+  color: #f8fafc;
+}
+
+body.dark-mode .bbs-drawer-subtitle {
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-drawer-close {
+  background: #1e293b;
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-drawer-handle {
+  background: #334155;
+}
+
+body.dark-mode .bbs-section-title {
+  color: #94a3b8;
+}
+
 /* ─── Screen Container ───────────────────────────────────── */
 .bbs-screen {
   position: fixed;

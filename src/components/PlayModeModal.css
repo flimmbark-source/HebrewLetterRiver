@@ -168,3 +168,68 @@
   margin-top: 3px;
   line-height: 1.4;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Dark Mode Overrides
+   ═══════════════════════════════════════════════════════════ */
+body.dark-mode .play-mode-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .play-mode-modal {
+  background: #020617;
+  border-color: #1e293b;
+}
+
+body.dark-mode .play-mode-close {
+  background: #1e293b;
+  color: #94a3b8;
+}
+
+body.dark-mode .play-mode-title {
+  color: #10b981;
+}
+
+body.dark-mode .play-mode-card--river {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+body.dark-mode .play-mode-card--river:hover {
+  background: #1e293b;
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+body.dark-mode .play-mode-card--bridge {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+body.dark-mode .play-mode-card--bridge:hover {
+  background: #1e293b;
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+body.dark-mode .play-mode-card--deep {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+body.dark-mode .play-mode-card--deep:hover {
+  background: #1e293b;
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+body.dark-mode .play-mode-card--river .play-mode-icon,
+body.dark-mode .play-mode-card--bridge .play-mode-icon,
+body.dark-mode .play-mode-card--deep .play-mode-icon {
+  background: #1e293b;
+}
+
+body.dark-mode .play-mode-name {
+  color: #f8fafc;
+}
+
+body.dark-mode .play-mode-desc {
+  color: #94a3b8;
+}

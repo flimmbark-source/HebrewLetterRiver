@@ -2286,7 +2286,7 @@ function startClickMode(itemEl, payload) {
     try {
       const settings = {
         showIntroductions: document.getElementById('toggle-introductions')?.checked ?? true,
-        highContrast: highContrastToggle?.checked ?? false,
+        darkMode: highContrastToggle?.checked ?? false,
         randomLetters: randomLettersToggle?.checked ?? false,
         reducedMotion: reducedMotionToggle?.checked ?? false,
         gameSpeed: parseInt(gameSpeedSlider?.value ?? 17, 10),
@@ -2317,7 +2317,7 @@ function startClickMode(itemEl, payload) {
         const normalizedStartingLetters = Math.min(10, Math.max(1, settings.startingLetters ?? 2));
         const introductionsToggle = document.getElementById('toggle-introductions');
         if (introductionsToggle) introductionsToggle.checked = settings.showIntroductions ?? true;
-        if (highContrastToggle) highContrastToggle.checked = settings.highContrast ?? false;
+        if (highContrastToggle) highContrastToggle.checked = settings.darkMode ?? settings.highContrast ?? false;
         if (randomLettersToggle) randomLettersToggle.checked = settings.randomLetters ?? false;
         if (reducedMotionToggle) reducedMotionToggle.checked = settings.reducedMotion ?? false;
         if (gameSpeedSlider) gameSpeedSlider.value = settings.gameSpeed ?? 17;
@@ -2336,12 +2336,14 @@ function startClickMode(itemEl, payload) {
         startingLettersCount = normalizedStartingLetters;
         selectedFont = normalizedFont;
 
-        // Apply high contrast
-        if (settings.highContrast) {
-          document.body.classList.add('high-contrast');
+        // Apply dark mode
+        const isDark = settings.darkMode ?? settings.highContrast ?? false;
+        if (isDark) {
+          document.body.classList.add('dark-mode');
         } else {
-          document.body.classList.remove('high-contrast');
+          document.body.classList.remove('dark-mode');
         }
+        document.body.classList.remove('high-contrast');
 
         // Refresh drop zones to update click mode handlers
         if (dropZones && dropZones.length > 0) {
@@ -2422,7 +2424,8 @@ accessibilityBtn?.addEventListener('click', () => {
 
   closeAccessibilityBtn?.addEventListener('click', () => accessibilityView.classList.add('hidden'));
   highContrastToggle?.addEventListener('change', (e) => {
-    document.body.classList.toggle('high-contrast', e.target.checked);
+    document.body.classList.toggle('dark-mode', e.target.checked);
+    document.body.classList.remove('high-contrast');
     syncSettingsToLocalStorage();
   });
   randomLettersToggle?.addEventListener('change', (e) => {

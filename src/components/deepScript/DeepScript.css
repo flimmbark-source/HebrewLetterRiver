@@ -58,95 +58,76 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  padding-top: calc(12px + env(safe-area-inset-top, 0px));
-  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+  padding: 16px 24px;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  background: rgba(2, 6, 23, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .ds-back-btn {
   flex-shrink: 0;
-  background: var(--ds-stone-light);
-  border: 1px solid var(--ds-stone-lighter);
-  border-radius: 6px;
-  padding: 6px 14px;
-  font-family: inherit;
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--ds-parchment-dim);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 9999px;
+  color: #10b981;
   cursor: pointer;
+  transition: background 0.15s;
 }
-.ds-back-btn:active { transform: translateY(1px); }
+.ds-back-btn:hover {
+  background: rgba(16, 185, 129, 0.1);
+}
+.ds-back-btn:active { transform: scale(0.95); }
 
 .ds-screen-title {
-  font-family: var(--ds-font-display);
-  font-size: 26px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 20px;
   font-weight: 800;
-  color: var(--ds-gold);
+  color: #34d399;
   margin: 0;
-  text-shadow: 0 2px 8px var(--ds-gold-glow);
+  letter-spacing: -0.3px;
   flex: 1;
 }
 
-.ds-source-toggle {
-  --toggle-bg: rgba(255, 255, 255, 0.06);
-  --toggle-border: rgba(255, 255, 255, 0.12);
-  --toggle-text: rgba(255, 255, 255, 0.68);
-  --toggle-text-active: #ffffff;
-  --track-bg: rgba(255, 255, 255, 0.08);
-  --knob-bg: linear-gradient(180deg, #ffffff 0%, #dfe7f3 100%);
-
-  display: inline-flex;
+/* ─── Word Source Pill Toggle ──────────────────────────── */
+.ds-source-pill {
+  display: flex;
   align-items: center;
-  gap: 0.38rem;
-  padding: 0.22rem 0.42rem;
-  border: 1px solid var(--toggle-border);
-  border-radius: 999px;
-  background: var(--toggle-bg);
-  color: var(--toggle-text);
-  font: inherit;
-  font-size: 0.72rem;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 9999px;
+  padding: 4px;
+}
+
+.ds-source-pill-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 9999px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
   font-weight: 700;
-  line-height: 1;
+  color: #94a3b8;
+  background: transparent;
   cursor: pointer;
-  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  transition: all 0.2s ease;
 }
 
-.ds-source-toggle-label {
-  min-width: 2.1rem;
-  text-align: center;
-  color: var(--toggle-text);
-  transition: color 160ms ease;
+.ds-source-pill-btn:hover {
+  color: #34d399;
 }
 
-.ds-source-toggle-label.is-active {
-  color: var(--toggle-text-active);
+.ds-source-pill-btn--active {
+  background: #10b981;
+  color: #020617;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
-.ds-source-toggle-track {
-  position: relative;
-  width: 2rem;
-  height: 1.1rem;
-  flex: 0 0 auto;
-  border-radius: 999px;
-  background: var(--track-bg);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
-}
-
-.ds-source-toggle-knob {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 0.85rem;
-  height: 0.85rem;
-  border-radius: 50%;
-  background: var(--knob-bg);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.ds-source-toggle.is-random .ds-source-toggle-knob {
-  transform: translateX(0.9rem);
-}
+/* (Old toggle styles removed — replaced by ds-source-pill) */
 
 /* ─── Run Status Bar ─────────────────────────────────────── */
 .ds-status-bar {
@@ -1616,14 +1597,43 @@
    KIT SELECT SCREEN
    ═══════════════════════════════════════════════════════════ */
 
-.ds-kit-intro {
+/* ─── Kit Select — Emerald/Slate Redesign ──────────────── */
+
+.ds-kit-hero {
   text-align: center;
-  padding: 8px 20px 16px;
+  padding: 8px 24px 20px;
+}
+
+.ds-kit-badge {
+  display: inline-block;
+  padding: 4px 16px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 9999px;
+  margin-bottom: 12px;
+}
+
+.ds-kit-badge-text {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #34d399;
+}
+
+.ds-kit-hero-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 8px;
+  letter-spacing: -0.5px;
 }
 
 .ds-kit-subtitle {
-  font-size: 15px;
-  color: var(--ds-parchment-dim);
+  font-size: 14px;
+  font-weight: 500;
+  color: #94a3b8;
   margin: 0;
 }
 
@@ -1631,139 +1641,172 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 0 16px 16px;
+  gap: 12px;
+  padding: 0 24px 16px;
   overflow-y: auto;
 }
 
 .ds-kit-card {
+  position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 14px;
+  gap: 20px;
   width: 100%;
-  padding: 14px;
-  background: var(--ds-stone-mid);
-  border: 2px solid var(--ds-stone-lighter);
-  border-radius: 10px;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid #1e293b;
+  border-radius: 12px;
   cursor: pointer;
   text-align: left;
-  font-family: inherit;
-  color: var(--ds-parchment);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
-  transition: transform 0.15s, border-color 0.2s;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #f8fafc;
+  transition: all 0.3s ease;
 }
 
-.ds-kit-card:active { transform: translateY(1px); }
+.ds-kit-card:hover {
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.ds-kit-card:active {
+  transform: scale(0.98);
+}
 
 .ds-kit-card--selected {
-  border-color: var(--ds-gold);
-  box-shadow: 0 0 10px var(--ds-gold-glow), 0 2px 0 var(--ds-bronze-dim);
-  background: linear-gradient(135deg, #2e2820 0%, #262218 100%);
+  background: rgba(16, 185, 129, 0.05);
+  border: 2px solid #10b981;
+}
+
+.ds-kit-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: #10b981;
 }
 
 .ds-kit-icon {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
-  background: var(--ds-stone-light);
-  border-radius: 8px;
-  border: 1px solid var(--ds-stone-lighter);
+  background: #1e293b;
+  border-radius: 16px;
+  color: #34d399;
+  transition: all 0.3s ease;
+}
+
+.ds-kit-icon--selected {
+  background: #10b981;
+  color: #020617;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+}
+
+.ds-kit-card:hover .ds-kit-icon:not(.ds-kit-icon--selected) {
+  background: #10b981;
+  color: #020617;
 }
 
 .ds-kit-info { flex: 1; min-width: 0; }
 
 .ds-kit-name {
-  font-family: var(--ds-font-display);
-  font-size: 19px;
-  font-weight: 800;
-  color: var(--ds-gold);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
 }
 
 .ds-kit-desc {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ds-parchment-dim);
-  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #94a3b8;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.ds-kit-card--selected .ds-kit-desc {
+  color: #e2e8f0;
 }
 
 .ds-kit-details {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--ds-stone-lighter);
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #334155;
 }
 
 .ds-kit-flavor {
-  font-size: 12px;
+  font-size: 13px;
   font-style: italic;
-  color: #6a6050;
-  margin: 0 0 8px;
-  line-height: 1.4;
+  color: #64748b;
+  margin: 0 0 10px;
+  line-height: 1.5;
 }
 
 .ds-kit-stats {
   display: flex;
-  gap: 12px;
-  font-size: 12px;
+  gap: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--ds-bronze);
+  color: #34d399;
 }
 
 .ds-kit-gear {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .ds-kit-gear-tag {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  padding: 3px 8px;
-  background: var(--ds-stone-light);
-  border: 1px solid var(--ds-stone-lighter);
-  border-radius: 4px;
-  color: var(--ds-bronze-light);
+  padding: 4px 10px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #94a3b8;
 }
 
 /* ─── Primary / Secondary Buttons ────────────────────────── */
 .ds-footer {
   flex-shrink: 0;
-  padding: 12px 20px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  padding: 16px 24px 24px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
 .ds-primary-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
-  padding: 14px;
+  padding: 20px;
   border: none;
-  border-radius: 8px;
-  font-family: var(--ds-font-display);
+  border-radius: 9999px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   font-size: 18px;
   font-weight: 800;
-  letter-spacing: 0.5px;
   cursor: not-allowed;
-  transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s;
-  color: var(--ds-stone-lighter);
-  background: var(--ds-stone-light);
+  transition: all 0.2s ease;
+  color: #334155;
+  background: #1e293b;
   opacity: 0.5;
 }
 
 .ds-primary-btn--active {
   opacity: 1;
   cursor: pointer;
-  color: var(--ds-stone-darkest);
-  background: linear-gradient(135deg, var(--ds-gold) 0%, #d49a30 100%);
-  box-shadow: 0 3px 0 var(--ds-bronze-dim), 0 6px 12px rgba(138, 106, 58, 0.3);
+  color: #020617;
+  background: #10b981;
+  box-shadow: 0 12px 32px rgba(16, 185, 129, 0.4);
+}
+
+.ds-primary-btn--active:hover {
+  background: #34d399;
 }
 
 .ds-primary-btn--active:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--ds-bronze-dim), 0 3px 6px rgba(138, 106, 58, 0.3);
+  transform: scale(0.95);
 }
 
 .ds-primary-btn--done {
@@ -4119,36 +4162,40 @@
   }
 
   /* ─── Kit Select Screen ─────────────────────────────────── */
-  .ds-kit-intro {
-    padding: 6px 16px 12px;
+  .ds-kit-hero {
+    padding: 6px 20px 16px;
+  }
+
+  .ds-kit-hero-title {
+    font-size: 24px;
   }
 
   .ds-kit-subtitle {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .ds-kit-card {
-    gap: 10px;
-    padding: 12px;
+    gap: 14px;
+    padding: 18px;
   }
 
   .ds-kit-name {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .ds-kit-desc {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .ds-kit-stats {
-    gap: 8px;
-    font-size: 11px;
+    gap: 10px;
+    font-size: 12px;
     flex-wrap: wrap;
   }
 
   /* Footer/primary button: comfortable tap target */
   .ds-primary-btn {
-    padding: 16px;
+    padding: 18px;
     font-size: 17px;
     min-height: 52px;
   }

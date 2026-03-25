@@ -41,7 +41,7 @@ export default function SettingsView() {
   const { languageId, selectLanguage, appLanguageId, selectAppLanguage, languageOptions } = useLanguage();
 
   const [showIntroductions, setShowIntroductions] = useState(true);
-  const [highContrast, setHighContrast] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const [randomLetters, setRandomLetters] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [gameFont, setGameFont] = useState('default');
@@ -63,7 +63,7 @@ export default function SettingsView() {
         if (saved) {
           const settings = JSON.parse(saved);
           setShowIntroductions(settings.showIntroductions ?? true);
-          setHighContrast(settings.highContrast ?? false);
+          setDarkMode(settings.darkMode ?? settings.highContrast ?? false);
           setRandomLetters(settings.randomLetters ?? false);
           setReducedMotion(settings.reducedMotion ?? false);
           const savedFont = settings.gameFont === 'opendyslexic' ? 'lexend' : (settings.gameFont ?? 'default');
@@ -90,7 +90,7 @@ export default function SettingsView() {
     try {
       const settings = {
         showIntroductions,
-        highContrast,
+        darkMode,
         randomLetters,
         reducedMotion,
         gameFont,
@@ -102,12 +102,17 @@ export default function SettingsView() {
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
       window.dispatchEvent(new Event('gameSettingsChanged'));
-      if (highContrast) document.body.classList.add('high-contrast');
-      else document.body.classList.remove('high-contrast');
+      if (darkMode) {
+        document.body.classList.add('dark-mode');
+        document.body.classList.remove('high-contrast');
+      } else {
+        document.body.classList.remove('dark-mode');
+        document.body.classList.remove('high-contrast');
+      }
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
-  }, [hasLoadedSettings, showIntroductions, highContrast, randomLetters, reducedMotion, gameFont, fontShuffle, slowRiver, clickMode, associationMode, startingLetters]);
+  }, [hasLoadedSettings, showIntroductions, darkMode, randomLetters, reducedMotion, gameFont, fontShuffle, slowRiver, clickMode, associationMode, startingLetters]);
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
   const totalStarsEarned = player.totalStarsEarned ?? player.stars ?? 0;
@@ -147,9 +152,9 @@ export default function SettingsView() {
       title: 'Font Shuffle',
       description: 'Randomizes letter font styles during play to build recognition across different typographic forms.'
     },
-    highContrast: {
-      title: t('game.accessibility.highContrast'),
-      description: 'Increases contrast to make text and controls easier to distinguish.'
+    darkMode: {
+      title: 'Dark Mode',
+      description: 'Switch to a dark color scheme that is easier on the eyes in low-light environments.'
     },
     randomLetters: {
       title: t('game.accessibility.randomLetters'),
@@ -220,38 +225,38 @@ export default function SettingsView() {
   });
 
   return (
-    <div className="min-h-screen bg-[#fef7ff] pb-36 text-[#1d1a22]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-      <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between bg-[#fef7ff]/80 px-6 backdrop-blur-xl">
+    <div className="min-h-screen pb-36" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', background: 'var(--app-bg)', color: 'var(--app-on-surface)' }}>
+      <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between px-6 backdrop-blur-xl" style={{ background: 'var(--app-nav-bg)' }}>
         <div className="flex items-center gap-4">
-          <button className="text-[#1b6b4f] transition hover:opacity-80 active:scale-95" onClick={() => navigate('/')} type="button" aria-label="Back to Home">
+          <button className="transition hover:opacity-80 active:scale-95" style={{ color: 'var(--app-primary)' }} onClick={() => navigate('/')} type="button" aria-label="Back to Home">
             <Icon>arrow_back</Icon>
           </button>
-          <h1 className="text-lg font-bold text-[#1b6b4f]">Settings</h1>
+          <h1 className="text-lg font-bold" style={{ color: 'var(--app-primary)' }}>Settings</h1>
         </div>
         <div className="w-10"></div>
       </header>
 
       <main className="mx-auto max-w-2xl space-y-8 px-6 pt-20">
-        <section className="relative flex items-center gap-6 overflow-hidden rounded-xl bg-[#f9f1fd] p-6">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#1b6b4f]/10 blur-2xl"></div>
+        <section className="relative flex items-center gap-6 overflow-hidden rounded-xl p-6" style={{ background: 'var(--app-surface)' }}>
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full blur-2xl" style={{ background: 'var(--app-primary-container)' }}></div>
           <div className="relative">
-            <div className="h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg">
+            <div className="h-20 w-20 overflow-hidden rounded-full border-4 shadow-lg" style={{ borderColor: 'var(--app-card-bg)' }}>
               <img src={playerAvatar} alt="Profile avatar" className="h-full w-full object-cover" />
             </div>
-            <button type="button" onClick={() => setIsProfileEditorOpen(true)} className="absolute -bottom-1 -right-1 rounded-full border border-white bg-[#1b6b4f] p-1 text-white">
+            <button type="button" onClick={() => setIsProfileEditorOpen(true)} className="absolute -bottom-1 -right-1 rounded-full border p-1" style={{ borderColor: 'var(--app-card-bg)', background: 'var(--app-primary)', color: 'var(--app-on-primary)' }}>
               <Icon className="text-[14px]">edit</Icon>
             </button>
-            <div className="absolute -bottom-1 left-0 rounded-full bg-[#855315] px-2 py-0.5 text-[10px] font-bold text-white shadow-md">LVL {level}</div>
+            <div className="absolute -bottom-1 left-0 rounded-full px-2 py-0.5 text-[10px] font-bold shadow-md" style={{ background: 'var(--app-secondary)', color: 'var(--app-on-primary)' }}>LVL {level}</div>
           </div>
           <div className="flex-1 space-y-2">
             <h2 className="text-2xl font-extrabold tracking-tight">{playerName}</h2>
             <div className="space-y-1">
-              <div className="flex justify-between text-xs font-semibold text-[#4a6365]">
+              <div className="flex justify-between text-xs font-semibold" style={{ color: 'var(--app-muted)' }}>
                 <span>Progress</span>
                 <span>{levelProgress.toLocaleString()} / {starsPerLevel.toLocaleString()} XP</span>
               </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-[#a7f3d0]">
-                <div className="h-full rounded-full bg-[#1b6b4f]" style={{ width: `${progressPct}%` }}></div>
+              <div className="h-3 w-full overflow-hidden rounded-full" style={{ background: 'var(--app-progress-bg)' }}>
+                <div className="h-full rounded-full" style={{ width: `${progressPct}%`, background: 'var(--app-progress-fill)' }}></div>
               </div>
             </div>
           </div>
@@ -337,7 +342,7 @@ export default function SettingsView() {
               </label>
 
               <Toggle id="settings-font-shuffle-toggle" label={<span className="cursor-help" {...getInfoHandlers('fontShuffle')}>Font Shuffle</span>} icon="shuffle" checked={fontShuffle} onChange={setFontShuffle} />
-              <Toggle id="settings-high-contrast-toggle" label={<span className="cursor-help" {...getInfoHandlers('highContrast')}>{t('game.accessibility.highContrast')}</span>} icon="contrast" checked={highContrast} onChange={setHighContrast} />
+              <Toggle id="settings-dark-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('darkMode')}>Dark Mode</span>} icon="dark_mode" checked={darkMode} onChange={setDarkMode} />
               <Toggle id="settings-random-letters-toggle" label={<span className="cursor-help" {...getInfoHandlers('randomLetters')}>{t('game.accessibility.randomLetters')}</span>} icon="casino" checked={randomLetters} onChange={setRandomLetters} />
               <Toggle id="settings-reduced-motion-toggle" label={<span className="cursor-help" {...getInfoHandlers('reducedMotion')}>{t('game.accessibility.reducedMotion')}</span>} icon="motion_photos_off" checked={reducedMotion} onChange={setReducedMotion} />
               <Toggle id="settings-slow-river-toggle" label={<span className="cursor-help" {...getInfoHandlers('slowRiver')}>Slow River Mode</span>} icon="waves" checked={slowRiver} onChange={setSlowRiver} />

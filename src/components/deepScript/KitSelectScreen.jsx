@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { starterKits } from '../../data/deepScript/starterKits.js';
 import { getGearById } from '../../data/deepScript/gear.js';
 
+/* ─── Kit icon mapping to Material Symbols ─────────────── */
+const KIT_ICONS = {
+  scribe: 'history_edu',
+  interpreter: 'glass_cup',
+  rootkeeper: 'eco',
+};
+
 export default function KitSelectScreen({
   onSelect,
   onBack,
@@ -13,40 +20,46 @@ export default function KitSelectScreen({
 
   return (
     <div className="ds-screen ds-kit-select">
+      {/* Header */}
       <div className="ds-header">
-        <button className="ds-back-btn" onClick={onBack} type="button">Back</button>
+        <button className="ds-back-btn" onClick={onBack} type="button">
+          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back</span>
+        </button>
         <h1 className="ds-screen-title">Deep Script</h1>
         {showWordSourceToggle && (
-<button
-  type="button"
-  className={`ds-source-toggle ${wordSourceMode === 'random' ? 'is-random' : 'is-pack'}`}
-  onClick={() => onWordSourceModeChange(wordSourceMode === 'pack' ? 'random' : 'pack')}
-  aria-label="Toggle floor word source"
-  role="switch"
-  aria-checked={wordSourceMode === 'random'}
->
-  <span className={`ds-source-toggle-label ${wordSourceMode === 'pack' ? 'is-active' : ''}`}>
-    Pack
-  </span>
-
-  <span className="ds-source-toggle-track" aria-hidden="true">
-    <span className="ds-source-toggle-knob" />
-  </span>
-
-  <span className={`ds-source-toggle-label ${wordSourceMode === 'random' ? 'is-active' : ''}`}>
-    Random
-  </span>
-</button>
+          <div className="ds-source-pill">
+            <button
+              type="button"
+              className={`ds-source-pill-btn ${wordSourceMode === 'pack' ? 'ds-source-pill-btn--active' : ''}`}
+              onClick={() => onWordSourceModeChange('pack')}
+            >
+              Pack
+            </button>
+            <button
+              type="button"
+              className={`ds-source-pill-btn ${wordSourceMode === 'random' ? 'ds-source-pill-btn--active' : ''}`}
+              onClick={() => onWordSourceModeChange('random')}
+            >
+              Random
+            </button>
+          </div>
         )}
       </div>
 
-      <div className="ds-kit-intro">
+      {/* Hero Section */}
+      <div className="ds-kit-hero">
+        <div className="ds-kit-badge">
+          <span className="ds-kit-badge-text">Selection Archive</span>
+        </div>
+        <h2 className="ds-kit-hero-title">Expedition Route</h2>
         <p className="ds-kit-subtitle">Choose your path through the archive</p>
       </div>
 
+      {/* Kit Cards */}
       <div className="ds-kit-list">
         {starterKits.map(kit => {
           const isSelected = selectedKit === kit.id;
+          const materialIcon = KIT_ICONS[kit.id] || 'category';
           return (
             <button
               key={kit.id}
@@ -54,7 +67,14 @@ export default function KitSelectScreen({
               className={`ds-kit-card ${isSelected ? 'ds-kit-card--selected' : ''}`}
               onClick={() => setSelectedKit(kit.id)}
             >
-              <div className="ds-kit-icon">{kit.icon}</div>
+              {isSelected && (
+                <div className="ds-kit-check">
+                  <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                </div>
+              )}
+              <div className={`ds-kit-icon ${isSelected ? 'ds-kit-icon--selected' : ''}`}>
+                <span className="material-symbols-outlined" style={{ fontSize: 28 }}>{materialIcon}</span>
+              </div>
               <div className="ds-kit-info">
                 <div className="ds-kit-name">{kit.name}</div>
                 <div className="ds-kit-desc">{kit.description}</div>
@@ -84,6 +104,7 @@ export default function KitSelectScreen({
         })}
       </div>
 
+      {/* CTA */}
       <div className="ds-footer">
         <button
           type="button"
@@ -92,6 +113,7 @@ export default function KitSelectScreen({
           disabled={!selectedKit}
         >
           Begin Expedition
+          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>east</span>
         </button>
       </div>
     </div>
