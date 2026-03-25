@@ -291,7 +291,7 @@ export default function HomeView() {
               {recentLetters.length > 0 ? (
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {recentLetters.map((letter) => (
-                    <div key={letter.id} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-lg font-bold text-[#1b6b4f] shadow-sm" title={letter.name}>
+                    <div key={letter.id} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#bec9c2]/40 bg-[#ede6f1] text-lg font-bold text-[#1b6b4f] shadow-sm" title={letter.name}>
                       {letter.symbol}
                     </div>
                   ))}
