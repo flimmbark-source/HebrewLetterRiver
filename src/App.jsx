@@ -235,7 +235,7 @@ function LanguageOnboardingModal() {
 }
 
 function Shell() {
-  const { openGame, closeGame, isVisible: isGameVisible, isGameRunning, setShowPlayModal } = useGame();
+  const { openGame, closeGame, isVisible: isGameVisible, isGameRunning, showPlayModal, setShowPlayModal } = useGame();
   const { interfaceLanguagePack } = useLocalization();
   const { currentTutorial, currentStepIndex } = useTutorial();
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
@@ -283,7 +283,11 @@ function Shell() {
     if (isGameVisible) {
       closeGame?.();
     }
-  }, [isGameVisible, closeGame]);
+    // Close the play-mode modal if it's open
+    if (showPlayModal) {
+      setShowPlayModal(false);
+    }
+  }, [isGameVisible, closeGame, showPlayModal, setShowPlayModal]);
 
   return (
     <div className="app-shell">
