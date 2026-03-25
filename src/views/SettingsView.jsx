@@ -194,14 +194,24 @@ export default function SettingsView() {
     setShowInfoPopup(true);
   };
 
+  // Close popup when clicking anywhere else
+  useEffect(() => {
+    if (!showInfoPopup) return;
+    const handleDismiss = () => setShowInfoPopup(false);
+    document.addEventListener('click', handleDismiss);
+    document.addEventListener('touchstart', handleDismiss);
+    return () => {
+      document.removeEventListener('click', handleDismiss);
+      document.removeEventListener('touchstart', handleDismiss);
+    };
+  }, [showInfoPopup]);
+
   const getInfoHandlers = (settingKey) => ({
-    onMouseEnter: (event) => showInfo(settingKey, event),
     onClick: (event) => {
       event.preventDefault();
       event.stopPropagation();
       showInfo(settingKey, event);
     },
-    onMouseLeave: () => setShowInfoPopup(false),
     onTouchStart: (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -356,8 +366,10 @@ export default function SettingsView() {
       />
       {showInfoPopup && (
         <div
-          className="pointer-events-none fixed z-50 max-w-xs rounded-xl border border-[#bec9c2]/40 bg-white/95 p-3 shadow-xl backdrop-blur-sm"
+          className="fixed z-50 max-w-xs rounded-xl border border-[#bec9c2]/40 bg-white/95 p-3 shadow-xl backdrop-blur-sm"
           style={{ left: `${popupPosition.x}px`, top: `${popupPosition.y}px` }}
+          onClick={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
         >
           <p className="text-sm font-bold text-[#1b6b4f]">{infoPopupContent.title}</p>
           <p className="mt-1 text-xs leading-relaxed text-[#4a6365]">{infoPopupContent.description}</p>
