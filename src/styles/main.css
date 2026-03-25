@@ -2018,6 +2018,7 @@ body.no-scroll {
   min-height: 70px;
   border: 2px solid #A7F3D0;
   background: #FFFFFF;
+  color: #0f172a;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
@@ -2834,6 +2835,36 @@ body.dark-mode .daily-quest-card,
 body.dark-mode .module-card {
   background: #0f172a !important;
   border-color: #1e293b !important;
+}
+
+/* Dark mode fixes for Letter River setup modal + buckets */
+body.dark-mode #modal-content {
+  border-color: #334155 !important;
+  background: linear-gradient(180deg, #0f172a 0%, #111827 55%, #020617 100%) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.dark-mode #setup-view h1,
+body.dark-mode #setup-view h2,
+body.dark-mode #setup-view .goal-column__label,
+body.dark-mode #setup-view .mode-column__headline {
+  color: #34d399 !important;
+}
+
+body.dark-mode #setup-view p {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode #setup-view .goal-column,
+body.dark-mode #setup-view .mode-panel {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+body.dark-mode .catcher-box {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
 }
 
 #main-menu-view {
