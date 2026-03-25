@@ -9,6 +9,7 @@ import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js
 import { languagePacks } from '../data/languages/index.js';
 import { getAllSeenWords } from '../lib/seenWordsStorage.ts';
 import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
+import { findDictionaryEntryForWord } from '../lib/sentenceDictionaryLookup.ts';
 
 const LANGUAGE_FLAGS = {
   hebrew: '🇮🇱', english: '🇬🇧', spanish: '🇪🇸', french: '🇫🇷',
@@ -127,13 +128,13 @@ export default function HomeView() {
       .slice(0, 5)
       .map((entry) => {
         const word = wordLookup[entry.wordId];
+        const dictionaryEntry = findDictionaryEntryForWord(entry.wordId, languageId, appLanguageId, t);
         return {
           id: entry.wordId,
-          hebrew: word?.hebrew ?? entry.wordId,
-          translation: word?.translation ?? 'Word learned'
+          text: word?.hebrew ?? dictionaryEntry?.practiceWord ?? entry.wordId
         };
       });
-  }, [wordLookup]);
+  }, [appLanguageId, languageId, t, wordLookup]);
 
   const modeLabelById = useMemo(() => ({
     letter_river: 'Letter River',
@@ -303,7 +304,7 @@ export default function HomeView() {
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {recentWords.map((word) => (
                     <span key={word.id} className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#1d1a22] shadow-sm">
-                      {word.hebrew}
+                      {word.text}
                     </span>
                   ))}
                 </div>
