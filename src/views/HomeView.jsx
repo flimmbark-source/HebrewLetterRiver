@@ -60,7 +60,7 @@ function LanguageCard({ id, label, value, onChange, options, leading, trailing }
 }
 
 export default function HomeView() {
-  const { player, starLevelSize, updatePlayerProfile } = useProgress();
+  const { player, badges, starLevelSize, updatePlayerProfile } = useProgress();
   const { setShowPlayModal } = useGame();
   const { languageId, appLanguageId, languageOptions, selectLanguage, selectAppLanguage } = useLanguage();
   const { t } = useLocalization();
@@ -178,6 +178,35 @@ export default function HomeView() {
     Vocabulary: { icon: 'school', iconClass: 'text-[#1f6f8b]', bgClass: 'bg-[#1f6f8b]/10', badgeClass: 'text-[#1f6f8b]' }
   }), []);
 
+  const recentAchievementXpByGame = useMemo(() => {
+    const nowMs = Date.now();
+    const recentWindowMs = 14 * 24 * 60 * 60 * 1000;
+    const badgeGameById = {
+      'bridge-architect': 'Bridge Builder',
+      'bridge-perfectionist': 'Bridge Builder',
+      'word-collector': 'Bridge Builder',
+      'dungeon-delver': 'Deep Script',
+      'rune-vanquisher': 'Deep Script',
+      'iron-will': 'Deep Script'
+    };
+
+    const totals = {};
+
+    Object.entries(badges ?? {}).forEach(([badgeId, state]) => {
+      const gameName = badgeGameById[badgeId] ?? 'Letter River';
+      const unclaimedRewards = Array.isArray(state?.unclaimed) ? state.unclaimed : [];
+
+      unclaimedRewards.forEach((reward) => {
+        const earnedAtMs = reward?.earnedAt ? new Date(reward.earnedAt).getTime() : 0;
+        if (!earnedAtMs || nowMs - earnedAtMs > recentWindowMs) return;
+
+        totals[gameName] = (totals[gameName] ?? 0) + (reward?.stars ?? 0);
+      });
+    });
+
+    return totals;
+  }, [badges]);
+
   React.useEffect(() => {
     try {
       const saved = localStorage.getItem('homePreferences');
@@ -293,7 +322,9 @@ export default function HomeView() {
                       </div>
                       <div className="flex flex-1 items-center justify-between">
                         <p className="text-sm font-bold">{modeName}</p>
-                        <span className={`text-xs font-bold ${modeUi.badgeClass}`}>Played</span>
+                        <span className={`text-xs font-bold ${modeUi.badgeClass}`}>
+                          +{recentAchievementXpByGame[modeName] ?? 0} XP
+                        </span>
                       </div>
                     </div>
                   );
