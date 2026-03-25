@@ -222,6 +222,17 @@ export default function AchievementsView() {
           })}
         </section>
 
+        <section className="mb-10 space-y-3">
+          <h3 className="text-lg font-bold text-[#1b6b4f]">Claimable Awards</h3>
+          {claimableAwards.map((badge) => (
+            <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
+          ))}
+          {claimableAwards.length === 0 ? (
+            <p className="text-xs font-semibold text-[#6f7973]">No currently claimable achievements.</p>
+          ) : null}
+          {claiming ? <p className="text-xs font-semibold text-[#4a6365]">Claiming reward...</p> : null}
+        </section>
+
         <h3 className="mb-6 text-xl font-extrabold text-[#1b6b4f]">Upcoming Milestones</h3>
         <div className="mb-10 space-y-4">
           {upcomingByGroup.map((group) => (
@@ -259,17 +270,6 @@ export default function AchievementsView() {
             <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No milestones in progress yet.</div>
           ) : null}
         </div>
-
-        <section className="space-y-3">
-          <h3 className="text-lg font-bold text-[#1b6b4f]">Claimable Awards</h3>
-          {claimableAwards.map((badge) => (
-            <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
-          ))}
-          {claimableAwards.length === 0 ? (
-            <p className="text-xs font-semibold text-[#6f7973]">No currently claimable achievements.</p>
-          ) : null}
-          {claiming ? <p className="text-xs font-semibold text-[#4a6365]">Claiming reward...</p> : null}
-        </section>
 
         <section className="mt-10 space-y-3">
           <button
