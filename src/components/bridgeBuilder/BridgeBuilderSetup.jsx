@@ -558,6 +558,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
               <select className="bbs-sort" value={sortBy} onChange={(e) => {
                 setSortBy(e.target.value);
                 emit('analytics:bridge_setup', { event: 'expert_sort_change', sortBy: e.target.value });
+                e.target.blur();
               }}>
                 <option value="recommended">Recommended</option>
                 <option value="time">Shortest time</option>
