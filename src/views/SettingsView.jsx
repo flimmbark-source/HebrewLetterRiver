@@ -52,6 +52,9 @@ export default function SettingsView() {
   const [startingLetters, setStartingLetters] = useState(2);
   const [hasLoadedSettings, setHasLoadedSettings] = useState(false);
   const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
+  const [showInfoPopup, setShowInfoPopup] = useState(false);
+  const [infoPopupContent, setInfoPopupContent] = useState({ title: '', description: '' });
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const loadSettings = () => {
@@ -126,6 +129,77 @@ export default function SettingsView() {
     () => languageOptions.map((option) => ({ ...option, name: getFormattedLanguageName(option, t) })),
     [languageOptions, t]
   );
+
+  const settingInfo = useMemo(() => ({
+    gameFont: {
+      title: 'Game Font',
+      description: 'Choose from different fonts, including dyslexia-friendly options, to improve readability and comfort.'
+    },
+    startingLetters: {
+      title: 'Starting Letters',
+      description: 'Sets how many letters are introduced at the start of practice. Lower values can make onboarding easier.'
+    },
+    showIntroductions: {
+      title: t('game.accessibility.showIntroductions'),
+      description: 'Shows an intro screen for each new letter before gameplay so you can preview sounds and shapes first.'
+    },
+    fontShuffle: {
+      title: 'Font Shuffle',
+      description: 'Randomizes letter font styles during play to build recognition across different typographic forms.'
+    },
+    highContrast: {
+      title: t('game.accessibility.highContrast'),
+      description: 'Increases contrast to make text and controls easier to distinguish.'
+    },
+    randomLetters: {
+      title: t('game.accessibility.randomLetters'),
+      description: 'Presents letters in random order instead of a fixed sequence for more varied practice.'
+    },
+    reducedMotion: {
+      title: t('game.accessibility.reducedMotion'),
+      description: 'Reduces animation complexity for a calmer visual experience and easier tracking.'
+    },
+    slowRiver: {
+      title: 'Slow River Mode',
+      description: 'Keeps letters on screen longer so you have more time to identify and place each one.'
+    },
+    clickMode: {
+      title: 'Click Mode',
+      description: 'Lets you click to select and place letters instead of dragging.'
+    },
+    associationMode: {
+      title: 'Association Mode',
+      description: 'Shows image-based cues to support letter-sound matching through visual associations.'
+    }
+  }), [t]);
+
+  const showInfo = (settingKey, event) => {
+    if (!settingInfo[settingKey]) return;
+    const clientX = event?.clientX || event?.touches?.[0]?.clientX || 0;
+    const clientY = event?.clientY || event?.touches?.[0]?.clientY || 0;
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    const horizontalPadding = 16;
+    const verticalOffset = 15;
+    const bottomBuffer = 24;
+    const estimatedPopupHeight = 180;
+    const maxPopupWidth = 320;
+    const rawX = clientX + 15;
+    const x = Math.min(Math.max(rawX, horizontalPadding), viewportWidth - maxPopupWidth - horizontalPadding);
+    const rawY = clientY + verticalOffset;
+    const maxY = viewportHeight - estimatedPopupHeight - bottomBuffer;
+    const y = Math.min(rawY, maxY);
+    setInfoPopupContent(settingInfo[settingKey]);
+    setPopupPosition({ x, y });
+    setShowInfoPopup(true);
+  };
+
+  const getInfoHandlers = (settingKey) => ({
+    onMouseEnter: (event) => showInfo(settingKey, event),
+    onClick: (event) => showInfo(settingKey, event),
+    onMouseLeave: () => setShowInfoPopup(false),
+    onTouchStart: (event) => showInfo(settingKey, event)
+  });
 
   return (
     <div className="min-h-screen bg-[#fef7ff] pb-36 text-[#1d1a22]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
@@ -213,7 +287,7 @@ export default function SettingsView() {
               <div className="flex items-center justify-between p-4 hover:bg-[#f9f1fd]">
                 <div className="flex items-center gap-4">
                   <Icon className="text-[#4a6365]">text_fields</Icon>
-                  <span className="font-semibold">Game Font</span>
+                  <span className="cursor-help font-semibold" {...getInfoHandlers('gameFont')}>Game Font</span>
                 </div>
                 <select id="settings-font-select" value={gameFont} onChange={(event) => setGameFont(event.target.value)} className="rounded-md border border-[#bec9c2]/50 px-2 py-1 font-bold text-[#1b6b4f]">
                   {fontOptions.map((option) => (
@@ -225,7 +299,7 @@ export default function SettingsView() {
               <div className="flex items-center justify-between p-4 hover:bg-[#f9f1fd]">
                 <div className="flex items-center gap-4">
                   <Icon className="text-[#4a6365]">format_list_numbered</Icon>
-                  <span className="font-semibold">Starting Letters</span>
+                  <span className="cursor-help font-semibold" {...getInfoHandlers('startingLetters')}>Starting Letters</span>
                 </div>
                 <select id="settings-starting-letters-select" value={startingLetters} onChange={(event) => setStartingLetters(parseInt(event.target.value, 10))} className="rounded-md border border-[#bec9c2]/50 pl-2 pr-8 py-1 font-bold text-[#1b6b4f]">
                   {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => (
@@ -239,18 +313,18 @@ export default function SettingsView() {
               <label htmlFor="settings-toggle-introductions" className="flex cursor-pointer items-center justify-between">
                 <div className="flex items-center gap-4">
                   <Icon className="text-[#4a6365]">info</Icon>
-                  <span className="font-semibold">{t('game.accessibility.showIntroductions')}</span>
+                  <span className="cursor-help font-semibold" {...getInfoHandlers('showIntroductions')}>{t('game.accessibility.showIntroductions')}</span>
                 </div>
                 <input id="settings-toggle-introductions" type="checkbox" checked={showIntroductions} onChange={(event) => setShowIntroductions(event.target.checked)} className="h-5 w-5 rounded border-[#6f7973] text-[#1b6b4f]" />
               </label>
 
-              <Toggle id="settings-font-shuffle-toggle" label="Font Shuffle" icon="shuffle" checked={fontShuffle} onChange={setFontShuffle} />
-              <Toggle id="settings-high-contrast-toggle" label={t('game.accessibility.highContrast')} icon="contrast" checked={highContrast} onChange={setHighContrast} />
-              <Toggle id="settings-random-letters-toggle" label={t('game.accessibility.randomLetters')} icon="casino" checked={randomLetters} onChange={setRandomLetters} />
-              <Toggle id="settings-reduced-motion-toggle" label={t('game.accessibility.reducedMotion')} icon="motion_photos_off" checked={reducedMotion} onChange={setReducedMotion} />
-              <Toggle id="settings-slow-river-toggle" label="Slow River Mode" icon="waves" checked={slowRiver} onChange={setSlowRiver} />
-              <Toggle id="settings-click-mode-toggle" label="Click Mode" icon="ads_click" checked={clickMode} onChange={setClickMode} />
-              <Toggle id="settings-association-mode-toggle" label="Association Mode" icon="hub" checked={associationMode} onChange={setAssociationMode} />
+              <Toggle id="settings-font-shuffle-toggle" label={<span className="cursor-help" {...getInfoHandlers('fontShuffle')}>Font Shuffle</span>} icon="shuffle" checked={fontShuffle} onChange={setFontShuffle} />
+              <Toggle id="settings-high-contrast-toggle" label={<span className="cursor-help" {...getInfoHandlers('highContrast')}>{t('game.accessibility.highContrast')}</span>} icon="contrast" checked={highContrast} onChange={setHighContrast} />
+              <Toggle id="settings-random-letters-toggle" label={<span className="cursor-help" {...getInfoHandlers('randomLetters')}>{t('game.accessibility.randomLetters')}</span>} icon="casino" checked={randomLetters} onChange={setRandomLetters} />
+              <Toggle id="settings-reduced-motion-toggle" label={<span className="cursor-help" {...getInfoHandlers('reducedMotion')}>{t('game.accessibility.reducedMotion')}</span>} icon="motion_photos_off" checked={reducedMotion} onChange={setReducedMotion} />
+              <Toggle id="settings-slow-river-toggle" label={<span className="cursor-help" {...getInfoHandlers('slowRiver')}>Slow River Mode</span>} icon="waves" checked={slowRiver} onChange={setSlowRiver} />
+              <Toggle id="settings-click-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('clickMode')}>Click Mode</span>} icon="ads_click" checked={clickMode} onChange={setClickMode} />
+              <Toggle id="settings-association-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('associationMode')}>Association Mode</span>} icon="hub" checked={associationMode} onChange={setAssociationMode} />
             </div>
           </div>
         </section>
@@ -272,6 +346,15 @@ export default function SettingsView() {
           setIsProfileEditorOpen(false);
         }}
       />
+      {showInfoPopup && (
+        <div
+          className="pointer-events-none fixed z-50 max-w-xs rounded-xl border border-[#bec9c2]/40 bg-white/95 p-3 shadow-xl backdrop-blur-sm"
+          style={{ left: `${popupPosition.x}px`, top: `${popupPosition.y}px` }}
+        >
+          <p className="text-sm font-bold text-[#1b6b4f]">{infoPopupContent.title}</p>
+          <p className="mt-1 text-xs leading-relaxed text-[#4a6365]">{infoPopupContent.description}</p>
+        </div>
+      )}
     </div>
   );
 }
