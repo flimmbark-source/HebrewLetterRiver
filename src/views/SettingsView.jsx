@@ -7,6 +7,12 @@ import { getFormattedLanguageName } from '../lib/languageUtils.js';
 import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 
+const LANGUAGE_FLAGS = {
+  hebrew: '🇮🇱', english: '🇬🇧', spanish: '🇪🇸', french: '🇫🇷',
+  portuguese: '🇧🇷', russian: '🇷🇺', arabic: '🇸🇦', hindi: '🇮🇳',
+  bengali: '🇧🇩', mandarin: '🇨🇳', japanese: '🇯🇵', amharic: '🇪🇹',
+};
+
 function Icon({ children, className = '', filled = false }) {
   return (
     <span
@@ -286,7 +292,7 @@ export default function SettingsView() {
             <div className="rounded-xl bg-white p-5 shadow-sm">
               <label htmlFor="settings-practice-language-select" className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-6 w-8 items-center justify-center overflow-hidden rounded border border-[#bec9c2]/20 bg-slate-100 text-xs font-bold">IL</div>
+                  <div className="flex h-6 w-8 items-center justify-center overflow-hidden rounded border border-[#bec9c2]/20 bg-slate-100 text-base">{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>
                   <div>
                     <p className="text-xs font-medium text-[#4a6365]">I'm Learning</p>
                     <p className="font-bold">{displayLanguageOptions.find((option) => option.id === languageId)?.name}</p>
