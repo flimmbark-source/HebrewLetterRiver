@@ -7,6 +7,7 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 import { languagePacks } from '../data/languages/index.js';
+import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
 import { getAllSeenWords } from '../lib/seenWordsStorage.ts';
 import { findDictionaryEntryForWord } from '../lib/sentenceDictionaryLookup.ts';
 
