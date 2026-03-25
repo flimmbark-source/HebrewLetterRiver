@@ -440,6 +440,14 @@ body.dark-mode .bbs-section-title {
   border-radius: 12px;
   padding: 10px 12px;
   background: #fff;
+  min-width: 0;
+  width: 100%;
+}
+
+@media (max-width: 560px) {
+  .bbs-expert-controls {
+    grid-template-columns: 1fr;
+  }
 }
 
 .bbs-pack-meta {

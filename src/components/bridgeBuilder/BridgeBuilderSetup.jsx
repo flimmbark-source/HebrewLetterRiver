@@ -559,7 +559,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                 setSortBy(e.target.value);
                 emit('analytics:bridge_setup', { event: 'expert_sort_change', sortBy: e.target.value });
               }}>
-                <option value="recommended">Recommended order</option>
+                <option value="recommended">Recommended</option>
                 <option value="time">Shortest time</option>
                 <option value="difficulty">Difficulty</option>
               </select>
