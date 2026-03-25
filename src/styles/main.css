@@ -2018,6 +2018,7 @@ body.no-scroll {
   min-height: 70px;
   border: 2px solid #A7F3D0;
   background: #FFFFFF;
+  color: #064E3B;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
@@ -2572,6 +2573,21 @@ body.no-scroll {
   animation-timing-function: linear;
   animation-fill-mode: forwards;
   transition: transform 0.2s ease-out;
+}
+
+body.dark-mode #play-area {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.96)) !important;
+}
+
+body.dark-mode .catcher-box {
+  background: #1e293b;
+  border-color: #34d399;
+  color: #f8fafc;
+}
+
+body.dark-mode .falling-letter {
+  color: #f8fafc;
+  text-shadow: 0 2px 8px rgba(2, 6, 23, 0.85);
 }
 
 /* Drag mode items need touch-action: none for full pointer control */
