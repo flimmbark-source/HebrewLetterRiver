@@ -65,6 +65,10 @@
   -webkit-backdrop-filter: blur(20px);
 }
 
+.ds-header--scrollable {
+  flex-shrink: unset;
+}
+
 .ds-back-btn {
   flex-shrink: 0;
   width: 40px;

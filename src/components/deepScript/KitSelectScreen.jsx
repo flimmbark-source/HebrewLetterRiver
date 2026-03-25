@@ -20,8 +20,8 @@ export default function KitSelectScreen({
 
   return (
     <div className="ds-screen ds-kit-select">
-      {/* Header */}
-      <div className="ds-header">
+      {/* Header — scrolls with content on this screen */}
+      <div className="ds-header ds-header--scrollable">
         <button className="ds-back-btn" onClick={onBack} type="button">
           <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back</span>
         </button>
