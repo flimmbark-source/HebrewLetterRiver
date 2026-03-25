@@ -6,6 +6,9 @@ import { getFormattedLanguageName } from '../lib/languageUtils.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
+import { languagePacks } from '../data/languages/index.js';
+import { getAllSeenWords } from '../lib/seenWordsStorage.ts';
+import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
 
 const LANGUAGE_FLAGS = {
   hebrew: '🇮🇱', english: '🇬🇧', spanish: '🇪🇸', french: '🇫🇷',
@@ -57,7 +60,7 @@ function LanguageCard({ id, label, value, onChange, options, leading, trailing }
 }
 
 export default function HomeView() {
-  const { player, starLevelSize, updatePlayerProfile } = useProgress();
+  const { player, badges, starLevelSize, updatePlayerProfile } = useProgress();
   const { setShowPlayModal } = useGame();
   const { languageId, appLanguageId, languageOptions, selectLanguage, selectAppLanguage } = useLanguage();
   const { t } = useLocalization();
@@ -79,6 +82,130 @@ export default function HomeView() {
   const [isEditingReminder, setIsEditingReminder] = React.useState(false);
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
+
+  const wordLookup = useMemo(() => (
+    bridgeBuilderWords.reduce((acc, word) => {
+      acc[word.id] = word;
+      return acc;
+    }, {})
+  ), []);
+
+  const recentLetters = useMemo(() => {
+    const letterIds = Object.keys(player?.letters ?? {});
+    const currentPack = languagePacks[languageId];
+    const candidateItems = [
+      ...(currentPack?.items ?? []),
+      ...(currentPack?.allItems ?? []),
+      ...(currentPack?.consonants ?? []),
+      ...(currentPack?.basicConsonants ?? []),
+      ...(currentPack?.finalForms ?? []),
+      ...(currentPack?.niqqudWithCarrier ?? []),
+      ...(currentPack?.vowels?.syllableBases ?? []),
+    ];
+    const itemsById = candidateItems.reduce((acc, item) => {
+      if (item?.id) acc[item.id] = item;
+      return acc;
+    }, {});
+
+    return letterIds
+      .slice(-5)
+      .reverse()
+      .map((letterId) => {
+        const item = itemsById[letterId];
+        return {
+          id: letterId,
+          symbol: item?.symbol ?? item?.hebrew ?? item?.character ?? item?.glyph ?? letterId,
+          name: item?.name ?? letterId
+        };
+      });
+  }, [player?.letters, languageId]);
+
+  const recentWords = useMemo(() => {
+    const entries = Object.values(getAllSeenWords() ?? {});
+    return entries
+      .sort((a, b) => new Date(b.firstSeenAt).getTime() - new Date(a.firstSeenAt).getTime())
+      .slice(0, 5)
+      .map((entry) => {
+        const word = wordLookup[entry.wordId];
+        return {
+          id: entry.wordId,
+          hebrew: word?.hebrew ?? entry.wordId,
+          translation: word?.translation ?? 'Word learned'
+        };
+      });
+  }, [wordLookup]);
+
+  const modeLabelById = useMemo(() => ({
+    letter_river: 'Letter River',
+    letterRiver: 'Letter River',
+    bridge_builder: 'Bridge Builder',
+    bridgeBuilder: 'Bridge Builder',
+    loose_planks: 'Loose Planks',
+    deep_script: 'Deep Script',
+    deepScript: 'Deep Script',
+    vocab: 'Vocabulary'
+  }), []);
+
+  const recentModes = useMemo(
+    () => (player?.modesPlayed ?? []).slice(-4).reverse().map((modeId) => {
+      const explicitLabel = modeLabelById[modeId];
+      if (explicitLabel) return explicitLabel;
+
+      // Letter River practice submodes should display as the parent game name.
+      if (
+        modeId?.includes('consonants') ||
+        modeId?.includes('forms') ||
+        modeId?.includes('niqqud') ||
+        modeId?.includes('vowel')
+      ) {
+        return 'Letter River';
+      }
+
+      return modeId;
+    }),
+    [player?.modesPlayed, modeLabelById]
+  );
+
+  const totalWordsLearned = useMemo(() => Object.keys(getAllSeenWords() ?? {}).length, []);
+  const totalWordTarget = bridgeBuilderWords.length;
+  const wordProgressPct = totalWordTarget > 0 ? Math.min(Math.round((totalWordsLearned / totalWordTarget) * 100), 100) : 0;
+
+  const modeDisplayByName = useMemo(() => ({
+    'Letter River': { icon: 'water', iconClass: 'text-[#1b6b4f]', bgClass: 'bg-[#1b6b4f]/10', badgeClass: 'text-[#1b6b4f]' },
+    'Bridge Builder': { icon: 'conversion_path', iconClass: 'text-[#855315]', bgClass: 'bg-[#855315]/10', badgeClass: 'text-[#855315]' },
+    'Deep Script': { icon: 'ink_pen', iconClass: 'text-[#5b4b8a]', bgClass: 'bg-[#5b4b8a]/10', badgeClass: 'text-[#5b4b8a]' },
+    'Loose Planks': { icon: 'view_stream', iconClass: 'text-[#3f5b96]', bgClass: 'bg-[#3f5b96]/10', badgeClass: 'text-[#3f5b96]' },
+    Vocabulary: { icon: 'school', iconClass: 'text-[#1f6f8b]', bgClass: 'bg-[#1f6f8b]/10', badgeClass: 'text-[#1f6f8b]' }
+  }), []);
+
+  const recentAchievementXpByGame = useMemo(() => {
+    const nowMs = Date.now();
+    const recentWindowMs = 14 * 24 * 60 * 60 * 1000;
+    const badgeGameById = {
+      'bridge-architect': 'Bridge Builder',
+      'bridge-perfectionist': 'Bridge Builder',
+      'word-collector': 'Bridge Builder',
+      'dungeon-delver': 'Deep Script',
+      'rune-vanquisher': 'Deep Script',
+      'iron-will': 'Deep Script'
+    };
+
+    const totals = {};
+
+    Object.entries(badges ?? {}).forEach(([badgeId, state]) => {
+      const gameName = badgeGameById[badgeId] ?? 'Letter River';
+      const unclaimedRewards = Array.isArray(state?.unclaimed) ? state.unclaimed : [];
+
+      unclaimedRewards.forEach((reward) => {
+        const earnedAtMs = reward?.earnedAt ? new Date(reward.earnedAt).getTime() : 0;
+        if (!earnedAtMs || nowMs - earnedAtMs > recentWindowMs) return;
+
+        totals[gameName] = (totals[gameName] ?? 0) + (reward?.stars ?? 0);
+      });
+    });
+
+    return totals;
+  }, [badges]);
 
   React.useEffect(() => {
     try {
@@ -149,6 +276,73 @@ export default function HomeView() {
               leading={<div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white text-2xl shadow-sm">{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>}
               trailing={<div className="flex items-center gap-3"><span className="rounded-full bg-[#1b6b4f]/10 px-3 py-1 text-[10px] font-black text-[#1b6b4f]">ACTIVE</span><Icon className="text-[#6f7973]">swap_horiz</Icon></div>}
             />
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="px-2 text-xl font-bold">Profile Overview</h2>
+
+          <div className="space-y-4 rounded-2xl bg-[#f9f1fd] p-5">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-bold text-[#4a6365]">Recent Mastery</p>
+                <Icon className="text-[#6f7973]">account_circle</Icon>
+              </div>
+              {recentLetters.length > 0 ? (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {recentLetters.map((letter) => (
+                    <div key={letter.id} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#bec9c2]/40 bg-[#ede6f1] text-lg font-bold text-[#1b6b4f] shadow-sm" title={letter.name}>
+                      {letter.symbol}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-[#4a6365]">Catch a few letters to unlock your mastery row.</p>
+              )}
+              {recentWords.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {recentWords.map((word) => (
+                    <span key={word.id} className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#1d1a22] shadow-sm">
+                      {word.hebrew}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-bold text-[#4a6365]">Game Activity</p>
+              {recentModes.length > 0 ? (
+                recentModes.slice(0, 3).map((modeName) => {
+                  const modeUi = modeDisplayByName[modeName] ?? { icon: 'sports_esports', iconClass: 'text-[#1b6b4f]', bgClass: 'bg-[#1b6b4f]/10', badgeClass: 'text-[#1b6b4f]' };
+                  return (
+                    <div key={modeName} className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm">
+                      <div className={`flex h-9 w-9 items-center justify-center rounded-full ${modeUi.bgClass}`}>
+                        <Icon className={`text-lg ${modeUi.iconClass}`}>{modeUi.icon}</Icon>
+                      </div>
+                      <div className="flex flex-1 items-center justify-between">
+                        <p className="text-sm font-bold">{modeName}</p>
+                        <span className={`text-xs font-bold ${modeUi.badgeClass}`}>
+                          +{recentAchievementXpByGame[modeName] ?? 0} XP
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-sm text-[#4a6365]">Start a game and your latest activity will appear here.</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-end justify-between">
+                <p className="text-sm font-bold text-[#4a6365]">Total Progress</p>
+                <p className="text-xs font-bold text-[#1b6b4f]">{totalWordsLearned} / {totalWordTarget} Words</p>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-white">
+                <div className="h-full rounded-full bg-[#1b6b4f]" style={{ width: `${wordProgressPct}%` }}></div>
+              </div>
+            </div>
           </div>
         </section>
 
