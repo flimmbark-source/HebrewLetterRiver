@@ -6,6 +6,9 @@ import { getFormattedLanguageName } from '../lib/languageUtils.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
+import { languagePacks } from '../data/languages/index.js';
+import { getAllSeenWords } from '../lib/seenWordsStorage.ts';
+import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
 
 const LANGUAGE_FLAGS = {
   hebrew: '🇮🇱', english: '🇬🇧', spanish: '🇪🇸', french: '🇫🇷',
@@ -80,6 +83,62 @@ export default function HomeView() {
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
+  const wordLookup = useMemo(() => (
+    bridgeBuilderWords.reduce((acc, word) => {
+      acc[word.id] = word;
+      return acc;
+    }, {})
+  ), []);
+
+  const recentLetters = useMemo(() => {
+    const letterIds = Object.keys(player?.letters ?? {});
+    const currentPack = languagePacks[languageId];
+    const itemsById = currentPack?.itemsById ?? {};
+
+    return letterIds
+      .slice(-5)
+      .reverse()
+      .map((letterId) => {
+        const item = itemsById[letterId];
+        return {
+          id: letterId,
+          symbol: item?.symbol ?? letterId,
+          name: item?.name ?? letterId
+        };
+      });
+  }, [player?.letters, languageId]);
+
+  const recentWords = useMemo(() => {
+    const entries = Object.values(getAllSeenWords() ?? {});
+    return entries
+      .sort((a, b) => new Date(b.firstSeenAt).getTime() - new Date(a.firstSeenAt).getTime())
+      .slice(0, 5)
+      .map((entry) => {
+        const word = wordLookup[entry.wordId];
+        return {
+          id: entry.wordId,
+          hebrew: word?.hebrew ?? entry.wordId,
+          translation: word?.translation ?? 'Word learned'
+        };
+      });
+  }, [wordLookup]);
+
+  const modeLabelById = useMemo(() => ({
+    letter_river: 'Letter River',
+    letterRiver: 'Letter River',
+    bridge_builder: 'Bridge Builder',
+    bridgeBuilder: 'Bridge Builder',
+    loose_planks: 'Loose Planks',
+    deep_script: 'Deep Script',
+    deepScript: 'Deep Script',
+    vocab: 'Vocabulary'
+  }), []);
+
+  const recentModes = useMemo(
+    () => (player?.modesPlayed ?? []).slice(-4).reverse().map((modeId) => modeLabelById[modeId] ?? modeId),
+    [player?.modesPlayed, modeLabelById]
+  );
+
   React.useEffect(() => {
     try {
       const saved = localStorage.getItem('homePreferences');
@@ -149,6 +208,65 @@ export default function HomeView() {
               leading={<div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white text-2xl shadow-sm">{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>}
               trailing={<div className="flex items-center gap-3"><span className="rounded-full bg-[#1b6b4f]/10 px-3 py-1 text-[10px] font-black text-[#1b6b4f]">ACTIVE</span><Icon className="text-[#6f7973]">swap_horiz</Icon></div>}
             />
+          </div>
+        </section>
+
+        <section className="space-y-4 rounded-2xl border border-[#1b6b4f]/10 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f9f1fd] text-[#1b6b4f]">
+              <Icon>person</Icon>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Profile Overview</h2>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#4a6365]">Your recent learning activity</p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-3 rounded-xl bg-[#f9f1fd] p-4">
+              <h3 className="text-sm font-black uppercase tracking-wide text-[#4a6365]">Recent Letters</h3>
+              {recentLetters.length > 0 ? (
+                <ul className="space-y-2">
+                  {recentLetters.map((letter) => (
+                    <li key={letter.id} className="flex items-center justify-between gap-2 text-sm">
+                      <span className="text-lg font-black">{letter.symbol}</span>
+                      <span className="text-right font-semibold text-[#4a6365]">{letter.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-[#4a6365]">Catch a few letters to see your progress here.</p>
+              )}
+            </div>
+
+            <div className="space-y-3 rounded-xl bg-[#f9f1fd] p-4">
+              <h3 className="text-sm font-black uppercase tracking-wide text-[#4a6365]">Recent Words</h3>
+              {recentWords.length > 0 ? (
+                <ul className="space-y-2">
+                  {recentWords.map((word) => (
+                    <li key={word.id} className="space-y-0.5 text-sm">
+                      <p className="font-bold">{word.hebrew}</p>
+                      <p className="text-xs text-[#4a6365]">{word.translation}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-[#4a6365]">Play word games to track your newest vocabulary.</p>
+              )}
+            </div>
+
+            <div className="space-y-3 rounded-xl bg-[#f9f1fd] p-4">
+              <h3 className="text-sm font-black uppercase tracking-wide text-[#4a6365]">Games Played</h3>
+              {recentModes.length > 0 ? (
+                <ul className="space-y-2 text-sm font-semibold text-[#1d1a22]">
+                  {recentModes.map((modeName) => (
+                    <li key={modeName} className="rounded-lg bg-white px-3 py-2">{modeName}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-[#4a6365]">Start a game and your played modes will appear here.</p>
+              )}
+            </div>
           </div>
         </section>
 
