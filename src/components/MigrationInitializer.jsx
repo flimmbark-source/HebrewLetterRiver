@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { needsMigration, migrateToIndexedDB, getMigrationVersion } from '../lib/storageMigration';
 import { getOnlineStatusManager } from '../lib/offlineQueue';
+import { probeStorageCapability, setStartupFlag } from '../lib/storageCapability';
 
 /**
  * Migration Initializer Component
@@ -13,6 +14,17 @@ export default function MigrationInitializer({ children }) {
   useEffect(() => {
     async function runMigration() {
       setMigrationComplete(false);
+
+      const capability = await probeStorageCapability();
+      if (!capability.isMigrationSafe) {
+        const warningMessage = `[Migration] Storage capability check failed (localStorage: ${capability.localStorageAvailable}, indexedDB: ${capability.indexedDBAvailable}). Migration skipped. ${capability.warnings.join(' | ')}`;
+        console.warn(warningMessage);
+        setStartupFlag('storageMigrationSkipped', true);
+        setStartupFlag('storageCapability', capability);
+        setMigrationError('Storage migration was skipped because persistent browser storage is unavailable.');
+        setMigrationComplete(true);
+        return;
+      }
 
       let shouldMigrate = false;
 
@@ -74,5 +86,14 @@ export default function MigrationInitializer({ children }) {
     );
   }
 
-  return children;
+  return (
+    <>
+      {migrationError && (
+        <div className="mx-4 mt-4 rounded-lg border border-amber-400/40 bg-amber-500/10 p-3 text-sm text-amber-100">
+          <strong className="font-semibold">Storage warning:</strong> {migrationError}
+        </div>
+      )}
+      {children}
+    </>
+  );
 }
