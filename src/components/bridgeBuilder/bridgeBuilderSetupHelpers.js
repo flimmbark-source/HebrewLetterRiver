@@ -10,6 +10,14 @@
 
 /** How many packs to show in the preview (including the featured one). */
 export const PREVIEW_LIMIT = 3;
+export const GOAL_FILTERS = [
+  { id: 'all', label: 'All goals' },
+  { id: 'connect-ideas', label: 'Connect ideas' },
+  { id: 'sound-natural', label: 'Sound natural' },
+  { id: 'ask-questions', label: 'Ask questions' },
+  { id: 'reading-patterns', label: 'Reading patterns' },
+  { id: 'time-and-sequence', label: 'Time & sequence' },
+];
 
 /**
  * Get the recommended "Quick Start" pack for a section.
@@ -70,4 +78,43 @@ export function getPackButtonLabel(progress) {
     return 'Continue';
   }
   return 'Play';
+}
+
+export function formatEstimatedMinutes(seconds = 0) {
+  const minutes = Math.max(1, Math.round(seconds / 60));
+  return `${minutes} min`;
+}
+
+export function matchesGoal(pack, goalId) {
+  if (!goalId || goalId === 'all') return true;
+  return Array.isArray(pack.goalTags) && pack.goalTags.includes(goalId);
+}
+
+export function matchesQuery(pack, query) {
+  const normalizedQuery = (query || '').trim().toLowerCase();
+  if (!normalizedQuery) return true;
+  const haystack = [
+    pack.title,
+    pack.description,
+    pack.primaryType,
+    pack.difficultyBand,
+    ...(pack.goalTags || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  return haystack.includes(normalizedQuery);
+}
+
+export function sortPackData(packData, sortBy) {
+  const sorted = [...packData];
+  if (sortBy === 'time') {
+    sorted.sort((a, b) => (a.pack.estimatedTimeSec || 0) - (b.pack.estimatedTimeSec || 0));
+  } else if (sortBy === 'difficulty') {
+    const rank = { Starter: 0, Core: 1, Advanced: 2 };
+    sorted.sort((a, b) => (rank[a.pack.difficultyBand] ?? 99) - (rank[b.pack.difficultyBand] ?? 99));
+  } else {
+    sorted.sort((a, b) => a.pack.order - b.pack.order);
+  }
+  return sorted;
 }
