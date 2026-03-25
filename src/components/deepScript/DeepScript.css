@@ -65,8 +65,13 @@
   -webkit-backdrop-filter: blur(20px);
 }
 
-.ds-header--scrollable {
-  flex-shrink: unset;
+/* Kit select: everything scrolls together (header not pinned) */
+.ds-kit-select-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
 }
 
 .ds-back-btn {

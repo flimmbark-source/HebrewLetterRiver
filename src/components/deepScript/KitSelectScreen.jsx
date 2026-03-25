@@ -19,9 +19,9 @@ export default function KitSelectScreen({
   const [selectedKit, setSelectedKit] = useState(null);
 
   return (
-    <div className="ds-screen ds-kit-select">
+    <div className="ds-kit-select-scroll">
       {/* Header — scrolls with content on this screen */}
-      <div className="ds-header ds-header--scrollable">
+      <div className="ds-header">
         <button className="ds-back-btn" onClick={onBack} type="button">
           <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back</span>
         </button>
