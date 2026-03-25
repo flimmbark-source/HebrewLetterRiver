@@ -397,13 +397,18 @@ const cafeTalkPacks = cafeTalkCategoryIds.map((categoryId, idx) => {
   const category = CAFE_TALK_CATEGORIES[categoryId];
   const title = CAFE_TALK_CATEGORY_NAMES[categoryId] || categoryId;
   const snake = categoryId.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+  const previewWords = category.wordIds.slice(0, 3).join(', ');
+  const remainingWordCount = Math.max(0, category.wordIds.length - 3);
+  const compactDescription = remainingWordCount > 0
+    ? `${previewWords} +${remainingWordCount} more`
+    : previewWords;
 
   return {
     id: `cafe_talk_${snake}_01`,
     sectionId: 'cafe_talk',
     title,
     theme: 'cafe_talk',
-    description: category.wordIds.join(', '),
+    description: compactDescription,
     wordIds: category.wordIds.map(wordId => `bbct-${wordId}`),
     order: idx + 1,
     unlockAfter: idx === 0 ? null : `cafe_talk_${cafeTalkCategoryIds[idx - 1].replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()}_01`,
