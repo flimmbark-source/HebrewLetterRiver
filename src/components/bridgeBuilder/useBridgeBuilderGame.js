@@ -41,6 +41,7 @@ import { emit } from '../../lib/eventBus.js';
 const MAX_HEARTS = 3;
 const TRANSLIT_CHOICES = 3;
 const MEANING_CHOICES = 3;
+const VOWELS = ['a', 'e', 'i', 'o', 'u'];
 
 function shuffle(arr) {
   const a = [...arr];
@@ -82,13 +83,84 @@ function pickNextWord(sessionStates, allWords, lastWordId) {
 }
 
 function buildTransliterationChoices(word) {
-  const distractors = getTransliterationDistractors(word.id, TRANSLIT_CHOICES - 1);
-  return shuffle([word.transliteration, ...distractors]);
+  const misspellings = buildMisspelledTransliterationDistractors(word.transliteration, TRANSLIT_CHOICES - 1);
+
+  if (misspellings.length < TRANSLIT_CHOICES - 1) {
+    const fallbackCount = (TRANSLIT_CHOICES - 1) - misspellings.length;
+    const fallback = getTransliterationDistractors(word.id, fallbackCount)
+      .filter(choice => choice !== word.transliteration && !misspellings.includes(choice));
+    return shuffle([word.transliteration, ...misspellings, ...fallback].slice(0, TRANSLIT_CHOICES));
+  }
+
+  return shuffle([word.transliteration, ...misspellings]);
 }
 
-function buildMeaningChoices(word) {
-  const distractors = getTranslationDistractors(word.id, MEANING_CHOICES - 1);
+function buildMeaningChoices(word, sessionWords) {
+  const inSessionDistractors = sessionWords
+    .filter(w => w.id !== word.id)
+    .map(w => w.translation)
+    .filter(Boolean);
+
+  const uniqueInSessionDistractors = [...new Set(inSessionDistractors)];
+  const fromSession = shuffle(uniqueInSessionDistractors).slice(0, MEANING_CHOICES - 1);
+
+  if (fromSession.length < MEANING_CHOICES - 1) {
+    const fallbackCount = (MEANING_CHOICES - 1) - fromSession.length;
+    const fallback = getTranslationDistractors(word.id, fallbackCount)
+      .filter(choice => choice !== word.translation && !fromSession.includes(choice));
+    const distractors = [...fromSession, ...fallback].slice(0, MEANING_CHOICES - 1);
+    return shuffle([word.translation, ...distractors]);
+  }
+
+  const distractors = fromSession;
   return shuffle([word.translation, ...distractors]);
+}
+
+function buildMisspelledTransliterationDistractors(transliteration, count = 2) {
+  if (!transliteration || typeof transliteration !== 'string') return [];
+  const trimmed = transliteration.trim();
+  if (!trimmed) return [];
+
+  const variants = [];
+  const normalized = trimmed.toLowerCase();
+  const chars = normalized.split('');
+  const isLetter = (ch) => /[a-z]/.test(ch);
+
+  // 1) Single-letter vowel/consonant substitution.
+  for (let i = 0; i < chars.length && variants.length < count; i++) {
+    const ch = chars[i];
+    if (!isLetter(ch)) continue;
+    const replacement = VOWELS.includes(ch) ? VOWELS.find(v => v !== ch) : 'a';
+    if (!replacement) continue;
+    const copy = [...chars];
+    copy[i] = replacement;
+    const candidate = copy.join('');
+    if (candidate !== normalized && !variants.includes(candidate)) {
+      variants.push(candidate);
+    }
+  }
+
+  // 2) Adjacent swap to produce natural-looking typo.
+  for (let i = 0; i < chars.length - 1 && variants.length < count; i++) {
+    if (!isLetter(chars[i]) || !isLetter(chars[i + 1])) continue;
+    const copy = [...chars];
+    [copy[i], copy[i + 1]] = [copy[i + 1], copy[i]];
+    const candidate = copy.join('');
+    if (candidate !== normalized && !variants.includes(candidate)) {
+      variants.push(candidate);
+    }
+  }
+
+  // 3) Drop one letter if still short.
+  for (let i = 0; i < chars.length && variants.length < count; i++) {
+    if (!isLetter(chars[i])) continue;
+    const candidate = chars.filter((_, idx) => idx !== i).join('');
+    if (candidate.length >= 2 && candidate !== normalized && !variants.includes(candidate)) {
+      variants.push(candidate);
+    }
+  }
+
+  return variants.slice(0, count);
 }
 
 /**
@@ -192,14 +264,14 @@ export default function useBridgeBuilderGame(sessionConfig) {
           setPhase('meaningTeach');
         } else {
           // Introduced word — test meaning with multiple choices
-          const choices = buildMeaningChoices(currentWord);
+          const choices = buildMeaningChoices(currentWord, allSessionWords);
           setMeaningChoices(choices);
           setPhase('meaningChoice');
         }
       }, 700);
       return () => clearTimeout(timerRef.current);
     }
-  }, [phase, currentWord]);
+  }, [phase, currentWord, allSessionWords]);
 
   // After meaning resolved, complete the word
   useEffect(() => {
