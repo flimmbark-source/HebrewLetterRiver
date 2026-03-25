@@ -139,6 +139,18 @@ export default function HomeView() {
     [player?.modesPlayed, modeLabelById]
   );
 
+  const totalWordsLearned = useMemo(() => Object.keys(getAllSeenWords() ?? {}).length, []);
+  const totalWordTarget = bridgeBuilderWords.length;
+  const wordProgressPct = totalWordTarget > 0 ? Math.min(Math.round((totalWordsLearned / totalWordTarget) * 100), 100) : 0;
+
+  const modeDisplayByName = useMemo(() => ({
+    'Letter River': { icon: 'water', iconClass: 'text-[#1b6b4f]', bgClass: 'bg-[#1b6b4f]/10', badgeClass: 'text-[#1b6b4f]' },
+    'Bridge Builder': { icon: 'conversion_path', iconClass: 'text-[#855315]', bgClass: 'bg-[#855315]/10', badgeClass: 'text-[#855315]' },
+    'Deep Script': { icon: 'ink_pen', iconClass: 'text-[#5b4b8a]', bgClass: 'bg-[#5b4b8a]/10', badgeClass: 'text-[#5b4b8a]' },
+    'Loose Planks': { icon: 'view_stream', iconClass: 'text-[#3f5b96]', bgClass: 'bg-[#3f5b96]/10', badgeClass: 'text-[#3f5b96]' },
+    Vocabulary: { icon: 'school', iconClass: 'text-[#1f6f8b]', bgClass: 'bg-[#1f6f8b]/10', badgeClass: 'text-[#1f6f8b]' }
+  }), []);
+
   React.useEffect(() => {
     try {
       const saved = localStorage.getItem('homePreferences');
@@ -211,61 +223,70 @@ export default function HomeView() {
           </div>
         </section>
 
-        <section className="space-y-4 rounded-2xl border border-[#1b6b4f]/10 bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f9f1fd] text-[#1b6b4f]">
-              <Icon>person</Icon>
-            </div>
-            <div>
-              <h2 className="text-xl font-bold">Profile Overview</h2>
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#4a6365]">Your recent learning activity</p>
+        <section className="space-y-6 rounded-xl bg-[#f6f0ff] p-4">
+          <div className="mb-1 flex items-center justify-between">
+            <h3 className="text-xl font-bold">Profile Overview</h3>
+            <Icon className="text-[#4a6365]">account_circle</Icon>
+          </div>
+
+          <div className="space-y-3">
+            <p className="mb-1 text-xs font-black uppercase tracking-wide text-[#4a6365]">Recent Mastery</p>
+            {recentLetters.length > 0 ? (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {recentLetters.map((letter) => (
+                  <div key={letter.id} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-emerald-200 bg-emerald-100 font-serif text-lg font-bold text-[#1b6b4f]" title={letter.name}>
+                    {letter.symbol}
+                  </div>
+                ))}
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#1b6b4f]/25 bg-[#1b6b4f]/10 text-[#1b6b4f]">
+                  <Icon className="text-xs">add</Icon>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-[#4a6365]">Catch a few letters to unlock your mastery row.</p>
+            )}
+            {recentWords.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {recentWords.map((word) => (
+                  <span key={word.id} className="shrink-0 rounded-full border border-[#1b6b4f]/20 bg-white px-3 py-1 text-xs font-semibold text-[#1d1a22]">
+                    {word.hebrew} · {word.translation}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-3">
+            <p className="mb-1 text-xs font-black uppercase tracking-wide text-[#4a6365]">Game Activity</p>
+            <div className="space-y-2">
+              {recentModes.length > 0 ? (
+                recentModes.slice(0, 3).map((modeName) => {
+                  const modeUi = modeDisplayByName[modeName] ?? { icon: 'sports_esports', iconClass: 'text-[#1b6b4f]', bgClass: 'bg-[#1b6b4f]/10', badgeClass: 'text-[#1b6b4f]' };
+                  return (
+                    <div key={modeName} className="flex items-center gap-3 rounded-lg bg-white p-2 shadow-sm">
+                      <div className={`flex h-8 w-8 items-center justify-center rounded-full ${modeUi.bgClass}`}>
+                        <Icon className={`text-lg ${modeUi.iconClass}`}>{modeUi.icon}</Icon>
+                      </div>
+                      <div className="flex flex-1 items-center justify-between">
+                        <p className="text-xs font-bold">{modeName}</p>
+                        <span className={`text-[10px] font-black ${modeUi.badgeClass}`}>Played</span>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-sm text-[#4a6365]">Start a game and your latest activity will appear here.</p>
+              )}
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-3 rounded-xl bg-[#f9f1fd] p-4">
-              <h3 className="text-sm font-black uppercase tracking-wide text-[#4a6365]">Recent Letters</h3>
-              {recentLetters.length > 0 ? (
-                <ul className="space-y-2">
-                  {recentLetters.map((letter) => (
-                    <li key={letter.id} className="flex items-center justify-between gap-2 text-sm">
-                      <span className="text-lg font-black">{letter.symbol}</span>
-                      <span className="text-right font-semibold text-[#4a6365]">{letter.name}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-[#4a6365]">Catch a few letters to see your progress here.</p>
-              )}
+          <div className="space-y-2">
+            <div className="mb-1 flex items-end justify-between">
+              <p className="text-xs font-black uppercase tracking-wide text-[#4a6365]">Total Progress</p>
+              <p className="text-[10px] font-black text-[#1b6b4f]">{totalWordsLearned} / {totalWordTarget} Words</p>
             </div>
-
-            <div className="space-y-3 rounded-xl bg-[#f9f1fd] p-4">
-              <h3 className="text-sm font-black uppercase tracking-wide text-[#4a6365]">Recent Words</h3>
-              {recentWords.length > 0 ? (
-                <ul className="space-y-2">
-                  {recentWords.map((word) => (
-                    <li key={word.id} className="space-y-0.5 text-sm">
-                      <p className="font-bold">{word.hebrew}</p>
-                      <p className="text-xs text-[#4a6365]">{word.translation}</p>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-[#4a6365]">Play word games to track your newest vocabulary.</p>
-              )}
-            </div>
-
-            <div className="space-y-3 rounded-xl bg-[#f9f1fd] p-4">
-              <h3 className="text-sm font-black uppercase tracking-wide text-[#4a6365]">Games Played</h3>
-              {recentModes.length > 0 ? (
-                <ul className="space-y-2 text-sm font-semibold text-[#1d1a22]">
-                  {recentModes.map((modeName) => (
-                    <li key={modeName} className="rounded-lg bg-white px-3 py-2">{modeName}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-[#4a6365]">Start a game and your played modes will appear here.</p>
-              )}
+            <div className="h-1 w-full overflow-hidden rounded-full bg-[#1b6b4f]/20">
+              <div className="h-full rounded-full bg-[#1b6b4f]" style={{ width: `${wordProgressPct}%` }}></div>
             </div>
           </div>
         </section>
