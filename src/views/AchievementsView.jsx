@@ -228,7 +228,7 @@ export default function AchievementsView() {
             <div key={group.key} className="space-y-2">
               <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
               {group.badges.length > 0 ? (
-                group.badges.map((badge, index) => {
+                group.badges.map((badge) => {
                   const state = badges?.[badge.id];
                   const goal = badge.tiers[Math.min(state?.tier ?? 0, badge.tiers.length - 1)]?.goal ?? 1;
                   const current = Math.min(state?.progress ?? 0, goal);
@@ -242,7 +242,7 @@ export default function AchievementsView() {
                       <div className="flex-1">
                         <div className="mb-1 flex items-end justify-between">
                           <h4 className="font-bold">{getBadgeCopy(badge, t, gameName, goal).name}</h4>
-                          <span className="text-[10px] font-bold text-[#3f4943]">STEP {10 + index}</span>
+                          <span className="text-[10px] font-bold text-[#3f4943]">{current}/{goal}</span>
                         </div>
                         <p className="mb-2 text-xs text-[#3f4943]">{getBadgeCopy(badge, t, gameName, goal).summary}</p>
                         <div className="h-2 w-full overflow-hidden rounded-full bg-[#e7e0eb]"><div className="h-full bg-[#1b6b4f]/30" style={{ width: `${pct}%` }}></div></div>
