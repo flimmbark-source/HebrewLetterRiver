@@ -2819,7 +2819,14 @@ body.no-scroll {
 /* Legacy high-contrast (kept for compat, dark-mode is primary) */
 body.high-contrast { background: #000; color: #fff; }
 
-/* ─── Dark Mode: main.css component overrides ──────────── */
+/* ─── Dark Mode: shell & component overrides ───────────── */
+body.dark-mode .app-shell {
+  background: #020617 !important;
+}
+body.dark-mode .main-content {
+  background: #020617 !important;
+}
+
 body.dark-mode .hero-card,
 body.dark-mode .progress-card-small,
 body.dark-mode .quest-card,
