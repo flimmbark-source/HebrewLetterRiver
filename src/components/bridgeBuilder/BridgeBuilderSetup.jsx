@@ -16,6 +16,11 @@ import {
   getRemainingCount,
   getPackButtonLabel,
   PREVIEW_LIMIT,
+  GOAL_FILTERS,
+  formatEstimatedMinutes,
+  matchesGoal,
+  matchesQuery,
+  sortPackData,
 } from './bridgeBuilderSetupHelpers.js';
 import './BridgeBuilderSetup.css';
 
@@ -133,6 +138,12 @@ function PackRow({ pack, progress, unlocked, completion, modeOverride, onDotClic
         {!compact && (
           <div className="bbs-pack-row-subtitle">{pack.description}</div>
         )}
+        <div className="bbs-pack-meta">
+          <span className="bbs-pack-chip">{pack.primaryType || 'mixed'}</span>
+          <span className="bbs-pack-chip">{pack.difficultyBand || 'Core'}</span>
+          <span className="bbs-pack-chip">{pack.targetsNewCount || pack.wordIds.length} new</span>
+          <span className="bbs-pack-chip">{formatEstimatedMinutes(pack.estimatedTimeSec)}</span>
+        </div>
         <div className="bbs-pack-row-bottom">
           <ProgressDots
             completion={completion}
@@ -181,6 +192,12 @@ function QuickStartCard({ packData, modeOverride, onDotClick, onPlay }) {
           <div className="bbs-quickstart-label">Quick Start</div>
           <div className="bbs-quickstart-title">{pack.title}</div>
           <div className="bbs-quickstart-desc">{pack.description}</div>
+          <div className="bbs-pack-meta">
+            <span className="bbs-pack-chip">{pack.primaryType || 'mixed'}</span>
+            <span className="bbs-pack-chip">{pack.difficultyBand || 'Core'}</span>
+            <span className="bbs-pack-chip">{pack.targetsNewCount || pack.wordIds.length} new</span>
+            <span className="bbs-pack-chip">{formatEstimatedMinutes(pack.estimatedTimeSec)}</span>
+          </div>
           <div className="bbs-quickstart-bottom">
             <ProgressDots
               completion={completion}
@@ -348,6 +365,10 @@ function ReviewCard({ eligibleCount, onPlay }) {
 /* ─── Main Setup Screen ──────────────────────────────────── */
 
 export default function BridgeBuilderSetup({ onPlay, onBack }) {
+  const [browseMode, setBrowseMode] = useState('guided');
+  const [goalFilter, setGoalFilter] = useState('all');
+  const [query, setQuery] = useState('');
+  const [sortBy, setSortBy] = useState('recommended');
   const [expandedSection, setExpandedSection] = useState(null);
   const [drawerSectionId, setDrawerSectionId] = useState(null);
   const [modeOverrides, setModeOverrides] = useState({});
@@ -413,6 +434,19 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     ? sectionData.find(sd => sd.section.id === drawerSectionId)
     : null;
 
+  const allUnlockedPackData = useMemo(
+    () => sectionData.flatMap(sd => sd.packData).filter(pd => pd.unlocked),
+    [sectionData]
+  );
+  const goalModePackData = useMemo(
+    () => allUnlockedPackData.filter(pd => matchesGoal(pd.pack, goalFilter)),
+    [allUnlockedPackData, goalFilter]
+  );
+  const expertModePackData = useMemo(() => {
+    const filtered = allUnlockedPackData.filter(pd => matchesQuery(pd.pack, query));
+    return sortPackData(filtered, sortBy);
+  }, [allUnlockedPackData, query, sortBy]);
+
   return (
     <div className="bbs-screen">
       {/* Scrollable content */}
@@ -422,6 +456,79 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
           <h1 className="bbs-title">Vocab Builder</h1>
           <p className="bbs-subtitle">Master your Hebrew journey through themed categories.</p>
         </div>
+        <div className="bbs-mode-tabs" role="tablist" aria-label="Browse modes">
+          <button type="button" className={`bbs-mode-tab ${browseMode === 'guided' ? 'active' : ''}`} onClick={() => setBrowseMode('guided')}>Guided</button>
+          <button type="button" className={`bbs-mode-tab ${browseMode === 'goal' ? 'active' : ''}`} onClick={() => setBrowseMode('goal')}>Goal-based</button>
+          <button type="button" className={`bbs-mode-tab ${browseMode === 'expert' ? 'active' : ''}`} onClick={() => setBrowseMode('expert')}>Expert</button>
+        </div>
+        {browseMode === 'goal' && (
+          <div className="bbs-mode-panel">
+            <h3 className="bbs-mode-title">What do you want to do today?</h3>
+            <div className="bbs-goal-filters">
+              {GOAL_FILTERS.map(goal => (
+                <button
+                  key={goal.id}
+                  type="button"
+                  className={`bbs-goal-chip ${goalFilter === goal.id ? 'active' : ''}`}
+                  onClick={() => setGoalFilter(goal.id)}
+                >
+                  {goal.label}
+                </button>
+              ))}
+            </div>
+            <div className="bbs-upnext-list">
+              {goalModePackData.slice(0, 12).map(pd => (
+                <PackRow
+                  key={pd.pack.id}
+                  pack={pd.pack}
+                  progress={pd.progress}
+                  unlocked={pd.unlocked}
+                  completion={pd.completion}
+                  modeOverride={modeOverrides[pd.pack.id] || null}
+                  onDotClick={handleDotClick}
+                  onPlay={handlePlayPack}
+                  compact
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        {browseMode === 'expert' && (
+          <div className="bbs-mode-panel">
+            <h3 className="bbs-mode-title">Search & filter your library</h3>
+            <div className="bbs-expert-controls">
+              <input
+                type="search"
+                className="bbs-search"
+                placeholder="Search packs or goals"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              <select className="bbs-sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="recommended">Recommended order</option>
+                <option value="time">Shortest time</option>
+                <option value="difficulty">Difficulty</option>
+              </select>
+            </div>
+            <div className="bbs-upnext-list">
+              {expertModePackData.slice(0, 20).map(pd => (
+                <PackRow
+                  key={pd.pack.id}
+                  pack={pd.pack}
+                  progress={pd.progress}
+                  unlocked={pd.unlocked}
+                  completion={pd.completion}
+                  modeOverride={modeOverrides[pd.pack.id] || null}
+                  onDotClick={handleDotClick}
+                  onPlay={handlePlayPack}
+                  compact
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        {browseMode === 'guided' && (
+          <>
         {sectionData.map(({ section, sectionProgress, unlocked, packData }) => {
           const recommended = getRecommendedPack(packData);
           const isExpanded = expandedSection === section.id && unlocked;
@@ -495,6 +602,8 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
             </section>
           );
         })}
+          </>
+        )}
 
         {/* Random Review */}
         <ReviewCard

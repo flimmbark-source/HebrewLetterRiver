@@ -17,6 +17,13 @@
  * @property {string[]}    wordIds      — Ordered list of word IDs in this pack
  * @property {number}      order        — Sort order within section
  * @property {string|null} unlockAfter  — Pack ID that must be completed to unlock this one (null = unlocked by default)
+ * @property {('noun'|'verb'|'connector'|'phrase'|'reading-pattern'|'mixed')} [primaryType]
+ * @property {string[]}    [goalTags]
+ * @property {('Starter'|'Core'|'Advanced')} [difficultyBand]
+ * @property {number}      [estimatedTimeSec]
+ * @property {number}      [targetsNewCount]
+ * @property {number}      [supportReviewCount]
+ * @property {string}      [whyItMatters]
  */
 
 import { CAFE_TALK_CATEGORIES, getCafeTalkCategoryIds } from './readingTexts/cafeTalk/cafeTalkCanonical.js';
@@ -404,6 +411,60 @@ const cafeTalkPacks = cafeTalkCategoryIds.map((categoryId, idx) => {
 });
 
 bridgeBuilderPacks.push(...cafeTalkPacks);
+
+function inferPrimaryType(pack) {
+  const title = `${pack.title} ${pack.theme}`.toLowerCase();
+  if (title.includes('connector') || title.includes('discourse') || title.includes('qualifier') || title.includes('modifier')) {
+    return 'connector';
+  }
+  if (title.includes('vowel') || title.includes('reading')) return 'reading-pattern';
+  if (title.includes('verb') || title.includes('action')) return 'verb';
+  if (title.includes('phrase') || title.includes('conversation') || title.includes('chunk')) return 'phrase';
+  return 'mixed';
+}
+
+function inferGoalTags(pack) {
+  const title = `${pack.title} ${pack.theme}`.toLowerCase();
+  if (title.includes('connector') || title.includes('discourse') || title.includes('logical')) {
+    return ['connect-ideas', 'sound-natural'];
+  }
+  if (title.includes('question')) return ['ask-questions', 'daily-talk'];
+  if (title.includes('vowel') || title.includes('reading')) return ['reading-patterns'];
+  if (title.includes('time')) return ['time-and-sequence', 'daily-talk'];
+  if (title.includes('emotion') || title.includes('feeling')) return ['express-feelings', 'sound-natural'];
+  return ['daily-talk'];
+}
+
+function inferDifficultyBand(pack) {
+  if (pack.sectionId === 'foundations') return 'Starter';
+  if (pack.sectionId === 'cafe_talk' || pack.sectionId === 'meaning_builders') return 'Advanced';
+  return 'Core';
+}
+
+function estimatePackTime(pack) {
+  const targetsNewCount = Math.max(1, Math.min(pack.wordIds.length, 6));
+  const supportReviewCount = Math.max(0, pack.wordIds.length - targetsNewCount);
+  const baseOverhead = 20;
+  const avgStepSec = 7;
+  const reviewStepSec = 4;
+  const exerciseStepsPerTarget = 4;
+  return {
+    targetsNewCount,
+    supportReviewCount,
+    estimatedTimeSec: baseOverhead + (targetsNewCount * exerciseStepsPerTarget * avgStepSec) + (supportReviewCount * reviewStepSec),
+  };
+}
+
+for (const pack of bridgeBuilderPacks) {
+  const derivedTime = estimatePackTime(pack);
+  pack.primaryType = pack.primaryType || inferPrimaryType(pack);
+  pack.goalTags = pack.goalTags || inferGoalTags(pack);
+  pack.difficultyBand = pack.difficultyBand || inferDifficultyBand(pack);
+  pack.estimatedTimeSec = pack.estimatedTimeSec || derivedTime.estimatedTimeSec;
+  pack.targetsNewCount = pack.targetsNewCount || derivedTime.targetsNewCount;
+  pack.supportReviewCount = pack.supportReviewCount || derivedTime.supportReviewCount;
+  pack.whyItMatters = pack.whyItMatters || `Builds ${pack.title.toLowerCase()} fluency for real conversations.`;
+}
 
 /**
  * Get a pack by ID.
