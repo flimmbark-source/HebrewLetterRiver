@@ -7,8 +7,8 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 import { languagePacks } from '../data/languages/index.js';
-import { getAllSeenWords } from '../lib/seenWordsStorage.ts';
 import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
+import { getAllSeenWords } from '../lib/seenWordsStorage.ts';
 import { findDictionaryEntryForWord } from '../lib/sentenceDictionaryLookup.ts';
 
 const LANGUAGE_FLAGS = {
@@ -84,12 +84,6 @@ export default function HomeView() {
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
-  const wordLookup = useMemo(() => (
-    bridgeBuilderWords.reduce((acc, word) => {
-      acc[word.id] = word;
-      return acc;
-    }, {})
-  ), []);
 
   const recentLetters = useMemo(() => {
     const letterIds = Object.keys(player?.letters ?? {});
@@ -127,14 +121,14 @@ export default function HomeView() {
       .sort((a, b) => new Date(b.firstSeenAt).getTime() - new Date(a.firstSeenAt).getTime())
       .slice(0, 5)
       .map((entry) => {
-        const word = wordLookup[entry.wordId];
         const dictionaryEntry = findDictionaryEntryForWord(entry.wordId, languageId, appLanguageId, t);
+
         return {
           id: entry.wordId,
-          text: word?.hebrew ?? dictionaryEntry?.practiceWord ?? entry.wordId
+          text: dictionaryEntry.practiceWord
         };
       });
-  }, [appLanguageId, languageId, t, wordLookup]);
+  }, [appLanguageId, languageId, t]);
 
   const modeLabelById = useMemo(() => ({
     letter_river: 'Letter River',
