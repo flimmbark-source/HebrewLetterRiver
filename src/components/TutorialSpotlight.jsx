@@ -101,6 +101,8 @@ export default function TutorialSpotlight({
   useLayoutEffect(() => {
     if (!calloutRef.current) return;
 
+    let ro = null;
+
     const measure = () => {
       const h = calloutRef.current?.getBoundingClientRect?.().height || 0;
       setCalloutHeight(h);
@@ -108,13 +110,15 @@ export default function TutorialSpotlight({
 
     measure();
 
-    const ro = new ResizeObserver(measure);
-    ro.observe(calloutRef.current);
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(measure);
+      ro.observe(calloutRef.current);
+    }
 
     window.addEventListener('resize', measure);
 
     return () => {
-      ro.disconnect();
+      if (ro) ro.disconnect();
       window.removeEventListener('resize', measure);
     };
   }, [stepIndex, step?.title, step?.description, step?.waitForAction]);
@@ -155,7 +159,7 @@ export default function TutorialSpotlight({
     mutationObserver.observe(document.body, { childList: true, subtree: true });
 
     const elementNow = document.querySelector(step.targetSelector);
-    if (elementNow) {
+    if (typeof ResizeObserver !== 'undefined' && elementNow) {
       observer = new ResizeObserver(measureElement);
       observer.observe(elementNow);
     }
