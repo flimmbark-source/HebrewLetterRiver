@@ -196,9 +196,17 @@ export default function SettingsView() {
 
   const getInfoHandlers = (settingKey) => ({
     onMouseEnter: (event) => showInfo(settingKey, event),
-    onClick: (event) => showInfo(settingKey, event),
+    onClick: (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      showInfo(settingKey, event);
+    },
     onMouseLeave: () => setShowInfoPopup(false),
-    onTouchStart: (event) => showInfo(settingKey, event)
+    onTouchStart: (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      showInfo(settingKey, event);
+    }
   });
 
   return (
