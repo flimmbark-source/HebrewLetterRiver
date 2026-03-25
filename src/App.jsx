@@ -244,6 +244,32 @@ function Shell() {
   const [inDeepScript, setInDeepScript] = React.useState(false);
   const location = useLocation();
 
+  React.useEffect(() => {
+    const applyThemeFromSettings = () => {
+      try {
+        const saved = localStorage.getItem('gameSettings');
+        const parsed = saved ? JSON.parse(saved) : {};
+        const darkModeEnabled = !!(parsed.darkMode ?? parsed.highContrast ?? false);
+        document.body.classList.toggle('dark-mode', darkModeEnabled);
+      } catch (error) {
+        console.error('Failed to apply theme from game settings', error);
+      }
+    };
+
+    const handleStorage = (event) => {
+      if (event.key === 'gameSettings') applyThemeFromSettings();
+    };
+
+    applyThemeFromSettings();
+    window.addEventListener('gameSettingsChanged', applyThemeFromSettings);
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      window.removeEventListener('gameSettingsChanged', applyThemeFromSettings);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
+
 
   // Check if we're in conversation practice or deep script mode
   React.useEffect(() => {
