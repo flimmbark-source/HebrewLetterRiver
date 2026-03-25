@@ -7,9 +7,12 @@ import {
   isPackUnlocked,
   getSectionProgress,
   isSectionUnlocked,
-  getReviewEligibleWordIds,
+  getDueReviewWordIds,
+  getWeakWordIds,
   getAllPackCompletions,
 } from '../../lib/bridgeBuilderStorage.js';
+import { getRecommendedSessionForPack } from '../../data/bridgeBuilderSessions.js';
+import { emit } from '../../lib/eventBus.js';
 import {
   getRecommendedPack,
   getPreviewPacks,
@@ -103,7 +106,7 @@ function StatusPill({ modifier, label }) {
 
 /* ─── Pack Row (used in preview + drawer) ────────────────── */
 
-function PackRow({ pack, progress, unlocked, completion, modeOverride, onDotClick, onPlay, compact = false }) {
+function PackRow({ pack, progress, unlocked, completion, modeOverride, onDotClick, onPlay, compact = false, entryPoint = 'guided' }) {
   const { wordsIntroducedCount, wordsLearnedCount, totalWords, completed } = progress;
   const statusInfo = getPackStatusInfo(progress, unlocked);
   const buttonLabel = getPackButtonLabel(progress);
@@ -112,11 +115,17 @@ function PackRow({ pack, progress, unlocked, completion, modeOverride, onDotClic
     e.stopPropagation();
     if (!unlocked) return;
     const gameMode = resolveGameMode(completion, modeOverride);
+    const session = getRecommendedSessionForPack(pack);
     onPlay({
       sessionType: 'guided_pack',
       packId: pack.id,
-      selectedWordIds: pack.wordIds,
+      sessionId: session?.id || null,
+      selectedWordIds: session ? [...session.targetWordIds, ...session.supportWordIds] : pack.wordIds,
       gameMode,
+      entryPoint,
+      targetsNewCount: pack.targetsNewCount || pack.wordIds.length,
+      supportReviewCount: pack.supportReviewCount || 0,
+      estimatedTimeSec: pack.estimatedTimeSec || 0,
     });
   };
 
@@ -142,8 +151,10 @@ function PackRow({ pack, progress, unlocked, completion, modeOverride, onDotClic
           <span className="bbs-pack-chip">{pack.primaryType || 'mixed'}</span>
           <span className="bbs-pack-chip">{pack.difficultyBand || 'Core'}</span>
           <span className="bbs-pack-chip">{pack.targetsNewCount || pack.wordIds.length} new</span>
+          <span className="bbs-pack-chip">{pack.supportReviewCount || 0} review</span>
           <span className="bbs-pack-chip">{formatEstimatedMinutes(pack.estimatedTimeSec)}</span>
         </div>
+        {!compact && <div className="bbs-pack-why">{pack.whyItMatters}</div>}
         <div className="bbs-pack-row-bottom">
           <ProgressDots
             completion={completion}
@@ -174,11 +185,17 @@ function QuickStartCard({ packData, modeOverride, onDotClick, onPlay }) {
     e.stopPropagation();
     if (!unlocked) return;
     const gameMode = resolveGameMode(completion, modeOverride);
+    const session = getRecommendedSessionForPack(pack);
     onPlay({
       sessionType: 'guided_pack',
       packId: pack.id,
-      selectedWordIds: pack.wordIds,
+      sessionId: session?.id || null,
+      selectedWordIds: session ? [...session.targetWordIds, ...session.supportWordIds] : pack.wordIds,
       gameMode,
+      entryPoint: 'guided_recommended',
+      targetsNewCount: pack.targetsNewCount || pack.wordIds.length,
+      supportReviewCount: pack.supportReviewCount || 0,
+      estimatedTimeSec: pack.estimatedTimeSec || 0,
     });
   };
 
@@ -196,8 +213,10 @@ function QuickStartCard({ packData, modeOverride, onDotClick, onPlay }) {
             <span className="bbs-pack-chip">{pack.primaryType || 'mixed'}</span>
             <span className="bbs-pack-chip">{pack.difficultyBand || 'Core'}</span>
             <span className="bbs-pack-chip">{pack.targetsNewCount || pack.wordIds.length} new</span>
+            <span className="bbs-pack-chip">{pack.supportReviewCount || 0} review</span>
             <span className="bbs-pack-chip">{formatEstimatedMinutes(pack.estimatedTimeSec)}</span>
           </div>
+          <div className="bbs-pack-why">{pack.whyItMatters}</div>
           <div className="bbs-quickstart-bottom">
             <ProgressDots
               completion={completion}
@@ -329,8 +348,8 @@ function SectionCard({ section, sectionProgress, unlocked, expanded, onToggle })
 
 /* ─── Random Review Card ──────────────────────────────────── */
 
-function ReviewCard({ eligibleCount, onPlay }) {
-  const available = eligibleCount > 0;
+function ReviewCard({ dueCount, weakCount, onPlay }) {
+  const available = dueCount > 0 || weakCount > 0;
 
   let cardCls = 'bbs-review-card';
   if (!available) cardCls += ' bbs-review-card--disabled';
@@ -342,10 +361,10 @@ function ReviewCard({ eligibleCount, onPlay }) {
           <span className="material-symbols-outlined" style={{ fontSize: 36, color: 'var(--m3-primary)', fontVariationSettings: "'FILL' 1" }}>casino</span>
         </div>
         <div className="bbs-review-info">
-          <h3 className="bbs-review-title">Random Review</h3>
+          <h3 className="bbs-review-title">Review Due Now</h3>
           <p className="bbs-review-desc">
             {available
-              ? 'Test your knowledge across all categories with a curated shuffle.'
+              ? `${dueCount} due · ${weakCount} weak items`
               : 'Complete a pack first to unlock review.'}
           </p>
         </div>
@@ -355,7 +374,7 @@ function ReviewCard({ eligibleCount, onPlay }) {
           onClick={() => available && onPlay()}
           disabled={!available}
         >
-          Start Review
+          Start Due Review
         </button>
       </div>
     </div>
@@ -365,17 +384,18 @@ function ReviewCard({ eligibleCount, onPlay }) {
 /* ─── Main Setup Screen ──────────────────────────────────── */
 
 export default function BridgeBuilderSetup({ onPlay, onBack }) {
-  const [browseMode, setBrowseMode] = useState('guided');
   const [goalFilter, setGoalFilter] = useState('all');
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState('recommended');
+  const [activeSubview, setActiveSubview] = useState(null); // goal | expert | null
   const [expandedSection, setExpandedSection] = useState(null);
   const [drawerSectionId, setDrawerSectionId] = useState(null);
   const [modeOverrides, setModeOverrides] = useState({});
 
   const sections = useMemo(() => getSectionsInOrder(), []);
   const allProgress = useMemo(() => getAllWordProgress(), []);
-  const reviewWordIds = useMemo(() => getReviewEligibleWordIds(), []);
+  const dueReviewWordIds = useMemo(() => getDueReviewWordIds(), []);
+  const weakWordIds = useMemo(() => getWeakWordIds(), []);
   const packCompletions = useMemo(() => getAllPackCompletions(), []);
 
   const sectionData = useMemo(() => {
@@ -410,17 +430,21 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   }, []);
 
   const handlePlayPack = useCallback((sessionConfig) => {
+    emit('analytics:bridge_setup', { event: 'session_start', ...sessionConfig });
     onPlay(sessionConfig);
   }, [onPlay]);
 
   const handlePlayReview = useCallback(() => {
+    const reviewIds = dueReviewWordIds.length > 0 ? dueReviewWordIds : weakWordIds;
+    emit('analytics:bridge_setup', { event: 'review_start', dueCount: dueReviewWordIds.length, weakCount: weakWordIds.length });
     onPlay({
-      sessionType: 'random_review',
+      sessionType: 'due_review',
       packId: null,
-      selectedWordIds: reviewWordIds,
+      selectedWordIds: reviewIds,
       gameMode: 'bridge_builder',
+      entryPoint: 'review_due',
     });
-  }, [onPlay, reviewWordIds]);
+  }, [onPlay, dueReviewWordIds, weakWordIds]);
 
   const handleOpenDrawer = useCallback((sectionId) => {
     setDrawerSectionId(sectionId);
@@ -457,20 +481,42 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
           <p className="bbs-subtitle">Master your Hebrew journey through themed categories.</p>
         </div>
         <div className="bbs-mode-tabs" role="tablist" aria-label="Browse modes">
-          <button type="button" className={`bbs-mode-tab ${browseMode === 'guided' ? 'active' : ''}`} onClick={() => setBrowseMode('guided')}>Guided</button>
-          <button type="button" className={`bbs-mode-tab ${browseMode === 'goal' ? 'active' : ''}`} onClick={() => setBrowseMode('goal')}>Goal-based</button>
-          <button type="button" className={`bbs-mode-tab ${browseMode === 'expert' ? 'active' : ''}`} onClick={() => setBrowseMode('expert')}>Expert</button>
+          <button
+            type="button"
+            className={`bbs-mode-tab ${activeSubview === null ? 'active' : ''}`}
+            onClick={() => setActiveSubview(null)}
+          >
+            Guided
+          </button>
+          <button
+            type="button"
+            className={`bbs-mode-tab ${activeSubview === 'goal' ? 'active' : ''}`}
+            onClick={() => { setActiveSubview('goal'); emit('analytics:bridge_setup', { event: 'open_goal_browse' }); }}
+          >
+            Browse by goal
+          </button>
+          <button
+            type="button"
+            className={`bbs-mode-tab ${activeSubview === 'expert' ? 'active' : ''}`}
+            onClick={() => { setActiveSubview('expert'); emit('analytics:bridge_setup', { event: 'open_expert_browse' }); }}
+          >
+            Advanced tools
+          </button>
         </div>
-        {browseMode === 'goal' && (
+        {activeSubview === 'goal' && (
           <div className="bbs-mode-panel">
             <h3 className="bbs-mode-title">What do you want to do today?</h3>
+            <button type="button" className="bbs-subview-close" onClick={() => setActiveSubview(null)}>Back to guided</button>
             <div className="bbs-goal-filters">
               {GOAL_FILTERS.map(goal => (
                 <button
                   key={goal.id}
                   type="button"
                   className={`bbs-goal-chip ${goalFilter === goal.id ? 'active' : ''}`}
-                  onClick={() => setGoalFilter(goal.id)}
+                  onClick={() => {
+                    setGoalFilter(goal.id);
+                    emit('analytics:bridge_setup', { event: 'goal_filter_change', goalId: goal.id });
+                  }}
                 >
                   {goal.label}
                 </button>
@@ -488,24 +534,33 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                   onDotClick={handleDotClick}
                   onPlay={handlePlayPack}
                   compact
+                  entryPoint="goal_browse"
                 />
               ))}
             </div>
           </div>
         )}
-        {browseMode === 'expert' && (
+        {activeSubview === 'expert' && (
           <div className="bbs-mode-panel">
             <h3 className="bbs-mode-title">Search & filter your library</h3>
+            <button type="button" className="bbs-subview-close" onClick={() => setActiveSubview(null)}>Back to guided</button>
             <div className="bbs-expert-controls">
               <input
                 type="search"
                 className="bbs-search"
                 placeholder="Search packs or goals"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  emit('analytics:bridge_setup', { event: 'expert_search_change', queryLength: e.target.value.length });
+                }}
               />
-              <select className="bbs-sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="recommended">Recommended order</option>
+              <select className="bbs-sort" value={sortBy} onChange={(e) => {
+                setSortBy(e.target.value);
+                emit('analytics:bridge_setup', { event: 'expert_sort_change', sortBy: e.target.value });
+                e.target.blur();
+              }}>
+                <option value="recommended">Recommended</option>
                 <option value="time">Shortest time</option>
                 <option value="difficulty">Difficulty</option>
               </select>
@@ -522,12 +577,13 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                   onDotClick={handleDotClick}
                   onPlay={handlePlayPack}
                   compact
+                  entryPoint="expert_browse"
                 />
               ))}
             </div>
           </div>
         )}
-        {browseMode === 'guided' && (
+        {activeSubview === null && (
           <>
         {sectionData.map(({ section, sectionProgress, unlocked, packData }) => {
           const recommended = getRecommendedPack(packData);
@@ -606,10 +662,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
         )}
 
         {/* Random Review */}
-        <ReviewCard
-          eligibleCount={reviewWordIds.length}
-          onPlay={handlePlayReview}
-        />
+        <ReviewCard dueCount={dueReviewWordIds.length} weakCount={weakWordIds.length} onPlay={handlePlayReview} />
       </div>
 
       {/* Bottom Drawer */}

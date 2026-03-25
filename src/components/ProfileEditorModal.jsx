@@ -27,7 +27,7 @@ export default function ProfileEditorModal({ isOpen, initialName, initialAvatar,
             value={name}
             onChange={(event) => setName(event.target.value)}
             maxLength={30}
-            className="w-full rounded-xl border border-[#bec9c2] px-3 py-2 font-semibold text-[#1d1a22]"
+            className="w-full rounded-xl border border-[#bec9c2] bg-white px-3 py-2 font-semibold text-[#1d1a22]"
           />
         </label>
 

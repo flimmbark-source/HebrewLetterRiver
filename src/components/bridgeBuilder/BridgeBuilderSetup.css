@@ -74,6 +74,10 @@ body.dark-mode .bbs-mode-title {
   color: #f8fafc;
 }
 
+body.dark-mode .bbs-subview-close {
+  color: #34d399;
+}
+
 body.dark-mode .bbs-goal-chip,
 body.dark-mode .bbs-search,
 body.dark-mode .bbs-sort {
@@ -90,6 +94,10 @@ body.dark-mode .bbs-goal-chip.active {
 body.dark-mode .bbs-pack-chip {
   background: #1e293b;
   color: #cbd5e1;
+}
+
+body.dark-mode .bbs-pack-why {
+  color: #94a3b8;
 }
 
 body.dark-mode .bbs-section-card {
@@ -388,6 +396,16 @@ body.dark-mode .bbs-section-title {
   font-size: 16px;
 }
 
+.bbs-subview-close {
+  border: none;
+  background: transparent;
+  color: var(--m3-primary);
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  padding: 0;
+}
+
 .bbs-goal-filters {
   display: flex;
   gap: 8px;
@@ -422,6 +440,14 @@ body.dark-mode .bbs-section-title {
   border-radius: 12px;
   padding: 10px 12px;
   background: #fff;
+  min-width: 0;
+  width: 100%;
+}
+
+@media (max-width: 560px) {
+  .bbs-expert-controls {
+    grid-template-columns: 1fr;
+  }
 }
 
 .bbs-pack-meta {
@@ -438,6 +464,12 @@ body.dark-mode .bbs-section-title {
   border-radius: 999px;
   background: var(--m3-surface-container-high);
   color: var(--m3-on-surface-variant);
+}
+
+.bbs-pack-why {
+  font-size: 12px;
+  color: var(--m3-on-surface-variant);
+  margin-top: 2px;
 }
 
 /* ─── Scrollable content ──────────────────────────────────── */

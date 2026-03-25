@@ -164,6 +164,43 @@ export function getReviewEligibleWordIds() {
     .map(wp => wp.wordId);
 }
 
+/**
+ * Return introduced words that should be reviewed now.
+ * Lightweight heuristic until full SRS scheduling is wired:
+ * - practicing words due after 12h
+ * - learned words due after 72h
+ * - meaning_taught words due immediately
+ */
+export function getDueReviewWordIds(now = Date.now()) {
+  const allProgress = getAllWordProgress();
+  return Object.values(allProgress)
+    .filter((wp) => wp.meaningIntroduced && wp.masteryStage !== 'new')
+    .filter((wp) => {
+      if (!wp.lastSeenAt) return true;
+      const elapsed = now - new Date(wp.lastSeenAt).getTime();
+      if (wp.masteryStage === 'meaning_taught') return true;
+      if (wp.masteryStage === 'practicing') return elapsed >= 12 * 60 * 60 * 1000;
+      return elapsed >= 72 * 60 * 60 * 1000;
+    })
+    .map((wp) => wp.wordId);
+}
+
+/**
+ * Return introduced words with weak accuracy.
+ */
+export function getWeakWordIds(minAttempts = 3, threshold = 0.65) {
+  const allProgress = getAllWordProgress();
+  return Object.values(allProgress)
+    .filter((wp) => wp.meaningIntroduced && wp.masteryStage !== 'new')
+    .filter((wp) => {
+      const totalAttempts = wp.transliterationAttempts + wp.meaningAttempts;
+      if (totalAttempts < minAttempts) return false;
+      const correct = wp.transliterationCorrect + wp.meaningCorrect;
+      return (correct / totalAttempts) < threshold;
+    })
+    .map((wp) => wp.wordId);
+}
+
 /* ═══════════════════════════════════════════════════════════
    Section progress — derived from pack progress
    ═══════════════════════════════════════════════════════════ */
