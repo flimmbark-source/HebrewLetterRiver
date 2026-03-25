@@ -73,8 +73,32 @@ export default function HomeView() {
   const levelProgress = player.levelProgress ?? (totalStarsEarned % starsPerLevel);
   const progressPct = starsPerLevel > 0 ? Math.round(Math.min((levelProgress / starsPerLevel) * 100, 100)) : 0;
   const [isProfileEditorOpen, setIsProfileEditorOpen] = React.useState(false);
+  const [dailyGoalMinutes, setDailyGoalMinutes] = React.useState(15);
+  const [reminderTime, setReminderTime] = React.useState('20:00');
+  const [isEditingGoal, setIsEditingGoal] = React.useState(false);
+  const [isEditingReminder, setIsEditingReminder] = React.useState(false);
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
+
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem('homePreferences');
+      if (!saved) return;
+      const parsed = JSON.parse(saved);
+      setDailyGoalMinutes(Math.max(5, Math.min(180, parsed.dailyGoalMinutes ?? 15)));
+      setReminderTime(parsed.reminderTime ?? '20:00');
+    } catch (error) {
+      console.error('Failed to load home preferences', error);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('homePreferences', JSON.stringify({ dailyGoalMinutes, reminderTime }));
+    } catch (error) {
+      console.error('Failed to save home preferences', error);
+    }
+  }, [dailyGoalMinutes, reminderTime]);
 
   return (
     <div className="relative min-h-screen bg-[#fef7ff] text-[#1d1a22]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
@@ -130,17 +154,54 @@ export default function HomeView() {
 
         <section className="grid grid-cols-2 gap-4">
           <div className="space-y-3 rounded-2xl bg-[#f9f1fd] p-6">
-            <Icon className="text-3xl text-[#855315]" filled>bolt</Icon>
+            <div className="flex items-start justify-between gap-2">
+              <Icon className="text-3xl text-[#855315]" filled>bolt</Icon>
+              <button type="button" className="rounded-full bg-white/70 p-1 text-[#6f7973]" onClick={() => setIsEditingGoal((prev) => !prev)}>
+                <Icon className="text-sm">edit</Icon>
+              </button>
+            </div>
             <div>
               <h3 className="leading-tight font-bold">Daily Goal</h3>
-              <p className="text-sm text-[#4a6365]">15 mins / day</p>
+              {isEditingGoal ? (
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={5}
+                    max={180}
+                    value={dailyGoalMinutes}
+                    onChange={(event) => setDailyGoalMinutes(Math.max(5, Math.min(180, Number(event.target.value) || 15)))}
+                    className="w-20 rounded-lg border border-[#bec9c2] bg-white px-2 py-1 text-sm font-semibold text-[#1d1a22]"
+                  />
+                  <span className="text-xs font-semibold text-[#4a6365]">mins/day</span>
+                </div>
+              ) : (
+                <p className="text-sm text-[#4a6365]">{dailyGoalMinutes} mins / day</p>
+              )}
             </div>
           </div>
           <div className="space-y-3 rounded-2xl bg-[#f9f1fd] p-6">
-            <Icon className="text-3xl text-[#1b6b4f]" filled>notifications</Icon>
+            <div className="flex items-start justify-between gap-2">
+              <Icon className="text-3xl text-[#1b6b4f]" filled>notifications</Icon>
+              <button type="button" className="rounded-full bg-white/70 p-1 text-[#6f7973]" onClick={() => setIsEditingReminder((prev) => !prev)}>
+                <Icon className="text-sm">edit</Icon>
+              </button>
+            </div>
             <div>
               <h3 className="leading-tight font-bold">Reminders</h3>
-              <p className="text-sm text-[#4a6365]">8:00 PM Daily</p>
+              {isEditingReminder ? (
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    type="time"
+                    value={reminderTime}
+                    onChange={(event) => setReminderTime(event.target.value)}
+                    className="rounded-lg border border-[#bec9c2] bg-white px-2 py-1 text-sm font-semibold text-[#1d1a22]"
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-[#4a6365]">
+                  {new Date(`2000-01-01T${reminderTime}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })} Daily
+                </p>
+              )}
             </div>
           </div>
         </section>
