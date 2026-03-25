@@ -19,6 +19,20 @@ import {
 } from './bridgeBuilderSetupHelpers.js';
 import './BridgeBuilderSetup.css';
 
+/* ─── Section visual metadata ──────────────────────────────── */
+
+const SECTION_META = {
+  foundations: { icon: 'school', accent: 'primary' },
+  daily_life: { icon: 'home', accent: 'secondary' },
+  people_social: { icon: 'groups', accent: 'tertiary' },
+  meaning_builders: { icon: 'auto_stories', accent: 'primary' },
+  cafe_talk: { icon: 'coffee', accent: 'secondary' },
+};
+
+function getSectionMeta(sectionId) {
+  return SECTION_META[sectionId] || { icon: 'category', accent: 'primary' };
+}
+
 /* ─── Status helpers ─────────────────────────────────────── */
 
 function getPackStatusInfo(progress, unlocked) {
@@ -234,23 +248,19 @@ function PackDrawer({ sectionTitle, packData, modeOverrides, onDotClick, onPlay,
 
 /* ─── Section Card ────────────────────────────────────────── */
 
-function SectionCard({ section, sectionProgress, unlocked, expanded, onToggle, recommendedPackTitle }) {
+function SectionCard({ section, sectionProgress, unlocked, expanded, onToggle }) {
   const { packsCompleted, totalPacks, wordsIntroducedCount } = sectionProgress;
+  const meta = getSectionMeta(section.id);
+  const accent = meta.accent;
 
-  let statusLabel;
-  let statusModifier;
+  const progressPercent = totalPacks > 0 ? (packsCompleted / totalPacks) * 100 : 0;
+
+  // Pack count label
+  let packCountLabel;
   if (!unlocked) {
-    statusLabel = 'Locked';
-    statusModifier = 'locked';
-  } else if (packsCompleted >= totalPacks) {
-    statusLabel = 'Completed';
-    statusModifier = 'completed';
-  } else if (wordsIntroducedCount > 0) {
-    statusLabel = `${packsCompleted}/${totalPacks} packs`;
-    statusModifier = 'progress';
+    packCountLabel = `${totalPacks} packs`;
   } else {
-    statusLabel = `${totalPacks} packs`;
-    statusModifier = 'new';
+    packCountLabel = `${packsCompleted}/${totalPacks} packs`;
   }
 
   let cardCls = 'bbs-section-card';
@@ -264,34 +274,38 @@ function SectionCard({ section, sectionProgress, unlocked, expanded, onToggle, r
       onClick={() => unlocked && onToggle(section.id)}
       disabled={!unlocked}
     >
-      <div className="bbs-section-icon">
-        {!unlocked ? '\ud83d\udd12' : packsCompleted >= totalPacks ? '\u2b50' : '\ud83d\udcd6'}
+      {/* Icon */}
+      <div className={`bbs-section-icon bbs-section-icon--${accent}`}>
+        <span className="material-symbols-outlined" style={{ fontSize: 30 }}>{meta.icon}</span>
       </div>
+
+      {/* Body */}
       <div className="bbs-section-info">
-        <div className="bbs-section-card-title">{section.title}</div>
-        <div className="bbs-section-desc">{section.description}</div>
-        <div className="bbs-section-meta">
-          <StatusPill modifier={statusModifier} label={statusLabel} />
-          {unlocked && recommendedPackTitle && (
-            <span className="bbs-section-continue">
-              Continue: <span className="bbs-section-continue-title">{recommendedPackTitle}</span>
+        <div className="bbs-section-top-row">
+          <h3 className="bbs-section-card-title">{section.title}</h3>
+          <span className={`bbs-pack-count-pill bbs-pack-count-pill--${accent}`}>
+            {packCountLabel}
+          </span>
+        </div>
+        <p className="bbs-section-desc">{section.description}</p>
+
+        {/* Bottom: progress bar + continue link */}
+        <div className="bbs-section-bottom">
+          <div className="bbs-progress-track">
+            <div
+              className={`bbs-progress-fill bbs-progress-fill--${accent}`}
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          {unlocked && (
+            <span className={`bbs-continue-link bbs-continue-link--${accent}`}>
+              {packsCompleted >= totalPacks ? 'Review' : 'Continue'}
+              {' '}
+              <span className="material-symbols-outlined" style={{ fontSize: 14 }}>arrow_forward</span>
             </span>
           )}
         </div>
       </div>
-      {unlocked && (
-        <div className={`bbs-section-chevron ${expanded ? 'bbs-section-chevron--open' : ''}`}>
-          {'\u25b8'}
-        </div>
-      )}
-      {unlocked && wordsIntroducedCount > 0 && (
-        <div className="bbs-section-bar">
-          <div
-            className="bbs-section-bar-fill"
-            style={{ width: `${(packsCompleted / totalPacks) * 100}%` }}
-          />
-        </div>
-      )}
     </button>
   );
 }
@@ -305,21 +319,29 @@ function ReviewCard({ eligibleCount, onPlay }) {
   if (!available) cardCls += ' bbs-review-card--disabled';
 
   return (
-    <button
-      type="button"
-      className={cardCls}
-      onClick={() => available && onPlay()}
-      disabled={!available}
-    >
-      <div className="bbs-review-info">
-        <div className="bbs-review-title">Random Review</div>
-        <div className="bbs-review-desc">
-          {available
-            ? `Practice ${eligibleCount} introduced word${eligibleCount !== 1 ? 's' : ''}`
-            : 'Complete a pack first to unlock review'}
+    <div className="bbs-review-wrap">
+      <div className={cardCls}>
+        <div className="bbs-review-icon-wrap">
+          <span className="material-symbols-outlined" style={{ fontSize: 36, color: 'var(--m3-primary)', fontVariationSettings: "'FILL' 1" }}>casino</span>
         </div>
+        <div className="bbs-review-info">
+          <h3 className="bbs-review-title">Random Review</h3>
+          <p className="bbs-review-desc">
+            {available
+              ? 'Test your knowledge across all categories with a curated shuffle.'
+              : 'Complete a pack first to unlock review.'}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="bbs-review-btn"
+          onClick={() => available && onPlay()}
+          disabled={!available}
+        >
+          Start Review
+        </button>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -396,6 +418,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
       {/* Header */}
       <div className="bbs-header">
         <h1 className="bbs-title">Vocab Builder</h1>
+        <p className="bbs-subtitle">Master your Hebrew journey through themed categories.</p>
       </div>
 
       {/* Scrollable content */}
@@ -416,7 +439,6 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                 unlocked={unlocked}
                 expanded={isExpanded}
                 onToggle={handleToggleSection}
-                recommendedPackTitle={recommended ? recommended.pack.title : null}
               />
               {isExpanded && recommended && (
                 <div className="bbs-expanded-area">
@@ -476,13 +498,10 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
         })}
 
         {/* Random Review */}
-        <section className="bbs-section">
-          <div className="bbs-section-title">Review</div>
-          <ReviewCard
-            eligibleCount={reviewWordIds.length}
-            onPlay={handlePlayReview}
-          />
-        </section>
+        <ReviewCard
+          eligibleCount={reviewWordIds.length}
+          onPlay={handlePlayReview}
+        />
       </div>
 
       {/* Bottom Drawer */}
