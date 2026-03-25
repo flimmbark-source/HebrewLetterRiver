@@ -481,9 +481,27 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
           <p className="bbs-subtitle">Master your Hebrew journey through themed categories.</p>
         </div>
         <div className="bbs-mode-tabs" role="tablist" aria-label="Browse modes">
-          <button type="button" className="bbs-mode-tab active">Guided</button>
-          <button type="button" className="bbs-mode-tab" onClick={() => { setActiveSubview('goal'); emit('analytics:bridge_setup', { event: 'open_goal_browse' }); }}>Browse by goal</button>
-          <button type="button" className="bbs-mode-tab" onClick={() => { setActiveSubview('expert'); emit('analytics:bridge_setup', { event: 'open_expert_browse' }); }}>Advanced tools</button>
+          <button
+            type="button"
+            className={`bbs-mode-tab ${activeSubview === null ? 'active' : ''}`}
+            onClick={() => setActiveSubview(null)}
+          >
+            Guided
+          </button>
+          <button
+            type="button"
+            className={`bbs-mode-tab ${activeSubview === 'goal' ? 'active' : ''}`}
+            onClick={() => { setActiveSubview('goal'); emit('analytics:bridge_setup', { event: 'open_goal_browse' }); }}
+          >
+            Browse by goal
+          </button>
+          <button
+            type="button"
+            className={`bbs-mode-tab ${activeSubview === 'expert' ? 'active' : ''}`}
+            onClick={() => { setActiveSubview('expert'); emit('analytics:bridge_setup', { event: 'open_expert_browse' }); }}
+          >
+            Advanced tools
+          </button>
         </div>
         {activeSubview === 'goal' && (
           <div className="bbs-mode-panel">
