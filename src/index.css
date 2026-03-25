@@ -117,9 +117,14 @@ body.dark-mode {
 }
 
 /* Dark mode: override common hardcoded Tailwind colors in JSX views */
-body.dark-mode {
-  background: #020617;
+body.dark-mode,
+body.dark-mode.arcade-bg {
+  background: #020617 !important;
   color: #f8fafc;
+}
+
+html:has(body.dark-mode) {
+  background: #020617;
 }
 
 /* Backgrounds */
