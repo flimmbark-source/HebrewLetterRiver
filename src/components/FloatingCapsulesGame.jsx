@@ -418,6 +418,15 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
   }
 
   // Pointer event handlers - all capsule types are draggable
+  const safelySetPointerCapture = (target, pointerId) => {
+    if (!target || typeof target.setPointerCapture !== 'function' || pointerId == null) return;
+    try {
+      target.setPointerCapture(pointerId);
+    } catch {
+      // Some mobile browsers can throw if pointer capture is unsupported/interrupted.
+    }
+  };
+
   const handlePointerDown = useCallback((e, capsule, index) => {
     if (capsule.matched || !capsule.visible) return;
 
@@ -429,6 +438,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
     }
 
     e.preventDefault();
+    if (!playAreaRef.current) return;
+
     const rect = playAreaRef.current.getBoundingClientRect();
     dragStateRef.current = {
       isDragging: true,
@@ -439,7 +450,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       rafId: null,
     };
 
-    e.target.setPointerCapture(e.pointerId);
+    safelySetPointerCapture(e.currentTarget, e.pointerId);
     // Force one re-render so the dragging class is applied
     forceUpdate(n => n + 1);
   }, [gameStarted]);
@@ -447,6 +458,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
   const handlePointerMove = useCallback((e) => {
     const drag = dragStateRef.current;
     if (!drag.isDragging) return;
+    if (!playAreaRef.current) return;
 
     const rect = playAreaRef.current.getBoundingClientRect();
     const index = drag.capsuleIndex;
@@ -465,6 +477,19 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
         el.style.top = `${capsule.y}px`;
       }
     });
+  }, []);
+
+  const resetDragState = useCallback(() => {
+    dragStateRef.current.isDragging = false;
+    dragStateRef.current.capsuleIndex = null;
+    dragStateRef.current.capsuleType = null;
+    dragStateRef.current.offsetX = 0;
+    dragStateRef.current.offsetY = 0;
+    if (dragStateRef.current.rafId) {
+      cancelAnimationFrame(dragStateRef.current.rafId);
+      dragStateRef.current.rafId = null;
+    }
+    forceUpdate(n => n + 1);
   }, []);
 
   const handlePointerUp = useCallback((e) => {
@@ -577,9 +602,13 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       }
     }
 
-    dragStateRef.current.isDragging = false;
-    forceUpdate(n => n + 1);
-  }, []);
+    resetDragState();
+  }, [resetDragState]);
+
+  const handlePointerCancel = useCallback(() => {
+    if (!dragStateRef.current.isDragging) return;
+    resetDragState();
+  }, [resetDragState]);
 
   // Draw canvas overlay for lines — draw ONCE per state change, no rAF loop
   useEffect(() => {
@@ -707,6 +736,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
         className="absolute inset-0"
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
       >
         {/* Ghost pairs — CSS-animated float-up, removed on animationend */}
         {ghostPairs.map((ghost, i) => (
