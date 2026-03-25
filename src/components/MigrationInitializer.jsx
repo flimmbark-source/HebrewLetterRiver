@@ -7,12 +7,25 @@ import { getOnlineStatusManager } from '../lib/offlineQueue';
  * Handles automatic migration from localStorage to IndexedDB
  */
 export default function MigrationInitializer({ children }) {
-  const [migrationComplete, setMigrationComplete] = useState(!needsMigration());
+  const [migrationComplete, setMigrationComplete] = useState(true);
   const [migrationError, setMigrationError] = useState(null);
 
   useEffect(() => {
     async function runMigration() {
-      if (!needsMigration()) {
+      setMigrationComplete(false);
+
+      let shouldMigrate = false;
+
+      try {
+        shouldMigrate = needsMigration();
+      } catch (error) {
+        console.warn('[Migration] Failed to check migration status, continuing without migration:', error);
+        setMigrationError(error.message);
+        setMigrationComplete(true);
+        return;
+      }
+
+      if (!shouldMigrate) {
         console.log('[Migration] No migration needed, current version:', getMigrationVersion());
         setMigrationComplete(true);
         return;
