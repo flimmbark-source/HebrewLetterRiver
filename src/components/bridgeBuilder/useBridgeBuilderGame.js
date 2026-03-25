@@ -27,7 +27,6 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
   bridgeBuilderWords,
-  getTransliterationDistractors,
   getTranslationDistractors,
 } from '../../data/bridgeBuilderWords.js';
 import {
@@ -41,6 +40,7 @@ import { emit } from '../../lib/eventBus.js';
 const MAX_HEARTS = 3;
 const TRANSLIT_CHOICES = 3;
 const MEANING_CHOICES = 3;
+const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
 
 function shuffle(arr) {
   const a = [...arr];
@@ -82,8 +82,44 @@ function pickNextWord(sessionStates, allWords, lastWordId) {
 }
 
 function buildTransliterationChoices(word) {
-  const distractors = getTransliterationDistractors(word.id, TRANSLIT_CHOICES - 1);
+  const distractors = buildMisspelledTransliterationDistractors(
+    word.transliteration,
+    TRANSLIT_CHOICES - 1
+  );
   return shuffle([word.transliteration, ...distractors]);
+}
+
+function buildMisspelledTransliterationDistractors(correctTransliteration, count) {
+  const trimmed = (correctTransliteration || '').trim();
+  if (!trimmed) return [];
+
+  const availableIndexes = [...trimmed]
+    .map((char, index) => ({ char, index }))
+    .filter(({ char }) => /[a-z]/i.test(char))
+    .map(({ index }) => index);
+
+  if (availableIndexes.length === 0) return [];
+
+  const distractors = new Set();
+  const maxAttempts = 60;
+
+  for (let i = 0; i < maxAttempts && distractors.size < count; i++) {
+    const chars = [...trimmed];
+    const typoCount = availableIndexes.length > 4 && Math.random() < 0.5 ? 2 : 1;
+    const chosen = shuffle(availableIndexes).slice(0, typoCount);
+
+    for (const idx of chosen) {
+      const original = chars[idx].toLowerCase();
+      const replacementPool = LETTERS.replace(original, '');
+      const replacement = replacementPool[Math.floor(Math.random() * replacementPool.length)];
+      chars[idx] = chars[idx] === chars[idx].toUpperCase() ? replacement.toUpperCase() : replacement;
+    }
+
+    const typo = chars.join('');
+    if (typo !== trimmed) distractors.add(typo);
+  }
+
+  return [...distractors].slice(0, count);
 }
 
 function buildMeaningChoices(word) {
