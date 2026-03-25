@@ -94,33 +94,36 @@
 }
 
 .play-mode-card--river {
-  background: #f9f1fd;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  background: #e0f2f1;
+  border: 1px solid #a7d8d0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .play-mode-card--river:hover {
-  background: #f3ebf7;
-  box-shadow: 0 4px 12px rgba(27, 107, 79, 0.08);
+  background: #ccebe8;
+  box-shadow: 0 4px 12px rgba(27, 107, 79, 0.12);
 }
 
 .play-mode-card--bridge {
-  background: #f9f1fd;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  background: #fef3e2;
+  border: 1px solid #e8c992;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .play-mode-card--bridge:hover {
-  background: #f3ebf7;
-  box-shadow: 0 4px 12px rgba(27, 107, 79, 0.08);
+  background: #fde9cc;
+  box-shadow: 0 4px 12px rgba(133, 83, 21, 0.12);
 }
 
 .play-mode-card--deep {
-  background: #f9f1fd;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  background: #ede6f1;
+  border: 1px solid #c5b3d6;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .play-mode-card--deep:hover {
-  background: #f3ebf7;
-  box-shadow: 0 4px 12px rgba(27, 107, 79, 0.08);
+  background: #e2d8ed;
+  box-shadow: 0 4px 12px rgba(74, 99, 101, 0.12);
 }
 
 .play-mode-icon {
