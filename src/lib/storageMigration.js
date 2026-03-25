@@ -14,22 +14,36 @@ const CURRENT_MIGRATION_VERSION = 1;
  * Check if migration is needed
  */
 export function needsMigration() {
-  const currentVersion = parseInt(localStorage.getItem(MIGRATION_VERSION_KEY) || '0', 10);
-  return currentVersion < CURRENT_MIGRATION_VERSION;
+  try {
+    const currentVersion = parseInt(localStorage.getItem(MIGRATION_VERSION_KEY) || '0', 10);
+    return currentVersion < CURRENT_MIGRATION_VERSION;
+  } catch (error) {
+    console.warn('[Migration] Unable to determine migration status, skipping migration check:', error);
+    return false;
+  }
 }
 
 /**
  * Get migration status
  */
 export function getMigrationVersion() {
-  return parseInt(localStorage.getItem(MIGRATION_VERSION_KEY) || '0', 10);
+  try {
+    return parseInt(localStorage.getItem(MIGRATION_VERSION_KEY) || '0', 10);
+  } catch (error) {
+    console.warn('[Migration] Unable to read migration version, defaulting to 0:', error);
+    return 0;
+  }
 }
 
 /**
  * Set migration version
  */
 function setMigrationVersion(version) {
-  localStorage.setItem(MIGRATION_VERSION_KEY, version.toString());
+  try {
+    localStorage.setItem(MIGRATION_VERSION_KEY, version.toString());
+  } catch (error) {
+    console.warn('[Migration] Unable to persist migration version:', error);
+  }
 }
 
 /**
