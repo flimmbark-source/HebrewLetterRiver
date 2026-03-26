@@ -250,7 +250,7 @@ export default function HomeView() {
   }, [dailyGoalMinutes, reminderTime]);
 
   return (
-    <div className="relative min-h-screen bg-[#fef7ff] text-[#1d1a22]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+    <div className="relative min-h-screen bg-[#fef7ff] text-[#1d1a22]">
       <main className="mx-auto max-w-2xl space-y-8 px-6 pb-48 pt-8">
         <section>
           <div className="flex flex-col items-center space-y-4 rounded-2xl border border-[#1b6b4f]/5 bg-white p-8 text-center shadow-sm">
