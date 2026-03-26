@@ -19,6 +19,7 @@ import OfflineIndicator from './components/OfflineIndicator.jsx';
 import MigrationInitializer from './components/MigrationInitializer.jsx';
 import PWAInstallPrompt from './components/PWAInstallPrompt.jsx';
 import PlayModeModal from './components/PlayModeModal.jsx';
+import { useFontSettings } from './hooks/useFontSettings.js';
 
 function HomeIcon(props) {
   return (
@@ -243,6 +244,7 @@ function Shell() {
   const [inConversationPractice, setInConversationPractice] = React.useState(false);
   const [inDeepScript, setInDeepScript] = React.useState(false);
   const location = useLocation();
+  const { appFontClass } = useFontSettings();
 
   React.useEffect(() => {
     const applyThemeFromSettings = () => {
@@ -316,7 +318,7 @@ function Shell() {
   }, [isGameVisible, closeGame, showPlayModal, setShowPlayModal]);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${appFontClass}`}>
       <LanguageOnboardingModal />
       <OfflineIndicator />
       <PWAInstallPrompt />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useBridgeBuilderGame from './useBridgeBuilderGame.js';
+import { useFontSettings } from '../../hooks/useFontSettings.js';
 import './BridgeBuilder.css';
 
 /* ─── HUD (compact strip) ──────────────────────────────── */
@@ -27,7 +28,7 @@ function HUD({ score, streak, hearts, maxHearts, completedCount, totalWords }) {
 
 /* ─── Bridge Slot — the two plank positions between the rails ─── */
 
-function BridgeSlot({ segment, slideState }) {
+function BridgeSlot({ segment, slideState, getFontClass }) {
   const hasTranslit = segment && segment.transliteration;
   const hasMeaning = segment && segment.translation;
 
@@ -38,7 +39,7 @@ function BridgeSlot({ segment, slideState }) {
         {hasTranslit ? (
           <div className="bb-placed bb-placed--translit bb-placed--drop" key={segment.transliteration}>
             <span className="bb-placed-grain" />
-            <span className="bb-placed-text">{segment.transliteration}</span>
+            <span className={`bb-placed-text ${getFontClass(`${segment?.wordId || 'slot'}-translit`)}`}>{segment.transliteration}</span>
           </div>
         ) : (
           <div className="bb-gap">
@@ -52,7 +53,7 @@ function BridgeSlot({ segment, slideState }) {
         {hasMeaning ? (
           <div className="bb-placed bb-placed--meaning bb-placed--drop" key={segment.translation}>
             <span className="bb-placed-grain" />
-            <span className="bb-placed-text">{segment.translation}</span>
+            <span className={`bb-placed-text ${getFontClass(`${segment?.wordId || 'slot'}-meaning`)}`}>{segment.translation}</span>
           </div>
         ) : (
           <div className="bb-gap">
@@ -66,7 +67,7 @@ function BridgeSlot({ segment, slideState }) {
 
 /* ─── Choice Plank ─────────────────────────────────────── */
 
-function ChoicePlank({ text, onClick, state, disabled, variant, exiting }) {
+function ChoicePlank({ text, onClick, state, disabled, variant, exiting, fontClass = '' }) {
   let cls = 'bb-choice';
   if (variant === 'teach') cls += ' bb-choice--teach';
   if (state === 'correct') cls += ' bb-choice--correct';
@@ -76,14 +77,14 @@ function ChoicePlank({ text, onClick, state, disabled, variant, exiting }) {
   return (
     <button className={cls} onClick={onClick} disabled={disabled} type="button">
       <span className="bb-choice-grain" />
-      <span className="bb-choice-text">{text}</span>
+      <span className={`bb-choice-text ${fontClass}`}>{text}</span>
     </button>
   );
 }
 
 /* ─── End Screen ───────────────────────────────────────── */
 
-function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack, onNext }) {
+function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack, onNext, getFontClass }) {
   // Deduplicate segments by wordId — words may appear multiple times
   // during a session (learn + recall), but show each only once on results
   const uniqueSegments = [];
@@ -104,9 +105,9 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack, onNex
         <div className="bb-end-bridge-mini">
           {uniqueSegments.map((seg, i) => (
             <div key={i} className="bb-end-seg">
-              <span className="bb-end-plank bb-end-plank--t">{seg.transliteration}</span>
+              <span className={`bb-end-plank bb-end-plank--t ${getFontClass(`${seg.wordId}-end-translit`)}`}>{seg.transliteration}</span>
               {seg.translation && (
-                <span className="bb-end-plank bb-end-plank--m">{seg.translation}</span>
+                <span className={`bb-end-plank bb-end-plank--m ${getFontClass(`${seg.wordId}-end-meaning`)}`}>{seg.translation}</span>
               )}
             </div>
           ))}
@@ -133,6 +134,7 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack, onNex
 /* ─── Main ─────────────────────────────────────────────── */
 
 export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComplete, onNext }) {
+  const { getGameFontClass } = useFontSettings();
   const {
     phase,
     currentWord,
@@ -215,6 +217,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComple
           onRestart={restartGame}
           onBack={onBack}
           onNext={onNext}
+          getFontClass={getGameFontClass}
         />
       </div>
     );
@@ -245,7 +248,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComple
       <div className="bb-prompt-zone">
         {currentWord && (
           <div className={`bb-prompt ${promptVisible ? 'bb-prompt--visible' : ''}`}>
-            <span className="bb-prompt-hebrew">{currentWord.hebrew}</span>
+            <span className={`bb-prompt-hebrew ${getGameFontClass(`${currentWord.id}-hebrew`)}`}>{currentWord.hebrew}</span>
           </div>
         )}
       </div>
@@ -266,7 +269,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComple
           {/* Bridge: rails + slot centered between them */}
           <div className="bb-bridge">
             <div className="bb-rail bb-rail--top" />
-            <BridgeSlot segment={displaySegment} slideState={slideState} />
+            <BridgeSlot segment={displaySegment} slideState={slideState} getFontClass={getGameFontClass} />
             <div className="bb-rail bb-rail--bottom" />
           </div>
         </div>
@@ -285,6 +288,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComple
               <ChoicePlank
                 key={c}
                 text={c}
+                fontClass={getGameFontClass(`${currentWord?.id || 'word'}-translit-${c}`)}
                 onClick={() => handleTransliterationChoice(c)}
                 state={selectedChoice === c ? choiceResult : null}
                 disabled={disabled}
@@ -297,6 +301,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComple
           <div className="bb-planks bb-planks--enter" key={'teach-' + wordIndex}>
             <ChoicePlank
               text={currentWord.translation}
+              fontClass={getGameFontClass(`${currentWord.id}-teach-${currentWord.translation}`)}
               onClick={handleMeaningTeachPlace}
               variant="teach"
               state={null}
@@ -311,6 +316,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComple
               <ChoicePlank
                 key={c}
                 text={c}
+                fontClass={getGameFontClass(`${currentWord?.id || 'word'}-meaning-${c}`)}
                 onClick={() => handleMeaningChoice(c)}
                 state={selectedChoice === c ? choiceResult : null}
                 disabled={disabled}

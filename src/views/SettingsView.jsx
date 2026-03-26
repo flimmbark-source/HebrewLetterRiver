@@ -51,6 +51,7 @@ export default function SettingsView() {
   const [randomLetters, setRandomLetters] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [gameFont, setGameFont] = useState('default');
+  const [appFont, setAppFont] = useState('default');
   const [fontShuffle, setFontShuffle] = useState(false);
   const [slowRiver, setSlowRiver] = useState(false);
   const [clickMode, setClickMode] = useState(false);
@@ -73,7 +74,9 @@ export default function SettingsView() {
           setRandomLetters(settings.randomLetters ?? false);
           setReducedMotion(settings.reducedMotion ?? false);
           const savedFont = settings.gameFont === 'opendyslexic' ? 'lexend' : (settings.gameFont ?? 'default');
+          const savedAppFont = settings.appFont === 'opendyslexic' ? 'lexend' : (settings.appFont ?? 'default');
           setGameFont(savedFont);
+          setAppFont(savedAppFont);
           setFontShuffle(settings.fontShuffle ?? false);
           setSlowRiver(settings.slowRiver ?? false);
           setClickMode(settings.clickMode ?? false);
@@ -100,6 +103,7 @@ export default function SettingsView() {
         randomLetters,
         reducedMotion,
         gameFont,
+        appFont,
         fontShuffle,
         slowRiver,
         clickMode,
@@ -118,7 +122,7 @@ export default function SettingsView() {
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
-  }, [hasLoadedSettings, showIntroductions, darkMode, randomLetters, reducedMotion, gameFont, fontShuffle, slowRiver, clickMode, associationMode, startingLetters]);
+  }, [hasLoadedSettings, showIntroductions, darkMode, randomLetters, reducedMotion, gameFont, appFont, fontShuffle, slowRiver, clickMode, associationMode, startingLetters]);
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
   const totalStarsEarned = player.totalStarsEarned ?? player.stars ?? 0;
@@ -145,6 +149,10 @@ export default function SettingsView() {
     gameFont: {
       title: 'Game Font',
       description: 'Choose from different fonts, including dyslexia-friendly options, to improve readability and comfort.'
+    },
+    appFont: {
+      title: 'App Font',
+      description: 'Changes the interface font for the app UI only. Game mode text uses the separate Game Font setting.'
     },
     startingLetters: {
       title: 'Starting Letters',
@@ -313,6 +321,27 @@ export default function SettingsView() {
           <h3 className="px-2 text-sm font-bold uppercase tracking-widest text-[#4a6365]">Game Settings</h3>
           <div className="overflow-hidden rounded-xl bg-white shadow-sm">
             <div className="space-y-5 p-4">
+              <div className="rounded-lg border border-[#bec9c2]/25 p-4">
+                <Toggle id="settings-dark-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('darkMode')}>Dark Mode</span>} icon="dark_mode" checked={darkMode} onChange={setDarkMode} />
+              </div>
+
+              <div className="rounded-lg border border-[#bec9c2]/25">
+                <div className="border-b border-[#bec9c2]/20 px-4 py-3">
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-[#4a6365]">App Font</p>
+                </div>
+                <div className="flex items-center justify-between p-4 hover:bg-[#f9f1fd]">
+                  <div className="flex items-center gap-4">
+                    <Icon className="text-[#4a6365]">text_format</Icon>
+                    <span className="cursor-help font-semibold" {...getInfoHandlers('appFont')}>App Font</span>
+                  </div>
+                  <select id="settings-app-font-select" value={appFont} onChange={(event) => setAppFont(event.target.value)} className="rounded-md border border-[#bec9c2]/50 px-2 py-1 font-bold text-[#1b6b4f]">
+                    {fontOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
               <div className="rounded-lg border border-[#bec9c2]/25">
                 <div className="border-b border-[#bec9c2]/20 px-4 py-3">
                   <p className="text-xs font-extrabold uppercase tracking-wider text-[#4a6365]">Game Font</p>
@@ -368,9 +397,6 @@ export default function SettingsView() {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-[#bec9c2]/25 p-4">
-                <Toggle id="settings-dark-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('darkMode')}>Dark Mode</span>} icon="dark_mode" checked={darkMode} onChange={setDarkMode} />
-              </div>
             </div>
           </div>
         </section>
