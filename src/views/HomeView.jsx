@@ -75,7 +75,7 @@ function LanguageCard({ id, label, value, onChange, options, leading, trailing }
 }
 
 export default function HomeView() {
-  const { player, badges, starLevelSize, updatePlayerProfile } = useProgress();
+  const { player, starLevelSize, updatePlayerProfile } = useProgress();
   const { setShowPlayModal } = useGame();
   const { languageId, appLanguageId, languageOptions, selectLanguage, selectAppLanguage } = useLanguage();
   const { t } = useLocalization();
@@ -213,21 +213,18 @@ export default function HomeView() {
     };
 
     const totals = {};
-
-    Object.entries(badges ?? {}).forEach(([badgeId, state]) => {
-      const gameName = badgeGameById[badgeId] ?? 'Letter River';
-      const unclaimedRewards = Array.isArray(state?.unclaimed) ? state.unclaimed : [];
-
-      unclaimedRewards.forEach((reward) => {
-        const earnedAtMs = reward?.earnedAt ? new Date(reward.earnedAt).getTime() : 0;
-        if (!earnedAtMs || nowMs - earnedAtMs > recentWindowMs) return;
-
-        totals[gameName] = (totals[gameName] ?? 0) + (reward?.stars ?? 0);
-      });
+    const claims = Array.isArray(player?.recentAchievementClaims) ? player.recentAchievementClaims : [];
+    claims.forEach((claim) => {
+      const claimedAtMs = claim?.claimedAt ? new Date(claim.claimedAt).getTime() : 0;
+      if (!claimedAtMs || nowMs - claimedAtMs > recentWindowMs) return;
+      const stars = Number.isFinite(claim?.stars) ? claim.stars : 0;
+      if (stars <= 0) return;
+      const gameName = badgeGameById[claim.badgeId] ?? 'Letter River';
+      totals[gameName] = (totals[gameName] ?? 0) + stars;
     });
 
     return totals;
-  }, [badges]);
+  }, [player?.recentAchievementClaims]);
 
   React.useEffect(() => {
     try {
