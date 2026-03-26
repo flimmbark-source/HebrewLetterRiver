@@ -108,6 +108,13 @@ body.no-scroll {
   overflow-x: hidden;
 }
 
+.app-shell button,
+.app-shell input,
+.app-shell select,
+.app-shell textarea {
+  font-family: inherit;
+}
+
 .main-content {
   background: #FFFFFF !important;
   border-radius: 0;
