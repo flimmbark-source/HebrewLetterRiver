@@ -100,6 +100,7 @@ body.no-scroll {
 
 /* App shell container - responsive with vibrant gradient */
 .app-shell {
+  --app-text-line-height: 1.25;
   width: 100%;
   max-width: 100%;
   min-height: 100vh;
@@ -119,6 +120,14 @@ body.no-scroll {
 .app-shell select,
 .app-shell textarea {
   font-family: inherit;
+}
+
+.app-shell :is(h1, h2, h3, h4, h5, h6, p, span, label, button, input, select, textarea, a) {
+  line-height: var(--app-text-line-height);
+}
+
+.app-shell :is(button, input, select, textarea) {
+  min-height: 2.25rem;
 }
 
 .main-content {
