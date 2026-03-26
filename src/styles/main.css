@@ -17,25 +17,25 @@ body.no-scroll {
 @font-face {
   font-family: 'App Lexend Metric';
   src: local('Lexend');
-  size-adjust: 100%;
+  size-adjust: 97%;
 }
 
 @font-face {
   font-family: 'App Comic Sans Metric';
   src: local('Comic Sans MS');
-  size-adjust: 87%;
+  size-adjust: 93%;
 }
 
 @font-face {
   font-family: 'App Arial Metric';
   src: local('Arial');
-  size-adjust: 95%;
+  size-adjust: 98%;
 }
 
 @font-face {
   font-family: 'App Verdana Metric';
   src: local('Verdana');
-  size-adjust: 97%;
+  size-adjust: 90%;
 }
 
 /* Accessibility Font Classes */
@@ -125,7 +125,6 @@ body.no-scroll {
   max-width: 100%;
   min-height: 100vh;
   font-family: var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
-  font-size-adjust: 0.52;
   border-radius: 0;
   background: linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%);
   padding: 0 0 80px;
@@ -155,7 +154,6 @@ body.no-scroll {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-block-size: 1.4em;
 }
 
 .main-content {
