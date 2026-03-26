@@ -239,7 +239,14 @@ export default function SettingsView() {
   });
 
   return (
-    <div className="min-h-screen pb-36" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', background: 'var(--app-bg)', color: 'var(--app-on-surface)' }}>
+    <div
+      className="min-h-screen pb-36"
+      style={{
+        fontFamily: 'var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif)',
+        background: 'var(--app-bg)',
+        color: 'var(--app-on-surface)'
+      }}
+    >
       <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between px-6 backdrop-blur-xl" style={{ background: 'var(--app-nav-bg)' }}>
         <div className="flex items-center gap-4">
           <button className="transition hover:opacity-80 active:scale-95" style={{ color: 'var(--app-primary)' }} onClick={() => navigate('/')} type="button" aria-label="Back to Home">

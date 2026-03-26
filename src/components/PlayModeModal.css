@@ -61,7 +61,7 @@
 }
 
 .play-mode-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   font-size: 22px;
   font-weight: 800;
   color: #1b6b4f;
@@ -85,7 +85,7 @@
   border: none;
   cursor: pointer;
   text-align: left;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   transition: transform 0.15s, box-shadow 0.2s;
 }
 
