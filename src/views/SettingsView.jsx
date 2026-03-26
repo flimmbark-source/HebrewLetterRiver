@@ -388,13 +388,7 @@ export default function SettingsView() {
                     </select>
                   </div>
 
-                  <label htmlFor="settings-toggle-introductions" className="flex cursor-pointer items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Icon className="text-[#4a6365]">info</Icon>
-                      <span className="cursor-help font-semibold" {...getInfoHandlers('showIntroductions')}>{t('game.accessibility.showIntroductions')}</span>
-                    </div>
-                    <input id="settings-toggle-introductions" type="checkbox" checked={showIntroductions} onChange={(event) => setShowIntroductions(event.target.checked)} className="h-5 w-5 rounded border-[#6f7973] text-[#1b6b4f]" />
-                  </label>
+                  <Toggle id="settings-toggle-introductions" label={<span className="cursor-help" {...getInfoHandlers('showIntroductions')}>{t('game.accessibility.showIntroductions')}</span>} icon="info" checked={showIntroductions} onChange={setShowIntroductions} />
 
                   <Toggle id="settings-random-letters-toggle" label={<span className="cursor-help" {...getInfoHandlers('randomLetters')}>{t('game.accessibility.randomLetters')}</span>} icon="casino" checked={randomLetters} onChange={setRandomLetters} />
                   <Toggle id="settings-reduced-motion-toggle" label={<span className="cursor-help" {...getInfoHandlers('reducedMotion')}>{t('game.accessibility.reducedMotion')}</span>} icon="motion_photos_off" checked={reducedMotion} onChange={setReducedMotion} />
