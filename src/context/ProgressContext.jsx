@@ -58,17 +58,36 @@ const defaultPlayer = {
   },
   letters: {},
   latestBadge: null,
+  recentAchievementClaims: [],
   modesPlayed: [],
   recentModesPlayed: []
 };
 
 const MAX_RECENT_MODES = 12;
+const MAX_RECENT_ACHIEVEMENT_CLAIMS = 50;
 
 function appendRecentMode(existingModes = [], modeId) {
   if (!modeId || typeof modeId !== 'string') return existingModes;
   const next = [...existingModes, modeId];
   if (next.length <= MAX_RECENT_MODES) return next;
   return next.slice(next.length - MAX_RECENT_MODES);
+}
+
+function normalizeRecentAchievementClaims(claims) {
+  if (!Array.isArray(claims)) return [];
+  return claims
+    .map((entry) => {
+      const stars = Number.isFinite(entry?.stars) ? Math.max(0, Math.floor(entry.stars)) : 0;
+      if (!entry?.badgeId || stars <= 0) return null;
+      return {
+        badgeId: entry.badgeId,
+        tier: Number.isFinite(entry?.tier) ? entry.tier : null,
+        stars,
+        claimedAt: typeof entry?.claimedAt === 'string' ? entry.claimedAt : null
+      };
+    })
+    .filter(Boolean)
+    .slice(-MAX_RECENT_ACHIEVEMENT_CLAIMS);
 }
 
 const defaultBadges = badgesCatalog.reduce((acc, badge) => {
@@ -425,7 +444,8 @@ export function ProgressProvider({ children }) {
           labelKey: source.latestBadge.labelKey ?? tierSpec?.labelKey,
           summaryKey: source.latestBadge.summaryKey ?? badge.summaryKey
         };
-      })()
+      })(),
+      recentAchievementClaims: normalizeRecentAchievementClaims(source.recentAchievementClaims)
     };
     if (!stored) {
       saveState(`${storagePrefix}.player`, hydrated);
@@ -633,6 +653,18 @@ export function ProgressProvider({ children }) {
         };
         if (latestBadge) {
           nextPlayer.latestBadge = latestBadge;
+        }
+        if (source === 'badge' && metadata?.badgeId) {
+          const existingClaims = normalizeRecentAchievementClaims(prev.recentAchievementClaims);
+          nextPlayer.recentAchievementClaims = [
+            ...existingClaims,
+            {
+              badgeId: metadata.badgeId,
+              tier: Number.isFinite(metadata?.tier) ? metadata.tier : null,
+              stars,
+              claimedAt: metadata?.claimedAt ?? new Date().toISOString()
+            }
+          ].slice(-MAX_RECENT_ACHIEVEMENT_CLAIMS);
         }
         console.log('applyStarsToPlayer: Stars awarded', {
           starsAwarded: stars,
@@ -919,7 +951,7 @@ export function ProgressProvider({ children }) {
           summary
         },
         source: 'badge',
-        metadata: { badgeId, tier: reward.tier }
+        metadata: { badgeId, tier: reward.tier, claimedAt: new Date().toISOString() }
       });
 
       // Verify stars were actually applied
