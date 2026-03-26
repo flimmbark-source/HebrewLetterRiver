@@ -8,7 +8,7 @@ import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 import { languagePacks } from '../data/languages/index.js';
 import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
-import { getAllSeenWords } from '../lib/seenWordsStorage.ts';
+import { getAllSeenWords, getSeenWordsUpdatedEventName } from '../lib/seenWordsStorage.ts';
 import { findDictionaryEntryForWord } from '../lib/sentenceDictionaryLookup.ts';
 
 const LANGUAGE_FLAGS = {
@@ -95,9 +95,23 @@ export default function HomeView() {
   const [reminderTime, setReminderTime] = React.useState('20:00');
   const [isEditingGoal, setIsEditingGoal] = React.useState(false);
   const [isEditingReminder, setIsEditingReminder] = React.useState(false);
+  const [seenWordsVersion, setSeenWordsVersion] = React.useState(0);
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
+  React.useEffect(() => {
+    const handleSeenWordsUpdated = () => setSeenWordsVersion((prev) => prev + 1);
+    const eventName = getSeenWordsUpdatedEventName();
+    window.addEventListener(eventName, handleSeenWordsUpdated);
+    return () => {
+      window.removeEventListener(eventName, handleSeenWordsUpdated);
+    };
+  }, []);
+
+  const seenWordEntries = useMemo(
+    () => Object.values(getAllSeenWords() ?? {}),
+    [seenWordsVersion, player?.totals?.sessions]
+  );
 
   const recentLetters = useMemo(() => {
     const letterIds = Object.keys(player?.letters ?? {});
@@ -130,8 +144,7 @@ export default function HomeView() {
   }, [player?.letters, languageId]);
 
   const recentWords = useMemo(() => {
-    const entries = Object.values(getAllSeenWords() ?? {});
-    return entries
+    return seenWordEntries
       .sort((a, b) => new Date(b.firstSeenAt).getTime() - new Date(a.firstSeenAt).getTime())
       .slice(0, 5)
       .map((entry) => {
@@ -142,7 +155,7 @@ export default function HomeView() {
           text: dictionaryEntry.practiceWord
         };
       });
-  }, [appLanguageId, languageId, t]);
+  }, [appLanguageId, languageId, seenWordEntries, t]);
 
   const modeLabelById = useMemo(() => ({
     letter_river: 'Letter River',
@@ -156,7 +169,7 @@ export default function HomeView() {
   }), []);
 
   const recentModes = useMemo(
-    () => (player?.modesPlayed ?? []).slice(-4).reverse().map((modeId) => {
+    () => (player?.recentModesPlayed ?? player?.modesPlayed ?? []).slice(-4).reverse().map((modeId) => {
       const explicitLabel = modeLabelById[modeId];
       if (explicitLabel) return explicitLabel;
 
@@ -172,10 +185,10 @@ export default function HomeView() {
 
       return modeId;
     }),
-    [player?.modesPlayed, modeLabelById]
+    [player?.modesPlayed, player?.recentModesPlayed, modeLabelById]
   );
 
-  const totalWordsLearned = useMemo(() => Object.keys(getAllSeenWords() ?? {}).length, []);
+  const totalWordsLearned = seenWordEntries.length;
   const totalWordTarget = bridgeBuilderWords.length;
   const wordProgressPct = totalWordTarget > 0 ? Math.min(Math.round((totalWordsLearned / totalWordTarget) * 100), 100) : 0;
 
@@ -322,10 +335,10 @@ export default function HomeView() {
             <div className="space-y-2">
               <p className="text-sm font-bold text-[#4a6365]">Game Activity</p>
               {recentModes.length > 0 ? (
-                recentModes.slice(0, 3).map((modeName) => {
+                recentModes.slice(0, 3).map((modeName, index) => {
                   const modeUi = modeDisplayByName[modeName] ?? { icon: 'sports_esports', iconClass: 'text-[#1b6b4f]', bgClass: 'bg-[#1b6b4f]/10', badgeClass: 'text-[#1b6b4f]' };
                   return (
-                    <div key={modeName} className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm">
+                    <div key={`${modeName}-${index}`} className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm">
                       <div className={`flex h-9 w-9 items-center justify-center rounded-full ${modeUi.bgClass}`}>
                         <Icon className={`text-lg ${modeUi.iconClass}`}>{modeUi.icon}</Icon>
                       </div>

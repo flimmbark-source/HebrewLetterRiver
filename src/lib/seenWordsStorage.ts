@@ -4,6 +4,7 @@
  */
 
 const STORAGE_KEY = 'seenWords';
+const SEEN_WORDS_UPDATED_EVENT = 'seenWords:updated';
 
 export interface SeenWordEntry {
   wordId: string;
@@ -31,6 +32,9 @@ function loadState(): SeenWordsState {
 function saveState(state: SeenWordsState) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event(SEEN_WORDS_UPDATED_EVENT));
+    }
   } catch (err) {
     console.warn('[seenWordsStorage] Failed to save state', err);
   }
@@ -93,7 +97,14 @@ export function resetWordSeen(wordId: string) {
 export function clearAllSeenWords() {
   try {
     localStorage.removeItem(STORAGE_KEY);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event(SEEN_WORDS_UPDATED_EVENT));
+    }
   } catch (err) {
     console.warn('[seenWordsStorage] Failed to clear state', err);
   }
+}
+
+export function getSeenWordsUpdatedEventName(): string {
+  return SEEN_WORDS_UPDATED_EVENT;
 }

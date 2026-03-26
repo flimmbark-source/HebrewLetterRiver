@@ -58,8 +58,18 @@ const defaultPlayer = {
   },
   letters: {},
   latestBadge: null,
-  modesPlayed: []
+  modesPlayed: [],
+  recentModesPlayed: []
 };
+
+const MAX_RECENT_MODES = 12;
+
+function appendRecentMode(existingModes = [], modeId) {
+  if (!modeId || typeof modeId !== 'string') return existingModes;
+  const next = [...existingModes, modeId];
+  if (next.length <= MAX_RECENT_MODES) return next;
+  return next.slice(next.length - MAX_RECENT_MODES);
+}
 
 const defaultBadges = badgesCatalog.reduce((acc, badge) => {
   acc[badge.id] = { tier: 0, progress: 0, unclaimed: [] };
@@ -1146,6 +1156,9 @@ export function ProgressProvider({ children }) {
           sessionStatsRef.current.modesPlayed.forEach(mode => prevModes.add(mode));
           const newModesCount = prevModes.size;
           const oldModesCount = (prev.modesPlayed ?? []).length;
+          const recentModes = sessionStatsRef.current.modesPlayed.size > 0
+            ? appendRecentMode(prev.recentModesPlayed, Array.from(sessionStatsRef.current.modesPlayed).at(-1))
+            : prev.recentModesPlayed ?? [];
 
           if (newModesCount > oldModesCount) {
             trackBadgeProgress('explorer', newModesCount - oldModesCount);
@@ -1153,7 +1166,8 @@ export function ProgressProvider({ children }) {
 
           return {
             ...prev,
-            modesPlayed: Array.from(prevModes)
+            modesPlayed: Array.from(prevModes),
+            recentModesPlayed: recentModes
           };
         });
       }
@@ -1248,6 +1262,11 @@ export function ProgressProvider({ children }) {
     const offBridgeComplete = on('bridge:session-complete', (payload) => {
       const { completedCount = 0, isFullClear, isPerfect } = payload ?? {};
 
+      setPlayer((prev) => ({
+        ...prev,
+        recentModesPlayed: appendRecentMode(prev.recentModesPlayed, 'bridge_builder')
+      }));
+
       // Track completed sessions (only full clears count)
       if (isFullClear) {
         trackBadgeProgress('bridge-architect', 1);
@@ -1281,6 +1300,11 @@ export function ProgressProvider({ children }) {
     // ─── Deep Script events ───────────────────────────────
     const offDSCombat = on('deep-script:combat-won', (payload) => {
       const { isMiniboss } = payload ?? {};
+
+      setPlayer((prev) => ({
+        ...prev,
+        recentModesPlayed: appendRecentMode(prev.recentModesPlayed, 'deep_script')
+      }));
 
       trackBadgeProgress('dungeon-delver', 1);
 
