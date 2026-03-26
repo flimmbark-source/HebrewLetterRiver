@@ -173,7 +173,14 @@ export default function AchievementsView() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fef7ff] px-6 pb-36 pt-8" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+        <div
+      className="min-h-screen pb-36"
+      style={{
+        fontFamily: 'var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif)',
+        background: 'var(--app-bg)',
+        color: 'var(--app-on-surface)'
+      }}
+    >
       <main className="mx-auto max-w-2xl">
         <section className="relative mb-10">
           <div className="relative overflow-hidden rounded-xl bg-[#1b6b4f] p-8 text-white shadow-lg">

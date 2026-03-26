@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useFontSettings } from '../hooks/useFontSettings.js';
 
 /**
  * FloatingCapsulesGame - A word-matching mini-game with floating capsules
@@ -26,6 +27,7 @@ function getResponsiveConstants(width) {
 }
 
 export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode = false }) {
+  const { getGameFontClass } = useFontSettings();
   const canvasRef = useRef(null);
   const [gameState, setGameState] = useState('playing'); // 'playing' | 'completed'
   const [mismatchCount, setMismatchCount] = useState(0);
@@ -702,10 +704,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
             <p className="text-slate-400">Words learned:</p>
             {wordPairs.map((pair, i) => (
               <div key={i} className="flex gap-3 justify-center items-center">
-                <span className="hebrew-font text-white" dir="rtl">{pair.hebrew}</span>
-                <span className="text-slate-400 text-xs">({pair.transliteration || pair.hebrew})</span>
+                <span className={`hebrew-font text-white ${getGameFontClass(`${pair.hebrew}-${i}-h`)}`} dir="rtl">{pair.hebrew}</span>
+                <span className={`text-slate-400 text-xs ${getGameFontClass(`${pair.hebrew}-${i}-t`)}`}>({pair.transliteration || pair.hebrew})</span>
                 <span className="text-slate-400">→</span>
-                <span className="text-white">{pair.meaning}</span>
+                <span className={`text-white ${getGameFontClass(`${pair.hebrew}-${i}-m`)}`}>{pair.meaning}</span>
               </div>
             ))}
           </div>
@@ -753,7 +755,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
               return (
                 <span
                   key={`${item.text}-${itemIndex}`}
-                  className={`font-semibold ${
+                  className={`font-semibold ${getGameFontClass(`${item.text}-${itemIndex}`)} ${
                     isHebrew ? 'hebrew-font text-emerald-200' : 'text-slate-200'
                   }`}
                   dir={isHebrew ? 'rtl' : 'ltr'}
@@ -809,7 +811,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
                 }}
                 onPointerDown={(e) => handlePointerDown(e, capsule, index)}
               >
-                <span className="ds-bubble-text" dir={isHebrew ? 'rtl' : 'ltr'}>
+                <span className={`ds-bubble-text ${getGameFontClass(capsule.id)}`} dir={isHebrew ? 'rtl' : 'ltr'}>
                   {isHebrew ? <span className="hebrew-font">{capsule.text}</span> : capsule.text}
                 </span>
                 <span className="ds-bubble-shine" />
@@ -847,8 +849,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
                 }`}
                 dir={isHebrew ? 'rtl' : 'ltr'}
               >
-                {isHebrew && <span className="hebrew-font">{capsule.text}</span>}
-                {!isHebrew && capsule.text}
+                {isHebrew && <span className={`hebrew-font ${getGameFontClass(capsule.id)}`}>{capsule.text}</span>}
+                {!isHebrew && <span className={getGameFontClass(capsule.id)}>{capsule.text}</span>}
               </div>
             </div>
           );

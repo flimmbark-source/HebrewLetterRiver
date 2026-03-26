@@ -12,6 +12,7 @@ import {
   playGear, playVictory,
   playDefeat,
 } from './dsSounds.js';
+import { useFontSettings } from '../../hooks/useFontSettings.js';
 
 /**
  * CombatScreen — roguelike dungeon-crawler combat encounter.
@@ -23,7 +24,8 @@ import {
  *   4. Ability cards row with tile sockets
  *   5. End Turn button
  */
-export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
+export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOpenMenu }) {
+  const { getGameFontClass } = useFontSettings();
   const initialState = useMemo(() => {
     const state = createCombatState(wordId, {
       ...runState,
@@ -235,10 +237,15 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     <div className="ds-combat-screen">
       {/* ═══ TOP HUD — health left, progress right ═══ */}
       <div className="ds-top-hud">
-        <div className="ds-hud-health">
-          {healthPips.map((full, i) => (
-            <span key={i} className={`ds-hud-pip ${full ? 'ds-hud-pip--full' : 'ds-hud-pip--empty'}`} />
-          ))}
+        <div className="ds-hud-left">
+          <button type="button" className="ds-hamburger-btn" onClick={onOpenMenu} aria-label="Open game menu">
+            ☰
+          </button>
+          <div className="ds-hud-health">
+            {healthPips.map((full, i) => (
+              <span key={i} className={`ds-hud-pip ${full ? 'ds-hud-pip--full' : 'ds-hud-pip--empty'}`} />
+            ))}
+          </div>
         </div>
 
         <div className="ds-hud-progress">
@@ -271,8 +278,8 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
             <div className="ds-encounter-sigil">
               <div className="ds-encounter-rune-ring" />
               <div className="ds-encounter-clue">
-                <span className="ds-encounter-english">{word.english}</span>
-                <span className="ds-encounter-translit">{word.transliteration}</span>
+                <span className={`ds-encounter-english ${getGameFontClass(`${word.id}-english`)}`}>{word.english}</span>
+                <span className={`ds-encounter-translit ${getGameFontClass(`${word.id}-translit`)}`}>{word.transliteration}</span>
               </div>
             </div>
 
@@ -300,11 +307,11 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                     disabled={slot.correct || slot.locked || combat.phase !== 'active'}
                   >
                     {slot.correct ? (
-                      <span className="ds-rune-letter">{slot.targetLetter}</span>
+                      <span className={`ds-rune-letter ${getGameFontClass(`${word.id}-rune-${index}`)}`}>{slot.targetLetter}</span>
                     ) : slot.locked ? (
                       <span className="ds-rune-lock">🔒</span>
                     ) : slot.revealed ? (
-                      <span className="ds-rune-hint">{slot.targetLetter}</span>
+                      <span className={`ds-rune-hint ${getGameFontClass(`${word.id}-hint-${index}`)}`}>{slot.targetLetter}</span>
                     ) : (
                       <span className="ds-rune-empty" />
                     )}
@@ -336,7 +343,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
                     onClick={() => handleTrayClick(tile.id)}
                     disabled={combat.phase !== 'active'}
                   >
-                    {tile.letter}
+                    <span className={getGameFontClass(tile.id)}>{tile.letter}</span>
                   </button>
                 );
               })}
@@ -423,9 +430,9 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       {combat.phase === 'victory' && (
         <div className="ds-phase-overlay ds-phase-victory">
           <div className="ds-phase-message">Word Vanquished!</div>
-          <div className="ds-phase-word" dir="rtl">{word.hebrew}</div>
+          <div className={`ds-phase-word ${getGameFontClass(`${word.id}-phase-hebrew`)}`} dir="rtl">{word.hebrew}</div>
           {word.english && (
-            <div className="ds-phase-translation">{word.english}</div>
+            <div className={`ds-phase-translation ${getGameFontClass(`${word.id}-phase-translation`)}`}>{word.english}</div>
           )}
           <button
             type="button"
@@ -439,7 +446,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
       {combat.phase === 'defeat' && (
         <div className="ds-phase-overlay ds-phase-defeat">
           <div className="ds-phase-message">Overwhelmed...</div>
-          <div className="ds-phase-word" dir="rtl">{word.hebrew} — {word.english}</div>
+          <div className={`ds-phase-word ${getGameFontClass(`${word.id}-defeat`)}`} dir="rtl">{word.hebrew} — {word.english}</div>
         </div>
       )}
 

@@ -35,6 +35,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   const previousFloorWordIdsRef = useRef(new Set());
   const [wordSourceMode, setWordSourceMode] = useState('pack'); // pack | random (standalone only)
   const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | end
+  const [isPauseMenuOpen, setIsPauseMenuOpen] = useState(false);
   const [runState, setRunState] = useState(null);
   const [endResult, setEndResult] = useState(null);
   const [floorNumber, setFloorNumber] = useState(1);
@@ -96,6 +97,12 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     };
   }, []);
 
+  useEffect(() => {
+    if (screen !== 'exploring' && screen !== 'combat') {
+      setIsPauseMenuOpen(false);
+    }
+  }, [screen]);
+
   // ─── Kit Selection ────────────────────────────────────────
 
   const handleKitSelect = useCallback((kitId) => {
@@ -117,6 +124,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setHasCompletedCapsulesMiniGameThisFloor(false);
     setFloorMiniGameWords(pickMiniGameWords(newFloor));
     setScreen('exploring');
+    setIsPauseMenuOpen(false);
   }, [createFloorForNumber, pickMiniGameWords]);
 
   // ─── Exploration: Movement ────────────────────────────────
@@ -372,7 +380,22 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setEndResult(null);
     setFloorNumber(1);
     previousFloorWordIdsRef.current = new Set();
+    setIsPauseMenuOpen(false);
   }, []);
+
+  const handleResumeGame = useCallback(() => {
+    setIsPauseMenuOpen(false);
+  }, []);
+
+  const handleOpenSettings = useCallback(() => {
+    // Placeholder for upcoming settings screen flow.
+    setIsPauseMenuOpen(false);
+  }, []);
+
+  const handleReturnToMenu = useCallback(() => {
+    setIsPauseMenuOpen(false);
+    onBack();
+  }, [onBack]);
 
   // ─── Render ───────────────────────────────────────────────
 
@@ -432,7 +455,17 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
           runState={runState}
           onEnd={handleCombatEnd}
           isMiniboss={activeCombat.isMiniboss}
+          onOpenMenu={() => setIsPauseMenuOpen(true)}
         />
+        {isPauseMenuOpen && (
+          <div className="ds-pause-overlay" role="dialog" aria-modal="true" aria-label="Game menu">
+            <div className="ds-pause-menu">
+              <button type="button" className="ds-pause-btn" onClick={handleResumeGame}>Resume</button>
+              <button type="button" className="ds-pause-btn" onClick={handleReturnToMenu}>Menu</button>
+              <button type="button" className="ds-pause-btn" onClick={handleOpenSettings}>Settings</button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -454,7 +487,17 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         floorWordPool={floorWordPool}
         floorMiniGameWords={floorMiniGameWords}
         runState={runState}
+        onOpenMenu={() => setIsPauseMenuOpen(true)}
       />
+      {isPauseMenuOpen && (
+        <div className="ds-pause-overlay" role="dialog" aria-modal="true" aria-label="Game menu">
+          <div className="ds-pause-menu">
+            <button type="button" className="ds-pause-btn" onClick={handleResumeGame}>Resume</button>
+            <button type="button" className="ds-pause-btn" onClick={handleReturnToMenu}>Menu</button>
+            <button type="button" className="ds-pause-btn" onClick={handleOpenSettings}>Settings</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

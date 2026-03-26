@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { bridgeBuilderWords } from '../../data/bridgeBuilderWords.js';
 import { markLoosePlanksComplete } from '../../lib/bridgeBuilderStorage.js';
+import { useFontSettings } from '../../hooks/useFontSettings.js';
 import './LoosePlanks.css';
 
 function shuffle(arr) {
@@ -84,6 +85,7 @@ function generatePositions(count, containerEl, minTopClearance = 0) {
  * randomly either transliteration or translation per word per round.
  */
 export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
+  const { getGameFontClass } = useFontSettings();
   const { packId, selectedWordIds } = sessionConfig;
 
   const allWords = useMemo(() => {
@@ -247,8 +249,8 @@ export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
             <div className="lp-end-words">
               {allWords.map(w => (
                 <div key={w.id} className="lp-end-word">
-                  <span className="lp-end-hebrew">{w.hebrew}</span>
-                  <span className="lp-end-translit">{w.transliteration}</span>
+                  <span className={`lp-end-hebrew ${getGameFontClass(`${w.id}-hebrew`)}`}>{w.hebrew}</span>
+                  <span className={`lp-end-translit ${getGameFontClass(`${w.id}-translit`)}`}>{w.transliteration}</span>
                 </div>
               ))}
             </div>
@@ -311,7 +313,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
               type="button"
             >
               <span className="lp-plank-grain" />
-              <span className="lp-plank-text lp-plank-text--rtl">
+              <span className={`lp-plank-text lp-plank-text--rtl ${getGameFontClass(plank.key)}`}>
                 {plank.text}
               </span>
             </button>
@@ -357,7 +359,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
                 type="button"
               >
                 <span className="lp-plank-grain" />
-                <span className="lp-plank-text">
+                <span className={`lp-plank-text ${getGameFontClass(plank.key)}`}>
                   {plank.text}
                 </span>
               </button>

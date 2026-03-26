@@ -51,6 +51,7 @@ export default function SettingsView() {
   const [randomLetters, setRandomLetters] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [gameFont, setGameFont] = useState('default');
+  const [appFont, setAppFont] = useState('default');
   const [fontShuffle, setFontShuffle] = useState(false);
   const [slowRiver, setSlowRiver] = useState(false);
   const [clickMode, setClickMode] = useState(false);
@@ -73,7 +74,9 @@ export default function SettingsView() {
           setRandomLetters(settings.randomLetters ?? false);
           setReducedMotion(settings.reducedMotion ?? false);
           const savedFont = settings.gameFont === 'opendyslexic' ? 'lexend' : (settings.gameFont ?? 'default');
+          const savedAppFont = settings.appFont === 'opendyslexic' ? 'lexend' : (settings.appFont ?? 'default');
           setGameFont(savedFont);
+          setAppFont(savedAppFont);
           setFontShuffle(settings.fontShuffle ?? false);
           setSlowRiver(settings.slowRiver ?? false);
           setClickMode(settings.clickMode ?? false);
@@ -100,6 +103,7 @@ export default function SettingsView() {
         randomLetters,
         reducedMotion,
         gameFont,
+        appFont,
         fontShuffle,
         slowRiver,
         clickMode,
@@ -118,7 +122,7 @@ export default function SettingsView() {
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
-  }, [hasLoadedSettings, showIntroductions, darkMode, randomLetters, reducedMotion, gameFont, fontShuffle, slowRiver, clickMode, associationMode, startingLetters]);
+  }, [hasLoadedSettings, showIntroductions, darkMode, randomLetters, reducedMotion, gameFont, appFont, fontShuffle, slowRiver, clickMode, associationMode, startingLetters]);
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
   const totalStarsEarned = player.totalStarsEarned ?? player.stars ?? 0;
@@ -145,6 +149,10 @@ export default function SettingsView() {
     gameFont: {
       title: 'Game Font',
       description: 'Choose from different fonts, including dyslexia-friendly options, to improve readability and comfort.'
+    },
+    appFont: {
+      title: 'App Font',
+      description: 'Changes the interface font for the app UI only. Game mode text uses the separate Game Font setting.'
     },
     startingLetters: {
       title: 'Starting Letters',
@@ -231,7 +239,14 @@ export default function SettingsView() {
   });
 
   return (
-    <div className="min-h-screen pb-36" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', background: 'var(--app-bg)', color: 'var(--app-on-surface)' }}>
+    <div
+      className="min-h-screen pb-36"
+      style={{
+        fontFamily: 'var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif)',
+        background: 'var(--app-bg)',
+        color: 'var(--app-on-surface)'
+      }}
+    >
       <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between px-6 backdrop-blur-xl" style={{ background: 'var(--app-nav-bg)' }}>
         <div className="flex items-center gap-4">
           <button className="transition hover:opacity-80 active:scale-95" style={{ color: 'var(--app-primary)' }} onClick={() => navigate('/')} type="button" aria-label="Back to Home">
@@ -312,48 +327,83 @@ export default function SettingsView() {
         <section className="space-y-4">
           <h3 className="px-2 text-sm font-bold uppercase tracking-widest text-[#4a6365]">Game Settings</h3>
           <div className="overflow-hidden rounded-xl bg-white shadow-sm">
-            <div className="divide-y divide-[#bec9c2]/20">
-              <div className="flex items-center justify-between p-4 hover:bg-[#f9f1fd]">
-                <div className="flex items-center gap-4">
-                  <Icon className="text-[#4a6365]">text_fields</Icon>
-                  <span className="cursor-help font-semibold" {...getInfoHandlers('gameFont')}>Game Font</span>
-                </div>
-                <select id="settings-font-select" value={gameFont} onChange={(event) => setGameFont(event.target.value)} className="rounded-md border border-[#bec9c2]/50 px-2 py-1 font-bold text-[#1b6b4f]">
-                  {fontOptions.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
+            <div className="space-y-5 p-4">
+              <div className="rounded-lg border border-[#bec9c2]/25 p-4">
+                <Toggle id="settings-dark-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('darkMode')}>Dark Mode</span>} icon="dark_mode" checked={darkMode} onChange={setDarkMode} />
               </div>
 
-              <div className="flex items-center justify-between p-4 hover:bg-[#f9f1fd]">
-                <div className="flex items-center gap-4">
-                  <Icon className="text-[#4a6365]">format_list_numbered</Icon>
-                  <span className="cursor-help font-semibold" {...getInfoHandlers('startingLetters')}>Starting Letters</span>
+              <div className="rounded-lg border border-[#bec9c2]/25">
+                <div className="border-b border-[#bec9c2]/20 px-4 py-3">
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-[#4a6365]">App Font</p>
                 </div>
-                <select id="settings-starting-letters-select" value={startingLetters} onChange={(event) => setStartingLetters(parseInt(event.target.value, 10))} className="rounded-md border border-[#bec9c2]/50 pl-2 pr-8 py-1 font-bold text-[#1b6b4f]">
-                  {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => (
-                    <option key={value} value={value}>{value}</option>
-                  ))}
-                </select>
+                <div className="flex items-center justify-between p-4 hover:bg-[#f9f1fd]">
+                  <div className="flex items-center gap-4">
+                    <Icon className="text-[#4a6365]">text_format</Icon>
+                    <span className="cursor-help font-semibold" {...getInfoHandlers('appFont')}>App Font</span>
+                  </div>
+                  <select id="settings-app-font-select" value={appFont} onChange={(event) => setAppFont(event.target.value)} className="rounded-md border border-[#bec9c2]/50 px-2 py-1 font-bold text-[#1b6b4f]">
+                    {fontOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-6 p-4">
-              <label htmlFor="settings-toggle-introductions" className="flex cursor-pointer items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Icon className="text-[#4a6365]">info</Icon>
-                  <span className="cursor-help font-semibold" {...getInfoHandlers('showIntroductions')}>{t('game.accessibility.showIntroductions')}</span>
+              <div className="rounded-lg border border-[#bec9c2]/25">
+                <div className="border-b border-[#bec9c2]/20 px-4 py-3">
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-[#4a6365]">Game Font</p>
                 </div>
-                <input id="settings-toggle-introductions" type="checkbox" checked={showIntroductions} onChange={(event) => setShowIntroductions(event.target.checked)} className="h-5 w-5 rounded border-[#6f7973] text-[#1b6b4f]" />
-              </label>
+                <div className="divide-y divide-[#bec9c2]/20">
+                  <div className="flex items-center justify-between p-4 hover:bg-[#f9f1fd]">
+                    <div className="flex items-center gap-4">
+                      <Icon className="text-[#4a6365]">text_fields</Icon>
+                      <span className="cursor-help font-semibold" {...getInfoHandlers('gameFont')}>Game Font</span>
+                    </div>
+                    <select id="settings-font-select" value={gameFont} onChange={(event) => setGameFont(event.target.value)} className="rounded-md border border-[#bec9c2]/50 px-2 py-1 font-bold text-[#1b6b4f]">
+                      {fontOptions.map((option) => (
+                        <option key={option.value} value={option.value}>{option.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="p-4">
+                    <Toggle id="settings-font-shuffle-toggle" label={<span className="cursor-help" {...getInfoHandlers('fontShuffle')}>Font Shuffle</span>} icon="shuffle" checked={fontShuffle} onChange={setFontShuffle} />
+                  </div>
+                </div>
+              </div>
 
-              <Toggle id="settings-font-shuffle-toggle" label={<span className="cursor-help" {...getInfoHandlers('fontShuffle')}>Font Shuffle</span>} icon="shuffle" checked={fontShuffle} onChange={setFontShuffle} />
-              <Toggle id="settings-dark-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('darkMode')}>Dark Mode</span>} icon="dark_mode" checked={darkMode} onChange={setDarkMode} />
-              <Toggle id="settings-random-letters-toggle" label={<span className="cursor-help" {...getInfoHandlers('randomLetters')}>{t('game.accessibility.randomLetters')}</span>} icon="casino" checked={randomLetters} onChange={setRandomLetters} />
-              <Toggle id="settings-reduced-motion-toggle" label={<span className="cursor-help" {...getInfoHandlers('reducedMotion')}>{t('game.accessibility.reducedMotion')}</span>} icon="motion_photos_off" checked={reducedMotion} onChange={setReducedMotion} />
-              <Toggle id="settings-slow-river-toggle" label={<span className="cursor-help" {...getInfoHandlers('slowRiver')}>Slow River Mode</span>} icon="waves" checked={slowRiver} onChange={setSlowRiver} />
-              <Toggle id="settings-click-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('clickMode')}>Click Mode</span>} icon="ads_click" checked={clickMode} onChange={setClickMode} />
-              <Toggle id="settings-association-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('associationMode')}>Association Mode</span>} icon="hub" checked={associationMode} onChange={setAssociationMode} />
+              <div className="rounded-lg border border-[#bec9c2]/25">
+                <div className="border-b border-[#bec9c2]/20 px-4 py-3">
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-[#4a6365]">Letter River Settings</p>
+                </div>
+                <div className="space-y-6 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Icon className="text-[#4a6365]">format_list_numbered</Icon>
+                      <span className="cursor-help font-semibold" {...getInfoHandlers('startingLetters')}>Starting Letters</span>
+                    </div>
+                    <select id="settings-starting-letters-select" value={startingLetters} onChange={(event) => setStartingLetters(parseInt(event.target.value, 10))} className="rounded-md border border-[#bec9c2]/50 pl-2 pr-8 py-1 font-bold text-[#1b6b4f]">
+                      {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => (
+                        <option key={value} value={value}>{value}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <label htmlFor="settings-toggle-introductions" className="flex cursor-pointer items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Icon className="text-[#4a6365]">info</Icon>
+                      <span className="cursor-help font-semibold" {...getInfoHandlers('showIntroductions')}>{t('game.accessibility.showIntroductions')}</span>
+                    </div>
+                    <input id="settings-toggle-introductions" type="checkbox" checked={showIntroductions} onChange={(event) => setShowIntroductions(event.target.checked)} className="h-5 w-5 rounded border-[#6f7973] text-[#1b6b4f]" />
+                  </label>
+
+                  <Toggle id="settings-random-letters-toggle" label={<span className="cursor-help" {...getInfoHandlers('randomLetters')}>{t('game.accessibility.randomLetters')}</span>} icon="casino" checked={randomLetters} onChange={setRandomLetters} />
+                  <Toggle id="settings-reduced-motion-toggle" label={<span className="cursor-help" {...getInfoHandlers('reducedMotion')}>{t('game.accessibility.reducedMotion')}</span>} icon="motion_photos_off" checked={reducedMotion} onChange={setReducedMotion} />
+                  <Toggle id="settings-slow-river-toggle" label={<span className="cursor-help" {...getInfoHandlers('slowRiver')}>Slow River Mode</span>} icon="waves" checked={slowRiver} onChange={setSlowRiver} />
+                  <Toggle id="settings-click-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('clickMode')}>Click Mode</span>} icon="ads_click" checked={clickMode} onChange={setClickMode} />
+                  <Toggle id="settings-association-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('associationMode')}>Association Mode</span>} icon="hub" checked={associationMode} onChange={setAssociationMode} />
+                </div>
+              </div>
+
             </div>
           </div>
         </section>

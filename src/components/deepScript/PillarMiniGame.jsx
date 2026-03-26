@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { deepScriptWords } from '../../data/deepScript/words.js';
+import { useFontSettings } from '../../hooks/useFontSettings.js';
 
 function shuffle(items) {
   const copy = [...items];
@@ -58,6 +59,7 @@ export default function PillarMiniGame({
   wordPool = deepScriptWords,
   selectedWords = null,
 }) {
+  const { getGameFontClass } = useFontSettings();
   const [rows, setRows] = useState(() => buildPillarRows(wordPool, selectedWords));
   const [spinningRowId, setSpinningRowId] = useState(null);
   const [showProceed, setShowProceed] = useState(false);
@@ -132,7 +134,7 @@ export default function PillarMiniGame({
       {rows.map((row) => (
         <React.Fragment key={row.id}>
           <div className="ds-pillar-slat ds-pillar-slat--fixed" aria-label={`Hebrew word ${row.hebrew}`}>
-            {row.hebrew}
+            <span className={getGameFontClass(`${row.id}-hebrew`)}>{row.hebrew}</span>
           </div>
           <button
             type="button"
@@ -145,7 +147,7 @@ export default function PillarMiniGame({
             onPointerDown={(event) => onPointerDown(row.id, event)}
             onPointerUp={(event) => onPointerUp(row.id, event)}
           >
-            <span className="ds-pillar-slat-text">{row.options[row.currentIndex]}</span>
+            <span className={`ds-pillar-slat-text ${getGameFontClass(`${row.id}-${row.options[row.currentIndex]}`)}`}>{row.options[row.currentIndex]}</span>
           </button>
           <div className="ds-pillar-gap" aria-hidden="true" />
         </React.Fragment>

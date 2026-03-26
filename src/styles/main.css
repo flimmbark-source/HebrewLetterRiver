@@ -62,11 +62,43 @@ body.no-scroll {
   font-family: 'Heebo', sans-serif !important;
 }
 
+/* App font classes (UI only) */
+.app-font-default {
+  --app-language-font: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.app-font-lexend {
+  --app-language-font: 'Lexend', 'Atkinson Hyperlegible', 'Noto Sans', sans-serif;
+}
+
+.app-font-comic-sans {
+  --app-language-font: 'Comic Sans MS', 'Comic Sans', 'Nunito', sans-serif;
+}
+
+.app-font-arial {
+  --app-language-font: Arial, 'Nunito', sans-serif;
+}
+
+.app-font-verdana {
+  --app-language-font: Verdana, Geneva, 'Nunito', sans-serif;
+}
+
+/* Keep game modes controlled by Game Font settings (not App Font). */
+.bb-world,
+.lp-world {
+  font-family: 'Nunito', system-ui, sans-serif !important;
+}
+
+.ds-mode {
+  font-family: var(--ds-font-body, 'Nunito', system-ui, sans-serif) !important;
+}
+
 /* App shell container - responsive with vibrant gradient */
 .app-shell {
   width: 100%;
   max-width: 100%;
   min-height: 100vh;
+  font-family: var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   border-radius: 0;
   background: linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%);
   padding: 0 0 80px;
@@ -74,7 +106,15 @@ body.no-scroll {
   flex-direction: column;
   gap: 0;
   overflow-x: hidden;
+  .app-shell button,
+.app-shell input,
+.app-shell select,
+.app-shell textarea {
+  font-family: inherit;
 }
+}
+
+
 
 .main-content {
   background: #FFFFFF !important;

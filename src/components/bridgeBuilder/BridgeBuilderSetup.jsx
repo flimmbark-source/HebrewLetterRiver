@@ -66,9 +66,27 @@ function resolveGameMode(completion, modeOverride) {
 function ProgressDots({ completion, modeOverride, unlocked, packId, onDotClick }) {
   const { bridgeBuilderComplete, loosePlanksComplete, deepScriptComplete } = completion;
   const dots = [
-    { complete: bridgeBuilderComplete, override: modeOverride === 'bridge_builder', mode: 'bridge_builder' },
-    { complete: loosePlanksComplete, override: modeOverride === 'loose_planks', mode: 'loose_planks' },
-    { complete: deepScriptComplete, override: modeOverride === 'deep_script', mode: 'deep_script' },
+    {
+      complete: bridgeBuilderComplete,
+      override: modeOverride === 'bridge_builder',
+      mode: 'bridge_builder',
+      icon: 'conversion_path',
+      label: 'Bridge Builder',
+    },
+    {
+      complete: loosePlanksComplete,
+      override: modeOverride === 'loose_planks',
+      mode: 'loose_planks',
+      icon: 'view_stream',
+      label: 'Loose Planks',
+    },
+    {
+      complete: deepScriptComplete,
+      override: modeOverride === 'deep_script',
+      mode: 'deep_script',
+      icon: 'ink_pen',
+      label: 'Deep Script',
+    },
   ];
 
   return (
@@ -78,16 +96,20 @@ function ProgressDots({ completion, modeOverride, unlocked, packId, onDotClick }
         if (dot.override) cls += ' bbs-dot--override';
         else if (dot.complete) cls += ' bbs-dot--complete';
         return (
-          <span
+          <button
             key={i}
-            className={cls}
-            role="button"
-            tabIndex={unlocked ? 0 : -1}
+            type="button"
+            className="bbs-dot-mode"
+            disabled={!unlocked}
+            aria-label={dot.label}
             onClick={(e) => {
               e.stopPropagation();
               if (unlocked && onDotClick) onDotClick(packId, dot.mode);
             }}
-          />
+          >
+            <span className={cls} />
+            <span className="material-symbols-outlined bbs-dot-mode-icon" aria-hidden="true">{dot.icon}</span>
+          </button>
         );
       })}
     </div>
