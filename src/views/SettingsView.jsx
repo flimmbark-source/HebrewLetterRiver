@@ -4,6 +4,9 @@ import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { getFormattedLanguageName } from '../lib/languageUtils.js';
+import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
+import { deepScriptWords } from '../data/deepScript/words.js';
+import { languagePacks } from '../data/languages/index.js';
 import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 
@@ -113,6 +116,33 @@ export default function SettingsView() {
   const progressPct = starsPerLevel > 0 ? Math.round(Math.min((levelProgress / starsPerLevel) * 100, 100)) : 0;
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
+  const byMode = player?.totals?.byMode ?? {};
+  const gamesByMode = [
+    { key: 'letterRiver', label: 'Letter River', count: byMode.letterRiver ?? 0 },
+    { key: 'bridgeBuilder', label: 'Bridge Builder', count: byMode.bridgeBuilder ?? 0 },
+    { key: 'deepScript', label: 'Deep Script', count: byMode.deepScript ?? 0 }
+  ].filter((mode) => mode.count > 0);
+
+  const lettersLearned = useMemo(() => {
+    const pack = languagePacks[languageId];
+    const itemsById = pack?.itemsById ?? {};
+    const letterIds = Object.keys(player?.letters ?? {});
+    return letterIds
+      .map((letterId) => itemsById[letterId] ?? { id: letterId, symbol: letterId, name: letterId })
+      .filter(Boolean);
+  }, [languageId, player?.letters]);
+
+  const recentWordsLearned = useMemo(() => {
+    const wordLookup = new Map([
+      ...bridgeBuilderWords.map((word) => [word.id, { id: word.id, hebrew: word.hebrew, translation: word.translation }]),
+      ...deepScriptWords.map((word) => [word.id, { id: word.id, hebrew: word.hebrew, translation: word.english }])
+    ]);
+    return (player?.learnedWordIds ?? [])
+      .map((wordId) => wordLookup.get(wordId))
+      .filter(Boolean)
+      .slice(-8)
+      .reverse();
+  }, [player?.learnedWordIds]);
 
   const fontOptions = [
     { value: 'default', label: 'Default' },
@@ -160,6 +190,60 @@ export default function SettingsView() {
               </div>
               <div className="h-3 w-full overflow-hidden rounded-full bg-[#a7f3d0]">
                 <div className="h-full rounded-full bg-[#1b6b4f]" style={{ width: `${progressPct}%` }}></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <h3 className="px-2 text-sm font-bold uppercase tracking-widest text-[#4a6365]">Profile Overview</h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#4a6365]">Games Played</p>
+              <p className="mt-1 text-2xl font-extrabold text-[#1b6b4f]">{(player?.totals?.sessions ?? 0).toLocaleString()}</p>
+            </div>
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#4a6365]">Words Learned</p>
+              <p className="mt-1 text-2xl font-extrabold text-[#1b6b4f]">{(player?.learnedWordIds?.length ?? 0).toLocaleString()}</p>
+            </div>
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#4a6365]">Letters Learned</p>
+              <p className="mt-1 text-2xl font-extrabold text-[#1b6b4f]">{lettersLearned.length.toLocaleString()}</p>
+            </div>
+          </div>
+
+          <div className="rounded-xl bg-white p-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#4a6365]">Games by mode</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {gamesByMode.length > 0 ? gamesByMode.map((mode) => (
+                <span key={mode.key} className="rounded-full bg-[#f9f1fd] px-3 py-1 text-xs font-bold text-[#1b6b4f]">
+                  {mode.label}: {mode.count}
+                </span>
+              )) : <span className="text-xs font-semibold text-[#6f7973]">No games played yet.</span>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#4a6365]">Recent words learned</p>
+              <div className="mt-3 space-y-2">
+                {recentWordsLearned.length > 0 ? recentWordsLearned.map((word) => (
+                  <div key={word.id} className="flex items-center justify-between rounded-lg bg-[#f9f1fd] px-3 py-2">
+                    <span className="font-bold text-[#1d1a22]" dir="rtl">{word.hebrew}</span>
+                    <span className="text-xs font-semibold text-[#4a6365]">{word.translation}</span>
+                  </div>
+                )) : <p className="text-xs font-semibold text-[#6f7973]">Play Bridge Builder or Deep Script to add words here.</p>}
+              </div>
+            </div>
+
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#4a6365]">Letters learned</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {lettersLearned.length > 0 ? lettersLearned.slice(0, 20).map((letter) => (
+                  <span key={letter.id} className="rounded-lg bg-[#f9f1fd] px-3 py-1 text-sm font-bold text-[#1b6b4f]">
+                    {letter.symbol ?? letter.id}
+                  </span>
+                )) : <p className="text-xs font-semibold text-[#6f7973]">Play Letter River to add letters here.</p>}
               </div>
             </div>
           </div>

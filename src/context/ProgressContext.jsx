@@ -54,9 +54,15 @@ const defaultPlayer = {
   totalStarsEarned: 0,
   totals: {
     sessions: 0,
-    perfectCatches: 0
+    perfectCatches: 0,
+    byMode: {
+      letterRiver: 0,
+      bridgeBuilder: 0,
+      deepScript: 0
+    }
   },
   letters: {},
+  learnedWordIds: [],
   latestBadge: null,
   modesPlayed: []
 };
@@ -403,6 +409,7 @@ export function ProgressProvider({ children }) {
       level,
       levelProgress,
       totals: { ...defaultPlayer.totals, ...(source.totals ?? {}) },
+      learnedWordIds: Array.isArray(source.learnedWordIds) ? Array.from(new Set(source.learnedWordIds.filter(Boolean))) : [],
       letters: assets.normalizeLetterStats(source.letters ?? {}),
       latestBadge: (() => {
         if (!source.latestBadge) return null;
@@ -1101,7 +1108,12 @@ export function ProgressProvider({ children }) {
           ...prev,
           totals: {
             ...prev.totals,
-            sessions: prev.totals.sessions + 1
+            sessions: prev.totals.sessions + 1,
+            byMode: {
+              ...defaultPlayer.totals.byMode,
+              ...(prev.totals.byMode ?? {}),
+              letterRiver: (prev.totals.byMode?.letterRiver ?? 0) + 1
+            }
           }
         };
       });
@@ -1246,7 +1258,22 @@ export function ProgressProvider({ children }) {
 
     // ─── Bridge Builder events ──────────────────────────────
     const offBridgeComplete = on('bridge:session-complete', (payload) => {
-      const { completedCount = 0, isFullClear, isPerfect } = payload ?? {};
+      const { completedCount = 0, isFullClear, isPerfect, completedWordIds = [] } = payload ?? {};
+
+      setPlayer((prev) => ({
+        ...prev,
+        totals: {
+          ...prev.totals,
+          sessions: (prev.totals?.sessions ?? 0) + 1,
+          byMode: {
+            ...defaultPlayer.totals.byMode,
+            ...(prev.totals?.byMode ?? {}),
+            bridgeBuilder: (prev.totals?.byMode?.bridgeBuilder ?? 0) + 1
+          }
+        },
+        modesPlayed: Array.from(new Set([...(prev.modesPlayed ?? []), 'bridgeBuilder'])),
+        learnedWordIds: Array.from(new Set([...(prev.learnedWordIds ?? []), ...completedWordIds]))
+      }));
 
       // Track completed sessions (only full clears count)
       if (isFullClear) {
@@ -1293,7 +1320,22 @@ export function ProgressProvider({ children }) {
     });
 
     const offDSRunEnd = on('deep-script:run-end', (payload) => {
-      const { result } = payload ?? {};
+      const { result, wordsCompleted = [] } = payload ?? {};
+
+      setPlayer((prev) => ({
+        ...prev,
+        totals: {
+          ...prev.totals,
+          sessions: (prev.totals?.sessions ?? 0) + 1,
+          byMode: {
+            ...defaultPlayer.totals.byMode,
+            ...(prev.totals?.byMode ?? {}),
+            deepScript: (prev.totals?.byMode?.deepScript ?? 0) + 1
+          }
+        },
+        modesPlayed: Array.from(new Set([...(prev.modesPlayed ?? []), 'deepScript'])),
+        learnedWordIds: Array.from(new Set([...(prev.learnedWordIds ?? []), ...wordsCompleted]))
+      }));
 
       if (result === 'victory') {
         trackBadgeProgress('iron-will', 1);
