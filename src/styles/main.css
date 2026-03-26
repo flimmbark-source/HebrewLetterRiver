@@ -155,6 +155,13 @@ body.no-scroll {
   min-height: 2.25rem;
 }
 
+/* Prevent font swaps from increasing block height due reflow/wrapping */
+.app-shell :is(h1, h2, h3, h4, label, button, select) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .main-content {
   background: #FFFFFF !important;
   border-radius: 0;
