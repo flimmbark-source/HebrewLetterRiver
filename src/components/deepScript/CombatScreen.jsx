@@ -23,7 +23,7 @@ import {
  *   4. Ability cards row with tile sockets
  *   5. End Turn button
  */
-export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
+export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOpenMenu }) {
   const initialState = useMemo(() => {
     const state = createCombatState(wordId, {
       ...runState,
@@ -235,10 +235,15 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss }) {
     <div className="ds-combat-screen">
       {/* ═══ TOP HUD — health left, progress right ═══ */}
       <div className="ds-top-hud">
-        <div className="ds-hud-health">
-          {healthPips.map((full, i) => (
-            <span key={i} className={`ds-hud-pip ${full ? 'ds-hud-pip--full' : 'ds-hud-pip--empty'}`} />
-          ))}
+        <div className="ds-hud-left">
+          <button type="button" className="ds-hamburger-btn" onClick={onOpenMenu} aria-label="Open game menu">
+            ☰
+          </button>
+          <div className="ds-hud-health">
+            {healthPips.map((full, i) => (
+              <span key={i} className={`ds-hud-pip ${full ? 'ds-hud-pip--full' : 'ds-hud-pip--empty'}`} />
+            ))}
+          </div>
         </div>
 
         <div className="ds-hud-progress">

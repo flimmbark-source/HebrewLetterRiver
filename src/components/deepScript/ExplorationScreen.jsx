@@ -28,6 +28,7 @@ export default function ExplorationScreen({
   floorWordPool = [],
   floorMiniGameWords = null,
   runState,
+  onOpenMenu,
 }) {
   const [inspecting, setInspecting] = useState(null);
   const [transitioning, setTransitioning] = useState(false);
@@ -155,10 +156,15 @@ export default function ExplorationScreen({
     <div className={`ds-explore-screen ${transitioning ? `ds-explore--trans-${transDir}` : ''} ${walkPhase ? `ds-explore--${walkPhase}` : ''} ${isMiniGameOpenInThisRoom ? 'ds-explore--minigame-active' : ''}`}>
       {/* ═══ TOP HUD ═══ */}
       <div className="ds-explore-top-hud">
-        <div className="ds-hud-health">
-          {healthPips.map((full, i) => (
-            <span key={i} className={`ds-hud-pip ${full ? 'ds-hud-pip--full' : 'ds-hud-pip--empty'}`} />
-          ))}
+        <div className="ds-hud-left">
+          <button type="button" className="ds-hamburger-btn" onClick={onOpenMenu} aria-label="Open game menu">
+            ☰
+          </button>
+          <div className="ds-hud-health">
+            {healthPips.map((full, i) => (
+              <span key={i} className={`ds-hud-pip ${full ? 'ds-hud-pip--full' : 'ds-hud-pip--empty'}`} />
+            ))}
+          </div>
         </div>
         <div className="ds-explore-chamber-name">
           {getChamberDisplayName(chamber.type)}
