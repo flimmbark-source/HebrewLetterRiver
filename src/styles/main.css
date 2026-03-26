@@ -149,11 +149,28 @@ body.no-scroll {
   min-height: 36px;
 }
 
-/* Prevent font swaps from increasing block height due reflow/wrapping */
-.app-shell :is(h1, h2, h3, h4, label, button, select) {
+/* Prevent font swaps from changing container heights.
+   Different fonts have different character widths; without nowrap,
+   text reflows to a different number of lines per font, resizing
+   every card/section on the page. */
+.app-shell :is(h1, h2, h3, h4, h5, h6, p, label, button, select) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Opt-in wrapping for elements that genuinely need multi-line text */
+.app-shell :is(.leading-relaxed, .whitespace-normal, .text-wrap) {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+}
+
+/* Game modes use fixed fonts — restore normal wrapping inside them */
+.app-shell :is(.bb-world, .lp-world, .ds-mode, #game-view) :is(h1, h2, h3, h4, h5, h6, p, label, button, select) {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
 }
 
 .main-content {
