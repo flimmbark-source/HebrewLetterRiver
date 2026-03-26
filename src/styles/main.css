@@ -13,6 +13,31 @@ body.no-scroll {
 
 * { box-sizing: border-box; }
 
+/* Metric-normalized aliases to reduce layout shift when swapping app fonts */
+@font-face {
+  font-family: 'App Lexend Metric';
+  src: local('Lexend');
+  size-adjust: 98%;
+}
+
+@font-face {
+  font-family: 'App Comic Sans Metric';
+  src: local('Comic Sans MS');
+  size-adjust: 90%;
+}
+
+@font-face {
+  font-family: 'App Arial Metric';
+  src: local('Arial');
+  size-adjust: 95%;
+}
+
+@font-face {
+  font-family: 'App Verdana Metric';
+  src: local('Verdana');
+  size-adjust: 92%;
+}
+
 /* Accessibility Font Classes */
 .game-font-default {
   /* Uses the language-specific font class already set */
@@ -69,22 +94,22 @@ body.no-scroll {
 }
 
 .app-font-lexend {
-  --app-language-font: 'Lexend', 'Atkinson Hyperlegible', 'Noto Sans', sans-serif;
+  --app-language-font: 'App Lexend Metric', 'Lexend', 'Atkinson Hyperlegible', 'Noto Sans', sans-serif;
   --app-font-size-adjust: 0.53;
 }
 
 .app-font-comic-sans {
-  --app-language-font: 'Comic Sans MS', 'Comic Sans', 'Nunito', sans-serif;
+  --app-language-font: 'App Comic Sans Metric', 'Comic Sans MS', 'Comic Sans', 'Nunito', sans-serif;
   --app-font-size-adjust: 0.5;
 }
 
 .app-font-arial {
-  --app-language-font: Arial, 'Nunito', sans-serif;
+  --app-language-font: 'App Arial Metric', Arial, 'Nunito', sans-serif;
   --app-font-size-adjust: 0.52;
 }
 
 .app-font-verdana {
-  --app-language-font: Verdana, Geneva, 'Nunito', sans-serif;
+  --app-language-font: 'App Verdana Metric', Verdana, Geneva, 'Nunito', sans-serif;
   --app-font-size-adjust: 0.55;
 }
 
