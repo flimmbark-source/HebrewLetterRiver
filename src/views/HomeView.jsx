@@ -168,8 +168,9 @@ export default function HomeView() {
     vocab: 'Vocabulary'
   }), []);
 
-  const recentModes = useMemo(
-    () => (player?.recentModesPlayed ?? player?.modesPlayed ?? []).slice(-4).reverse().map((modeId) => {
+  const recentModes = useMemo(() => {
+    const modeIds = (player?.recentModesPlayed ?? player?.modesPlayed ?? []).slice(-12).reverse();
+    const labels = modeIds.map((modeId) => {
       const explicitLabel = modeLabelById[modeId];
       if (explicitLabel) return explicitLabel;
 
@@ -184,9 +185,11 @@ export default function HomeView() {
       }
 
       return modeId;
-    }),
-    [player?.modesPlayed, player?.recentModesPlayed, modeLabelById]
-  );
+    });
+
+    // Show only one entry per game mode in profile activity.
+    return Array.from(new Set(labels));
+  }, [player?.modesPlayed, player?.recentModesPlayed, modeLabelById]);
 
   const totalWordsLearned = seenWordEntries.length;
   const totalWordTarget = bridgeBuilderWords.length;
@@ -332,10 +335,10 @@ export default function HomeView() {
             <div className="space-y-2">
               <p className="text-sm font-bold text-[#4a6365]">Game Activity</p>
               {recentModes.length > 0 ? (
-                recentModes.slice(0, 3).map((modeName, index) => {
+                recentModes.slice(0, 3).map((modeName) => {
                   const modeUi = modeDisplayByName[modeName] ?? { icon: 'sports_esports', iconClass: 'text-[#1b6b4f]', bgClass: 'bg-[#1b6b4f]/10', badgeClass: 'text-[#1b6b4f]' };
                   return (
-                    <div key={`${modeName}-${index}`} className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm">
+                    <div key={modeName} className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm">
                       <div className={`flex h-9 w-9 items-center justify-center rounded-full ${modeUi.bgClass}`}>
                         <Icon className={`text-lg ${modeUi.iconClass}`}>{modeUi.icon}</Icon>
                       </div>
