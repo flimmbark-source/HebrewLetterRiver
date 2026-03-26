@@ -160,6 +160,7 @@ body.no-scroll {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-block-size: 1.4em;
 }
 
 .main-content {
