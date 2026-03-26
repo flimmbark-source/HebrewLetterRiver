@@ -150,20 +150,32 @@ body.no-scroll {
 }
 
 /* Prevent font swaps from changing container heights.
-   Different fonts have different character widths; without nowrap,
-   text reflows to a different number of lines per font, resizing
-   every card/section on the page. */
-.app-shell :is(h1, h2, h3, h4, h5, h6, p, label, button, select) {
+   Different fonts have different character widths; without these
+   constraints, text reflows to a different number of lines per font,
+   resizing every card/section on the page.
+
+   Headings, labels, buttons → single-line (nowrap + ellipsis).
+   Paragraphs → allow wrapping but cap at 2 visible lines so the
+   height stays fixed regardless of which font is active. */
+.app-shell :is(h1, h2, h3, h4, h5, h6, label, button, select) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Opt-in wrapping for elements that genuinely need multi-line text */
+.app-shell p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* Opt-in full wrapping for elements that need unlimited lines */
 .app-shell :is(.leading-relaxed, .whitespace-normal, .text-wrap) {
   white-space: normal;
   overflow: visible;
-  text-overflow: unset;
+  -webkit-line-clamp: unset;
+  display: block;
 }
 
 /* Game modes use fixed fonts — restore normal wrapping inside them */
@@ -171,6 +183,8 @@ body.no-scroll {
   white-space: normal;
   overflow: visible;
   text-overflow: unset;
+  -webkit-line-clamp: unset;
+  display: revert;
 }
 
 .main-content {
