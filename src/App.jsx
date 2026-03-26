@@ -323,7 +323,7 @@ function Shell() {
       <OfflineIndicator />
       <PWAInstallPrompt />
       <PlayModeModal />
-      <main className="flex-1 main-content">
+      <main className={`flex-1 main-content ${fontClass}`} dir={direction}>
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomeView />} />

@@ -64,23 +64,23 @@ body.no-scroll {
 
 /* App font classes (UI only) */
 .app-font-default {
-  font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --app-language-font: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .app-font-lexend {
-  font-family: 'Lexend', 'Atkinson Hyperlegible', 'Noto Sans', sans-serif;
+  --app-language-font: 'Lexend', 'Atkinson Hyperlegible', 'Noto Sans', sans-serif;
 }
 
 .app-font-comic-sans {
-  font-family: 'Comic Sans MS', 'Comic Sans', 'Nunito', sans-serif;
+  --app-language-font: 'Comic Sans MS', 'Comic Sans', 'Nunito', sans-serif;
 }
 
 .app-font-arial {
-  font-family: Arial, 'Nunito', sans-serif;
+  --app-language-font: Arial, 'Nunito', sans-serif;
 }
 
 .app-font-verdana {
-  font-family: Verdana, Geneva, 'Nunito', sans-serif;
+  --app-language-font: Verdana, Geneva, 'Nunito', sans-serif;
 }
 
 /* Keep game modes controlled by Game Font settings (not App Font). */
