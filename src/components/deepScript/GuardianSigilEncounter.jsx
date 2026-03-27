@@ -4,7 +4,7 @@ const ACTIVE_COUNT = 3;
 const BELT_SIZE = 3;
 const START_TIME = 5;
 const TIMER_STEP = 0.1;
-const TIMER_INTERVAL_MS = 100;
+const TIMER_INTERVAL_MS = 750;
 
 const ATTACK_PROFILES = [
   { y: '58vh', durationMs: 1500, impactMs: 820 },
