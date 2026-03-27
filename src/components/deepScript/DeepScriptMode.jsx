@@ -220,8 +220,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
 
   // ─── Combat End ───────────────────────────────────────────
 
-  const handleCombatEnd = useCallback((result, wordId) => {
+  const handleCombatEnd = useCallback((result, wordId, options = {}) => {
     const { chamberId, isMiniboss } = activeCombat || {};
+    const { skipHealthPenalty = false } = options;
 
     if (result === 'victory') {
       // Mark chamber as resolved
@@ -282,12 +283,16 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     } else {
       // Defeat — lose health
       const currentRun = runStateRef.current;
-      const newHealth = (currentRun?.health ?? 1) - 1;
+      const newHealth = skipHealthPenalty
+        ? (currentRun?.health ?? 0)
+        : ((currentRun?.health ?? 1) - 1);
 
-      setRunState(prev => ({
-        ...prev,
-        health: Math.max(0, prev.health - 1),
-      }));
+      if (!skipHealthPenalty) {
+        setRunState(prev => ({
+          ...prev,
+          health: Math.max(0, prev.health - 1),
+        }));
+      }
 
       if (newHealth <= 0) {
         setEndResult('defeat');
@@ -308,6 +313,13 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
 
     setActiveCombat(null);
   }, [activeCombat, isGuidedPackRun, onRunComplete, floorNumber]);
+
+  const handleGuardianStrike = useCallback((damage = 1) => {
+    setRunState(prev => ({
+      ...prev,
+      health: Math.max(0, prev.health - damage),
+    }));
+  }, []);
 
   const handleNextFloor = useCallback(() => {
     if (isGuidedPackRun) {
@@ -447,6 +459,16 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
 
   // Combat screen
   if (screen === 'combat' && activeCombat) {
+    const guardianWords = floorWordPool
+      .filter(word => word && !word.isMiniboss)
+      .map(word => ({
+        id: word.id,
+        hebrew: word.hebrew,
+        transliteration: word.transliteration,
+        meaning: word.english,
+      }))
+      .filter(word => word.hebrew && word.transliteration && word.meaning);
+
     return (
       <div className="ds-mode">
         <CombatScreen
@@ -454,6 +476,8 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
           runState={runState}
           onEnd={handleCombatEnd}
           isMiniboss={activeCombat.isMiniboss}
+          floorWords={guardianWords}
+          onGuardianStrike={handleGuardianStrike}
           onOpenMenu={() => setIsPauseMenuOpen(true)}
         />
         {isPauseMenuOpen && (

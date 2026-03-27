@@ -731,6 +731,141 @@
   border-radius: 1px;
 }
 
+/* ─── Guardian Sigil encounter ───────────────────────────── */
+.ds-encounter--guardian {
+  width: min(620px, 90%);
+  max-width: none;
+  top: 10%;
+  gap: 12px;
+}
+
+.ds-guardian-word {
+  width: min(420px, 100%);
+  border: 1px solid rgba(196, 149, 90, 0.25);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(30, 34, 40, 0.86), rgba(18, 22, 30, 0.9));
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.42);
+  padding: 8px 12px 10px;
+  color: var(--ds-parchment);
+  text-align: center;
+  position: relative;
+}
+
+.ds-guardian-word--targetable:hover {
+  border-color: rgba(240, 198, 116, 0.45);
+}
+
+.ds-guardian-word--wrong {
+  animation: ds-wrong-shake 0.22s ease-in-out;
+}
+
+.ds-guardian-timer-track {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.8);
+  overflow: hidden;
+}
+
+.ds-guardian-timer-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+  transition: width 80ms linear;
+}
+
+.ds-guardian-hebrew {
+  margin-top: 8px;
+  font-size: clamp(30px, 4.5vw, 48px);
+  font-weight: 700;
+  line-height: 1;
+  position: relative;
+  min-height: 52px;
+  animation: ds-guardian-drift 3.1s ease-in-out infinite;
+}
+
+.ds-guardian-hebrew.is-attacking {
+  animation: ds-guardian-strike 1.55s cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+
+@keyframes ds-guardian-drift {
+  0% { transform: translateY(0px) rotate(-1deg); }
+  50% { transform: translateY(-5px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(-1deg); }
+}
+
+@keyframes ds-guardian-strike {
+  0% { transform: translateY(0vh) scale(1); }
+  20% { transform: translateY(-3vh) scale(1.04); }
+  60% { transform: translateY(58vh) scale(0.95); }
+  78% { transform: translateY(58vh) scale(0.95); }
+  100% { transform: translateY(0vh) scale(1); }
+}
+
+.ds-guardian-impact {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 2px solid rgba(244, 244, 245, 0.75);
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: ds-guardian-impact 0.45s ease-out 1;
+}
+
+@keyframes ds-guardian-impact {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.6); }
+  35% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1.55); }
+}
+
+.ds-guardian-seals {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.ds-guardian-seal {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.65);
+}
+
+.ds-guardian-seal.is-done {
+  border-color: rgba(74, 222, 128, 0.9);
+  background: rgba(74, 222, 128, 0.95);
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.45);
+}
+
+.ds-guardian-belt {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px 12px calc(14px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0) 0%, rgba(2, 6, 23, 0.85) 34%, rgba(2, 6, 23, 0.95) 100%);
+}
+
+.ds-guardian-token {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.88);
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ds-guardian-token.is-active {
+  border-color: rgba(240, 198, 116, 0.65);
+  box-shadow: 0 0 14px rgba(240, 198, 116, 0.22);
+}
+
 
 /* ─── Combat Controls Container ─────────────────────────── */
 .ds-combat-controls {
