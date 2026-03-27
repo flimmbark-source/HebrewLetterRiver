@@ -114,7 +114,7 @@ function tokenLabel(token, wordById) {
   return token.kind === 'meaning' ? word.meaning : word.transliteration;
 }
 
-export default function GuardianSigilEncounter({ words, onDamage, onVictory, getGameFontClass }) {
+export default function GuardianSigilEncounter({ words, onDamage, onVictory, getGameFontClass, paused = false }) {
   const initial = useMemo(() => {
     const seed = words.slice(0, ACTIVE_COUNT).map((word, idx) => makeAttacker(word, START_TIME + (idx * 1.2)));
     const reserve = words.slice(ACTIVE_COUNT);
@@ -157,8 +157,12 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
     };
   }, []);
 
+  const pausedRef = useRef(paused);
+  useEffect(() => { pausedRef.current = paused; }, [paused]);
+
   useEffect(() => {
     const timer = window.setInterval(() => {
+      if (pausedRef.current) return;
       setAttackers((prev) => prev.map((attacker) => {
         if (attacker.isAttacking) return attacker;
         const nextTimer = +(attacker.timer - TIMER_STEP).toFixed(1);
@@ -171,6 +175,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
   }, []);
 
   useEffect(() => {
+    if (paused) return;
     attackers.forEach((attacker) => {
       if (!attacker.isAttacking) return;
       const key = `${attacker.id}:${attacker.attackTick}`;
@@ -198,7 +203,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
 
       attackTimersRef.current.set(key, { impactTimeout, recoverTimeout });
     });
-  }, [attackers, onDamage]);
+  }, [attackers, onDamage, paused]);
 
   const applyToken = useCallback((token, attackerId) => {
     const attacker = attackers.find((item) => item.id === attackerId);

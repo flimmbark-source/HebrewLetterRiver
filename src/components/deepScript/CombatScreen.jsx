@@ -33,6 +33,7 @@ export default function CombatScreen({
   onOpenMenu,
   floorWords = [],
   onGuardianStrike = null,
+  isPaused = false,
 }) {
   const { getGameFontClass } = useFontSettings();
   const initialState = useMemo(() => {
@@ -299,6 +300,7 @@ export default function CombatScreen({
               getGameFontClass={getGameFontClass}
               onDamage={(damage) => onGuardianStrike?.(damage)}
               onVictory={() => onEnd('victory', wordId)}
+              paused={isPaused}
             />
           ) : (
             <>
