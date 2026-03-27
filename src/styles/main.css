@@ -163,6 +163,31 @@ body.no-scroll {
   min-block-size: 1.4em;
 }
 
+/* Pin heading heights so font swaps don't resize containers */
+.app-shell :is(h1, h2, h3, h4) {
+  max-block-size: 1.4em;
+}
+
+/* Stable card containers: prevent font-induced height changes */
+.stable-card {
+  overflow: hidden;
+}
+
+/* Clamp text to a fixed number of lines so containers stay stable across fonts */
+.line-clamp-1-stable {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+.line-clamp-2-stable {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
 .main-content {
   background: #FFFFFF !important;
   border-radius: 0;

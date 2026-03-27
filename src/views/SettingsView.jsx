@@ -258,7 +258,7 @@ export default function SettingsView() {
       </header>
 
       <main className="mx-auto max-w-2xl space-y-8 px-6 pt-20">
-        <section className="relative flex items-center gap-6 overflow-hidden rounded-xl p-6" style={{ background: 'var(--app-surface)' }}>
+        <section className="stable-card relative flex items-center gap-6 overflow-hidden rounded-xl p-6" style={{ background: 'var(--app-surface)' }}>
           <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full blur-2xl" style={{ background: 'var(--app-primary-container)' }}></div>
           <div className="relative">
             <div className="h-20 w-20 overflow-hidden rounded-full border-4 shadow-lg" style={{ borderColor: 'var(--app-card-bg)' }}>
@@ -286,13 +286,13 @@ export default function SettingsView() {
         <section className="space-y-4">
           <h3 className="px-2 text-sm font-bold uppercase tracking-widest text-[#4a6365]">Language Preferences</h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="rounded-xl bg-white p-5 shadow-sm">
+            <div className="stable-card rounded-xl bg-white p-5 shadow-sm">
               <label htmlFor="settings-app-language-select" className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <Icon className="text-[#1b6b4f]">language</Icon>
                   <div>
-                    <p className="text-xs font-medium text-[#4a6365]">App Language</p>
-                    <p className="font-bold">{displayLanguageOptions.find((option) => option.id === appLanguageId)?.name}</p>
+                    <p className="text-xs font-medium text-[#4a6365] line-clamp-1">App Language</p>
+                    <p className="font-bold line-clamp-1">{displayLanguageOptions.find((option) => option.id === appLanguageId)?.name}</p>
                   </div>
                 </div>
                 <Icon className="text-[#bec9c2]">expand_more</Icon>
@@ -304,13 +304,13 @@ export default function SettingsView() {
               </select>
             </div>
 
-            <div className="rounded-xl bg-white p-5 shadow-sm">
+            <div className="stable-card rounded-xl bg-white p-5 shadow-sm">
               <label htmlFor="settings-practice-language-select" className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="flex h-6 w-8 items-center justify-center overflow-hidden rounded border border-[#bec9c2]/20 bg-slate-100 text-base">{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>
                   <div>
-                    <p className="text-xs font-medium text-[#4a6365]">I'm Learning</p>
-                    <p className="font-bold">{displayLanguageOptions.find((option) => option.id === languageId)?.name}</p>
+                    <p className="text-xs font-medium text-[#4a6365] line-clamp-1">I'm Learning</p>
+                    <p className="font-bold line-clamp-1">{displayLanguageOptions.find((option) => option.id === languageId)?.name}</p>
                   </div>
                 </div>
                 <span className="rounded-md bg-[#1b6b4f] px-2 py-1 text-[10px] font-black text-white">ACTIVE</span>
@@ -326,7 +326,7 @@ export default function SettingsView() {
 
         <section className="space-y-4">
           <h3 className="px-2 text-sm font-bold uppercase tracking-widest text-[#4a6365]">Game Settings</h3>
-          <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+          <div className="stable-card overflow-hidden rounded-xl bg-white shadow-sm">
             <div className="space-y-5 p-4">
               <div className="rounded-lg border border-[#bec9c2]/25 p-4">
                 <Toggle id="settings-dark-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('darkMode')}>Dark Mode</span>} icon="dark_mode" checked={darkMode} onChange={setDarkMode} />
