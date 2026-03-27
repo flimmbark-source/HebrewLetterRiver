@@ -245,49 +245,92 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
     onVictory();
   }, [isWon, onVictory]);
 
+  const totalEnemies = words.length;
+  const defeated = totalEnemies - attackers.length - reserve.length;
+
   return (
     <>
-      <div className="ds-encounter ds-encounter--guardian">
-        {attackers.map((attacker) => {
-          const progress = attacker.timer / attacker.timerMax;
-          const impactActive = impacts.some((impact) => impact.wordId === attacker.id);
+      {/* ═══ BATTLE ARENA — enemy formation ═══ */}
+      <div className="ds-battle-arena">
+        <div className="ds-battle-status">
+          <span className="ds-battle-label">Guardian Sigil</span>
+          <span className="ds-battle-count">{defeated}/{totalEnemies}</span>
+        </div>
 
-          return (
-            <button
-              type="button"
-              key={attacker.id}
-              className={`ds-guardian-word ${selected ? 'ds-guardian-word--targetable' : ''} ${wrongPulseId === attacker.id ? 'ds-guardian-word--wrong' : ''}`}
-              onClick={() => {
-                if (selected) applyToken(selected, attacker.id);
-              }}
-            >
-              <div className="ds-guardian-timer-track">
-                <div className="ds-guardian-timer-fill" style={{ width: `${Math.max(0, progress * 100)}%` }} />
-              </div>
-              <div className={`ds-guardian-hebrew ${attacker.isAttacking ? 'is-attacking' : ''}`}>
-                <span className={getGameFontClass(`guardian-${attacker.id}`)}>{attacker.hebrew}</span>
-                {impactActive && <span className="ds-guardian-impact" />}
-              </div>
-              <div className="ds-guardian-seals">
-                <span className={`ds-guardian-seal ${attacker.solved.meaning ? 'is-done' : ''}`} />
-                <span className={`ds-guardian-seal ${attacker.solved.transliteration ? 'is-done' : ''}`} />
-              </div>
-            </button>
-          );
-        })}
+        <div className="ds-battle-formation">
+          {attackers.map((attacker, idx) => {
+            const progress = attacker.timer / attacker.timerMax;
+            const impactActive = impacts.some((impact) => impact.wordId === attacker.id);
+            const isUrgent = progress < 0.3 && !attacker.isAttacking;
+
+            return (
+              <button
+                type="button"
+                key={attacker.id}
+                className={[
+                  'ds-battle-enemy',
+                  selected ? 'ds-battle-enemy--targetable' : '',
+                  wrongPulseId === attacker.id ? 'ds-battle-enemy--wrong' : '',
+                  isUrgent ? 'ds-battle-enemy--urgent' : '',
+                  attacker.isAttacking ? 'ds-battle-enemy--striking' : '',
+                ].filter(Boolean).join(' ')}
+                style={{ '--enemy-index': idx }}
+                onClick={() => {
+                  if (selected) applyToken(selected, attacker.id);
+                }}
+              >
+                <div className="ds-battle-enemy-frame">
+                  <div className="ds-battle-timer-track">
+                    <div
+                      className={`ds-battle-timer-fill ${isUrgent ? 'ds-battle-timer-fill--urgent' : ''}`}
+                      style={{ width: `${Math.max(0, progress * 100)}%` }}
+                    />
+                  </div>
+
+                  <div className={`ds-battle-hebrew ${attacker.isAttacking ? 'is-attacking' : ''}`}>
+                    <span className={getGameFontClass(`guardian-${attacker.id}`)}>{attacker.hebrew}</span>
+                  </div>
+
+                  <div className="ds-battle-seals">
+                    <span className={`ds-battle-seal ${attacker.solved.meaning ? 'is-done' : ''}`} title="Meaning" />
+                    <span className={`ds-battle-seal ${attacker.solved.transliteration ? 'is-done' : ''}`} title="Transliteration" />
+                  </div>
+
+                  {impactActive && <span className="ds-battle-impact" />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {reserve.length > 0 && (
+          <div className="ds-battle-reserve">
+            {reserve.map((_, i) => (
+              <span key={i} className="ds-battle-reserve-pip" />
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="ds-guardian-belt" role="group" aria-label="Guardian answer pool">
+      {/* ═══ DIVIDER — battle line ═══ */}
+      <div className="ds-battle-divider">
+        <div className="ds-battle-divider-line" />
+        <span className="ds-battle-divider-rune">⟡</span>
+        <div className="ds-battle-divider-line" />
+      </div>
+
+      {/* ═══ ACTION BAR — token selection ═══ */}
+      <div className="ds-battle-actionbar" role="group" aria-label="Guardian answer pool">
         {belt.map((token) => {
           const active = selected && tokenId(selected) === tokenId(token);
           return (
             <button
               type="button"
               key={tokenId(token)}
-              className={`ds-guardian-token ${active ? 'is-active' : ''}`}
+              className={`ds-battle-token ${active ? 'is-active' : ''}`}
               onClick={() => setSelected(active ? null : token)}
             >
-              {tokenLabel(token, wordById)}
+              <span className="ds-battle-token-label">{tokenLabel(token, wordById)}</span>
             </button>
           );
         })}

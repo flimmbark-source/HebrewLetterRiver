@@ -269,7 +269,7 @@ export default function CombatScreen({
 
         <div className="ds-hud-progress">
           <span className="ds-hud-progress-text">
-            {isGuardianSigil ? 'Guardian Sigil' : `${completedSlots}/${totalSlots}`}
+            {isGuardianSigil ? '⚔ Battle' : `${completedSlots}/${totalSlots}`}
           </span>
         </div>
       </div>
