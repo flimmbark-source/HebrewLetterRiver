@@ -381,13 +381,6 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
                     <span className={`ds-battle-seal ${attacker.solved.transliteration ? 'is-done' : ''}`} title="Transliteration" />
                   </div>
 
-                  {impactActive && (
-                    <>
-                      <span className="ds-battle-impact" />
-                      <span className="ds-battle-slash ds-battle-slash--a" />
-                      <span className="ds-battle-slash ds-battle-slash--b" />
-                    </>
-                  )}
                 </div>
               </button>
             );
@@ -452,9 +445,14 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
         </div>
       )}
 
-      {/* Screen hit vignette */}
+      {/* Player hit visuals — bottom of screen */}
       {impacts.length > 0 && (
-        <div className="ds-battle-hit-vignette" key={impacts[impacts.length - 1].id} />
+        <div className="ds-battle-player-hit" key={impacts[impacts.length - 1].id}>
+          <span className="ds-battle-hit-flash" />
+          <span className="ds-battle-slash ds-battle-slash--a" />
+          <span className="ds-battle-slash ds-battle-slash--b" />
+          <div className="ds-battle-hit-vignette" />
+        </div>
       )}
     </>
   );
