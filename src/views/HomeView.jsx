@@ -52,7 +52,7 @@ function LanguageCard({ id, label, value, onChange, options, leading, trailing }
           {leading}
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-[#4a6365]">{label}</p>
-            <p className="text-lg font-bold">{options.find((option) => option.id === value)?.name ?? value}</p>
+            <p className="line-clamp-1-stable text-lg font-bold">{options.find((option) => option.id === value)?.name ?? value}</p>
           </div>
         </div>
         {trailing}
@@ -253,7 +253,7 @@ export default function HomeView() {
     <div div className="relative min-h-screen bg-[#fef7ff] text-[#1d1a22]">
       <main className="mx-auto max-w-2xl space-y-8 px-6 pb-48 pt-8">
         <section>
-          <div className="flex flex-col items-center space-y-4 rounded-2xl border border-[#1b6b4f]/5 bg-white p-8 text-center shadow-sm">
+          <div className="stable-card flex flex-col items-center space-y-4 rounded-2xl border border-[#1b6b4f]/5 bg-white p-8 text-center shadow-sm">
             <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#f9f1fd]">
               <img alt="Avatar Large" className="h-20 w-20 rounded-full object-cover" src={playerAvatar || topAvatar} />
               <button onClick={() => setIsProfileEditorOpen(true)} className="absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 border-white bg-[#1b6b4f] p-2 text-white shadow-lg" type="button">
@@ -262,7 +262,7 @@ export default function HomeView() {
             </div>
             <div>
               <h1 className="text-2xl font-extrabold tracking-tight">{playerName}</h1>
-              <p className="text-sm text-[#4a6365]">Learning since January 2024</p>
+              <p className="line-clamp-1-stable text-sm text-[#4a6365]">Learning since January 2024</p>
             </div>
             <div className="mt-4 w-full space-y-2">
               <div className="flex justify-between text-xs font-bold text-[#1b6b4f]">
@@ -304,7 +304,7 @@ export default function HomeView() {
         <section className="space-y-4">
           <h2 className="px-2 text-xl font-bold">Profile Overview</h2>
 
-          <div className="space-y-4 rounded-2xl bg-[#f9f1fd] p-5">
+          <div className="stable-card space-y-4 rounded-2xl bg-[#f9f1fd] p-5">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-bold text-[#4a6365]">Recent Mastery</p>
@@ -319,7 +319,7 @@ export default function HomeView() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-[#4a6365]">Catch a few letters to unlock your mastery row.</p>
+                <p className="line-clamp-2-stable text-sm text-[#4a6365]">Catch a few letters to unlock your mastery row.</p>
               )}
               {recentWords.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto pb-1">
@@ -352,7 +352,7 @@ export default function HomeView() {
                   );
                 })
               ) : (
-                <p className="text-sm text-[#4a6365]">Start a game and your latest activity will appear here.</p>
+                <p className="line-clamp-2-stable text-sm text-[#4a6365]">Start a game and your latest activity will appear here.</p>
               )}
             </div>
 
@@ -369,7 +369,7 @@ export default function HomeView() {
         </section>
 
         <section className="grid grid-cols-2 gap-4">
-          <div className="space-y-3 rounded-2xl bg-[#f9f1fd] p-6">
+          <div className="stable-card space-y-3 rounded-2xl bg-[#f9f1fd] p-6">
             <div className="flex items-start justify-between gap-2">
               <Icon className="text-3xl text-[#855315]" filled>bolt</Icon>
               <button type="button" className="rounded-full bg-white/70 p-1 text-[#6f7973]" onClick={() => setIsEditingGoal((prev) => !prev)}>
@@ -391,11 +391,11 @@ export default function HomeView() {
                   <span className="text-xs font-semibold text-[#4a6365]">mins/day</span>
                 </div>
               ) : (
-                <p className="text-sm text-[#4a6365]">{dailyGoalMinutes} mins / day</p>
+                <p className="line-clamp-1-stable text-sm text-[#4a6365]">{dailyGoalMinutes} mins / day</p>
               )}
             </div>
           </div>
-          <div className="space-y-3 rounded-2xl bg-[#f9f1fd] p-6">
+          <div className="stable-card space-y-3 rounded-2xl bg-[#f9f1fd] p-6">
             <div className="flex items-start justify-between gap-2">
               <Icon className="text-3xl text-[#1b6b4f]" filled>notifications</Icon>
               <button type="button" className="rounded-full bg-white/70 p-1 text-[#6f7973]" onClick={() => setIsEditingReminder((prev) => !prev)}>
@@ -414,7 +414,7 @@ export default function HomeView() {
                   />
                 </div>
               ) : (
-                <p className="text-sm text-[#4a6365]">
+                <p className="line-clamp-1-stable text-sm text-[#4a6365]">
                   {formatReminderTime(reminderTime)}
                 </p>
               )}

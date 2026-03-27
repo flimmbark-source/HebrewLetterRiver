@@ -13,6 +13,7 @@ import {
   playDefeat,
 } from './dsSounds.js';
 import { useFontSettings } from '../../hooks/useFontSettings.js';
+import GuardianSigilEncounter from './GuardianSigilEncounter.jsx';
 
 /**
  * CombatScreen — roguelike dungeon-crawler combat encounter.
@@ -24,7 +25,16 @@ import { useFontSettings } from '../../hooks/useFontSettings.js';
  *   4. Ability cards row with tile sockets
  *   5. End Turn button
  */
-export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOpenMenu }) {
+export default function CombatScreen({
+  wordId,
+  runState,
+  onEnd,
+  isMiniboss,
+  onOpenMenu,
+  floorWords = [],
+  onGuardianStrike = null,
+  isPaused = false,
+}) {
   const { getGameFontClass } = useFontSettings();
   const initialState = useMemo(() => {
     const state = createCombatState(wordId, {
@@ -81,6 +91,13 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOp
       return () => clearTimeout(timer);
     }
   }, [combat?.phase, onEnd, wordId]);
+
+  useEffect(() => {
+    if (!isMiniboss || floorWords.length === 0) return;
+    if ((runState?.health ?? 0) <= 0) {
+      onEnd('defeat', wordId, { skipHealthPenalty: true });
+    }
+  }, [floorWords.length, isMiniboss, onEnd, runState?.health, wordId]);
 
   const handleProceed = useCallback(() => {
     onEnd('victory', wordId);
@@ -218,15 +235,18 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOp
   }, [combat?.log]);
 
   if (!combat) return <div className="ds-screen">Loading...</div>;
+  const isGuardianSigil = isMiniboss && floorWords.length > 0;
 
   const word = combat.word;
   const completedSlots = combat.answerTrack.filter(s => s.correct).length;
   const totalSlots = combat.answerTrack.length;
 
-  // Health pips (use combat-local health for curse damage tracking)
+  // Health pips
   const healthPips = [];
-  for (let i = 0; i < combat.maxHealth; i++) {
-    healthPips.push(i < combat.health);
+  const maxHealth = runState?.maxHealth ?? combat.maxHealth;
+  const activeHealth = runState?.health ?? combat.health;
+  for (let i = 0; i < maxHealth; i++) {
+    healthPips.push(i < activeHealth);
   }
 
   // Tile action availability
@@ -249,7 +269,9 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOp
         </div>
 
         <div className="ds-hud-progress">
-          <span className="ds-hud-progress-text">{completedSlots}/{totalSlots}</span>
+          <span className="ds-hud-progress-text">
+            {isGuardianSigil ? '⚔ Battle' : `${completedSlots}/${totalSlots}`}
+          </span>
         </div>
       </div>
 
@@ -272,58 +294,70 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOp
             <div className="ds-torch-flame" />
           </div>
 
-          {/* ═══ ENCOUNTER ═══ */}
-          <div className={`ds-encounter ${isMiniboss ? 'ds-encounter--boss' : ''}`}>
-            {isMiniboss && <div className="ds-encounter-boss-glow" />}
-            <div className="ds-encounter-sigil">
-              <div className="ds-encounter-rune-ring" />
-              <div className="ds-encounter-clue">
-                <span className={`ds-encounter-english ${getGameFontClass(`${word.id}-english`)}`}>{word.english}</span>
-                <span className={`ds-encounter-translit ${getGameFontClass(`${word.id}-translit`)}`}>{word.transliteration}</span>
+          {isGuardianSigil ? (
+            <GuardianSigilEncounter
+              words={floorWords}
+              getGameFontClass={getGameFontClass}
+              onDamage={(damage) => onGuardianStrike?.(damage)}
+              onVictory={() => onEnd('victory', wordId)}
+              paused={isPaused}
+            />
+          ) : (
+            <>
+              {/* ═══ ENCOUNTER ═══ */}
+              <div className={`ds-encounter ${isMiniboss ? 'ds-encounter--boss' : ''}`}>
+                {isMiniboss && <div className="ds-encounter-boss-glow" />}
+                <div className="ds-encounter-sigil">
+                  <div className="ds-encounter-rune-ring" />
+                  <div className="ds-encounter-clue">
+                    <span className={`ds-encounter-english ${getGameFontClass(`${word.id}-english`)}`}>{word.english}</span>
+                    <span className={`ds-encounter-translit ${getGameFontClass(`${word.id}-translit`)}`}>{word.transliteration}</span>
+                  </div>
+                </div>
+
+                {/* Inscription slots */}
+                <div className="ds-inscription" dir="rtl">
+                  {combat.answerTrack.map((slot, index) => {
+                    let slotCls = 'ds-rune-slot';
+                    if (slot.correct) {
+                      slotCls += ' ds-rune-slot--correct';
+                      if (justCorrectSlot === index) slotCls += ' ds-rune-slot--just-correct';
+                    } else if (slot.locked) {
+                      slotCls += ' ds-rune-slot--locked';
+                    } else if (justWrongSlot === index) {
+                      slotCls += ' ds-rune-slot--just-wrong';
+                    } else if (hasSelection && !slot.correct && !slot.locked) {
+                      slotCls += ' ds-rune-slot--target';
+                    }
+
+                    return (
+                      <button
+                        key={index}
+                        type="button"
+                        className={slotCls}
+                        onClick={() => handleSlotClick(index)}
+                        disabled={slot.correct || slot.locked || combat.phase !== 'active'}
+                      >
+                        {slot.correct ? (
+                          <span className={`ds-rune-letter ${getGameFontClass(`${word.id}-rune-${index}`)}`}>{slot.targetLetter}</span>
+                        ) : slot.locked ? (
+                          <span className="ds-rune-lock">🔒</span>
+                        ) : slot.revealed ? (
+                          <span className={`ds-rune-hint ${getGameFontClass(`${word.id}-hint-${index}`)}`}>{slot.targetLetter}</span>
+                        ) : (
+                          <span className="ds-rune-empty" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-
-            {/* Inscription slots */}
-            <div className="ds-inscription" dir="rtl">
-              {combat.answerTrack.map((slot, index) => {
-                let slotCls = 'ds-rune-slot';
-                if (slot.correct) {
-                  slotCls += ' ds-rune-slot--correct';
-                  if (justCorrectSlot === index) slotCls += ' ds-rune-slot--just-correct';
-                } else if (slot.locked) {
-                  slotCls += ' ds-rune-slot--locked';
-                } else if (justWrongSlot === index) {
-                  slotCls += ' ds-rune-slot--just-wrong';
-                } else if (hasSelection && !slot.correct && !slot.locked) {
-                  slotCls += ' ds-rune-slot--target';
-                }
-
-                return (
-                  <button
-                    key={index}
-                    type="button"
-                    className={slotCls}
-                    onClick={() => handleSlotClick(index)}
-                    disabled={slot.correct || slot.locked || combat.phase !== 'active'}
-                  >
-                    {slot.correct ? (
-                      <span className={`ds-rune-letter ${getGameFontClass(`${word.id}-rune-${index}`)}`}>{slot.targetLetter}</span>
-                    ) : slot.locked ? (
-                      <span className="ds-rune-lock">🔒</span>
-                    ) : slot.revealed ? (
-                      <span className={`ds-rune-hint ${getGameFontClass(`${word.id}-hint-${index}`)}`}>{slot.targetLetter}</span>
-                    ) : (
-                      <span className="ds-rune-empty" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
 
-      <div className="ds-combat-controls">
+      {!isGuardianSigil && <div className="ds-combat-controls">
         <div className="ds-tray-end-labels">
         </div>
         <div className="ds-tile-row ds-tile-row--solo">
@@ -378,10 +412,10 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOp
             <div className="ds-ability-effect">Vowels</div>
           </button>
         </div>
-      </div>
+      </div>}
 
       {/* Choice Bundle Modal */}
-      {overflowBursts.map((burst, index) => {
+      {!isGuardianSigil && overflowBursts.map((burst, index) => {
         const lane = (index % 5) - 2; // -2, -1, 0, 1, 2
         const columnOffset = lane * 28;
         const rowOffset = Math.floor(index / 5) * 24;
@@ -406,7 +440,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOp
         );
       })}
 
-      {combat.choiceBundle && (
+      {!isGuardianSigil && combat.choiceBundle && (
         <div className="ds-choice-overlay">
           <div className="ds-choice-modal">
             <h3 className="ds-choice-title">Choose a Rune</h3>
@@ -427,7 +461,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOp
       )}
 
       {/* Phase Overlays */}
-      {combat.phase === 'victory' && (
+      {!isGuardianSigil && combat.phase === 'victory' && (
         <div className="ds-phase-overlay ds-phase-victory">
           <div className="ds-phase-message">Word Vanquished!</div>
           <div className={`ds-phase-word ${getGameFontClass(`${word.id}-phase-hebrew`)}`} dir="rtl">{word.hebrew}</div>
@@ -443,7 +477,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOp
           </button>
         </div>
       )}
-      {combat.phase === 'defeat' && (
+      {!isGuardianSigil && combat.phase === 'defeat' && (
         <div className="ds-phase-overlay ds-phase-defeat">
           <div className="ds-phase-message">Overwhelmed...</div>
           <div className={`ds-phase-word ${getGameFontClass(`${word.id}-defeat`)}`} dir="rtl">{word.hebrew} — {word.english}</div>
@@ -451,7 +485,7 @@ export default function CombatScreen({ wordId, runState, onEnd, isMiniboss, onOp
       )}
 
       {/* Log toast */}
-      {latestLogEntry && (
+      {!isGuardianSigil && latestLogEntry && (
         <div className="ds-log-toast" key={combat.log.length}>
           {latestLogEntry.message || latestLogEntry.type}
         </div>

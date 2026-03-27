@@ -731,6 +731,534 @@
   border-radius: 1px;
 }
 
+/* ─── Guardian Sigil Battle Screen ───────────────────────── */
+
+/* Battle arena — fills the dungeon viewport */
+.ds-battle-arena {
+  position: absolute;
+  top: 16%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  width: min(600px, 92%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Status header — label + defeated count */
+.ds-battle-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 4px 4px;
+}
+
+.ds-battle-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ds-ember);
+  text-shadow: 0 0 10px var(--ds-ember-glow);
+}
+
+.ds-battle-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ds-bronze-light);
+  letter-spacing: 0.5px;
+}
+
+/* Enemy formation — horizontal row */
+.ds-battle-formation {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Individual enemy card */
+.ds-battle-enemy {
+  flex: 1;
+  min-width: 0;
+  max-width: 180px;
+  border: 1px solid var(--ds-bronze-dim);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg,
+      rgba(30, 34, 40, 0.92) 0%,
+      rgba(13, 15, 20, 0.95) 100%
+    );
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(196, 149, 90, 0.08);
+  padding: 0;
+  color: var(--ds-parchment);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  animation: ds-battle-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--enemy-index, 0) * 80ms) both;
+}
+
+@keyframes ds-battle-enter {
+  0% { opacity: 0; transform: translateY(-16px) scale(0.92); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Idle menace — subtle glow pulse, no translation */
+.ds-battle-enemy:not(.ds-battle-enemy--striking):not(.ds-battle-enemy--urgent):not(.ds-battle-enemy--wrong) {
+  animation: ds-battle-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--enemy-index, 0) * 80ms) both,
+             ds-battle-idle 3s ease-in-out infinite;
+}
+
+@keyframes ds-battle-idle {
+  0%, 100% {
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(196, 149, 90, 0.08);
+  }
+  50% {
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 8px rgba(196, 149, 90, 0.12), inset 0 1px 0 rgba(196, 149, 90, 0.08);
+  }
+}
+
+.ds-battle-enemy--targetable {
+  cursor: pointer;
+}
+
+.ds-battle-enemy--targetable:hover,
+.ds-battle-enemy--dragover {
+  border-color: var(--ds-gold);
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.5),
+    0 0 16px var(--ds-gold-glow);
+}
+
+.ds-battle-enemy--dragover {
+  transform: scale(1.04);
+}
+
+.ds-battle-enemy--wrong {
+  animation: ds-wrong-shake 0.22s ease-in-out;
+}
+
+.ds-battle-enemy--urgent {
+  border-color: rgba(239, 68, 68, 0.55);
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.5),
+    0 0 12px var(--ds-ember-glow);
+  animation: ds-battle-urgent-pulse 0.7s ease-in-out infinite;
+}
+
+@keyframes ds-battle-urgent-pulse {
+  0%, 100% { box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 10px var(--ds-ember-glow); }
+  50% { box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 22px var(--ds-ember-glow); }
+}
+
+/* Striking — fly down and slam the bottom of the screen */
+.ds-battle-enemy--striking {
+  border-color: rgba(239, 68, 68, 0.8);
+  animation: ds-battle-strike 1.5s ease-in-out 1;
+  z-index: 6;
+}
+
+/* Inner frame */
+.ds-battle-enemy-frame {
+  padding: 8px 10px 10px;
+  position: relative;
+}
+
+/* Timer bar */
+.ds-battle-timer-track {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.85);
+  overflow: hidden;
+}
+
+.ds-battle-timer-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--ds-bronze), var(--ds-gold));
+  transition: width 80ms linear;
+}
+
+.ds-battle-timer-fill--urgent {
+  background: linear-gradient(90deg, #f59e0b, var(--ds-ember));
+}
+
+/* Hebrew text */
+.ds-battle-hebrew {
+  margin-top: 8px;
+  font-size: clamp(26px, 4vw, 42px);
+  font-weight: 700;
+  line-height: 1;
+  position: relative;
+  min-height: 44px;
+}
+
+@keyframes ds-battle-strike {
+  /* Rest */
+  0% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+  }
+  /* Wind-up: coil back */
+  12% {
+    transform: scale(0.9) translateY(-14px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 22px rgba(239,68,68,0.5);
+  }
+  /* Slam: fast strike to the bottom */
+  28% {
+    transform: scale(1.12, 0.9) translateY(55vh);
+    box-shadow: 0 0 50px rgba(255,140,60,0.65), 0 0 90px rgba(239,68,68,0.3);
+  }
+  /* Return: smooth arc home */
+  100% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+  }
+}
+
+/* Seal indicators (meaning + transliteration) */
+.ds-battle-seals {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.ds-battle-seal {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: rgba(15, 23, 42, 0.6);
+  transition: all 0.25s ease;
+}
+
+.ds-battle-seal.is-done {
+  border-color: rgba(74, 222, 128, 0.9);
+  background: rgba(74, 222, 128, 0.95);
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+
+/* ─── Player Hit Visuals (bottom of screen) ────────────────── */
+
+/* Container anchored to the bottom-center */
+.ds-battle-player-hit {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Radial glow from the bottom */
+.ds-battle-hit-flash {
+  position: absolute;
+  bottom: 0;
+  left: 5%;
+  right: 5%;
+  height: 70%;
+  border-radius: 50% 50% 0 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(255,140,60,0.5) 0%, rgba(239,68,68,0.15) 40%, transparent 70%);
+  box-shadow: 0 0 60px rgba(239,68,68,0.4);
+  opacity: 0;
+  transform-origin: 50% 100%;
+  animation: ds-hit-flash 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
+}
+
+@keyframes ds-hit-flash {
+  0%   { opacity: 0; transform: scaleY(0.4) scaleX(0.7); }
+  20%  { opacity: 1; transform: scaleY(1) scaleX(1); }
+  100% { opacity: 0; transform: scaleY(0.8) scaleX(1.1); }
+}
+
+/* Slash marks */
+.ds-battle-slash {
+  position: absolute;
+  bottom: 25%;
+  left: 50%;
+  width: min(300px, 75%);
+  height: 2px;
+  pointer-events: none;
+  transform-origin: center;
+  border-radius: 2px;
+  opacity: 0;
+}
+
+.ds-battle-slash--a {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,220,120,0.9) 20%, rgba(255,220,120,0.9) 80%, transparent 100%);
+  animation: ds-slash-a 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1 forwards;
+}
+
+.ds-battle-slash--b {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,160,70,0.8) 20%, rgba(255,160,70,0.8) 80%, transparent 100%);
+  animation: ds-slash-b 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.06s 1 forwards;
+}
+
+@keyframes ds-slash-a {
+  0%   { opacity: 0; transform: translate(-50%, 0) rotate(-28deg) scaleX(0); }
+  25%  { opacity: 1; transform: translate(-50%, 0) rotate(-28deg) scaleX(1); }
+  100% { opacity: 0; transform: translate(-50%, 0) rotate(-28deg) scaleX(1); }
+}
+
+@keyframes ds-slash-b {
+  0%   { opacity: 0; transform: translate(-50%, 0) rotate(24deg) scaleX(0); }
+  25%  { opacity: 1; transform: translate(-50%, 0) rotate(24deg) scaleX(1); }
+  100% { opacity: 0; transform: translate(-50%, 0) rotate(24deg) scaleX(1); }
+}
+
+/* Full-screen vignette — red edges */
+.ds-battle-hit-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  animation: ds-hit-vignette 0.85s cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
+}
+
+@keyframes ds-hit-vignette {
+  0%   { box-shadow: inset 0 0 80px rgba(239,68,68,0.5), inset 0 0 140px rgba(239,68,68,0.12); }
+  100% { box-shadow: inset 0 0 0 transparent, inset 0 0 0 transparent; }
+}
+
+/* Reserve pips — enemies waiting */
+.ds-battle-reserve {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  padding-top: 2px;
+}
+
+.ds-battle-reserve-pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ds-bronze-dim);
+  opacity: 0.6;
+}
+
+/* ─── Battle Divider ───────────────────────────────────────── */
+.ds-battle-divider {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 32%;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(500px, 80%);
+  pointer-events: none;
+}
+
+.ds-battle-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--ds-bronze-dim) 30%,
+    var(--ds-bronze-dim) 70%,
+    transparent 100%
+  );
+  opacity: 0.4;
+}
+
+.ds-battle-divider-rune {
+  font-size: 14px;
+  color: var(--ds-bronze-dim);
+  opacity: 0.5;
+}
+
+/* ─── Action Bar ───────────────────────────────────────────── */
+.ds-battle-actionbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10%;
+  z-index: 7;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg,
+    rgba(2, 6, 23, 0) 0%,
+    rgba(13, 15, 20, 0.7) 30%,
+    rgba(13, 15, 20, 0.85) 100%
+  );
+}
+
+/* Token — beveled rune tablet shape */
+.ds-battle-token {
+  position: relative;
+  color: var(--ds-parchment);
+  padding: 14px 26px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: grab;
+  white-space: nowrap;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  clip-path: polygon(
+    10px 0%, calc(100% - 10px) 0%,
+    100% 40%, 100% 60%,
+    calc(100% - 10px) 100%, 10px 100%,
+    0% 60%, 0% 40%
+  );
+  background:
+    linear-gradient(170deg,
+      rgba(42, 38, 30, 0.95) 0%,
+      rgba(24, 22, 20, 0.98) 50%,
+      rgba(30, 28, 24, 0.96) 100%
+    );
+  transition: filter 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+}
+
+/* Outer border — a slightly larger clip behind the token */
+.ds-battle-token::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  clip-path: polygon(
+    10px 0%, calc(100% - 10px) 0%,
+    100% 40%, 100% 60%,
+    calc(100% - 10px) 100%, 10px 100%,
+    0% 60%, 0% 40%
+  );
+  background: linear-gradient(180deg, var(--ds-bronze-dim), rgba(60, 48, 28, 0.6));
+  z-index: -1;
+}
+
+/* Top highlight bevel */
+.ds-battle-token::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 18px;
+  right: 18px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(224, 184, 120, 0.25) 30%,
+    rgba(224, 184, 120, 0.25) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.ds-battle-token:active {
+  transform: scale(0.95);
+}
+
+/* Dragging source — fade out the original */
+.ds-battle-token.is-dragging {
+  opacity: 0.55;
+  transform: scale(0.95);
+  cursor: grabbing;
+  filter: brightness(0.7);
+}
+
+/* Kind colour tint — meaning gets a cool rune-blue hue */
+.ds-battle-token--meaning {
+  color: #c0d4f0;
+  text-shadow: 0 0 8px var(--ds-rune-blue-glow);
+}
+
+.ds-battle-token--meaning::before {
+  background: linear-gradient(180deg, rgba(91, 141, 217, 0.35), rgba(40, 50, 70, 0.5));
+}
+
+/* Transliteration — distinct green-teal so it doesn't blend into warm backgrounds */
+.ds-battle-token--transliteration {
+  color: #88e0b0;
+  text-shadow: 0 0 8px rgba(100, 210, 160, 0.3);
+}
+
+.ds-battle-token--transliteration::before {
+  background: linear-gradient(180deg, rgba(80, 190, 140, 0.3), rgba(30, 55, 45, 0.5));
+}
+
+/* Hover */
+.ds-battle-token:hover {
+  filter: brightness(1.2);
+}
+
+.ds-battle-token:hover::before {
+  background: linear-gradient(180deg, var(--ds-bronze), rgba(80, 64, 36, 0.7));
+}
+
+/* Active / selected */
+.ds-battle-token.is-active {
+  color: var(--ds-gold);
+  text-shadow: 0 0 10px var(--ds-gold-glow);
+  filter: brightness(1.15);
+}
+
+.ds-battle-token.is-active::before {
+  background: linear-gradient(180deg, var(--ds-gold), rgba(160, 120, 40, 0.7));
+  box-shadow: 0 0 14px var(--ds-gold-glow);
+}
+
+.ds-battle-token.is-active::after {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(240, 198, 116, 0.45) 30%,
+    rgba(240, 198, 116, 0.45) 70%,
+    transparent 100%
+  );
+}
+
+/* ─── Drag Ghost ───────────────────────────────────────────── */
+.ds-battle-drag-ghost {
+  position: fixed;
+  z-index: 100;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  padding: 14px 26px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  color: var(--ds-gold);
+  text-shadow: 0 0 12px var(--ds-gold-glow);
+  clip-path: polygon(
+    10px 0%, calc(100% - 10px) 0%,
+    100% 40%, 100% 60%,
+    calc(100% - 10px) 100%, 10px 100%,
+    0% 60%, 0% 40%
+  );
+  background:
+    linear-gradient(170deg,
+      rgba(52, 46, 30, 0.96) 0%,
+      rgba(30, 26, 20, 0.98) 50%,
+      rgba(40, 34, 24, 0.96) 100%
+    );
+  filter: brightness(1.3);
+  opacity: 0.92;
+}
+
+/* Kind tint on the ghost */
+.ds-battle-drag-ghost.ds-battle-token--meaning {
+  color: #d0e0ff;
+  text-shadow: 0 0 12px rgba(91, 141, 217, 0.5);
+}
+
+.ds-battle-drag-ghost.ds-battle-token--transliteration {
+  color: #a0f0cc;
+  text-shadow: 0 0 12px rgba(100, 210, 160, 0.5);
+}
+
 
 /* ─── Combat Controls Container ─────────────────────────── */
 .ds-combat-controls {

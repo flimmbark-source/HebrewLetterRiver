@@ -33,6 +33,7 @@ function collectFloorWordIds(floor) {
 export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGuidedPackRun = false }) {
   const hasCustomWordPool = !!(packWords && packWords.length > 0);
   const previousFloorWordIdsRef = useRef(new Set());
+  const runStateRef = useRef(null);
   const [wordSourceMode, setWordSourceMode] = useState('pack'); // pack | random (standalone only)
   const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | end
   const [isPauseMenuOpen, setIsPauseMenuOpen] = useState(false);
@@ -49,6 +50,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   const [activeMiniGame, setActiveMiniGame] = useState(null); // { chamberId, miniGameId }
   const [hasCompletedCapsulesMiniGameThisFloor, setHasCompletedCapsulesMiniGameThisFloor] = useState(false);
   const [floorMiniGameWords, setFloorMiniGameWords] = useState(null); // 3 words shared by capsules + pillar per floor
+  runStateRef.current = runState;
 
   const getRandomPackWordsForFloor = useCallback(() => {
     if (bridgeBuilderPacks.length === 0) return [];
@@ -218,8 +220,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
 
   // ─── Combat End ───────────────────────────────────────────
 
-  const handleCombatEnd = useCallback((result, wordId) => {
+  const handleCombatEnd = useCallback((result, wordId, options = {}) => {
     const { chamberId, isMiniboss } = activeCombat || {};
+    const { skipHealthPenalty = false } = options;
 
     if (result === 'victory') {
       // Mark chamber as resolved
@@ -234,6 +237,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         return { ...prev, chambers: newChambers };
       });
 
+      let updatedCombatsWon;
+      let updatedWordsCompleted;
+
       setRunState(prev => {
         const updated = {
           ...prev,
@@ -241,74 +247,79 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
           wordsCompleted: [...prev.wordsCompleted, wordId],
           roomsCompleted: prev.roomsCompleted + 1,
         };
+        updatedCombatsWon = updated.combatsWon;
+        updatedWordsCompleted = updated.wordsCompleted;
+        return updated;
+      });
 
+      // Defer event emission so it doesn't trigger setState in
+      // ProgressProvider during React's render cycle.
+      queueMicrotask(() => {
         emit('deep-script:combat-won', {
           wordId,
           isMiniboss,
-          combatsWon: updated.combatsWon,
+          combatsWon: updatedCombatsWon,
           floorNumber,
         });
 
-        return updated;
+        if (isMiniboss) {
+          emit('deep-script:run-end', {
+            result: 'victory',
+            floorNumber,
+            combatsWon: updatedCombatsWon,
+            wordsCompleted: updatedWordsCompleted,
+          });
+        }
       });
 
       // Check if miniboss was defeated = victory
       if (isMiniboss) {
         setEndResult('victory');
         setScreen('end');
-        setRunState(prev => {
-          emit('deep-script:run-end', {
-            result: 'victory',
-            floorNumber,
-            combatsWon: prev.combatsWon,
-            wordsCompleted: prev.wordsCompleted,
-          });
-          return prev;
-        });
         if (onRunComplete && isGuidedPackRun) onRunComplete('victory');
       } else {
         setScreen('exploring');
       }
     } else {
       // Defeat — lose health
-      setRunState(prev => {
-        const newHealth = prev.health - 1;
-        if (newHealth <= 0) {
-          setEndResult('defeat');
-          setScreen('end');
+      const currentRun = runStateRef.current;
+      const newHealth = skipHealthPenalty
+        ? (currentRun?.health ?? 0)
+        : ((currentRun?.health ?? 1) - 1);
+
+      if (!skipHealthPenalty) {
+        setRunState(prev => ({
+          ...prev,
+          health: Math.max(0, prev.health - 1),
+        }));
+      }
+
+      if (newHealth <= 0) {
+        setEndResult('defeat');
+        setScreen('end');
+        queueMicrotask(() => {
           emit('deep-script:run-end', {
             result: 'defeat',
             floorNumber,
-            combatsWon: prev.combatsWon,
-            wordsCompleted: prev.wordsCompleted,
+            combatsWon: currentRun?.combatsWon ?? 0,
+            wordsCompleted: currentRun?.wordsCompleted ?? [],
           });
-          return { ...prev, health: 0 };
-        }
-        return { ...prev, health: newHealth };
-      });
-
-      // If still alive, return to exploration (retreat from combat)
-      setRunState(prev => {
-        if (prev.health > 0) {
-          // Don't mark chamber as resolved — they can try again
-          return prev;
-        }
-        return prev;
-      });
-
-      // Check health after state update
-      setTimeout(() => {
-        setRunState(prev => {
-          if (prev.health > 0) {
-            setScreen('exploring');
-          }
-          return prev;
         });
-      }, 0);
+      } else {
+        // Still alive — return to exploration
+        setTimeout(() => setScreen('exploring'), 0);
+      }
     }
 
     setActiveCombat(null);
-  }, [activeCombat, isGuidedPackRun, onRunComplete]);
+  }, [activeCombat, isGuidedPackRun, onRunComplete, floorNumber]);
+
+  const handleGuardianStrike = useCallback((damage = 1) => {
+    setRunState(prev => ({
+      ...prev,
+      health: Math.max(0, prev.health - damage),
+    }));
+  }, []);
 
   const handleNextFloor = useCallback(() => {
     if (isGuidedPackRun) {
@@ -448,6 +459,16 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
 
   // Combat screen
   if (screen === 'combat' && activeCombat) {
+    const guardianWords = floorWordPool
+      .filter(word => word && !word.isMiniboss)
+      .map(word => ({
+        id: word.id,
+        hebrew: word.hebrew,
+        transliteration: word.transliteration,
+        meaning: word.english,
+      }))
+      .filter(word => word.hebrew && word.transliteration && word.meaning);
+
     return (
       <div className="ds-mode">
         <CombatScreen
@@ -455,7 +476,10 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
           runState={runState}
           onEnd={handleCombatEnd}
           isMiniboss={activeCombat.isMiniboss}
+          floorWords={guardianWords}
+          onGuardianStrike={handleGuardianStrike}
           onOpenMenu={() => setIsPauseMenuOpen(true)}
+          isPaused={isPauseMenuOpen}
         />
         {isPauseMenuOpen && (
           <div className="ds-pause-overlay" role="dialog" aria-modal="true" aria-label="Game menu">
