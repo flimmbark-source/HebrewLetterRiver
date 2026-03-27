@@ -330,11 +330,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
               className={`ds-battle-token ds-battle-token--${token.kind} ${active ? 'is-active' : ''}`}
               onClick={() => setSelected(active ? null : token)}
             >
-              <span className="ds-battle-token-icon">
-                {token.kind === 'meaning' ? '◇' : '◈'}
-              </span>
-              <span className="ds-battle-token-label">{tokenLabel(token, wordById)}</span>
-              <span className="ds-battle-token-edge" />
+              {tokenLabel(token, wordById)}
             </button>
           );
         })}

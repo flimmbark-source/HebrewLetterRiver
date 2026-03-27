@@ -984,144 +984,128 @@
   opacity: 0.5;
 }
 
-/* ─── Action Bar (replaces belt) ───────────────────────────── */
+/* ─── Action Bar ───────────────────────────────────────────── */
 .ds-battle-actionbar {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 7;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
-  padding: 12px 14px calc(16px + env(safe-area-inset-bottom, 0px));
+  padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(180deg,
     rgba(2, 6, 23, 0) 0%,
-    rgba(13, 15, 20, 0.82) 24%,
+    rgba(13, 15, 20, 0.8) 22%,
     rgba(13, 15, 20, 0.96) 100%
   );
 }
 
+/* Token — beveled rune tablet shape */
 .ds-battle-token {
-  border: 1px solid var(--ds-bronze-dim);
-  border-radius: 12px;
-  background:
-    linear-gradient(180deg,
-      rgba(36, 34, 28, 0.92) 0%,
-      rgba(22, 22, 26, 0.96) 100%
-    );
-  color: var(--ds-parchment);
-  padding: 10px 12px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
   position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow:
-    0 3px 10px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(196, 149, 90, 0.07);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.1s ease;
-}
-
-.ds-battle-token:active {
-  transform: scale(0.97);
-}
-
-/* Kind accent — meaning tokens get a rune-blue left edge, transliteration gets bronze */
-.ds-battle-token--meaning {
-  border-left: 2px solid var(--ds-rune-blue);
-}
-
-.ds-battle-token--transliteration {
-  border-left: 2px solid var(--ds-bronze);
-}
-
-/* Icon glyph */
-.ds-battle-token-icon {
-  flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  line-height: 1;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-}
-
-.ds-battle-token--meaning .ds-battle-token-icon {
-  color: var(--ds-rune-blue);
-  border-color: rgba(91, 141, 217, 0.2);
-}
-
-.ds-battle-token--transliteration .ds-battle-token-icon {
-  color: var(--ds-bronze-light);
-  border-color: rgba(196, 149, 90, 0.2);
-}
-
-/* Label text */
-.ds-battle-token-label {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--ds-parchment);
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
   white-space: nowrap;
+  /* Clipped hexagonal / tablet shape */
+  clip-path: polygon(
+    8px 0%, calc(100% - 8px) 0%,
+    100% 40%, 100% 60%,
+    calc(100% - 8px) 100%, 8px 100%,
+    0% 60%, 0% 40%
+  );
+  background:
+    linear-gradient(170deg,
+      rgba(42, 38, 30, 0.95) 0%,
+      rgba(24, 22, 20, 0.98) 50%,
+      rgba(30, 28, 24, 0.96) 100%
+    );
+  transition: filter 0.15s ease, transform 0.1s ease;
 }
 
-/* Bottom edge accent line */
-.ds-battle-token-edge {
+/* Outer border — a slightly larger clip behind the token */
+.ds-battle-token::before {
+  content: '';
   position: absolute;
-  bottom: 0;
-  left: 12px;
-  right: 12px;
+  inset: -1px;
+  clip-path: polygon(
+    8px 0%, calc(100% - 8px) 0%,
+    100% 40%, 100% 60%,
+    calc(100% - 8px) 100%, 8px 100%,
+    0% 60%, 0% 40%
+  );
+  background: linear-gradient(180deg, var(--ds-bronze-dim), rgba(60, 48, 28, 0.6));
+  z-index: -1;
+}
+
+/* Top highlight bevel */
+.ds-battle-token::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
   height: 1px;
   background: linear-gradient(90deg,
     transparent 0%,
-    rgba(196, 149, 90, 0.15) 30%,
-    rgba(196, 149, 90, 0.15) 70%,
+    rgba(224, 184, 120, 0.25) 30%,
+    rgba(224, 184, 120, 0.25) 70%,
     transparent 100%
   );
   pointer-events: none;
 }
 
-/* Hover state */
+.ds-battle-token:active {
+  transform: scale(0.95);
+}
+
+/* Kind colour tint — meaning gets a cool rune-blue hue, transliteration gets warm bronze */
+.ds-battle-token--meaning {
+  color: #c0d4f0;
+  text-shadow: 0 0 8px var(--ds-rune-blue-glow);
+}
+
+.ds-battle-token--meaning::before {
+  background: linear-gradient(180deg, rgba(91, 141, 217, 0.35), rgba(40, 50, 70, 0.5));
+}
+
+.ds-battle-token--transliteration {
+  color: var(--ds-bronze-light);
+  text-shadow: 0 0 8px rgba(224, 184, 120, 0.2);
+}
+
+/* Hover */
 .ds-battle-token:hover {
-  border-color: var(--ds-bronze);
-  box-shadow:
-    0 3px 10px rgba(0, 0, 0, 0.4),
-    0 0 8px rgba(196, 149, 90, 0.12);
+  filter: brightness(1.2);
 }
 
-/* Active / selected state */
+.ds-battle-token:hover::before {
+  background: linear-gradient(180deg, var(--ds-bronze), rgba(80, 64, 36, 0.7));
+}
+
+/* Active / selected */
 .ds-battle-token.is-active {
-  border-color: var(--ds-gold);
-  box-shadow:
-    0 3px 12px rgba(0, 0, 0, 0.4),
-    0 0 16px var(--ds-gold-glow),
-    inset 0 0 14px rgba(240, 198, 116, 0.05);
-  background:
-    linear-gradient(180deg,
-      rgba(48, 42, 26, 0.94) 0%,
-      rgba(26, 24, 22, 0.96) 100%
-    );
-}
-
-.ds-battle-token.is-active .ds-battle-token-icon {
-  background: rgba(240, 198, 116, 0.12);
-  border-color: rgba(240, 198, 116, 0.3);
   color: var(--ds-gold);
+  text-shadow: 0 0 10px var(--ds-gold-glow);
+  filter: brightness(1.15);
 }
 
-.ds-battle-token.is-active .ds-battle-token-edge {
+.ds-battle-token.is-active::before {
+  background: linear-gradient(180deg, var(--ds-gold), rgba(160, 120, 40, 0.7));
+  box-shadow: 0 0 14px var(--ds-gold-glow);
+}
+
+.ds-battle-token.is-active::after {
   background: linear-gradient(90deg,
     transparent 0%,
-    rgba(240, 198, 116, 0.25) 30%,
-    rgba(240, 198, 116, 0.25) 70%,
+    rgba(240, 198, 116, 0.45) 30%,
+    rgba(240, 198, 116, 0.45) 70%,
     transparent 100%
   );
 }
