@@ -33,6 +33,7 @@ function collectFloorWordIds(floor) {
 export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGuidedPackRun = false }) {
   const hasCustomWordPool = !!(packWords && packWords.length > 0);
   const previousFloorWordIdsRef = useRef(new Set());
+  const runStateRef = useRef(null);
   const [wordSourceMode, setWordSourceMode] = useState('pack'); // pack | random (standalone only)
   const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | end
   const [isPauseMenuOpen, setIsPauseMenuOpen] = useState(false);
@@ -49,6 +50,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   const [activeMiniGame, setActiveMiniGame] = useState(null); // { chamberId, miniGameId }
   const [hasCompletedCapsulesMiniGameThisFloor, setHasCompletedCapsulesMiniGameThisFloor] = useState(false);
   const [floorMiniGameWords, setFloorMiniGameWords] = useState(null); // 3 words shared by capsules + pillar per floor
+  runStateRef.current = runState;
 
   const getRandomPackWordsForFloor = useCallback(() => {
     if (bridgeBuilderPacks.length === 0) return [];
@@ -234,6 +236,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         return { ...prev, chambers: newChambers };
       });
 
+      let updatedCombatsWon;
+      let updatedWordsCompleted;
+
       setRunState(prev => {
         const updated = {
           ...prev,
@@ -241,74 +246,68 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
           wordsCompleted: [...prev.wordsCompleted, wordId],
           roomsCompleted: prev.roomsCompleted + 1,
         };
+        updatedCombatsWon = updated.combatsWon;
+        updatedWordsCompleted = updated.wordsCompleted;
+        return updated;
+      });
 
+      // Defer event emission so it doesn't trigger setState in
+      // ProgressProvider during React's render cycle.
+      queueMicrotask(() => {
         emit('deep-script:combat-won', {
           wordId,
           isMiniboss,
-          combatsWon: updated.combatsWon,
+          combatsWon: updatedCombatsWon,
           floorNumber,
         });
 
-        return updated;
+        if (isMiniboss) {
+          emit('deep-script:run-end', {
+            result: 'victory',
+            floorNumber,
+            combatsWon: updatedCombatsWon,
+            wordsCompleted: updatedWordsCompleted,
+          });
+        }
       });
 
       // Check if miniboss was defeated = victory
       if (isMiniboss) {
         setEndResult('victory');
         setScreen('end');
-        setRunState(prev => {
-          emit('deep-script:run-end', {
-            result: 'victory',
-            floorNumber,
-            combatsWon: prev.combatsWon,
-            wordsCompleted: prev.wordsCompleted,
-          });
-          return prev;
-        });
         if (onRunComplete && isGuidedPackRun) onRunComplete('victory');
       } else {
         setScreen('exploring');
       }
     } else {
       // Defeat — lose health
-      setRunState(prev => {
-        const newHealth = prev.health - 1;
-        if (newHealth <= 0) {
-          setEndResult('defeat');
-          setScreen('end');
+      const currentRun = runStateRef.current;
+      const newHealth = (currentRun?.health ?? 1) - 1;
+
+      setRunState(prev => ({
+        ...prev,
+        health: Math.max(0, prev.health - 1),
+      }));
+
+      if (newHealth <= 0) {
+        setEndResult('defeat');
+        setScreen('end');
+        queueMicrotask(() => {
           emit('deep-script:run-end', {
             result: 'defeat',
             floorNumber,
-            combatsWon: prev.combatsWon,
-            wordsCompleted: prev.wordsCompleted,
+            combatsWon: currentRun?.combatsWon ?? 0,
+            wordsCompleted: currentRun?.wordsCompleted ?? [],
           });
-          return { ...prev, health: 0 };
-        }
-        return { ...prev, health: newHealth };
-      });
-
-      // If still alive, return to exploration (retreat from combat)
-      setRunState(prev => {
-        if (prev.health > 0) {
-          // Don't mark chamber as resolved — they can try again
-          return prev;
-        }
-        return prev;
-      });
-
-      // Check health after state update
-      setTimeout(() => {
-        setRunState(prev => {
-          if (prev.health > 0) {
-            setScreen('exploring');
-          }
-          return prev;
         });
-      }, 0);
+      } else {
+        // Still alive — return to exploration
+        setTimeout(() => setScreen('exploring'), 0);
+      }
     }
 
     setActiveCombat(null);
-  }, [activeCombat, isGuidedPackRun, onRunComplete]);
+  }, [activeCombat, isGuidedPackRun, onRunComplete, floorNumber]);
 
   const handleNextFloor = useCallback(() => {
     if (isGuidedPackRun) {
