@@ -1074,9 +1074,10 @@
 
 /* Dragging source — fade out the original */
 .ds-battle-token.is-dragging {
-  opacity: 0.3;
+  opacity: 0.55;
   transform: scale(0.95);
   cursor: grabbing;
+  filter: brightness(0.7);
 }
 
 /* Kind colour tint — meaning gets a cool rune-blue hue */
