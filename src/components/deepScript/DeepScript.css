@@ -861,7 +861,7 @@
 /* Striking — fly down and slam the bottom of the screen */
 .ds-battle-enemy--striking {
   border-color: rgba(239, 68, 68, 0.8);
-  animation: ds-battle-strike 1.5s cubic-bezier(0.22, 1, 0.36, 1) 1;
+  animation: ds-battle-strike 1.6s cubic-bezier(0.33, 1, 0.68, 1) 1;
   z-index: 6;
 }
 
@@ -904,35 +904,48 @@
 @keyframes ds-battle-strike {
   0% {
     transform: scale(1) translateY(0);
+    opacity: 1;
     box-shadow: 0 4px 18px rgba(0,0,0,0.5);
   }
-  /* Wind-up — pull back and glow */
-  12% {
-    transform: scale(0.9) translateY(-12px);
-    box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 24px rgba(239,68,68,0.6);
+  /* Wind-up — pull back, charge glow */
+  10% {
+    transform: scale(0.92) translateY(-10px);
+    opacity: 1;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 20px rgba(239,68,68,0.4);
   }
-  /* Lunge down — fly toward the bottom */
-  38% {
-    transform: scale(1.1) translateY(55vh);
-    box-shadow: 0 0 40px rgba(239,68,68,0.7), 0 0 80px rgba(239,68,68,0.3);
+  /* Accelerate downward */
+  25% {
+    transform: scale(1.05) translateY(20vh);
+    opacity: 0.95;
+    box-shadow: 0 0 30px rgba(239,68,68,0.5), 0 0 60px rgba(239,68,68,0.2);
   }
-  /* Slam — hit bottom and compress */
-  46% {
-    transform: scale(1.2, 0.85) translateY(55vh);
-    box-shadow: 0 0 50px rgba(255,140,60,0.8), 0 0 100px rgba(239,68,68,0.4);
+  /* Slam — arrive at bottom */
+  40% {
+    transform: scale(1.15, 0.88) translateY(55vh);
+    opacity: 0.9;
+    box-shadow: 0 0 50px rgba(255,140,60,0.7), 0 0 90px rgba(239,68,68,0.35);
   }
-  /* Bounce back up */
-  58% {
-    transform: scale(0.95) translateY(48vh);
-    box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 12px rgba(239,68,68,0.3);
+  /* Hold and settle at impact point */
+  50% {
+    transform: scale(1.05, 0.95) translateY(54vh);
+    opacity: 0.85;
+    box-shadow: 0 0 35px rgba(239,68,68,0.4), 0 0 60px rgba(239,68,68,0.15);
   }
-  /* Return to formation */
-  80% {
-    transform: scale(1.02) translateY(-4px);
+  /* Begin return */
+  65% {
+    transform: scale(1) translateY(30vh);
+    opacity: 0.9;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 12px rgba(239,68,68,0.15);
+  }
+  /* Ease back into formation */
+  85% {
+    transform: scale(1.01) translateY(-2px);
+    opacity: 1;
     box-shadow: 0 4px 18px rgba(0,0,0,0.5);
   }
   100% {
     transform: scale(1) translateY(0);
+    opacity: 1;
     box-shadow: 0 4px 18px rgba(0,0,0,0.5);
   }
 }
@@ -968,107 +981,85 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 40%;
+  height: 45%;
   z-index: 15;
   pointer-events: none;
 }
 
-/* Bright flash at the bottom impact zone */
+/* Radial glow from the bottom — fades in smoothly, lingers, then dissolves */
 .ds-battle-hit-flash {
   position: absolute;
   bottom: 0;
-  left: 10%;
-  right: 10%;
-  height: 60%;
+  left: 5%;
+  right: 5%;
+  height: 70%;
   border-radius: 50% 50% 0 0;
-  animation: ds-battle-hit-flash 0.45s ease-out 1 forwards;
+  background: radial-gradient(ellipse at 50% 100%, rgba(255,140,60,0.45) 0%, rgba(239,68,68,0.15) 35%, transparent 65%);
+  box-shadow: 0 0 60px rgba(239,68,68,0.4);
+  animation: ds-hit-flash 0.85s ease-out 1 forwards;
 }
 
-@keyframes ds-battle-hit-flash {
-  0% {
-    opacity: 0;
-    background: radial-gradient(ellipse at 50% 100%, rgba(255,140,60,0.5) 0%, transparent 70%);
-    box-shadow: 0 0 40px rgba(239,68,68,0.6);
-  }
-  20% {
-    opacity: 1;
-    background: radial-gradient(ellipse at 50% 100%, rgba(255,180,80,0.6) 0%, rgba(239,68,68,0.2) 40%, transparent 70%);
-    box-shadow: 0 0 80px rgba(239,68,68,0.7);
-  }
-  50% {
-    opacity: 0.6;
-    background: radial-gradient(ellipse at 50% 100%, rgba(239,68,68,0.3) 0%, transparent 60%);
-    box-shadow: 0 0 40px rgba(239,68,68,0.3);
-  }
-  100% {
-    opacity: 0;
-    background: transparent;
-    box-shadow: none;
-  }
+@keyframes ds-hit-flash {
+  0%  { opacity: 0; transform: scaleY(0.6); }
+  15% { opacity: 0.9; transform: scaleY(1); }
+  40% { opacity: 0.7; transform: scaleY(0.95); }
+  70% { opacity: 0.3; transform: scaleY(0.9); }
+  100% { opacity: 0; transform: scaleY(0.85); }
 }
 
-/* Slash marks — cross in the player zone */
+/* Slash marks — swipe across with a smooth fade trail */
 .ds-battle-slash {
   position: absolute;
-  bottom: 20%;
+  bottom: 25%;
   left: 50%;
-  width: min(280px, 70%);
-  height: 3px;
+  width: min(300px, 75%);
+  height: 2px;
   pointer-events: none;
   transform-origin: center;
   border-radius: 2px;
+  opacity: 0;
 }
 
 .ds-battle-slash--a {
-  background: linear-gradient(90deg, transparent 5%, rgba(255,220,120,0.95) 35%, rgba(255,220,120,0.95) 65%, transparent 95%);
-  transform: translate(-50%, 0) rotate(-30deg);
-  animation: ds-battle-slash-in 0.3s ease-out 1 forwards;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,220,120,0.9) 20%, rgba(255,220,120,0.9) 80%, transparent 100%);
+  transform: translate(-50%, 0) rotate(-28deg);
+  animation: ds-slash-a 0.7s ease-out 1 forwards;
 }
 
 .ds-battle-slash--b {
-  background: linear-gradient(90deg, transparent 5%, rgba(255,160,70,0.9) 35%, rgba(255,160,70,0.9) 65%, transparent 95%);
-  transform: translate(-50%, 0) rotate(25deg);
-  animation: ds-battle-slash-in 0.3s ease-out 0.05s 1 forwards;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,160,70,0.8) 20%, rgba(255,160,70,0.8) 80%, transparent 100%);
+  transform: translate(-50%, 0) rotate(24deg);
+  animation: ds-slash-b 0.7s ease-out 0.08s 1 forwards;
 }
 
-@keyframes ds-battle-slash-in {
-  0% {
-    opacity: 0;
-    clip-path: inset(0 100% 0 0);
-  }
-  25% {
-    opacity: 1;
-    clip-path: inset(0 0 0 0);
-  }
-  55% {
-    opacity: 0.9;
-    clip-path: inset(0 0 0 0);
-  }
-  100% {
-    opacity: 0;
-    clip-path: inset(0 0 0 100%);
-  }
+@keyframes ds-slash-a {
+  0%   { opacity: 0; transform: translate(-50%, 0) rotate(-28deg) scaleX(0); }
+  15%  { opacity: 0.9; transform: translate(-50%, 0) rotate(-28deg) scaleX(1.05); }
+  35%  { opacity: 0.85; transform: translate(-50%, 0) rotate(-28deg) scaleX(1); }
+  100% { opacity: 0; transform: translate(-50%, 0) rotate(-28deg) scaleX(0.9); }
 }
 
-/* Full-screen vignette — red edges */
+@keyframes ds-slash-b {
+  0%   { opacity: 0; transform: translate(-50%, 0) rotate(24deg) scaleX(0); }
+  15%  { opacity: 0.85; transform: translate(-50%, 0) rotate(24deg) scaleX(1.05); }
+  35%  { opacity: 0.8; transform: translate(-50%, 0) rotate(24deg) scaleX(1); }
+  100% { opacity: 0; transform: translate(-50%, 0) rotate(24deg) scaleX(0.9); }
+}
+
+/* Full-screen vignette — red edges that linger and dissolve */
 .ds-battle-hit-vignette {
   position: fixed;
   inset: 0;
   z-index: 20;
   pointer-events: none;
-  animation: ds-battle-vignette 0.5s ease-out 1 forwards;
+  animation: ds-hit-vignette 0.9s ease-out 1 forwards;
 }
 
-@keyframes ds-battle-vignette {
-  0% {
-    box-shadow: inset 0 0 80px rgba(239,68,68,0.55), inset 0 0 160px rgba(239,68,68,0.15);
-  }
-  30% {
-    box-shadow: inset 0 0 50px rgba(239,68,68,0.35), inset 0 0 100px rgba(239,68,68,0.1);
-  }
-  100% {
-    box-shadow: inset 0 0 0 transparent;
-  }
+@keyframes ds-hit-vignette {
+  0%   { box-shadow: inset 0 0 80px rgba(239,68,68,0.5), inset 0 0 150px rgba(239,68,68,0.12); }
+  20%  { box-shadow: inset 0 0 60px rgba(239,68,68,0.4), inset 0 0 120px rgba(239,68,68,0.1); }
+  50%  { box-shadow: inset 0 0 35px rgba(239,68,68,0.2), inset 0 0 70px rgba(239,68,68,0.05); }
+  100% { box-shadow: inset 0 0 0 transparent, inset 0 0 0 transparent; }
 }
 
 /* Reserve pips — enemies waiting */

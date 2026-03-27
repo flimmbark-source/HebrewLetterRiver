@@ -209,7 +209,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
         setImpacts((prev) => [...prev, { id: impactId, wordId: attacker.id }]);
         window.setTimeout(() => {
           setImpacts((prev) => prev.filter((item) => item.id !== impactId));
-        }, 500);
+        }, 900);
       }, profile.impactMs);
 
       const recoverTimeout = window.setTimeout(() => {
