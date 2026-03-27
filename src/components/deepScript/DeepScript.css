@@ -802,7 +802,8 @@
   overflow: hidden;
   cursor: default;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  animation: ds-battle-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--enemy-index, 0) * 80ms) both;
+  animation: ds-battle-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--enemy-index, 0) * 80ms) both,
+             ds-battle-idle 3.1s ease-in-out infinite;
 }
 
 @keyframes ds-battle-enter {
@@ -845,6 +846,7 @@
 
 .ds-battle-enemy--striking {
   border-color: rgba(239, 68, 68, 0.7);
+  animation: ds-battle-strike 1.55s cubic-bezier(0.22, 1, 0.36, 1) 1;
 }
 
 /* Inner frame */
@@ -881,11 +883,6 @@
   line-height: 1;
   position: relative;
   min-height: 44px;
-  animation: ds-battle-idle 3.1s ease-in-out infinite;
-}
-
-.ds-battle-hebrew.is-attacking {
-  animation: ds-battle-strike 1.55s cubic-bezier(0.22, 1, 0.36, 1) 1;
 }
 
 @keyframes ds-battle-idle {

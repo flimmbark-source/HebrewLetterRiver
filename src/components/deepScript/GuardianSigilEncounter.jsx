@@ -372,7 +372,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
                     />
                   </div>
 
-                  <div className={`ds-battle-hebrew ${attacker.isAttacking ? 'is-attacking' : ''}`}>
+                  <div className="ds-battle-hebrew">
                     <span className={getGameFontClass(`guardian-${attacker.id}`)}>{attacker.hebrew}</span>
                   </div>
 
