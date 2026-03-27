@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 
 const ACTIVE_COUNT = 3;
-const BELT_SIZE = 4;
+const BELT_SIZE = 3;
 const START_TIME = 5;
 const TIMER_STEP = 0.1;
 const TIMER_INTERVAL_MS = 100;
@@ -135,6 +135,11 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
   const [wrongPulseId, setWrongPulseId] = useState(null);
   const [impacts, setImpacts] = useState([]);
 
+  // Drag state
+  const [dragging, setDragging] = useState(null); // { token, x, y, originX, originY }
+  const enemyRefs = useRef(new Map());
+  const dragRef = useRef(null); // keeps latest drag in sync for pointermove
+
   const wordById = useMemo(() => buildWordById(words), [words]);
   const attackTimersRef = useRef(new Map());
   const impactIdRef = useRef(0);
@@ -245,6 +250,50 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
     refill(nextAttackers, nextReserve, nextCooldowns, remainingBelt);
   }, [attackers, belt, cooldowns, reserve, refill]);
 
+  // ─── Drag handlers ─────────────────────────────────────────
+  const handlePointerDown = useCallback((e, token) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const state = {
+      token,
+      x: e.clientX,
+      y: e.clientY,
+      originX: rect.left + rect.width / 2,
+      originY: rect.top + rect.height / 2,
+    };
+    setDragging(state);
+    dragRef.current = state;
+    setSelected(null);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }, []);
+
+  const handlePointerMove = useCallback((e) => {
+    if (!dragRef.current) return;
+    const next = { ...dragRef.current, x: e.clientX, y: e.clientY };
+    dragRef.current = next;
+    setDragging(next);
+  }, []);
+
+  const handlePointerUp = useCallback((e) => {
+    const drag = dragRef.current;
+    if (!drag) return;
+    dragRef.current = null;
+    setDragging(null);
+
+    // Hit-test enemy cards
+    for (const [id, el] of enemyRefs.current) {
+      if (!el) continue;
+      const rect = el.getBoundingClientRect();
+      if (
+        e.clientX >= rect.left && e.clientX <= rect.right &&
+        e.clientY >= rect.top && e.clientY <= rect.bottom
+      ) {
+        applyToken(drag.token, id);
+        return;
+      }
+    }
+  }, [applyToken]);
+
   useEffect(() => {
     if (!isWon) return;
     onVictory();
@@ -267,14 +316,22 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
             const progress = attacker.timer / attacker.timerMax;
             const impactActive = impacts.some((impact) => impact.wordId === attacker.id);
             const isUrgent = progress < 0.3 && !attacker.isAttacking;
+            const isDragOver = dragging && (() => {
+              const el = enemyRefs.current.get(attacker.id);
+              if (!el) return false;
+              const r = el.getBoundingClientRect();
+              return dragging.x >= r.left && dragging.x <= r.right && dragging.y >= r.top && dragging.y <= r.bottom;
+            })();
 
             return (
               <button
                 type="button"
                 key={attacker.id}
+                ref={(el) => { if (el) enemyRefs.current.set(attacker.id, el); else enemyRefs.current.delete(attacker.id); }}
                 className={[
                   'ds-battle-enemy',
-                  selected ? 'ds-battle-enemy--targetable' : '',
+                  selected || dragging ? 'ds-battle-enemy--targetable' : '',
+                  isDragOver ? 'ds-battle-enemy--dragover' : '',
                   wrongPulseId === attacker.id ? 'ds-battle-enemy--wrong' : '',
                   isUrgent ? 'ds-battle-enemy--urgent' : '',
                   attacker.isAttacking ? 'ds-battle-enemy--striking' : '',
@@ -328,18 +385,42 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
       <div className="ds-battle-actionbar" role="group" aria-label="Guardian answer pool">
         {belt.map((token) => {
           const active = selected && tokenId(selected) === tokenId(token);
+          const isDragSource = dragging && tokenId(dragging.token) === tokenId(token);
           return (
             <button
               type="button"
               key={tokenId(token)}
-              className={`ds-battle-token ds-battle-token--${token.kind} ${active ? 'is-active' : ''}`}
+              className={[
+                'ds-battle-token',
+                `ds-battle-token--${token.kind}`,
+                active ? 'is-active' : '',
+                isDragSource ? 'is-dragging' : '',
+              ].filter(Boolean).join(' ')}
               onClick={() => setSelected(active ? null : token)}
+              onPointerDown={(e) => handlePointerDown(e, token)}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={() => { dragRef.current = null; setDragging(null); }}
             >
               {tokenLabel(token, wordById)}
             </button>
           );
         })}
       </div>
+
+      {/* Drag ghost */}
+      {dragging && (
+        <div
+          className={`ds-battle-drag-ghost ds-battle-token--${dragging.token.kind}`}
+          style={{
+            left: dragging.x,
+            top: dragging.y,
+          }}
+          aria-hidden="true"
+        >
+          {tokenLabel(dragging.token, wordById)}
+        </div>
+      )}
     </>
   );
 }

@@ -814,11 +814,16 @@
   cursor: pointer;
 }
 
-.ds-battle-enemy--targetable:hover {
+.ds-battle-enemy--targetable:hover,
+.ds-battle-enemy--dragover {
   border-color: var(--ds-gold);
   box-shadow:
     0 4px 18px rgba(0, 0, 0, 0.5),
     0 0 16px var(--ds-gold-glow);
+}
+
+.ds-battle-enemy--dragover {
+  transform: scale(1.04);
 }
 
 .ds-battle-enemy--wrong {
@@ -994,8 +999,8 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
-  padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  gap: 12px;
+  padding: 16px 16px calc(20px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(180deg,
     rgba(2, 6, 23, 0) 0%,
     rgba(13, 15, 20, 0.8) 22%,
@@ -1007,17 +1012,19 @@
 .ds-battle-token {
   position: relative;
   color: var(--ds-parchment);
-  padding: 9px 18px;
-  font-size: 14px;
+  padding: 14px 26px;
+  font-size: 17px;
   font-weight: 700;
   letter-spacing: 0.3px;
-  cursor: pointer;
+  cursor: grab;
   white-space: nowrap;
-  /* Clipped hexagonal / tablet shape */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   clip-path: polygon(
-    8px 0%, calc(100% - 8px) 0%,
+    10px 0%, calc(100% - 10px) 0%,
     100% 40%, 100% 60%,
-    calc(100% - 8px) 100%, 8px 100%,
+    calc(100% - 10px) 100%, 10px 100%,
     0% 60%, 0% 40%
   );
   background:
@@ -1026,7 +1033,7 @@
       rgba(24, 22, 20, 0.98) 50%,
       rgba(30, 28, 24, 0.96) 100%
     );
-  transition: filter 0.15s ease, transform 0.1s ease;
+  transition: filter 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
 }
 
 /* Outer border — a slightly larger clip behind the token */
@@ -1035,9 +1042,9 @@
   position: absolute;
   inset: -1px;
   clip-path: polygon(
-    8px 0%, calc(100% - 8px) 0%,
+    10px 0%, calc(100% - 10px) 0%,
     100% 40%, 100% 60%,
-    calc(100% - 8px) 100%, 8px 100%,
+    calc(100% - 10px) 100%, 10px 100%,
     0% 60%, 0% 40%
   );
   background: linear-gradient(180deg, var(--ds-bronze-dim), rgba(60, 48, 28, 0.6));
@@ -1049,8 +1056,8 @@
   content: '';
   position: absolute;
   top: 0;
-  left: 16px;
-  right: 16px;
+  left: 18px;
+  right: 18px;
   height: 1px;
   background: linear-gradient(90deg,
     transparent 0%,
@@ -1065,7 +1072,14 @@
   transform: scale(0.95);
 }
 
-/* Kind colour tint — meaning gets a cool rune-blue hue, transliteration gets warm bronze */
+/* Dragging source — fade out the original */
+.ds-battle-token.is-dragging {
+  opacity: 0.3;
+  transform: scale(0.95);
+  cursor: grabbing;
+}
+
+/* Kind colour tint — meaning gets a cool rune-blue hue */
 .ds-battle-token--meaning {
   color: #c0d4f0;
   text-shadow: 0 0 8px var(--ds-rune-blue-glow);
@@ -1075,9 +1089,14 @@
   background: linear-gradient(180deg, rgba(91, 141, 217, 0.35), rgba(40, 50, 70, 0.5));
 }
 
+/* Transliteration — distinct green-teal so it doesn't blend into warm backgrounds */
 .ds-battle-token--transliteration {
-  color: var(--ds-bronze-light);
-  text-shadow: 0 0 8px rgba(224, 184, 120, 0.2);
+  color: #88e0b0;
+  text-shadow: 0 0 8px rgba(100, 210, 160, 0.3);
+}
+
+.ds-battle-token--transliteration::before {
+  background: linear-gradient(180deg, rgba(80, 190, 140, 0.3), rgba(30, 55, 45, 0.5));
 }
 
 /* Hover */
@@ -1108,6 +1127,46 @@
     rgba(240, 198, 116, 0.45) 70%,
     transparent 100%
   );
+}
+
+/* ─── Drag Ghost ───────────────────────────────────────────── */
+.ds-battle-drag-ghost {
+  position: fixed;
+  z-index: 100;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  padding: 14px 26px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  color: var(--ds-gold);
+  text-shadow: 0 0 12px var(--ds-gold-glow);
+  clip-path: polygon(
+    10px 0%, calc(100% - 10px) 0%,
+    100% 40%, 100% 60%,
+    calc(100% - 10px) 100%, 10px 100%,
+    0% 60%, 0% 40%
+  );
+  background:
+    linear-gradient(170deg,
+      rgba(52, 46, 30, 0.96) 0%,
+      rgba(30, 26, 20, 0.98) 50%,
+      rgba(40, 34, 24, 0.96) 100%
+    );
+  filter: brightness(1.3);
+  opacity: 0.92;
+}
+
+/* Kind tint on the ghost */
+.ds-battle-drag-ghost.ds-battle-token--meaning {
+  color: #d0e0ff;
+  text-shadow: 0 0 12px rgba(91, 141, 217, 0.5);
+}
+
+.ds-battle-drag-ghost.ds-battle-token--transliteration {
+  color: #a0f0cc;
+  text-shadow: 0 0 12px rgba(100, 210, 160, 0.5);
 }
 
 
