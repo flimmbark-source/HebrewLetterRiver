@@ -801,14 +801,28 @@
   position: relative;
   overflow: hidden;
   cursor: default;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  animation: ds-battle-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--enemy-index, 0) * 80ms) both,
-             ds-battle-idle 3.1s ease-in-out infinite;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  animation: ds-battle-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--enemy-index, 0) * 80ms) both;
 }
 
 @keyframes ds-battle-enter {
   0% { opacity: 0; transform: translateY(-16px) scale(0.92); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Idle menace — subtle glow pulse, no translation */
+.ds-battle-enemy:not(.ds-battle-enemy--striking):not(.ds-battle-enemy--urgent):not(.ds-battle-enemy--wrong) {
+  animation: ds-battle-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--enemy-index, 0) * 80ms) both,
+             ds-battle-idle 3s ease-in-out infinite;
+}
+
+@keyframes ds-battle-idle {
+  0%, 100% {
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(196, 149, 90, 0.08);
+  }
+  50% {
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 8px rgba(196, 149, 90, 0.12), inset 0 1px 0 rgba(196, 149, 90, 0.08);
+  }
 }
 
 .ds-battle-enemy--targetable {
@@ -844,9 +858,11 @@
   50% { box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 22px var(--ds-ember-glow); }
 }
 
+/* Striking — charge up, slam forward, recoil back */
 .ds-battle-enemy--striking {
-  border-color: rgba(239, 68, 68, 0.7);
-  animation: ds-battle-strike 1.55s cubic-bezier(0.22, 1, 0.36, 1) 1;
+  border-color: rgba(239, 68, 68, 0.8);
+  animation: ds-battle-strike 1.5s ease-out 1;
+  z-index: 6;
 }
 
 /* Inner frame */
@@ -885,18 +901,39 @@
   min-height: 44px;
 }
 
-@keyframes ds-battle-idle {
-  0%   { transform: translateY(0px); }
-  50%  { transform: translateY(-3px); }
-  100% { transform: translateY(0px); }
-}
-
 @keyframes ds-battle-strike {
-  0%   { transform: translateY(0vh) scale(1); opacity: 1; }
-  15%  { transform: translateY(-2vh) scale(1.08); opacity: 1; }
-  45%  { transform: translateY(52vh) scale(0.9); opacity: 0.85; }
-  70%  { transform: translateY(52vh) scale(0.9); opacity: 0.85; }
-  100% { transform: translateY(0vh) scale(1); opacity: 1; }
+  0% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+    border-color: var(--ds-bronze-dim);
+  }
+  /* Wind-up — pull back and glow */
+  18% {
+    transform: scale(0.92) translateY(-6px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 20px rgba(239,68,68,0.5);
+    border-color: rgba(239,68,68,0.8);
+  }
+  /* Slam forward */
+  35% {
+    transform: scale(1.18) translateY(14px);
+    box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 40px rgba(239,68,68,0.7), 0 0 80px rgba(239,68,68,0.3);
+    border-color: rgba(255,120,80,0.9);
+  }
+  /* Hold at impact */
+  50% {
+    transform: scale(1.12) translateY(10px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 30px rgba(239,68,68,0.4);
+  }
+  /* Recoil */
+  70% {
+    transform: scale(0.96) translateY(-4px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 8px rgba(239,68,68,0.2);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+    border-color: var(--ds-bronze-dim);
+  }
 }
 
 /* Seal indicators (meaning + transliteration) */
@@ -922,20 +959,107 @@
   box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
 }
 
-/* Impact flash */
+/* Impact flash — bright ember burst on the card */
 .ds-battle-impact {
   position: absolute;
-  inset: -4px;
-  border-radius: 14px;
-  border: 2px solid rgba(239, 68, 68, 0.7);
+  inset: -6px;
+  border-radius: 16px;
   pointer-events: none;
-  animation: ds-battle-impact-flash 0.45s ease-out 1 forwards;
+  animation: ds-battle-impact-flash 0.5s ease-out 1 forwards;
 }
 
 @keyframes ds-battle-impact-flash {
-  0%   { opacity: 0; box-shadow: inset 0 0 0 rgba(239, 68, 68, 0); }
-  30%  { opacity: 1; box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.3); }
-  100% { opacity: 0; box-shadow: inset 0 0 0 rgba(239, 68, 68, 0); }
+  0% {
+    opacity: 0;
+    border: 2px solid rgba(255, 140, 60, 0);
+    box-shadow: inset 0 0 0 rgba(239, 68, 68, 0), 0 0 0 rgba(239, 68, 68, 0);
+    background: rgba(239, 68, 68, 0);
+  }
+  20% {
+    opacity: 1;
+    border: 2px solid rgba(255, 180, 80, 0.9);
+    box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.4), 0 0 30px rgba(239, 68, 68, 0.5);
+    background: rgba(255, 120, 60, 0.15);
+  }
+  50% {
+    opacity: 0.7;
+    border: 2px solid rgba(239, 68, 68, 0.5);
+    box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.2), 0 0 15px rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.05);
+  }
+  100% {
+    opacity: 0;
+    border: 2px solid rgba(239, 68, 68, 0);
+    box-shadow: inset 0 0 0 rgba(239, 68, 68, 0), 0 0 0 rgba(239, 68, 68, 0);
+    background: rgba(239, 68, 68, 0);
+  }
+}
+
+/* Slash marks — two diagonal lines that cross on impact */
+.ds-battle-slash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 110%;
+  height: 2px;
+  pointer-events: none;
+  transform-origin: center;
+}
+
+.ds-battle-slash--a {
+  background: linear-gradient(90deg, transparent 10%, rgba(255, 200, 100, 0.9) 40%, rgba(255, 200, 100, 0.9) 60%, transparent 90%);
+  transform: translate(-50%, -50%) rotate(-35deg);
+  animation: ds-battle-slash-in 0.35s ease-out 1 forwards;
+}
+
+.ds-battle-slash--b {
+  background: linear-gradient(90deg, transparent 10%, rgba(255, 140, 60, 0.8) 40%, rgba(255, 140, 60, 0.8) 60%, transparent 90%);
+  transform: translate(-50%, -50%) rotate(30deg);
+  animation: ds-battle-slash-in 0.35s ease-out 0.06s 1 forwards;
+}
+
+@keyframes ds-battle-slash-in {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  30% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+  60% {
+    opacity: 0.8;
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    opacity: 0;
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+/* Screen-level hit vignette — red flash on the viewport edges */
+.ds-battle-hit-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  border-radius: inherit;
+  animation: ds-battle-vignette 0.4s ease-out 1 forwards;
+}
+
+@keyframes ds-battle-vignette {
+  0% {
+    box-shadow: inset 0 0 60px rgba(239, 68, 68, 0.5), inset 0 0 120px rgba(239, 68, 68, 0.15);
+    background: rgba(239, 68, 68, 0.06);
+  }
+  40% {
+    box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.3), inset 0 0 80px rgba(239, 68, 68, 0.08);
+    background: rgba(239, 68, 68, 0.02);
+  }
+  100% {
+    box-shadow: inset 0 0 0 rgba(239, 68, 68, 0);
+    background: transparent;
+  }
 }
 
 /* Reserve pips — enemies waiting */
