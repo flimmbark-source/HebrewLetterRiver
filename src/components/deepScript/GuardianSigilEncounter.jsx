@@ -140,6 +140,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
   const [dragSourceId, setDragSourceId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
   const dragRef = useRef(null); // { token, x, y }
+  const didDragRef = useRef(false); // suppress click after drag
   const ghostRef = useRef(null);
   const enemyRefs = useRef(new Map());
 
@@ -278,6 +279,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
   const handlePointerDown = useCallback((e, token) => {
     e.preventDefault();
     dragRef.current = { token, x: e.clientX, y: e.clientY };
+    didDragRef.current = false;
     setDragSourceId(tokenId(token));
     setIsDragging(true);
     setSelected(null);
@@ -287,6 +289,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
   const handlePointerMove = useCallback((e) => {
     const drag = dragRef.current;
     if (!drag) return;
+    didDragRef.current = true;
     drag.x = e.clientX;
     drag.y = e.clientY;
     // Move ghost via DOM — no setState
@@ -416,7 +419,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
                 active ? 'is-active' : '',
                 dragSourceId === tid ? 'is-dragging' : '',
               ].filter(Boolean).join(' ')}
-              onClick={() => setSelected(active ? null : token)}
+              onClick={() => { if (!didDragRef.current) setSelected(active ? null : token); }}
               onPointerDown={(e) => handlePointerDown(e, token)}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
