@@ -861,7 +861,7 @@
 /* Striking — fly down and slam the bottom of the screen */
 .ds-battle-enemy--striking {
   border-color: rgba(239, 68, 68, 0.8);
-  animation: ds-battle-strike 1.6s cubic-bezier(0.33, 1, 0.68, 1) 1;
+  animation: ds-battle-strike 1.5s ease-in-out 1;
   z-index: 6;
 }
 
@@ -902,50 +902,24 @@
 }
 
 @keyframes ds-battle-strike {
+  /* Rest */
   0% {
     transform: scale(1) translateY(0);
-    opacity: 1;
     box-shadow: 0 4px 18px rgba(0,0,0,0.5);
   }
-  /* Wind-up — pull back, charge glow */
-  10% {
-    transform: scale(0.92) translateY(-10px);
-    opacity: 1;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 20px rgba(239,68,68,0.4);
+  /* Wind-up: coil back */
+  12% {
+    transform: scale(0.9) translateY(-14px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 22px rgba(239,68,68,0.5);
   }
-  /* Accelerate downward */
-  25% {
-    transform: scale(1.05) translateY(20vh);
-    opacity: 0.95;
-    box-shadow: 0 0 30px rgba(239,68,68,0.5), 0 0 60px rgba(239,68,68,0.2);
+  /* Slam: one fluid motion to the bottom */
+  42% {
+    transform: scale(1.12, 0.9) translateY(55vh);
+    box-shadow: 0 0 50px rgba(255,140,60,0.65), 0 0 90px rgba(239,68,68,0.3);
   }
-  /* Slam — arrive at bottom */
-  40% {
-    transform: scale(1.15, 0.88) translateY(55vh);
-    opacity: 0.9;
-    box-shadow: 0 0 50px rgba(255,140,60,0.7), 0 0 90px rgba(239,68,68,0.35);
-  }
-  /* Hold and settle at impact point */
-  50% {
-    transform: scale(1.05, 0.95) translateY(54vh);
-    opacity: 0.85;
-    box-shadow: 0 0 35px rgba(239,68,68,0.4), 0 0 60px rgba(239,68,68,0.15);
-  }
-  /* Begin return */
-  65% {
-    transform: scale(1) translateY(30vh);
-    opacity: 0.9;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 12px rgba(239,68,68,0.15);
-  }
-  /* Ease back into formation */
-  85% {
-    transform: scale(1.01) translateY(-2px);
-    opacity: 1;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.5);
-  }
+  /* Return: smooth arc home */
   100% {
     transform: scale(1) translateY(0);
-    opacity: 1;
     box-shadow: 0 4px 18px rgba(0,0,0,0.5);
   }
 }
@@ -986,7 +960,7 @@
   pointer-events: none;
 }
 
-/* Radial glow from the bottom — fades in smoothly, lingers, then dissolves */
+/* Radial glow from the bottom */
 .ds-battle-hit-flash {
   position: absolute;
   bottom: 0;
@@ -994,20 +968,20 @@
   right: 5%;
   height: 70%;
   border-radius: 50% 50% 0 0;
-  background: radial-gradient(ellipse at 50% 100%, rgba(255,140,60,0.45) 0%, rgba(239,68,68,0.15) 35%, transparent 65%);
+  background: radial-gradient(ellipse at 50% 100%, rgba(255,140,60,0.5) 0%, rgba(239,68,68,0.15) 40%, transparent 70%);
   box-shadow: 0 0 60px rgba(239,68,68,0.4);
-  animation: ds-hit-flash 0.85s ease-out 1 forwards;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  animation: ds-hit-flash 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
 }
 
 @keyframes ds-hit-flash {
-  0%  { opacity: 0; transform: scaleY(0.6); }
-  15% { opacity: 0.9; transform: scaleY(1); }
-  40% { opacity: 0.7; transform: scaleY(0.95); }
-  70% { opacity: 0.3; transform: scaleY(0.9); }
-  100% { opacity: 0; transform: scaleY(0.85); }
+  0%   { opacity: 0; transform: scaleY(0.4) scaleX(0.7); }
+  20%  { opacity: 1; transform: scaleY(1) scaleX(1); }
+  100% { opacity: 0; transform: scaleY(0.8) scaleX(1.1); }
 }
 
-/* Slash marks — swipe across with a smooth fade trail */
+/* Slash marks */
 .ds-battle-slash {
   position: absolute;
   bottom: 25%;
@@ -1022,43 +996,37 @@
 
 .ds-battle-slash--a {
   background: linear-gradient(90deg, transparent 0%, rgba(255,220,120,0.9) 20%, rgba(255,220,120,0.9) 80%, transparent 100%);
-  transform: translate(-50%, 0) rotate(-28deg);
-  animation: ds-slash-a 0.7s ease-out 1 forwards;
+  animation: ds-slash-a 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1 forwards;
 }
 
 .ds-battle-slash--b {
   background: linear-gradient(90deg, transparent 0%, rgba(255,160,70,0.8) 20%, rgba(255,160,70,0.8) 80%, transparent 100%);
-  transform: translate(-50%, 0) rotate(24deg);
-  animation: ds-slash-b 0.7s ease-out 0.08s 1 forwards;
+  animation: ds-slash-b 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.06s 1 forwards;
 }
 
 @keyframes ds-slash-a {
   0%   { opacity: 0; transform: translate(-50%, 0) rotate(-28deg) scaleX(0); }
-  15%  { opacity: 0.9; transform: translate(-50%, 0) rotate(-28deg) scaleX(1.05); }
-  35%  { opacity: 0.85; transform: translate(-50%, 0) rotate(-28deg) scaleX(1); }
-  100% { opacity: 0; transform: translate(-50%, 0) rotate(-28deg) scaleX(0.9); }
+  25%  { opacity: 1; transform: translate(-50%, 0) rotate(-28deg) scaleX(1); }
+  100% { opacity: 0; transform: translate(-50%, 0) rotate(-28deg) scaleX(1); }
 }
 
 @keyframes ds-slash-b {
   0%   { opacity: 0; transform: translate(-50%, 0) rotate(24deg) scaleX(0); }
-  15%  { opacity: 0.85; transform: translate(-50%, 0) rotate(24deg) scaleX(1.05); }
-  35%  { opacity: 0.8; transform: translate(-50%, 0) rotate(24deg) scaleX(1); }
-  100% { opacity: 0; transform: translate(-50%, 0) rotate(24deg) scaleX(0.9); }
+  25%  { opacity: 1; transform: translate(-50%, 0) rotate(24deg) scaleX(1); }
+  100% { opacity: 0; transform: translate(-50%, 0) rotate(24deg) scaleX(1); }
 }
 
-/* Full-screen vignette — red edges that linger and dissolve */
+/* Full-screen vignette — red edges */
 .ds-battle-hit-vignette {
   position: fixed;
   inset: 0;
   z-index: 20;
   pointer-events: none;
-  animation: ds-hit-vignette 0.9s ease-out 1 forwards;
+  animation: ds-hit-vignette 0.85s cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
 }
 
 @keyframes ds-hit-vignette {
-  0%   { box-shadow: inset 0 0 80px rgba(239,68,68,0.5), inset 0 0 150px rgba(239,68,68,0.12); }
-  20%  { box-shadow: inset 0 0 60px rgba(239,68,68,0.4), inset 0 0 120px rgba(239,68,68,0.1); }
-  50%  { box-shadow: inset 0 0 35px rgba(239,68,68,0.2), inset 0 0 70px rgba(239,68,68,0.05); }
+  0%   { box-shadow: inset 0 0 80px rgba(239,68,68,0.5), inset 0 0 140px rgba(239,68,68,0.12); }
   100% { box-shadow: inset 0 0 0 transparent, inset 0 0 0 transparent; }
 }
 
