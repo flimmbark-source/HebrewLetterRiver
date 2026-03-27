@@ -479,6 +479,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
           floorWords={guardianWords}
           onGuardianStrike={handleGuardianStrike}
           onOpenMenu={() => setIsPauseMenuOpen(true)}
+          isPaused={isPauseMenuOpen}
         />
         {isPauseMenuOpen && (
           <div className="ds-pause-overlay" role="dialog" aria-modal="true" aria-label="Game menu">

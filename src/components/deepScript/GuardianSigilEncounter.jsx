@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 
 const ACTIVE_COUNT = 3;
-const BELT_SIZE = 4;
+const BELT_SIZE = 3;
 const START_TIME = 5;
 const TIMER_STEP = 0.1;
-const TIMER_INTERVAL_MS = 100;
+const TIMER_INTERVAL_MS = 750;
 
 const ATTACK_PROFILES = [
   { y: '58vh', durationMs: 1500, impactMs: 820 },
@@ -114,7 +114,7 @@ function tokenLabel(token, wordById) {
   return token.kind === 'meaning' ? word.meaning : word.transliteration;
 }
 
-export default function GuardianSigilEncounter({ words, onDamage, onVictory, getGameFontClass }) {
+export default function GuardianSigilEncounter({ words, onDamage, onVictory, getGameFontClass, paused = false }) {
   const initial = useMemo(() => {
     const seed = words.slice(0, ACTIVE_COUNT).map((word, idx) => makeAttacker(word, START_TIME + (idx * 1.2)));
     const reserve = words.slice(ACTIVE_COUNT);
@@ -135,17 +135,31 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
   const [wrongPulseId, setWrongPulseId] = useState(null);
   const [impacts, setImpacts] = useState([]);
 
+  // Drag — only isDragging triggers re-renders; position is ref-driven
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragSourceId, setDragSourceId] = useState(null);
+  const [dragOverId, setDragOverId] = useState(null);
+  const dragRef = useRef(null); // { token, x, y }
+  const didDragRef = useRef(false); // suppress click after drag
+  const ghostRef = useRef(null);
+  const enemyRefs = useRef(new Map());
+
   const wordById = useMemo(() => buildWordById(words), [words]);
   const attackTimersRef = useRef(new Map());
   const impactIdRef = useRef(0);
 
   const isWon = attackers.length === 0 && reserve.length === 0;
 
-  const refill = useCallback((nextAttackers, nextReserve, nextCooldowns, seedBelt = belt) => {
+  // Use refs so refill doesn't depend on belt state
+  const beltRef = useRef(belt);
+  beltRef.current = belt;
+
+  const refill = useCallback((nextAttackers, nextReserve, nextCooldowns) => {
     const cooled = decayCooldowns(nextCooldowns);
     setCooldowns(cooled);
-    setBelt(buildBelt(nextAttackers, nextReserve, cooled, seedBelt));
-  }, [belt]);
+    const nextBelt = buildBelt(nextAttackers, nextReserve, cooled, beltRef.current);
+    setBelt(nextBelt);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -157,20 +171,31 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
     };
   }, []);
 
+  const pausedRef = useRef(paused);
+  useEffect(() => { pausedRef.current = paused; }, [paused]);
+
+  // Timer — bail early when no attacker actually changes
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setAttackers((prev) => prev.map((attacker) => {
-        if (attacker.isAttacking) return attacker;
-        const nextTimer = +(attacker.timer - TIMER_STEP).toFixed(1);
-        if (nextTimer > 0) return { ...attacker, timer: nextTimer };
-        return { ...attacker, timer: 0, isAttacking: true, attackTick: attacker.attackTick + 1 };
-      }));
+      if (pausedRef.current) return;
+      setAttackers((prev) => {
+        let changed = false;
+        const next = prev.map((attacker) => {
+          if (attacker.isAttacking) return attacker;
+          const nextTimer = +(attacker.timer - TIMER_STEP).toFixed(1);
+          changed = true;
+          if (nextTimer > 0) return { ...attacker, timer: nextTimer };
+          return { ...attacker, timer: 0, isAttacking: true, attackTick: attacker.attackTick + 1 };
+        });
+        return changed ? next : prev;
+      });
     }, TIMER_INTERVAL_MS);
 
     return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
+    if (paused) return;
     attackers.forEach((attacker) => {
       if (!attacker.isAttacking) return;
       const key = `${attacker.id}:${attacker.attackTick}`;
@@ -184,7 +209,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
         setImpacts((prev) => [...prev, { id: impactId, wordId: attacker.id }]);
         window.setTimeout(() => {
           setImpacts((prev) => prev.filter((item) => item.id !== impactId));
-        }, 500);
+        }, 900);
       }, profile.impactMs);
 
       const recoverTimeout = window.setTimeout(() => {
@@ -198,7 +223,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
 
       attackTimersRef.current.set(key, { impactTimeout, recoverTimeout });
     });
-  }, [attackers, onDamage]);
+  }, [attackers, onDamage, paused]);
 
   const applyToken = useCallback((token, attackerId) => {
     const attacker = attackers.find((item) => item.id === attackerId);
@@ -232,66 +257,203 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
       }
     }
 
-    const remainingBelt = belt.filter((item) => tokenId(item) !== tokenId(token));
+    // Update beltRef before refill reads it
+    beltRef.current = belt.filter((item) => tokenId(item) !== tokenId(token));
 
     setAttackers(nextAttackers);
     setReserve(nextReserve);
     setSelected(null);
-    refill(nextAttackers, nextReserve, nextCooldowns, remainingBelt);
+    refill(nextAttackers, nextReserve, nextCooldowns);
   }, [attackers, belt, cooldowns, reserve, refill]);
+
+  // ─── Drag handlers (ref-driven, no re-render per move) ────
+  const hitTestEnemy = useCallback((x, y) => {
+    for (const [id, el] of enemyRefs.current) {
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return id;
+    }
+    return null;
+  }, []);
+
+  const handlePointerDown = useCallback((e, token) => {
+    e.preventDefault();
+    dragRef.current = { token, x: e.clientX, y: e.clientY };
+    didDragRef.current = false;
+    setDragSourceId(tokenId(token));
+    setIsDragging(true);
+    setSelected(null);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }, []);
+
+  const handlePointerMove = useCallback((e) => {
+    const drag = dragRef.current;
+    if (!drag) return;
+    didDragRef.current = true;
+    drag.x = e.clientX;
+    drag.y = e.clientY;
+    // Move ghost via DOM — no setState
+    if (ghostRef.current) {
+      ghostRef.current.style.left = `${e.clientX}px`;
+      ghostRef.current.style.top = `${e.clientY}px`;
+    }
+    // Update dragover highlight only when it changes
+    const hoveredId = hitTestEnemy(e.clientX, e.clientY);
+    setDragOverId((prev) => prev === hoveredId ? prev : hoveredId);
+  }, [hitTestEnemy]);
+
+  const handlePointerUp = useCallback((e) => {
+    const drag = dragRef.current;
+    if (!drag) return;
+    dragRef.current = null;
+    setIsDragging(false);
+    setDragSourceId(null);
+    setDragOverId(null);
+
+    const targetId = hitTestEnemy(e.clientX, e.clientY);
+    if (targetId) {
+      applyToken(drag.token, targetId);
+    }
+  }, [applyToken, hitTestEnemy]);
+
+  const handlePointerCancel = useCallback(() => {
+    dragRef.current = null;
+    setIsDragging(false);
+    setDragSourceId(null);
+    setDragOverId(null);
+  }, []);
 
   useEffect(() => {
     if (!isWon) return;
     onVictory();
   }, [isWon, onVictory]);
 
+  const totalEnemies = words.length;
+  const defeated = totalEnemies - attackers.length - reserve.length;
+
   return (
     <>
-      <div className="ds-encounter ds-encounter--guardian">
-        {attackers.map((attacker) => {
-          const progress = attacker.timer / attacker.timerMax;
-          const impactActive = impacts.some((impact) => impact.wordId === attacker.id);
+      {/* ═══ BATTLE ARENA — enemy formation ═══ */}
+      <div className="ds-battle-arena">
+        <div className="ds-battle-status">
+          <span className="ds-battle-label">Guardian Sigil</span>
+          <span className="ds-battle-count">{defeated}/{totalEnemies}</span>
+        </div>
 
-          return (
-            <button
-              type="button"
-              key={attacker.id}
-              className={`ds-guardian-word ${selected ? 'ds-guardian-word--targetable' : ''} ${wrongPulseId === attacker.id ? 'ds-guardian-word--wrong' : ''}`}
-              onClick={() => {
-                if (selected) applyToken(selected, attacker.id);
-              }}
-            >
-              <div className="ds-guardian-timer-track">
-                <div className="ds-guardian-timer-fill" style={{ width: `${Math.max(0, progress * 100)}%` }} />
-              </div>
-              <div className={`ds-guardian-hebrew ${attacker.isAttacking ? 'is-attacking' : ''}`}>
-                <span className={getGameFontClass(`guardian-${attacker.id}`)}>{attacker.hebrew}</span>
-                {impactActive && <span className="ds-guardian-impact" />}
-              </div>
-              <div className="ds-guardian-seals">
-                <span className={`ds-guardian-seal ${attacker.solved.meaning ? 'is-done' : ''}`} />
-                <span className={`ds-guardian-seal ${attacker.solved.transliteration ? 'is-done' : ''}`} />
-              </div>
-            </button>
-          );
-        })}
+        <div className="ds-battle-formation">
+          {attackers.map((attacker, idx) => {
+            const progress = attacker.timer / attacker.timerMax;
+            const impactActive = impacts.some((impact) => impact.wordId === attacker.id);
+            const isUrgent = progress < 0.3 && !attacker.isAttacking;
+
+            return (
+              <button
+                type="button"
+                key={attacker.id}
+                ref={(el) => { if (el) enemyRefs.current.set(attacker.id, el); else enemyRefs.current.delete(attacker.id); }}
+                className={[
+                  'ds-battle-enemy',
+                  selected || isDragging ? 'ds-battle-enemy--targetable' : '',
+                  dragOverId === attacker.id ? 'ds-battle-enemy--dragover' : '',
+                  wrongPulseId === attacker.id ? 'ds-battle-enemy--wrong' : '',
+                  isUrgent ? 'ds-battle-enemy--urgent' : '',
+                  attacker.isAttacking ? 'ds-battle-enemy--striking' : '',
+                ].filter(Boolean).join(' ')}
+                style={{ '--enemy-index': idx }}
+                onClick={() => {
+                  if (selected) applyToken(selected, attacker.id);
+                }}
+              >
+                <div className="ds-battle-enemy-frame">
+                  <div className="ds-battle-timer-track">
+                    <div
+                      className={`ds-battle-timer-fill ${isUrgent ? 'ds-battle-timer-fill--urgent' : ''}`}
+                      style={{ width: `${Math.max(0, progress * 100)}%` }}
+                    />
+                  </div>
+
+                  <div className="ds-battle-hebrew">
+                    <span className={getGameFontClass(`guardian-${attacker.id}`)}>{attacker.hebrew}</span>
+                  </div>
+
+                  <div className="ds-battle-seals">
+                    <span className={`ds-battle-seal ${attacker.solved.meaning ? 'is-done' : ''}`} title="Meaning" />
+                    <span className={`ds-battle-seal ${attacker.solved.transliteration ? 'is-done' : ''}`} title="Transliteration" />
+                  </div>
+
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {reserve.length > 0 && (
+          <div className="ds-battle-reserve">
+            {reserve.map((_, i) => (
+              <span key={i} className="ds-battle-reserve-pip" />
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="ds-guardian-belt" role="group" aria-label="Guardian answer pool">
+      {/* ═══ DIVIDER — battle line ═══ */}
+      <div className="ds-battle-divider">
+        <div className="ds-battle-divider-line" />
+        <span className="ds-battle-divider-rune">⟡</span>
+        <div className="ds-battle-divider-line" />
+      </div>
+
+      {/* ═══ ACTION BAR — token selection ═══ */}
+      <div className="ds-battle-actionbar" role="group" aria-label="Guardian answer pool">
         {belt.map((token) => {
-          const active = selected && tokenId(selected) === tokenId(token);
+          const tid = tokenId(token);
+          const active = selected && tokenId(selected) === tid;
           return (
             <button
               type="button"
-              key={tokenId(token)}
-              className={`ds-guardian-token ${active ? 'is-active' : ''}`}
-              onClick={() => setSelected(active ? null : token)}
+              key={tid}
+              className={[
+                'ds-battle-token',
+                `ds-battle-token--${token.kind}`,
+                active ? 'is-active' : '',
+                dragSourceId === tid ? 'is-dragging' : '',
+              ].filter(Boolean).join(' ')}
+              onClick={() => { if (!didDragRef.current) setSelected(active ? null : token); }}
+              onPointerDown={(e) => handlePointerDown(e, token)}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerCancel}
             >
               {tokenLabel(token, wordById)}
             </button>
           );
         })}
       </div>
+
+      {/* Drag ghost — positioned via ref, not state */}
+      {isDragging && (
+        <div
+          ref={ghostRef}
+          className={`ds-battle-drag-ghost ds-battle-token--${dragRef.current?.token.kind ?? 'meaning'}`}
+          style={{
+            left: dragRef.current?.x ?? 0,
+            top: dragRef.current?.y ?? 0,
+          }}
+          aria-hidden="true"
+        >
+          {dragRef.current ? tokenLabel(dragRef.current.token, wordById) : ''}
+        </div>
+      )}
+
+      {/* Player hit visuals — bottom of screen */}
+      {impacts.length > 0 && (
+        <div className="ds-battle-player-hit" key={impacts[impacts.length - 1].id}>
+          <span className="ds-battle-hit-flash" />
+          <span className="ds-battle-slash ds-battle-slash--a" />
+          <span className="ds-battle-slash ds-battle-slash--b" />
+          <div className="ds-battle-hit-vignette" />
+        </div>
+      )}
     </>
   );
 }
