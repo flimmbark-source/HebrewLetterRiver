@@ -57,13 +57,13 @@ function AwardCard({ badge, progress, onClaim, t }) {
       type="button"
       onClick={() => nextReward && onClaim(badge.id, nextReward.tier)}
       disabled={!nextReward}
-      className={`w-full rounded-xl p-4 text-left shadow-sm transition ${nextReward ? 'bg-[#f9f1fd] hover:scale-[1.01]' : 'bg-white'}`}
+      className={`stable-card w-full rounded-xl p-4 text-left shadow-sm transition ${nextReward ? 'bg-[#f9f1fd] hover:scale-[1.01]' : 'bg-white'}`}
     >
       <div className="mb-2 flex items-center justify-between">
-        <h4 className="font-bold text-[#1d1a22]">{name}</h4>
+        <h4 className="line-clamp-1-stable font-bold text-[#1d1a22]">{name}</h4>
         {nextReward ? <span className="rounded-full bg-[#1b6b4f] px-2 py-1 text-[10px] font-black text-white">CLAIM +{nextReward.stars}</span> : null}
       </div>
-      <p className="text-xs text-[#4a6365]">{summary}</p>
+      <p className="line-clamp-2-stable text-xs text-[#4a6365]">{summary}</p>
       <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#bec9c2]/30">
         <div className="h-full bg-[#1b6b4f]" style={{ width: `${pct}%` }}></div>
       </div>
@@ -183,7 +183,7 @@ export default function AchievementsView() {
     >
       <main className="mx-auto max-w-2xl">
         <section className="relative mb-10">
-          <div className="relative overflow-hidden rounded-xl bg-[#1b6b4f] p-8 text-white shadow-lg">
+          <div className="stable-card relative overflow-hidden rounded-xl bg-[#1b6b4f] p-8 text-white shadow-lg">
             <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-[#a7f3d0]/20 blur-3xl"></div>
             <div className="relative z-10">
               <p className="mb-1 text-sm font-bold opacity-80">CURRENT MILESTONE • {playerName}</p>
@@ -198,13 +198,13 @@ export default function AchievementsView() {
         </section>
 
         <section className="mb-10 grid grid-cols-2 gap-4">
-          <div className="col-span-2 flex items-center justify-between overflow-hidden rounded-lg bg-[#f9f1fd] p-6">
+          <div className="stable-card col-span-2 flex items-center justify-between overflow-hidden rounded-lg bg-[#f9f1fd] p-6">
             <div className="flex-1">
               <span className="mb-3 inline-block rounded-full bg-[#fcb972] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#774708]">Most Recent</span>
-              <h3 className="mb-1 text-xl font-bold">
+              <h3 className="line-clamp-1-stable mb-1 text-xl font-bold">
                 {recentBadge ? getBadgeCopy(recentBadge, t, gameName, recentBadge?.tiers?.[0]?.goal ?? 1).name : 'Polyglot Pioneer'}
               </h3>
-              <p className="text-sm text-[#3f4943]">
+              <p className="line-clamp-2-stable text-sm text-[#3f4943]">
                 {recentBadge ? getBadgeCopy(recentBadge, t, gameName, recentBadge?.tiers?.[0]?.goal ?? 1).summary : 'Completed 5 different language paths.'}
               </p>
             </div>
@@ -217,11 +217,11 @@ export default function AchievementsView() {
             const current = Math.min(state?.progress ?? 0, goal);
             const pct = Math.round((current / goal) * 100);
             return (
-              <div key={badge.id} className={`flex flex-col rounded-lg p-5 ${index === 0 ? 'bg-[#e7e0eb]' : 'bg-[#f9f1fd]'}`}>
+              <div key={badge.id} className={`stable-card flex flex-col rounded-lg p-5 ${index === 0 ? 'bg-[#e7e0eb]' : 'bg-[#f9f1fd]'}`}>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#1b6b4f]/10"><Icon className="text-[#1b6b4f]" filled>{index === 0 ? 'history_edu' : 'auto_awesome'}</Icon></div>
                 <div>
-                  <h4 className="mb-1 text-lg font-bold leading-tight">{getBadgeCopy(badge, t, gameName, goal).name}</h4>
-                  <p className="text-xs text-[#3f4943]">{getBadgeCopy(badge, t, gameName, goal).summary}</p>
+                  <h4 className="line-clamp-1-stable mb-1 text-lg font-bold leading-tight">{getBadgeCopy(badge, t, gameName, goal).name}</h4>
+                  <p className="line-clamp-2-stable text-xs text-[#3f4943]">{getBadgeCopy(badge, t, gameName, goal).summary}</p>
                   <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#bec9c2]/30"><div className="h-full bg-[#1b6b4f]" style={{ width: `${pct}%` }}></div></div>
                 </div>
               </div>
@@ -252,17 +252,17 @@ export default function AchievementsView() {
                   const current = Math.min(state?.progress ?? 0, goal);
                   const pct = Math.round((current / goal) * 100);
                   return (
-                    <div key={badge.id} className="flex items-center gap-5 rounded-xl p-4 transition-all hover:bg-[#f9f1fd]">
+                    <div key={badge.id} className="stable-card flex items-center gap-5 rounded-xl p-4 transition-all hover:bg-[#f9f1fd]">
                       <div className="relative">
                         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#e7e0eb]"><Icon className="text-[#6f7973]">workspace_premium</Icon></div>
                         <div className="absolute -bottom-1 -right-1 rounded-full bg-white p-1 shadow-sm"><Icon className="text-[14px] text-[#1b6b4f]">lock</Icon></div>
                       </div>
                       <div className="flex-1">
                         <div className="mb-1 flex items-end justify-between">
-                          <h4 className="font-bold">{getBadgeCopy(badge, t, gameName, goal).name}</h4>
+                          <h4 className="line-clamp-1-stable font-bold">{getBadgeCopy(badge, t, gameName, goal).name}</h4>
                           <span className="text-[10px] font-bold text-[#3f4943]">{current}/{goal}</span>
                         </div>
-                        <p className="mb-2 text-xs text-[#3f4943]">{getBadgeCopy(badge, t, gameName, goal).summary}</p>
+                        <p className="line-clamp-2-stable mb-2 text-xs text-[#3f4943]">{getBadgeCopy(badge, t, gameName, goal).summary}</p>
                         <div className="h-2 w-full overflow-hidden rounded-full bg-[#e7e0eb]"><div className="h-full bg-[#1b6b4f]/30" style={{ width: `${pct}%` }}></div></div>
                       </div>
                     </div>
