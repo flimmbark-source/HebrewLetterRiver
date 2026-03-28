@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { bridgeBuilderWords } from '../../data/bridgeBuilderWords.js';
 import { markLoosePlanksComplete } from '../../lib/bridgeBuilderStorage.js';
 import { useFontSettings } from '../../hooks/useFontSettings.js';
+import { getNativeScript, getTextDirection } from '../../lib/vocabLanguageAdapter.js';
 import './LoosePlanks.css';
 
 function shuffle(arr) {
@@ -148,13 +149,13 @@ export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
   const currentGroup = currentRound.words || [];
   const plankTypes = currentRound.plankTypes || {};
 
-  // Hebrew planks — fixed row at top
+  // Native script planks — fixed row at top
   const hebrewPlanks = useMemo(() =>
     currentGroup.map(w => ({
       key: `h-${w.id}-${roundIndex}`,
       type: 'hebrew',
       wordId: w.id,
-      text: w.hebrew,
+      text: getNativeScript(w),
     })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [roundIndex, currentGroup.length]
@@ -249,7 +250,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
             <div className="lp-end-words">
               {allWords.map(w => (
                 <div key={w.id} className="lp-end-word">
-                  <span className={`lp-end-hebrew ${getGameFontClass(`${w.id}-hebrew`)}`}>{w.hebrew}</span>
+                  <span className={`lp-end-hebrew ${getGameFontClass(`${w.id}-hebrew`)}`} dir={getTextDirection(w.languageId || 'hebrew')}>{getNativeScript(w)}</span>
                   <span className={`lp-end-translit ${getGameFontClass(`${w.id}-translit`)}`}>{w.transliteration}</span>
                 </div>
               ))}

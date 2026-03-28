@@ -2,6 +2,7 @@ import React from 'react';
 import { getRoomDisplayInfo } from '../../data/deepScript/roomGenerator.js';
 import { getWordById } from '../../data/deepScript/words.js';
 import { ARCHIVE_REWARDS } from '../../data/deepScript/roomGenerator.js';
+import { getMeaning } from '../../lib/vocabLanguageAdapter.js';
 
 export default function RoomChoiceScreen({ node, runState, onSelect, onBack }) {
   if (!node) return null;
@@ -55,7 +56,7 @@ export default function RoomChoiceScreen({ node, runState, onSelect, onBack }) {
           if (room.type === 'combat' || room.type === 'miniboss') {
             const word = getWordById(room.wordId);
             if (word) {
-              subtitle = `"${word.english}"`;
+              subtitle = `"${getMeaning(word)}"`;
             }
           } else if (room.type === 'archive' && room.rewardId) {
             const reward = ARCHIVE_REWARDS.find(r => r.id === room.rewardId);

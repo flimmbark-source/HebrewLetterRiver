@@ -1,5 +1,6 @@
 import React from 'react';
 import { getWordById } from '../../data/deepScript/words.js';
+import { getNativeScript, getTextDirection } from '../../lib/vocabLanguageAdapter.js';
 
 export default function RunEndScreen({
   result,
@@ -46,12 +47,12 @@ export default function RunEndScreen({
       {runState.wordsCompleted.length > 0 && (
         <div className="ds-end-words">
           <h3 className="ds-end-words-title">Words Learned</h3>
-          <div className="ds-end-word-list" dir="rtl">
+          <div className="ds-end-word-list" dir={getTextDirection(runState.wordsCompleted[0] ? (getWordById(runState.wordsCompleted[0])?.languageId || 'hebrew') : 'hebrew')}>
             {runState.wordsCompleted.map(wId => {
               const w = getWordById(wId);
               return w ? (
                 <span key={wId} className="ds-end-word-tag">
-                  {w.hebrew}
+                  {getNativeScript(w)}
                 </span>
               ) : null;
             })}

@@ -23,12 +23,13 @@ import { upgradeDefinitions, getRandomUpgrades } from '../../data/deepScript/upg
 // ─── Content Data Validation ────────────────────────────────
 
 describe('Deep Script Content Data', () => {
-  it('every word has matching hebrew and letters', () => {
+  it('every word has matching hebrew/nativeScript and letters', () => {
     for (const word of deepScriptWords) {
       const joined = word.letters.join('');
-      expect(joined).toBe(word.hebrew);
+      const nativeScript = word.nativeScript || word.hebrew;
+      expect(joined).toBe(nativeScript);
       expect(word.id).toBeTruthy();
-      expect(word.english).toBeTruthy();
+      expect(word.meaning || word.english).toBeTruthy();
       expect(word.transliteration).toBeTruthy();
       expect(word.difficulty).toBeGreaterThanOrEqual(1);
       expect(word.difficulty).toBeLessThanOrEqual(5);
@@ -364,7 +365,7 @@ describe('Combat State Creation', () => {
     const run = makeRunState();
     const combat = createCombatState('ds-sefer', run);
     expect(combat).not.toBeNull();
-    expect(combat.word.hebrew).toBe('ספר');
+    expect(combat.word.nativeScript || combat.word.hebrew).toBe('ספר');
     expect(combat.answerTrack.length).toBe(3);
     expect(combat.tray.length).toBe(3);
     expect(combat.phase).toBe('active');

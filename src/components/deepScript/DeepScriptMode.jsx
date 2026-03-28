@@ -85,7 +85,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     const pool = wordIds.size > 0
       ? Array.from(wordIds).map(id => getWordById(id)).filter(Boolean)
       : [...deepScriptWords];
-    const candidates = pool.filter(w => !w.isMiniboss && w.english);
+    const candidates = pool.filter(w => !w.isMiniboss && (w.meaning || w.english));
     const shuffled = [...candidates].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 3);
   }, []);
@@ -463,11 +463,13 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
       .filter(word => word && !word.isMiniboss)
       .map(word => ({
         id: word.id,
-        hebrew: word.hebrew,
+        hebrew: word.nativeScript || word.hebrew,
+        nativeScript: word.nativeScript || word.hebrew,
         transliteration: word.transliteration,
-        meaning: word.english,
+        meaning: word.meaning || word.english,
+        languageId: word.languageId || 'hebrew',
       }))
-      .filter(word => word.hebrew && word.transliteration && word.meaning);
+      .filter(word => (word.nativeScript || word.hebrew) && word.transliteration && word.meaning);
 
     return (
       <div className="ds-mode">

@@ -11,7 +11,7 @@
  * The engine is framework-agnostic; React integration is via useReducer.
  */
 
-import { getWordById, allDeepScriptLetters } from '../../data/deepScript/words.js';
+import { getWordById, allDeepScriptLetters, getLetterPoolForWords } from '../../data/deepScript/words.js';
 import { getGearById } from '../../data/deepScript/gear.js';
 import { getEnemyDef, ENEMY_TYPES } from '../../data/deepScript/enemies.js';
 import { nanoid } from 'nanoid/non-secure';
@@ -99,7 +99,7 @@ export function createLetterTile(letter, source = 'generated', cursed = false) {
 }
 
 function pickWeightedLetter(pool, letterProductionCounts = {}) {
-  if (!pool || pool.length === 0) return allDeepScriptLetters[0] || 'א';
+  if (!pool || pool.length === 0) return allDeepScriptLetters[0] || '?';
 
   const weightedPool = pool.map((letter) => ({
     letter,
@@ -131,20 +131,23 @@ function countProducedLetters(tiles, startingCounts = {}) {
 // ─── Helper: generate letters ───────────────────────────────
 
 /**
- * Generate N random Hebrew letters, biased toward the target word.
+ * Generate N random letters, biased toward the target word.
  * @param {number} count
  * @param {string[]} targetLetters — letters of the target word
  * @param {number} accuracy — 0-1, chance each letter is from target
+ * @param {Object} letterProductionCounts — tracking map for weighted distribution
+ * @param {string[]} [fullPool] — full letter pool for random picks (defaults to allDeepScriptLetters)
  * @returns {Object[]} array of LetterTile
  */
-export function generateLetters(count, targetLetters, accuracy = 0.3, letterProductionCounts = {}) {
+export function generateLetters(count, targetLetters, accuracy = 0.3, letterProductionCounts = {}, fullPool = null) {
+  const pool = fullPool || allDeepScriptLetters;
   const tiles = [];
   for (let i = 0; i < count; i++) {
     let letter;
     if (Math.random() < accuracy) {
       letter = pickWeightedLetter(targetLetters, letterProductionCounts);
     } else {
-      letter = pickWeightedLetter(allDeepScriptLetters, letterProductionCounts);
+      letter = pickWeightedLetter(pool, letterProductionCounts);
     }
     tiles.push(createLetterTile(letter));
   }
@@ -153,8 +156,10 @@ export function generateLetters(count, targetLetters, accuracy = 0.3, letterProd
 
 /**
  * Generate a choice bundle: N letters to choose from, biased toward useful ones.
+ * @param {string[]} [fullPool] — full letter pool for random picks (defaults to allDeepScriptLetters)
  */
-export function generateChoiceBundle(count, targetLetters, bonusCount = 0, letterProductionCounts = {}) {
+export function generateChoiceBundle(count, targetLetters, bonusCount = 0, letterProductionCounts = {}, fullPool = null) {
+  const pool = fullPool || allDeepScriptLetters;
   const total = count + bonusCount;
   const options = [];
   // At least 1 useful letter
@@ -163,7 +168,7 @@ export function generateChoiceBundle(count, targetLetters, bonusCount = 0, lette
     if (Math.random() < 0.5) {
       options.push(pickWeightedLetter(targetLetters, letterProductionCounts));
     } else {
-      options.push(pickWeightedLetter(allDeepScriptLetters, letterProductionCounts));
+      options.push(pickWeightedLetter(pool, letterProductionCounts));
     }
   }
   return options.sort(() => Math.random() - 0.5);
@@ -202,9 +207,12 @@ export function createCombatState(wordId, runState) {
     }
   }
 
+  // Compute language-aware letter pool for this combat
+  const letterPool = getLetterPoolForWords(runState.customWords || null);
+
   // Generate initial letters for tray — small starting hand
   const accuracy = 0.3 + (runState.passives?.generateBonus || 0);
-  const initialLetters = generateLetters(3, word.letters, accuracy);
+  const initialLetters = generateLetters(3, word.letters, accuracy, {}, letterPool);
 
   // Build gear states with socket tracking
   const gearStates = {};
@@ -257,6 +265,7 @@ export function createCombatState(wordId, runState) {
     choiceBundle: null,
     selectedTrayTile: null,
     selectedSatchelTile: null,
+    letterPool, // language-aware letter pool for this combat
     phase: 'active',         // 'active' | 'victory' | 'defeat'
     log: [],
     isMiniboss: word.isMiniboss || false,
@@ -401,7 +410,7 @@ function executeEnemyIntent(state) {
       const spawned = [];
       for (let i = 0; i < effectiveValue; i++) {
         if (state.tray.length + spawned.length >= trayMax) break;
-        const junkLetter = pickWeightedLetter(allDeepScriptLetters, state.letterProductionCounts || {});
+        const junkLetter = pickWeightedLetter(state.letterPool || allDeepScriptLetters, state.letterProductionCounts || {});
         spawned.push(createLetterTile(junkLetter, 'spawned', true));
       }
       if (spawned.length === 0) return state;
@@ -726,7 +735,7 @@ export function combatReducer(state, action) {
       switch (gearDef.type) {
         case 'generate-random': {
           // Scribe Knife: 2 random tiles, weighted toward target
-          const newTiles = generateLetters(2, targetLetters, genAccuracy, state.letterProductionCounts);
+          const newTiles = generateLetters(2, targetLetters, genAccuracy, state.letterProductionCounts, state.letterPool);
           const pushResult = pushTilesToTray({ ...state, tray: updates.tray }, newTiles, runState);
           updates.tray = pushResult.tray;
           updates.letterProductionCounts = pushResult.letterProductionCounts;
@@ -791,7 +800,7 @@ export function combatReducer(state, action) {
           }
           const salvageCount = salvaged ? 2 : 1;
           const salvageAccuracy = 0.4 + (runState?.passives?.generateBonus || 0);
-          const salvageTiles = generateLetters(salvageCount, targetLetters, salvageAccuracy, updates.letterProductionCounts);
+          const salvageTiles = generateLetters(salvageCount, targetLetters, salvageAccuracy, updates.letterProductionCounts, state.letterPool);
           const pushResult = pushTilesToTray({ ...state, tray: updates.tray, letterProductionCounts: updates.letterProductionCounts }, salvageTiles, runState);
           updates.tray = pushResult.tray;
           updates.letterProductionCounts = pushResult.letterProductionCounts;
@@ -824,7 +833,7 @@ export function combatReducer(state, action) {
           // that blooms into 1 tile (60%) at START of next turn.
           // Tempo decision: delayed tile is vulnerable to enemy burn/corrupt.
           const sproutAccuracy = 0.3 + (runState?.passives?.generateBonus || 0);
-          const sproutTiles = generateLetters(1, targetLetters, sproutAccuracy, updates.letterProductionCounts);
+          const sproutTiles = generateLetters(1, targetLetters, sproutAccuracy, updates.letterProductionCounts, state.letterPool);
           const pushResult = pushTilesToTray({ ...state, tray: updates.tray, letterProductionCounts: updates.letterProductionCounts }, sproutTiles, runState);
           updates.tray = pushResult.tray;
           updates.letterProductionCounts = pushResult.letterProductionCounts;
@@ -839,7 +848,7 @@ export function combatReducer(state, action) {
         }
         case 'choice': {
           const bonusCount = runState?.passives?.bonusChoiceCount || 0;
-          const bundle = generateChoiceBundle(3, targetLetters, bonusCount, state.letterProductionCounts);
+          const bundle = generateChoiceBundle(3, targetLetters, bonusCount, state.letterProductionCounts, state.letterPool);
           updates.choiceBundle = bundle;
           updates.log = [...state.log, { type: 'gear', name: gearDef.name, message: 'Choose a letter' }];
           break;
@@ -854,7 +863,7 @@ export function combatReducer(state, action) {
             if (isExact && remaining.length > 0) {
               newLetter = remaining[Math.floor(Math.random() * remaining.length)];
             } else {
-              newLetter = pickWeightedLetter(allDeepScriptLetters, updates.letterProductionCounts);
+              newLetter = pickWeightedLetter(state.letterPool || allDeepScriptLetters, updates.letterProductionCounts);
             }
             const transformedTile = createLetterTile(newLetter, 'transform');
             const pushResult = pushTilesToTray({ ...state, tray: updates.tray, letterProductionCounts: updates.letterProductionCounts }, [transformedTile], runState);
@@ -867,7 +876,7 @@ export function combatReducer(state, action) {
         case 'burn': {
           // Ash Brazier: burn socketed tile, generate 2 random
           const burnAccuracy = 0.4 + (runState?.passives?.generateBonus || 0);
-          const newTiles = generateLetters(2, targetLetters, burnAccuracy, updates.letterProductionCounts);
+          const newTiles = generateLetters(2, targetLetters, burnAccuracy, updates.letterProductionCounts, state.letterPool);
           const pushResult = pushTilesToTray({ ...state, tray: updates.tray, letterProductionCounts: updates.letterProductionCounts }, newTiles, runState);
           updates.tray = pushResult.tray;
           updates.letterProductionCounts = pushResult.letterProductionCounts;
@@ -982,7 +991,7 @@ export function combatReducer(state, action) {
       const seeds = state.pendingSeeds || [];
       for (const seed of seeds) {
         if (bloomedTray.length >= trayMax) break;
-        const bloomed = generateLetters(1, seed.targetLetters, seed.accuracy, nextLetterProductionCounts);
+        const bloomed = generateLetters(1, seed.targetLetters, seed.accuracy, nextLetterProductionCounts, state.letterPool);
         bloomedTray.push(...bloomed);
         nextLetterProductionCounts = countProducedLetters(bloomed, nextLetterProductionCounts);
         seedLog.push({ type: 'gear', message: `Seed bloomed → ${bloomed[0].letter} 🌱` });

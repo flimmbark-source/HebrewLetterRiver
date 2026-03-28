@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ARCHIVE_REWARDS } from '../../data/deepScript/roomGenerator.js';
-import { allDeepScriptLetters } from '../../data/deepScript/words.js';
+import { allDeepScriptLetters, getLetterPoolForWords } from '../../data/deepScript/words.js';
 import RunStatusBar from './RunStatusBar.jsx';
 
 export default function ArchiveScreen({ room, runState, onComplete }) {
@@ -33,7 +33,7 @@ export default function ArchiveScreen({ room, runState, onComplete }) {
 
         {reward.id === 'insight' && (
           <div className="ds-archive-insight">
-            <p>You study the ancient texts and gain understanding of Hebrew letter patterns.</p>
+            <p>You study the ancient texts and gain understanding of letter patterns.</p>
           </div>
         )}
 

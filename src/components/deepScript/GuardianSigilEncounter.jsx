@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { getNativeScript, getTextDirection } from '../../lib/vocabLanguageAdapter.js';
 
 const ACTIVE_COUNT = 3;
 const BELT_SIZE = 3;
@@ -372,8 +373,8 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
                     />
                   </div>
 
-                  <div className="ds-battle-hebrew">
-                    <span className={getGameFontClass(`guardian-${attacker.id}`)}>{attacker.hebrew}</span>
+                  <div className="ds-battle-hebrew" dir={getTextDirection(attacker.languageId || 'hebrew')}>
+                    <span className={getGameFontClass(`guardian-${attacker.id}`)}>{getNativeScript(attacker)}</span>
                   </div>
 
                   <div className="ds-battle-seals">

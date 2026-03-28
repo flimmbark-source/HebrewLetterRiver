@@ -1,7 +1,7 @@
 /**
- * Deep Script word content — Hebrew words used as combat enemies.
+ * Deep Script word content — words used as combat enemies.
  *
- * Each word uses consonantal spelling (no niqqud).
+ * Each word uses consonantal/base spelling (no diacritics).
  * Letters are stored as individual characters for validation.
  *
  * Enemy types: 'corruptor' | 'spawner' | 'amplifier'
@@ -10,15 +10,27 @@
  * - Difficulty 4: more spawners and amplifiers
  * - Minibosses: each gets a distinct type
  *
+ * Language-agnostic fields:
+ *   nativeScript — The word in its target script (alias for legacy `hebrew` field)
+ *   meaning      — English gloss (alias for legacy `english` field)
+ *   languageId   — Which language this word belongs to
+ *
+ * Legacy fields (kept for backward compat):
+ *   hebrew       — Target word text (same as nativeScript for Hebrew words)
+ *   english      — English meaning (same as meaning)
+ *
  * @typedef {Object} DSWord
  * @property {string}   id              — Stable identifier
- * @property {string}   hebrew          — Target Hebrew word (consonantal)
- * @property {string[]} letters         — Individual Hebrew letters, right-to-left order
+ * @property {string}   hebrew          — Target word (consonantal) [legacy, use nativeScript]
+ * @property {string}   nativeScript    — Target word in native script
+ * @property {string[]} letters         — Individual characters in reading order
  * @property {string}   transliteration — Romanized pronunciation
- * @property {string}   english         — English meaning
+ * @property {string}   english         — English meaning [legacy, use meaning]
+ * @property {string}   meaning         — English meaning
+ * @property {string}   languageId      — Language identifier (e.g. 'hebrew', 'arabic')
  * @property {number}   difficulty      — 1-5 scale
  * @property {string[]} tags            — Category tags
- * @property {string}   [root]          — Optional 3-letter root
+ * @property {string}   [root]          — Optional root form
  * @property {string}   [enemyType]     — Enemy archetype (defaults to 'corruptor')
  * @property {boolean}  [isMiniboss]    — Miniboss encounter flag
  */
@@ -154,11 +166,28 @@ export const deepScriptWords = [
   { id: 'ds-beresheet2',   hebrew: 'התחלה',   letters: ['ה','ת','ח','ל','ה'],         transliteration: 'hatchalah',    english: 'the beginning', difficulty: 5, tags: ['abstract','literary'], isMiniboss: true, enemyType: 'spawner' },
 ];
 
+// ─── Enrich all words with language-agnostic fields ─────────
+for (const word of deepScriptWords) {
+  word.nativeScript = word.nativeScript || word.hebrew;
+  word.meaning = word.meaning || word.english;
+  word.languageId = word.languageId || 'hebrew';
+}
+
 /**
- * All unique Hebrew letters used across the word set.
+ * All unique letters used across the Hebrew word set.
  * Useful for generation pools.
+ * @deprecated Use getLetterPoolForWords(wordPool) for language-agnostic letter pools.
  */
 export const allDeepScriptLetters = [...new Set(deepScriptWords.flatMap(w => w.letters))];
+
+/**
+ * Extract all unique letters from a word pool (language-agnostic).
+ * Falls back to allDeepScriptLetters if no pool given.
+ */
+export function getLetterPoolForWords(wordPool) {
+  const pool = wordPool && wordPool.length > 0 ? wordPool : deepScriptWords;
+  return [...new Set(pool.flatMap(w => w.letters))];
+}
 
 /**
  * Get words by difficulty range.
@@ -204,21 +233,32 @@ export function getWordById(id) {
 /**
  * Convert Bridge Builder words into DS-compatible word objects for pack-based runs.
  * Filters out multi-word phrases (containing spaces) since DS combat needs single words.
+ * Now language-aware: reads nativeScript or hebrew field.
  *
- * @param {Object[]} bbWords — Bridge Builder word objects (with hebrew, transliteration, translation)
+ * @param {Object[]} bbWords — Bridge Builder word objects
  * @returns {Object[]} DS-compatible word objects with letters array
  */
 export function convertBBWordsForDS(bbWords) {
   return bbWords
-    .filter(w => !w.hebrew.includes(' ')) // skip multi-word phrases
-    .map(w => ({
-      id: w.id,
-      hebrew: w.hebrew,
-      letters: [...w.hebrew], // split into individual characters
-      transliteration: w.transliteration,
-      english: w.translation,
-      difficulty: w.difficulty || 1,
-      tags: w.tags || [],
-      isMiniboss: false,
-    }));
+    .filter(w => {
+      const text = w.nativeScript || w.hebrew || '';
+      return !text.includes(' ');
+    })
+    .map(w => {
+      const nativeText = w.nativeScript || w.hebrew || '';
+      const meaningText = w.meaning || w.translation || '';
+      return {
+        id: w.id,
+        hebrew: nativeText,
+        nativeScript: nativeText,
+        letters: [...nativeText],
+        transliteration: w.transliteration,
+        english: meaningText,
+        meaning: meaningText,
+        languageId: w.languageId || 'hebrew',
+        difficulty: w.difficulty || 1,
+        tags: w.tags || [],
+        isMiniboss: false,
+      };
+    });
 }
