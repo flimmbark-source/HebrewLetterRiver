@@ -2,6 +2,8 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import SpeakButton from '../../SpeakButton.jsx';
 import { useLocalization } from '../../../context/LocalizationContext.jsx';
 import { evaluateWithVariants } from '../../../lib/translationEvaluator.ts';
+import { useLanguage } from '../../../context/LanguageContext.jsx';
+import { getLanguageName } from '../../../lib/vocabLanguageAdapter.js';
 
 /**
  * TypeInput Module
@@ -11,6 +13,8 @@ import { evaluateWithVariants } from '../../../lib/translationEvaluator.ts';
  */
 export default function TypeInput({ line, onResult, mode = 'auto' }) {
   const { t } = useLocalization();
+  const { languageId } = useLanguage();
+  const langName = getLanguageName(languageId);
   const [userInput, setUserInput] = useState('');
   const [evaluation, setEvaluation] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -91,7 +95,7 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
 
   const getInputPlaceholder = useCallback(() => {
     if (inputMode === 'hebrew') {
-      return t('conversation.modules.typeInput.placeholderHebrew', 'Type in Hebrew...');
+      return t('conversation.modules.typeInput.placeholderHebrew', `Type in ${langName}...`);
     }
     return t('conversation.modules.typeInput.placeholderTranslit', 'Type the transliteration...');
   }, [inputMode, t]);
@@ -105,7 +109,7 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
         </h3>
         <p className="text-sm text-slate-400">
           {inputMode === 'hebrew'
-            ? t('conversation.modules.typeInput.hintHebrew', 'Type the Hebrew phrase')
+            ? t('conversation.modules.typeInput.hintHebrew', `Type the ${langName} phrase`)
             : t('conversation.modules.typeInput.hintTranslit', 'Type the transliteration (pronunciation)')
           }
         </p>
@@ -196,7 +200,7 @@ export default function TypeInput({ line, onResult, mode = 'auto' }) {
               className="px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500"
             >
               {displayMode === 'english'
-                ? t('conversation.modules.typeInput.switchToHebrew', 'Show Hebrew')
+                ? t('conversation.modules.typeInput.switchToHebrew', `Show ${langName}`)
                 : t('conversation.modules.typeInput.switchToEnglish', 'Show English')
               }
             </button>

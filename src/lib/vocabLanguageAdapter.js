@@ -63,6 +63,19 @@ export function getFontClass(languageId) {
 }
 
 /**
+ * Get the English display name for a language (e.g., 'Hebrew', 'Arabic', 'Japanese').
+ */
+export function getLanguageName(languageId) {
+  const names = {
+    hebrew: 'Hebrew', arabic: 'Arabic', japanese: 'Japanese',
+    mandarin: 'Mandarin', hindi: 'Hindi', bengali: 'Bengali',
+    russian: 'Russian', amharic: 'Amharic', spanish: 'Spanish',
+    french: 'French', portuguese: 'Portuguese', english: 'English',
+  };
+  return names[languageId] || languageId;
+}
+
+/**
  * Get all unique letters from a language's consonant definitions.
  * Used as the letter pool for Deep Script combat.
  */

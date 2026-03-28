@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import SpeakButton from '../../SpeakButton.jsx';
 import { useLocalization } from '../../../context/LocalizationContext.jsx';
+import { useLanguage } from '../../../context/LanguageContext.jsx';
+import { getLanguageName } from '../../../lib/vocabLanguageAdapter.js';
 
 /**
  * GuidedReplyChoice Module
@@ -10,6 +12,8 @@ import { useLocalization } from '../../../context/LocalizationContext.jsx';
  */
 export default function GuidedReplyChoice({ line, distractorLines = [], onResult }) {
   const { t } = useLocalization();
+  const { languageId } = useLanguage();
+  const langName = getLanguageName(languageId);
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showTransliterations, setShowTransliterations] = useState(false);
@@ -92,10 +96,10 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
       {/* Instructions */}
       <div className="text-center">
         <h3 className="text-base sm:text-lg md:text-lg font-semibold text-slate-200 mb-1">
-          {t('conversation.modules.guidedReplyChoice.instruction', 'Choose the Hebrew phrase')}
+          {t('conversation.modules.guidedReplyChoice.instruction', `Choose the ${langName} phrase`)}
         </h3>
         <p className="text-sm text-slate-400">
-          {t('conversation.modules.guidedReplyChoice.hint', 'Pick the correct Hebrew response')}
+          {t('conversation.modules.guidedReplyChoice.hint', `Pick the correct ${langName} response`)}
         </p>
       </div>
 

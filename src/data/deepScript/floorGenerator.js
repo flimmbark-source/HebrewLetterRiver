@@ -51,7 +51,7 @@ export const TURN_RIGHT = {
 const INTERACTABLE_POOLS = {
   [CHAMBER_TYPES.ENTRANCE]: [
     { type: 'brazier', position: 'left', label: 'Lit Brazier', action: 'flavor', flavorText: 'The brazier casts a warm amber glow across the stone floor. You feel the expedition beginning.' },
-    { type: 'note-tablet', position: 'right', label: 'Carved Tablet', action: 'flavor', flavorText: 'Ancient marks etched into the wall. Some resemble Hebrew letters you have studied.' },
+    { type: 'note-tablet', position: 'right', label: 'Carved Tablet', action: 'flavor', flavorText: 'Ancient marks etched into the wall. Some resemble letters you have studied.' },
   ],
   [CHAMBER_TYPES.STANDARD]: [
     { type: 'brazier', position: 'left', label: 'Brazier', action: 'flavor', flavorText: 'Flickering embers light the chamber walls.' },

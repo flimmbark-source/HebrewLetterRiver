@@ -4,13 +4,15 @@ import { getReadingTextById } from '../data/readingTexts/index.js';
 import { getLanguageCode } from '../lib/languageUtils';
 import { useLanguage } from '../context/LanguageContext';
 import { useLocalization } from '../context/LocalizationContext';
+import { getLanguageName } from '../lib/vocabLanguageAdapter.js';
 
 /**
  * ModuleDictionaryModal - Displays all vocab and grammar words for a module
  * Shows Hebrew word, transliteration, and English meaning in a table
  */
 export default function ModuleDictionaryModal({ module, isOpen, onClose }) {
-  const { appLanguageId } = useLanguage();
+  const { appLanguageId, languageId } = useLanguage();
+  const langName = getLanguageName(languageId);
   const { t } = useLocalization();
 
   if (!isOpen) return null;
@@ -99,7 +101,7 @@ export default function ModuleDictionaryModal({ module, isOpen, onClose }) {
               <table className="w-full">
                 <thead className="bg-slate-800">
                   <tr className="border-b border-slate-700">
-                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">Hebrew</th>
+                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">{langName}</th>
                     <th className="p-3 text-left font-semibold text-slate-300 text-sm">Transliteration</th>
                     <th className="p-3 text-left font-semibold text-slate-300 text-sm">Meaning</th>
                   </tr>
@@ -126,7 +128,7 @@ export default function ModuleDictionaryModal({ module, isOpen, onClose }) {
               <table className="w-full">
                 <thead className="bg-slate-800">
                   <tr className="border-b border-slate-700">
-                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">Hebrew</th>
+                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">{langName}</th>
                     <th className="p-3 text-left font-semibold text-slate-300 text-sm">Transliteration</th>
                     <th className="p-3 text-left font-semibold text-slate-300 text-sm">Meaning</th>
                   </tr>

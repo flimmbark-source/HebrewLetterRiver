@@ -57,7 +57,7 @@ export default function PlayModeModal() {
             <div className="play-mode-icon">📜</div>
             <div className="play-mode-info">
               <div className="play-mode-name">Deep Script</div>
-              <div className="play-mode-desc">Endless dungeon-crawl through Hebrew words</div>
+              <div className="play-mode-desc">Endless dungeon-crawl through vocabulary words</div>
             </div>
           </button>
         </div>

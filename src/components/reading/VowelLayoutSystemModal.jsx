@@ -53,7 +53,7 @@ export function VowelLayoutSystemModal({
         {/* Header */}
         <div className="mb-6 text-center">
           <h2 className={`${appFontClass} mb-2 text-2xl font-bold text-white`}>
-            Hebrew Vowel Patterns
+            Vowel Patterns
           </h2>
           <p className={`${appFontClass} text-base text-slate-400`}>
             Understanding the visual system
@@ -68,9 +68,9 @@ export function VowelLayoutSystemModal({
               What are these icons?
             </h3>
             <p className={`${appFontClass} text-base text-slate-300 leading-relaxed`}>
-              Hebrew words follow vowel patterns. These colorful icons help you visualize and
+              Words follow vowel patterns. These colorful icons help you visualize and
               learn the vowel sequence in each word. They are read clockwise, starting at the
-              top of each shape at 12 o'clock. Each icon appears next to the Hebrew text
+              top of each shape at 12 o'clock. Each icon appears next to the target text
               while you practice reading.
             </p>
           </section>
@@ -143,7 +143,7 @@ export function VowelLayoutSystemModal({
             <ul className={`${appFontClass} space-y-2 text-base text-slate-300`}>
               <li className="flex items-start gap-2">
                 <span className="text-blue-400 flex-shrink-0">•</span>
-                <span>Icons appear in the reading area, next to each Hebrew word</span>
+                <span>Icons appear in the reading area, next to each word</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-400 flex-shrink-0">•</span>
@@ -155,7 +155,7 @@ export function VowelLayoutSystemModal({
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-400 flex-shrink-0">•</span>
-                <span>Use the icons as a visual guide while reading Hebrew text</span>
+                <span>Use the icons as a visual guide while reading</span>
               </li>
             </ul>
           </section>

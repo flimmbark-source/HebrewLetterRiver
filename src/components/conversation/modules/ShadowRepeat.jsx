@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
 import SpeakButton from '../../SpeakButton.jsx';
 import { useLocalization } from '../../../context/LocalizationContext.jsx';
+import { useLanguage } from '../../../context/LanguageContext.jsx';
+import { getLanguageName } from '../../../lib/vocabLanguageAdapter.js';
 
 /**
  * ShadowRepeat Module
@@ -11,6 +13,8 @@ import { useLocalization } from '../../../context/LocalizationContext.jsx';
  */
 export default function ShadowRepeat({ line, onResult }) {
   const { t } = useLocalization();
+  const { languageId } = useLanguage();
+  const langName = getLanguageName(languageId);
   const [showTarget, setShowTarget] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
@@ -83,7 +87,7 @@ export default function ShadowRepeat({ line, onResult }) {
               {/* Hebrew text */}
               <div className="text-center">
                 <div className="text-sm font-medium text-slate-400 mb-2">
-                  {t('conversation.modules.shadowRepeat.hebrewLabel', 'Hebrew')}
+                  {t('conversation.modules.shadowRepeat.hebrewLabel', langName)}
                 </div>
                 <div className="text-3xl font-semibold text-slate-100 tracking-wide" dir="rtl">
                   {line.he}

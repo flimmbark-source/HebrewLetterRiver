@@ -16,7 +16,7 @@ export const bridgeBuilderSections = [
   {
     id: 'foundations',
     title: 'Foundations',
-    description: 'Essential Hebrew words and phrases to get started',
+    description: 'Essential words and phrases to get started',
     order: 1,
     packIds: [
       'greetings_01',
@@ -63,8 +63,8 @@ export const bridgeBuilderSections = [
   },
   {
     id: 'meaning_builders',
-    title: 'Hebrew Meaning Builders',
-    description: 'Building blocks that make Hebrew click',
+    title: 'Meaning Builders',
+    description: 'Building blocks that make the language click',
     order: 4,
     packIds: [
       'location_words_01',
