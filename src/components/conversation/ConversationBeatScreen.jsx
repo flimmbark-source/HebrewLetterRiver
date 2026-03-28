@@ -1,5 +1,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
+import { useLanguage } from '../../context/LanguageContext.jsx';
+import { getLanguageName } from '../../lib/vocabLanguageAdapter.js';
 import ListenMeaningChoice from './modules/ListenMeaningChoice.jsx';
 import ShadowRepeat from './modules/ShadowRepeat.jsx';
 import GuidedReplyChoice from './modules/GuidedReplyChoice.jsx';
@@ -30,6 +32,8 @@ export default function ConversationBeatScreen({
   onExit
 }) {
   const { t } = useLocalization();
+  const { languageId } = useLanguage();
+  const langName = getLanguageName(languageId);
   const [showTranscript, setShowTranscript] = useState(false);
   const [showDictionary, setShowDictionary] = useState(false);
   const [showNextBanner, setShowNextBanner] = useState(false);
@@ -285,7 +289,7 @@ export default function ConversationBeatScreen({
                     <div className="grid grid-cols-3 gap-2 text-center">
                       {/* Hebrew */}
                       <div>
-                        <div className="text-xs text-slate-400 mb-1">Hebrew</div>
+                        <div className="text-xs text-slate-400 mb-1">{langName}</div>
                         <div className="text-base font-semibold text-slate-100" dir="rtl">
                           {hebrewText}
                         </div>

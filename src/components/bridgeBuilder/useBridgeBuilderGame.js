@@ -26,8 +26,8 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
-  bridgeBuilderWords,
-  getTranslationDistractors,
+  bridgeBuilderWords as defaultBridgeBuilderWords,
+  getTranslationDistractors as defaultGetTranslationDistractors,
 } from '../../data/bridgeBuilderWords.js';
 import {
   getWordProgress,
@@ -122,8 +122,16 @@ function buildMisspelledTransliterationDistractors(correctTransliteration, count
   return [...distractors].slice(0, count);
 }
 
-function buildMeaningChoices(word) {
-  const distractors = getTranslationDistractors(word.id, MEANING_CHOICES - 1);
+function buildMeaningChoices(word, wordPool) {
+  if (wordPool && wordPool !== defaultBridgeBuilderWords) {
+    // Generate distractors from the active word pool
+    const others = wordPool
+      .filter(w => w.id !== word.id)
+      .map(w => w.translation || w.meaning || '');
+    const distractors = shuffle(others).slice(0, MEANING_CHOICES - 1);
+    return shuffle([word.translation || word.meaning || '', ...distractors]);
+  }
+  const distractors = defaultGetTranslationDistractors(word.id, MEANING_CHOICES - 1);
   return shuffle([word.translation, ...distractors]);
 }
 
@@ -133,15 +141,16 @@ function buildMeaningChoices(word) {
  * @param {string|null} sessionConfig.packId
  * @param {string[]} sessionConfig.selectedWordIds
  */
-export default function useBridgeBuilderGame(sessionConfig) {
+export default function useBridgeBuilderGame(sessionConfig, wordPool) {
   const { sessionType, selectedWordIds } = sessionConfig;
   const isGuidedPack = sessionType === 'guided_pack';
+  const activeWords = wordPool || defaultBridgeBuilderWords;
 
   // Resolve word IDs to word objects (stable for the session)
   const allSessionWords = useMemo(() => {
-    const wordMap = new Map(bridgeBuilderWords.map(w => [w.id, w]));
+    const wordMap = new Map(activeWords.map(w => [w.id, w]));
     return selectedWordIds.map(id => wordMap.get(id)).filter(Boolean);
-  }, [selectedWordIds]);
+  }, [selectedWordIds, activeWords]);
 
   // Session-level word states: wordId → 'pending' | 'learned' | 'completed'
   const buildInitialStates = useCallback(() => {
@@ -228,7 +237,7 @@ export default function useBridgeBuilderGame(sessionConfig) {
           setPhase('meaningTeach');
         } else {
           // Introduced word — test meaning with multiple choices
-          const choices = buildMeaningChoices(currentWord);
+          const choices = buildMeaningChoices(currentWord, activeWords);
           setMeaningChoices(choices);
           setPhase('meaningChoice');
         }

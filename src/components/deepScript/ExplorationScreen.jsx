@@ -146,9 +146,11 @@ export default function ExplorationScreen({
   const sharedMiniGameWords = floorMiniGameWords || [];
   const capsulePairs = useMemo(() => {
     return sharedMiniGameWords.map(word => ({
-      hebrew: word.hebrew,
+      hebrew: word.nativeScript || word.hebrew,
+      nativeScript: word.nativeScript || word.hebrew,
       transliteration: word.transliteration,
-      meaning: word.english,
+      meaning: word.meaning || word.english,
+      languageId: word.languageId || 'hebrew',
     }));
   }, [sharedMiniGameWords]);
 

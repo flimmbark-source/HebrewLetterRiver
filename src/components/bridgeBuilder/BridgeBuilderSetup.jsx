@@ -500,7 +500,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
         {/* Header */}
         <div className="bbs-header">
           <h1 className="bbs-title">Vocab Builder</h1>
-          <p className="bbs-subtitle">Master your Hebrew journey through themed categories.</p>
+          <p className="bbs-subtitle">Master your language journey through themed categories.</p>
         </div>
         <div className="bbs-mode-tabs" role="tablist" aria-label="Browse modes">
           <button

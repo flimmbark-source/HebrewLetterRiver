@@ -56,7 +56,7 @@ function getDefaultText(interactable) {
     case 'scroll-stand':
       return 'A scroll unfurled on a bronze stand. The ink still shimmers as if freshly written.';
     case 'mural':
-      return 'A wall painting depicting Hebrew root patterns branching like a great tree.';
+      return 'A wall painting depicting ancient root patterns branching like a great tree.';
     case 'altar':
       return 'An altar of polished obsidian. Runes carved along its edge glow softly, awaiting an offering of attention.';
     case 'sigil':

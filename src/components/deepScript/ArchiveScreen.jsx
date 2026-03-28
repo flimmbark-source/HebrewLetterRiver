@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { ARCHIVE_REWARDS } from '../../data/deepScript/roomGenerator.js';
-import { allDeepScriptLetters } from '../../data/deepScript/words.js';
+import { allDeepScriptLetters, getLetterPoolForWords } from '../../data/deepScript/words.js';
+import { getTextDirection } from '../../lib/vocabLanguageAdapter.js';
 import RunStatusBar from './RunStatusBar.jsx';
 
 export default function ArchiveScreen({ room, runState, onComplete }) {
   const [collected, setCollected] = useState(false);
   const reward = ARCHIVE_REWARDS.find(r => r.id === room.rewardId) || ARCHIVE_REWARDS[0];
 
-  // For free-letter reward, show a random useful letter
-  const bonusLetter = allDeepScriptLetters[Math.floor(Math.random() * allDeepScriptLetters.length)];
+  // For free-letter reward, show a random useful letter from the active language pool
+  const letterPool = getLetterPoolForWords(runState?.customWords || null);
+  const bonusLetter = letterPool[Math.floor(Math.random() * letterPool.length)];
 
   const handleCollect = () => {
     setCollected(true);
@@ -25,7 +27,7 @@ export default function ArchiveScreen({ room, runState, onComplete }) {
         <p className="ds-archive-desc">{reward.description}</p>
 
         {reward.id === 'free-letter' && (
-          <div className="ds-archive-letter" dir="rtl">
+          <div className="ds-archive-letter" dir={getTextDirection(runState?.customWords?.[0]?.languageId || 'hebrew')}>
             <span className="ds-archive-letter-char">{bonusLetter}</span>
             <span className="ds-archive-letter-label">Added to your next combat</span>
           </div>
@@ -33,7 +35,7 @@ export default function ArchiveScreen({ room, runState, onComplete }) {
 
         {reward.id === 'insight' && (
           <div className="ds-archive-insight">
-            <p>You study the ancient texts and gain understanding of Hebrew letter patterns.</p>
+            <p>You study the ancient texts and gain understanding of letter patterns.</p>
           </div>
         )}
 

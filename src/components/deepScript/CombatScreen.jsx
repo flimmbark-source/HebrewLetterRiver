@@ -5,7 +5,8 @@ import {
   createLetterTile,
   ACTIONS,
 } from './deepScriptEngine.js';
-import { allDeepScriptLetters } from '../../data/deepScript/words.js';
+import { allDeepScriptLetters, getLetterPoolForWords } from '../../data/deepScript/words.js';
+import { getNativeScript, getMeaning, getTextDirection } from '../../lib/vocabLanguageAdapter.js';
 import { celebrate } from '../../lib/celebration.js';
 import {
   playSelect, playCorrect, playWrong,
@@ -35,7 +36,7 @@ export default function CombatScreen({
   onGuardianStrike = null,
   isPaused = false,
 }) {
-  const { getGameFontClass } = useFontSettings();
+  const { getGameFontClass, getNativeScriptFontClass } = useFontSettings();
   const initialState = useMemo(() => {
     const state = createCombatState(wordId, {
       ...runState,
@@ -152,9 +153,12 @@ export default function CombatScreen({
   const handleProduceLetters = useCallback((kind) => {
     playGear();
     setActivatingGear(kind);
-    const vowelPool = ['א', 'ה', 'ו', 'י', 'ע'];
-    const consonantPool = allDeepScriptLetters.filter(letter => !vowelPool.includes(letter));
-    const pool = kind === 'vowel' ? vowelPool : consonantPool;
+    // Default Hebrew vowel matres lectionis; future languages will supply their own
+    const hebrewVowels = ['א', 'ה', 'ו', 'י', 'ע'];
+    const fullPool = combat?.letterPool || allDeepScriptLetters;
+    const vowelPool = fullPool.filter(letter => hebrewVowels.includes(letter));
+    const consonantPool = fullPool.filter(letter => !hebrewVowels.includes(letter));
+    const pool = kind === 'vowel' ? (vowelPool.length > 0 ? vowelPool : fullPool) : (consonantPool.length > 0 ? consonantPool : fullPool);
 
     const remainingNeeded = combat.answerTrack
       .filter(slot => !slot.correct)
@@ -172,7 +176,7 @@ export default function CombatScreen({
     }
 
     while (generatedLetters.length < 1) {
-      const letter = pool[Math.floor(Math.random() * pool.length)] || pool[0] || 'א';
+      const letter = pool[Math.floor(Math.random() * pool.length)] || pool[0] || fullPool[0] || '?';
       generatedLetters.push(letter);
       if (!generatedCorrect && remainingNeeded.includes(letter)) {
         generatedCorrect = true;
@@ -298,6 +302,7 @@ export default function CombatScreen({
             <GuardianSigilEncounter
               words={floorWords}
               getGameFontClass={getGameFontClass}
+              getNativeScriptFontClass={getNativeScriptFontClass}
               onDamage={(damage) => onGuardianStrike?.(damage)}
               onVictory={() => onEnd('victory', wordId)}
               paused={isPaused}
@@ -310,13 +315,13 @@ export default function CombatScreen({
                 <div className="ds-encounter-sigil">
                   <div className="ds-encounter-rune-ring" />
                   <div className="ds-encounter-clue">
-                    <span className={`ds-encounter-english ${getGameFontClass(`${word.id}-english`)}`}>{word.english}</span>
+                    <span className={`ds-encounter-english ${getGameFontClass(`${word.id}-english`)}`}>{getMeaning(word)}</span>
                     <span className={`ds-encounter-translit ${getGameFontClass(`${word.id}-translit`)}`}>{word.transliteration}</span>
                   </div>
                 </div>
 
                 {/* Inscription slots */}
-                <div className="ds-inscription" dir="rtl">
+                <div className="ds-inscription" dir={getTextDirection(word.languageId || 'hebrew')}>
                   {combat.answerTrack.map((slot, index) => {
                     let slotCls = 'ds-rune-slot';
                     if (slot.correct) {
@@ -339,11 +344,11 @@ export default function CombatScreen({
                         disabled={slot.correct || slot.locked || combat.phase !== 'active'}
                       >
                         {slot.correct ? (
-                          <span className={`ds-rune-letter ${getGameFontClass(`${word.id}-rune-${index}`)}`}>{slot.targetLetter}</span>
+                          <span className={`ds-rune-letter ${getNativeScriptFontClass(`${word.id}-rune-${index}`, word.languageId)}`}>{slot.targetLetter}</span>
                         ) : slot.locked ? (
                           <span className="ds-rune-lock">🔒</span>
                         ) : slot.revealed ? (
-                          <span className={`ds-rune-hint ${getGameFontClass(`${word.id}-hint-${index}`)}`}>{slot.targetLetter}</span>
+                          <span className={`ds-rune-hint ${getNativeScriptFontClass(`${word.id}-hint-${index}`, word.languageId)}`}>{slot.targetLetter}</span>
                         ) : (
                           <span className="ds-rune-empty" />
                         )}
@@ -377,7 +382,7 @@ export default function CombatScreen({
                     onClick={() => handleTrayClick(tile.id)}
                     disabled={combat.phase !== 'active'}
                   >
-                    <span className={getGameFontClass(tile.id)}>{tile.letter}</span>
+                    <span className={getNativeScriptFontClass(tile.id, word.languageId)}>{tile.letter}</span>
                   </button>
                 );
               })}
@@ -464,9 +469,9 @@ export default function CombatScreen({
       {!isGuardianSigil && combat.phase === 'victory' && (
         <div className="ds-phase-overlay ds-phase-victory">
           <div className="ds-phase-message">Word Vanquished!</div>
-          <div className={`ds-phase-word ${getGameFontClass(`${word.id}-phase-hebrew`)}`} dir="rtl">{word.hebrew}</div>
-          {word.english && (
-            <div className={`ds-phase-translation ${getGameFontClass(`${word.id}-phase-translation`)}`}>{word.english}</div>
+          <div className={`ds-phase-word ${getNativeScriptFontClass(`${word.id}-phase-hebrew`, word.languageId)}`} dir={getTextDirection(word.languageId || 'hebrew')}>{getNativeScript(word)}</div>
+          {getMeaning(word) && (
+            <div className={`ds-phase-translation ${getGameFontClass(`${word.id}-phase-translation`)}`}>{getMeaning(word)}</div>
           )}
           <button
             type="button"
@@ -480,7 +485,7 @@ export default function CombatScreen({
       {!isGuardianSigil && combat.phase === 'defeat' && (
         <div className="ds-phase-overlay ds-phase-defeat">
           <div className="ds-phase-message">Overwhelmed...</div>
-          <div className={`ds-phase-word ${getGameFontClass(`${word.id}-defeat`)}`} dir="rtl">{word.hebrew} — {word.english}</div>
+          <div className={`ds-phase-word ${getNativeScriptFontClass(`${word.id}-defeat`, word.languageId)}`} dir={getTextDirection(word.languageId || 'hebrew')}>{getNativeScript(word)} — {getMeaning(word)}</div>
         </div>
       )}
 

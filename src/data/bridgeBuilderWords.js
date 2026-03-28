@@ -8,8 +8,13 @@ import {
  * Bridge Builder vocabulary data
  *
  * Static word data for the Bridge Builder game mode.
- * Structured for future glossary integration — each word has a stable id,
- * hebrew text, canonical transliteration, translation, theme, and difficulty.
+ * Each word has: id, hebrew (legacy), nativeScript, transliteration,
+ * translation (legacy), meaning, languageId, theme, difficulty, tags.
+ *
+ * Language-agnostic fields:
+ *   nativeScript — The word in its target script (mirrors `hebrew` for Hebrew words)
+ *   meaning      — English gloss (mirrors `translation`)
+ *   languageId   — Which language this word belongs to
  */
 
 export const bridgeBuilderWords = [
@@ -1268,6 +1273,15 @@ const cafeTalkBridgeBuilderWords = CAFE_TALK_WORDS
   }));
 
 bridgeBuilderWords.push(...cafeTalkBridgeBuilderWords);
+
+// ─── Enrich all words with language-agnostic fields ─────────
+// This adds nativeScript, meaning, and languageId to every word
+// so components can use the generic accessors.
+for (const word of bridgeBuilderWords) {
+  word.nativeScript = word.nativeScript || word.hebrew;
+  word.meaning = word.meaning || word.translation;
+  word.languageId = word.languageId || 'hebrew';
+}
 
 /**
  * Get multiple words by their IDs.

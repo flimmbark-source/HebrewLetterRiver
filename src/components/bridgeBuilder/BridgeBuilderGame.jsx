@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useBridgeBuilderGame from './useBridgeBuilderGame.js';
 import { useFontSettings } from '../../hooks/useFontSettings.js';
+import { getNativeScript } from '../../lib/vocabLanguageAdapter.js';
+import { getTextDirection } from '../../lib/vocabLanguageAdapter.js';
 import './BridgeBuilder.css';
 
 /* ─── HUD (compact strip) ──────────────────────────────── */
@@ -133,8 +135,8 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack, onNex
 
 /* ─── Main ─────────────────────────────────────────────── */
 
-export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComplete, onNext }) {
-  const { getGameFontClass } = useFontSettings();
+export default function BridgeBuilderGame({ sessionConfig, wordPool, onBack, onRoundComplete, onNext }) {
+  const { getGameFontClass, getNativeScriptFontClass } = useFontSettings();
   const {
     phase,
     currentWord,
@@ -156,7 +158,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComple
     handleMeaningTeachPlace,
     handleMeaningChoice,
     restartGame,
-  } = useBridgeBuilderGame(sessionConfig);
+  } = useBridgeBuilderGame(sessionConfig, wordPool);
 
   // Track slide transition state for bridge slot
   const [slideState, setSlideState] = useState('center');
@@ -244,11 +246,11 @@ export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComple
         />
       </div>
 
-      {/* Hebrew prompt area — fixed height, centered */}
+      {/* Native script prompt area — fixed height, centered */}
       <div className="bb-prompt-zone">
         {currentWord && (
-          <div className={`bb-prompt ${promptVisible ? 'bb-prompt--visible' : ''}`}>
-            <span className={`bb-prompt-hebrew ${getGameFontClass(`${currentWord.id}-hebrew`)}`}>{currentWord.hebrew}</span>
+          <div className={`bb-prompt ${promptVisible ? 'bb-prompt--visible' : ''}`} dir={getTextDirection(currentWord.languageId || 'hebrew')}>
+            <span className={`bb-prompt-hebrew ${getNativeScriptFontClass(`${currentWord.id}-hebrew`, currentWord.languageId)}`}>{getNativeScript(currentWord)}</span>
           </div>
         )}
       </div>

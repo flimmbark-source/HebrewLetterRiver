@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { deepScriptWords } from '../../data/deepScript/words.js';
 import { useFontSettings } from '../../hooks/useFontSettings.js';
+import { getNativeScript, getMeaning, getTextDirection } from '../../lib/vocabLanguageAdapter.js';
 
 function shuffle(items) {
   const copy = [...items];
@@ -12,20 +13,20 @@ function shuffle(items) {
 }
 
 function buildPillarRows(wordPool = deepScriptWords, selectedWordsOverride = null) {
-  const candidates = wordPool.filter(word => !word.isMiniboss && word.english);
+  const candidates = wordPool.filter(word => !word.isMiniboss && getMeaning(word));
   const selectedWords = selectedWordsOverride?.length
-    ? selectedWordsOverride.filter(word => word?.english && !word?.isMiniboss)
+    ? selectedWordsOverride.filter(word => getMeaning(word) && !word?.isMiniboss)
     : shuffle(candidates).slice(0, 3);
 
-  const selectedAnswerSet = new Set(selectedWords.map(word => word.english).filter(Boolean));
+  const selectedAnswerSet = new Set(selectedWords.map(word => getMeaning(word)).filter(Boolean));
 
   const sharedAnswers = Array.from(
-    new Set(selectedWords.map(word => word.english).filter(Boolean))
+    new Set(selectedWords.map(word => getMeaning(word)).filter(Boolean))
   );
 
     const extraDistractors = shuffle(
     candidates
-      .map(word => word.english)
+      .map(word => getMeaning(word))
       .filter(Boolean)
       .filter(answer => !selectedAnswerSet.has(answer))
   );
@@ -35,7 +36,8 @@ function buildPillarRows(wordPool = deepScriptWords, selectedWordsOverride = nul
 
   return selectedWords.map((word) => {
     const options = shuffle(sharedAnswers);
-    const correctIndex = options.findIndex(option => option === word.english);
+    const correctTranslation = getMeaning(word);
+    const correctIndex = options.findIndex(option => option === correctTranslation);
     const availableStartIndexes = options
       .map((_, index) => index)
       .filter(index => index !== correctIndex);
@@ -45,8 +47,10 @@ function buildPillarRows(wordPool = deepScriptWords, selectedWordsOverride = nul
 
     return {
       id: word.id,
-      hebrew: word.hebrew,
-      correctTranslation: word.english,
+      hebrew: getNativeScript(word),
+      nativeScript: getNativeScript(word),
+      languageId: word.languageId || 'hebrew',
+      correctTranslation,
       options,
       currentIndex: startIndex,
     };
@@ -59,7 +63,7 @@ export default function PillarMiniGame({
   wordPool = deepScriptWords,
   selectedWords = null,
 }) {
-  const { getGameFontClass } = useFontSettings();
+  const { getGameFontClass, getNativeScriptFontClass } = useFontSettings();
   const [rows, setRows] = useState(() => buildPillarRows(wordPool, selectedWords));
   const [spinningRowId, setSpinningRowId] = useState(null);
   const [showProceed, setShowProceed] = useState(false);
@@ -133,8 +137,8 @@ export default function PillarMiniGame({
       <div className="ds-pillar-core" aria-hidden="true" />
       {rows.map((row) => (
         <React.Fragment key={row.id}>
-          <div className="ds-pillar-slat ds-pillar-slat--fixed" aria-label={`Hebrew word ${row.hebrew}`}>
-            <span className={getGameFontClass(`${row.id}-hebrew`)}>{row.hebrew}</span>
+          <div className="ds-pillar-slat ds-pillar-slat--fixed" dir={getTextDirection(row.languageId || 'hebrew')} aria-label={`Word ${row.nativeScript || row.hebrew}`}>
+            <span className={getNativeScriptFontClass(`${row.id}-hebrew`, row.languageId)}>{row.nativeScript || row.hebrew}</span>
           </div>
           <button
             type="button"

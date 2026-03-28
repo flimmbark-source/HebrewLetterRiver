@@ -73,7 +73,7 @@ export default function LearnView() {
           />
         ) : (
           <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
-            {t('conversation.list.unavailable', 'Conversation practice is currently available for Hebrew.')}
+            {t('conversation.list.unavailable', 'No conversation practice available for this language yet.')}
           </div>
         )}
       </div>
