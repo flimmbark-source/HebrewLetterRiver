@@ -135,7 +135,7 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack, onNex
 
 /* ─── Main ─────────────────────────────────────────────── */
 
-export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComplete, onNext }) {
+export default function BridgeBuilderGame({ sessionConfig, wordPool, onBack, onRoundComplete, onNext }) {
   const { getGameFontClass, getNativeScriptFontClass } = useFontSettings();
   const {
     phase,
@@ -158,7 +158,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComple
     handleMeaningTeachPlace,
     handleMeaningChoice,
     restartGame,
-  } = useBridgeBuilderGame(sessionConfig);
+  } = useBridgeBuilderGame(sessionConfig, wordPool);
 
   // Track slide transition state for bridge slot
   const [slideState, setSlideState] = useState('center');

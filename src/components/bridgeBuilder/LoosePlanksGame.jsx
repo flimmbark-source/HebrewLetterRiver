@@ -85,14 +85,15 @@ function generatePositions(count, containerEl, minTopClearance = 0) {
  * Hebrew planks sit in a row at the top. Floating planks on the water are
  * randomly either transliteration or translation per word per round.
  */
-export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
+export default function LoosePlanksGame({ sessionConfig, wordPool, onBack, onNext }) {
   const { getGameFontClass, getNativeScriptFontClass } = useFontSettings();
   const { packId, selectedWordIds } = sessionConfig;
 
+  const activeWords = wordPool || bridgeBuilderWords;
   const allWords = useMemo(() => {
-    const wordMap = new Map(bridgeBuilderWords.map(w => [w.id, w]));
+    const wordMap = new Map(activeWords.map(w => [w.id, w]));
     return selectedWordIds.map(id => wordMap.get(id)).filter(Boolean);
-  }, [selectedWordIds]);
+  }, [selectedWordIds, activeWords]);
 
   // Build rounds: two passes per group of 3 — first pass random type, second pass flipped.
   // Rounds are shuffled so the two passes for the same group aren't back-to-back.

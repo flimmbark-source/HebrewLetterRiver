@@ -7,6 +7,8 @@ import DeepScriptMode from '../components/deepScript/DeepScriptMode.jsx';
 import { markBridgeBuilderComplete, markDeepScriptComplete } from '../lib/bridgeBuilderStorage.js';
 import { bridgeBuilderWords, getWordsByIds } from '../data/bridgeBuilderWords.js';
 import { convertBBWordsForDS } from '../data/deepScript/words.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
+import { loadBridgeBuilderWords, getBridgeBuilderWordsSync } from '../data/bridgeBuilder/words/index.js';
 
 /**
  * BridgeBuilderView — routes between setup screen, Bridge Builder gameplay,
@@ -21,8 +23,30 @@ import { convertBBWordsForDS } from '../data/deepScript/words.js';
 export default function BridgeBuilderView() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { languageId } = useLanguage();
   const [sessionConfig, setSessionConfig] = useState(null);
   const [showDeepScript, setShowDeepScript] = useState(false);
+  const [langWordsReady, setLangWordsReady] = useState(languageId === 'hebrew');
+  const isHebrew = languageId === 'hebrew';
+
+  // Load language-specific word data when a non-Hebrew language is selected
+  useEffect(() => {
+    if (isHebrew) {
+      setLangWordsReady(true);
+      return;
+    }
+    let cancelled = false;
+    loadBridgeBuilderWords(languageId).then(() => {
+      if (!cancelled) setLangWordsReady(true);
+    });
+    return () => { cancelled = true; };
+  }, [languageId, isHebrew]);
+
+  // Get the active word pool for the selected language
+  const activeWordPool = useMemo(
+    () => isHebrew ? bridgeBuilderWords : getBridgeBuilderWordsSync(languageId),
+    [isHebrew, languageId, langWordsReady] // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   // Open Deep Script directly when navigated with state
   useEffect(() => {
@@ -34,7 +58,18 @@ export default function BridgeBuilderView() {
   }, [location.state?.deepScript, navigate, location.pathname]);
 
   const handlePlay = (config) => {
-    setSessionConfig(config);
+    if (!isHebrew) {
+      // For non-Hebrew languages, override selectedWordIds to use language pool
+      // since pack word IDs reference Hebrew-specific words
+      const langWords = activeWordPool;
+      const langWordIds = langWords.map(w => w.id);
+      setSessionConfig({
+        ...config,
+        selectedWordIds: langWordIds,
+      });
+    } else {
+      setSessionConfig(config);
+    }
   };
 
   const handleBackToSetup = () => {
@@ -81,18 +116,25 @@ export default function BridgeBuilderView() {
     }
   }, [sessionConfig?.sessionType]);
 
+  // Resolve word IDs from the active pool (language-aware)
+  const getWordsFromPool = useCallback((ids) => {
+    if (isHebrew) return getWordsByIds(ids);
+    const idSet = new Set(ids);
+    return activeWordPool.filter(w => idSet.has(w.id));
+  }, [isHebrew, activeWordPool]);
+
   // Convert pack words to DS format for deep_script mode
   const packDSWords = useMemo(() => {
     if (sessionConfig?.gameMode === 'deep_script' && sessionConfig.selectedWordIds?.length > 0) {
-      const bbWords = getWordsByIds(sessionConfig.selectedWordIds);
+      const bbWords = getWordsFromPool(sessionConfig.selectedWordIds);
       return convertBBWordsForDS(bbWords);
     }
     return null;
-  }, [sessionConfig?.gameMode, sessionConfig?.selectedWordIds]);
+  }, [sessionConfig?.gameMode, sessionConfig?.selectedWordIds, getWordsFromPool]);
 
   const endlessDSWords = useMemo(
-    () => convertBBWordsForDS(bridgeBuilderWords),
-    []
+    () => convertBBWordsForDS(activeWordPool),
+    [activeWordPool]
   );
 
   // Standalone Deep Script (no pack)
@@ -102,6 +144,7 @@ export default function BridgeBuilderView() {
         onBack={handleBackToHome}
         packWords={endlessDSWords}
         isGuidedPackRun={false}
+        languageId={languageId}
       />
     );
   }
@@ -115,6 +158,7 @@ export default function BridgeBuilderView() {
           packWords={packDSWords}
           onRunComplete={handleDeepScriptRunComplete}
           isGuidedPackRun={true}
+          languageId={languageId}
         />
       );
     }
@@ -124,6 +168,7 @@ export default function BridgeBuilderView() {
         <LoosePlanksGame
           key={sessionConfig.packId || 'loose-planks'}
           sessionConfig={sessionConfig}
+          wordPool={activeWordPool}
           onBack={handleBackToSetup}
           onNext={sessionConfig.sessionType === 'guided_pack' ? handleNextFromLoosePlanks : undefined}
         />
@@ -134,6 +179,7 @@ export default function BridgeBuilderView() {
       <BridgeBuilderGame
         key={sessionConfig.packId || 'review'}
         sessionConfig={sessionConfig}
+        wordPool={activeWordPool}
         onBack={handleBackToSetup}
         onRoundComplete={handleBridgeBuilderComplete}
         onNext={sessionConfig.sessionType === 'guided_pack' ? handleNextFromBridgeBuilder : undefined}

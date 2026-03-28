@@ -3,6 +3,7 @@ import { getStarterKit } from '../../data/deepScript/starterKits.js';
 import { generateDungeonFloor, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
 import { registerCustomWords, clearCustomWords, convertBBWordsForDS, getWordById, deepScriptWords } from '../../data/deepScript/words.js';
+import { loadDeepScriptWords, getDeepScriptWordsSync } from '../../data/deepScript/words/index.js';
 import { bridgeBuilderPacks } from '../../data/bridgeBuilderPacks.js';
 import { getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import { emit } from '../../lib/eventBus.js';
@@ -30,10 +31,18 @@ function collectFloorWordIds(floor) {
   return wordIds;
 }
 
-export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGuidedPackRun = false }) {
+export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGuidedPackRun = false, languageId = 'hebrew' }) {
   const hasCustomWordPool = !!(packWords && packWords.length > 0);
+  const isHebrew = languageId === 'hebrew';
   const previousFloorWordIdsRef = useRef(new Set());
   const runStateRef = useRef(null);
+  const [langDSWordsReady, setLangDSWordsReady] = useState(isHebrew);
+
+  // Load language-specific Deep Script words
+  useEffect(() => {
+    if (isHebrew) return;
+    loadDeepScriptWords(languageId).then(() => setLangDSWordsReady(true));
+  }, [languageId, isHebrew]);
   const [wordSourceMode, setWordSourceMode] = useState('pack'); // pack | random (standalone only)
   const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | end
   const [isPauseMenuOpen, setIsPauseMenuOpen] = useState(false);
@@ -52,22 +61,41 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   const [floorMiniGameWords, setFloorMiniGameWords] = useState(null); // 3 words shared by capsules + pillar per floor
   runStateRef.current = runState;
 
+  // Get the default DS word pool for the active language
+  const langDSWords = isHebrew ? deepScriptWords : getDeepScriptWordsSync(languageId);
+
   const getRandomPackWordsForFloor = useCallback(() => {
+    if (!isHebrew) {
+      // For non-Hebrew, use language-specific DS words directly
+      return langDSWords;
+    }
     if (bridgeBuilderPacks.length === 0) return [];
     const pack = bridgeBuilderPacks[Math.floor(Math.random() * bridgeBuilderPacks.length)];
     return convertBBWordsForDS(getWordsByIds(pack.wordIds));
-  }, []);
+  }, [isHebrew, langDSWords]);
 
   const createFloorForNumber = useCallback((targetFloorNumber) => {
     const combatCount = Math.min(6, 3 + Math.floor((targetFloorNumber - 1) / 2));
-    const floorWordPool = isGuidedPackRun
-      ? (hasCustomWordPool ? packWords : null)
-      : (wordSourceMode === 'pack' ? getRandomPackWordsForFloor() : null);
+    let floorWordPool;
+    if (isGuidedPackRun) {
+      floorWordPool = hasCustomWordPool ? packWords : null;
+    } else if (!isHebrew) {
+      // Non-Hebrew standalone: always use language DS words
+      floorWordPool = langDSWords;
+    } else {
+      floorWordPool = wordSourceMode === 'pack' ? getRandomPackWordsForFloor() : null;
+    }
 
     if (floorWordPool && floorWordPool.length > 0) {
       registerCustomWords(floorWordPool);
     } else {
-      clearCustomWords();
+      // Fallback: register language words so getWordById can find them
+      if (!isHebrew && langDSWords.length > 0) {
+        registerCustomWords(langDSWords);
+        floorWordPool = langDSWords;
+      } else {
+        clearCustomWords();
+      }
     }
 
     const nextFloor = generateDungeonFloor({
@@ -77,18 +105,19 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     });
     previousFloorWordIdsRef.current = collectFloorWordIds(nextFloor);
     return nextFloor;
-  }, [getRandomPackWordsForFloor, hasCustomWordPool, isGuidedPackRun, packWords, wordSourceMode]);
+  }, [getRandomPackWordsForFloor, hasCustomWordPool, isGuidedPackRun, isHebrew, langDSWords, packWords, wordSourceMode]);
 
   // Pick 3 random words for minigames when a new floor is created
   const pickMiniGameWords = useCallback((newFloor) => {
     const wordIds = collectFloorWordIds(newFloor);
+    const fallbackPool = isHebrew ? deepScriptWords : langDSWords;
     const pool = wordIds.size > 0
       ? Array.from(wordIds).map(id => getWordById(id)).filter(Boolean)
-      : [...deepScriptWords];
+      : [...fallbackPool];
     const candidates = pool.filter(w => !w.isMiniboss && (w.meaning || w.english));
     const shuffled = [...candidates].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 3);
-  }, []);
+  }, [isHebrew, langDSWords]);
 
   // Add/remove body class for nav bar hiding; clean up custom words on unmount
   useEffect(() => {
