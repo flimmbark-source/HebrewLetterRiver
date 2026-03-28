@@ -309,7 +309,9 @@ function Shell() {
             <NavLink
               to="/home"
               onClick={handleNavClick}
-              className={({ isActive }) => `flex flex-col items-center justify-center px-4 py-2 transition-colors duration-200 active:scale-90 ${isActive ? 'text-[#1b6b4f]' : 'text-[#4a6365] hover:text-[#1b6b4f]'}`}
+              className={({ isActive }) =>
+                `flex flex-col items-center justify-center px-5 py-2 text-[12px] font-semibold transition-all duration-200 active:scale-90 ${isActive ? 'scale-110 rounded-full bg-[#1b6b4f] text-white shadow-lg' : 'text-[#4a6365] hover:text-[#1b6b4f]'}`
+              }
             >
               <span className="material-symbols-outlined">home</span>
               <span className="text-[12px] font-semibold">Home</span>
@@ -328,7 +330,9 @@ function Shell() {
             <NavLink
               to="/achievements"
               onClick={handleNavClick}
-              className={({ isActive }) => `flex flex-col items-center justify-center px-4 py-2 transition-colors duration-200 active:scale-90 ${isActive ? 'text-[#1b6b4f]' : 'text-[#4a6365] hover:text-[#1b6b4f]'}`}
+              className={({ isActive }) =>
+                `flex flex-col items-center justify-center px-5 py-2 text-[12px] font-semibold transition-all duration-200 active:scale-90 ${isActive ? 'scale-110 rounded-full bg-[#1b6b4f] text-white shadow-lg' : 'text-[#4a6365] hover:text-[#1b6b4f]'}`
+              }
             >
               <span className="material-symbols-outlined">emoji_events</span>
               <span className="text-[12px] font-semibold">Awards</span>

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import badgesCatalog from '../data/badges.json';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
-import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
+import { DEFAULT_PROFILE_NAME } from '../data/profileAvatars.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 
 const SECTION_GROUPS = [
@@ -9,6 +9,8 @@ const SECTION_GROUPS = [
   { key: 'bridgeBuilder', label: 'Bridge Builder', sections: ['bridgeBuilder'] },
   { key: 'deepScript', label: 'Deep Script', sections: ['deepScript'] }
 ];
+
+const DEFAULT_FALLBACK_GROUP = { key: 'moreAchievements', label: 'More Achievements', sections: [] };
 
 function Icon({ children, className = '', filled = false }) {
   return (
@@ -73,6 +75,7 @@ export default function AchievementsView() {
   const { player, badges, activeBadges, starLevelSize, claimBadgeReward } = useProgress();
   const { t } = useLocalization();
   const [claiming, setClaiming] = useState(false);
+  const [isAllAchievementsExpanded, setIsAllAchievementsExpanded] = useState(false);
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
   const totalStarsEarned = Math.max(0, Math.floor(player?.totalStarsEarned ?? player?.stars ?? 0));
@@ -98,6 +101,21 @@ export default function AchievementsView() {
     [badges]
   );
 
+
+  const sectionGroups = useMemo(() => {
+    const knownSections = new Set(SECTION_GROUPS.flatMap((group) => group.sections));
+    const discoveredSections = new Set(allBadges.map(({ badge }) => badge.section).filter(Boolean));
+    const extraSections = Array.from(discoveredSections).filter((section) => !knownSections.has(section));
+    if (extraSections.length === 0) return SECTION_GROUPS;
+    return [
+      ...SECTION_GROUPS,
+      {
+        ...DEFAULT_FALLBACK_GROUP,
+        sections: extraSections
+      }
+    ];
+  }, [allBadges]);
+
   const milestones = useMemo(() => {
     const active = activeBadgeSpecs.slice(1, 3);
     if (active.length > 0) return active;
@@ -111,17 +129,8 @@ export default function AchievementsView() {
     [allBadges]
   );
 
-  const claimableByGroup = useMemo(() => {
-    return SECTION_GROUPS.map((group) => ({
-      ...group,
-      badges: allBadges
-        .filter(({ badge, state }) => group.sections.includes(badge.section) && Array.isArray(state.unclaimed) && state.unclaimed.length > 0)
-        .map(({ badge }) => badge)
-    }));
-  }, [allBadges]);
-
   const upcomingByGroup = useMemo(() => {
-    return SECTION_GROUPS.map((group) => ({
+    return sectionGroups.map((group) => ({
       ...group,
       badges: (() => {
         const candidates = allBadges
@@ -136,7 +145,7 @@ export default function AchievementsView() {
         return source.map(({ badge }) => badge);
       })()
     }));
-  }, [allBadges]);
+  }, [allBadges, sectionGroups]);
 
   const upcoming = useMemo(
     () =>
@@ -147,16 +156,15 @@ export default function AchievementsView() {
   );
 
   const allByGroup = useMemo(() => {
-    return SECTION_GROUPS.map((group) => ({
+    return sectionGroups.map((group) => ({
       ...group,
       badges: allBadges
         .filter(({ badge }) => group.sections.includes(badge.section))
         .map(({ badge }) => badge)
     }));
-  }, [allBadges]);
+  }, [allBadges, sectionGroups]);
   const totalAchievementCount = allBadges.length;
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
-  const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
   const handleClaim = (badgeId, tier) => {
     if (claiming) return;
@@ -165,27 +173,17 @@ export default function AchievementsView() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fef7ff] px-6 pb-36 pt-24" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-      <header className="fixed left-0 right-0 top-0 z-40 bg-[#fef7ff]/80 backdrop-blur-xl">
-        <div className="flex w-full items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 overflow-hidden rounded-full bg-[#a7f3d0]"><img alt="Profile" src={playerAvatar} className="h-full w-full object-cover" /></div>
-            <h1 className="text-lg font-bold tracking-tight text-[#1b6b4f]">Level {level} • {totalStarsEarned.toLocaleString()} XP</h1>
-          </div>
-          <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-[#1b6b4f]/10"><Icon className="text-[#1b6b4f]" filled>local_fire_department</Icon></button>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-[#fef7ff] px-6 pb-36 pt-8" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
       <main className="mx-auto max-w-2xl">
         <section className="relative mb-10">
           <div className="relative overflow-hidden rounded-xl bg-[#1b6b4f] p-8 text-white shadow-lg">
             <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-[#a7f3d0]/20 blur-3xl"></div>
             <div className="relative z-10">
               <p className="mb-1 text-sm font-bold opacity-80">CURRENT MILESTONE • {playerName}</p>
-              <h2 className="mb-4 text-3xl font-extrabold tracking-tight">Step {Math.min(level + 3, 15)} of 15</h2>
+              <h2 className="mb-4 text-3xl font-extrabold tracking-tight">Level {level}</h2>
               <div className="mb-2 h-4 w-full overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-[#a7f3d0]" style={{ width: `${levelPercent}%` }}></div></div>
               <div className="flex justify-between text-xs font-bold">
-                <span>{levelProgress} / {starsPerLevel} XP TO STEP {Math.min(level + 1, 15)}</span>
+                <span>{levelProgress} / {starsPerLevel} XP TO LEVEL {Math.min(level + 1, 15)}</span>
                 <span className="text-[#a7f3d0]">{levelPercent}% COMPLETED</span>
               </div>
             </div>
@@ -212,7 +210,7 @@ export default function AchievementsView() {
             const current = Math.min(state?.progress ?? 0, goal);
             const pct = Math.round((current / goal) * 100);
             return (
-              <div key={badge.id} className={`flex aspect-square flex-col justify-between rounded-lg p-5 ${index === 0 ? 'bg-[#e7e0eb]' : 'bg-[#f9f1fd]'}`}>
+              <div key={badge.id} className={`flex flex-col rounded-lg p-5 ${index === 0 ? 'bg-[#e7e0eb]' : 'bg-[#f9f1fd]'}`}>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#1b6b4f]/10"><Icon className="text-[#1b6b4f]" filled>{index === 0 ? 'history_edu' : 'auto_awesome'}</Icon></div>
                 <div>
                   <h4 className="mb-1 text-lg font-bold leading-tight">{getBadgeCopy(badge, t, gameName, goal).name}</h4>
@@ -264,36 +262,42 @@ export default function AchievementsView() {
 
         <section className="space-y-3">
           <h3 className="text-lg font-bold text-[#1b6b4f]">Claimable Awards</h3>
-          {claimableByGroup.map((group) => (
-            <div key={group.key} className="space-y-2">
-              <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
-              {group.badges.length > 0 ? (
-                group.badges.map((badge) => (
-                  <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
-                ))
-              ) : (
-                <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No claimable awards in this section yet.</div>
-              )}
-            </div>
+          {claimableAwards.map((badge) => (
+            <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
           ))}
           {claimableAwards.length === 0 ? (
-            <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No claimable awards right now.</div>
+            <p className="text-xs font-semibold text-[#6f7973]">No currently claimable achievements.</p>
           ) : null}
           {claiming ? <p className="text-xs font-semibold text-[#4a6365]">Claiming reward...</p> : null}
         </section>
 
         <section className="mt-10 space-y-3">
-          <h3 className="text-lg font-bold text-[#1b6b4f]">All Achievements ({totalAchievementCount})</h3>
-          {allByGroup.map((group) => (
-            <div key={group.key} className="space-y-2">
-              <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
-              <div className="space-y-2">
-                {group.badges.map((badge) => (
-                  <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
-                ))}
+          <button
+            type="button"
+            onClick={() => setIsAllAchievementsExpanded((prev) => !prev)}
+            className="flex w-full items-center justify-between rounded-xl bg-white px-4 py-3 text-left shadow-sm"
+            aria-expanded={isAllAchievementsExpanded}
+          >
+            <h3 className="text-lg font-bold text-[#1b6b4f]">All Achievements ({totalAchievementCount})</h3>
+            <Icon className="text-[#1b6b4f]">{isAllAchievementsExpanded ? 'expand_less' : 'expand_more'}</Icon>
+          </button>
+
+          {isAllAchievementsExpanded ? (
+            allByGroup.map((group) => (
+              <div key={group.key} className="space-y-2">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-[#4a6365]">{group.label}</h4>
+                <div className="space-y-2">
+                  {group.badges.map((badge) => (
+                    <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : null}
+
+          {isAllAchievementsExpanded && totalAchievementCount === 0 ? (
+            <div className="rounded-xl bg-white p-3 text-xs font-semibold text-[#6f7973]">No achievements available yet.</div>
+          ) : null}
         </section>
       </main>
     </div>

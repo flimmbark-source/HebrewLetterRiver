@@ -72,19 +72,7 @@ export default function HomeView() {
 
   return (
     <div className="relative min-h-screen bg-[#fef7ff] text-[#1d1a22]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-      <header className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between bg-[#fef7ff]/80 px-6 py-4 backdrop-blur-xl">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-[#1b6b4f] bg-[#e7e0eb]">
-            <img alt="User Profile" src={playerAvatar || topAvatar} className="h-full w-full object-cover" />
-          </div>
-          <span className="text-lg font-bold tracking-tight text-[#1b6b4f]">Level {level} • {totalStarsEarned.toLocaleString()} XP</span>
-        </div>
-        <button className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-[#1b6b4f]/10" type="button">
-          <Icon className="text-[#1b6b4f]" filled>local_fire_department</Icon>
-        </button>
-      </header>
-
-      <main className="mx-auto max-w-2xl space-y-8 px-6 pb-48 pt-24">
+      <main className="mx-auto max-w-2xl space-y-8 px-6 pb-48 pt-8">
         <section>
           <div className="flex flex-col items-center space-y-4 rounded-2xl border border-[#1b6b4f]/5 bg-white p-8 text-center shadow-sm">
             <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#f9f1fd]">
