@@ -115,7 +115,7 @@ function tokenLabel(token, wordById) {
   return token.kind === 'meaning' ? word.meaning : word.transliteration;
 }
 
-export default function GuardianSigilEncounter({ words, onDamage, onVictory, getGameFontClass, paused = false }) {
+export default function GuardianSigilEncounter({ words, onDamage, onVictory, getGameFontClass, getNativeScriptFontClass, paused = false }) {
   const initial = useMemo(() => {
     const seed = words.slice(0, ACTIVE_COUNT).map((word, idx) => makeAttacker(word, START_TIME + (idx * 1.2)));
     const reserve = words.slice(ACTIVE_COUNT);
@@ -374,7 +374,7 @@ export default function GuardianSigilEncounter({ words, onDamage, onVictory, get
                   </div>
 
                   <div className="ds-battle-hebrew" dir={getTextDirection(attacker.languageId || 'hebrew')}>
-                    <span className={getGameFontClass(`guardian-${attacker.id}`)}>{getNativeScript(attacker)}</span>
+                    <span className={(getNativeScriptFontClass || getGameFontClass)(`guardian-${attacker.id}`, attacker.languageId)}>{getNativeScript(attacker)}</span>
                   </div>
 
                   <div className="ds-battle-seals">

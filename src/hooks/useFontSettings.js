@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { getFontClass } from '../lib/vocabLanguageAdapter.js';
 
+// Hebrew-specific font shuffle options (only applicable when language is Hebrew)
 const SHUFFLE_FONT_CLASSES = [
   'game-font-frank-ruhl',
   'game-font-noto-serif',
@@ -65,8 +67,21 @@ export function useFontSettings() {
     return `app-font-${selectedAppFont}`;
   }, [selectedAppFont]);
 
+  /**
+   * Get font class for native script display, language-aware.
+   * For Hebrew: uses the user's game font preference / shuffle.
+   * For other languages: uses the language-specific font class from the language pack.
+   */
+  const getNativeScriptFontClass = useCallback((seed, languageId) => {
+    if (!languageId || languageId === 'hebrew') {
+      return getGameFontClass(seed);
+    }
+    return getFontClass(languageId);
+  }, [getGameFontClass]);
+
   return {
     getGameFontClass,
+    getNativeScriptFontClass,
     appFontClass,
   };
 }

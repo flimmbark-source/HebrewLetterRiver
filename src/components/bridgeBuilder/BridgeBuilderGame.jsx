@@ -136,7 +136,7 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack, onNex
 /* ─── Main ─────────────────────────────────────────────── */
 
 export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComplete, onNext }) {
-  const { getGameFontClass } = useFontSettings();
+  const { getGameFontClass, getNativeScriptFontClass } = useFontSettings();
   const {
     phase,
     currentWord,
@@ -250,7 +250,7 @@ export default function BridgeBuilderGame({ sessionConfig, onBack, onRoundComple
       <div className="bb-prompt-zone">
         {currentWord && (
           <div className={`bb-prompt ${promptVisible ? 'bb-prompt--visible' : ''}`} dir={getTextDirection(currentWord.languageId || 'hebrew')}>
-            <span className={`bb-prompt-hebrew ${getGameFontClass(`${currentWord.id}-hebrew`)}`}>{getNativeScript(currentWord)}</span>
+            <span className={`bb-prompt-hebrew ${getNativeScriptFontClass(`${currentWord.id}-hebrew`, currentWord.languageId)}`}>{getNativeScript(currentWord)}</span>
           </div>
         )}
       </div>

@@ -63,7 +63,7 @@ export default function PillarMiniGame({
   wordPool = deepScriptWords,
   selectedWords = null,
 }) {
-  const { getGameFontClass } = useFontSettings();
+  const { getGameFontClass, getNativeScriptFontClass } = useFontSettings();
   const [rows, setRows] = useState(() => buildPillarRows(wordPool, selectedWords));
   const [spinningRowId, setSpinningRowId] = useState(null);
   const [showProceed, setShowProceed] = useState(false);
@@ -138,7 +138,7 @@ export default function PillarMiniGame({
       {rows.map((row) => (
         <React.Fragment key={row.id}>
           <div className="ds-pillar-slat ds-pillar-slat--fixed" dir={getTextDirection(row.languageId || 'hebrew')} aria-label={`Word ${row.nativeScript || row.hebrew}`}>
-            <span className={getGameFontClass(`${row.id}-hebrew`)}>{row.nativeScript || row.hebrew}</span>
+            <span className={getNativeScriptFontClass(`${row.id}-hebrew`, row.languageId)}>{row.nativeScript || row.hebrew}</span>
           </div>
           <button
             type="button"

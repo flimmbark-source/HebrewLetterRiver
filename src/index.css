@@ -427,3 +427,27 @@ body {
 .language-font-ethiopic {
   font-family: var(--app-language-font, 'Noto Sans Ethiopic', 'Abyssinica SIL', 'Nyala', sans-serif);
 }
+
+/* Script-specific size scaling — CJK and complex scripts need slightly larger
+   sizes to maintain visual weight and readability at the same em context. */
+.language-font-han,
+.language-font-japanese {
+  font-size: 1.1em;
+  line-height: 1.3;
+}
+
+.language-font-devanagari,
+.language-font-bengali {
+  font-size: 1.05em;
+  line-height: 1.4;
+}
+
+.language-font-ethiopic {
+  font-size: 1.05em;
+  line-height: 1.35;
+}
+
+.language-font-arabic {
+  font-size: 1.1em;
+  line-height: 1.5;
+}

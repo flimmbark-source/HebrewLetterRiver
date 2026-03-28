@@ -86,7 +86,7 @@ function generatePositions(count, containerEl, minTopClearance = 0) {
  * randomly either transliteration or translation per word per round.
  */
 export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
-  const { getGameFontClass } = useFontSettings();
+  const { getGameFontClass, getNativeScriptFontClass } = useFontSettings();
   const { packId, selectedWordIds } = sessionConfig;
 
   const allWords = useMemo(() => {
@@ -156,6 +156,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
       type: 'hebrew',
       wordId: w.id,
       text: getNativeScript(w),
+      languageId: w.languageId || 'hebrew',
     })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [roundIndex, currentGroup.length]
@@ -250,7 +251,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
             <div className="lp-end-words">
               {allWords.map(w => (
                 <div key={w.id} className="lp-end-word">
-                  <span className={`lp-end-hebrew ${getGameFontClass(`${w.id}-hebrew`)}`} dir={getTextDirection(w.languageId || 'hebrew')}>{getNativeScript(w)}</span>
+                  <span className={`lp-end-hebrew ${getNativeScriptFontClass(`${w.id}-hebrew`, w.languageId)}`} dir={getTextDirection(w.languageId || 'hebrew')}>{getNativeScript(w)}</span>
                   <span className={`lp-end-translit ${getGameFontClass(`${w.id}-translit`)}`}>{w.transliteration}</span>
                 </div>
               ))}
@@ -314,7 +315,7 @@ export default function LoosePlanksGame({ sessionConfig, onBack, onNext }) {
               type="button"
             >
               <span className="lp-plank-grain" />
-              <span className={`lp-plank-text lp-plank-text--rtl ${getGameFontClass(plank.key)}`}>
+              <span className={`lp-plank-text lp-plank-text--rtl ${getNativeScriptFontClass(plank.key, plank.languageId)}`} dir={getTextDirection(plank.languageId)}>
                 {plank.text}
               </span>
             </button>
