@@ -224,12 +224,16 @@ export default function useBridgeBuilderGame(sessionConfig) {
     if (phase === 'roundComplete' && !hasEmittedRef.current) {
       hasEmittedRef.current = true;
       const allCompleted = allSessionWords.every(w => sessionStatesRef.current[w.id] === 'completed');
+      const completedWordIds = allSessionWords
+        .filter(w => sessionStatesRef.current[w.id] === 'completed')
+        .map(w => w.id);
       emit('bridge:session-complete', {
         score,
         streak,
         hearts,
         maxHearts: MAX_HEARTS,
         completedCount,
+        completedWordIds,
         totalWords: allSessionWords.length,
         isGameOver: hearts <= 0,
         isFullClear: allCompleted && hearts > 0,

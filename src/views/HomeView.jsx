@@ -4,6 +4,9 @@ import { useGame } from '../context/GameContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { getFormattedLanguageName } from '../lib/languageUtils.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
+import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
+import { deepScriptWords } from '../data/deepScript/words.js';
+import { languagePacks } from '../data/languages/index.js';
 import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 
@@ -69,6 +72,30 @@ export default function HomeView() {
   const [isProfileEditorOpen, setIsProfileEditorOpen] = React.useState(false);
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
+  const byMode = player?.totals?.byMode ?? {};
+  const gamesByMode = [
+    { key: 'letterRiver', label: 'Letter River', count: byMode.letterRiver ?? 0 },
+    { key: 'bridgeBuilder', label: 'Bridge Builder', count: byMode.bridgeBuilder ?? 0 },
+    { key: 'deepScript', label: 'Deep Script', count: byMode.deepScript ?? 0 }
+  ].filter((mode) => mode.count > 0);
+  const lettersLearned = useMemo(() => {
+    const pack = languagePacks[languageId];
+    const itemsById = pack?.itemsById ?? {};
+    return Object.keys(player?.letters ?? {})
+      .map((letterId) => itemsById[letterId] ?? { id: letterId, symbol: letterId })
+      .filter(Boolean);
+  }, [languageId, player?.letters]);
+  const recentWordsLearned = useMemo(() => {
+    const wordLookup = new Map([
+      ...bridgeBuilderWords.map((word) => [word.id, { id: word.id, hebrew: word.hebrew, translation: word.translation }]),
+      ...deepScriptWords.map((word) => [word.id, { id: word.id, hebrew: word.hebrew, translation: word.english }])
+    ]);
+    return (player?.learnedWordIds ?? [])
+      .map((wordId) => wordLookup.get(wordId))
+      .filter(Boolean)
+      .slice(-6)
+      .reverse();
+  }, [player?.learnedWordIds]);
 
   return (
     <div className="relative min-h-screen bg-[#fef7ff] text-[#1d1a22]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
@@ -147,6 +174,43 @@ export default function HomeView() {
             <div>
               <h3 className="leading-tight font-bold">Reminders</h3>
               <p className="text-sm text-[#4a6365]">8:00 PM Daily</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="px-2 text-xl font-bold">Profile Overview</h2>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="rounded-2xl bg-[#f9f1fd] p-4 text-center">
+              <p className="text-[10px] font-black uppercase tracking-wider text-[#4a6365]">Games</p>
+              <p className="mt-1 text-xl font-extrabold text-[#1b6b4f]">{(player?.totals?.sessions ?? 0).toLocaleString()}</p>
+            </div>
+            <div className="rounded-2xl bg-[#f9f1fd] p-4 text-center">
+              <p className="text-[10px] font-black uppercase tracking-wider text-[#4a6365]">Words</p>
+              <p className="mt-1 text-xl font-extrabold text-[#1b6b4f]">{(player?.learnedWordIds?.length ?? 0).toLocaleString()}</p>
+            </div>
+            <div className="rounded-2xl bg-[#f9f1fd] p-4 text-center">
+              <p className="text-[10px] font-black uppercase tracking-wider text-[#4a6365]">Letters</p>
+              <p className="mt-1 text-xl font-extrabold text-[#1b6b4f]">{lettersLearned.length.toLocaleString()}</p>
+            </div>
+          </div>
+          <div className="rounded-2xl bg-[#f9f1fd] p-4">
+            <p className="text-[10px] font-black uppercase tracking-wider text-[#4a6365]">Games played</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {gamesByMode.length > 0 ? gamesByMode.map((mode) => (
+                <span key={mode.key} className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#1b6b4f]">{mode.label}: {mode.count}</span>
+              )) : <span className="text-xs font-semibold text-[#4a6365]">No games played yet.</span>}
+            </div>
+          </div>
+          <div className="rounded-2xl bg-[#f9f1fd] p-4">
+            <p className="text-[10px] font-black uppercase tracking-wider text-[#4a6365]">Recent words learned</p>
+            <div className="mt-2 space-y-2">
+              {recentWordsLearned.length > 0 ? recentWordsLearned.map((word) => (
+                <div key={word.id} className="flex items-center justify-between rounded-lg bg-white px-3 py-2">
+                  <span className="font-bold text-[#1d1a22]" dir="rtl">{word.hebrew}</span>
+                  <span className="text-xs font-semibold text-[#4a6365]">{word.translation}</span>
+                </div>
+              )) : <span className="text-xs font-semibold text-[#4a6365]">Play Bridge Builder or Deep Script to add words here.</span>}
             </div>
           </div>
         </section>
