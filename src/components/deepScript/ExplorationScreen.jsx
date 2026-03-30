@@ -311,13 +311,11 @@ export default function ExplorationScreen({
           )}
 
           {isMiniGameOpenInThisRoom && activeMiniGame?.miniGameId === 'memory-gate' && (
-            <div className="ds-room-object ds-room-object--pillar" aria-label="Memory gate challenge">
-              <MemoryGateMiniGame
-                onSolved={onCompleteMiniGame}
-                compact
-                wordPool={activeWordPool}
-              />
-            </div>
+            <MemoryGateMiniGame
+              onSolved={onCompleteMiniGame}
+              compact
+              wordPool={activeWordPool}
+            />
           )}
 
           {/* Chamber state indicator */}
