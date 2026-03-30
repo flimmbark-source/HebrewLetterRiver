@@ -228,6 +228,17 @@ describe('Dungeon Floor Generation', () => {
     expect(boss.payload.wordId).toBeTruthy();
   });
 
+  it('places a memory gate chamber directly before the miniboss', () => {
+    const floor = generateDungeonFloor();
+    const boss = floor.chambers.get(floor.bossChamberId);
+    const gate = floor.chambers.get(floor.memoryGateChamberId);
+    expect(gate).toBeTruthy();
+    expect(gate.type).toBe(CHAMBER_TYPES.MEMORY_GATE);
+    expect(gate.payload.memoryGateRequiredScore).toBe(0.8);
+    expect(Object.values(gate.exits)).toContain(floor.bossChamberId);
+    expect(Object.values(boss.exits)).toContain(gate.id);
+  });
+
   it('all chambers have valid exits pointing to existing chambers', () => {
     const floor = generateDungeonFloor();
     for (const [id, chamber] of floor.chambers) {

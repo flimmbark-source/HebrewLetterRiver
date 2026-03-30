@@ -56,6 +56,9 @@ export default function MemoryGateMiniGame({ wordPool = [], onSolved, compact = 
   const current = queue[currentIndex] ?? null;
   const totalWords = floorWords.length;
   const isComplete = !current;
+  const totalAttempts = resolvedCount + mistakes;
+  const successRate = totalAttempts > 0 ? resolvedCount / totalAttempts : 0;
+  const passedGate = successRate >= 0.8;
 
   const advance = () => {
     setSelected(null);
@@ -96,7 +99,7 @@ export default function MemoryGateMiniGame({ wordPool = [], onSolved, compact = 
   const handleProceed = () => {
     if (isCompleting) return;
     setIsCompleting(true);
-    window.setTimeout(() => onSolved?.(), 450);
+    window.setTimeout(() => onSolved?.({ passed: passedGate, successRate }), 450);
   };
 
   if (!totalWords) return null;
@@ -227,6 +230,8 @@ export default function MemoryGateMiniGame({ wordPool = [], onSolved, compact = 
                 <span>{resolvedCount}/{totalWords}</span>
                 <span>•</span>
                 <span>{mistakes} mistakes</span>
+                <span>•</span>
+                <span>{Math.round(successRate * 100)}% success</span>
               </div>
             </div>
           </div>
@@ -287,8 +292,12 @@ export default function MemoryGateMiniGame({ wordPool = [], onSolved, compact = 
           ) : (
             <div className="ds-memory-gate__complete">
               <div className="ds-memory-gate__complete-glyph">🜂</div>
-              <div className="ds-memory-gate__complete-title">Gate Unsealed</div>
-              <button type="button" className="ds-memory-gate__proceed" onClick={handleProceed}>Proceed</button>
+              <div className="ds-memory-gate__complete-title">
+                {passedGate ? 'Gate Unsealed' : 'Seal Rejects Your Attempt'}
+              </div>
+              <button type="button" className="ds-memory-gate__proceed" onClick={handleProceed}>
+                {passedGate ? 'Proceed' : 'Try Again'}
+              </button>
             </div>
           )}
         </div>

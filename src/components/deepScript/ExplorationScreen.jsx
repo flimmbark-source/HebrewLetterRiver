@@ -7,6 +7,7 @@ import InspectPanel from './InspectPanel.jsx';
 import PillarMiniGame from './PillarMiniGame.jsx';
 import FloatingCapsulesGame from '../FloatingCapsulesGame.jsx';
 import { deepScriptWords } from '../../data/deepScript/words.js';
+import MemoryGateMiniGame from './MemoryGateMiniGame.jsx';
 
 /**
  * ExplorationScreen — first-person dungeon traversal.
@@ -29,6 +30,7 @@ export default function ExplorationScreen({
   floorMiniGameWords = null,
   runState,
   onOpenMenu,
+  isMemoryGateUnlocked = false,
 }) {
   const [inspecting, setInspecting] = useState(null);
   const [transitioning, setTransitioning] = useState(false);
@@ -58,6 +60,8 @@ export default function ExplorationScreen({
   // Click a door directly
   const handleDoorClick = useCallback((chamberId, direction) => {
     if (transitioning || activeMiniGame?.chamberId === currentChamberId) return;
+    const targetChamber = floor.chambers.get(chamberId);
+    if (targetChamber?.type === CHAMBER_TYPES.MINIBOSS && !isMemoryGateUnlocked) return;
     setTransitioning(true);
     setTransDir(direction);
     setWalkPhase('walking');
@@ -71,7 +75,7 @@ export default function ExplorationScreen({
         setWalkPhase(null);
       }, 400);
     }, 600);
-  }, [transitioning, onMove, activeMiniGame, currentChamberId]);
+  }, [transitioning, onMove, activeMiniGame, currentChamberId, floor, isMemoryGateUnlocked]);
 
   // Click an interactable
   const handleHotspotClick = useCallback((interactable) => {
@@ -86,6 +90,9 @@ export default function ExplorationScreen({
         break;
       case 'trigger-minigame':
         onTriggerMiniGame(chamber.id, interactable.minigameId);
+        break;
+      case 'trigger-memory-gate':
+        onTriggerMiniGame(chamber.id, 'memory-gate');
         break;
       case 'loot':
         setInspecting({ ...interactable, isLoot: true });
@@ -184,9 +191,11 @@ export default function ExplorationScreen({
             {forwardDoor && (
               <button
                 type="button"
-                className={`ds-explore-door ds-explore-door--forward ${forwardChamber?.visited ? 'ds-explore-door--visited' : ''}`}
+                className={`ds-explore-door ds-explore-door--forward ${forwardChamber?.visited ? 'ds-explore-door--visited' : ''} ${forwardChamber?.type === CHAMBER_TYPES.MINIBOSS && !isMemoryGateUnlocked ? 'ds-explore-door--locked' : ''}`}
                 onClick={() => handleDoorClick(forwardDoor, 'forward')}
-                title={forwardChamber?.visited ? getChamberDisplayName(forwardChamber.type) : 'Unexplored passage'}
+                title={forwardChamber?.type === CHAMBER_TYPES.MINIBOSS && !isMemoryGateUnlocked
+                  ? 'A memory seal blocks this door. Score 80%+ in the Memory Gate to enter.'
+                  : (forwardChamber?.visited ? getChamberDisplayName(forwardChamber.type) : 'Unexplored passage')}
               >
                 <div className="ds-explore-door-arch" />
                 <div className="ds-explore-door-label">
@@ -199,9 +208,11 @@ export default function ExplorationScreen({
             {leftDoor && (
               <button
                 type="button"
-                className={`ds-explore-door ds-explore-door--side ds-explore-door--left ${leftChamber?.visited ? 'ds-explore-door--visited' : ''}`}
+                className={`ds-explore-door ds-explore-door--side ds-explore-door--left ${leftChamber?.visited ? 'ds-explore-door--visited' : ''} ${leftChamber?.type === CHAMBER_TYPES.MINIBOSS && !isMemoryGateUnlocked ? 'ds-explore-door--locked' : ''}`}
                 onClick={() => handleDoorClick(leftDoor, 'left')}
-                title={leftChamber?.visited ? getChamberDisplayName(leftChamber.type) : 'Unexplored passage'}
+                title={leftChamber?.type === CHAMBER_TYPES.MINIBOSS && !isMemoryGateUnlocked
+                  ? 'A memory seal blocks this door. Score 80%+ in the Memory Gate to enter.'
+                  : (leftChamber?.visited ? getChamberDisplayName(leftChamber.type) : 'Unexplored passage')}
               >
                 <div className="ds-explore-door-arch" />
               </button>
@@ -211,9 +222,11 @@ export default function ExplorationScreen({
             {rightDoor && (
               <button
                 type="button"
-                className={`ds-explore-door ds-explore-door--side ds-explore-door--right ${rightChamber?.visited ? 'ds-explore-door--visited' : ''}`}
+                className={`ds-explore-door ds-explore-door--side ds-explore-door--right ${rightChamber?.visited ? 'ds-explore-door--visited' : ''} ${rightChamber?.type === CHAMBER_TYPES.MINIBOSS && !isMemoryGateUnlocked ? 'ds-explore-door--locked' : ''}`}
                 onClick={() => handleDoorClick(rightDoor, 'right')}
-                title={rightChamber?.visited ? getChamberDisplayName(rightChamber.type) : 'Unexplored passage'}
+                title={rightChamber?.type === CHAMBER_TYPES.MINIBOSS && !isMemoryGateUnlocked
+                  ? 'A memory seal blocks this door. Score 80%+ in the Memory Gate to enter.'
+                  : (rightChamber?.visited ? getChamberDisplayName(rightChamber.type) : 'Unexplored passage')}
               >
                 <div className="ds-explore-door-arch" />
               </button>
@@ -223,9 +236,11 @@ export default function ExplorationScreen({
           {visibleBackDoor && (
             <button
               type="button"
-              className={`ds-explore-door ds-explore-door--back ${backChamber?.visited ? 'ds-explore-door--visited' : ''}`}
+              className={`ds-explore-door ds-explore-door--back ${backChamber?.visited ? 'ds-explore-door--visited' : ''} ${backChamber?.type === CHAMBER_TYPES.MINIBOSS && !isMemoryGateUnlocked ? 'ds-explore-door--locked' : ''}`}
               onClick={() => handleDoorClick(visibleBackDoor, 'back')}
-              title={backChamber?.visited ? getChamberDisplayName(backChamber.type) : 'Unexplored passage behind you'}
+              title={backChamber?.type === CHAMBER_TYPES.MINIBOSS && !isMemoryGateUnlocked
+                ? 'A memory seal blocks this door. Score 80%+ in the Memory Gate to enter.'
+                : (backChamber?.visited ? getChamberDisplayName(backChamber.type) : 'Unexplored passage behind you')}
             >
               <div className="ds-explore-door-arch" />
               <div className="ds-explore-door-label">
@@ -295,6 +310,16 @@ export default function ExplorationScreen({
             </div>
           )}
 
+          {isMiniGameOpenInThisRoom && activeMiniGame?.miniGameId === 'memory-gate' && (
+            <div className="ds-room-object ds-room-object--pillar" aria-label="Memory gate challenge">
+              <MemoryGateMiniGame
+                onSolved={onCompleteMiniGame}
+                compact
+                wordPool={activeWordPool}
+              />
+            </div>
+          )}
+
           {/* Chamber state indicator */}
           {chamber.resolved && chamber.type === CHAMBER_TYPES.COMBAT && (
             <div className="ds-explore-cleared-badge">CLEARED</div>
@@ -337,6 +362,7 @@ function getHotspotIcon(type) {
     case 'pillar': return '🗿';
     case 'capsule-orb': return '🫧';
     case 'trial-pedestal': return '🧩';
+    case 'memory-gate-seal': return '⟡';
     case 'brazier': return '🔥';
     case 'statue': return '🗿';
     case 'chest': return '📦';
