@@ -19,6 +19,7 @@ export const CHAMBER_TYPES = {
   COMBAT: 'combat',
   MINIGAME_PILLAR: 'minigame-pillar',
   MINIGAME_CAPSULES: 'minigame-capsules',
+  MEMORY_GATE: 'memory-gate',
   EVENT: 'event',
   MINIBOSS: 'miniboss',
 };
@@ -68,6 +69,9 @@ const INTERACTABLE_POOLS = {
   [CHAMBER_TYPES.MINIGAME_CAPSULES]: [
     { type: 'trial-pedestal', position: 'center', label: 'Trial Pedestal', action: 'trigger-minigame' },
   ],
+  [CHAMBER_TYPES.MEMORY_GATE]: [
+    { type: 'memory-gate-seal', position: 'center', label: 'Memory Gate', action: 'trigger-memory-gate' },
+  ],
   [CHAMBER_TYPES.EVENT]: [
     { type: 'chest', position: 'center', label: 'Dusty Chest', action: 'loot' },
     { type: 'statue', position: 'left', label: 'Mysterious Statue', action: 'flavor', flavorText: 'The statue seems to watch you with hollow eyes. A faint warmth emanates from its base.' },
@@ -84,6 +88,7 @@ export const CHAMBER_THEMES = {
   [CHAMBER_TYPES.COMBAT]: 'crypt',
   [CHAMBER_TYPES.MINIGAME_PILLAR]: 'shrine',
   [CHAMBER_TYPES.MINIGAME_CAPSULES]: 'library',
+  [CHAMBER_TYPES.MEMORY_GATE]: 'shrine',
   [CHAMBER_TYPES.EVENT]: 'stone',
   [CHAMBER_TYPES.MINIBOSS]: 'crypt',
 };
@@ -92,16 +97,20 @@ export const CHAMBER_THEMES = {
 
 let chamberIdCounter = 0;
 
+function createInteractablesForType(chamberId, type) {
+  const pool = INTERACTABLE_POOLS[type] || [];
+  return pool.map((template, i) => ({
+    ...template,
+    id: `${chamberId}-obj-${i}`,
+    resolved: false,
+  }));
+}
+
 function createChamber(type, payload = {}) {
   const id = `chamber-${++chamberIdCounter}-${type}`;
 
   // Pick interactables for this chamber type
-  const pool = INTERACTABLE_POOLS[type] || [];
-  const interactables = pool.map((template, i) => ({
-    ...template,
-    id: `${id}-obj-${i}`,
-    resolved: false,
-  }));
+  const interactables = createInteractablesForType(id, type);
 
   return {
     id,
@@ -718,6 +727,28 @@ export function generateDungeonFloor({
 
       // Safety assertion: every chamber must reach exit and non-endpoints must not be dead ends.
       assertFloorSafety(chambers, entrance.id, miniboss.id, minRouteLength);
+
+      const minibossNeighbors = Object.values(miniboss.exits)
+        .map(neighborId => chambers.get(neighborId))
+        .filter(Boolean)
+        .sort((a, b) => shortestPathLength(chambers, entrance.id, a.id) - shortestPathLength(chambers, entrance.id, b.id));
+      const memoryGateChamber = minibossNeighbors[0];
+      if (!memoryGateChamber) {
+        throw new Error('Invalid floor: miniboss has no adjacent chamber for memory gate.');
+      }
+
+      memoryGateChamber.type = CHAMBER_TYPES.MEMORY_GATE;
+      memoryGateChamber.theme = CHAMBER_THEMES[CHAMBER_TYPES.MEMORY_GATE];
+      memoryGateChamber.resolved = false;
+      memoryGateChamber.payload = {
+        ...memoryGateChamber.payload,
+        miniGameId: 'memory-gate',
+        memoryGateRequiredScore: 0.8,
+        memoryGatePassed: false,
+        memoryGateBestScore: 0,
+      };
+      memoryGateChamber.interactables = createInteractablesForType(memoryGateChamber.id, CHAMBER_TYPES.MEMORY_GATE);
+
       const floorPlan = buildFloorPlan(chambers, positions, entrance.id, miniboss.id);
 
       return {
@@ -726,6 +757,7 @@ export function generateDungeonFloor({
         floorPlan,
         startChamberId: entrance.id,
         bossChamberId: miniboss.id,
+        memoryGateChamberId: memoryGateChamber.id,
         chamberCount: chambers.size,
       };
     } catch (error) {
@@ -745,6 +777,7 @@ export function getChamberDisplayName(type) {
     case CHAMBER_TYPES.COMBAT: return 'Dark Chamber';
     case CHAMBER_TYPES.MINIGAME_PILLAR: return 'Pillar Trial Chamber';
     case CHAMBER_TYPES.MINIGAME_CAPSULES: return 'Capsule Trial Chamber';
+    case CHAMBER_TYPES.MEMORY_GATE: return 'Memory Gate Chamber';
     case CHAMBER_TYPES.EVENT: return 'Quiet Chamber';
     case CHAMBER_TYPES.MINIBOSS: return 'Guardian\'s Chamber';
     default: return 'Chamber';
@@ -758,6 +791,7 @@ export function getChamberIcon(type) {
     case CHAMBER_TYPES.COMBAT: return '⚔️';
     case CHAMBER_TYPES.MINIGAME_PILLAR: return '🗿';
     case CHAMBER_TYPES.MINIGAME_CAPSULES: return '🫧';
+    case CHAMBER_TYPES.MEMORY_GATE: return '⟡';
     case CHAMBER_TYPES.EVENT: return '✨';
     case CHAMBER_TYPES.MINIBOSS: return '👁️';
     default: return '❓';
