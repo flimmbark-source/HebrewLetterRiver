@@ -327,6 +327,87 @@ body.dark-mode .bbs-section-title {
   color: #94a3b8;
 }
 
+/* Dark mode — Path Row */
+body.dark-mode .bbs-path-row--expanded {
+  background: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .bbs-path-row-collapsed:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+body.dark-mode .bbs-path-marker--completed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+body.dark-mode .bbs-path-marker--current {
+  background: #10b981;
+  color: #020617;
+}
+
+body.dark-mode .bbs-path-marker--upcoming {
+  background: #1e293b;
+  color: #64748b;
+}
+
+body.dark-mode .bbs-path-marker--locked {
+  background: rgba(51, 65, 85, 0.5);
+  color: #475569;
+}
+
+body.dark-mode .bbs-path-row-title {
+  color: #f8fafc;
+}
+
+body.dark-mode .bbs-path-row-support {
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-path-row-desc {
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-study-method-btn {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.dark-mode .bbs-study-method-btn:hover {
+  background: #1e293b;
+  border-color: #475569;
+}
+
+body.dark-mode .bbs-study-method-btn--last {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+body.dark-mode .bbs-study-method-btn--last:hover {
+  background: rgba(16, 185, 129, 0.18);
+}
+
+body.dark-mode .bbs-study-method-icon {
+  color: #34d399;
+}
+
+body.dark-mode .bbs-study-method-label {
+  color: #f8fafc;
+}
+
+body.dark-mode .bbs-study-method-hint {
+  color: #94a3b8;
+}
+
+body.dark-mode .bbs-study-method-arrow {
+  color: #64748b;
+}
+
+body.dark-mode .bbs-path-row-last-used {
+  color: #64748b;
+}
+
 /* ─── Screen Container ───────────────────────────────────── */
 .bbs-screen {
   position: fixed;
@@ -693,6 +774,206 @@ body.dark-mode .bbs-section-title {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Path List (Guided view — ordered pack rows)
+   ═══════════════════════════════════════════════════════════ */
+.bbs-path-list {
+  gap: 4px;
+  padding: 8px 12px 12px;
+}
+
+/* ─── Path Row ─────────────────────────────────────────── */
+.bbs-path-row {
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+.bbs-path-row--expanded {
+  background: var(--m3-surface-container-lowest);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.bbs-path-row--locked {
+  opacity: 0.45;
+}
+
+.bbs-path-row-collapsed {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--m3-font);
+  text-align: left;
+  border-radius: 12px;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bbs-path-row-collapsed:hover:not(:disabled) {
+  background: var(--m3-surface-container);
+}
+
+.bbs-path-row-collapsed:disabled {
+  cursor: default;
+}
+
+/* State marker */
+.bbs-path-marker {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+}
+
+.bbs-path-marker--completed {
+  background: var(--m3-primary-10);
+  color: var(--m3-primary);
+}
+
+.bbs-path-marker--current {
+  background: var(--m3-primary);
+  color: var(--m3-on-primary);
+}
+
+.bbs-path-marker--upcoming {
+  background: var(--m3-surface-container);
+  color: var(--m3-outline);
+}
+
+.bbs-path-marker--locked {
+  background: var(--m3-outline-variant-30);
+  color: var(--m3-outline);
+}
+
+/* Center */
+.bbs-path-row-center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bbs-path-row-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--m3-on-surface);
+  line-height: 1.3;
+}
+
+.bbs-path-row-support {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--m3-on-surface-variant);
+  line-height: 1.3;
+}
+
+/* Expanded detail */
+.bbs-path-row-detail {
+  padding: 0 12px 14px 56px; /* 12 + 32 marker + 12 gap = 56 left indent */
+}
+
+.bbs-path-row-desc {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--m3-on-surface-variant);
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+/* ─── Study Method Buttons ─────────────────────────────── */
+.bbs-study-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bbs-study-method-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--m3-outline-variant-30);
+  border-radius: 12px;
+  background: var(--m3-surface-container-lowest);
+  cursor: pointer;
+  font-family: var(--m3-font);
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bbs-study-method-btn:hover {
+  background: var(--m3-surface-container);
+  border-color: var(--m3-outline-variant);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.bbs-study-method-btn:active {
+  transform: scale(0.98);
+}
+
+.bbs-study-method-btn--last {
+  border-color: var(--m3-primary);
+  background: var(--m3-primary-10);
+}
+
+.bbs-study-method-btn--last:hover {
+  background: rgba(27, 107, 79, 0.15);
+}
+
+.bbs-study-method-icon {
+  font-size: 22px;
+  color: var(--m3-primary);
+  flex-shrink: 0;
+}
+
+.bbs-study-method-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.bbs-study-method-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--m3-on-surface);
+  line-height: 1.3;
+}
+
+.bbs-study-method-hint {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--m3-on-surface-variant);
+  line-height: 1.3;
+}
+
+.bbs-study-method-arrow {
+  font-size: 18px;
+  color: var(--m3-outline);
+  flex-shrink: 0;
+}
+
+/* Last used hint */
+.bbs-path-row-last-used {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--m3-on-surface-variant);
+  letter-spacing: 0.3px;
 }
 
 /* ═══════════════════════════════════════════════════════════
