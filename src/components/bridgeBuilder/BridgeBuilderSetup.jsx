@@ -102,6 +102,7 @@ function ProgressDots({ completion, modeOverride, unlocked, packId, onDotClick }
             className="bbs-dot-mode"
             disabled={!unlocked}
             aria-label={dot.label}
+            aria-pressed={dot.override}
             onClick={(e) => {
               e.stopPropagation();
               if (unlocked && onDotClick) onDotClick(packId, dot.mode);
