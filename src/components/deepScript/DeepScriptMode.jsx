@@ -332,7 +332,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         }));
       }
 
-      if (newHealth <= 0) {
+      if (newHealth <= 0 && !isMiniboss) {
         setEndResult('defeat');
         setScreen('end');
         queueMicrotask(() => {
@@ -344,6 +344,13 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
           });
         });
       } else {
+        if (newHealth <= 0 && isMiniboss) {
+          // Guardian sigil losses should return the player to exploration so they can retry.
+          setRunState(prev => ({
+            ...prev,
+            health: Math.max(1, prev.health),
+          }));
+        }
         // Still alive — return to exploration
         setTimeout(() => setScreen('exploring'), 0);
       }
