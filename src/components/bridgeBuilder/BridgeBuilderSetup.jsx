@@ -85,21 +85,29 @@ function buildSupportLine(pack, progress) {
   return parts.join(' \u00b7 ');
 }
 
-/* ─── Pack state marker ──────────────────────────────────── */
+/* ─── Node state ─────────────────────────────────────────── */
 
-function getPackMarker(progress, unlocked, isCurrent) {
-  if (!unlocked) return { icon: 'lock', cls: 'locked' };
-  if (progress.completed) return { icon: 'check', cls: 'completed' };
-  if (isCurrent || progress.wordsIntroducedCount > 0) return { icon: 'play_arrow', cls: 'current' };
-  return { icon: 'circle', cls: 'upcoming' };
+function getNodeState(progress, unlocked, isCurrent) {
+  if (!unlocked) return 'locked';
+  if (progress.completed) return 'completed';
+  if (isCurrent || progress.wordsIntroducedCount > 0) return 'current';
+  return 'upcoming';
+}
+
+/* ─── Snake pattern: determines horizontal position ──────── */
+// Nodes snake: left, center, right, center, left, center, right …
+// This creates the S-curve / winding path feel.
+const SNAKE_POSITIONS = ['left', 'center', 'right', 'center'];
+function getSnakePosition(index) {
+  return SNAKE_POSITIONS[index % SNAKE_POSITIONS.length];
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PackPathRow — a single node on the learning path
+   PathNode — a single node on the winding path
    ═══════════════════════════════════════════════════════════ */
 
-function PackPathRow({ pack, progress, unlocked, isExpanded, isCurrent, lastMethod, onToggle, onLaunch, isFirst, isLast, lineAbove, lineBelow }) {
-  const marker = getPackMarker(progress, unlocked, isCurrent);
+function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod, position, onToggle, onLaunch, accent }) {
+  const state = getNodeState(progress, unlocked, isCurrent);
   const support = buildSupportLine(pack, progress);
 
   const handleLaunch = (method) => {
@@ -107,73 +115,69 @@ function PackPathRow({ pack, progress, unlocked, isExpanded, isCurrent, lastMeth
     onLaunch(pack, method);
   };
 
-  let cls = 'bbs-pr';
-  if (isExpanded) cls += ' bbs-pr--open';
-  if (!unlocked) cls += ' bbs-pr--locked';
-  if (isCurrent && !isExpanded) cls += ' bbs-pr--current';
-  if (progress.completed) cls += ' bbs-pr--done';
+  // Node icon
+  let icon;
+  if (state === 'locked') icon = 'lock';
+  else if (state === 'completed') icon = 'check';
+  else if (state === 'current') icon = 'play_arrow';
+  else icon = 'radio_button_unchecked';
 
-  // lineAbove/lineBelow: 'done' | 'pending' | 'none'
-  const aboveCls = isFirst ? 'none' : lineAbove;
-  const belowCls = isLast ? 'none' : lineBelow;
+  const nodeCls = `bbs-node bbs-node--${state} bbs-node--${position}`;
 
   return (
-    <div className={cls}>
-      <button
-        type="button"
-        className="bbs-pr-row"
-        onClick={() => unlocked && onToggle(pack.id)}
-        disabled={!unlocked}
-      >
-        {/* Connector column: line above, marker, line below */}
-        <div className="bbs-pr-rail">
-          <span className={`bbs-pr-line bbs-pr-line--${aboveCls}`} />
-          <span className={`bbs-pr-marker bbs-pr-marker--${marker.cls}`}>
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>{marker.icon}</span>
+    <div className={`bbs-node-cell bbs-node-cell--${position}`}>
+      <div className={isExpanded ? `${nodeCls} bbs-node--expanded` : nodeCls}>
+        <button
+          type="button"
+          className="bbs-node-btn"
+          onClick={() => unlocked && onToggle(pack.id)}
+          disabled={!unlocked}
+          aria-label={`${pack.title} — ${support}`}
+        >
+          <span className={`bbs-node-circle bbs-node-circle--${state} bbs-node-circle--${accent}`}>
+            <span className="material-symbols-outlined bbs-node-icon">{icon}</span>
           </span>
-          <span className={`bbs-pr-line bbs-pr-line--${belowCls}`} />
+        </button>
+        <div className="bbs-node-label">
+          <span className="bbs-node-title">{pack.title}</span>
+          <span className="bbs-node-support">{support}</span>
         </div>
-        <div className="bbs-pr-center">
-          <span className="bbs-pr-title">{pack.title}</span>
-          <span className="bbs-pr-support">{support}</span>
-        </div>
-      </button>
+      </div>
 
+      {/* Study method chooser — appears below the node */}
       {isExpanded && (
-        <div className="bbs-pr-expand">
-          {pack.description && <p className="bbs-pr-desc">{pack.description}</p>}
-          <div className="bbs-pr-methods">
-            <button
-              type="button"
-              className={`bbs-method ${lastMethod === 'vocab' ? 'bbs-method--last' : ''}`}
-              onClick={() => handleLaunch('vocab')}
-            >
-              <span className="material-symbols-outlined bbs-method-ic">conversion_path</span>
-              <div className="bbs-method-text">
-                <span className="bbs-method-name">
-                  {lastMethod === 'vocab' ? 'Continue Vocab Builder' : 'Vocab Builder'}
-                </span>
-                <span className="bbs-method-sub">Structured pack practice</span>
-              </div>
-              <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
-            </button>
-            <button
-              type="button"
-              className={`bbs-method ${lastMethod === 'deep_script' ? 'bbs-method--last' : ''}`}
-              onClick={() => handleLaunch('deep_script')}
-            >
-              <span className="material-symbols-outlined bbs-method-ic">ink_pen</span>
-              <div className="bbs-method-text">
-                <span className="bbs-method-name">
-                  {lastMethod === 'deep_script' ? 'Continue Deep Script' : 'Deep Script Floor'}
-                </span>
-                <span className="bbs-method-sub">A dungeon floor built from this pack</span>
-              </div>
-              <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
-            </button>
-          </div>
+        <div className="bbs-chooser">
+          {pack.description && <p className="bbs-chooser-desc">{pack.description}</p>}
+          <button
+            type="button"
+            className={`bbs-method ${lastMethod === 'vocab' ? 'bbs-method--last' : ''}`}
+            onClick={() => handleLaunch('vocab')}
+          >
+            <span className="material-symbols-outlined bbs-method-ic">conversion_path</span>
+            <div className="bbs-method-text">
+              <span className="bbs-method-name">
+                {lastMethod === 'vocab' ? 'Continue Vocab Builder' : 'Vocab Builder'}
+              </span>
+              <span className="bbs-method-sub">Structured pack practice</span>
+            </div>
+            <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
+          </button>
+          <button
+            type="button"
+            className={`bbs-method ${lastMethod === 'deep_script' ? 'bbs-method--last' : ''}`}
+            onClick={() => handleLaunch('deep_script')}
+          >
+            <span className="material-symbols-outlined bbs-method-ic">ink_pen</span>
+            <div className="bbs-method-text">
+              <span className="bbs-method-name">
+                {lastMethod === 'deep_script' ? 'Continue Deep Script' : 'Deep Script Floor'}
+              </span>
+              <span className="bbs-method-sub">A dungeon floor built from this pack</span>
+            </div>
+            <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
+          </button>
           {lastMethod && (
-            <div className="bbs-pr-hint">
+            <div className="bbs-chooser-hint">
               Last used: {lastMethod === 'deep_script' ? 'Deep Script' : 'Vocab Builder'}
             </div>
           )}
@@ -184,7 +188,31 @@ function PackPathRow({ pack, progress, unlocked, isExpanded, isCurrent, lastMeth
 }
 
 /* ═══════════════════════════════════════════════════════════
-   SectionBlock — always-visible container for a section
+   SVG connector between two adjacent nodes
+   ═══════════════════════════════════════════════════════════ */
+
+function PathConnector({ fromPos, toPos, state }) {
+  // state: 'done' | 'pending'
+  // Each cell is laid out on a 3-column grid.
+  // Positions map to x%: left=20%, center=50%, right=80%
+  const xMap = { left: 20, center: 50, right: 80 };
+  const x1 = xMap[fromPos];
+  const x2 = xMap[toPos];
+
+  return (
+    <div className="bbs-connector">
+      <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="bbs-connector-svg">
+        <path
+          d={`M ${x1} 0 C ${x1} 20, ${x2} 20, ${x2} 40`}
+          className={`bbs-connector-line bbs-connector-line--${state}`}
+        />
+      </svg>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SectionBlock — always-visible section with winding path
    ═══════════════════════════════════════════════════════════ */
 
 function SectionBlock({ section, sectionProgress, unlocked, packData, activePackId, expandedPack, lastMethods, onTogglePack, onLaunch }) {
@@ -193,11 +221,8 @@ function SectionBlock({ section, sectionProgress, unlocked, packData, activePack
   const accent = meta.accent;
   const progressPct = totalPacks > 0 ? (packsCompleted / totalPacks) * 100 : 0;
 
-  let blockCls = 'bbs-block';
-  if (!unlocked) blockCls += ' bbs-block--locked';
-
   return (
-    <div className={blockCls}>
+    <div className={`bbs-block ${!unlocked ? 'bbs-block--locked' : ''}`}>
       {/* Section header */}
       <div className="bbs-block-header">
         <div className={`bbs-block-icon bbs-block-icon--${accent}`}>
@@ -219,32 +244,31 @@ function SectionBlock({ section, sectionProgress, unlocked, packData, activePack
         </div>
       </div>
 
-      {/* Always-visible pack path */}
-      <div className="bbs-block-packs">
+      {/* Winding pack path */}
+      <div className="bbs-path">
         {packData.map((pd, idx) => {
-          const isCompleted = pd.progress.completed;
-          const nextCompleted = idx < packData.length - 1 && packData[idx + 1].progress.completed;
-          const prevCompleted = idx > 0 && packData[idx - 1].progress.completed;
-          // Line above this node: 'done' if both this and previous are completed
-          const lineAbove = (isCompleted && prevCompleted) ? 'done' : (prevCompleted || (idx > 0 && packData[idx - 1].progress.wordsIntroducedCount > 0)) ? 'done' : 'pending';
-          // Line below this node: 'done' if this node is completed, 'pending' otherwise
-          const lineBelow = isCompleted ? 'done' : 'pending';
+          const pos = getSnakePosition(idx);
+          const nextPos = idx < packData.length - 1 ? getSnakePosition(idx + 1) : null;
+          const connectorState = pd.progress.completed ? 'done' : 'pending';
+
           return (
-            <PackPathRow
-              key={pd.pack.id}
-              pack={pd.pack}
-              progress={pd.progress}
-              unlocked={pd.unlocked}
-              isExpanded={expandedPack === pd.pack.id}
-              isCurrent={pd.pack.id === activePackId}
-              lastMethod={lastMethods[pd.pack.id] || null}
-              onToggle={onTogglePack}
-              onLaunch={onLaunch}
-              isFirst={idx === 0}
-              isLast={idx === packData.length - 1}
-              lineAbove={lineAbove}
-              lineBelow={lineBelow}
-            />
+            <React.Fragment key={pd.pack.id}>
+              <PathNode
+                pack={pd.pack}
+                progress={pd.progress}
+                unlocked={pd.unlocked}
+                isCurrent={pd.pack.id === activePackId}
+                isExpanded={expandedPack === pd.pack.id}
+                lastMethod={lastMethods[pd.pack.id] || null}
+                position={pos}
+                onToggle={onTogglePack}
+                onLaunch={onLaunch}
+                accent={accent}
+              />
+              {nextPos && (
+                <PathConnector fromPos={pos} toPos={nextPos} state={connectorState} />
+              )}
+            </React.Fragment>
           );
         })}
       </div>
@@ -389,7 +413,6 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     });
   }, [sections, allProgress, packCompletions]);
 
-  /* The single "current" pack across all sections */
   const activePackId = useMemo(() => {
     for (const sd of sectionData) {
       for (const pd of sd.packData) {
@@ -449,7 +472,6 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     onPlay({ sessionType: 'due_review', packId: null, selectedWordIds: reviewIds, gameMode: 'bridge_builder', entryPoint: 'review_due' });
   }, [onPlay, dueReviewWordIds, weakWordIds]);
 
-  /* Browse / Expert data */
   const allUnlockedPackData = useMemo(() => sectionData.flatMap(sd => sd.packData).filter(pd => pd.unlocked), [sectionData]);
   const goalModePackData = useMemo(() => allUnlockedPackData.filter(pd => matchesGoal(pd.pack, goalFilter)), [allUnlockedPackData, goalFilter]);
   const expertModePackData = useMemo(() => {
@@ -474,7 +496,6 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
             onClick={() => { setActiveSubview('expert'); emit('analytics:bridge_setup', { event: 'open_expert_browse' }); }}>Advanced tools</button>
         </div>
 
-        {/* Browse by Goal */}
         {activeSubview === 'goal' && (
           <div className="bbs-mode-panel">
             <h3 className="bbs-mode-title">What do you want to do today?</h3>
@@ -497,7 +518,6 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
           </div>
         )}
 
-        {/* Advanced Tools */}
         {activeSubview === 'expert' && (
           <div className="bbs-mode-panel">
             <h3 className="bbs-mode-title">Search & filter your library</h3>
@@ -521,7 +541,6 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
           </div>
         )}
 
-        {/* ─── Guided: always-visible section blocks ─────────── */}
         {activeSubview === null && (
           <div className="bbs-guided">
             {sectionData.map(({ section, sectionProgress, unlocked, packData }) => (
