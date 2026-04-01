@@ -95,10 +95,10 @@ function getPackMarker(progress, unlocked, isCurrent) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PackPathRow — a single pack inside a section container
+   PackPathRow — a single node on the learning path
    ═══════════════════════════════════════════════════════════ */
 
-function PackPathRow({ pack, progress, unlocked, isExpanded, isCurrent, lastMethod, onToggle, onLaunch }) {
+function PackPathRow({ pack, progress, unlocked, isExpanded, isCurrent, lastMethod, onToggle, onLaunch, isFirst, isLast, lineAbove, lineBelow }) {
   const marker = getPackMarker(progress, unlocked, isCurrent);
   const support = buildSupportLine(pack, progress);
 
@@ -111,6 +111,11 @@ function PackPathRow({ pack, progress, unlocked, isExpanded, isCurrent, lastMeth
   if (isExpanded) cls += ' bbs-pr--open';
   if (!unlocked) cls += ' bbs-pr--locked';
   if (isCurrent && !isExpanded) cls += ' bbs-pr--current';
+  if (progress.completed) cls += ' bbs-pr--done';
+
+  // lineAbove/lineBelow: 'done' | 'pending' | 'none'
+  const aboveCls = isFirst ? 'none' : lineAbove;
+  const belowCls = isLast ? 'none' : lineBelow;
 
   return (
     <div className={cls}>
@@ -120,9 +125,14 @@ function PackPathRow({ pack, progress, unlocked, isExpanded, isCurrent, lastMeth
         onClick={() => unlocked && onToggle(pack.id)}
         disabled={!unlocked}
       >
-        <span className={`bbs-pr-marker bbs-pr-marker--${marker.cls}`}>
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>{marker.icon}</span>
-        </span>
+        {/* Connector column: line above, marker, line below */}
+        <div className="bbs-pr-rail">
+          <span className={`bbs-pr-line bbs-pr-line--${aboveCls}`} />
+          <span className={`bbs-pr-marker bbs-pr-marker--${marker.cls}`}>
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>{marker.icon}</span>
+          </span>
+          <span className={`bbs-pr-line bbs-pr-line--${belowCls}`} />
+        </div>
         <div className="bbs-pr-center">
           <span className="bbs-pr-title">{pack.title}</span>
           <span className="bbs-pr-support">{support}</span>
@@ -209,21 +219,34 @@ function SectionBlock({ section, sectionProgress, unlocked, packData, activePack
         </div>
       </div>
 
-      {/* Always-visible pack list */}
+      {/* Always-visible pack path */}
       <div className="bbs-block-packs">
-        {packData.map((pd) => (
-          <PackPathRow
-            key={pd.pack.id}
-            pack={pd.pack}
-            progress={pd.progress}
-            unlocked={pd.unlocked}
-            isExpanded={expandedPack === pd.pack.id}
-            isCurrent={pd.pack.id === activePackId}
-            lastMethod={lastMethods[pd.pack.id] || null}
-            onToggle={onTogglePack}
-            onLaunch={onLaunch}
-          />
-        ))}
+        {packData.map((pd, idx) => {
+          const isCompleted = pd.progress.completed;
+          const nextCompleted = idx < packData.length - 1 && packData[idx + 1].progress.completed;
+          const prevCompleted = idx > 0 && packData[idx - 1].progress.completed;
+          // Line above this node: 'done' if both this and previous are completed
+          const lineAbove = (isCompleted && prevCompleted) ? 'done' : (prevCompleted || (idx > 0 && packData[idx - 1].progress.wordsIntroducedCount > 0)) ? 'done' : 'pending';
+          // Line below this node: 'done' if this node is completed, 'pending' otherwise
+          const lineBelow = isCompleted ? 'done' : 'pending';
+          return (
+            <PackPathRow
+              key={pd.pack.id}
+              pack={pd.pack}
+              progress={pd.progress}
+              unlocked={pd.unlocked}
+              isExpanded={expandedPack === pd.pack.id}
+              isCurrent={pd.pack.id === activePackId}
+              lastMethod={lastMethods[pd.pack.id] || null}
+              onToggle={onTogglePack}
+              onLaunch={onLaunch}
+              isFirst={idx === 0}
+              isLast={idx === packData.length - 1}
+              lineAbove={lineAbove}
+              lineBelow={lineBelow}
+            />
+          );
+        })}
       </div>
     </div>
   );

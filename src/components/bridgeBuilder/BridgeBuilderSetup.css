@@ -99,13 +99,16 @@ body.dark-mode .bbs-block-packs { border-color: #1e293b; }
 
 /* Pack path rows */
 body.dark-mode .bbs-pr-row:hover:not(:disabled) { background: rgba(30, 41, 59, 0.6); }
-body.dark-mode .bbs-pr--open { background: #1e293b; }
-body.dark-mode .bbs-pr--current:not(.bbs-pr--open) { background: rgba(16, 185, 129, 0.06); }
-body.dark-mode .bbs-pr-marker--completed { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-body.dark-mode .bbs-pr-marker--current { background: #10b981; color: #020617; }
-body.dark-mode .bbs-pr-marker--upcoming { background: #1e293b; color: #64748b; }
-body.dark-mode .bbs-pr-marker--locked { background: rgba(51, 65, 85, 0.5); color: #475569; }
+body.dark-mode .bbs-pr--open { background: #1e293b; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
+body.dark-mode .bbs-pr--current:not(.bbs-pr--open) { background: rgba(16, 185, 129, 0.08); }
+body.dark-mode .bbs-pr-line--done { background: #10b981; }
+body.dark-mode .bbs-pr-line--pending { background: #334155; }
+body.dark-mode .bbs-pr-marker--completed { background: #10b981; color: #020617; }
+body.dark-mode .bbs-pr-marker--current { background: #10b981; color: #020617; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15), 0 2px 8px rgba(16, 185, 129, 0.3); }
+body.dark-mode .bbs-pr-marker--upcoming { background: #0f172a; color: #64748b; border-color: #475569; }
+body.dark-mode .bbs-pr-marker--locked { background: #0f172a; color: #475569; border-color: #334155; }
 body.dark-mode .bbs-pr-title { color: #f8fafc; }
+body.dark-mode .bbs-pr--done .bbs-pr-title { color: #64748b; }
 body.dark-mode .bbs-pr-support { color: #94a3b8; }
 body.dark-mode .bbs-pr-desc { color: #94a3b8; }
 
@@ -409,23 +412,24 @@ body.dark-mode .bbs-review-btn { background: #10b981; color: #020617; }
 /* ─── Pack list inside block ───────────────────────────── */
 .bbs-block-packs {
   border-top: 1px solid var(--m3-outline-variant-30);
-  padding: 6px 10px 10px;
+  padding: 4px 10px 10px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0; /* no gap — vertical connector lines bridge between rows */
 }
 
 /* ═══════════════════════════════════════════════════════════
-   Pack Path Row (Guided)
+   Pack Path Row (Guided) — learning-path node with connector
    ═══════════════════════════════════════════════════════════ */
 .bbs-pr {
   border-radius: 10px;
   transition: background 0.15s;
+  position: relative;
 }
 
 .bbs-pr--open {
   background: var(--m3-surface-container-lowest);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
 
 .bbs-pr--locked { opacity: 0.40; }
@@ -434,13 +438,13 @@ body.dark-mode .bbs-review-btn { background: #10b981; color: #020617; }
   background: var(--m3-primary-10);
 }
 
-/* Collapsed row button */
+/* Row button */
 .bbs-pr-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  padding: 10px 10px;
+  padding: 4px 10px 4px 6px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -457,20 +461,71 @@ body.dark-mode .bbs-review-btn { background: #10b981; color: #020617; }
 
 .bbs-pr-row:disabled { cursor: default; }
 
-/* State marker circle */
+/* ─── Rail: vertical connector + marker ────────────────── */
+.bbs-pr-rail {
+  flex-shrink: 0;
+  width: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+}
+
+/* Connector lines above and below marker */
+.bbs-pr-line {
+  flex: 1;
+  width: 3px;
+  min-height: 8px;
+  border-radius: 1.5px;
+}
+
+.bbs-pr-line--done {
+  background: var(--m3-primary);
+}
+
+.bbs-pr-line--pending {
+  background: var(--m3-outline-variant-30);
+}
+
+.bbs-pr-line--none {
+  background: transparent;
+}
+
+/* Marker node on the rail */
 .bbs-pr-marker {
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  position: relative;
+  z-index: 1;
 }
-.bbs-pr-marker--completed { background: var(--m3-primary-10); color: var(--m3-primary); }
-.bbs-pr-marker--current { background: var(--m3-primary); color: var(--m3-on-primary); }
-.bbs-pr-marker--upcoming { background: var(--m3-surface-container); color: var(--m3-outline); }
-.bbs-pr-marker--locked { background: var(--m3-outline-variant-30); color: var(--m3-outline); }
+
+.bbs-pr-marker--completed {
+  background: var(--m3-primary);
+  color: var(--m3-on-primary);
+}
+
+.bbs-pr-marker--current {
+  background: var(--m3-primary);
+  color: var(--m3-on-primary);
+  box-shadow: 0 0 0 4px var(--m3-primary-10), 0 2px 8px rgba(27, 107, 79, 0.25);
+}
+
+.bbs-pr-marker--upcoming {
+  background: var(--m3-surface-container-lowest);
+  color: var(--m3-outline);
+  border: 2px solid var(--m3-outline-variant);
+}
+
+.bbs-pr-marker--locked {
+  background: var(--m3-surface-container);
+  color: var(--m3-outline);
+  border: 2px solid var(--m3-outline-variant-30);
+}
 
 /* Title + support */
 .bbs-pr-center {
@@ -479,6 +534,7 @@ body.dark-mode .bbs-review-btn { background: #10b981; color: #020617; }
   display: flex;
   flex-direction: column;
   gap: 1px;
+  padding: 8px 0;
 }
 
 .bbs-pr-title {
@@ -486,6 +542,11 @@ body.dark-mode .bbs-review-btn { background: #10b981; color: #020617; }
   font-weight: 700;
   color: var(--m3-on-surface);
   line-height: 1.3;
+}
+
+/* Dim completed packs */
+.bbs-pr--done .bbs-pr-title {
+  color: var(--m3-on-surface-variant);
 }
 
 .bbs-pr-support {
@@ -497,7 +558,7 @@ body.dark-mode .bbs-review-btn { background: #10b981; color: #020617; }
 
 /* ─── Expanded detail ──────────────────────────────────── */
 .bbs-pr-expand {
-  padding: 0 10px 12px 48px; /* align with text after marker */
+  padding: 0 10px 14px 50px; /* 6px pad + 32px rail + 12px gap = 50px */
 }
 
 .bbs-pr-desc {
