@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
 import { getPacksBySection } from '../../data/bridgeBuilderPacks.js';
 import {
@@ -40,14 +40,13 @@ function getSectionMeta(sectionId) {
 /* ─── Status helpers ─────────────────────────────────────── */
 
 function getPackStatusInfo(progress, unlocked) {
-  const { wordsIntroducedCount, totalWords, completed } = progress;
   if (!unlocked) return { label: 'Locked', modifier: 'locked' };
-  if (completed) return { label: 'Completed', modifier: 'completed' };
-  if (wordsIntroducedCount > 0) return { label: 'In Progress', modifier: 'progress' };
+  if (progress.completed) return { label: 'Done', modifier: 'completed' };
+  if (progress.wordsIntroducedCount > 0) return { label: 'Started', modifier: 'progress' };
   return { label: 'New', modifier: 'new' };
 }
 
-/* ─── Game mode resolver (shared) ────────────────────────── */
+/* ─── Game mode resolver ─────────────────────────────────── */
 
 function resolveGameMode(completion, modeOverride) {
   const { bridgeBuilderComplete, loosePlanksComplete, deepScriptComplete } = completion;
@@ -62,9 +61,8 @@ function resolveGameMode(completion, modeOverride) {
 const LAST_METHOD_KEY = 'bbs_last_study_method';
 
 function getLastStudyMethods() {
-  try {
-    return JSON.parse(localStorage.getItem(LAST_METHOD_KEY) || '{}');
-  } catch { return {}; }
+  try { return JSON.parse(localStorage.getItem(LAST_METHOD_KEY) || '{}'); }
+  catch { return {}; }
 }
 
 function setLastStudyMethod(packId, method) {
@@ -73,17 +71,7 @@ function setLastStudyMethod(packId, method) {
   try { localStorage.setItem(LAST_METHOD_KEY, JSON.stringify(all)); } catch {}
 }
 
-/* ─── Pack state marker ──────────────────────────────────── */
-
-function getPackStateMarker(progress, unlocked, isActive) {
-  if (!unlocked) return { symbol: 'lock', cls: 'locked' };
-  if (progress.completed) return { symbol: 'check', cls: 'completed' };
-  if (isActive) return { symbol: 'play_arrow', cls: 'current' };
-  if (progress.wordsIntroducedCount > 0) return { symbol: 'play_arrow', cls: 'current' };
-  return { symbol: 'circle', cls: 'upcoming' };
-}
-
-/* ─── Support line builder ───────────────────────────────── */
+/* ─── Support line ───────────────────────────────────────── */
 
 function buildSupportLine(pack, progress) {
   const parts = [];
@@ -94,103 +82,88 @@ function buildSupportLine(pack, progress) {
   else if (progress.completed) parts.push('Complete');
   else parts.push(`${newCount} words`);
   if (pack.estimatedTimeSec) parts.push(formatEstimatedMinutes(pack.estimatedTimeSec));
-  return parts.join(' · ');
+  return parts.join(' \u00b7 ');
 }
 
-/* ─── Path Row Component (Guided view) ───────────────────── */
+/* ─── Pack state marker ──────────────────────────────────── */
 
-function PackPathRow({
-  pack, progress, unlocked, completion, isExpanded, isActive,
-  lastMethod, onToggle, onLaunch,
-}) {
-  const statusInfo = getPackStatusInfo(progress, unlocked);
-  const marker = getPackStateMarker(progress, unlocked, isActive);
-  const supportLine = buildSupportLine(pack, progress);
+function getPackMarker(progress, unlocked, isCurrent) {
+  if (!unlocked) return { icon: 'lock', cls: 'locked' };
+  if (progress.completed) return { icon: 'check', cls: 'completed' };
+  if (isCurrent || progress.wordsIntroducedCount > 0) return { icon: 'play_arrow', cls: 'current' };
+  return { icon: 'circle', cls: 'upcoming' };
+}
 
-  const handleRowClick = () => {
-    if (!unlocked) return;
-    onToggle(pack.id);
-  };
+/* ═══════════════════════════════════════════════════════════
+   PackPathRow — a single pack inside a section container
+   ═══════════════════════════════════════════════════════════ */
+
+function PackPathRow({ pack, progress, unlocked, isExpanded, isCurrent, lastMethod, onToggle, onLaunch }) {
+  const marker = getPackMarker(progress, unlocked, isCurrent);
+  const support = buildSupportLine(pack, progress);
 
   const handleLaunch = (method) => {
     if (!unlocked) return;
     onLaunch(pack, method);
   };
 
-  let rowCls = 'bbs-path-row';
-  if (isExpanded) rowCls += ' bbs-path-row--expanded';
-  if (!unlocked) rowCls += ' bbs-path-row--locked';
+  let cls = 'bbs-pr';
+  if (isExpanded) cls += ' bbs-pr--open';
+  if (!unlocked) cls += ' bbs-pr--locked';
+  if (isCurrent && !isExpanded) cls += ' bbs-pr--current';
 
   return (
-    <div className={rowCls}>
-      {/* Collapsed row */}
+    <div className={cls}>
       <button
         type="button"
-        className="bbs-path-row-collapsed"
-        onClick={handleRowClick}
+        className="bbs-pr-row"
+        onClick={() => unlocked && onToggle(pack.id)}
         disabled={!unlocked}
       >
-        {/* State marker */}
-        <span className={`bbs-path-marker bbs-path-marker--${marker.cls}`}>
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-            {marker.symbol}
-          </span>
+        <span className={`bbs-pr-marker bbs-pr-marker--${marker.cls}`}>
+          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>{marker.icon}</span>
         </span>
-
-        {/* Center: title + support */}
-        <div className="bbs-path-row-center">
-          <span className="bbs-path-row-title">{pack.title}</span>
-          <span className="bbs-path-row-support">{supportLine}</span>
+        <div className="bbs-pr-center">
+          <span className="bbs-pr-title">{pack.title}</span>
+          <span className="bbs-pr-support">{support}</span>
         </div>
-
-        {/* Right: status text */}
-        <span className={`bbs-status-pill bbs-status-pill--${statusInfo.modifier}`}>
-          {statusInfo.label}
-        </span>
       </button>
 
-      {/* Expanded detail */}
       {isExpanded && (
-        <div className="bbs-path-row-detail">
-          {pack.description && (
-            <p className="bbs-path-row-desc">{pack.description}</p>
-          )}
-
-          {/* Study method buttons */}
-          <div className="bbs-study-methods">
+        <div className="bbs-pr-expand">
+          {pack.description && <p className="bbs-pr-desc">{pack.description}</p>}
+          <div className="bbs-pr-methods">
             <button
               type="button"
-              className={`bbs-study-method-btn ${lastMethod === 'vocab' ? 'bbs-study-method-btn--last' : ''}`}
+              className={`bbs-method ${lastMethod === 'vocab' ? 'bbs-method--last' : ''}`}
               onClick={() => handleLaunch('vocab')}
             >
-              <span className="material-symbols-outlined bbs-study-method-icon">conversion_path</span>
-              <div className="bbs-study-method-info">
-                <span className="bbs-study-method-label">
+              <span className="material-symbols-outlined bbs-method-ic">conversion_path</span>
+              <div className="bbs-method-text">
+                <span className="bbs-method-name">
                   {lastMethod === 'vocab' ? 'Continue Vocab Builder' : 'Vocab Builder'}
                 </span>
-                <span className="bbs-study-method-hint">Structured pack practice</span>
+                <span className="bbs-method-sub">Structured pack practice</span>
               </div>
-              <span className="material-symbols-outlined bbs-study-method-arrow">arrow_forward</span>
+              <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
             </button>
-
             <button
               type="button"
-              className={`bbs-study-method-btn ${lastMethod === 'deep_script' ? 'bbs-study-method-btn--last' : ''}`}
+              className={`bbs-method ${lastMethod === 'deep_script' ? 'bbs-method--last' : ''}`}
               onClick={() => handleLaunch('deep_script')}
             >
-              <span className="material-symbols-outlined bbs-study-method-icon">ink_pen</span>
-              <div className="bbs-study-method-info">
-                <span className="bbs-study-method-label">
+              <span className="material-symbols-outlined bbs-method-ic">ink_pen</span>
+              <div className="bbs-method-text">
+                <span className="bbs-method-name">
                   {lastMethod === 'deep_script' ? 'Continue Deep Script' : 'Deep Script Floor'}
                 </span>
-                <span className="bbs-study-method-hint">A dungeon floor built from this pack</span>
+                <span className="bbs-method-sub">A dungeon floor built from this pack</span>
               </div>
-              <span className="material-symbols-outlined bbs-study-method-arrow">arrow_forward</span>
+              <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
             </button>
           </div>
-
           {lastMethod && (
-            <div className="bbs-path-row-last-used">
+            <div className="bbs-pr-hint">
               Last used: {lastMethod === 'deep_script' ? 'Deep Script' : 'Vocab Builder'}
             </div>
           )}
@@ -200,7 +173,65 @@ function PackPathRow({
   );
 }
 
-/* ─── Progress Dots (kept for Browse / Expert views) ─────── */
+/* ═══════════════════════════════════════════════════════════
+   SectionBlock — always-visible container for a section
+   ═══════════════════════════════════════════════════════════ */
+
+function SectionBlock({ section, sectionProgress, unlocked, packData, activePackId, expandedPack, lastMethods, onTogglePack, onLaunch }) {
+  const { packsCompleted, totalPacks } = sectionProgress;
+  const meta = getSectionMeta(section.id);
+  const accent = meta.accent;
+  const progressPct = totalPacks > 0 ? (packsCompleted / totalPacks) * 100 : 0;
+
+  let blockCls = 'bbs-block';
+  if (!unlocked) blockCls += ' bbs-block--locked';
+
+  return (
+    <div className={blockCls}>
+      {/* Section header */}
+      <div className="bbs-block-header">
+        <div className={`bbs-block-icon bbs-block-icon--${accent}`}>
+          <span className="material-symbols-outlined" style={{ fontSize: 22 }}>{meta.icon}</span>
+        </div>
+        <div className="bbs-block-info">
+          <div className="bbs-block-top">
+            <h3 className="bbs-block-title">{section.title}</h3>
+            <span className={`bbs-block-count bbs-block-count--${accent}`}>
+              {unlocked ? `${packsCompleted}/${totalPacks}` : `${totalPacks} packs`}
+            </span>
+          </div>
+          <p className="bbs-block-desc">{section.description}</p>
+          <div className="bbs-block-bar">
+            <div className="bbs-block-track">
+              <div className={`bbs-block-fill bbs-block-fill--${accent}`} style={{ width: `${progressPct}%` }} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Always-visible pack list */}
+      <div className="bbs-block-packs">
+        {packData.map((pd) => (
+          <PackPathRow
+            key={pd.pack.id}
+            pack={pd.pack}
+            progress={pd.progress}
+            unlocked={pd.unlocked}
+            isExpanded={expandedPack === pd.pack.id}
+            isCurrent={pd.pack.id === activePackId}
+            lastMethod={lastMethods[pd.pack.id] || null}
+            onToggle={onTogglePack}
+            onLaunch={onLaunch}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Components kept for Browse / Expert views only
+   ═══════════════════════════════════════════════════════════ */
 
 function ProgressDots({ completion, modeOverride, unlocked, packId, onDotClick }) {
   const { bridgeBuilderComplete, loosePlanksComplete, deepScriptComplete } = completion;
@@ -209,7 +240,6 @@ function ProgressDots({ completion, modeOverride, unlocked, packId, onDotClick }
     { complete: loosePlanksComplete, override: modeOverride === 'loose_planks', mode: 'loose_planks', icon: 'view_stream', label: 'Loose Planks' },
     { complete: deepScriptComplete, override: modeOverride === 'deep_script', mode: 'deep_script', icon: 'ink_pen', label: 'Deep Script' },
   ];
-
   return (
     <div className="bbs-dots" aria-label="Progress dots">
       {dots.map((dot, i) => {
@@ -217,18 +247,9 @@ function ProgressDots({ completion, modeOverride, unlocked, packId, onDotClick }
         if (dot.override) cls += ' bbs-dot--override';
         else if (dot.complete) cls += ' bbs-dot--complete';
         return (
-          <button
-            key={i}
-            type="button"
-            className="bbs-dot-mode"
-            disabled={!unlocked}
-            aria-label={dot.label}
-            aria-pressed={dot.override}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (unlocked && onDotClick) onDotClick(packId, dot.mode);
-            }}
-          >
+          <button key={i} type="button" className="bbs-dot-mode" disabled={!unlocked}
+            aria-label={dot.label} aria-pressed={dot.override}
+            onClick={(e) => { e.stopPropagation(); if (unlocked && onDotClick) onDotClick(packId, dot.mode); }}>
             <span className={cls} />
             <span className="material-symbols-outlined bbs-dot-mode-icon" aria-hidden="true">{dot.icon}</span>
           </button>
@@ -238,59 +259,37 @@ function ProgressDots({ completion, modeOverride, unlocked, packId, onDotClick }
   );
 }
 
-/* ─── Status Pill ────────────────────────────────────────── */
-
-function StatusPill({ modifier, label }) {
-  return (
-    <span className={`bbs-status-pill bbs-status-pill--${modifier}`}>
-      {label}
-    </span>
-  );
-}
-
-/* ─── Pack Row (used in Browse / Expert views) ──────────── */
-
 function PackRow({ pack, progress, unlocked, completion, modeOverride, onDotClick, onPlay, compact = false, entryPoint = 'guided' }) {
-  const { wordsIntroducedCount, wordsLearnedCount, totalWords, completed } = progress;
+  const { completed } = progress;
   const statusInfo = getPackStatusInfo(progress, unlocked);
   const buttonLabel = getPackButtonLabel(progress);
-
   const handlePlay = (e) => {
     e.stopPropagation();
     if (!unlocked) return;
     const gameMode = resolveGameMode(completion, modeOverride);
     const session = getRecommendedSessionForPack(pack);
     onPlay({
-      sessionType: 'guided_pack',
-      packId: pack.id,
-      sessionId: session?.id || null,
+      sessionType: 'guided_pack', packId: pack.id, sessionId: session?.id || null,
       selectedWordIds: session ? [...session.targetWordIds, ...session.supportWordIds] : pack.wordIds,
-      gameMode,
-      entryPoint,
+      gameMode, entryPoint,
       targetsNewCount: pack.targetsNewCount || pack.wordIds.length,
       supportReviewCount: pack.supportReviewCount || 0,
       estimatedTimeSec: pack.estimatedTimeSec || 0,
     });
   };
-
   let rowCls = 'bbs-pack-row';
   if (!unlocked) rowCls += ' bbs-pack-row--locked';
-
   return (
     <div className={rowCls}>
       <div className={`bbs-pack-row-icon ${compact ? 'bbs-pack-row-icon--compact' : ''}`}>
-        <span className="bbs-pack-row-emoji">
-          {!unlocked ? '\ud83d\udd12' : completed ? '\u2705' : '\ud83d\udce6'}
-        </span>
+        <span className="bbs-pack-row-emoji">{!unlocked ? '\ud83d\udd12' : completed ? '\u2705' : '\ud83d\udce6'}</span>
       </div>
       <div className="bbs-pack-row-body">
         <div className="bbs-pack-row-top">
           <span className="bbs-pack-row-title">{pack.title}</span>
-          <StatusPill modifier={statusInfo.modifier} label={statusInfo.label} />
+          <span className={`bbs-status-pill bbs-status-pill--${statusInfo.modifier}`}>{statusInfo.label}</span>
         </div>
-        {!compact && (
-          <div className="bbs-pack-row-subtitle">{pack.description}</div>
-        )}
+        {!compact && <div className="bbs-pack-row-subtitle">{pack.description}</div>}
         <div className="bbs-pack-meta">
           <span className="bbs-pack-chip">{pack.primaryType || 'mixed'}</span>
           <span className="bbs-pack-chip">{pack.difficultyBand || 'Core'}</span>
@@ -300,110 +299,31 @@ function PackRow({ pack, progress, unlocked, completion, modeOverride, onDotClic
         </div>
         {!compact && <div className="bbs-pack-why">{pack.whyItMatters}</div>}
         <div className="bbs-pack-row-bottom">
-          <ProgressDots
-            completion={completion}
-            modeOverride={modeOverride}
-            unlocked={unlocked}
-            packId={pack.id}
-            onDotClick={onDotClick}
-          />
-          {unlocked && (
-            <button type="button" className="bbs-action-btn" onClick={handlePlay}>
-              {buttonLabel}
-            </button>
-          )}
+          <ProgressDots completion={completion} modeOverride={modeOverride} unlocked={unlocked} packId={pack.id} onDotClick={onDotClick} />
+          {unlocked && <button type="button" className="bbs-action-btn" onClick={handlePlay}>{buttonLabel}</button>}
         </div>
       </div>
     </div>
   );
 }
 
-/* ─── Section Card ────────────────────────────────────────── */
-
-function SectionCard({ section, sectionProgress, unlocked, expanded, onToggle }) {
-  const { packsCompleted, totalPacks } = sectionProgress;
-  const meta = getSectionMeta(section.id);
-  const accent = meta.accent;
-
-  const progressPercent = totalPacks > 0 ? (packsCompleted / totalPacks) * 100 : 0;
-
-  let packCountLabel;
-  if (!unlocked) {
-    packCountLabel = `${totalPacks} packs`;
-  } else {
-    packCountLabel = `${packsCompleted}/${totalPacks} packs`;
-  }
-
-  let cardCls = 'bbs-section-card';
-  if (!unlocked) cardCls += ' bbs-section-card--locked';
-  if (expanded) cardCls += ' bbs-section-card--expanded';
-
-  return (
-    <button
-      type="button"
-      className={cardCls}
-      onClick={() => unlocked && onToggle(section.id)}
-      disabled={!unlocked}
-    >
-      <div className={`bbs-section-icon bbs-section-icon--${accent}`}>
-        <span className="material-symbols-outlined" style={{ fontSize: 30 }}>{meta.icon}</span>
-      </div>
-      <div className="bbs-section-info">
-        <div className="bbs-section-top-row">
-          <h3 className="bbs-section-card-title">{section.title}</h3>
-          <span className={`bbs-pack-count-pill bbs-pack-count-pill--${accent}`}>
-            {packCountLabel}
-          </span>
-        </div>
-        <p className="bbs-section-desc">{section.description}</p>
-        <div className="bbs-section-bottom">
-          <div className="bbs-progress-track">
-            <div
-              className={`bbs-progress-fill bbs-progress-fill--${accent}`}
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-          {unlocked && (
-            <span className={`bbs-continue-link bbs-continue-link--${accent}`}>
-              {packsCompleted >= totalPacks ? 'Review' : 'Continue'}
-              {' '}
-              <span className="material-symbols-outlined" style={{ fontSize: 14 }}>arrow_forward</span>
-            </span>
-          )}
-        </div>
-      </div>
-    </button>
-  );
-}
-
-/* ─── Random Review Card ──────────────────────────────────── */
+/* ─── Review Card ────────────────────────────────────────── */
 
 function ReviewCard({ dueCount, weakCount, onPlay }) {
   const available = dueCount > 0 || weakCount > 0;
-
-  let cardCls = 'bbs-review-card';
-  if (!available) cardCls += ' bbs-review-card--disabled';
-
   return (
     <div className="bbs-review-wrap">
-      <div className={cardCls}>
+      <div className={`bbs-review-card ${!available ? 'bbs-review-card--disabled' : ''}`}>
         <div className="bbs-review-icon-wrap">
           <span className="material-symbols-outlined" style={{ fontSize: 36, color: 'var(--m3-primary)', fontVariationSettings: "'FILL' 1" }}>casino</span>
         </div>
         <div className="bbs-review-info">
           <h3 className="bbs-review-title">Review Due Now</h3>
           <p className="bbs-review-desc">
-            {available
-              ? `${dueCount} due · ${weakCount} weak items`
-              : 'Complete a pack first to unlock review.'}
+            {available ? `${dueCount} due \u00b7 ${weakCount} weak items` : 'Complete a pack first to unlock review.'}
           </p>
         </div>
-        <button
-          type="button"
-          className="bbs-review-btn"
-          onClick={() => available && onPlay()}
-          disabled={!available}
-        >
+        <button type="button" className="bbs-review-btn" onClick={() => available && onPlay()} disabled={!available}>
           Start Due Review
         </button>
       </div>
@@ -411,14 +331,15 @@ function ReviewCard({ dueCount, weakCount, onPlay }) {
   );
 }
 
-/* ─── Main Setup Screen ──────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   Main Setup Screen
+   ═══════════════════════════════════════════════════════════ */
 
 export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const [goalFilter, setGoalFilter] = useState('all');
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState('recommended');
-  const [activeSubview, setActiveSubview] = useState(null); // goal | expert | null
-  const [expandedSection, setExpandedSection] = useState(null);
+  const [activeSubview, setActiveSubview] = useState(null);
   const [expandedPack, setExpandedPack] = useState(null);
   const [modeOverrides, setModeOverrides] = useState({});
   const [lastMethods, setLastMethods] = useState(() => getLastStudyMethods());
@@ -445,16 +366,13 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     });
   }, [sections, allProgress, packCompletions]);
 
-  /* Find the recommended (current/active) pack across all sections */
+  /* The single "current" pack across all sections */
   const activePackId = useMemo(() => {
     for (const sd of sectionData) {
       for (const pd of sd.packData) {
-        if (pd.unlocked && pd.progress.wordsIntroducedCount > 0 && !pd.progress.completed) {
-          return pd.pack.id;
-        }
+        if (pd.unlocked && pd.progress.wordsIntroducedCount > 0 && !pd.progress.completed) return pd.pack.id;
       }
     }
-    // Fallback: first unlocked incomplete pack
     for (const sd of sectionData) {
       for (const pd of sd.packData) {
         if (pd.unlocked && !pd.progress.completed) return pd.pack.id;
@@ -463,22 +381,13 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     return null;
   }, [sectionData]);
 
-  const handleToggleSection = useCallback((sectionId) => {
-    setExpandedSection(prev => prev === sectionId ? null : sectionId);
-    setExpandedPack(null); // collapse any expanded pack when switching sections
-  }, []);
-
   const handleTogglePack = useCallback((packId) => {
     setExpandedPack(prev => prev === packId ? null : packId);
   }, []);
 
   const handleDotClick = useCallback((packId, mode) => {
     setModeOverrides(prev => {
-      if (prev[packId] === mode) {
-        const next = { ...prev };
-        delete next[packId];
-        return next;
-      }
+      if (prev[packId] === mode) { const next = { ...prev }; delete next[packId]; return next; }
       return { ...prev, [packId]: mode };
     });
   }, []);
@@ -488,33 +397,23 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     onPlay(sessionConfig);
   }, [onPlay]);
 
-  /* Launch a pack in a specific study method from the path row */
   const handleLaunchPackMethod = useCallback((pack, method) => {
     const session = getRecommendedSessionForPack(pack);
     const completion = packCompletions[pack.id] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
-
     let gameMode;
     if (method === 'deep_script') {
       gameMode = 'deep_script';
     } else {
-      // Vocab Builder: use natural progression (bridge_builder → loose_planks)
       gameMode = resolveGameMode(completion, null);
-      // But don't auto-promote to deep_script — that's the explicit DS button
       if (gameMode === 'deep_script') gameMode = 'bridge_builder';
     }
-
-    // Remember this choice
     setLastStudyMethod(pack.id, method);
     setLastMethods(prev => ({ ...prev, [pack.id]: method }));
-
     emit('analytics:bridge_setup', { event: 'session_start', method, packId: pack.id, gameMode });
     onPlay({
-      sessionType: 'guided_pack',
-      packId: pack.id,
-      sessionId: session?.id || null,
+      sessionType: 'guided_pack', packId: pack.id, sessionId: session?.id || null,
       selectedWordIds: session ? [...session.targetWordIds, ...session.supportWordIds] : pack.wordIds,
-      gameMode,
-      entryPoint: 'guided',
+      gameMode, entryPoint: 'guided',
       targetsNewCount: pack.targetsNewCount || pack.wordIds.length,
       supportReviewCount: pack.supportReviewCount || 0,
       estimatedTimeSec: pack.estimatedTimeSec || 0,
@@ -524,23 +423,12 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const handlePlayReview = useCallback(() => {
     const reviewIds = dueReviewWordIds.length > 0 ? dueReviewWordIds : weakWordIds;
     emit('analytics:bridge_setup', { event: 'review_start', dueCount: dueReviewWordIds.length, weakCount: weakWordIds.length });
-    onPlay({
-      sessionType: 'due_review',
-      packId: null,
-      selectedWordIds: reviewIds,
-      gameMode: 'bridge_builder',
-      entryPoint: 'review_due',
-    });
+    onPlay({ sessionType: 'due_review', packId: null, selectedWordIds: reviewIds, gameMode: 'bridge_builder', entryPoint: 'review_due' });
   }, [onPlay, dueReviewWordIds, weakWordIds]);
 
-  const allUnlockedPackData = useMemo(
-    () => sectionData.flatMap(sd => sd.packData).filter(pd => pd.unlocked),
-    [sectionData]
-  );
-  const goalModePackData = useMemo(
-    () => allUnlockedPackData.filter(pd => matchesGoal(pd.pack, goalFilter)),
-    [allUnlockedPackData, goalFilter]
-  );
+  /* Browse / Expert data */
+  const allUnlockedPackData = useMemo(() => sectionData.flatMap(sd => sd.packData).filter(pd => pd.unlocked), [sectionData]);
+  const goalModePackData = useMemo(() => allUnlockedPackData.filter(pd => matchesGoal(pd.pack, goalFilter)), [allUnlockedPackData, goalFilter]);
   const expertModePackData = useMemo(() => {
     const filtered = allUnlockedPackData.filter(pd => matchesQuery(pd.pack, query));
     return sortPackData(filtered, sortBy);
@@ -549,33 +437,18 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   return (
     <div className="bbs-screen">
       <div className="bbs-content">
-        {/* Header */}
         <div className="bbs-header">
           <h1 className="bbs-title">Vocab Builder</h1>
           <p className="bbs-subtitle">Your learning path</p>
         </div>
+
         <div className="bbs-mode-tabs" role="tablist" aria-label="Browse modes">
-          <button
-            type="button"
-            className={`bbs-mode-tab ${activeSubview === null ? 'active' : ''}`}
-            onClick={() => setActiveSubview(null)}
-          >
-            Guided
-          </button>
-          <button
-            type="button"
-            className={`bbs-mode-tab ${activeSubview === 'goal' ? 'active' : ''}`}
-            onClick={() => { setActiveSubview('goal'); emit('analytics:bridge_setup', { event: 'open_goal_browse' }); }}
-          >
-            Browse by goal
-          </button>
-          <button
-            type="button"
-            className={`bbs-mode-tab ${activeSubview === 'expert' ? 'active' : ''}`}
-            onClick={() => { setActiveSubview('expert'); emit('analytics:bridge_setup', { event: 'open_expert_browse' }); }}
-          >
-            Advanced tools
-          </button>
+          <button type="button" className={`bbs-mode-tab ${activeSubview === null ? 'active' : ''}`}
+            onClick={() => setActiveSubview(null)}>Guided</button>
+          <button type="button" className={`bbs-mode-tab ${activeSubview === 'goal' ? 'active' : ''}`}
+            onClick={() => { setActiveSubview('goal'); emit('analytics:bridge_setup', { event: 'open_goal_browse' }); }}>Browse by goal</button>
+          <button type="button" className={`bbs-mode-tab ${activeSubview === 'expert' ? 'active' : ''}`}
+            onClick={() => { setActiveSubview('expert'); emit('analytics:bridge_setup', { event: 'open_expert_browse' }); }}>Advanced tools</button>
         </div>
 
         {/* Browse by Goal */}
@@ -585,33 +458,17 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
             <button type="button" className="bbs-subview-close" onClick={() => setActiveSubview(null)}>Back to guided</button>
             <div className="bbs-goal-filters">
               {GOAL_FILTERS.map(goal => (
-                <button
-                  key={goal.id}
-                  type="button"
-                  className={`bbs-goal-chip ${goalFilter === goal.id ? 'active' : ''}`}
-                  onClick={() => {
-                    setGoalFilter(goal.id);
-                    emit('analytics:bridge_setup', { event: 'goal_filter_change', goalId: goal.id });
-                  }}
-                >
+                <button key={goal.id} type="button" className={`bbs-goal-chip ${goalFilter === goal.id ? 'active' : ''}`}
+                  onClick={() => { setGoalFilter(goal.id); emit('analytics:bridge_setup', { event: 'goal_filter_change', goalId: goal.id }); }}>
                   {goal.label}
                 </button>
               ))}
             </div>
             <div className="bbs-upnext-list">
               {goalModePackData.slice(0, 12).map(pd => (
-                <PackRow
-                  key={pd.pack.id}
-                  pack={pd.pack}
-                  progress={pd.progress}
-                  unlocked={pd.unlocked}
-                  completion={pd.completion}
-                  modeOverride={modeOverrides[pd.pack.id] || null}
-                  onDotClick={handleDotClick}
-                  onPlay={handlePlayPack}
-                  compact
-                  entryPoint="goal_browse"
-                />
+                <PackRow key={pd.pack.id} pack={pd.pack} progress={pd.progress} unlocked={pd.unlocked}
+                  completion={pd.completion} modeOverride={modeOverrides[pd.pack.id] || null}
+                  onDotClick={handleDotClick} onPlay={handlePlayPack} compact entryPoint="goal_browse" />
               ))}
             </div>
           </div>
@@ -623,21 +480,9 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
             <h3 className="bbs-mode-title">Search & filter your library</h3>
             <button type="button" className="bbs-subview-close" onClick={() => setActiveSubview(null)}>Back to guided</button>
             <div className="bbs-expert-controls">
-              <input
-                type="search"
-                className="bbs-search"
-                placeholder="Search packs or goals"
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  emit('analytics:bridge_setup', { event: 'expert_search_change', queryLength: e.target.value.length });
-                }}
-              />
-              <select className="bbs-sort" value={sortBy} onChange={(e) => {
-                setSortBy(e.target.value);
-                emit('analytics:bridge_setup', { event: 'expert_sort_change', sortBy: e.target.value });
-                e.target.blur();
-              }}>
+              <input type="search" className="bbs-search" placeholder="Search packs or goals" value={query}
+                onChange={(e) => { setQuery(e.target.value); emit('analytics:bridge_setup', { event: 'expert_search_change', queryLength: e.target.value.length }); }} />
+              <select className="bbs-sort" value={sortBy} onChange={(e) => { setSortBy(e.target.value); emit('analytics:bridge_setup', { event: 'expert_sort_change', sortBy: e.target.value }); e.target.blur(); }}>
                 <option value="recommended">Recommended</option>
                 <option value="time">Shortest time</option>
                 <option value="difficulty">Difficulty</option>
@@ -645,63 +490,34 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
             </div>
             <div className="bbs-upnext-list">
               {expertModePackData.slice(0, 20).map(pd => (
-                <PackRow
-                  key={pd.pack.id}
-                  pack={pd.pack}
-                  progress={pd.progress}
-                  unlocked={pd.unlocked}
-                  completion={pd.completion}
-                  modeOverride={modeOverrides[pd.pack.id] || null}
-                  onDotClick={handleDotClick}
-                  onPlay={handlePlayPack}
-                  compact
-                  entryPoint="expert_browse"
-                />
+                <PackRow key={pd.pack.id} pack={pd.pack} progress={pd.progress} unlocked={pd.unlocked}
+                  completion={pd.completion} modeOverride={modeOverrides[pd.pack.id] || null}
+                  onDotClick={handleDotClick} onPlay={handlePlayPack} compact entryPoint="expert_browse" />
               ))}
             </div>
           </div>
         )}
 
-        {/* ─── Guided Path View ───────────────────────────────── */}
+        {/* ─── Guided: always-visible section blocks ─────────── */}
         {activeSubview === null && (
-          <>
-            {sectionData.map(({ section, sectionProgress, unlocked, packData }) => {
-              const isExpanded = expandedSection === section.id && unlocked;
-
-              return (
-                <section key={section.id} className="bbs-section">
-                  <SectionCard
-                    section={section}
-                    sectionProgress={sectionProgress}
-                    unlocked={unlocked}
-                    expanded={isExpanded}
-                    onToggle={handleToggleSection}
-                  />
-                  {isExpanded && (
-                    <div className="bbs-expanded-area bbs-path-list">
-                      {packData.map((pd) => (
-                        <PackPathRow
-                          key={pd.pack.id}
-                          pack={pd.pack}
-                          progress={pd.progress}
-                          unlocked={pd.unlocked}
-                          completion={pd.completion}
-                          isExpanded={expandedPack === pd.pack.id}
-                          isActive={pd.pack.id === activePackId}
-                          lastMethod={lastMethods[pd.pack.id] || null}
-                          onToggle={handleTogglePack}
-                          onLaunch={handleLaunchPackMethod}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </section>
-              );
-            })}
-          </>
+          <div className="bbs-guided">
+            {sectionData.map(({ section, sectionProgress, unlocked, packData }) => (
+              <SectionBlock
+                key={section.id}
+                section={section}
+                sectionProgress={sectionProgress}
+                unlocked={unlocked}
+                packData={packData}
+                activePackId={activePackId}
+                expandedPack={expandedPack}
+                lastMethods={lastMethods}
+                onTogglePack={handleTogglePack}
+                onLaunch={handleLaunchPackMethod}
+              />
+            ))}
+          </div>
         )}
 
-        {/* Random Review */}
         <ReviewCard dueCount={dueReviewWordIds.length} weakCount={weakWordIds.length} onPlay={handlePlayReview} />
       </div>
     </div>
