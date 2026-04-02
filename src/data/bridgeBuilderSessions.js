@@ -17,7 +17,7 @@ export function getSessionsForPack(pack) {
     packId: pack.id,
     title: chunks.length > 1 ? `${pack.title} · Part ${idx + 1}` : pack.title,
     targetWordIds,
-    supportWordIds: [],
+    supportWordIds: pack.supportWordIds || [],
     estimatedTimeSec: Math.max(60, Math.round((pack.estimatedTimeSec || 180) / chunks.length)),
     type: pack.primaryType || 'mixed',
     difficultyBand: pack.difficultyBand || 'Core',
