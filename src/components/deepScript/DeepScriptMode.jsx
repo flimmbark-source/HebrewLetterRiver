@@ -31,6 +31,30 @@ function collectFloorWordIds(floor) {
   return wordIds;
 }
 
+function collectCombatWordIds(floor) {
+  if (!floor?.chambers) return new Set();
+  const wordIds = new Set();
+  for (const chamber of floor.chambers.values()) {
+    if (chamber?.type === CHAMBER_TYPES.COMBAT && chamber?.payload?.wordId) {
+      wordIds.add(chamber.payload.wordId);
+    }
+  }
+  return wordIds;
+}
+
+function mergeUniqueWordIds(existing = [], nextIds = []) {
+  const merged = new Set(existing || []);
+  for (const wordId of nextIds || []) {
+    if (wordId) merged.add(wordId);
+  }
+  return Array.from(merged);
+}
+
+function getGuidedCombatCount(packSize) {
+  if (packSize <= 0) return 3;
+  return Math.min(4, Math.max(3, Math.ceil(packSize / 2)));
+}
+
 export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGuidedPackRun = false, languageId = 'hebrew' }) {
   const hasCustomWordPool = !!(packWords && packWords.length > 0);
   const isHebrew = languageId === 'hebrew';
@@ -59,7 +83,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   const [activeMiniGame, setActiveMiniGame] = useState(null); // { chamberId, miniGameId }
   const [hasCompletedCapsulesMiniGameThisFloor, setHasCompletedCapsulesMiniGameThisFloor] = useState(false);
   const [isMemoryGateUnlocked, setIsMemoryGateUnlocked] = useState(false);
-  const [floorMiniGameWords, setFloorMiniGameWords] = useState(null); // 3 words shared by capsules + pillar per floor
+  const [floorMiniGameWords, setFloorMiniGameWords] = useState(null); // guided runs use remaining pack words; endless runs keep a smaller shared word set
   runStateRef.current = runState;
 
   // Get the default DS word pool for the active language
@@ -75,8 +99,21 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     return convertBBWordsForDS(getWordsByIds(pack.wordIds));
   }, [isHebrew, langDSWords]);
 
+  const markWordsSeen = useCallback((wordIds = []) => {
+    if (wordIds.length === 0) return;
+    setRunState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        wordsSeen: mergeUniqueWordIds(prev.wordsSeen, wordIds),
+      };
+    });
+  }, []);
+
   const createFloorForNumber = useCallback((targetFloorNumber) => {
-    const combatCount = Math.min(6, 3 + Math.floor((targetFloorNumber - 1) / 2));
+    const combatCount = isGuidedPackRun && hasCustomWordPool
+      ? getGuidedCombatCount(packWords.length)
+      : Math.min(6, 3 + Math.floor((targetFloorNumber - 1) / 2));
     let floorWordPool;
     if (isGuidedPackRun) {
       floorWordPool = hasCustomWordPool ? packWords : null;
@@ -108,8 +145,27 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     return nextFloor;
   }, [getRandomPackWordsForFloor, hasCustomWordPool, isGuidedPackRun, isHebrew, langDSWords, packWords, wordSourceMode]);
 
-  // Pick 3 random words for minigames when a new floor is created
+  // Guided pack runs assign mini-games any pack words not surfaced as combat chambers.
+  // Endless runs keep the existing smaller shared mini-game selection.
   const pickMiniGameWords = useCallback((newFloor) => {
+    if (isGuidedPackRun && hasCustomWordPool) {
+      const combatWordIds = collectCombatWordIds(newFloor);
+      const remainingPackWords = packWords.filter(word =>
+        word &&
+        !word.isMiniboss &&
+        (word.meaning || word.english) &&
+        !combatWordIds.has(word.id)
+      );
+
+      if (remainingPackWords.length > 0) {
+        return remainingPackWords;
+      }
+
+      return packWords
+        .filter(word => word && !word.isMiniboss && (word.meaning || word.english))
+        .slice(0, Math.min(3, packWords.length));
+    }
+
     const wordIds = collectFloorWordIds(newFloor);
     const fallbackPool = isHebrew ? deepScriptWords : langDSWords;
     const pool = wordIds.size > 0
@@ -118,7 +174,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     const candidates = pool.filter(w => !w.isMiniboss && (w.meaning || w.english));
     const shuffled = [...candidates].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 3);
-  }, [isHebrew, langDSWords]);
+  }, [hasCustomWordPool, isGuidedPackRun, isHebrew, langDSWords, packWords]);
 
   // Add/remove body class for nav bar hiding; clean up custom words on unmount
   useEffect(() => {
@@ -148,6 +204,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     const newRun = createRunState(kit, [], []);
     // Add floor reference
     newRun.floor = newFloor;
+    newRun.wordsSeen = [];
 
     setRunState(newRun);
     setFloor(newFloor);
@@ -182,6 +239,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     // Auto-trigger combat in unresolved combat/miniboss chambers
     if (!chamber.resolved) {
       if (chamber.type === CHAMBER_TYPES.COMBAT || (chamber.type === CHAMBER_TYPES.MINIBOSS && isMemoryGateUnlocked)) {
+        if (chamber.type === CHAMBER_TYPES.COMBAT && chamber.payload?.wordId) {
+          markWordsSeen([chamber.payload.wordId]);
+        }
         // Small delay to let the room render first, then show battle transition
         setTimeout(() => {
           setActiveCombat({
@@ -202,19 +262,22 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         }, 600);
       }
     }
-  }, [floor, hasCompletedCapsulesMiniGameThisFloor, isMemoryGateUnlocked]);
+  }, [floor, hasCompletedCapsulesMiniGameThisFloor, isMemoryGateUnlocked, markWordsSeen]);
 
   // ─── Exploration: Trigger encounters from hotspots ────────
 
   const handleTriggerCombat = useCallback((wordId, chamberId) => {
     const chamber = floor?.chambers.get(chamberId);
+    if (chamber?.type === CHAMBER_TYPES.COMBAT && wordId) {
+      markWordsSeen([wordId]);
+    }
     setActiveCombat({
       wordId,
       chamberId,
       isMiniboss: chamber?.type === CHAMBER_TYPES.MINIBOSS,
     });
     setScreen('battle_transition');
-  }, [floor]);
+  }, [floor, markWordsSeen]);
 
   const handleBattleTransitionComplete = useCallback(() => {
     setScreen('combat');
@@ -423,6 +486,9 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setRunState(prev => ({
       ...prev,
       roomsCompleted: prev.roomsCompleted + 1,
+      wordsSeen: miniGameId === 'memory-gate'
+        ? prev.wordsSeen
+        : mergeUniqueWordIds(prev.wordsSeen, (floorMiniGameWords || []).map(word => word?.id)),
     }));
 
     if (miniGameId === 'capsules') {
@@ -433,7 +499,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     }
 
     setActiveMiniGame(null);
-  }, [activeMiniGame]);
+  }, [activeMiniGame, floorMiniGameWords]);
 
   const handleCloseMiniGame = useCallback(() => {
     setActiveMiniGame(null);
@@ -504,9 +570,18 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   }
 
   if (!runState || !floor) return null;
-  const floorWordPool = Array.from(collectFloorWordIds(floor))
+  const discoveredFloorWordPool = Array.from(collectFloorWordIds(floor))
     .map(id => getWordById(id))
     .filter(Boolean);
+  const floorWordPool = isGuidedPackRun && hasCustomWordPool
+    ? packWords.filter(Boolean)
+    : discoveredFloorWordPool;
+  const requiredMemoryGateWordIds = isGuidedPackRun && hasCustomWordPool
+    ? packWords.map(word => word?.id).filter(Boolean)
+    : [];
+  const seenWordIds = new Set(runState.wordsSeen || []);
+  const memoryGateWordsRemaining = requiredMemoryGateWordIds.filter(wordId => !seenWordIds.has(wordId)).length;
+  const canEnterMemoryGate = !isGuidedPackRun || memoryGateWordsRemaining === 0;
 
   // Battle transition
   if (screen === 'battle_transition' && activeCombat) {
@@ -523,7 +598,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   // Combat screen
   if (screen === 'combat' && activeCombat) {
     const guardianWords = floorWordPool
-      .filter(word => word && !word.isMiniboss)
+      .filter(word => word && (isGuidedPackRun || !word.isMiniboss))
       .map(word => ({
         id: word.id,
         hebrew: word.nativeScript || word.hebrew,
@@ -578,6 +653,8 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
         runState={runState}
         onOpenMenu={() => setIsPauseMenuOpen(true)}
         isMemoryGateUnlocked={isMemoryGateUnlocked}
+        canEnterMemoryGate={canEnterMemoryGate}
+        memoryGateWordsRemaining={memoryGateWordsRemaining}
       />
       {isPauseMenuOpen && (
         <div className="ds-pause-overlay" role="dialog" aria-modal="true" aria-label="Game menu">
