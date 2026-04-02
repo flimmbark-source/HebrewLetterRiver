@@ -93,7 +93,7 @@ export default function ExplorationScreen({
         setTransDir(null);
         setWalkPhase(null);
       }, 400);
-    }, 600);
+    }, 700);
   }, [transitioning, onMove, activeMiniGame, currentChamberId, floor, isMemoryGateUnlocked, canEnterMemoryGate]);
 
   // Click an interactable
