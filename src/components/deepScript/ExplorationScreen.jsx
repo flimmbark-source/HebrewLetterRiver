@@ -83,17 +83,23 @@ export default function ExplorationScreen({
     if (targetChamber?.type === CHAMBER_TYPES.MEMORY_GATE && !canEnterMemoryGate) return;
     setTransitioning(true);
     setTransDir(direction);
-    setWalkPhase('walking');
-    playFootstep();
-    setTimeout(() => {
-      onMove(chamberId);
-      setWalkPhase('arriving');
-      setTimeout(() => {
-        setTransitioning(false);
-        setTransDir(null);
-        setWalkPhase(null);
-      }, 400);
-    }, 1000);
+    // Let the browser paint the direction classes before starting the animation.
+    // Double-rAF ensures layout is flushed and the compositor layer is ready.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setWalkPhase('walking');
+        playFootstep();
+        setTimeout(() => {
+          onMove(chamberId);
+          setWalkPhase('arriving');
+          setTimeout(() => {
+            setTransitioning(false);
+            setTransDir(null);
+            setWalkPhase(null);
+          }, 400);
+        }, 1000);
+      });
+    });
   }, [transitioning, onMove, activeMiniGame, currentChamberId, floor, isMemoryGateUnlocked, canEnterMemoryGate]);
 
   // Click an interactable
