@@ -4069,12 +4069,12 @@
 
 .ds-explore--walking.ds-explore--trans-left .ds-explore-viewport {
   animation: ds-walk-bob 1s ease-in forwards;
-  transform-origin: 9% 38%;
+  transform-origin: 9% 30%;
 }
 
 .ds-explore--walking.ds-explore--trans-right .ds-explore-viewport {
   animation: ds-walk-bob 1s ease-in forwards;
-  transform-origin: 91% 38%;
+  transform-origin: 91% 30%;
 }
 
 .ds-explore--walking.ds-explore--trans-back .ds-explore-viewport {
