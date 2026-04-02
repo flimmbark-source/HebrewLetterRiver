@@ -3321,6 +3321,8 @@
   position: relative;
   overflow: hidden;
   min-height: 0;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .ds-explore-room {
@@ -4067,8 +4069,6 @@
 .ds-explore--walking.ds-explore--trans-right .ds-explore-viewport,
 .ds-explore--walking.ds-explore--trans-back .ds-explore-viewport {
   animation: ds-walk-bob 1s ease-in forwards;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
 }
 
 .ds-explore--walking.ds-explore--trans-forward .ds-explore-viewport {
