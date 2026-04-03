@@ -21,7 +21,7 @@ export default function PlayModeModal() {
 
   const handleDeepScript = () => {
     setShowPlayModal(false);
-    navigate('/bridge', { state: { deepScript: true } });
+    navigate('/deep-script');
   };
 
   const handleClose = () => {

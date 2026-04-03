@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import BridgeBuilderSetup from '../components/bridgeBuilder/BridgeBuilderSetup.jsx';
 import BridgeBuilderGame from '../components/bridgeBuilder/BridgeBuilderGame.jsx';
 import LoosePlanksGame from '../components/bridgeBuilder/LoosePlanksGame.jsx';
@@ -22,10 +22,8 @@ import { loadBridgeBuilderWords, getBridgeBuilderWordsSync } from '../data/bridg
  */
 export default function BridgeBuilderView() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { languageId } = useLanguage();
   const [sessionConfig, setSessionConfig] = useState(null);
-  const [showDeepScript, setShowDeepScript] = useState(false);
   const [langWordsReady, setLangWordsReady] = useState(languageId === 'hebrew');
   const isHebrew = languageId === 'hebrew';
 
@@ -48,15 +46,6 @@ export default function BridgeBuilderView() {
     [isHebrew, languageId, langWordsReady] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
-  // Open Deep Script directly when navigated with state
-  useEffect(() => {
-    if (location.state?.deepScript) {
-      setShowDeepScript(true);
-      // Clear the state so refreshing doesn't re-trigger
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location.state?.deepScript, navigate, location.pathname]);
-
   const handlePlay = (config) => {
     if (!isHebrew) {
       // For non-Hebrew languages, override selectedWordIds to use language pool
@@ -74,7 +63,6 @@ export default function BridgeBuilderView() {
 
   const handleBackToSetup = () => {
     setSessionConfig(null);
-    setShowDeepScript(false);
   };
 
   const handleBackToHome = () => {
@@ -131,23 +119,6 @@ export default function BridgeBuilderView() {
     }
     return null;
   }, [sessionConfig?.gameMode, sessionConfig?.selectedWordIds, getWordsFromPool]);
-
-  const endlessDSWords = useMemo(
-    () => convertBBWordsForDS(activeWordPool),
-    [activeWordPool]
-  );
-
-  // Standalone Deep Script (no pack)
-  if (showDeepScript) {
-    return (
-      <DeepScriptMode
-        onBack={handleBackToHome}
-        packWords={endlessDSWords}
-        isGuidedPackRun={false}
-        languageId={languageId}
-      />
-    );
-  }
 
   if (sessionConfig) {
     if (sessionConfig.gameMode === 'deep_script') {
