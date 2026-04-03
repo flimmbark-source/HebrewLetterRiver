@@ -73,23 +73,41 @@ function setLastStudyMethod(packId, method) {
 
 /* ─── Support line ───────────────────────────────────────── */
 
-function buildSupportLine(pack, progress) {
+function buildSupportLine(pack, progress, completion) {
+  const comp = completion || { loosePlanksComplete: false, deepScriptComplete: false };
+  const level = getCompletionLevel(comp);
+
+  if (level === 'full') return 'Complete';
+
   const parts = [];
+  if (level === 'partial') {
+    const done = comp.loosePlanksComplete ? 'Planks' : 'Deep Script';
+    parts.push(`${done} done`);
+  }
+
   const newCount = pack.targetsNewCount || pack.wordIds.length;
   const introduced = progress.wordsIntroducedCount || 0;
   const remaining = Math.max(0, newCount - introduced);
   if (remaining > 0) parts.push(`${remaining} new`);
-  else if (progress.completed) parts.push('Complete');
-  else parts.push(`${newCount} words`);
-  if (pack.estimatedTimeSec) parts.push(formatEstimatedMinutes(pack.estimatedTimeSec));
+  else if (parts.length === 0) parts.push(`${newCount} words`);
+
+  if (parts.length === 0 && pack.estimatedTimeSec) parts.push(formatEstimatedMinutes(pack.estimatedTimeSec));
+
   return parts.join(' \u00b7 ');
 }
 
 /* ─── Node state ─────────────────────────────────────────── */
 
-function getNodeState(progress, unlocked, isCurrent) {
+function getCompletionLevel(completion) {
+  const { loosePlanksComplete, deepScriptComplete } = completion || {};
+  if (loosePlanksComplete && deepScriptComplete) return 'full';
+  if (loosePlanksComplete || deepScriptComplete) return 'partial';
+  return 'none';
+}
+
+function getNodeState(progress, unlocked, isCurrent, completion) {
   if (!unlocked) return 'locked';
-  if (progress.completed) return 'completed';
+  if (getCompletionLevel(completion) === 'full') return 'completed';
   if (isCurrent || progress.wordsIntroducedCount > 0) return 'current';
   return 'upcoming';
 }
@@ -106,9 +124,12 @@ function getSnakePosition(index) {
    PathNode — a single node on the winding path
    ═══════════════════════════════════════════════════════════ */
 
-function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod, position, onToggle, onLaunch, accent }) {
-  const state = getNodeState(progress, unlocked, isCurrent);
-  const support = buildSupportLine(pack, progress);
+function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod, position, onToggle, onLaunch, accent, completion }) {
+  const defaultCompletion = { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
+  const comp = completion || defaultCompletion;
+  const state = getNodeState(progress, unlocked, isCurrent, comp);
+  const completionLevel = unlocked ? getCompletionLevel(comp) : 'none';
+  const support = buildSupportLine(pack, progress, comp);
 
   const handleLaunch = (method) => {
     if (!unlocked) return;
@@ -137,6 +158,12 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
           <span className={`bbs-node-circle bbs-node-circle--${state} bbs-node-circle--${accent}`}>
             <span className="material-symbols-outlined bbs-node-icon">{icon}</span>
           </span>
+          {unlocked && state !== 'locked' && (
+            <span className="bbs-completion-pips" aria-label={completionLevel === 'full' ? 'Fully completed' : completionLevel === 'partial' ? 'Partially completed' : 'Not completed'}>
+              <span className={`bbs-completion-pip ${comp.loosePlanksComplete ? 'bbs-completion-pip--done' : ''}`} title="Planks" />
+              <span className={`bbs-completion-pip ${comp.deepScriptComplete ? 'bbs-completion-pip--done' : ''}`} title="Deep Script" />
+            </span>
+          )}
         </button>
         <div className="bbs-node-label">
           <span className="bbs-node-title">{pack.title}</span>
@@ -249,7 +276,7 @@ function SectionBlock({ section, sectionProgress, unlocked, packData, activePack
         {packData.map((pd, idx) => {
           const pos = getSnakePosition(idx);
           const nextPos = idx < packData.length - 1 ? getSnakePosition(idx + 1) : null;
-          const connectorState = pd.progress.completed ? 'done' : 'pending';
+          const connectorState = getCompletionLevel(pd.completion || {}) === 'full' ? 'done' : 'pending';
 
           return (
             <React.Fragment key={pd.pack.id}>
@@ -264,6 +291,7 @@ function SectionBlock({ section, sectionProgress, unlocked, packData, activePack
                 onToggle={onTogglePack}
                 onLaunch={onLaunch}
                 accent={accent}
+                completion={pd.completion}
               />
               {nextPos && (
                 <PathConnector fromPos={pos} toPos={nextPos} state={connectorState} />
@@ -401,7 +429,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     const allPacks = sections.flatMap(s => getPacksBySection(s.id));
     return sections.map(section => {
       const packs = getPacksBySection(section.id);
-      const sectionProgress = getSectionProgress(section, packs, allProgress);
+      const sectionProgress = getSectionProgress(section, packs, allProgress, packCompletions);
       const unlocked = isSectionUnlocked(section, sections, allPacks, allProgress);
       const packData = packs.map(pack => ({
         pack,
