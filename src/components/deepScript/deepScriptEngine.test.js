@@ -12,6 +12,7 @@ import {
   ENEMY_TYPES,
   rollEnemyIntent,
   getIntentDisplay,
+  createDefaultRunStats,
 } from './deepScriptEngine.js';
 import { getStarterKit, starterKits } from '../../data/deepScript/starterKits.js';
 import { getSharedGear, gearDefinitions } from '../../data/deepScript/gear.js';
@@ -82,6 +83,25 @@ describe('Starter Kits', () => {
   it('getStarterKit returns correct kit', () => {
     expect(getStarterKit('scribe').name).toBe('Scribe');
     expect(getStarterKit('nonexistent')).toBeNull();
+  });
+});
+
+describe('Default Run Stats', () => {
+  it('creates default stats with scribe damage model', () => {
+    const stats = createDefaultRunStats();
+    expect(stats.id).toBe('scribe');
+    expect(stats.health).toBeGreaterThan(0);
+    expect(stats.traySize).toBeGreaterThan(0);
+    expect(stats.gearIds).toEqual([]);
+    expect(stats.passives).toEqual({});
+  });
+
+  it('works with createRunState', () => {
+    const map = generateRunMap(6);
+    const run = createRunState(createDefaultRunStats(), [], map);
+    expect(run.kitId).toBe('scribe');
+    expect(run.health).toBe(5);
+    expect(run.gearIds).toEqual([]);
   });
 });
 
@@ -367,8 +387,6 @@ describe('Combat State Creation', () => {
     const run = makeRunState();
     expect(run.kitId).toBe('scribe');
     expect(run.health).toBe(kit.health);
-    expect(run.maxEnergy).toBe(kit.maxEnergy);
-    expect(run.gearIds.length).toBeGreaterThan(0);
     expect(run.phase).toBe('room_choice');
   });
 

@@ -1074,17 +1074,32 @@ export function combatReducer(state, action) {
 
 // ─── Run state management ───────────────────────────────────
 
+/**
+ * Default run stats — replaces the old kit-based system.
+ * Uses the scribe damage model (no tile cursing on wrong guesses).
+ */
+export function createDefaultRunStats() {
+  return {
+    id: 'scribe',
+    health: 5,
+    traySize: 6,
+    satchelSize: 3,
+    maxEnergy: 3,
+    gearIds: [],
+    passives: {},
+  };
+}
+
 export function createRunState(kit, sharedGearIds, runMap) {
   return {
     kitId: kit.id,
-    kit,
     health: kit.health,
     maxHealth: kit.health,
     traySize: kit.traySize + 1,
     satchelSize: 0,
     maxEnergy: 0,
-    gearIds: [kit.gearIds[0]],
-    passives: { ...kit.passives },
+    gearIds: [],
+    passives: {},
     upgrades: {},
     roomIndex: 0,
     runMap,
