@@ -4,6 +4,7 @@ import HomeView from './views/HomeView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import LearnView from './views/LearnView.jsx';
 import BridgeBuilderView from './views/BridgeBuilderView.jsx';
+import DeepScriptView from './views/DeepScriptView.jsx';
 import SettingsView from './views/SettingsView.jsx';
 import DailyView from './views/DailyView.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
@@ -330,6 +331,7 @@ function Shell() {
           <Route path="/achievements" element={<AchievementsView />} />
           <Route path="/read" element={<LearnView />} />
           <Route path="/bridge" element={<BridgeBuilderView />} />
+          <Route path="/deep-script" element={<DeepScriptView />} />
           <Route path="/daily" element={<DailyView />} />
           <Route path="/settings" element={<SettingsView />} />
           <Route path="/play" element={<Navigate to="/home" replace />} />
