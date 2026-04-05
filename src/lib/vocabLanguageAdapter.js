@@ -86,6 +86,65 @@ export function getLetterPoolForLanguage(languageId) {
   return consonants.map(c => c.symbol).filter(Boolean);
 }
 
+// ─── Vowel / consonant classification ─────────────────────
+
+/**
+ * Vowel letters per language (used for the consonant/vowel split in Deep Script combat).
+ * For abjads (Hebrew, Arabic) these are matres lectionis / long vowel carriers.
+ * For alphabets these are standard vowels.
+ * Languages without a meaningful vowel/consonant split return an empty array,
+ * which causes both buttons to draw from the full pool.
+ */
+const VOWEL_LETTERS = {
+  hebrew:     ['א', 'ה', 'ו', 'י', 'ע'],
+  arabic:     ['ا', 'و', 'ي'],
+  russian:    ['А', 'Е', 'Ё', 'И', 'О', 'У', 'Ы', 'Э', 'Ю', 'Я',
+               'а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я'],
+  spanish:    ['A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u'],
+  french:     ['A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u'],
+  portuguese: ['A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u'],
+  english:    ['A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u'],
+  hindi:      ['अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ए', 'ऐ', 'ओ', 'औ'],
+  bengali:    ['অ', 'আ', 'ই', 'ঈ', 'উ', 'ঊ', 'এ', 'ঐ', 'ও', 'ঔ'],
+  amharic:    [], // syllabary — vowels are part of consonant forms
+  mandarin:   [], // logographic — no vowel/consonant split
+  japanese:   [], // syllabary — no meaningful split
+};
+
+/**
+ * Get the vowel letters for a language.
+ * Returns an empty array for languages without a vowel/consonant distinction.
+ */
+export function getVowelLetters(languageId) {
+  return VOWEL_LETTERS[languageId] || [];
+}
+
+/**
+ * Get a representative vowel symbol for a language (used for button labels).
+ * Returns null for languages without vowels.
+ */
+export function getVowelSymbol(languageId) {
+  const symbols = {
+    hebrew: 'א', arabic: 'ا', russian: 'А',
+    spanish: 'A', french: 'A', portuguese: 'A', english: 'A',
+    hindi: 'अ', bengali: 'অ',
+  };
+  return symbols[languageId] || null;
+}
+
+/**
+ * Get a representative consonant symbol for a language (used for button labels).
+ * Returns a generic placeholder for languages without a consonant/vowel distinction.
+ */
+export function getConsonantSymbol(languageId) {
+  const symbols = {
+    hebrew: 'ב', arabic: 'ب', russian: 'Б',
+    spanish: 'B', french: 'B', portuguese: 'B', english: 'B',
+    hindi: 'क', bengali: 'ক',
+  };
+  return symbols[languageId] || '◌';
+}
+
 // ─── Word normalization ─────────────────────────────────────
 
 /**
