@@ -6,7 +6,7 @@ import {
   ACTIONS,
 } from './deepScriptEngine.js';
 import { allDeepScriptLetters, getLetterPoolForWords } from '../../data/deepScript/words.js';
-import { getNativeScript, getMeaning, getTextDirection } from '../../lib/vocabLanguageAdapter.js';
+import { getNativeScript, getMeaning, getTextDirection, getVowelLetters, getVowelSymbol, getConsonantSymbol } from '../../lib/vocabLanguageAdapter.js';
 import { celebrate } from '../../lib/celebration.js';
 import {
   playSelect, playCorrect, playWrong,
@@ -150,14 +150,16 @@ export default function CombatScreen({
     dispatch({ type: ACTIONS.SELECT_TRAY_TILE, tileId });
   }, []);
 
+  const wordLanguageId = combat?.word?.languageId || 'hebrew';
+  const langVowels = useMemo(() => getVowelLetters(wordLanguageId), [wordLanguageId]);
+  const hasVowelSplit = langVowels.length > 0;
+
   const handleProduceLetters = useCallback((kind) => {
     playGear();
     setActivatingGear(kind);
-    // Default Hebrew vowel matres lectionis; future languages will supply their own
-    const hebrewVowels = ['א', 'ה', 'ו', 'י', 'ע'];
     const fullPool = combat?.letterPool || allDeepScriptLetters;
-    const vowelPool = fullPool.filter(letter => hebrewVowels.includes(letter));
-    const consonantPool = fullPool.filter(letter => !hebrewVowels.includes(letter));
+    const vowelPool = fullPool.filter(letter => langVowels.includes(letter));
+    const consonantPool = fullPool.filter(letter => !langVowels.includes(letter));
     const pool = kind === 'vowel' ? (vowelPool.length > 0 ? vowelPool : fullPool) : (consonantPool.length > 0 ? consonantPool : fullPool);
 
     const remainingNeeded = combat.answerTrack
@@ -190,7 +192,7 @@ export default function CombatScreen({
     });
 
     dispatch({ type: ACTIONS.GENERATE_LETTERS, letters: generated, runState });
-  }, [combat?.answerTrack, nextCorrectBoost, runState]);
+  }, [combat?.answerTrack, combat?.letterPool, langVowels, nextCorrectBoost, runState]);
 
   const handlePickChoice = useCallback((letter) => {
     playSelect();
@@ -394,28 +396,42 @@ export default function CombatScreen({
           </div>
         </div>
 
-        {/* ═══ ABILITIES — dual centered buttons ═══ */}
+        {/* ═══ ABILITIES — letter generation buttons ═══ */}
         <div className="ds-ability-row ds-ability-row--dual">
           <div className="ds-ability-spawn-fx" key={`spawn-fx-${spawnFxCounter}`} />
-          <button
-            type="button"
-            className={`ds-ability-card ds-ability-card--mega ds-ability-card--ready ${activatingGear === 'consonant' ? 'ds-ability-card--activating' : ''}`}
-            onClick={() => handleProduceLetters('consonant')}
-            disabled={combat.phase !== 'active'}
-          >
-            <div className="ds-ability-icon-center">◌</div>
-            <div className="ds-ability-effect">Consonants</div>
-          </button>
+          {hasVowelSplit ? (
+            <>
+              <button
+                type="button"
+                className={`ds-ability-card ds-ability-card--mega ds-ability-card--ready ${activatingGear === 'consonant' ? 'ds-ability-card--activating' : ''}`}
+                onClick={() => handleProduceLetters('consonant')}
+                disabled={combat.phase !== 'active'}
+              >
+                <div className="ds-ability-icon-center">{getConsonantSymbol(wordLanguageId)}</div>
+                <div className="ds-ability-effect">Consonants</div>
+              </button>
 
-          <button
-            type="button"
-            className={`ds-ability-card ds-ability-card--mega ds-ability-card--ready ${activatingGear === 'vowel' ? 'ds-ability-card--activating' : ''}`}
-            onClick={() => handleProduceLetters('vowel')}
-            disabled={combat.phase !== 'active'}
-          >
-            <div className="ds-ability-icon-center">א</div>
-            <div className="ds-ability-effect">Vowels</div>
-          </button>
+              <button
+                type="button"
+                className={`ds-ability-card ds-ability-card--mega ds-ability-card--ready ${activatingGear === 'vowel' ? 'ds-ability-card--activating' : ''}`}
+                onClick={() => handleProduceLetters('vowel')}
+                disabled={combat.phase !== 'active'}
+              >
+                <div className="ds-ability-icon-center">{getVowelSymbol(wordLanguageId)}</div>
+                <div className="ds-ability-effect">Vowels</div>
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              className={`ds-ability-card ds-ability-card--mega ds-ability-card--ready ${activatingGear === 'consonant' ? 'ds-ability-card--activating' : ''}`}
+              onClick={() => handleProduceLetters('consonant')}
+              disabled={combat.phase !== 'active'}
+            >
+              <div className="ds-ability-icon-center">◌</div>
+              <div className="ds-ability-effect">Generate Letter</div>
+            </button>
+          )}
         </div>
       </div>}
 

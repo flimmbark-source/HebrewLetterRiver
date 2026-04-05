@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFontSettings } from '../hooks/useFontSettings.js';
+import { getTextDirection } from '../lib/vocabLanguageAdapter.js';
 
 /**
  * FloatingCapsulesGame - A word-matching mini-game with floating capsules
@@ -27,7 +28,10 @@ function getResponsiveConstants(width) {
 }
 
 export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode = false }) {
-  const { getGameFontClass } = useFontSettings();
+  const { getGameFontClass, getNativeScriptFontClass } = useFontSettings();
+  const wordLanguageId = wordPairs?.[0]?.languageId || 'hebrew';
+  const nativeScriptDir = getTextDirection(wordLanguageId);
+  const isNativeRtl = nativeScriptDir === 'rtl';
   const canvasRef = useRef(null);
   const [gameState, setGameState] = useState('playing'); // 'playing' | 'completed'
   const [mismatchCount, setMismatchCount] = useState(0);
@@ -104,12 +108,12 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
 
     const measurementCanvas = document.createElement('canvas');
     const measurementContext = measurementCanvas.getContext('2d');
-    const getCapsuleRadius = (text, isHebrew) => {
+    const getCapsuleRadius = (text, isNativeScript) => {
       if (!measurementContext) {
         return rc.capsuleRadius;
       }
-      const fontSize = isNarrow ? (isHebrew ? 14 : 12) : (isHebrew ? 18 : 16);
-      const fontFamily = isHebrew ? '"Noto Sans Hebrew", "Arial", sans-serif' : '"Inter", "Arial", sans-serif';
+      const fontSize = isNarrow ? (isNativeScript ? 14 : 12) : (isNativeScript ? 18 : 16);
+      const fontFamily = isNativeScript ? '"Noto Sans Hebrew", "Noto Sans Arabic", "Noto Sans Devanagari", "Arial", sans-serif' : '"Inter", "Arial", sans-serif';
       measurementContext.font = `600 ${fontSize}px ${fontFamily}`;
       const textWidth = measurementContext.measureText(text).width;
       const paddingH = isNarrow ? 20 : 32;
@@ -285,9 +289,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       meaningOrder = rotateOrder(hebrewOrder, meaningShift);
     }
 
-    // Create ALL Hebrew capsules in left column (grid positions, randomized order)
+    // Create ALL native script capsules in left column (grid positions, randomized order)
     uniquePairs.forEach((pair, pairIndex) => {
-      const radius = getCapsuleRadius(pair.hebrew, true);
+      const nativeText = pair.nativeScript || pair.hebrew;
+      const radius = getCapsuleRadius(nativeText, true);
       const positionIndex = hebrewOrder[pairIndex];
       const y = gridYPositions[positionIndex];
       const wanderDelay = 1200 + Math.random() * 1800;
@@ -295,7 +300,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       capsules.push({
         id: `hebrew-${pairIndex}`,
         type: 'hebrew',
-        text: pair.hebrew,
+        text: nativeText,
         pairIndex: pairIndex,
         x: hebrewColumnX,
         y: y,
@@ -313,7 +318,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
 
     // Create ALL Transliteration capsules in middle column (grid positions, randomized order)
     uniquePairs.forEach((pair, pairIndex) => {
-      const radius = getCapsuleRadius(pair.transliteration || pair.hebrew, false);
+      const radius = getCapsuleRadius(pair.transliteration || pair.nativeScript || pair.hebrew, false);
       const positionIndex = translitOrder[pairIndex];
       const y = gridYPositions[positionIndex];
       const wanderDelay = 1200 + Math.random() * 1800;
@@ -321,7 +326,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       capsules.push({
         id: `transliteration-${pairIndex}`,
         type: 'transliteration',
-        text: pair.transliteration || pair.hebrew,
+        text: pair.transliteration || pair.nativeScript || pair.hebrew,
         pairIndex: pairIndex,
         x: translitColumnX,
         y: y,
@@ -702,14 +707,17 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
           {/* Recap of pairs */}
           <div className="mt-6 space-y-2 text-sm">
             <p className="text-slate-400">Words learned:</p>
-            {wordPairs.map((pair, i) => (
-              <div key={i} className="flex gap-3 justify-center items-center">
-                <span className={`hebrew-font text-white ${getGameFontClass(`${pair.hebrew}-${i}-h`)}`} dir="rtl">{pair.hebrew}</span>
-                <span className={`text-slate-400 text-xs ${getGameFontClass(`${pair.hebrew}-${i}-t`)}`}>({pair.transliteration || pair.hebrew})</span>
-                <span className="text-slate-400">→</span>
-                <span className={`text-white ${getGameFontClass(`${pair.hebrew}-${i}-m`)}`}>{pair.meaning}</span>
-              </div>
-            ))}
+            {wordPairs.map((pair, i) => {
+              const native = pair.nativeScript || pair.hebrew;
+              return (
+                <div key={i} className="flex gap-3 justify-center items-center">
+                  <span className={`text-white ${getNativeScriptFontClass(`${native}-${i}-h`, wordLanguageId)}`} dir={nativeScriptDir}>{native}</span>
+                  <span className={`text-slate-400 text-xs ${getGameFontClass(`${native}-${i}-t`)}`}>({pair.transliteration || native})</span>
+                  <span className="text-slate-400">→</span>
+                  <span className={`text-white ${getGameFontClass(`${native}-${i}-m`)}`}>{pair.meaning}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -755,10 +763,10 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
               return (
                 <span
                   key={`${item.text}-${itemIndex}`}
-                  className={`font-semibold ${getGameFontClass(`${item.text}-${itemIndex}`)} ${
-                    isHebrew ? 'hebrew-font text-emerald-200' : 'text-slate-200'
+                  className={`font-semibold ${isHebrew ? getNativeScriptFontClass(`${item.text}-${itemIndex}`, wordLanguageId) : getGameFontClass(`${item.text}-${itemIndex}`)} ${
+                    isHebrew ? 'text-emerald-200' : 'text-slate-200'
                   }`}
-                  dir={isHebrew ? 'rtl' : 'ltr'}
+                  dir={isHebrew ? nativeScriptDir : 'ltr'}
                 >
                   {item.text}
                 </span>
@@ -811,8 +819,8 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
                 }}
                 onPointerDown={(e) => handlePointerDown(e, capsule, index)}
               >
-                <span className={`ds-bubble-text ${getGameFontClass(capsule.id)}`} dir={isHebrew ? 'rtl' : 'ltr'}>
-                  {isHebrew ? <span className="hebrew-font">{capsule.text}</span> : capsule.text}
+                <span className={`ds-bubble-text ${isHebrew ? getNativeScriptFontClass(capsule.id, wordLanguageId) : getGameFontClass(capsule.id)}`} dir={isHebrew ? nativeScriptDir : 'ltr'}>
+                  {capsule.text}
                 </span>
                 <span className="ds-bubble-shine" />
               </div>
@@ -847,10 +855,9 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
                 } ${
                   capsule.shaking ? 'ring-2 ring-red-500' : ''
                 }`}
-                dir={isHebrew ? 'rtl' : 'ltr'}
+                dir={isHebrew ? nativeScriptDir : 'ltr'}
               >
-                {isHebrew && <span className={`hebrew-font ${getGameFontClass(capsule.id)}`}>{capsule.text}</span>}
-                {!isHebrew && <span className={getGameFontClass(capsule.id)}>{capsule.text}</span>}
+                <span className={isHebrew ? getNativeScriptFontClass(capsule.id, wordLanguageId) : getGameFontClass(capsule.id)}>{capsule.text}</span>
               </div>
             </div>
           );

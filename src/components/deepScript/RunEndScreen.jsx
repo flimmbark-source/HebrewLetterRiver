@@ -38,10 +38,6 @@ export default function RunEndScreen({
           <span className="ds-end-stat-value">{runState.roomsCompleted}</span>
           <span className="ds-end-stat-label">Rooms Explored</span>
         </div>
-        <div className="ds-end-stat">
-          <span className="ds-end-stat-value">{runState.kit.icon} {runState.kit.name}</span>
-          <span className="ds-end-stat-label">Class</span>
-        </div>
       </div>
 
       {runState.wordsCompleted.length > 0 && (

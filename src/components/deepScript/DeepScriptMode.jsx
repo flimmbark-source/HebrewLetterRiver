@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { getStarterKit } from '../../data/deepScript/starterKits.js';
+import { createDefaultRunStats } from './deepScriptEngine.js';
 import { generateDungeonFloor, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
 import { registerCustomWords, clearCustomWords, convertBBWordsForDS, getWordById, deepScriptWords } from '../../data/deepScript/words.js';
@@ -60,6 +60,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   const isHebrew = languageId === 'hebrew';
   const previousFloorWordIdsRef = useRef(new Set());
   const runStateRef = useRef(null);
+  const hasAutoStarted = useRef(false);
   const [langDSWordsReady, setLangDSWordsReady] = useState(isHebrew);
 
   // Load language-specific Deep Script words
@@ -193,16 +194,12 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
 
   // ─── Kit Selection ────────────────────────────────────────
 
-  const handleKitSelect = useCallback((kitId) => {
-    const kit = getStarterKit(kitId);
-    if (!kit) return;
-
+  const handleStartRun = useCallback(() => {
     // Generate dungeon floor (pass custom words if available)
     const newFloor = createFloorForNumber(1);
 
-    // Create run state (pass a dummy runMap for backward compat)
-    const newRun = createRunState(kit, [], []);
-    // Add floor reference
+    // Create run state with default stats
+    const newRun = createRunState(createDefaultRunStats(), [], []);
     newRun.floor = newFloor;
     newRun.wordsSeen = [];
 
@@ -520,6 +517,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setEndResult(null);
     setFloorNumber(1);
     previousFloorWordIdsRef.current = new Set();
+    hasAutoStarted.current = false;
     setIsPauseMenuOpen(false);
   }, []);
 
@@ -539,15 +537,23 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
 
   // ─── Render ───────────────────────────────────────────────
 
+  useEffect(() => {
+    if (isGuidedPackRun && screen === 'kit_select' && !hasAutoStarted.current) {
+      hasAutoStarted.current = true;
+      handleStartRun();
+    }
+  }, [isGuidedPackRun, screen, handleStartRun]);
+
   if (screen === 'kit_select') {
+    if (isGuidedPackRun) return null; // waiting for auto-start effect
+
     return (
       <div className="ds-mode">
         <KitSelectScreen
-          onSelect={handleKitSelect}
+          onSelect={handleStartRun}
           onBack={onBack}
           wordSourceMode={wordSourceMode}
           onWordSourceModeChange={setWordSourceMode}
-          showWordSourceToggle={!isGuidedPackRun}
         />
       </div>
     );

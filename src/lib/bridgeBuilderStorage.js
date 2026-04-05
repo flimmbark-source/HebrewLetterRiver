@@ -214,7 +214,7 @@ export function getWeakWordIds(minAttempts = 3, threshold = 0.65) {
  * @param {{ [wordId: string]: WordProgress }} allProgress — all word progress
  * @returns {{ sectionId, packsCompleted, totalPacks, wordsIntroducedCount, wordsLearnedCount, totalWords }}
  */
-export function getSectionProgress(section, sectionPacks, allProgress) {
+export function getSectionProgress(section, sectionPacks, allProgress, packCompletions) {
   let packsCompleted = 0;
   let wordsIntroducedCount = 0;
   let wordsLearnedCount = 0;
@@ -222,7 +222,9 @@ export function getSectionProgress(section, sectionPacks, allProgress) {
 
   for (const pack of sectionPacks) {
     const pp = getPackProgress(pack, allProgress);
-    if (pp.completed) packsCompleted++;
+    const comp = packCompletions?.[pack.id];
+    const isFullyComplete = comp?.loosePlanksComplete && comp?.deepScriptComplete;
+    if (isFullyComplete) packsCompleted++;
     wordsIntroducedCount += pp.wordsIntroducedCount;
     wordsLearnedCount += pp.wordsLearnedCount;
     totalWords += pp.totalWords;

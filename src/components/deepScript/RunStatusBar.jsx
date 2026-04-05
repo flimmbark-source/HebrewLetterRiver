@@ -20,10 +20,6 @@ export default function RunStatusBar({ runState }) {
       <div className="ds-status-health">
         {healthPips}
       </div>
-      <div className="ds-status-kit">
-        <span className="ds-status-kit-icon">{runState.kit.icon}</span>
-        <span className="ds-status-kit-name">{runState.kit.name}</span>
-      </div>
       <div className="ds-status-progress">
         {runState.combatsWon} won
       </div>
