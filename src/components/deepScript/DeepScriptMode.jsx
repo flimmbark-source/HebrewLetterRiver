@@ -143,7 +143,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
       excludeWordIds: previousFloorWordIdsRef.current,
     });
     previousFloorWordIdsRef.current = collectFloorWordIds(nextFloor);
-    return nextFloor;
+    return { floor: nextFloor, floorWordPool };
   }, [getRandomPackWordsForFloor, hasCustomWordPool, isGuidedPackRun, isHebrew, langDSWords, packWords, wordSourceMode]);
 
   // Guided pack runs assign mini-games any pack words not surfaced as combat chambers.
@@ -196,12 +196,13 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
 
   const handleStartRun = useCallback(() => {
     // Generate dungeon floor (pass custom words if available)
-    const newFloor = createFloorForNumber(1);
+    const { floor: newFloor, floorWordPool } = createFloorForNumber(1);
 
     // Create run state with default stats
     const newRun = createRunState(createDefaultRunStats(), [], []);
     newRun.floor = newFloor;
     newRun.wordsSeen = [];
+    newRun.customWords = floorWordPool || null;
 
     setRunState(newRun);
     setFloor(newFloor);
@@ -433,7 +434,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
       return;
     }
     const nextFloorNumber = floorNumber + 1;
-    const nextFloor = createFloorForNumber(nextFloorNumber);
+    const { floor: nextFloor, floorWordPool } = createFloorForNumber(nextFloorNumber);
 
     setFloor(nextFloor);
     setCurrentChamberId(nextFloor.startChamberId);
@@ -443,6 +444,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
       ...prev,
       floor: nextFloor,
       health: Math.min(prev.maxHealth, prev.health + 1),
+      customWords: floorWordPool || prev.customWords || null,
     }));
     setHasCompletedCapsulesMiniGameThisFloor(false);
     setIsMemoryGateUnlocked(false);
