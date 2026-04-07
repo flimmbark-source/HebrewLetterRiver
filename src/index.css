@@ -44,11 +44,11 @@
   --font-bold: 700;
 
   /* === APP THEME TOKENS (Light) === */
-  --app-bg: #f5f0e8;
-  --app-bg-gradient: linear-gradient(165deg, #f5f0e8 0%, #efe8db 40%, #f2ece2 100%);
-  --app-surface: #ece5d8;
-  --app-surface-high: #e3dac9;
-  --app-surface-highest: #d6ccb8;
+  --app-bg: #edf5f0;
+  --app-bg-gradient: linear-gradient(165deg, #eef6f1 0%, #e4f0e8 40%, #e8ede6 60%, #f0ece4 100%);
+  --app-surface: #e2ede6;
+  --app-surface-high: #d6e5dc;
+  --app-surface-highest: #c8d9cf;
   --app-on-surface: #2c2418;
   --app-on-surface-variant: #4a3f30;
   --app-muted: #7a6f5f;
@@ -60,13 +60,13 @@
   --app-secondary-container: #fcd888;
   --app-outline: #9a8e7e;
   --app-outline-variant: #c8bfae;
-  --app-card-bg: #fffdf8;
-  --app-card-bg-gradient: linear-gradient(180deg, #fffef9 0%, #fdf8ef 100%);
-  --app-card-border: rgba(180, 160, 120, 0.18);
-  --app-card-glow: rgba(180, 160, 120, 0.06);
-  --app-nav-bg: rgba(245, 240, 232, 0.92);
-  --app-nav-border: rgba(180, 160, 120, 0.15);
-  --app-nav-shadow: rgba(120, 100, 60, 0.08);
+  --app-card-bg: #f8fcf9;
+  --app-card-bg-gradient: linear-gradient(180deg, #fafcfa 0%, #f2f8f4 100%);
+  --app-card-border: rgba(100, 160, 130, 0.15);
+  --app-card-glow: rgba(100, 160, 130, 0.06);
+  --app-nav-bg: rgba(237, 245, 240, 0.92);
+  --app-nav-border: rgba(100, 160, 130, 0.12);
+  --app-nav-shadow: rgba(40, 100, 70, 0.08);
   --app-active-text: #ffffff;
   --app-active-bg: #1a7a55;
   --app-hover-text: #1a7a55;
@@ -76,10 +76,10 @@
   --app-progress-fill: #1a7a55;
   --app-error-bg: rgba(200, 50, 50, 0.08);
   --app-error-text: #b53030;
-  --app-input-border: rgba(180, 160, 120, 0.2);
-  --app-input-bg: #fffdf8;
-  --app-popup-bg: rgba(255, 253, 248, 0.97);
-  --app-popup-border: rgba(180, 160, 120, 0.15);
+  --app-input-border: rgba(100, 160, 130, 0.2);
+  --app-input-bg: #f8fcf9;
+  --app-popup-bg: rgba(248, 252, 249, 0.97);
+  --app-popup-border: rgba(100, 160, 130, 0.15);
 
   /* === GAME MODE ACCENT TOKENS === */
   --app-mode-river: #0d8a5e;
@@ -101,30 +101,30 @@
 
 /* === DARK MODE OVERRIDES === */
 body.dark-mode {
-  --app-bg: #12110e;
-  --app-bg-gradient: linear-gradient(165deg, #12110e 0%, #161410 40%, #13120f 100%);
-  --app-surface: #1e1b16;
-  --app-surface-high: #28241d;
-  --app-surface-highest: #352f25;
+  --app-bg: #0e1210;
+  --app-bg-gradient: linear-gradient(165deg, #0e1210 0%, #101612 40%, #0f1311 100%);
+  --app-surface: #161e1a;
+  --app-surface-high: #1e2824;
+  --app-surface-highest: #283530;
   --app-on-surface: #ede8df;
   --app-on-surface-variant: #b0a898;
   --app-muted: #8a8070;
   --app-primary: #4ae898;
   --app-primary-light: #6af0b0;
-  --app-on-primary: #12110e;
-  --app-primary-container: rgba(74, 232, 152, 0.12);
+  --app-on-primary: #0e1210;
+  --app-primary-container: rgba(74, 232, 152, 0.14);
   --app-secondary: #f0c35a;
   --app-secondary-container: rgba(240, 195, 90, 0.15);
-  --app-outline: #4a4438;
-  --app-outline-variant: #383228;
-  --app-card-bg: #1c1a15;
-  --app-card-bg-gradient: linear-gradient(180deg, #1e1b16 0%, #1a1812 100%);
-  --app-card-border: rgba(255, 240, 200, 0.07);
-  --app-card-glow: rgba(255, 240, 200, 0.02);
-  --app-nav-bg: rgba(18, 17, 14, 0.94);
-  --app-nav-border: rgba(255, 240, 200, 0.06);
+  --app-outline: #3a4a42;
+  --app-outline-variant: #2a3832;
+  --app-card-bg: #141c18;
+  --app-card-bg-gradient: linear-gradient(180deg, #161e1a 0%, #121a16 100%);
+  --app-card-border: rgba(74, 232, 152, 0.07);
+  --app-card-glow: rgba(74, 232, 152, 0.03);
+  --app-nav-bg: rgba(14, 18, 16, 0.94);
+  --app-nav-border: rgba(74, 232, 152, 0.06);
   --app-nav-shadow: rgba(0, 0, 0, 0.5);
-  --app-active-text: #12110e;
+  --app-active-text: #0e1210;
   --app-active-bg: #4ae898;
   --app-hover-text: #6af0b0;
   --app-badge-bg: #4ae898;
@@ -133,10 +133,10 @@ body.dark-mode {
   --app-progress-fill: #4ae898;
   --app-error-bg: rgba(248, 113, 113, 0.1);
   --app-error-text: #f87171;
-  --app-input-border: #352f25;
-  --app-input-bg: #28241d;
-  --app-popup-bg: rgba(28, 26, 21, 0.97);
-  --app-popup-border: rgba(255, 240, 200, 0.08);
+  --app-input-border: #283530;
+  --app-input-bg: #1e2824;
+  --app-popup-bg: rgba(20, 28, 24, 0.97);
+  --app-popup-border: rgba(74, 232, 152, 0.08);
 
   /* === GAME MODE ACCENT TOKENS (Dark) === */
   --app-mode-river: #4ae898;
@@ -284,12 +284,12 @@ body {
     0 2px 4px rgba(0, 0, 0, 0.06),
     0 8px 20px var(--app-card-glow),
     0 16px 40px rgba(0, 0, 0, 0.06);
-  border-color: rgba(180, 160, 120, 0.25);
+  border-color: rgba(100, 160, 130, 0.25);
   transform: translateY(-1px);
 }
 
 body.dark-mode .card-elevated:hover {
-  border-color: rgba(255, 240, 200, 0.1);
+  border-color: rgba(74, 232, 152, 0.12);
 }
 
 .card-surface {
