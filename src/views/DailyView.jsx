@@ -37,11 +37,8 @@ function TaskCard({ task, onClaim, claiming }) {
     : 'In progress…';
   return (
     <div
-      className="quest-card rounded-2xl p-5 shadow-sm transition-all duration-200"
-      style={{
-        background: 'var(--app-card-bg)',
-        border: claimable ? '2px solid var(--app-secondary)' : '1px solid var(--app-card-border)',
-      }}
+      className="card-elevated quest-card rounded-2xl p-5 transition-all duration-200"
+      style={claimable ? { borderColor: 'var(--app-secondary)', borderWidth: '2px' } : {}}
     >
       <div className="flex items-start justify-between">
         <div>
@@ -194,16 +191,21 @@ export default function DailyView() {
     <div className="space-y-8 stagger-children">
 
       <section
-        className="card-elevated rounded-2xl p-6 transition-all duration-200"
-        style={celebrating ? { boxShadow: '0 0 0 2px var(--app-secondary)' } : {}}
+        className="relative overflow-hidden rounded-2xl p-6 shadow-lg transition-all duration-200"
+        style={{
+          background: 'linear-gradient(135deg, var(--app-primary-light) 0%, var(--app-primary) 50%, #145e42 100%)',
+          color: 'var(--app-on-primary)',
+          ...(celebrating ? { boxShadow: '0 0 0 3px var(--app-secondary), 0 8px 24px rgba(26, 122, 85, 0.3)' } : {}),
+        }}
       >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full blur-3xl" style={{ background: 'rgba(255, 255, 255, 0.08)' }}></div>
+        <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--app-primary)' }}>{t('daily.badge.title')}</p>
-            <h2 className="text-2xl font-bold sm:text-3xl" style={{ color: 'var(--app-on-surface)', fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
+            <p className="text-xs font-bold uppercase tracking-widest opacity-80">{t('daily.badge.title')}</p>
+            <h2 className="text-2xl font-bold sm:text-3xl" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
               {dailyClaimable ? t('daily.badge.claimStars') : rewardClaimed ? t('daily.badge.rewardsCollected') : t('daily.badge.completeQuests')}
             </h2>
-            <p className="text-sm" style={{ color: 'var(--app-muted)' }}>
+            <p className="text-sm opacity-80">
               {dailyClaimable
                 ? t('daily.badge.starsReady', { stars: formatNumber(rewardStars) })
                 : t('daily.badge.finishQuests')}
@@ -214,12 +216,13 @@ export default function DailyView() {
               type="button"
               onClick={handleClaimAll}
               disabled={claiming || Boolean(claimingTaskId)}
-              className="btn-cta shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+              className="shrink-0 rounded-full px-5 py-2.5 text-sm font-bold shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+              style={{ background: 'var(--app-secondary)', color: '#fff', boxShadow: '0 2px 0 rgba(0,0,0,0.15), 0 4px 12px rgba(176, 120, 48, 0.3)' }}
             >
               {claiming ? 'Claiming…' : `Claim all +${formatNumber(rewardStars)}`}
             </button>
           ) : (
-            <span className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold" style={{ border: '1px solid var(--app-card-border)', color: 'var(--app-muted)' }}>
+            <span className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold" style={{ border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)' }}>
               {rewardClaimed ? `Claimed ${claimedDate ?? 'today'}` : 'Keep going!'}
             </span>
           )}
@@ -237,7 +240,7 @@ export default function DailyView() {
         ))}
       </section>
 
-      <section className="card-surface rounded-2xl p-6">
+      <section className="card-elevated rounded-2xl p-6">
         <h2 className="text-lg font-bold" style={{ color: 'var(--app-on-surface)', fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Tips for today&apos;s run</h2>
         <ul className="mt-3 space-y-2 text-sm" style={{ color: 'var(--app-muted)' }}>
           <li>• Warm-Up completes when you finish two full game sessions.</li>

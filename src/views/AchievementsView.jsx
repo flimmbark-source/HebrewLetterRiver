@@ -184,12 +184,12 @@ export default function AchievementsView() {
     >
       <main className="mx-auto max-w-2xl stagger-children">
         <section className="relative mb-10 animate-fade-in-up">
-          <div className="stable-card relative overflow-hidden rounded-xl p-8 shadow-lg" style={{ background: 'var(--app-primary)', color: 'var(--app-on-primary)' }}>
+          <div className="stable-card relative overflow-hidden rounded-xl p-8 shadow-lg" style={{ background: 'linear-gradient(135deg, var(--app-primary-light) 0%, var(--app-primary) 50%, #145e42 100%)', color: 'var(--app-on-primary)' }}>
             <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full blur-3xl" style={{ background: 'var(--app-primary-container)', opacity: 0.2 }}></div>
             <div className="relative z-10">
               <p className="mb-1 text-sm font-bold opacity-80">CURRENT MILESTONE • {playerName}</p>
               <h2 className="mb-4 text-3xl font-extrabold tracking-tight" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Level {level}</h2>
-              <div className="mb-2 h-4 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255,255,255,0.2)' }}><div className="progress-fill h-full rounded-full" style={{ width: `${levelPercent}%`, background: 'var(--app-primary-container)' }}></div></div>
+              <div className="mb-2 h-4 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255,255,255,0.15)' }}><div className="progress-fill h-full rounded-full" style={{ width: `${levelPercent}%`, background: 'linear-gradient(90deg, #4ae898, #80f0b8)' }}></div></div>
               <div className="flex justify-between text-xs font-bold">
                 <span>{levelProgress} / {starsPerLevel} XP TO LEVEL {Math.min(level + 1, 15)}</span>
                 <span style={{ color: 'var(--app-primary-container)' }}>{levelPercent}% COMPLETED</span>
@@ -209,7 +209,7 @@ export default function AchievementsView() {
                 {recentBadge ? getBadgeCopy(recentBadge, t, gameName, recentBadge?.tiers?.[0]?.goal ?? 1).summary : 'Completed 5 different language paths.'}
               </p>
             </div>
-            <div className="ml-4 flex h-20 w-20 items-center justify-center rounded-full shadow-sm" style={{ background: 'var(--app-card-bg)' }}><Icon className="text-4xl" style={{ color: 'var(--app-secondary)' }} filled>emoji_events</Icon></div>
+            <div className="ml-4 flex h-20 w-20 items-center justify-center rounded-full shadow-sm" style={{ background: 'var(--app-secondary-container)' }}><Icon className="text-4xl" style={{ color: 'var(--app-secondary)' }} filled>emoji_events</Icon></div>
           </div>
 
           {milestones.map((badge, index) => {

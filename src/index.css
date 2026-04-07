@@ -44,96 +44,102 @@
   --font-bold: 700;
 
   /* === APP THEME TOKENS (Light) === */
-  --app-bg: #faf9f6;
-  --app-surface: #f3f1ec;
-  --app-surface-high: #eae7df;
-  --app-surface-highest: #ddd9cf;
-  --app-on-surface: #1a1a1a;
-  --app-on-surface-variant: #3d3d3d;
-  --app-muted: #6b6b6b;
-  --app-primary: #1a6b50;
-  --app-primary-light: #2d9d6f;
+  --app-bg: #f5f0e8;
+  --app-bg-gradient: linear-gradient(165deg, #f5f0e8 0%, #efe8db 40%, #f2ece2 100%);
+  --app-surface: #ece5d8;
+  --app-surface-high: #e3dac9;
+  --app-surface-highest: #d6ccb8;
+  --app-on-surface: #2c2418;
+  --app-on-surface-variant: #4a3f30;
+  --app-muted: #7a6f5f;
+  --app-primary: #1a7a55;
+  --app-primary-light: #28a06e;
   --app-on-primary: #ffffff;
-  --app-primary-container: #d4f0e2;
-  --app-secondary: #8b6914;
-  --app-secondary-container: #f5d78e;
-  --app-outline: #8a8a8a;
-  --app-outline-variant: #c8c4ba;
-  --app-card-bg: #ffffff;
-  --app-card-border: rgba(0, 0, 0, 0.06);
-  --app-nav-bg: rgba(250, 249, 246, 0.92);
-  --app-nav-border: rgba(0, 0, 0, 0.06);
-  --app-nav-shadow: rgba(0, 0, 0, 0.08);
+  --app-primary-container: #c8eed9;
+  --app-secondary: #b07830;
+  --app-secondary-container: #fce4b8;
+  --app-outline: #9a8e7e;
+  --app-outline-variant: #c8bfae;
+  --app-card-bg: #fffdf8;
+  --app-card-bg-gradient: linear-gradient(180deg, #fffef9 0%, #fdf8ef 100%);
+  --app-card-border: rgba(180, 160, 120, 0.18);
+  --app-card-glow: rgba(180, 160, 120, 0.06);
+  --app-nav-bg: rgba(245, 240, 232, 0.92);
+  --app-nav-border: rgba(180, 160, 120, 0.15);
+  --app-nav-shadow: rgba(120, 100, 60, 0.08);
   --app-active-text: #ffffff;
-  --app-active-bg: #1a6b50;
-  --app-hover-text: #1a6b50;
-  --app-badge-bg: #1a6b50;
+  --app-active-bg: #1a7a55;
+  --app-hover-text: #1a7a55;
+  --app-badge-bg: #1a7a55;
   --app-badge-text: #ffffff;
-  --app-progress-bg: #d4f0e2;
-  --app-progress-fill: #1a6b50;
-  --app-error-bg: rgba(220, 53, 53, 0.08);
-  --app-error-text: #c53030;
-  --app-input-border: rgba(0, 0, 0, 0.12);
-  --app-input-bg: #ffffff;
-  --app-popup-bg: rgba(255, 255, 255, 0.97);
-  --app-popup-border: rgba(0, 0, 0, 0.08);
+  --app-progress-bg: #c8eed9;
+  --app-progress-fill: #1a7a55;
+  --app-error-bg: rgba(200, 50, 50, 0.08);
+  --app-error-text: #b53030;
+  --app-input-border: rgba(180, 160, 120, 0.2);
+  --app-input-bg: #fffdf8;
+  --app-popup-bg: rgba(255, 253, 248, 0.97);
+  --app-popup-border: rgba(180, 160, 120, 0.15);
 
   /* === GAME MODE ACCENT TOKENS === */
-  --app-mode-river: #1a6b50;
-  --app-mode-river-bg: #e8f5ef;
-  --app-mode-bridge: #8b6914;
-  --app-mode-bridge-bg: #fdf4e0;
-  --app-mode-deep: #5b4a8a;
-  --app-mode-deep-bg: #eeebf5;
+  --app-mode-river: #1a7a55;
+  --app-mode-river-bg: #dff0e8;
+  --app-mode-bridge: #b07830;
+  --app-mode-bridge-bg: #fdf0d8;
+  --app-mode-deep: #6b4fa0;
+  --app-mode-deep-bg: #ece6f5;
   --app-mode-planks: #3b5998;
-  --app-mode-planks-bg: #e8edf5;
-  --app-mode-vocab: #1a6b7a;
-  --app-mode-vocab-bg: #e5f2f4;
+  --app-mode-planks-bg: #e0e8f5;
+  --app-mode-vocab: #1a7a8a;
+  --app-mode-vocab-bg: #daf0f4;
 }
 
 /* === DARK MODE OVERRIDES === */
 body.dark-mode {
-  --app-bg: #0f0f0f;
-  --app-surface: #1a1a1a;
-  --app-surface-high: #252525;
-  --app-surface-highest: #333333;
-  --app-on-surface: #ececec;
-  --app-on-surface-variant: #a0a0a0;
-  --app-muted: #888888;
-  --app-primary: #3dd68c;
-  --app-primary-light: #5eeaa5;
-  --app-on-primary: #0f0f0f;
-  --app-primary-container: rgba(61, 214, 140, 0.12);
+  --app-bg: #12110e;
+  --app-bg-gradient: linear-gradient(165deg, #12110e 0%, #161410 40%, #13120f 100%);
+  --app-surface: #1e1b16;
+  --app-surface-high: #28241d;
+  --app-surface-highest: #352f25;
+  --app-on-surface: #ede8df;
+  --app-on-surface-variant: #b0a898;
+  --app-muted: #8a8070;
+  --app-primary: #4ae898;
+  --app-primary-light: #6af0b0;
+  --app-on-primary: #12110e;
+  --app-primary-container: rgba(74, 232, 152, 0.12);
   --app-secondary: #f0c35a;
   --app-secondary-container: rgba(240, 195, 90, 0.15);
-  --app-outline: #444444;
-  --app-outline-variant: #333333;
-  --app-card-bg: #1a1a1a;
-  --app-card-border: rgba(255, 255, 255, 0.06);
-  --app-nav-bg: rgba(15, 15, 15, 0.92);
-  --app-nav-border: rgba(255, 255, 255, 0.06);
-  --app-nav-shadow: rgba(0, 0, 0, 0.4);
-  --app-active-text: #0f0f0f;
-  --app-active-bg: #3dd68c;
-  --app-hover-text: #5eeaa5;
-  --app-badge-bg: #3dd68c;
-  --app-badge-text: #0f0f0f;
-  --app-progress-bg: rgba(61, 214, 140, 0.15);
-  --app-progress-fill: #3dd68c;
+  --app-outline: #4a4438;
+  --app-outline-variant: #383228;
+  --app-card-bg: #1c1a15;
+  --app-card-bg-gradient: linear-gradient(180deg, #1e1b16 0%, #1a1812 100%);
+  --app-card-border: rgba(255, 240, 200, 0.07);
+  --app-card-glow: rgba(255, 240, 200, 0.02);
+  --app-nav-bg: rgba(18, 17, 14, 0.94);
+  --app-nav-border: rgba(255, 240, 200, 0.06);
+  --app-nav-shadow: rgba(0, 0, 0, 0.5);
+  --app-active-text: #12110e;
+  --app-active-bg: #4ae898;
+  --app-hover-text: #6af0b0;
+  --app-badge-bg: #4ae898;
+  --app-badge-text: #12110e;
+  --app-progress-bg: rgba(74, 232, 152, 0.12);
+  --app-progress-fill: #4ae898;
   --app-error-bg: rgba(248, 113, 113, 0.1);
   --app-error-text: #f87171;
-  --app-input-border: #333333;
-  --app-input-bg: #252525;
-  --app-popup-bg: rgba(26, 26, 26, 0.97);
-  --app-popup-border: rgba(255, 255, 255, 0.08);
+  --app-input-border: #352f25;
+  --app-input-bg: #28241d;
+  --app-popup-bg: rgba(28, 26, 21, 0.97);
+  --app-popup-border: rgba(255, 240, 200, 0.08);
 
   /* === GAME MODE ACCENT TOKENS (Dark) === */
-  --app-mode-river: #3dd68c;
-  --app-mode-river-bg: rgba(61, 214, 140, 0.1);
+  --app-mode-river: #4ae898;
+  --app-mode-river-bg: rgba(74, 232, 152, 0.1);
   --app-mode-bridge: #f0c35a;
   --app-mode-bridge-bg: rgba(240, 195, 90, 0.1);
-  --app-mode-deep: #a78bfa;
-  --app-mode-deep-bg: rgba(167, 139, 250, 0.1);
+  --app-mode-deep: #b08df8;
+  --app-mode-deep-bg: rgba(176, 141, 248, 0.1);
   --app-mode-planks: #7da0e0;
   --app-mode-planks-bg: rgba(125, 160, 224, 0.1);
   --app-mode-vocab: #5cc8d8;
@@ -171,12 +177,14 @@ html,
 body {
   @apply min-h-screen font-sans;
   color: var(--app-on-surface);
-  background: var(--app-bg);
+  background: var(--app-bg-gradient);
+  background-color: var(--app-bg);
   font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .arcade-bg {
-  background: var(--app-bg);
+  background: var(--app-bg-gradient);
+  background-color: var(--app-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -250,29 +258,35 @@ body {
    Elevation & Card System
    ═══════════════════════════════════════════════════════════ */
 .card-elevated {
-  background: var(--app-card-bg);
+  background: var(--app-card-bg-gradient);
+  background-color: var(--app-card-bg);
   border: 1px solid var(--app-card-border);
   border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 12px var(--app-card-glow),
+    0 8px 24px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
 }
 
 .card-elevated:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.05);
-}
-
-body.dark-mode .card-elevated {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 8px 20px var(--app-card-glow),
+    0 16px 40px rgba(0, 0, 0, 0.06);
+  border-color: rgba(180, 160, 120, 0.25);
+  transform: translateY(-1px);
 }
 
 body.dark-mode .card-elevated:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 240, 200, 0.1);
 }
 
 .card-surface {
   background: var(--app-surface);
+  border: 1px solid var(--app-card-border);
   border-radius: 16px;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -330,23 +344,33 @@ body.dark-mode .card-elevated:hover {
 
 /* CTA button style */
 .btn-cta {
-  background: var(--app-primary);
+  background: linear-gradient(135deg, var(--app-primary-light) 0%, var(--app-primary) 100%);
   color: var(--app-on-primary);
   border: none;
   border-radius: 9999px;
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.15s ease;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(26, 122, 85, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 .btn-cta:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
-  transform: translateY(-1px);
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(26, 122, 85, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  filter: brightness(1.05);
 }
 
 .btn-cta:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(26, 122, 85, 0.25);
 }
 
 /* Nav pill indicator */
@@ -357,7 +381,7 @@ body.dark-mode .card-elevated:hover {
 
 .nav-item-active {
   color: var(--app-active-text) !important;
-  background: var(--app-active-bg);
+  background: linear-gradient(135deg, var(--app-primary-light), var(--app-primary));
   border-radius: 9999px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(26, 122, 85, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1);
 }

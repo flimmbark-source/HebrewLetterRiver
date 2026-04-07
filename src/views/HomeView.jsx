@@ -46,7 +46,7 @@ function Icon({ children, className = '', filled = false }) {
 
 function LanguageCard({ id, label, value, onChange, options, leading, trailing }) {
   return (
-    <label htmlFor={id} className="group relative block rounded-2xl p-6 transition-all duration-200 hover:scale-[1.01]" style={{ background: 'var(--app-surface)', border: '1px solid var(--app-card-border)' }}>
+    <label htmlFor={id} className="card-elevated group relative block rounded-2xl p-6 transition-all duration-200 hover:scale-[1.01]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-4">
           {leading}
@@ -253,24 +253,28 @@ export default function HomeView() {
     <div className="relative min-h-screen" style={{ background: 'var(--app-bg)', color: 'var(--app-on-surface)' }}>
       <main className="mx-auto max-w-2xl space-y-8 px-6 pb-48 pt-8 stagger-children">
         <section className="animate-fade-in-up">
-          <div className="card-elevated flex flex-col items-center space-y-4 p-8 text-center">
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-full" style={{ background: 'var(--app-surface)' }}>
-              <img alt="Avatar Large" className="h-20 w-20 rounded-full object-cover" src={playerAvatar || topAvatar} />
-              <button onClick={() => setIsProfileEditorOpen(true)} className="btn-press absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 p-2 shadow-lg" style={{ borderColor: 'var(--app-card-bg)', background: 'var(--app-primary)', color: 'var(--app-on-primary)' }} type="button">
-                <Icon className="text-sm">edit</Icon>
-              </button>
-            </div>
-            <div>
-              <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: 'var(--app-on-surface)' }}>{playerName}</h1>
-              <p className="line-clamp-1-stable text-sm" style={{ color: 'var(--app-muted)' }}>Learning since January 2024</p>
-            </div>
-            <div className="mt-4 w-full space-y-2">
-              <div className="flex justify-between text-xs font-bold" style={{ color: 'var(--app-primary)' }}>
-                <span>LEVEL {level}</span>
-                <span>{levelProgress.toLocaleString()} / {starsPerLevel.toLocaleString()} XP</span>
+          <div className="relative overflow-hidden rounded-2xl p-8 text-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--app-primary) 0%, #145e42 60%, #0f4a34 100%)', color: 'var(--app-on-primary)' }}>
+            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full blur-3xl" style={{ background: 'rgba(255, 255, 255, 0.08)' }}></div>
+            <div className="absolute -left-6 bottom-0 h-28 w-28 rounded-full blur-2xl" style={{ background: 'rgba(74, 232, 152, 0.1)' }}></div>
+            <div className="relative z-10 flex flex-col items-center space-y-4">
+              <div className="relative flex h-24 w-24 items-center justify-center rounded-full shadow-lg" style={{ background: 'rgba(255, 255, 255, 0.15)', border: '3px solid rgba(255, 255, 255, 0.25)' }}>
+                <img alt="Avatar Large" className="h-20 w-20 rounded-full object-cover" src={playerAvatar || topAvatar} />
+                <button onClick={() => setIsProfileEditorOpen(true)} className="btn-press absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 p-2 shadow-lg" style={{ borderColor: 'rgba(255,255,255,0.3)', background: 'var(--app-secondary)', color: '#fff' }} type="button">
+                  <Icon className="text-sm">edit</Icon>
+                </button>
               </div>
-              <div className="h-3 w-full overflow-hidden rounded-full" style={{ background: 'var(--app-progress-bg)' }}>
-                <div className="progress-fill h-full rounded-full" style={{ width: `${progressPct}%`, background: 'var(--app-progress-fill)' }}></div>
+              <div>
+                <h1 className="text-2xl font-extrabold tracking-tight">{playerName}</h1>
+                <p className="line-clamp-1-stable text-sm opacity-70">Learning since January 2024</p>
+              </div>
+              <div className="mt-4 w-full space-y-2">
+                <div className="flex justify-between text-xs font-bold opacity-80">
+                  <span>LEVEL {level}</span>
+                  <span>{levelProgress.toLocaleString()} / {starsPerLevel.toLocaleString()} XP</span>
+                </div>
+                <div className="h-3 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255, 255, 255, 0.15)' }}>
+                  <div className="progress-fill h-full rounded-full" style={{ width: `${progressPct}%`, background: 'linear-gradient(90deg, #4ae898, #80f0b8)' }}></div>
+                </div>
               </div>
             </div>
           </div>
@@ -285,7 +289,7 @@ export default function HomeView() {
               value={appLanguageId}
               onChange={selectAppLanguage}
               options={displayLanguageOptions}
-              leading={<div className="flex h-12 w-12 items-center justify-center rounded-full shadow-sm" style={{ background: 'var(--app-card-bg)' }}><Icon style={{ color: 'var(--app-primary)' }}>language</Icon></div>}
+              leading={<div className="flex h-12 w-12 items-center justify-center rounded-full shadow-sm" style={{ background: 'var(--app-primary-container)' }}><Icon style={{ color: 'var(--app-primary)' }}>language</Icon></div>}
               trailing={<Icon style={{ color: 'var(--app-outline)' }}>expand_more</Icon>}
             />
 
@@ -295,7 +299,7 @@ export default function HomeView() {
               value={languageId}
               onChange={selectLanguage}
               options={displayLanguageOptions}
-              leading={<div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full text-2xl shadow-sm" style={{ background: 'var(--app-card-bg)' }}>{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>}
+              leading={<div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full text-2xl shadow-sm" style={{ background: 'var(--app-secondary-container)' }}>{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>}
               trailing={<div className="flex items-center gap-3"><span className="rounded-full px-3 py-1 text-[10px] font-black" style={{ background: 'var(--app-primary-container)', color: 'var(--app-primary)' }}>ACTIVE</span><Icon style={{ color: 'var(--app-outline)' }}>swap_horiz</Icon></div>}
             />
           </div>
@@ -304,7 +308,7 @@ export default function HomeView() {
         <section className="space-y-4">
           <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Profile Overview</h2>
 
-          <div className="card-surface space-y-4 p-5">
+          <div className="card-elevated space-y-4 p-5">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>Recent Mastery</p>
@@ -313,7 +317,7 @@ export default function HomeView() {
               {recentLetters.length > 0 ? (
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {recentLetters.map((letter) => (
-                    <div key={letter.id} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold shadow-sm" style={{ border: '1px solid var(--app-outline-variant)', background: 'var(--app-surface-high)', color: 'var(--app-primary)' }} title={letter.name}>
+                    <div key={letter.id} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold shadow-sm" style={{ border: '1px solid var(--app-primary-container)', background: 'var(--app-primary-container)', color: 'var(--app-primary)' }} title={letter.name}>
                       {letter.symbol}
                     </div>
                   ))}
@@ -338,7 +342,7 @@ export default function HomeView() {
                 recentModes.slice(0, 3).map((modeName) => {
                   const modeUi = modeDisplayByName[modeName] ?? { icon: 'sports_esports', color: 'var(--app-primary)', bg: 'var(--app-primary-container)' };
                   return (
-                    <div key={modeName} className="flex items-center gap-3 rounded-xl p-3 shadow-sm" style={{ background: 'var(--app-card-bg)' }}>
+                    <div key={modeName} className="flex items-center gap-3 rounded-xl p-3 shadow-sm" style={{ background: 'var(--app-card-bg)', border: '1px solid var(--app-card-border)' }}>
                       <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: modeUi.bg }}>
                         <Icon className="text-lg" style={{ color: modeUi.color }}>{modeUi.icon}</Icon>
                       </div>
@@ -369,9 +373,9 @@ export default function HomeView() {
         </section>
 
         <section className="grid grid-cols-2 gap-4">
-          <div className="card-surface space-y-3 p-6">
+          <div className="card-elevated space-y-3 p-6">
             <div className="flex items-start justify-between gap-2">
-              <Icon className="text-3xl" style={{ color: 'var(--app-secondary)' }} filled>bolt</Icon>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: 'var(--app-mode-bridge-bg)' }}><Icon className="text-xl" style={{ color: 'var(--app-secondary)' }} filled>bolt</Icon></div>
               <button type="button" className="btn-press rounded-full p-1" style={{ background: 'var(--app-surface-high)', color: 'var(--app-outline)' }} onClick={() => setIsEditingGoal((prev) => !prev)}>
                 <Icon className="text-sm">edit</Icon>
               </button>
@@ -396,9 +400,9 @@ export default function HomeView() {
               )}
             </div>
           </div>
-          <div className="card-surface space-y-3 p-6">
+          <div className="card-elevated space-y-3 p-6">
             <div className="flex items-start justify-between gap-2">
-              <Icon className="text-3xl" style={{ color: 'var(--app-primary)' }} filled>notifications</Icon>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: 'var(--app-mode-river-bg)' }}><Icon className="text-xl" style={{ color: 'var(--app-primary)' }} filled>notifications</Icon></div>
               <button type="button" className="btn-press rounded-full p-1" style={{ background: 'var(--app-surface-high)', color: 'var(--app-outline)' }} onClick={() => setIsEditingReminder((prev) => !prev)}>
                 <Icon className="text-sm">edit</Icon>
               </button>
