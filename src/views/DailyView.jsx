@@ -10,6 +10,14 @@ const MODE_LABELS = {
   deepScript: 'Deep Script',
 };
 
+const TASK_COLORS = {
+  warmup: { accent: 'var(--app-mode-river)', bg: 'var(--app-mode-river-bg)', surface: 'var(--app-mode-river-surface)', icon: 'fitness_center' },
+  focus: { accent: 'var(--app-mode-deep)', bg: 'var(--app-mode-deep-bg)', surface: 'var(--app-mode-deep-surface)', icon: 'center_focus_strong' },
+  spice: { accent: 'var(--app-mode-bridge)', bg: 'var(--app-mode-bridge-bg)', surface: 'var(--app-mode-bridge-surface)', icon: 'local_fire_department' },
+  streak: { accent: 'var(--app-mode-planks)', bg: 'var(--app-mode-planks-bg)', surface: 'var(--app-mode-planks-surface)', icon: 'trending_up' },
+  default: { accent: 'var(--app-mode-vocab)', bg: 'var(--app-mode-vocab-bg)', surface: 'var(--app-mode-vocab-surface)', icon: 'task_alt' },
+};
+
 function Icon({ children, className = '', filled = false }) {
   return (
     <span
@@ -35,51 +43,59 @@ function TaskCard({ task, onClaim, claiming }) {
     : task.completed
     ? 'Quest complete'
     : 'In progress…';
+  const tc = TASK_COLORS[task.id] ?? TASK_COLORS.default;
   return (
     <div
-      className="card-elevated quest-card rounded-2xl p-5 transition-all duration-200"
-      style={claimable ? { borderColor: 'var(--app-secondary)', borderWidth: '2px' } : {}}
+      className="quest-card rounded-2xl p-5 shadow-sm transition-all duration-200"
+      style={{
+        background: tc.surface,
+        border: claimable ? `2px solid ${tc.accent}` : `1px solid ${tc.bg}`,
+      }}
     >
       <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <p className="quest-category text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--app-muted)' }}>{task.title}</p>
-            {modeLabel && (
-              <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{
-                background: 'var(--app-mode-deep-bg)',
-                color: 'var(--app-mode-deep)',
-                border: '1px solid var(--app-card-border)',
-              }}>
-                {modeLabel}
-              </span>
-            )}
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-sm" style={{ background: tc.bg }}>
+            <Icon className="text-xl" style={{ color: tc.accent }} filled>{tc.icon}</Icon>
           </div>
-          <h3 className="quest-title mt-1 text-base font-semibold" style={{ color: 'var(--app-on-surface)' }}>{task.description}</h3>
+          <div>
+            <div className="flex items-center gap-2">
+              <p className="quest-category text-xs font-bold uppercase tracking-wider" style={{ color: tc.accent }}>{task.title}</p>
+              {modeLabel && (
+                <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{
+                  background: tc.bg,
+                  color: tc.accent,
+                }}>
+                  {modeLabel}
+                </span>
+              )}
+            </div>
+            <h3 className="quest-title mt-1 text-base font-semibold" style={{ color: 'var(--app-on-surface)' }}>{task.description}</h3>
+          </div>
         </div>
         <span
-          className="quest-badge shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
+          className="quest-badge shrink-0 rounded-full px-3 py-1 text-xs font-bold"
           style={task.completed
-            ? { background: 'var(--app-primary-container)', color: 'var(--app-primary)' }
+            ? { background: tc.bg, color: tc.accent }
             : { background: 'var(--app-secondary-container)', color: 'var(--app-secondary)' }
           }
         >
           {task.completed ? 'Complete' : 'In Progress'}
         </span>
       </div>
-      <div className="mt-4 h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--app-surface-high)' }}>
-        <div className="progress-fill h-full rounded-full" style={{ width: `${percentage}%`, background: 'var(--app-progress-fill)' }} />
+      <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full" style={{ background: 'rgba(0,0,0,0.06)' }}>
+        <div className="progress-fill h-full rounded-full" style={{ width: `${percentage}%`, background: tc.accent }} />
       </div>
       <div className="mt-3 flex items-center justify-between">
-        <span className="quest-progress-text text-sm" style={{ color: 'var(--app-muted)' }}>{statusLabel}</span>
-        <span className="quest-progress-text text-sm" style={{ color: 'var(--app-muted)' }}>
+        <span className="quest-progress-text text-sm font-semibold" style={{ color: tc.accent }}>{statusLabel}</span>
+        <span className="quest-progress-text text-sm font-semibold" style={{ color: 'var(--app-muted)' }}>
           {task.progress ?? 0} / {task.goal}
         </span>
       </div>
       {rewardValue > 0 && (
-        <div className="mt-4 space-y-3 rounded-xl p-4" style={{ background: 'var(--app-secondary-container)', border: '1px solid var(--app-card-border)' }}>
+        <div className="mt-4 space-y-3 rounded-xl p-4" style={{ background: tc.bg, border: `1px solid ${tc.accent}22` }}>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold" style={{ color: 'var(--app-secondary)' }}>Quest reward</span>
-            <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: 'var(--app-secondary)' }}>
+            <span className="text-xs font-bold" style={{ color: tc.accent }}>Quest reward</span>
+            <span className="flex items-center gap-1 text-xs font-bold" style={{ color: tc.accent }}>
               +{formattedReward} <Icon className="text-sm" filled>star</Icon>
             </span>
           </div>
@@ -90,8 +106,8 @@ function TaskCard({ task, onClaim, claiming }) {
               type="button"
               onClick={() => (claimable && !claiming && onClaim ? onClaim(task.id) : null)}
               disabled={!claimable || claiming}
-              className="btn-press w-full rounded-xl px-4 py-2 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-60"
-              style={{ background: 'var(--app-secondary)', color: 'var(--app-on-primary)' }}
+              className="btn-press w-full rounded-xl px-4 py-2.5 text-sm font-bold shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-60"
+              style={{ background: tc.accent, color: '#fff' }}
             >
               {claiming ? 'Claiming…' : `Claim +${formattedReward}`}
             </button>

@@ -196,11 +196,11 @@ export default function HomeView() {
   const wordProgressPct = totalWordTarget > 0 ? Math.min(Math.round((totalWordsLearned / totalWordTarget) * 100), 100) : 0;
 
   const modeDisplayByName = useMemo(() => ({
-    'Letter River': { icon: 'waves', color: 'var(--app-mode-river)', bg: 'var(--app-mode-river-bg)' },
-    'Bridge Builder': { icon: 'extension', color: 'var(--app-mode-bridge)', bg: 'var(--app-mode-bridge-bg)' },
-    'Deep Script': { icon: 'explore', color: 'var(--app-mode-deep)', bg: 'var(--app-mode-deep-bg)' },
-    'Loose Planks': { icon: 'view_stream', color: 'var(--app-mode-planks)', bg: 'var(--app-mode-planks-bg)' },
-    Vocabulary: { icon: 'school', color: 'var(--app-mode-vocab)', bg: 'var(--app-mode-vocab-bg)' }
+    'Letter River': { icon: 'waves', color: 'var(--app-mode-river)', bg: 'var(--app-mode-river-bg)', surface: 'var(--app-mode-river-surface)', border: 'var(--app-mode-river-bg)' },
+    'Bridge Builder': { icon: 'extension', color: 'var(--app-mode-bridge)', bg: 'var(--app-mode-bridge-bg)', surface: 'var(--app-mode-bridge-surface)', border: 'var(--app-mode-bridge-bg)' },
+    'Deep Script': { icon: 'explore', color: 'var(--app-mode-deep)', bg: 'var(--app-mode-deep-bg)', surface: 'var(--app-mode-deep-surface)', border: 'var(--app-mode-deep-bg)' },
+    'Loose Planks': { icon: 'view_stream', color: 'var(--app-mode-planks)', bg: 'var(--app-mode-planks-bg)', surface: 'var(--app-mode-planks-surface)', border: 'var(--app-mode-planks-bg)' },
+    Vocabulary: { icon: 'school', color: 'var(--app-mode-vocab)', bg: 'var(--app-mode-vocab-bg)', surface: 'var(--app-mode-vocab-surface)', border: 'var(--app-mode-vocab-bg)' }
   }), []);
 
   const recentAchievementXpByGame = useMemo(() => {
@@ -328,7 +328,7 @@ export default function HomeView() {
               {recentWords.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {recentWords.map((word) => (
-                    <span key={word.id} className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold shadow-sm" style={{ background: 'var(--app-card-bg)', color: 'var(--app-on-surface)' }}>
+                    <span key={word.id} className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold shadow-sm" style={{ background: 'var(--app-mode-deep-bg)', color: 'var(--app-mode-deep)' }}>
                       {word.text}
                     </span>
                   ))}
@@ -342,8 +342,8 @@ export default function HomeView() {
                 recentModes.slice(0, 3).map((modeName) => {
                   const modeUi = modeDisplayByName[modeName] ?? { icon: 'sports_esports', color: 'var(--app-primary)', bg: 'var(--app-primary-container)' };
                   return (
-                    <div key={modeName} className="flex items-center gap-3 rounded-xl p-3 shadow-sm" style={{ background: 'var(--app-card-bg)', border: '1px solid var(--app-card-border)' }}>
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: modeUi.bg }}>
+                    <div key={modeName} className="flex items-center gap-3 rounded-xl p-3 shadow-sm" style={{ background: modeUi.surface, border: `1px solid ${modeUi.border}` }}>
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full shadow-sm" style={{ background: modeUi.bg }}>
                         <Icon className="text-lg" style={{ color: modeUi.color }}>{modeUi.icon}</Icon>
                       </div>
                       <div className="flex flex-1 items-center justify-between">
@@ -365,18 +365,18 @@ export default function HomeView() {
                 <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>Total Progress</p>
                 <p className="text-xs font-bold" style={{ color: 'var(--app-primary)' }}>{totalWordsLearned} / {totalWordTarget} Words</p>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--app-card-bg)' }}>
-                <div className="progress-fill h-full rounded-full" style={{ width: `${wordProgressPct}%`, background: 'var(--app-progress-fill)' }}></div>
+              <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--app-mode-river-bg)' }}>
+                <div className="progress-fill h-full rounded-full" style={{ width: `${wordProgressPct}%`, background: 'linear-gradient(90deg, var(--app-mode-river), var(--app-mode-vocab))' }}></div>
               </div>
             </div>
           </div>
         </section>
 
         <section className="grid grid-cols-2 gap-4">
-          <div className="card-elevated space-y-3 p-6">
+          <div className="space-y-3 rounded-2xl p-6 shadow-sm" style={{ background: 'var(--app-mode-bridge-surface)', border: '1px solid var(--app-mode-bridge-bg)' }}>
             <div className="flex items-start justify-between gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: 'var(--app-mode-bridge-bg)' }}><Icon className="text-xl" style={{ color: 'var(--app-secondary)' }} filled>bolt</Icon></div>
-              <button type="button" className="btn-press rounded-full p-1" style={{ background: 'var(--app-surface-high)', color: 'var(--app-outline)' }} onClick={() => setIsEditingGoal((prev) => !prev)}>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl shadow-sm" style={{ background: 'var(--app-mode-bridge-bg)' }}><Icon className="text-xl" style={{ color: 'var(--app-mode-bridge)' }} filled>bolt</Icon></div>
+              <button type="button" className="btn-press rounded-full p-1" style={{ background: 'rgba(255,255,255,0.5)', color: 'var(--app-mode-bridge)' }} onClick={() => setIsEditingGoal((prev) => !prev)}>
                 <Icon className="text-sm">edit</Icon>
               </button>
             </div>
@@ -391,19 +391,19 @@ export default function HomeView() {
                     value={dailyGoalMinutes}
                     onChange={(event) => setDailyGoalMinutes(Math.max(5, Math.min(180, Number(event.target.value) || 15)))}
                     className="w-20 rounded-lg px-2 py-1 text-sm font-semibold"
-                    style={{ border: '1px solid var(--app-input-border)', background: 'var(--app-input-bg)', color: 'var(--app-on-surface)' }}
+                    style={{ border: '1px solid var(--app-mode-bridge-bg)', background: 'rgba(255,255,255,0.7)', color: 'var(--app-on-surface)' }}
                   />
-                  <span className="text-xs font-semibold" style={{ color: 'var(--app-muted)' }}>mins/day</span>
+                  <span className="text-xs font-semibold" style={{ color: 'var(--app-mode-bridge)' }}>mins/day</span>
                 </div>
               ) : (
-                <p className="line-clamp-1-stable text-sm" style={{ color: 'var(--app-muted)' }}>{dailyGoalMinutes} mins / day</p>
+                <p className="line-clamp-1-stable text-sm font-semibold" style={{ color: 'var(--app-mode-bridge)' }}>{dailyGoalMinutes} mins / day</p>
               )}
             </div>
           </div>
-          <div className="card-elevated space-y-3 p-6">
+          <div className="space-y-3 rounded-2xl p-6 shadow-sm" style={{ background: 'var(--app-mode-river-surface)', border: '1px solid var(--app-mode-river-bg)' }}>
             <div className="flex items-start justify-between gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: 'var(--app-mode-river-bg)' }}><Icon className="text-xl" style={{ color: 'var(--app-primary)' }} filled>notifications</Icon></div>
-              <button type="button" className="btn-press rounded-full p-1" style={{ background: 'var(--app-surface-high)', color: 'var(--app-outline)' }} onClick={() => setIsEditingReminder((prev) => !prev)}>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl shadow-sm" style={{ background: 'var(--app-mode-river-bg)' }}><Icon className="text-xl" style={{ color: 'var(--app-mode-river)' }} filled>notifications</Icon></div>
+              <button type="button" className="btn-press rounded-full p-1" style={{ background: 'rgba(255,255,255,0.5)', color: 'var(--app-mode-river)' }} onClick={() => setIsEditingReminder((prev) => !prev)}>
                 <Icon className="text-sm">edit</Icon>
               </button>
             </div>
@@ -416,11 +416,11 @@ export default function HomeView() {
                     value={reminderTime}
                     onChange={(event) => setReminderTime(event.target.value)}
                     className="rounded-lg px-2 py-1 text-sm font-semibold"
-                    style={{ border: '1px solid var(--app-input-border)', background: 'var(--app-input-bg)', color: 'var(--app-on-surface)' }}
+                    style={{ border: '1px solid var(--app-mode-river-bg)', background: 'rgba(255,255,255,0.7)', color: 'var(--app-on-surface)' }}
                   />
                 </div>
               ) : (
-                <p className="line-clamp-1-stable text-sm" style={{ color: 'var(--app-muted)' }}>
+                <p className="line-clamp-1-stable text-sm font-semibold" style={{ color: 'var(--app-mode-river)' }}>
                   {formatReminderTime(reminderTime)}
                 </p>
               )}

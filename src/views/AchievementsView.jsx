@@ -40,6 +40,16 @@ function getBadgeCopy(badge, t, gameName, goal) {
   return { name, summary };
 }
 
+const SECTION_COLORS = {
+  classic: { accent: 'var(--app-mode-river)', bg: 'var(--app-mode-river-bg)', surface: 'var(--app-mode-river-surface)' },
+  special: { accent: 'var(--app-mode-deep)', bg: 'var(--app-mode-deep-bg)', surface: 'var(--app-mode-deep-surface)' },
+  polyglot: { accent: 'var(--app-mode-vocab)', bg: 'var(--app-mode-vocab-bg)', surface: 'var(--app-mode-vocab-surface)' },
+  dedication: { accent: 'var(--app-mode-bridge)', bg: 'var(--app-mode-bridge-bg)', surface: 'var(--app-mode-bridge-surface)' },
+  bridgeBuilder: { accent: 'var(--app-mode-bridge)', bg: 'var(--app-mode-bridge-bg)', surface: 'var(--app-mode-bridge-surface)' },
+  deepScript: { accent: 'var(--app-mode-deep)', bg: 'var(--app-mode-deep-bg)', surface: 'var(--app-mode-deep-surface)' },
+  default: { accent: 'var(--app-mode-planks)', bg: 'var(--app-mode-planks-bg)', surface: 'var(--app-mode-planks-surface)' },
+};
+
 function AwardCard({ badge, progress, onClaim, t }) {
   const totalTiers = badge.tiers.length;
   const unclaimed = Array.isArray(progress?.unclaimed) ? progress.unclaimed : [];
@@ -51,6 +61,7 @@ function AwardCard({ badge, progress, onClaim, t }) {
   const current = nextReward ? goal : Math.min(progress?.progress ?? 0, goal);
   const pct = Math.min((current / goal) * 100, 100);
   const { name, summary } = getBadgeCopy(badge, t, t('app.title'), goal);
+  const sc = SECTION_COLORS[badge.section] ?? SECTION_COLORS.default;
 
   return (
     <button
@@ -58,15 +69,15 @@ function AwardCard({ badge, progress, onClaim, t }) {
       onClick={() => nextReward && onClaim(badge.id, nextReward.tier)}
       disabled={!nextReward}
       className={`stable-card w-full rounded-xl p-4 text-left transition-all duration-200 ${nextReward ? 'hover:scale-[1.01]' : ''}`}
-      style={{ background: nextReward ? 'var(--app-surface)' : 'var(--app-card-bg)', border: '1px solid var(--app-card-border)' }}
+      style={{ background: nextReward ? sc.surface : 'var(--app-card-bg)', border: `1px solid ${nextReward ? sc.bg : 'var(--app-card-border)'}` }}
     >
       <div className="mb-2 flex items-center justify-between">
         <h4 className="line-clamp-1-stable font-bold" style={{ color: 'var(--app-on-surface)' }}>{name}</h4>
-        {nextReward ? <span className="rounded-full px-2 py-1 text-[10px] font-black" style={{ background: 'var(--app-primary)', color: 'var(--app-on-primary)' }}>CLAIM +{nextReward.stars}</span> : null}
+        {nextReward ? <span className="rounded-full px-2 py-1 text-[10px] font-black shadow-sm" style={{ background: sc.accent, color: '#fff' }}>CLAIM +{nextReward.stars}</span> : null}
       </div>
       <p className="line-clamp-2-stable text-xs" style={{ color: 'var(--app-muted)' }}>{summary}</p>
-      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--app-outline-variant)', opacity: 0.3 }}>
-        <div className="progress-fill h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--app-progress-fill)' }}></div>
+      <div className="mt-3 h-2 w-full overflow-hidden rounded-full" style={{ background: 'rgba(0,0,0,0.06)' }}>
+        <div className="progress-fill h-full rounded-full" style={{ width: `${pct}%`, background: sc.accent }}></div>
       </div>
     </button>
   );
@@ -199,9 +210,9 @@ export default function AchievementsView() {
         </section>
 
         <section className="mb-10 grid grid-cols-2 gap-4">
-          <div className="stable-card col-span-2 flex items-center justify-between overflow-hidden rounded-xl p-6" style={{ background: 'var(--app-surface)', border: '1px solid var(--app-card-border)' }}>
+          <div className="stable-card col-span-2 flex items-center justify-between overflow-hidden rounded-xl p-6" style={{ background: 'var(--app-mode-bridge-surface)', border: '1px solid var(--app-mode-bridge-bg)' }}>
             <div className="flex-1">
-              <span className="mb-3 inline-block rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider" style={{ background: 'var(--app-secondary-container)', color: 'var(--app-secondary)' }}>Most Recent</span>
+              <span className="mb-3 inline-block rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider" style={{ background: 'var(--app-mode-bridge-bg)', color: 'var(--app-mode-bridge)' }}>Most Recent</span>
               <h3 className="line-clamp-1-stable mb-1 text-xl font-bold" style={{ color: 'var(--app-on-surface)' }}>
                 {recentBadge ? getBadgeCopy(recentBadge, t, gameName, recentBadge?.tiers?.[0]?.goal ?? 1).name : 'Polyglot Pioneer'}
               </h3>
@@ -209,7 +220,7 @@ export default function AchievementsView() {
                 {recentBadge ? getBadgeCopy(recentBadge, t, gameName, recentBadge?.tiers?.[0]?.goal ?? 1).summary : 'Completed 5 different language paths.'}
               </p>
             </div>
-            <div className="ml-4 flex h-20 w-20 items-center justify-center rounded-full shadow-sm" style={{ background: 'var(--app-secondary-container)' }}><Icon className="text-4xl" style={{ color: 'var(--app-secondary)' }} filled>emoji_events</Icon></div>
+            <div className="ml-4 flex h-20 w-20 items-center justify-center rounded-full shadow-sm" style={{ background: 'var(--app-mode-bridge-bg)' }}><Icon className="text-4xl" style={{ color: 'var(--app-mode-bridge)' }} filled>emoji_events</Icon></div>
           </div>
 
           {milestones.map((badge, index) => {
@@ -217,13 +228,16 @@ export default function AchievementsView() {
             const goal = badge.tiers[Math.min(state?.tier ?? 0, badge.tiers.length - 1)]?.goal ?? 1;
             const current = Math.min(state?.progress ?? 0, goal);
             const pct = Math.round((current / goal) * 100);
+            const mColors = index === 0
+              ? { surface: 'var(--app-mode-deep-surface)', border: 'var(--app-mode-deep-bg)', accent: 'var(--app-mode-deep)', bg: 'var(--app-mode-deep-bg)' }
+              : { surface: 'var(--app-mode-planks-surface)', border: 'var(--app-mode-planks-bg)', accent: 'var(--app-mode-planks)', bg: 'var(--app-mode-planks-bg)' };
             return (
-              <div key={badge.id} className="stable-card flex flex-col rounded-xl p-5" style={{ background: index === 0 ? 'var(--app-surface-high)' : 'var(--app-surface)' }}>
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full" style={{ background: 'var(--app-primary-container)' }}><Icon style={{ color: 'var(--app-primary)' }} filled>{index === 0 ? 'history_edu' : 'auto_awesome'}</Icon></div>
+              <div key={badge.id} className="stable-card flex flex-col rounded-xl p-5" style={{ background: mColors.surface, border: `1px solid ${mColors.border}` }}>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full shadow-sm" style={{ background: mColors.bg }}><Icon style={{ color: mColors.accent }} filled>{index === 0 ? 'history_edu' : 'auto_awesome'}</Icon></div>
                 <div>
                   <h4 className="line-clamp-1-stable mb-1 text-lg font-bold leading-tight" style={{ color: 'var(--app-on-surface)' }}>{getBadgeCopy(badge, t, gameName, goal).name}</h4>
                   <p className="line-clamp-2-stable text-xs" style={{ color: 'var(--app-muted)' }}>{getBadgeCopy(badge, t, gameName, goal).summary}</p>
-                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--app-outline-variant)', opacity: 0.3 }}><div className="progress-fill h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--app-progress-fill)' }}></div></div>
+                  <div className="mt-3 h-2 w-full overflow-hidden rounded-full" style={{ background: 'rgba(0,0,0,0.06)' }}><div className="progress-fill h-full rounded-full" style={{ width: `${pct}%`, background: mColors.accent }}></div></div>
                 </div>
               </div>
             );
@@ -243,28 +257,31 @@ export default function AchievementsView() {
 
         <h3 className="mb-6 text-xl font-extrabold" style={{ color: 'var(--app-primary)', fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Upcoming Milestones</h3>
         <div className="mb-10 space-y-4">
-          {upcomingByGroup.map((group) => (
+          {upcomingByGroup.map((group) => {
+            const gc = SECTION_COLORS[group.sections?.[0]] ?? SECTION_COLORS.default;
+            return (
             <div key={group.key} className="space-y-2">
-              <h4 className="text-xs font-extrabold uppercase tracking-widest" style={{ color: 'var(--app-muted)' }}>{group.label}</h4>
+              <h4 className="text-xs font-extrabold uppercase tracking-widest" style={{ color: gc.accent }}>{group.label}</h4>
               {group.badges.length > 0 ? (
                 group.badges.map((badge) => {
                   const state = badges?.[badge.id];
                   const goal = badge.tiers[Math.min(state?.tier ?? 0, badge.tiers.length - 1)]?.goal ?? 1;
                   const current = Math.min(state?.progress ?? 0, goal);
                   const pct = Math.round((current / goal) * 100);
+                  const bc = SECTION_COLORS[badge.section] ?? gc;
                   return (
-                    <div key={badge.id} className="stable-card flex items-center gap-5 rounded-xl p-4 transition-all duration-200" style={{ border: '1px solid var(--app-card-border)' }}>
+                    <div key={badge.id} className="stable-card flex items-center gap-5 rounded-xl p-4 transition-all duration-200" style={{ border: `1px solid ${bc.bg}`, background: 'var(--app-card-bg)' }}>
                       <div className="relative">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-full" style={{ background: 'var(--app-surface-high)' }}><Icon style={{ color: 'var(--app-outline)' }}>workspace_premium</Icon></div>
-                        <div className="absolute -bottom-1 -right-1 rounded-full p-1 shadow-sm" style={{ background: 'var(--app-card-bg)' }}><Icon className="text-[14px]" style={{ color: 'var(--app-primary)' }}>lock</Icon></div>
+                        <div className="flex h-14 w-14 items-center justify-center rounded-full shadow-sm" style={{ background: bc.bg }}><Icon style={{ color: bc.accent }}>workspace_premium</Icon></div>
+                        <div className="absolute -bottom-1 -right-1 rounded-full p-1 shadow-sm" style={{ background: 'var(--app-card-bg)' }}><Icon className="text-[14px]" style={{ color: bc.accent }}>lock</Icon></div>
                       </div>
                       <div className="flex-1">
                         <div className="mb-1 flex items-end justify-between">
                           <h4 className="line-clamp-1-stable font-bold" style={{ color: 'var(--app-on-surface)' }}>{getBadgeCopy(badge, t, gameName, goal).name}</h4>
-                          <span className="text-[10px] font-bold" style={{ color: 'var(--app-muted)' }}>{current}/{goal}</span>
+                          <span className="text-[10px] font-bold" style={{ color: bc.accent }}>{current}/{goal}</span>
                         </div>
                         <p className="line-clamp-2-stable mb-2 text-xs" style={{ color: 'var(--app-muted)' }}>{getBadgeCopy(badge, t, gameName, goal).summary}</p>
-                        <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--app-surface-high)' }}><div className="progress-fill h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--app-progress-fill)', opacity: 0.4 }}></div></div>
+                        <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'rgba(0,0,0,0.06)' }}><div className="progress-fill h-full rounded-full" style={{ width: `${pct}%`, background: bc.accent }}></div></div>
                       </div>
                     </div>
                   );
@@ -273,7 +290,8 @@ export default function AchievementsView() {
                 <div className="rounded-xl p-3 text-xs font-semibold" style={{ background: 'var(--app-card-bg)', color: 'var(--app-outline)' }}>No in-progress milestones in this section.</div>
               )}
             </div>
-          ))}
+            );
+          })}
           {upcoming.length === 0 ? (
             <div className="rounded-xl p-3 text-xs font-semibold" style={{ background: 'var(--app-card-bg)', color: 'var(--app-outline)' }}>No milestones in progress yet.</div>
           ) : null}
@@ -292,16 +310,19 @@ export default function AchievementsView() {
           </button>
 
           {isAllAchievementsExpanded ? (
-            allByGroup.map((group) => (
+            allByGroup.map((group) => {
+              const agc = SECTION_COLORS[group.sections?.[0]] ?? SECTION_COLORS.default;
+              return (
               <div key={group.key} className="space-y-2">
-                <h4 className="text-xs font-extrabold uppercase tracking-widest" style={{ color: 'var(--app-muted)' }}>{group.label}</h4>
+                <h4 className="text-xs font-extrabold uppercase tracking-widest" style={{ color: agc.accent }}>{group.label}</h4>
                 <div className="space-y-2">
                   {group.badges.map((badge) => (
                     <AwardCard key={badge.id} badge={badge} progress={badges?.[badge.id]} onClaim={handleClaim} t={t} />
                   ))}
                 </div>
               </div>
-            ))
+              );
+            })
           ) : null}
 
           {isAllAchievementsExpanded && totalAchievementCount === 0 ? (

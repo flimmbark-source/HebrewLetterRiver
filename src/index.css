@@ -55,9 +55,9 @@
   --app-primary: #1a7a55;
   --app-primary-light: #28a06e;
   --app-on-primary: #ffffff;
-  --app-primary-container: #c8eed9;
-  --app-secondary: #b07830;
-  --app-secondary-container: #fce4b8;
+  --app-primary-container: #a8e6c4;
+  --app-secondary: #c07a10;
+  --app-secondary-container: #fcd888;
   --app-outline: #9a8e7e;
   --app-outline-variant: #c8bfae;
   --app-card-bg: #fffdf8;
@@ -82,16 +82,21 @@
   --app-popup-border: rgba(180, 160, 120, 0.15);
 
   /* === GAME MODE ACCENT TOKENS === */
-  --app-mode-river: #1a7a55;
-  --app-mode-river-bg: #dff0e8;
-  --app-mode-bridge: #b07830;
-  --app-mode-bridge-bg: #fdf0d8;
-  --app-mode-deep: #6b4fa0;
-  --app-mode-deep-bg: #ece6f5;
-  --app-mode-planks: #3b5998;
-  --app-mode-planks-bg: #e0e8f5;
-  --app-mode-vocab: #1a7a8a;
-  --app-mode-vocab-bg: #daf0f4;
+  --app-mode-river: #0d8a5e;
+  --app-mode-river-bg: #c2f0d8;
+  --app-mode-river-surface: linear-gradient(135deg, #e0fae9 0%, #c2f0d8 100%);
+  --app-mode-bridge: #c07a10;
+  --app-mode-bridge-bg: #fce4a8;
+  --app-mode-bridge-surface: linear-gradient(135deg, #fff5d6 0%, #fce4a8 100%);
+  --app-mode-deep: #7040b8;
+  --app-mode-deep-bg: #e2d6f8;
+  --app-mode-deep-surface: linear-gradient(135deg, #f0e8ff 0%, #e2d6f8 100%);
+  --app-mode-planks: #2d5ccc;
+  --app-mode-planks-bg: #c8d8f8;
+  --app-mode-planks-surface: linear-gradient(135deg, #e0ebff 0%, #c8d8f8 100%);
+  --app-mode-vocab: #0d7a8a;
+  --app-mode-vocab-bg: #b8ecf4;
+  --app-mode-vocab-surface: linear-gradient(135deg, #d8f5fa 0%, #b8ecf4 100%);
 }
 
 /* === DARK MODE OVERRIDES === */
@@ -135,15 +140,20 @@ body.dark-mode {
 
   /* === GAME MODE ACCENT TOKENS (Dark) === */
   --app-mode-river: #4ae898;
-  --app-mode-river-bg: rgba(74, 232, 152, 0.1);
+  --app-mode-river-bg: rgba(74, 232, 152, 0.15);
+  --app-mode-river-surface: linear-gradient(135deg, rgba(74, 232, 152, 0.08) 0%, rgba(74, 232, 152, 0.18) 100%);
   --app-mode-bridge: #f0c35a;
-  --app-mode-bridge-bg: rgba(240, 195, 90, 0.1);
+  --app-mode-bridge-bg: rgba(240, 195, 90, 0.15);
+  --app-mode-bridge-surface: linear-gradient(135deg, rgba(240, 195, 90, 0.08) 0%, rgba(240, 195, 90, 0.18) 100%);
   --app-mode-deep: #b08df8;
-  --app-mode-deep-bg: rgba(176, 141, 248, 0.1);
+  --app-mode-deep-bg: rgba(176, 141, 248, 0.15);
+  --app-mode-deep-surface: linear-gradient(135deg, rgba(176, 141, 248, 0.08) 0%, rgba(176, 141, 248, 0.18) 100%);
   --app-mode-planks: #7da0e0;
-  --app-mode-planks-bg: rgba(125, 160, 224, 0.1);
+  --app-mode-planks-bg: rgba(125, 160, 224, 0.15);
+  --app-mode-planks-surface: linear-gradient(135deg, rgba(125, 160, 224, 0.08) 0%, rgba(125, 160, 224, 0.18) 100%);
   --app-mode-vocab: #5cc8d8;
-  --app-mode-vocab-bg: rgba(92, 200, 216, 0.1);
+  --app-mode-vocab-bg: rgba(92, 200, 216, 0.15);
+  --app-mode-vocab-surface: linear-gradient(135deg, rgba(92, 200, 216, 0.08) 0%, rgba(92, 200, 216, 0.18) 100%);
 }
 
 /* ─── Token-aware dark mode for elements still using hardcoded values ─── */
