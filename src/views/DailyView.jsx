@@ -10,7 +10,19 @@ const MODE_LABELS = {
   deepScript: 'Deep Script',
 };
 
-function TaskCard({ task, accent, onClaim, claiming }) {
+function Icon({ children, className = '', filled = false }) {
+  return (
+    <span
+      className={`material-symbols-outlined ${className}`}
+      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
+      aria-hidden="true"
+    >
+      {children}
+    </span>
+  );
+}
+
+function TaskCard({ task, onClaim, claiming }) {
   const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
   const rewardValue = Number.isFinite(task.rewardStars) ? Math.max(0, task.rewardStars) : 0;
   const formattedReward = rewardValue.toLocaleString();
@@ -19,73 +31,72 @@ function TaskCard({ task, accent, onClaim, claiming }) {
   const statusLabel = task.rewardClaimed
     ? 'Reward collected'
     : claimable
-    ? `Claim +${formattedReward} ⭐`
+    ? `Claim +${formattedReward}`
     : task.completed
     ? 'Quest complete'
     : 'In progress…';
   return (
     <div
-      className={`quest-card rounded-3xl border bg-slate-900/70 shadow-inner transition ${
-        claimable ? 'border-amber-400/40 ring-1 ring-amber-300/60' : 'border-slate-800'
-      }`}
+      className="quest-card rounded-2xl p-5 shadow-sm transition-all duration-200"
+      style={{
+        background: 'var(--app-card-bg)',
+        border: claimable ? '2px solid var(--app-secondary)' : '1px solid var(--app-card-border)',
+      }}
     >
       <div className="flex items-start justify-between">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <p className="quest-category text-slate-400" style={{ margin: 0 }}>{task.title}</p>
+          <div className="flex items-center gap-2">
+            <p className="quest-category text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--app-muted)' }}>{task.title}</p>
             {modeLabel && (
-              <span style={{
-                fontSize: '0.65rem',
-                padding: '1px 7px',
-                borderRadius: '9999px',
-                backgroundColor: 'rgba(99,102,241,0.2)',
-                color: '#a5b4fc',
-                border: '1px solid rgba(99,102,241,0.3)',
-                fontWeight: 600,
-                whiteSpace: 'nowrap',
+              <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{
+                background: 'var(--app-mode-deep-bg)',
+                color: 'var(--app-mode-deep)',
+                border: '1px solid var(--app-card-border)',
               }}>
                 {modeLabel}
               </span>
             )}
           </div>
-          <h3 className="quest-title text-white">{task.description}</h3>
+          <h3 className="quest-title mt-1 text-base font-semibold" style={{ color: 'var(--app-on-surface)' }}>{task.description}</h3>
         </div>
         <span
-          className={`quest-badge rounded-full px-3 py-1 ${accent}`}
-          style={!task.completed ? {
-            backgroundColor: 'rgba(231, 231, 72, 0.2)',
-            color: '#4a2208',
-            border: '1px solid rgba(231, 231, 72, 0.4)'
-          } : {}}
+          className="quest-badge shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
+          style={task.completed
+            ? { background: 'var(--app-primary-container)', color: 'var(--app-primary)' }
+            : { background: 'var(--app-secondary-container)', color: 'var(--app-secondary)' }
+          }
         >
           {task.completed ? 'Complete' : 'In Progress'}
         </span>
       </div>
-      <div className="mt-5 h-2 rounded-full bg-slate-800">
-        <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" style={{ width: `${percentage}%` }} />
+      <div className="mt-4 h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--app-surface-high)' }}>
+        <div className="progress-fill h-full rounded-full" style={{ width: `${percentage}%`, background: 'var(--app-progress-fill)' }} />
       </div>
       <div className="mt-3 flex items-center justify-between">
-        <span className="quest-progress-text text-slate-300">{statusLabel}</span>
-        <span className="quest-progress-text text-slate-300">
+        <span className="quest-progress-text text-sm" style={{ color: 'var(--app-muted)' }}>{statusLabel}</span>
+        <span className="quest-progress-text text-sm" style={{ color: 'var(--app-muted)' }}>
           {task.progress ?? 0} / {task.goal}
         </span>
       </div>
       {rewardValue > 0 && (
-        <div className="mt-4 space-y-3 rounded-2xl border border-amber-400/50 bg-amber-400/10 p-4">
+        <div className="mt-4 space-y-3 rounded-xl p-4" style={{ background: 'var(--app-secondary-container)', border: '1px solid var(--app-card-border)' }}>
           <div className="flex items-center justify-between">
-            <span className="quest-reward-text text-amber-100">Quest reward</span>
-            <span className="quest-reward-text text-amber-100">+{formattedReward} ⭐</span>
+            <span className="text-xs font-semibold" style={{ color: 'var(--app-secondary)' }}>Quest reward</span>
+            <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: 'var(--app-secondary)' }}>
+              +{formattedReward} <Icon className="text-sm" filled>star</Icon>
+            </span>
           </div>
           {task.rewardClaimed ? (
-            <p className="quest-reward-text text-amber-100/80">Reward collected</p>
+            <p className="text-xs font-semibold" style={{ color: 'var(--app-muted)' }}>Reward collected</p>
           ) : (
             <button
               type="button"
               onClick={() => (claimable && !claiming && onClaim ? onClaim(task.id) : null)}
               disabled={!claimable || claiming}
-              className="w-full rounded-xl border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/20 focus:outline-none focus:ring-2 focus:ring-amber-300/60 disabled:cursor-not-allowed disabled:opacity-60"
+              className="btn-press w-full rounded-xl px-4 py-2 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-60"
+              style={{ background: 'var(--app-secondary)', color: 'var(--app-on-primary)' }}
             >
-              {claiming ? 'Claiming…' : `Claim +${formattedReward} ⭐`}
+              {claiming ? 'Claiming…' : `Claim +${formattedReward}`}
             </button>
           )}
         </div>
@@ -169,35 +180,30 @@ export default function DailyView() {
     [claimDailyReward, claimingTaskId, triggerCelebration]
   );
 
-  const rewardHighlightClass = celebrating
-    ? 'ring-2 ring-amber-400/70 shadow-amber-300/30 animate-pulse'
-    : dailyClaimable
-    ? 'border-amber-400/40'
-    : '';
-
   const claimedDate = daily?.claimedAt ? new Date(daily.claimedAt).toLocaleDateString() : null;
 
   if (!daily) {
     return (
-      <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 text-center text-slate-400">
+      <div className="rounded-2xl p-8 text-center" style={{ background: 'var(--app-surface)', border: '1px solid var(--app-card-border)', color: 'var(--app-muted)' }}>
         Loading daily quests…
       </div>
     );
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 stagger-children">
 
       <section
-        className={`rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-inner transition ${rewardHighlightClass}`}
+        className="card-elevated rounded-2xl p-6 transition-all duration-200"
+        style={celebrating ? { boxShadow: '0 0 0 2px var(--app-secondary)' } : {}}
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">{t('daily.badge.title')}</p>
-            <h2 className="text-2xl font-semibold text-white sm:text-3xl">
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--app-primary)' }}>{t('daily.badge.title')}</p>
+            <h2 className="text-2xl font-bold sm:text-3xl" style={{ color: 'var(--app-on-surface)', fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
               {dailyClaimable ? t('daily.badge.claimStars') : rewardClaimed ? t('daily.badge.rewardsCollected') : t('daily.badge.completeQuests')}
             </h2>
-            <p className="text-sm text-slate-300">
+            <p className="text-sm" style={{ color: 'var(--app-muted)' }}>
               {dailyClaimable
                 ? t('daily.badge.starsReady', { stars: formatNumber(rewardStars) })
                 : t('daily.badge.finishQuests')}
@@ -208,12 +214,12 @@ export default function DailyView() {
               type="button"
               onClick={handleClaimAll}
               disabled={claiming || Boolean(claimingTaskId)}
-              className="rounded-full bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+              className="btn-cta shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {claiming ? 'Claiming…' : `Claim all +${formatNumber(rewardStars)} ⭐`}
+              {claiming ? 'Claiming…' : `Claim all +${formatNumber(rewardStars)}`}
             </button>
           ) : (
-            <span className="rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-300">
+            <span className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold" style={{ border: '1px solid var(--app-card-border)', color: 'var(--app-muted)' }}>
               {rewardClaimed ? `Claimed ${claimedDate ?? 'today'}` : 'Keep going!'}
             </span>
           )}
@@ -225,19 +231,18 @@ export default function DailyView() {
           <TaskCard
             key={task.id}
             task={task}
-            accent={task.completed ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40' : ''}
             onClaim={handleClaimTask}
             claiming={claiming || claimingTaskId === task.id}
           />
         ))}
       </section>
 
-      <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
-        <h2 className="text-lg font-semibold text-white">Tips for today&apos;s run</h2>
-        <ul className="mt-3 space-y-2 text-sm text-slate-300">
+      <section className="card-surface rounded-2xl p-6">
+        <h2 className="text-lg font-bold" style={{ color: 'var(--app-on-surface)', fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Tips for today&apos;s run</h2>
+        <ul className="mt-3 space-y-2 text-sm" style={{ color: 'var(--app-muted)' }}>
           <li>• Warm-Up completes when you finish two full game sessions.</li>
           <li>
-            • Focus tracks perfect catches featuring <span className={`${fontClass} text-2xl text-cyan-300`}>{focusLetter}</span> — drop with precision.
+            • Focus tracks perfect catches featuring <span className={`${fontClass} text-2xl`} style={{ color: 'var(--app-primary)' }}>{focusLetter}</span> — drop with precision.
           </li>
           <li>• Spice checks your constraint — toggle the setting before you press start and finish a session to clear it.</li>
         </ul>

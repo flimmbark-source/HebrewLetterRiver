@@ -605,8 +605,8 @@ function GameCanvas({ fontClass, loadedSettings }) {
     id="modal-content"
     className="relative w-full max-w-lg shadow-2xl"
     style={{
-      border: '1px solid #E5E7EB',
-      background: 'linear-gradient(180deg, #fffce3ff 0%, #fae5d1ff 50%, #fdf4e0ff 100%)',
+      border: '1px solid var(--app-card-border)',
+      background: 'var(--app-card-bg)',
       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
     }}
     onClick={(e) => e.stopPropagation()}
@@ -616,25 +616,25 @@ function GameCanvas({ fontClass, loadedSettings }) {
               id="accessibility-btn"
               className="absolute left-2 top-1 text-2xl transition p-2 rounded-lg hover:bg-emerald-100/50 active:bg-emerald-200/50"
               aria-label={t('game.accessibility.gear')}
-              style={{ color: '#059669', minWidth: '44px', minHeight: '44px', zIndex: 10 }}            >
+              style={{ color: 'var(--app-primary)', minWidth: '44px', minHeight: '44px', zIndex: 10 }}            >
               ⚙️
             </button>
             <div id="setup-view" className="flex flex-col h-full">
               <div
                 className="relative flex items-center justify-center px-3 py-2 border-b-2"
-                style={{ borderColor: '#D1FAE5' }}
+                style={{ borderColor: 'var(--app-primary-container)' }}
               >
                 <div className="flex flex-col items-center flex-1 text-center gap-1">
                   <h1
                     className={`modal-title text-xl sm:text-2xl font-bold ${fontClass}`}
-                    style={{ color: '#059669' }}
+                    style={{ color: 'var(--app-primary)' }}
                   >
                     {t('game.setup.title')}
                   </h1>
                   <p
                     id="modal-subtitle"
                     className="text-xs font-semibold sm:text-sm"
-                    style={{ color: '#065F46' }}
+                    style={{ color: 'var(--app-on-surface)' }}
                   >
                     {t('game.setup.subtitleFallback')}
                   </p>
@@ -644,7 +644,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 <aside className="goal-column goal-selector" aria-label="Goal settings">
                   <div
                     className="goal-column__label text-xs font-bold uppercase tracking-wider"
-                    style={{ color: '#065F46' }}
+                    style={{ color: 'var(--app-on-surface)' }}
                   >
                     {t('game.setup.goal', 'Goal')}
                   </div>
@@ -733,7 +733,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 <section className="mode-column">
                   <h2
                     className="mode-column__headline text-xs font-bold uppercase tracking-wider"
-                    style={{ color: '#065F46' }}
+                    style={{ color: 'var(--app-on-surface)' }}
                   >
                     {t('game.setup.prompt')}
                   </h2>
@@ -774,14 +774,14 @@ function GameCanvas({ fontClass, loadedSettings }) {
               <h2
                 id="game-over-heading"
                 className={`mb-4 text-4xl font-bold ${fontClass}`}
-                style={{ color: '#064E3B' }}
+                style={{ color: 'var(--app-primary)' }}
               >
                 {t('game.summary.gameOver')}
               </h2>
               <p
                 id="final-score"
                 className="mb-6 text-2xl"
-                style={{ color: '#374151' }}
+                style={{ color: 'var(--app-on-surface)' }}
               >
                 {t('game.summary.finalScore', { score: 0 })}
               </p>
@@ -790,13 +790,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 <div className="flex flex-col gap-2 sm:flex-row sm:justify-center mt-8">
                   <button
                     id="game-over-exit-button"
-                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
-                    style={{
-                      border: '2px solid #10B981',
-                      background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                      color: '#FFFFFF',
-                      boxShadow: '0 2px 4px 0 rgba(16, 185, 129, 0.3)',
-                    }}
+                    className="btn-cta w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
                   >
                     {t('game.controls.backToMenu')}
                   </button>
@@ -812,23 +806,23 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 <div className="text-6xl">🎉</div>
                 <h2
                   className={`text-5xl font-bold ${fontClass}`}
-                  style={{ color: '#10B981' }}
+                  style={{ color: 'var(--app-primary)' }}
                 >
                   {t('game.win.title', 'You Win!')}
                 </h2>
                 <p
                   className="text-xl font-semibold"
-                  style={{ color: '#374151' }}
+                  style={{ color: 'var(--app-on-surface)' }}
                 >
                   {t('game.win.message', 'You reached your goal!')}
                 </p>
                 <div className="space-y-2">
-                  <p className="text-lg" style={{ color: '#6B7280' }}>
+                  <p className="text-lg" style={{ color: 'var(--app-muted)' }}>
                     {t('game.win.sessionCorrectPrefix', 'You caught')}{' '}
                     <span
                       className="font-bold"
                       id="session-correct-display"
-                      style={{ color: '#1F2937' }}
+                      style={{ color: 'var(--app-on-surface)' }}
                     >
                       0
                     </span>{' '}
@@ -837,12 +831,12 @@ function GameCanvas({ fontClass, loadedSettings }) {
                       'letters in a row this game!',
                     )}
                   </p>
-                  <p className="text-base" style={{ color: '#6B7280' }}>
+                  <p className="text-base" style={{ color: 'var(--app-muted)' }}>
                     {t('game.win.totalWins', 'Total wins')}:{' '}
                     <span
                       className="font-bold"
                       id="total-wins-display"
-                      style={{ color: '#1F2937' }}
+                      style={{ color: 'var(--app-on-surface)' }}
                     >
                       0
                     </span>
@@ -851,13 +845,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 <div className="flex flex-col gap-3 sm:flex-row sm:justify-center mt-8">
                   <button
                     id="continue-playing-button"
-                    className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
-                    style={{
-                      border: '2px solid #10B981',
-                      background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                      color: '#FFFFFF',
-                      boxShadow: '0 2px 4px 0 rgba(16, 185, 129, 0.3)',
-                    }}
+                    className="btn-cta w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
                   >
                     {t('game.win.continue', 'Continue Playing')}
                   </button>
@@ -865,9 +853,9 @@ function GameCanvas({ fontClass, loadedSettings }) {
                     id="win-exit-button"
                     className="w-full rounded-full px-8 py-3 text-base font-semibold transition sm:w-auto"
                     style={{
-                      border: '2px solid #E5E7EB',
-                      background: '#FFFFFF',
-                      color: '#374151',
+                      border: '1px solid var(--app-card-border)',
+                      background: 'var(--app-card-bg)',
+                      color: 'var(--app-on-surface)',
                       boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
                     }}
                   >
@@ -1176,7 +1164,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
         <div
           id="correct-answer-ghost"
           className="pointer-events-none absolute text-4xl font-bold opacity-0"
-          style={{ color: '#5acb5a' }}
+          style={{ color: 'var(--app-primary)' }}
         />
 
         {/* Pause Modal - Separate from main modal, no click-outside-to-close */}
@@ -1188,8 +1176,8 @@ function GameCanvas({ fontClass, loadedSettings }) {
           <div
             className="relative w-full max-w-md rounded-3xl shadow-2xl"
             style={{
-              border: '1px solid #E5E7EB',
-              background: 'linear-gradient(135deg, #fffcea 0%, #fcfff2 100%)',
+              border: '1px solid var(--app-card-border)',
+              background: 'var(--app-card-bg)',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
             }}
           >
@@ -1198,13 +1186,13 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 <div className="text-6xl">⏸️</div>
                 <h2
                   className={`text-4xl font-bold ${fontClass}`}
-                  style={{ color: '#059669' }}
+                  style={{ color: 'var(--app-primary)' }}
                 >
                   {t('game.pause.title', 'Paused')}
                 </h2>
                 <p
                   className="text-lg font-semibold"
-                  style={{ color: '#065F46' }}
+                  style={{ color: 'var(--app-on-surface)' }}
                 >
                   {t('game.pause.message', '')}
                 </p>

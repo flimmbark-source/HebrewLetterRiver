@@ -67,7 +67,7 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
   return (
     <div className="flex flex-col gap-2">
       {label ? (
-        <label htmlFor={selectId} className="text-xs font-bold uppercase tracking-wider text-slate-300">
+        <label htmlFor={selectId} className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--app-muted)' }}>
           {label}
         </label>
       ) : null}
@@ -75,7 +75,8 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
         id={selectId}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className={`w-full rounded-2xl border-4 border-slate-600 bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-inner focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/40 sm:text-base ${selectClassName}`}
+        className={`w-full rounded-2xl px-3 py-2 text-sm font-semibold shadow-inner focus:outline-none sm:text-base ${selectClassName}`}
+        style={{ border: '2px solid var(--app-card-border)', background: 'var(--app-surface)', color: 'var(--app-on-surface)' }}
       >
         {options.map((option) => (
           <option key={option.id} value={option.id}>
@@ -83,7 +84,7 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
           </option>
         ))}
       </select>
-      {helperText ? <p className="text-xs font-semibold text-slate-400">{helperText}</p> : null}
+      {helperText ? <p className="text-xs font-semibold" style={{ color: 'var(--app-muted)' }}>{helperText}</p> : null}
     </div>
   );
 }
