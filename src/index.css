@@ -44,345 +44,158 @@
   --font-bold: 700;
 
   /* === APP THEME TOKENS (Light) === */
-  --app-bg: #fef7ff;
-  --app-surface: #f9f1fd;
-  --app-surface-high: #ede6f1;
-  --app-surface-highest: #e7e0eb;
-  --app-on-surface: #1d1a22;
-  --app-on-surface-variant: #3f4943;
-  --app-muted: #4a6365;
-  --app-primary: #1b6b4f;
-  --app-primary-light: #10b981;
+  --app-bg: #e5f2eb;
+  --app-bg-gradient: linear-gradient(170deg, #ddf0e5 0%, #e5f2eb 35%, #eaf0e6 65%, #f0ece4 100%);
+  --app-surface: #e2ede6;
+  --app-surface-high: #d6e5dc;
+  --app-surface-highest: #c8d9cf;
+  --app-on-surface: #2c2418;
+  --app-on-surface-variant: #4a3f30;
+  --app-muted: #7a6f5f;
+  --app-primary: #1a7a55;
+  --app-primary-light: #28a06e;
   --app-on-primary: #ffffff;
-  --app-primary-container: #a7f3d0;
-  --app-secondary: #855315;
-  --app-secondary-container: #fcb972;
-  --app-outline: #6f7973;
-  --app-outline-variant: #bec9c2;
-  --app-card-bg: #ffffff;
-  --app-card-border: rgba(190, 201, 194, 0.3);
-  --app-nav-bg: rgba(254, 247, 255, 0.9);
-  --app-nav-border: rgba(255, 255, 255, 0.2);
-  --app-nav-shadow: rgba(0, 0, 0, 0.06);
+  --app-primary-container: #a8e6c4;
+  --app-secondary: #c07a10;
+  --app-secondary-container: #fcd888;
+  --app-outline: #9a8e7e;
+  --app-outline-variant: #c8bfae;
+  --app-card-bg: #f8fcf9;
+  --app-card-bg-gradient: linear-gradient(180deg, #fafcfa 0%, #f2f8f4 100%);
+  --app-card-border: rgba(100, 160, 130, 0.15);
+  --app-card-glow: rgba(100, 160, 130, 0.06);
+  --app-nav-bg: rgba(237, 245, 240, 0.92);
+  --app-nav-border: rgba(100, 160, 130, 0.12);
+  --app-nav-shadow: rgba(40, 100, 70, 0.08);
   --app-active-text: #ffffff;
-  --app-active-bg: #1b6b4f;
-  --app-hover-text: #1b6b4f;
-  --app-badge-bg: #1b6b4f;
+  --app-active-bg: #1a7a55;
+  --app-hover-text: #1a7a55;
+  --app-badge-bg: #1a7a55;
   --app-badge-text: #ffffff;
-  --app-progress-bg: #a7f3d0;
-  --app-progress-fill: #1b6b4f;
-  --app-error-bg: rgba(255, 218, 214, 0.2);
-  --app-error-text: #ba1a1a;
-  --app-input-border: rgba(190, 201, 194, 0.6);
-  --app-input-bg: #ffffff;
-  --app-popup-bg: rgba(255, 255, 255, 0.95);
-  --app-popup-border: rgba(190, 201, 194, 0.4);
+  --app-progress-bg: #c8eed9;
+  --app-progress-fill: #1a7a55;
+  --app-error-bg: rgba(200, 50, 50, 0.08);
+  --app-error-text: #b53030;
+  --app-input-border: rgba(100, 160, 130, 0.2);
+  --app-input-bg: #f8fcf9;
+  --app-popup-bg: rgba(248, 252, 249, 0.97);
+  --app-popup-border: rgba(100, 160, 130, 0.15);
+
+  /* === GAME MODE ACCENT TOKENS === */
+  --app-mode-river: #0d8a5e;
+  --app-mode-river-bg: #c2f0d8;
+  --app-mode-river-surface: linear-gradient(135deg, #e0fae9 0%, #c2f0d8 100%);
+  --app-mode-bridge: #c07a10;
+  --app-mode-bridge-bg: #fce4a8;
+  --app-mode-bridge-surface: linear-gradient(135deg, #fff5d6 0%, #fce4a8 100%);
+  --app-mode-deep: #7040b8;
+  --app-mode-deep-bg: #e2d6f8;
+  --app-mode-deep-surface: linear-gradient(135deg, #f0e8ff 0%, #e2d6f8 100%);
+  --app-mode-planks: #2d5ccc;
+  --app-mode-planks-bg: #c8d8f8;
+  --app-mode-planks-surface: linear-gradient(135deg, #e0ebff 0%, #c8d8f8 100%);
+  --app-mode-vocab: #0d7a8a;
+  --app-mode-vocab-bg: #b8ecf4;
+  --app-mode-vocab-surface: linear-gradient(135deg, #d8f5fa 0%, #b8ecf4 100%);
 }
 
 /* === DARK MODE OVERRIDES === */
 body.dark-mode {
-  --app-bg: #020617;
-  --app-surface: #0f172a;
-  --app-surface-high: #1e293b;
-  --app-surface-highest: #334155;
-  --app-on-surface: #f8fafc;
-  --app-on-surface-variant: #94a3b8;
-  --app-muted: #94a3b8;
-  --app-primary: #10b981;
-  --app-primary-light: #34d399;
-  --app-on-primary: #020617;
-  --app-primary-container: rgba(16, 185, 129, 0.15);
-  --app-secondary: #fcb972;
-  --app-secondary-container: rgba(252, 185, 114, 0.2);
-  --app-outline: #475569;
-  --app-outline-variant: #334155;
-  --app-card-bg: #0f172a;
-  --app-card-border: #1e293b;
-  --app-nav-bg: rgba(2, 6, 23, 0.9);
-  --app-nav-border: rgba(30, 41, 59, 0.5);
-  --app-nav-shadow: rgba(0, 0, 0, 0.3);
-  --app-active-text: #020617;
-  --app-active-bg: #10b981;
-  --app-hover-text: #34d399;
-  --app-badge-bg: #10b981;
-  --app-badge-text: #020617;
-  --app-progress-bg: rgba(16, 185, 129, 0.2);
-  --app-progress-fill: #10b981;
-  --app-error-bg: rgba(255, 218, 214, 0.1);
-  --app-error-text: #fca5a5;
-  --app-input-border: #334155;
-  --app-input-bg: #1e293b;
-  --app-popup-bg: rgba(15, 23, 42, 0.95);
-  --app-popup-border: rgba(51, 65, 85, 0.5);
+  --app-bg: #0e1210;
+  --app-bg-gradient: linear-gradient(165deg, #0e1210 0%, #101612 40%, #0f1311 100%);
+  --app-surface: #161e1a;
+  --app-surface-high: #1e2824;
+  --app-surface-highest: #283530;
+  --app-on-surface: #ede8df;
+  --app-on-surface-variant: #b0a898;
+  --app-muted: #8a8070;
+  --app-primary: #4ae898;
+  --app-primary-light: #6af0b0;
+  --app-on-primary: #0e1210;
+  --app-primary-container: rgba(74, 232, 152, 0.14);
+  --app-secondary: #f0c35a;
+  --app-secondary-container: rgba(240, 195, 90, 0.15);
+  --app-outline: #3a4a42;
+  --app-outline-variant: #2a3832;
+  --app-card-bg: #141c18;
+  --app-card-bg-gradient: linear-gradient(180deg, #161e1a 0%, #121a16 100%);
+  --app-card-border: rgba(74, 232, 152, 0.07);
+  --app-card-glow: rgba(74, 232, 152, 0.03);
+  --app-nav-bg: rgba(14, 18, 16, 0.94);
+  --app-nav-border: rgba(74, 232, 152, 0.06);
+  --app-nav-shadow: rgba(0, 0, 0, 0.5);
+  --app-active-text: #0e1210;
+  --app-active-bg: #4ae898;
+  --app-hover-text: #6af0b0;
+  --app-badge-bg: #4ae898;
+  --app-badge-text: #12110e;
+  --app-progress-bg: rgba(74, 232, 152, 0.12);
+  --app-progress-fill: #4ae898;
+  --app-error-bg: rgba(248, 113, 113, 0.1);
+  --app-error-text: #f87171;
+  --app-input-border: #283530;
+  --app-input-bg: #1e2824;
+  --app-popup-bg: rgba(20, 28, 24, 0.97);
+  --app-popup-border: rgba(74, 232, 152, 0.08);
+
+  /* === GAME MODE ACCENT TOKENS (Dark) === */
+  --app-mode-river: #4ae898;
+  --app-mode-river-bg: rgba(74, 232, 152, 0.15);
+  --app-mode-river-surface: linear-gradient(135deg, rgba(74, 232, 152, 0.08) 0%, rgba(74, 232, 152, 0.18) 100%);
+  --app-mode-bridge: #f0c35a;
+  --app-mode-bridge-bg: rgba(240, 195, 90, 0.15);
+  --app-mode-bridge-surface: linear-gradient(135deg, rgba(240, 195, 90, 0.08) 0%, rgba(240, 195, 90, 0.18) 100%);
+  --app-mode-deep: #b08df8;
+  --app-mode-deep-bg: rgba(176, 141, 248, 0.15);
+  --app-mode-deep-surface: linear-gradient(135deg, rgba(176, 141, 248, 0.08) 0%, rgba(176, 141, 248, 0.18) 100%);
+  --app-mode-planks: #7da0e0;
+  --app-mode-planks-bg: rgba(125, 160, 224, 0.15);
+  --app-mode-planks-surface: linear-gradient(135deg, rgba(125, 160, 224, 0.08) 0%, rgba(125, 160, 224, 0.18) 100%);
+  --app-mode-vocab: #5cc8d8;
+  --app-mode-vocab-bg: rgba(92, 200, 216, 0.15);
+  --app-mode-vocab-surface: linear-gradient(135deg, rgba(92, 200, 216, 0.08) 0%, rgba(92, 200, 216, 0.18) 100%);
 }
 
-/* Dark mode: override common hardcoded Tailwind colors in JSX views */
+/* ─── Token-aware dark mode for elements still using hardcoded values ─── */
+/* These exist only as a safety net for components not yet migrated to tokens.
+   As components adopt var(--app-*) references, these become unnecessary. */
 body.dark-mode,
 body.dark-mode.arcade-bg {
-  background: #020617 !important;
-  color: #f8fafc;
+  background: var(--app-bg-gradient) !important;
+  background-color: var(--app-bg) !important;
+  color: var(--app-on-surface);
 }
 
 html:has(body.dark-mode) {
-  background: #020617;
-}
-
-/* Backgrounds */
-body.dark-mode .bg-\[\#fef7ff\],
-body.dark-mode .bg-\[\#fef7ff\]\/80 {
-  background: #020617 !important;
-}
-body.dark-mode .bg-\[\#f9f1fd\] {
-  background: #0f172a !important;
-}
-body.dark-mode .bg-\[\#ede6f1\] {
-  background: #1e293b !important;
-}
-body.dark-mode .bg-white,
-body.dark-mode .bg-\[\#fef7ff\]\/90 {
-  background: #0f172a !important;
-}
-
-/* Text colors */
-body.dark-mode .text-\[\#1d1a22\] {
-  color: #f8fafc !important;
-}
-body.dark-mode .text-\[\#4a6365\] {
-  color: #94a3b8 !important;
-}
-body.dark-mode .text-\[\#3f4943\] {
-  color: #94a3b8 !important;
-}
-body.dark-mode .text-\[\#1b6b4f\] {
-  color: #10b981 !important;
-}
-
-/* Primary backgrounds */
-body.dark-mode .bg-\[\#1b6b4f\] {
-  background: #10b981 !important;
-}
-
-/* Progress bars */
-body.dark-mode .bg-\[\#a7f3d0\] {
-  background: rgba(16, 185, 129, 0.2) !important;
-}
-
-/* Cards and containers */
-body.dark-mode .shadow-sm {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Borders */
-body.dark-mode .border-\[\#bec9c2\]\/60,
-body.dark-mode .border-\[\#bec9c2\]\/20,
-body.dark-mode .border-\[\#bec9c2\]\/40 {
-  border-color: #334155 !important;
-}
-body.dark-mode .border-white\/20 {
-  border-color: rgba(30, 41, 59, 0.5) !important;
+  background: var(--app-bg);
 }
 
 /* Inputs & selects */
 body.dark-mode select,
 body.dark-mode input[type="checkbox"] {
-  background: #1e293b !important;
-  border-color: #334155 !important;
-  color: #f8fafc !important;
+  background: var(--app-input-bg) !important;
+  border-color: var(--app-input-border) !important;
+  color: var(--app-on-surface) !important;
 }
 
-/* Hover states */
-body.dark-mode .hover\:bg-\[\#f9f1fd\]:hover {
-  background: #1e293b !important;
-}
-body.dark-mode .hover\:bg-\[\#ede6f1\]:hover {
-  background: #334155 !important;
-}
-
-/* Error/logout section */
-body.dark-mode .bg-\[\#ffdad6\]\/20 {
-  background: rgba(255, 218, 214, 0.1) !important;
-}
-body.dark-mode .text-\[\#ba1a1a\] {
-  color: #fca5a5 !important;
-}
-
-/* Info popup */
-body.dark-mode .bg-white\/95 {
-  background: rgba(15, 23, 42, 0.95) !important;
-}
-
-/* Toggle component */
-body.dark-mode .peer-checked\:bg-\[\#1b6b4f\]:checked ~ div,
-body.dark-mode .peer:checked ~ .peer-checked\:bg-\[\#1b6b4f\] {
-  background: #10b981 !important;
-}
-body.dark-mode .bg-\[\#e7e0eb\] {
-  background: #334155 !important;
-}
-
-/* Active badge */
-body.dark-mode .bg-\[\#855315\] {
-  background: #b45309 !important;
-}
-
-/* ─── White / light card backgrounds ─────────────────────── */
-body.dark-mode .bg-white {
-  background: #0f172a !important;
-}
-body.dark-mode .bg-white\/20 {
-  background: rgba(15, 23, 42, 0.3) !important;
-}
-body.dark-mode .bg-white\/60 {
-  background: rgba(15, 23, 42, 0.6) !important;
-}
-
-/* ─── Light surface variants ─────────────────────────────── */
-body.dark-mode .bg-\[\#f3ebf7\] {
-  background: #1e293b !important;
-}
-body.dark-mode .bg-\[\#e7e0eb\] {
-  background: #334155 !important;
-}
-body.dark-mode .hover\:bg-\[\#f3ebf7\]:hover {
-  background: #334155 !important;
-}
-
-/* ─── Additional text color overrides ────────────────────── */
-body.dark-mode .text-\[\#6f7973\] {
-  color: #64748b !important;
-}
-body.dark-mode .text-\[\#292524\] {
-  color: #f1f5f9 !important;
-}
-body.dark-mode .text-\[\#57534e\] {
-  color: #94a3b8 !important;
-}
-body.dark-mode .text-\[\#047857\] {
-  color: #34d399 !important;
-}
-
-/* ─── Border overrides ───────────────────────────────────── */
-body.dark-mode .border-white,
-body.dark-mode .border-white\/20,
-body.dark-mode .border-4.border-white {
-  border-color: #1e293b !important;
-}
-body.dark-mode .border-\[\#6f7973\] {
-  border-color: #475569 !important;
-}
-body.dark-mode .divide-\[\#bec9c2\]\/20 > * + * {
-  border-color: #334155 !important;
-}
-
-/* ─── Shadows in dark mode ───────────────────────────────── */
-body.dark-mode .shadow-lg {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-}
-body.dark-mode .shadow-md {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
-}
-body.dark-mode .shadow-xl {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* ─── Inline style backgrounds (App.jsx modals, etc.) ────── */
-body.dark-mode [style*="background: linear-gradient(135deg, #fffcea"] {
-  background: #0f172a !important;
-}
-body.dark-mode [style*="background: '#fff5dd'"],
-body.dark-mode [style*="background: #fff5dd"] {
-  background: #1e293b !important;
-}
-body.dark-mode [style*="background: 'white'"],
-body.dark-mode [style*="background: white"] {
-  background: #0f172a !important;
-}
-
-/* ─── Slate utility overrides ────────────────────────────── */
-body.dark-mode .bg-slate-100 {
-  background: #1e293b !important;
-}
-body.dark-mode .border-slate-200 {
-  border-color: #334155 !important;
-}
-body.dark-mode .text-slate-600 {
-  color: #94a3b8 !important;
-}
-body.dark-mode .text-slate-500 {
-  color: #94a3b8 !important;
-}
-body.dark-mode .text-slate-900 {
-  color: #f8fafc !important;
-}
-body.dark-mode .text-slate-400 {
-  color: #94a3b8 !important;
-}
-
-/* ─── PostGameReview & modals with inline styles ─────────── */
-body.dark-mode .bg-\[\#fffaf0\],
-body.dark-mode .bg-\[\#fff9eb\],
-body.dark-mode .bg-\[\#ffe9c9\],
-body.dark-mode .bg-\[\#ffe5bd\],
-body.dark-mode .bg-\[\#fff5dd\] {
-  background: #0f172a !important;
-}
-
-/* ─── Font color for dark mode body ──────────────────────── */
-body.dark-mode .font-semibold.text-\[\#1d1a22\],
-body.dark-mode .font-bold.text-\[\#1d1a22\],
-body.dark-mode .font-extrabold {
-  color: #f8fafc;
-}
-
-/* ─── Active pill in settings ────────────────────────────── */
-body.dark-mode .text-\[\#10b981\] {
-  color: #10b981 !important;
-}
-
-/* ─── HomeView language cards ────────────────────────────── */
-body.dark-mode .bg-\[\#f9f1fd\]\/80,
-body.dark-mode .hover\:bg-\[\#ede6f1\] {
-  background: #0f172a !important;
-}
-
-/* ─── Rounded cards in HomeView ──────────────────────────── */
-body.dark-mode .rounded-full.bg-\[\#f9f1fd\] {
-  background: #0f172a !important;
-}
-
-/* ─── AchievementsView milestone cards ───────────────────── */
-body.dark-mode .bg-\[\#e7e0eb\] {
-  background: #334155 !important;
-}
-
-/* ─── HomeView profile overview accents ──────────────────── */
-body.dark-mode .bg-\[\#1b6b4f\]\/10 {
-  background: rgba(16, 185, 129, 0.2) !important;
-}
-body.dark-mode .bg-\[\#855315\]\/10 {
-  background: rgba(252, 185, 114, 0.2) !important;
-}
-body.dark-mode .bg-\[\#5b4b8a\]\/10,
-body.dark-mode .bg-\[\#3f5b96\]\/10,
-body.dark-mode .bg-\[\#1f6f8b\]\/10 {
-  background: rgba(148, 163, 184, 0.2) !important;
-}
-body.dark-mode .text-\[\#855315\],
-body.dark-mode .text-\[\#5b4b8a\],
-body.dark-mode .text-\[\#3f5b96\],
-body.dark-mode .text-\[\#1f6f8b\] {
-  color: #cbd5e1 !important;
-}
+/* Shadows scale up in dark mode for visibility */
+body.dark-mode .shadow-sm { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important; }
+body.dark-mode .shadow-md { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important; }
+body.dark-mode .shadow-lg { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important; }
+body.dark-mode .shadow-xl { box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45) !important; }
 
 html,
 body {
   @apply min-h-screen font-sans;
-  color: #064E3B;
+  color: var(--app-on-surface);
+  background: var(--app-bg-gradient);
+  background-color: var(--app-bg);
   font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .arcade-bg {
-  background: linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%);
+  background: var(--app-bg-gradient);
+  background-color: var(--app-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -450,4 +263,136 @@ body {
 .language-font-arabic {
   font-size: 1.1em;
   line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Elevation & Card System
+   ═══════════════════════════════════════════════════════════ */
+.card-elevated {
+  background: var(--app-card-bg-gradient);
+  background-color: var(--app-card-bg);
+  border: 1px solid var(--app-card-border);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 12px var(--app-card-glow),
+    0 8px 24px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+}
+
+.card-elevated:hover {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 8px 20px var(--app-card-glow),
+    0 16px 40px rgba(0, 0, 0, 0.06);
+  border-color: rgba(100, 160, 130, 0.25);
+  transform: translateY(-1px);
+}
+
+body.dark-mode .card-elevated:hover {
+  border-color: rgba(74, 232, 152, 0.12);
+}
+
+.card-surface {
+  background: var(--app-surface);
+  border: 1px solid var(--app-card-border);
+  border-radius: 16px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Animations & Transitions
+   ═══════════════════════════════════════════════════════════ */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease both;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.25s ease both;
+}
+
+/* Staggered children */
+.stagger-children > * { animation: fade-in-up 0.4s ease both; }
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+
+/* Progress bar animation */
+.progress-fill {
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Button press feedback */
+.btn-press {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-press:active {
+  transform: scale(0.97);
+}
+
+/* CTA button style */
+.btn-cta {
+  background: linear-gradient(135deg, var(--app-primary-light) 0%, var(--app-primary) 100%);
+  color: var(--app-on-primary);
+  border: none;
+  border-radius: 9999px;
+  font-weight: 700;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(26, 122, 85, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.btn-cta:hover {
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(26, 122, 85, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.btn-cta:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(26, 122, 85, 0.25);
+}
+
+/* Nav pill indicator */
+.nav-item {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.nav-item-active {
+  color: var(--app-active-text) !important;
+  background: linear-gradient(135deg, var(--app-primary-light), var(--app-primary));
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(26, 122, 85, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1);
 }

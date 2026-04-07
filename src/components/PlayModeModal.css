@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   Play Mode Selection Modal — M3 Style
+   Play Mode Selection Modal
    ═══════════════════════════════════════════════════════════ */
 
 .play-mode-overlay {
@@ -9,9 +9,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(29, 26, 34, 0.45);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   animation: play-mode-fade-in 0.2s ease;
 }
 
@@ -25,46 +25,46 @@
   width: 90%;
   max-width: 380px;
   padding: 28px 24px 24px;
-  border-radius: 28px;
-  background: #fef7ff;
-  border: 1px solid rgba(190, 201, 194, 0.3);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  animation: play-mode-slide-up 0.25s ease;
+  border-radius: 24px;
+  background: var(--app-card-bg-gradient);
+  background-color: var(--app-card-bg);
+  border: 1px solid var(--app-card-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px var(--app-card-glow);
+  animation: play-mode-slide-up 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @keyframes play-mode-slide-up {
-  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .play-mode-close {
   position: absolute;
-  top: 12px;
+  top: 14px;
   right: 14px;
   width: 32px;
   height: 32px;
   border: none;
   border-radius: 50%;
-  background: #ede6f1;
-  font-size: 20px;
-  line-height: 1;
-  color: #3f4943;
+  background: var(--app-surface);
+  color: var(--app-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 
 .play-mode-close:hover {
-  background: #e7e0eb;
+  background: var(--app-surface-high);
+  color: var(--app-on-surface);
 }
 
 .play-mode-title {
-  font-family: var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-family: "Baloo 2", system-ui, sans-serif;
   font-size: 22px;
-  font-weight: 800;
-  color: #1b6b4f;
+  font-weight: 700;
+  color: var(--app-on-surface);
   text-align: center;
   margin: 0 0 20px;
 }
@@ -72,7 +72,7 @@
 .play-mode-options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .play-mode-card {
@@ -80,73 +80,53 @@
   align-items: center;
   gap: 16px;
   width: 100%;
-  padding: 16px;
-  border-radius: 16px;
-  border: none;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--app-card-border);
   cursor: pointer;
   text-align: left;
-  font-family: var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
-  transition: transform 0.15s, box-shadow 0.2s;
+  font-family: "Nunito", system-ui, sans-serif;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  background: var(--app-card-bg);
+}
+
+.play-mode-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 .play-mode-card:active {
   transform: scale(0.98);
+  box-shadow: none;
 }
 
-.play-mode-card--river {
-  background: #e0f2f1;
-  border: 1px solid #a7d8d0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.play-mode-card--river:hover {
-  background: #ccebe8;
-  box-shadow: 0 4px 12px rgba(27, 107, 79, 0.12);
-}
-
-.play-mode-card--bridge {
-  background: #fef3e2;
-  border: 1px solid #e8c992;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.play-mode-card--bridge:hover {
-  background: #fde9cc;
-  box-shadow: 0 4px 12px rgba(133, 83, 21, 0.12);
-}
-
-.play-mode-card--deep {
-  background: #ede6f1;
-  border: 1px solid #c5b3d6;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.play-mode-card--deep:hover {
-  background: #e2d8ed;
-  box-shadow: 0 4px 12px rgba(74, 99, 101, 0.12);
-}
+.play-mode-card--river:hover { border-color: var(--app-mode-river); }
+.play-mode-card--bridge:hover { border-color: var(--app-mode-bridge); }
+.play-mode-card--deep:hover { border-color: var(--app-mode-deep); }
 
 .play-mode-icon {
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
   border-radius: 12px;
 }
 
 .play-mode-card--river .play-mode-icon {
-  background: rgba(27, 107, 79, 0.1);
+  background: var(--app-mode-river-bg);
+  color: var(--app-mode-river);
 }
 
 .play-mode-card--bridge .play-mode-icon {
-  background: rgba(133, 83, 21, 0.1);
+  background: var(--app-mode-bridge-bg);
+  color: var(--app-mode-bridge);
 }
 
 .play-mode-card--deep .play-mode-icon {
-  background: rgba(74, 99, 101, 0.1);
+  background: var(--app-mode-deep-bg);
+  color: var(--app-mode-deep);
 }
 
 .play-mode-info {
@@ -155,81 +135,16 @@
 }
 
 .play-mode-name {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
-  color: #1d1a22;
+  color: var(--app-on-surface);
   line-height: 1.3;
 }
 
 .play-mode-desc {
   font-size: 13px;
   font-weight: 500;
-  color: #3f4943;
-  margin-top: 3px;
+  color: var(--app-muted);
+  margin-top: 2px;
   line-height: 1.4;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   Dark Mode Overrides
-   ═══════════════════════════════════════════════════════════ */
-body.dark-mode .play-mode-overlay {
-  background: rgba(0, 0, 0, 0.6);
-}
-
-body.dark-mode .play-mode-modal {
-  background: #020617;
-  border-color: #1e293b;
-}
-
-body.dark-mode .play-mode-close {
-  background: #1e293b;
-  color: #94a3b8;
-}
-
-body.dark-mode .play-mode-title {
-  color: #10b981;
-}
-
-body.dark-mode .play-mode-card--river {
-  background: #0f172a;
-  border-color: #1e293b;
-}
-
-body.dark-mode .play-mode-card--river:hover {
-  background: #1e293b;
-  border-color: rgba(16, 185, 129, 0.5);
-}
-
-body.dark-mode .play-mode-card--bridge {
-  background: #0f172a;
-  border-color: #1e293b;
-}
-
-body.dark-mode .play-mode-card--bridge:hover {
-  background: #1e293b;
-  border-color: rgba(16, 185, 129, 0.5);
-}
-
-body.dark-mode .play-mode-card--deep {
-  background: #0f172a;
-  border-color: #1e293b;
-}
-
-body.dark-mode .play-mode-card--deep:hover {
-  background: #1e293b;
-  border-color: rgba(16, 185, 129, 0.5);
-}
-
-body.dark-mode .play-mode-card--river .play-mode-icon,
-body.dark-mode .play-mode-card--bridge .play-mode-icon,
-body.dark-mode .play-mode-card--deep .play-mode-icon {
-  background: #1e293b;
-}
-
-body.dark-mode .play-mode-name {
-  color: #f8fafc;
-}
-
-body.dark-mode .play-mode-desc {
-  color: #94a3b8;
 }

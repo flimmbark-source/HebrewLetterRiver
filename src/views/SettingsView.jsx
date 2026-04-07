@@ -29,12 +29,12 @@ function Toggle({ id, label, icon, checked, onChange }) {
   return (
     <label htmlFor={id} className="group flex cursor-pointer items-center justify-between">
       <div className="flex items-center gap-4">
-        <Icon className="text-[#4a6365] transition-colors group-hover:text-[#1b6b4f]">{icon}</Icon>
-        <span className="font-semibold text-[#1d1a22]">{label}</span>
+        <Icon style={{ color: 'var(--app-muted)', transition: 'color 0.15s' }}>{icon}</Icon>
+        <span className="font-semibold" style={{ color: 'var(--app-on-surface)' }}>{label}</span>
       </div>
       <div className="relative inline-flex items-center">
         <input id={id} type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="peer sr-only" />
-        <div className="h-6 w-11 rounded-full bg-[#e7e0eb] transition peer-checked:bg-[#1b6b4f] after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition peer-checked:after:translate-x-full"></div>
+        <div className="h-6 w-11 rounded-full transition after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition peer-checked:after:translate-x-full" style={{ background: checked ? 'var(--app-primary)' : 'var(--app-surface-highest)' }}></div>
       </div>
     </label>
   );
@@ -243,7 +243,6 @@ export default function SettingsView() {
       className="min-h-screen pb-36"
       style={{
         fontFamily: 'var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif)',
-        background: 'var(--app-bg)',
         color: 'var(--app-on-surface)'
       }}
     >
@@ -284,38 +283,38 @@ export default function SettingsView() {
         </section>
 
         <section className="space-y-4">
-          <h3 className="px-2 text-sm font-bold uppercase tracking-widest text-[#4a6365]">Language Preferences</h3>
+          <h3 className="px-2 text-sm font-bold uppercase tracking-widest" style={{ color: 'var(--app-muted)' }}>Language Preferences</h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="stable-card rounded-xl bg-white p-5 shadow-sm">
+            <div className="stable-card rounded-xl p-5 shadow-sm" style={{ background: 'var(--app-card-bg)', border: '1px solid var(--app-card-border)' }}>
               <label htmlFor="settings-app-language-select" className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <Icon className="text-[#1b6b4f]">language</Icon>
+                  <Icon style={{ color: 'var(--app-primary)' }}>language</Icon>
                   <div>
-                    <p className="line-clamp-1-stable text-xs font-medium text-[#4a6365]">App Language</p>
-                    <p className="line-clamp-1-stable font-bold">{displayLanguageOptions.find((option) => option.id === appLanguageId)?.name}</p>
+                    <p className="line-clamp-1-stable text-xs font-medium" style={{ color: 'var(--app-muted)' }}>App Language</p>
+                    <p className="line-clamp-1-stable font-bold" style={{ color: 'var(--app-on-surface)' }}>{displayLanguageOptions.find((option) => option.id === appLanguageId)?.name}</p>
                   </div>
                 </div>
-                <Icon className="text-[#bec9c2]">expand_more</Icon>
+                <Icon style={{ color: 'var(--app-outline-variant)' }}>expand_more</Icon>
               </label>
-              <select id="settings-app-language-select" value={appLanguageId} onChange={(event) => selectAppLanguage(event.target.value)} className="mt-3 w-full rounded-lg border border-[#bec9c2]/60 bg-white px-3 py-2 text-sm font-semibold text-[#1d1a22]">
+              <select id="settings-app-language-select" value={appLanguageId} onChange={(event) => selectAppLanguage(event.target.value)} className="mt-3 w-full rounded-lg px-3 py-2 text-sm font-semibold" style={{ border: '1px solid var(--app-input-border)', background: 'var(--app-input-bg)', color: 'var(--app-on-surface)' }}>
                 {displayLanguageOptions.map((option) => (
                   <option key={option.id} value={option.id}>{option.name}</option>
                 ))}
               </select>
             </div>
 
-            <div className="stable-card rounded-xl bg-white p-5 shadow-sm">
+            <div className="stable-card rounded-xl p-5 shadow-sm" style={{ background: 'var(--app-card-bg)', border: '1px solid var(--app-card-border)' }}>
               <label htmlFor="settings-practice-language-select" className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-6 w-8 items-center justify-center overflow-hidden rounded border border-[#bec9c2]/20 bg-slate-100 text-base">{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>
+                  <div className="flex h-6 w-8 items-center justify-center overflow-hidden rounded text-base" style={{ border: '1px solid var(--app-card-border)', background: 'var(--app-surface)' }}>{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>
                   <div>
-                    <p className="line-clamp-1-stable text-xs font-medium text-[#4a6365]">I'm Learning</p>
-                    <p className="line-clamp-1-stable font-bold">{displayLanguageOptions.find((option) => option.id === languageId)?.name}</p>
+                    <p className="line-clamp-1-stable text-xs font-medium" style={{ color: 'var(--app-muted)' }}>I'm Learning</p>
+                    <p className="line-clamp-1-stable font-bold" style={{ color: 'var(--app-on-surface)' }}>{displayLanguageOptions.find((option) => option.id === languageId)?.name}</p>
                   </div>
                 </div>
-                <span className="rounded-md bg-[#1b6b4f] px-2 py-1 text-[10px] font-black text-white">ACTIVE</span>
+                <span className="rounded-md px-2 py-1 text-[10px] font-black" style={{ background: 'var(--app-primary)', color: 'var(--app-on-primary)' }}>ACTIVE</span>
               </label>
-              <select id="settings-practice-language-select" value={languageId} onChange={(event) => selectLanguage(event.target.value)} className="mt-3 w-full rounded-lg border border-[#bec9c2]/60 bg-white px-3 py-2 text-sm font-semibold text-[#1d1a22]">
+              <select id="settings-practice-language-select" value={languageId} onChange={(event) => selectLanguage(event.target.value)} className="mt-3 w-full rounded-lg px-3 py-2 text-sm font-semibold" style={{ border: '1px solid var(--app-input-border)', background: 'var(--app-input-bg)', color: 'var(--app-on-surface)' }}>
                 {displayLanguageOptions.map((option) => (
                   <option key={option.id} value={option.id}>{option.name}</option>
                 ))}
@@ -325,23 +324,23 @@ export default function SettingsView() {
         </section>
 
         <section className="space-y-4">
-          <h3 className="px-2 text-sm font-bold uppercase tracking-widest text-[#4a6365]">Game Settings</h3>
-          <div className="stable-card overflow-hidden rounded-xl bg-white shadow-sm">
+          <h3 className="px-2 text-sm font-bold uppercase tracking-widest" style={{ color: 'var(--app-muted)' }}>Game Settings</h3>
+          <div className="stable-card overflow-hidden rounded-xl shadow-sm" style={{ background: 'var(--app-card-bg)', border: '1px solid var(--app-card-border)' }}>
             <div className="space-y-5 p-4">
-              <div className="rounded-lg border border-[#bec9c2]/25 p-4">
+              <div className="rounded-lg p-4" style={{ border: '1px solid var(--app-card-border)' }}>
                 <Toggle id="settings-dark-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('darkMode')}>Dark Mode</span>} icon="dark_mode" checked={darkMode} onChange={setDarkMode} />
               </div>
 
-              <div className="rounded-lg border border-[#bec9c2]/25">
-                <div className="border-b border-[#bec9c2]/20 px-4 py-3">
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-[#4a6365]">App Font</p>
+              <div className="rounded-lg" style={{ border: '1px solid var(--app-card-border)' }}>
+                <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--app-card-border)' }}>
+                  <p className="text-xs font-extrabold uppercase tracking-wider" style={{ color: 'var(--app-muted)' }}>App Font</p>
                 </div>
-                <div className="flex items-center justify-between p-4 hover:bg-[#f9f1fd]">
+                <div className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-4">
-                    <Icon className="text-[#4a6365]">text_format</Icon>
-                    <span className="cursor-help font-semibold" {...getInfoHandlers('appFont')}>App Font</span>
+                    <Icon style={{ color: 'var(--app-muted)' }}>text_format</Icon>
+                    <span className="cursor-help font-semibold" style={{ color: 'var(--app-on-surface)' }} {...getInfoHandlers('appFont')}>App Font</span>
                   </div>
-                  <select id="settings-app-font-select" value={appFont} onChange={(event) => setAppFont(event.target.value)} className="rounded-md border border-[#bec9c2]/50 px-2 py-1 font-bold text-[#1b6b4f]">
+                  <select id="settings-app-font-select" value={appFont} onChange={(event) => setAppFont(event.target.value)} className="rounded-md px-2 py-1 font-bold" style={{ border: '1px solid var(--app-input-border)', color: 'var(--app-primary)', background: 'var(--app-input-bg)' }}>
                     {fontOptions.map((option) => (
                       <option key={option.value} value={option.value}>{option.label}</option>
                     ))}
@@ -349,39 +348,39 @@ export default function SettingsView() {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-[#bec9c2]/25">
-                <div className="border-b border-[#bec9c2]/20 px-4 py-3">
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-[#4a6365]">Game Font</p>
+              <div className="rounded-lg" style={{ border: '1px solid var(--app-card-border)' }}>
+                <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--app-card-border)' }}>
+                  <p className="text-xs font-extrabold uppercase tracking-wider" style={{ color: 'var(--app-muted)' }}>Game Font</p>
                 </div>
-                <div className="divide-y divide-[#bec9c2]/20">
-                  <div className="flex items-center justify-between p-4 hover:bg-[#f9f1fd]">
+                <div style={{ borderBottom: '1px solid var(--app-card-border)' }}>
+                  <div className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-4">
-                      <Icon className="text-[#4a6365]">text_fields</Icon>
-                      <span className="cursor-help font-semibold" {...getInfoHandlers('gameFont')}>Game Font</span>
+                      <Icon style={{ color: 'var(--app-muted)' }}>text_fields</Icon>
+                      <span className="cursor-help font-semibold" style={{ color: 'var(--app-on-surface)' }} {...getInfoHandlers('gameFont')}>Game Font</span>
                     </div>
-                    <select id="settings-font-select" value={gameFont} onChange={(event) => setGameFont(event.target.value)} className="rounded-md border border-[#bec9c2]/50 px-2 py-1 font-bold text-[#1b6b4f]">
+                    <select id="settings-font-select" value={gameFont} onChange={(event) => setGameFont(event.target.value)} className="rounded-md px-2 py-1 font-bold" style={{ border: '1px solid var(--app-input-border)', color: 'var(--app-primary)', background: 'var(--app-input-bg)' }}>
                       {fontOptions.map((option) => (
                         <option key={option.value} value={option.value}>{option.label}</option>
                       ))}
                     </select>
                   </div>
-                  <div className="p-4">
-                    <Toggle id="settings-font-shuffle-toggle" label={<span className="cursor-help" {...getInfoHandlers('fontShuffle')}>Font Shuffle</span>} icon="shuffle" checked={fontShuffle} onChange={setFontShuffle} />
-                  </div>
+                </div>
+                <div className="p-4">
+                  <Toggle id="settings-font-shuffle-toggle" label={<span className="cursor-help" {...getInfoHandlers('fontShuffle')}>Font Shuffle</span>} icon="shuffle" checked={fontShuffle} onChange={setFontShuffle} />
                 </div>
               </div>
 
-              <div className="rounded-lg border border-[#bec9c2]/25">
-                <div className="border-b border-[#bec9c2]/20 px-4 py-3">
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-[#4a6365]">Letter River Settings</p>
+              <div className="rounded-lg" style={{ border: '1px solid var(--app-card-border)' }}>
+                <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--app-card-border)' }}>
+                  <p className="text-xs font-extrabold uppercase tracking-wider" style={{ color: 'var(--app-muted)' }}>Letter River Settings</p>
                 </div>
                 <div className="space-y-6 p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <Icon className="text-[#4a6365]">format_list_numbered</Icon>
-                      <span className="cursor-help font-semibold" {...getInfoHandlers('startingLetters')}>Starting Letters</span>
+                      <Icon style={{ color: 'var(--app-muted)' }}>format_list_numbered</Icon>
+                      <span className="cursor-help font-semibold" style={{ color: 'var(--app-on-surface)' }} {...getInfoHandlers('startingLetters')}>Starting Letters</span>
                     </div>
-                    <select id="settings-starting-letters-select" value={startingLetters} onChange={(event) => setStartingLetters(parseInt(event.target.value, 10))} className="rounded-md border border-[#bec9c2]/50 pl-2 pr-8 py-1 font-bold text-[#1b6b4f]">
+                    <select id="settings-starting-letters-select" value={startingLetters} onChange={(event) => setStartingLetters(parseInt(event.target.value, 10))} className="rounded-md pl-2 pr-8 py-1 font-bold" style={{ border: '1px solid var(--app-input-border)', color: 'var(--app-primary)', background: 'var(--app-input-bg)' }}>
                       {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => (
                         <option key={value} value={value}>{value}</option>
                       ))}
@@ -403,10 +402,10 @@ export default function SettingsView() {
         </section>
 
         <section className="pb-12 pt-4">
-          <button className="w-full rounded-xl bg-[#ffdad6]/20 py-4 text-sm font-extrabold uppercase tracking-widest text-[#ba1a1a] transition-colors hover:bg-[#ffdad6]/40" type="button">
+          <button className="btn-press w-full rounded-xl py-4 text-sm font-extrabold uppercase tracking-widest transition-colors" style={{ background: 'var(--app-error-bg)', color: 'var(--app-error-text)' }} type="button">
             Log Out
           </button>
-          <p className="mt-8 text-center text-[10px] font-medium text-[#4a6365]">River Mint Language App — Version 2.4.0</p>
+          <p className="mt-8 text-center text-[10px] font-medium" style={{ color: 'var(--app-muted)' }}>River Mint Language App — Version 2.4.0</p>
         </section>
       </main>
       <ProfileEditorModal
@@ -421,13 +420,13 @@ export default function SettingsView() {
       />
       {showInfoPopup && (
         <div
-          className="fixed z-50 max-w-xs rounded-xl border border-[#bec9c2]/40 bg-white/95 p-3 shadow-xl backdrop-blur-sm"
-          style={{ left: `${popupPosition.x}px`, top: `${popupPosition.y}px` }}
+          className="animate-scale-in fixed z-50 max-w-xs rounded-xl p-3 shadow-xl backdrop-blur-sm"
+          style={{ left: `${popupPosition.x}px`, top: `${popupPosition.y}px`, background: 'var(--app-popup-bg)', border: '1px solid var(--app-popup-border)' }}
           onClick={(e) => e.stopPropagation()}
           onTouchStart={(e) => e.stopPropagation()}
         >
-          <p className="text-sm font-bold text-[#1b6b4f]">{infoPopupContent.title}</p>
-          <p className="mt-1 text-xs leading-relaxed text-[#4a6365]">{infoPopupContent.description}</p>
+          <p className="text-sm font-bold" style={{ color: 'var(--app-primary)' }}>{infoPopupContent.title}</p>
+          <p className="mt-1 text-xs leading-relaxed" style={{ color: 'var(--app-muted)' }}>{infoPopupContent.description}</p>
         </div>
       )}
     </div>

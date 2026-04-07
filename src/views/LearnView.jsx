@@ -38,10 +38,10 @@ export default function LearnView() {
   return (
     <div className="space-y-6">
       <header className="space-y-2 px-1">
-        <h2 className="text-2xl font-semibold text-slate-800">
+        <h2 className="text-2xl font-semibold" style={{ color: 'var(--app-on-surface)', fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
           {t('read.title', 'Read')}
         </h2>
-        <p className="text-sm text-slate-600">
+        <p className="text-sm" style={{ color: 'var(--app-muted)' }}>
           {t(
             'read.intro',
             'Select a text to practice translating word by word. Type the translation and press Enter to continue.'
@@ -51,10 +51,10 @@ export default function LearnView() {
 
       <div className="space-y-4">
         <div className="space-y-1 px-1">
-          <h3 className="text-sm font-semibold text-slate-800">
+          <h3 className="text-sm font-semibold" style={{ color: 'var(--app-on-surface)' }}>
             {t('conversation.list.intro.title', 'Learn through conversation')}
           </h3>
-          <p className="text-xs text-slate-600">
+          <p className="text-xs" style={{ color: 'var(--app-muted)' }}>
             {t(
               'conversation.list.intro.description',
               'Each scenario teaches you practical phrases through listening, speaking, and typing exercises.'
@@ -72,7 +72,7 @@ export default function LearnView() {
             }}
           />
         ) : (
-          <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
+          <div className="rounded-xl p-4 text-sm" style={{ border: '1px solid var(--app-card-border)', background: 'var(--app-card-bg)', color: 'var(--app-muted)' }}>
             {t('conversation.list.unavailable', 'No conversation practice available for this language yet.')}
           </div>
         )}

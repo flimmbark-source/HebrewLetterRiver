@@ -46,13 +46,13 @@ function Icon({ children, className = '', filled = false }) {
 
 function LanguageCard({ id, label, value, onChange, options, leading, trailing }) {
   return (
-    <label htmlFor={id} className="group relative block rounded-full bg-[#f9f1fd] p-6 transition-colors hover:bg-[#ede6f1]">
+    <label htmlFor={id} className="card-elevated group relative block rounded-2xl p-6 transition-all duration-200 hover:scale-[1.01]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-4">
           {leading}
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#4a6365]">{label}</p>
-            <p className="line-clamp-1-stable text-lg font-bold">{options.find((option) => option.id === value)?.name ?? value}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--app-muted)' }}>{label}</p>
+            <p className="line-clamp-1-stable text-lg font-bold" style={{ color: 'var(--app-on-surface)' }}>{options.find((option) => option.id === value)?.name ?? value}</p>
           </div>
         </div>
         {trailing}
@@ -196,11 +196,11 @@ export default function HomeView() {
   const wordProgressPct = totalWordTarget > 0 ? Math.min(Math.round((totalWordsLearned / totalWordTarget) * 100), 100) : 0;
 
   const modeDisplayByName = useMemo(() => ({
-    'Letter River': { icon: 'water', iconClass: 'text-[#1b6b4f]', bgClass: 'bg-[#1b6b4f]/10', badgeClass: 'text-[#1b6b4f]' },
-    'Bridge Builder': { icon: 'conversion_path', iconClass: 'text-[#855315]', bgClass: 'bg-[#855315]/10', badgeClass: 'text-[#855315]' },
-    'Deep Script': { icon: 'ink_pen', iconClass: 'text-[#5b4b8a]', bgClass: 'bg-[#5b4b8a]/10', badgeClass: 'text-[#5b4b8a]' },
-    'Loose Planks': { icon: 'view_stream', iconClass: 'text-[#3f5b96]', bgClass: 'bg-[#3f5b96]/10', badgeClass: 'text-[#3f5b96]' },
-    Vocabulary: { icon: 'school', iconClass: 'text-[#1f6f8b]', bgClass: 'bg-[#1f6f8b]/10', badgeClass: 'text-[#1f6f8b]' }
+    'Letter River': { icon: 'waves', color: 'var(--app-mode-river)', bg: 'var(--app-mode-river-bg)', surface: 'var(--app-mode-river-surface)', border: 'var(--app-mode-river-bg)' },
+    'Bridge Builder': { icon: 'extension', color: 'var(--app-mode-bridge)', bg: 'var(--app-mode-bridge-bg)', surface: 'var(--app-mode-bridge-surface)', border: 'var(--app-mode-bridge-bg)' },
+    'Deep Script': { icon: 'explore', color: 'var(--app-mode-deep)', bg: 'var(--app-mode-deep-bg)', surface: 'var(--app-mode-deep-surface)', border: 'var(--app-mode-deep-bg)' },
+    'Loose Planks': { icon: 'view_stream', color: 'var(--app-mode-planks)', bg: 'var(--app-mode-planks-bg)', surface: 'var(--app-mode-planks-surface)', border: 'var(--app-mode-planks-bg)' },
+    Vocabulary: { icon: 'school', color: 'var(--app-mode-vocab)', bg: 'var(--app-mode-vocab-bg)', surface: 'var(--app-mode-vocab-surface)', border: 'var(--app-mode-vocab-bg)' }
   }), []);
 
   const recentAchievementXpByGame = useMemo(() => {
@@ -250,43 +250,47 @@ export default function HomeView() {
   }, [dailyGoalMinutes, reminderTime]);
 
   return (
-    <div className="relative min-h-screen bg-[#fef7ff] text-[#1d1a22]">
-      <main className="mx-auto max-w-2xl space-y-8 px-6 pb-48 pt-8">
-        <section>
-          <div className="stable-card flex flex-col items-center space-y-4 rounded-2xl border border-[#1b6b4f]/5 bg-white p-8 text-center shadow-sm">
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#f9f1fd]">
-              <img alt="Avatar Large" className="h-20 w-20 rounded-full object-cover" src={playerAvatar || topAvatar} />
-              <button onClick={() => setIsProfileEditorOpen(true)} className="absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 border-white bg-[#1b6b4f] p-2 text-white shadow-lg" type="button">
-                <Icon className="text-sm">edit</Icon>
-              </button>
-            </div>
-            <div>
-              <h1 className="text-2xl font-extrabold tracking-tight">{playerName}</h1>
-              <p className="line-clamp-1-stable text-sm text-[#4a6365]">Learning since January 2024</p>
-            </div>
-            <div className="mt-4 w-full space-y-2">
-              <div className="flex justify-between text-xs font-bold text-[#1b6b4f]">
-                <span>LEVEL {level}</span>
-                <span>{levelProgress.toLocaleString()} / {starsPerLevel.toLocaleString()} XP</span>
+    <div className="relative min-h-screen" style={{ color: 'var(--app-on-surface)' }}>
+      <main className="mx-auto max-w-2xl space-y-8 px-6 pb-48 pt-8 stagger-children">
+        <section className="animate-fade-in-up">
+          <div className="relative overflow-hidden rounded-2xl p-8 text-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--app-primary) 0%, #145e42 60%, #0f4a34 100%)', color: 'var(--app-on-primary)' }}>
+            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full blur-3xl" style={{ background: 'rgba(255, 255, 255, 0.08)' }}></div>
+            <div className="absolute -left-6 bottom-0 h-28 w-28 rounded-full blur-2xl" style={{ background: 'rgba(74, 232, 152, 0.1)' }}></div>
+            <div className="relative z-10 flex flex-col items-center space-y-4">
+              <div className="relative flex h-24 w-24 items-center justify-center rounded-full shadow-lg" style={{ background: 'rgba(255, 255, 255, 0.15)', border: '3px solid rgba(255, 255, 255, 0.25)' }}>
+                <img alt="Avatar Large" className="h-20 w-20 rounded-full object-cover" src={playerAvatar || topAvatar} />
+                <button onClick={() => setIsProfileEditorOpen(true)} className="btn-press absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 p-2 shadow-lg" style={{ borderColor: 'rgba(255,255,255,0.3)', background: 'var(--app-secondary)', color: '#fff' }} type="button">
+                  <Icon className="text-sm">edit</Icon>
+                </button>
               </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-[#a7f3d0]">
-                <div className="h-full rounded-full bg-[#1b6b4f]" style={{ width: `${progressPct}%` }}></div>
+              <div>
+                <h1 className="text-2xl font-extrabold tracking-tight">{playerName}</h1>
+                <p className="line-clamp-1-stable text-sm opacity-70">Learning since January 2024</p>
+              </div>
+              <div className="mt-4 w-full space-y-2">
+                <div className="flex justify-between text-xs font-bold opacity-80">
+                  <span>LEVEL {level}</span>
+                  <span>{levelProgress.toLocaleString()} / {starsPerLevel.toLocaleString()} XP</span>
+                </div>
+                <div className="h-3 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255, 255, 255, 0.15)' }}>
+                  <div className="progress-fill h-full rounded-full" style={{ width: `${progressPct}%`, background: 'linear-gradient(90deg, #4ae898, #80f0b8)' }}></div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
         <section className="space-y-4">
-          <h2 className="px-2 text-xl font-bold">Language Learning</h2>
-          <div className="space-y-4">
+          <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Language Learning</h2>
+          <div className="space-y-3">
             <LanguageCard
               id="home-app-language-select"
               label="App Language"
               value={appLanguageId}
               onChange={selectAppLanguage}
               options={displayLanguageOptions}
-              leading={<div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm"><Icon className="text-[#1b6b4f]">language</Icon></div>}
-              trailing={<Icon className="text-[#6f7973]">expand_more</Icon>}
+              leading={<div className="flex h-12 w-12 items-center justify-center rounded-full shadow-sm" style={{ background: 'var(--app-primary-container)' }}><Icon style={{ color: 'var(--app-primary)' }}>language</Icon></div>}
+              trailing={<Icon style={{ color: 'var(--app-outline)' }}>expand_more</Icon>}
             />
 
             <LanguageCard
@@ -295,36 +299,36 @@ export default function HomeView() {
               value={languageId}
               onChange={selectLanguage}
               options={displayLanguageOptions}
-              leading={<div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white text-2xl shadow-sm">{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>}
-              trailing={<div className="flex items-center gap-3"><span className="rounded-full bg-[#1b6b4f]/10 px-3 py-1 text-[10px] font-black text-[#1b6b4f]">ACTIVE</span><Icon className="text-[#6f7973]">swap_horiz</Icon></div>}
+              leading={<div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full text-2xl shadow-sm" style={{ background: 'var(--app-secondary-container)' }}>{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>}
+              trailing={<div className="flex items-center gap-3"><span className="rounded-full px-3 py-1 text-[10px] font-black" style={{ background: 'var(--app-primary-container)', color: 'var(--app-primary)' }}>ACTIVE</span><Icon style={{ color: 'var(--app-outline)' }}>swap_horiz</Icon></div>}
             />
           </div>
         </section>
 
         <section className="space-y-4">
-          <h2 className="px-2 text-xl font-bold">Profile Overview</h2>
+          <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Profile Overview</h2>
 
-          <div className="stable-card space-y-4 rounded-2xl bg-[#f9f1fd] p-5">
+          <div className="card-elevated space-y-4 p-5">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-[#4a6365]">Recent Mastery</p>
-                <Icon className="text-[#6f7973]">account_circle</Icon>
+                <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>Recent Mastery</p>
+                <Icon style={{ color: 'var(--app-outline)' }}>account_circle</Icon>
               </div>
               {recentLetters.length > 0 ? (
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {recentLetters.map((letter) => (
-                    <div key={letter.id} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#bec9c2]/40 bg-[#ede6f1] text-lg font-bold text-[#1b6b4f] shadow-sm" title={letter.name}>
+                    <div key={letter.id} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold shadow-sm" style={{ border: '1px solid var(--app-primary-container)', background: 'var(--app-primary-container)', color: 'var(--app-primary)' }} title={letter.name}>
                       {letter.symbol}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="line-clamp-2-stable text-sm text-[#4a6365]">Catch a few letters to unlock your mastery row.</p>
+                <p className="line-clamp-2-stable text-sm" style={{ color: 'var(--app-muted)' }}>Catch a few letters to unlock your mastery row.</p>
               )}
               {recentWords.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {recentWords.map((word) => (
-                    <span key={word.id} className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#1d1a22] shadow-sm">
+                    <span key={word.id} className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold shadow-sm" style={{ background: 'var(--app-mode-deep-bg)', color: 'var(--app-mode-deep)' }}>
                       {word.text}
                     </span>
                   ))}
@@ -333,18 +337,18 @@ export default function HomeView() {
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm font-bold text-[#4a6365]">Game Activity</p>
+              <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>Game Activity</p>
               {recentModes.length > 0 ? (
                 recentModes.slice(0, 3).map((modeName) => {
-                  const modeUi = modeDisplayByName[modeName] ?? { icon: 'sports_esports', iconClass: 'text-[#1b6b4f]', bgClass: 'bg-[#1b6b4f]/10', badgeClass: 'text-[#1b6b4f]' };
+                  const modeUi = modeDisplayByName[modeName] ?? { icon: 'sports_esports', color: 'var(--app-primary)', bg: 'var(--app-primary-container)' };
                   return (
-                    <div key={modeName} className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm">
-                      <div className={`flex h-9 w-9 items-center justify-center rounded-full ${modeUi.bgClass}`}>
-                        <Icon className={`text-lg ${modeUi.iconClass}`}>{modeUi.icon}</Icon>
+                    <div key={modeName} className="flex items-center gap-3 rounded-xl p-3 shadow-sm" style={{ background: modeUi.surface, border: `1px solid ${modeUi.border}` }}>
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full shadow-sm" style={{ background: modeUi.bg }}>
+                        <Icon className="text-lg" style={{ color: modeUi.color }}>{modeUi.icon}</Icon>
                       </div>
                       <div className="flex flex-1 items-center justify-between">
-                        <p className="text-sm font-bold">{modeName}</p>
-                        <span className={`text-xs font-bold ${modeUi.badgeClass}`}>
+                        <p className="text-sm font-bold" style={{ color: 'var(--app-on-surface)' }}>{modeName}</p>
+                        <span className="text-xs font-bold" style={{ color: modeUi.color }}>
                           +{recentAchievementXpByGame[modeName] ?? 0} XP
                         </span>
                       </div>
@@ -352,32 +356,32 @@ export default function HomeView() {
                   );
                 })
               ) : (
-                <p className="line-clamp-2-stable text-sm text-[#4a6365]">Start a game and your latest activity will appear here.</p>
+                <p className="line-clamp-2-stable text-sm" style={{ color: 'var(--app-muted)' }}>Start a game and your latest activity will appear here.</p>
               )}
             </div>
 
             <div className="space-y-2">
               <div className="flex items-end justify-between">
-                <p className="text-sm font-bold text-[#4a6365]">Total Progress</p>
-                <p className="text-xs font-bold text-[#1b6b4f]">{totalWordsLearned} / {totalWordTarget} Words</p>
+                <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>Total Progress</p>
+                <p className="text-xs font-bold" style={{ color: 'var(--app-primary)' }}>{totalWordsLearned} / {totalWordTarget} Words</p>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-white">
-                <div className="h-full rounded-full bg-[#1b6b4f]" style={{ width: `${wordProgressPct}%` }}></div>
+              <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--app-mode-river-bg)' }}>
+                <div className="progress-fill h-full rounded-full" style={{ width: `${wordProgressPct}%`, background: 'linear-gradient(90deg, var(--app-mode-river), var(--app-mode-vocab))' }}></div>
               </div>
             </div>
           </div>
         </section>
 
         <section className="grid grid-cols-2 gap-4">
-          <div className="stable-card space-y-3 rounded-2xl bg-[#f9f1fd] p-6">
+          <div className="space-y-3 rounded-2xl p-6 shadow-sm" style={{ background: 'var(--app-mode-bridge-surface)', border: '1px solid var(--app-mode-bridge-bg)' }}>
             <div className="flex items-start justify-between gap-2">
-              <Icon className="text-3xl text-[#855315]" filled>bolt</Icon>
-              <button type="button" className="rounded-full bg-white/70 p-1 text-[#6f7973]" onClick={() => setIsEditingGoal((prev) => !prev)}>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl shadow-sm" style={{ background: 'var(--app-mode-bridge-bg)' }}><Icon className="text-xl" style={{ color: 'var(--app-mode-bridge)' }} filled>bolt</Icon></div>
+              <button type="button" className="btn-press rounded-full p-1" style={{ background: 'rgba(255,255,255,0.5)', color: 'var(--app-mode-bridge)' }} onClick={() => setIsEditingGoal((prev) => !prev)}>
                 <Icon className="text-sm">edit</Icon>
               </button>
             </div>
             <div>
-              <h3 className="leading-tight font-bold">Daily Goal</h3>
+              <h3 className="leading-tight font-bold" style={{ color: 'var(--app-on-surface)' }}>Daily Goal</h3>
               {isEditingGoal ? (
                 <div className="mt-2 flex items-center gap-2">
                   <input
@@ -386,35 +390,37 @@ export default function HomeView() {
                     max={180}
                     value={dailyGoalMinutes}
                     onChange={(event) => setDailyGoalMinutes(Math.max(5, Math.min(180, Number(event.target.value) || 15)))}
-                    className="w-20 rounded-lg border border-[#bec9c2] bg-white px-2 py-1 text-sm font-semibold text-[#1d1a22]"
+                    className="w-20 rounded-lg px-2 py-1 text-sm font-semibold"
+                    style={{ border: '1px solid var(--app-mode-bridge-bg)', background: 'rgba(255,255,255,0.7)', color: 'var(--app-on-surface)' }}
                   />
-                  <span className="text-xs font-semibold text-[#4a6365]">mins/day</span>
+                  <span className="text-xs font-semibold" style={{ color: 'var(--app-mode-bridge)' }}>mins/day</span>
                 </div>
               ) : (
-                <p className="line-clamp-1-stable text-sm text-[#4a6365]">{dailyGoalMinutes} mins / day</p>
+                <p className="line-clamp-1-stable text-sm font-semibold" style={{ color: 'var(--app-mode-bridge)' }}>{dailyGoalMinutes} mins / day</p>
               )}
             </div>
           </div>
-          <div className="stable-card space-y-3 rounded-2xl bg-[#f9f1fd] p-6">
+          <div className="space-y-3 rounded-2xl p-6 shadow-sm" style={{ background: 'var(--app-mode-river-surface)', border: '1px solid var(--app-mode-river-bg)' }}>
             <div className="flex items-start justify-between gap-2">
-              <Icon className="text-3xl text-[#1b6b4f]" filled>notifications</Icon>
-              <button type="button" className="rounded-full bg-white/70 p-1 text-[#6f7973]" onClick={() => setIsEditingReminder((prev) => !prev)}>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl shadow-sm" style={{ background: 'var(--app-mode-river-bg)' }}><Icon className="text-xl" style={{ color: 'var(--app-mode-river)' }} filled>notifications</Icon></div>
+              <button type="button" className="btn-press rounded-full p-1" style={{ background: 'rgba(255,255,255,0.5)', color: 'var(--app-mode-river)' }} onClick={() => setIsEditingReminder((prev) => !prev)}>
                 <Icon className="text-sm">edit</Icon>
               </button>
             </div>
             <div>
-              <h3 className="leading-tight font-bold">Reminders</h3>
+              <h3 className="leading-tight font-bold" style={{ color: 'var(--app-on-surface)' }}>Reminders</h3>
               {isEditingReminder ? (
                 <div className="mt-2 flex items-center gap-2">
                   <input
                     type="time"
                     value={reminderTime}
                     onChange={(event) => setReminderTime(event.target.value)}
-                    className="rounded-lg border border-[#bec9c2] bg-white px-2 py-1 text-sm font-semibold text-[#1d1a22]"
+                    className="rounded-lg px-2 py-1 text-sm font-semibold"
+                    style={{ border: '1px solid var(--app-mode-river-bg)', background: 'rgba(255,255,255,0.7)', color: 'var(--app-on-surface)' }}
                   />
                 </div>
               ) : (
-                <p className="line-clamp-1-stable text-sm text-[#4a6365]">
+                <p className="line-clamp-1-stable text-sm font-semibold" style={{ color: 'var(--app-mode-river)' }}>
                   {formatReminderTime(reminderTime)}
                 </p>
               )}
@@ -425,16 +431,16 @@ export default function HomeView() {
         <section className="pt-4">
           <button
             onClick={() => setShowPlayModal(true)}
-            className="flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-br from-[#1b6b4f] to-[#1b6b4f]/80 py-5 text-lg font-bold text-white shadow-lg shadow-[#1b6b4f]/20 transition-all hover:scale-[1.02] active:scale-95"
+            className="btn-cta flex w-full items-center justify-center gap-3 py-5 text-lg"
             type="button"
           >
             Start learning
             <Icon>arrow_forward</Icon>
           </button>
-          <p className="mt-6 px-8 text-center text-xs leading-relaxed text-[#4a6365]">
+          <p className="mt-6 px-8 text-center text-xs leading-relaxed" style={{ color: 'var(--app-muted)' }}>
             Your progress is automatically synced with your cloud account.
             {' '}
-            <a className="font-bold text-[#1b6b4f] underline underline-offset-4" href="#">Privacy Policy</a>
+            <a className="font-bold underline underline-offset-4" style={{ color: 'var(--app-primary)' }} href="#">Privacy Policy</a>
           </p>
         </section>
       </main>

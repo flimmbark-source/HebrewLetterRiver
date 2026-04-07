@@ -67,7 +67,7 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
   return (
     <div className="flex flex-col gap-2">
       {label ? (
-        <label htmlFor={selectId} className="text-xs font-bold uppercase tracking-wider text-slate-300">
+        <label htmlFor={selectId} className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--app-muted)' }}>
           {label}
         </label>
       ) : null}
@@ -75,7 +75,8 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
         id={selectId}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className={`w-full rounded-2xl border-4 border-slate-600 bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-inner focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/40 sm:text-base ${selectClassName}`}
+        className={`w-full rounded-2xl px-3 py-2 text-sm font-semibold shadow-inner focus:outline-none sm:text-base ${selectClassName}`}
+        style={{ border: '2px solid var(--app-card-border)', background: 'var(--app-surface)', color: 'var(--app-on-surface)' }}
       >
         {options.map((option) => (
           <option key={option.id} value={option.id}>
@@ -83,7 +84,7 @@ function LanguageSelect({ selectId, value, onChange, label, helperText, selectCl
           </option>
         ))}
       </select>
-      {helperText ? <p className="text-xs font-semibold text-slate-400">{helperText}</p> : null}
+      {helperText ? <p className="text-xs font-semibold" style={{ color: 'var(--app-muted)' }}>{helperText}</p> : null}
     </div>
   );
 }
@@ -133,37 +134,37 @@ function LanguageOnboardingModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 language-onboarding-overlay" style={{
-      background: 'linear-gradient(135deg, #E8FFE3 0%, #E0FBFD 100%)'
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 language-onboarding-overlay animate-fade-in" style={{
+      background: 'var(--app-bg)'
     }}>
-      <div className="w-full max-w-lg rounded-3xl p-6 text-center shadow-2xl sm:p-8 language-onboarding-card" style={{
-        background: 'linear-gradient(135deg, #fffcea 0%, #fcfff2 100%)',
-        border: '3px solid #A7F3D0',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)'
+      <div className="animate-scale-in w-full max-w-lg rounded-3xl p-6 text-center sm:p-8 language-onboarding-card" style={{
+        background: 'var(--app-card-bg)',
+        border: '1px solid var(--app-card-border)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'
       }}>
         <h2 className="text-2xl font-bold sm:text-3xl" style={{
           fontFamily: '"Baloo 2", system-ui, sans-serif',
-          color: '#4a2208'
+          color: 'var(--app-on-surface)'
         }}>
           {translateOnboarding('app.languagePicker.onboardingTitle')}
         </h2>
-        <p className="mt-3 text-sm sm:text-base" style={{ color: '#6c3b14' }}>
+        <p className="mt-3 text-sm sm:text-base" style={{ color: 'var(--app-muted)' }}>
           {translateOnboarding('app.languagePicker.onboardingSubtitle')}
         </p>
         <div className="mt-6 space-y-5 text-left">
           <div className="flex flex-col gap-2 onboarding-app-language-section">
-            <label htmlFor="onboarding-app-language" className="text-xs font-bold uppercase tracking-wider" style={{ color: '#b07737' }}>
+            <label htmlFor="onboarding-app-language" className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--app-muted)' }}>
               {translateOnboarding('app.languagePicker.label')}
             </label>
             <select
               id="onboarding-app-language"
               value={pendingAppId}
               onChange={(event) => handleAppLanguageChange(event.target.value)}
-              className="w-full rounded-xl border-2 px-3 py-2 text-sm font-semibold shadow-inner sm:text-base onboarding-app-language-select"
+              className="w-full rounded-xl border px-3 py-2.5 text-sm font-semibold sm:text-base onboarding-app-language-select"
               style={{
-                borderColor: 'rgba(235, 179, 105, 0.95)',
-                background: '#fff5dd',
-                color: '#4a2208'
+                borderColor: 'var(--app-input-border)',
+                background: 'var(--app-input-bg)',
+                color: 'var(--app-on-surface)'
               }}
             >
               {languageOptions.map((option) => (
@@ -172,23 +173,23 @@ function LanguageOnboardingModal() {
                 </option>
               ))}
             </select>
-            <p className="text-xs font-semibold" style={{ color: '#b07737' }}>
+            <p className="text-xs font-semibold" style={{ color: 'var(--app-muted)' }}>
               {translateOnboarding('app.languagePicker.helper')}
             </p>
           </div>
           <div className="flex flex-col gap-2 onboarding-practice-language-section">
-            <label htmlFor="onboarding-language" className="text-xs font-bold uppercase tracking-wider" style={{ color: '#b07737' }}>
+            <label htmlFor="onboarding-language" className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--app-muted)' }}>
               {translateOnboarding('app.practicePicker.label')}
             </label>
             <select
               id="onboarding-language"
               value={pendingPracticeId}
               onChange={(event) => handleChange(event.target.value)}
-              className="w-full rounded-xl border-2 px-3 py-2 text-sm font-semibold shadow-inner sm:text-base onboarding-practice-language-select"
+              className="w-full rounded-xl border px-3 py-2.5 text-sm font-semibold sm:text-base onboarding-practice-language-select"
               style={{
-                borderColor: 'rgba(235, 179, 105, 0.95)',
-                background: '#fff5dd',
-                color: '#4a2208'
+                borderColor: 'var(--app-input-border)',
+                background: 'var(--app-input-bg)',
+                color: 'var(--app-on-surface)'
               }}
             >
               {languageOptions.map((option) => (
@@ -197,7 +198,7 @@ function LanguageOnboardingModal() {
                 </option>
               ))}
             </select>
-            <p className="text-xs font-semibold" style={{ color: '#b07737' }}>
+            <p className="text-xs font-semibold" style={{ color: 'var(--app-muted)' }}>
               {translateOnboarding('app.practicePicker.helper')}
             </p>
           </div>
@@ -206,27 +207,10 @@ function LanguageOnboardingModal() {
           type="button"
           onClick={handleContinue}
           disabled={isContinueDisabled}
-          className="mt-6 w-full rounded-full px-5 py-3 text-base font-bold shadow-lg transition-all active:translate-y-1 sm:w-auto sm:px-8 onboarding-continue-button"
+          className="btn-cta mt-6 w-full px-5 py-3.5 text-base sm:w-auto sm:px-8 onboarding-continue-button"
           style={{
-            border: 0,
-            fontFamily: '"Nunito", system-ui, sans-serif',
-            color: '#4a1a06',
-            background: 'radial-gradient(circle at 20% 0, #ffe6c7 0, #ffb45f 40%, #ff7a3b 100%)',
-            boxShadow: '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)',
             opacity: isContinueDisabled ? 0.5 : 1,
             cursor: isContinueDisabled ? 'not-allowed' : 'pointer'
-          }}
-          onMouseDown={(e) => {
-            if (!isContinueDisabled) {
-              e.currentTarget.style.transform = 'translateY(2px)';
-              e.currentTarget.style.boxShadow = '0 2px 0 #c85a24, 0 5px 12px rgba(200, 90, 36, 0.7)';
-            }
-          }}
-          onMouseUp={(e) => {
-            if (!isContinueDisabled) {
-              e.currentTarget.style.transform = '';
-              e.currentTarget.style.boxShadow = '0 4px 0 #c85a24, 0 7px 12px rgba(200, 90, 36, 0.7)';
-            }
           }}
         >
           {translateOnboarding('app.languagePicker.confirm')}
@@ -338,53 +322,53 @@ function Shell() {
         </Routes>
       </main>
       {!(isGameVisible && isGameRunning) && !inConversationPractice && !inDeepScript && (
-        <nav className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around px-4 pb-8 pt-2 backdrop-blur-2xl" style={{ background: 'var(--app-nav-bg)' }}>
-          <div className="fixed bottom-6 left-6 right-6 flex h-16 items-center justify-around rounded-full px-4" style={{ background: 'var(--app-nav-bg)', borderColor: 'var(--app-nav-border)', border: '1px solid var(--app-nav-border)', boxShadow: '0 24px 48px var(--app-nav-shadow)' }}>
+        <nav className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around px-4 pb-8 pt-2">
+          <div className="fixed bottom-6 left-6 right-6 flex h-16 items-center justify-around rounded-full px-2 backdrop-blur-xl" style={{ background: 'var(--app-nav-bg)', border: '1px solid var(--app-nav-border)', boxShadow: '0 4px 24px var(--app-nav-shadow), 0 1px 4px var(--app-nav-shadow)' }}>
             <NavLink
               to="/home"
               onClick={handleNavClick}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center px-5 py-2 text-[12px] font-semibold transition-all duration-200 active:scale-90 ${isActive ? 'scale-110 rounded-full shadow-lg' : ''}`
+                `nav-item flex flex-col items-center justify-center px-5 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 ${isActive ? 'nav-item-active' : ''}`
               }
-              style={({ isActive }) => isActive ? { background: 'var(--app-active-bg)', color: 'var(--app-active-text)' } : { color: 'var(--app-muted)' }}
+              style={({ isActive }) => isActive ? {} : { color: 'var(--app-muted)' }}
             >
-              <span className="material-symbols-outlined">home</span>
-              <span className="text-[12px] font-semibold">Home</span>
+              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>home</span>
+              <span>Home</span>
             </NavLink>
 
             <button
               type="button"
               onClick={handlePlay}
               disabled={isPlayDisabled}
-              className="flex flex-col items-center justify-center px-4 py-2 transition-colors duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-50"
+              className="nav-item flex flex-col items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-50"
               style={{ color: 'var(--app-muted)' }}
             >
-              <span className="material-symbols-outlined">videogame_asset</span>
-              <span className="text-[12px] font-semibold">Play</span>
+              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>videogame_asset</span>
+              <span>Play</span>
             </button>
 
             <NavLink
               to="/achievements"
               onClick={handleNavClick}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center px-5 py-2 text-[12px] font-semibold transition-all duration-200 active:scale-90 ${isActive ? 'scale-110 rounded-full shadow-lg' : ''}`
+                `nav-item flex flex-col items-center justify-center px-5 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 ${isActive ? 'nav-item-active' : ''}`
               }
-              style={({ isActive }) => isActive ? { background: 'var(--app-active-bg)', color: 'var(--app-active-text)' } : { color: 'var(--app-muted)' }}
+              style={({ isActive }) => isActive ? {} : { color: 'var(--app-muted)' }}
             >
-              <span className="material-symbols-outlined">emoji_events</span>
-              <span className="text-[12px] font-semibold">Awards</span>
+              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>emoji_events</span>
+              <span>Awards</span>
             </NavLink>
 
             <NavLink
               to="/settings"
               onClick={handleNavClick}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center px-5 py-2 text-[12px] font-semibold transition-all duration-200 active:scale-90 ${isActive ? 'scale-110 rounded-full shadow-lg' : ''}`
+                `nav-item flex flex-col items-center justify-center px-5 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 ${isActive ? 'nav-item-active' : ''}`
               }
-              style={({ isActive }) => isActive ? { background: 'var(--app-active-bg)', color: 'var(--app-active-text)' } : { color: 'var(--app-muted)' }}
+              style={({ isActive }) => isActive ? {} : { color: 'var(--app-muted)' }}
             >
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>settings</span>
-              <span className="text-[12px] font-semibold">Settings</span>
+              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>settings</span>
+              <span>Settings</span>
             </NavLink>
           </div>
         </nav>
