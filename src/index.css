@@ -44,8 +44,8 @@
   --font-bold: 700;
 
   /* === APP THEME TOKENS (Light) === */
-  --app-bg: #edf5f0;
-  --app-bg-gradient: linear-gradient(165deg, #eef6f1 0%, #e4f0e8 40%, #e8ede6 60%, #f0ece4 100%);
+  --app-bg: #e5f2eb;
+  --app-bg-gradient: linear-gradient(170deg, #ddf0e5 0%, #e5f2eb 35%, #eaf0e6 65%, #f0ece4 100%);
   --app-surface: #e2ede6;
   --app-surface-high: #d6e5dc;
   --app-surface-highest: #c8d9cf;
@@ -161,7 +161,8 @@ body.dark-mode {
    As components adopt var(--app-*) references, these become unnecessary. */
 body.dark-mode,
 body.dark-mode.arcade-bg {
-  background: var(--app-bg) !important;
+  background: var(--app-bg-gradient) !important;
+  background-color: var(--app-bg) !important;
   color: var(--app-on-surface);
 }
 

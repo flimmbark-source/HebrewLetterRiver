@@ -250,7 +250,7 @@ export default function HomeView() {
   }, [dailyGoalMinutes, reminderTime]);
 
   return (
-    <div className="relative min-h-screen" style={{ background: 'var(--app-bg)', color: 'var(--app-on-surface)' }}>
+    <div className="relative min-h-screen" style={{ color: 'var(--app-on-surface)' }}>
       <main className="mx-auto max-w-2xl space-y-8 px-6 pb-48 pt-8 stagger-children">
         <section className="animate-fade-in-up">
           <div className="relative overflow-hidden rounded-2xl p-8 text-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--app-primary) 0%, #145e42 60%, #0f4a34 100%)', color: 'var(--app-on-primary)' }}>

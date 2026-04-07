@@ -189,7 +189,6 @@ export default function AchievementsView() {
       className="min-h-screen pb-36"
       style={{
         fontFamily: 'var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif)',
-        background: 'var(--app-bg)',
         color: 'var(--app-on-surface)'
       }}
     >
