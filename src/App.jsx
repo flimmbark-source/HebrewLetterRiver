@@ -7,12 +7,14 @@ import BridgeBuilderView from './views/BridgeBuilderView.jsx';
 import DeepScriptView from './views/DeepScriptView.jsx';
 import SettingsView from './views/SettingsView.jsx';
 import DailyView from './views/DailyView.jsx';
+import DebugDashboardView from './views/DebugDashboardView.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import { ProgressProvider } from './context/ProgressContext.jsx';
 import { SRSProvider } from './context/SRSContext.jsx';
 import { GameProvider, useGame } from './context/GameContext.jsx';
 import { LocalizationProvider, useLocalization } from './context/LocalizationContext.jsx';
 import { LanguageProvider, useLanguage } from './context/LanguageContext.jsx';
+import { ExperimentProvider } from './context/ExperimentContext.jsx';
 import { TutorialProvider, useTutorial } from './context/TutorialContext.jsx';
 import { getFormattedLanguageName } from './lib/languageUtils.js';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
@@ -318,6 +320,7 @@ function Shell() {
           <Route path="/deep-script" element={<DeepScriptView />} />
           <Route path="/daily" element={<DailyView />} />
           <Route path="/settings" element={<SettingsView />} />
+          <Route path="/debug" element={<DebugDashboardView />} />
           <Route path="/play" element={<Navigate to="/home" replace />} />
         </Routes>
       </main>
@@ -382,6 +385,7 @@ export default function App() {
     <ErrorBoundary>
       <MigrationInitializer>
         <LanguageProvider>
+          <ExperimentProvider>
           <LocalizationProvider>
             <ToastProvider>
               <ProgressProvider>
@@ -395,6 +399,7 @@ export default function App() {
               </ProgressProvider>
             </ToastProvider>
           </LocalizationProvider>
+          </ExperimentProvider>
         </LanguageProvider>
       </MigrationInitializer>
     </ErrorBoundary>
