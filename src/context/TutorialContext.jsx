@@ -126,12 +126,6 @@ const TUTORIAL_DEFINITIONS = {
         translationKey: 'tutorials.firstTime.backToHome',
         icon: '🎮',
         navigateTo: '/home'
-      },
-      {
-        id: 'playButton',
-        translationKey: 'tutorials.firstTime.playButton',
-        icon: '▶️',
-        targetSelector: '.hero-cta'
       }
     ]
   },
@@ -400,11 +394,6 @@ export function TutorialProvider({ children }) {
     // Clear tutorial state from localStorage
     storage.remove('hlr.tutorials.current');
     storage.remove('hlr.tutorials.currentStep');
-
-    // Set up chained tutorials
-    if (tutorialId === 'firstTime' && !newCompleted.includes('gameSetup')) {
-      setPendingTutorial('gameSetup');
-    }
 
     setCurrentTutorial(null);
     setCurrentTutorialId(null);

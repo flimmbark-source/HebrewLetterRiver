@@ -282,8 +282,8 @@ function Shell() {
     return () => observer.disconnect();
   }, []);
 
-  // Check if play button should be disabled during tutorial
-  const isPlayDisabled = currentTutorial?.id === 'firstTime' && currentStepIndex < 4;
+  // Disable play button during entire firstTime tutorial to prevent accidental clicks
+  const isPlayDisabled = currentTutorial?.id === 'firstTime';
 
   const handlePlay = React.useCallback(
     (event) => {

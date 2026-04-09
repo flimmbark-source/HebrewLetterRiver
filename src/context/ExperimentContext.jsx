@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { loadState, saveState } from '../lib/storage.js';
-import { track } from '../lib/eventTracker.js';
+import { track } from '../lib/eventLog.js';
 
 const DEFAULT_FLAGS = {
   newOnboarding: false,

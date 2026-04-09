@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+const isDevMode = Boolean(import.meta.env.DEV);
+
 /**
  * Error Boundary Component
  * Catches React errors and displays user-friendly fallback UI
@@ -77,7 +79,7 @@ class ErrorBoundary extends React.Component {
               </p>
             </div>
 
-            {this.state.error && process.env.NODE_ENV === 'development' && (
+            {this.state.error && isDevMode && (
               <div className="mb-4 p-4 bg-slate-900 rounded border border-red-500/30">
                 <p className="text-sm text-red-400 font-mono mb-2">
                   {this.state.error.toString()}

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getEventLog, getEventCounts, getFunnelMetrics, clearAnalytics } from '../lib/eventTracker.js';
+import { getEventLog, getEventCounts, getFunnelMetrics, clearAnalytics } from '../lib/eventLog.js';
 import { useExperiment } from '../context/ExperimentContext.jsx';
 
 function Icon({ children, className = '', filled = false }) {

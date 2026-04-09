@@ -54,9 +54,24 @@ function probeLocalStorage() {
 
 function probeIndexedDB() {
   return new Promise((resolve) => {
+    let settled = false;
+    const settle = (result) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
+      resolve(result);
+    };
+
+    const timeoutId = setTimeout(() => {
+      settle({
+        available: false,
+        reason: 'IndexedDB probe timed out before completion.'
+      });
+    }, 4000);
+
     try {
       if (typeof window === 'undefined' || !window.indexedDB) {
-        resolve({
+        settle({
           available: false,
           reason: 'IndexedDB is not available in this runtime.'
         });
@@ -77,17 +92,24 @@ function probeIndexedDB() {
         const db = request.result;
         db.close();
         window.indexedDB.deleteDatabase(dbName);
-        resolve({ available: true, reason: null });
+        settle({ available: true, reason: null });
       };
 
       request.onerror = () => {
-        resolve({
+        settle({
           available: false,
           reason: `IndexedDB open failed: ${request.error?.message || 'unknown error'}`
         });
       };
+
+      request.onblocked = () => {
+        settle({
+          available: false,
+          reason: 'IndexedDB probe was blocked by another open connection.'
+        });
+      };
     } catch (error) {
-      resolve({
+      settle({
         available: false,
         reason: `IndexedDB probe failed: ${error?.message || 'unknown error'}`
       });
