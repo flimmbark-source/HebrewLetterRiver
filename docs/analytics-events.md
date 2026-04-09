@@ -1,6 +1,6 @@
 # Analytics Event Taxonomy
 
-Complete reference for all canonical analytics events tracked by `src/lib/analytics.js`.
+Complete reference for all canonical analytics events tracked by `src/lib/eventTracker.js`.
 
 ## Event Reference
 
