@@ -184,19 +184,18 @@ export function GameProvider({ children }) {
   }, [currentTutorial, isVisible, hasMounted]);
 
   const openGame = useCallback((openOptions = {}) => {
-    // If game is already visible, close it (acts as a toggle)
-    if (isVisible) {
-      if (gameApiRef.current) {
-        gameApiRef.current.resetToSetupScreen();
-      }
-      setIsVisible(false);
-      setIsGameRunning(false);
-      return;
-    }
     setOptions(openOptions);
     // Set autostart flag if requested
     if (openOptions.autostart) {
       shouldAutostartRef.current = true;
+    }
+    if (isVisible) {
+      // Keep modal open and re-initialize setup with latest options.
+      if (gameApiRef.current) {
+        gameApiRef.current.resetToSetupScreen();
+      }
+      setIsGameRunning(false);
+      return;
     }
     setIsVisible(true);
   }, [isVisible]);
