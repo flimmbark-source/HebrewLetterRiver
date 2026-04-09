@@ -32,30 +32,52 @@ async function resetServiceWorkersAndCaches() {
   if (typeof window === 'undefined') return;
   const forceReset = shouldForceServiceWorkerReset();
 
-  if ('serviceWorker' in navigator) {
-    const registrations = await navigator.serviceWorker.getRegistrations();
-    await Promise.all(
-      registrations.map(async (registration) => {
-        const success = await registration.unregister();
-        if (success) {
-          console.log('[PWA] Service Worker unregistered successfully');
+  try {
+    // Timeout for the entire SW reset operation (5 seconds max)
+    await Promise.race([
+      (async () => {
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(
+            registrations.map(async (registration) => {
+              try {
+                const success = await registration.unregister();
+                if (success) {
+                  console.log('[PWA] Service Worker unregistered successfully');
+                }
+              } catch (error) {
+                console.warn('[PWA] Failed to unregister SW:', error);
+              }
+            })
+          );
         }
-      })
-    );
-  }
 
-  if (forceReset && 'caches' in window) {
-    const cacheKeys = await window.caches.keys();
-    await Promise.all(
-      cacheKeys
-        .filter((key) => key.includes('workbox') || key.includes('cache') || key.includes('precache'))
-        .map((key) => window.caches.delete(key))
-    );
-    console.warn('[PWA] Forced cache reset completed.');
-    try {
-      window.localStorage.removeItem(SW_RESET_FLAG_KEY);
-    } catch {
-      // Ignore storage cleanup issues.
+        if (forceReset && 'caches' in window) {
+          const cacheKeys = await window.caches.keys();
+          await Promise.all(
+            cacheKeys
+              .filter((key) => key.includes('workbox') || key.includes('cache') || key.includes('precache'))
+              .map((key) => window.caches.delete(key).catch((error) => {
+                console.warn('[PWA] Failed to delete cache:', error);
+              }))
+          );
+          console.warn('[PWA] Forced cache reset completed.');
+          try {
+            window.localStorage.removeItem(SW_RESET_FLAG_KEY);
+          } catch {
+            // Ignore storage cleanup issues.
+          }
+        }
+      })(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('SW reset timeout')), 5000)
+      )
+    ]);
+  } catch (error) {
+    if (error.message !== 'SW reset timeout') {
+      console.warn('[PWA] SW reset error:', error);
+    } else {
+      console.warn('[PWA] Service worker reset timed out, continuing anyway');
     }
   }
 }
