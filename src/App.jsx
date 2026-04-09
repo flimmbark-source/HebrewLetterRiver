@@ -16,12 +16,14 @@ import { LocalizationProvider, useLocalization } from './context/LocalizationCon
 import { LanguageProvider, useLanguage } from './context/LanguageContext.jsx';
 import { ExperimentProvider } from './context/ExperimentContext.jsx';
 import { TutorialProvider, useTutorial } from './context/TutorialContext.jsx';
+import { PremiumProvider } from './context/PremiumContext.jsx';
 import { getFormattedLanguageName } from './lib/languageUtils.js';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import OfflineIndicator from './components/OfflineIndicator.jsx';
 import MigrationInitializer from './components/MigrationInitializer.jsx';
 import PWAInstallPrompt from './components/PWAInstallPrompt.jsx';
 import PlayModeModal from './components/PlayModeModal.jsx';
+import OnboardingFlow from './components/OnboardingFlow.jsx';
 import { useFontSettings } from './hooks/useFontSettings.js';
 
 function HomeIcon(props) {
@@ -307,6 +309,7 @@ function Shell() {
   return (
     <div className={`app-shell ${appFontClass}`}>
       <LanguageOnboardingModal />
+      <OnboardingFlow />
       <OfflineIndicator />
       <PWAInstallPrompt />
       <PlayModeModal />
@@ -389,6 +392,7 @@ export default function App() {
           <LocalizationProvider>
             <ToastProvider>
               <ProgressProvider>
+                <PremiumProvider>
                 <SRSProvider>
                   <TutorialProvider>
                     <GameProvider>
@@ -396,6 +400,7 @@ export default function App() {
                     </GameProvider>
                   </TutorialProvider>
                 </SRSProvider>
+                </PremiumProvider>
               </ProgressProvider>
             </ToastProvider>
           </LocalizationProvider>

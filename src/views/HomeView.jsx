@@ -1,15 +1,23 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { getFormattedLanguageName } from '../lib/languageUtils.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
+import StreakCard from '../components/StreakCard.jsx';
+import StreakMilestoneModal from '../components/StreakMilestoneModal.jsx';
+import DailyReviewCard from '../components/DailyReviewCard.jsx';
+import ReminderPrompt from '../components/ReminderPrompt.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 import { languagePacks } from '../data/languages/index.js';
 import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
 import { getAllSeenWords, getSeenWordsUpdatedEventName } from '../lib/seenWordsStorage.ts';
 import { findDictionaryEntryForWord } from '../lib/sentenceDictionaryLookup.ts';
+import ContinueLearningCard from '../components/ContinueLearningCard.jsx';
+import JourneyMap from '../components/JourneyMap.jsx';
+import { loadState, saveState } from '../lib/storage.js';
 
 const LANGUAGE_FLAGS = {
   hebrew: '🇮🇱', english: '🇬🇧', spanish: '🇪🇸', french: '🇫🇷',
@@ -76,9 +84,10 @@ function LanguageCard({ id, label, value, onChange, options, leading, trailing }
 
 export default function HomeView() {
   const { player, starLevelSize, updatePlayerProfile } = useProgress();
-  const { setShowPlayModal } = useGame();
+  const { openGame, setShowPlayModal } = useGame();
   const { languageId, appLanguageId, languageOptions, selectLanguage, selectAppLanguage } = useLanguage();
   const { t } = useLocalization();
+  const navigate = useNavigate();
 
   const displayLanguageOptions = useMemo(
     () => languageOptions.map((option) => ({ ...option, name: getFormattedLanguageName(option, t) })),
@@ -96,6 +105,9 @@ export default function HomeView() {
   const [isEditingGoal, setIsEditingGoal] = React.useState(false);
   const [isEditingReminder, setIsEditingReminder] = React.useState(false);
   const [seenWordsVersion, setSeenWordsVersion] = React.useState(0);
+  const [showAllModes, setShowAllModes] = React.useState(() => loadState('onboarding.showAllModes', false));
+
+  const isNewUser = (player.totals?.sessions === 0) && !showAllModes;
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
@@ -280,6 +292,19 @@ export default function HomeView() {
           </div>
         </section>
 
+        {/* Streak Card */}
+        <section className="animate-fade-in-up">
+          <StreakCard />
+        </section>
+
+        {/* Daily Review Card */}
+        <section className="animate-fade-in-up">
+          <DailyReviewCard />
+        </section>
+
+        {/* Reminder Prompt (shows after 2-3 sessions) */}
+        <ReminderPrompt />
+
         <section className="space-y-4">
           <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Language Learning</h2>
           <div className="space-y-3">
@@ -428,15 +453,56 @@ export default function HomeView() {
           </div>
         </section>
 
-        <section className="pt-4">
-          <button
-            onClick={() => setShowPlayModal(true)}
-            className="btn-cta flex w-full items-center justify-center gap-3 py-5 text-lg"
-            type="button"
-          >
-            Start learning
-            <Icon>arrow_forward</Icon>
-          </button>
+        <section className="pt-4 space-y-4">
+          {isNewUser ? (
+            <>
+              {/* Dominant Letter River card for new users */}
+              <button
+                type="button"
+                onClick={() => openGame({ autostart: false })}
+                className="group flex w-full items-center gap-4 rounded-2xl p-6 text-left shadow-lg transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+                style={{
+                  background: 'linear-gradient(135deg, var(--app-primary) 0%, #145e42 60%, #0f4a34 100%)',
+                  color: 'var(--app-on-primary, #fff)',
+                  border: 'none'
+                }}
+              >
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                  <Icon className="text-3xl" filled>waves</Icon>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-lg font-bold">Letter River</p>
+                  <p className="mt-0.5 text-sm opacity-80">Start learning letters through play</p>
+                </div>
+                <Icon className="text-2xl shrink-0 opacity-70">arrow_forward</Icon>
+              </button>
+
+              {/* Collapsed "More modes" section */}
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAllModes(true);
+                    saveState('onboarding.showAllModes', true);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition-colors"
+                  style={{ color: 'var(--app-muted)', background: 'var(--app-surface, transparent)' }}
+                >
+                  <Icon className="text-sm">expand_more</Icon>
+                  Show all modes
+                </button>
+              </div>
+            </>
+          ) : (
+            <button
+              onClick={() => setShowPlayModal(true)}
+              className="btn-cta flex w-full items-center justify-center gap-3 py-5 text-lg"
+              type="button"
+            >
+              Start learning
+              <Icon>arrow_forward</Icon>
+            </button>
+          )}
           <p className="mt-6 px-8 text-center text-xs leading-relaxed" style={{ color: 'var(--app-muted)' }}>
             Your progress is automatically synced with your cloud account.
             {' '}
@@ -454,6 +520,7 @@ export default function HomeView() {
           setIsProfileEditorOpen(false);
         }}
       />
+      <StreakMilestoneModal />
     </div>
   );
 }

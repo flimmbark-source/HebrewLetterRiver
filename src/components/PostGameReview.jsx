@@ -1,6 +1,10 @@
 import React, { useMemo } from 'react';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useSRS } from '../context/SRSContext.jsx';
+import { useProgress } from '../context/ProgressContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
+import ShareCard from './ShareCard.jsx';
+import ShareButton from './ShareButton.jsx';
 
 /**
  * Post-Game Review Screen
@@ -22,6 +26,8 @@ export default function PostGameReview({
 }) {
   const { languagePack, t } = useLocalization();
   const { getItemMaturity, progress, MATURITY } = useSRS();
+  const { player, streak } = useProgress();
+  const { languageId } = useLanguage();
 
   // Calculate session statistics
   const sessionStats = useMemo(() => {
@@ -242,6 +248,37 @@ export default function PostGameReview({
             </div>
           </div>
         )}
+
+        {/* Share Card & Button */}
+        <div className="mb-6">
+          <ShareCard
+            mode="letter_river"
+            score={finalScore}
+            accuracy={sessionStats.accuracy}
+            details={{ lettersLearned: sessionStats.totalLetters, totalLetters: sessionStats.totalLetters }}
+            playerName={player?.name}
+            playerLevel={player?.level}
+            languageId={languageId}
+            streakCount={streak?.current ?? 0}
+          />
+          <div className="mt-3 flex justify-center">
+            <ShareButton
+              data={{
+                type: 'session',
+                mode: 'letter_river',
+                score: finalScore,
+                accuracy: sessionStats.accuracy,
+                details: { lettersLearned: sessionStats.totalLetters, totalLetters: sessionStats.totalLetters },
+                playerName: player?.name,
+                playerLevel: player?.level,
+                languageId,
+                streakCount: streak?.current ?? 0,
+              }}
+              surface="post_game_review"
+              className="shadow-lg"
+            />
+          </div>
+        </div>
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 mt-6">

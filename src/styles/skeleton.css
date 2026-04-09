@@ -1,0 +1,55 @@
+/* ═══════════════════════════════════════════════════════════
+   Skeleton Loading Styles
+   ═══════════════════════════════════════════════════════════ */
+
+.skeleton {
+  background: var(--app-surface-highest, #e0e0e0);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+body.dark-mode .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.06),
+    transparent
+  );
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+.skeleton--circle {
+  border-radius: 50%;
+}
+
+.skeleton--text {
+  border-radius: 4px;
+}
