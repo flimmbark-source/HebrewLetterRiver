@@ -11,6 +11,7 @@ import { saveState } from '../lib/storage.js';
 export default function GuidedFirstSession({ onComplete }) {
   const { openGame, isVisible } = useGame();
   const hasLaunchedRef = useRef(false);
+  const hasBeenVisibleRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
@@ -69,11 +70,17 @@ export default function GuidedFirstSession({ onComplete }) {
   // If the game becomes not visible after having been launched, it means the user
   // closed the game manually — treat as completion
   useEffect(() => {
-    if (hasLaunchedRef.current && !isVisible) {
+    if (isVisible) {
+      hasBeenVisibleRef.current = true;
+      return;
+    }
+
+    if (hasLaunchedRef.current && hasBeenVisibleRef.current && !isVisible) {
       // Small delay to avoid racing with session-complete event
       const timer = setTimeout(() => {
         if (hasLaunchedRef.current) {
           hasLaunchedRef.current = false; // prevent double-fire
+          hasBeenVisibleRef.current = false;
           // Restore normal settings
           try {
             const saved = localStorage.getItem('gameSettings');
