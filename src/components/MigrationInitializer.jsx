@@ -12,8 +12,24 @@ export default function MigrationInitializer({ children }) {
   const [migrationError, setMigrationError] = useState(null);
 
   useEffect(() => {
+    let cancelled = false;
+    let migrationGuardTimer;
+
+    const finalizeMigration = (errorMessage = null) => {
+      if (cancelled) return;
+      if (migrationGuardTimer) {
+        clearTimeout(migrationGuardTimer);
+      }
+      if (errorMessage) {
+        setMigrationError(errorMessage);
+      }
+      setMigrationComplete(true);
+    };
+
     async function runMigration() {
-      setMigrationComplete(false);
+      if (!cancelled) {
+        setMigrationComplete(false);
+      }
 
       const capability = await probeStorageCapability();
       if (!capability.isMigrationSafe) {
@@ -21,8 +37,7 @@ export default function MigrationInitializer({ children }) {
         console.warn(warningMessage);
         setStartupFlag('storageMigrationSkipped', true);
         setStartupFlag('storageCapability', capability);
-        setMigrationError('Storage migration was skipped because persistent browser storage is unavailable.');
-        setMigrationComplete(true);
+        finalizeMigration('Storage migration was skipped because persistent browser storage is unavailable.');
         return;
       }
 
@@ -32,14 +47,13 @@ export default function MigrationInitializer({ children }) {
         shouldMigrate = needsMigration();
       } catch (error) {
         console.warn('[Migration] Failed to check migration status, continuing without migration:', error);
-        setMigrationError(error.message);
-        setMigrationComplete(true);
+        finalizeMigration(error.message);
         return;
       }
 
       if (!shouldMigrate) {
         console.log('[Migration] No migration needed, current version:', getMigrationVersion());
-        setMigrationComplete(true);
+        finalizeMigration();
         return;
       }
 
@@ -49,25 +63,33 @@ export default function MigrationInitializer({ children }) {
 
         if (result.success) {
           console.log('[Migration] Migration completed successfully');
-          setMigrationComplete(true);
+          finalizeMigration();
         } else {
           console.error('[Migration] Migration failed:', result.error);
-          setMigrationError(result.error);
           // Continue anyway - app can still work with localStorage
-          setMigrationComplete(true);
+          finalizeMigration(result.error);
         }
       } catch (error) {
         console.error('[Migration] Migration error:', error);
-        setMigrationError(error.message);
         // Continue anyway
-        setMigrationComplete(true);
+        finalizeMigration(error.message);
       }
     }
 
     // Initialize online status manager
     getOnlineStatusManager();
 
+    migrationGuardTimer = setTimeout(() => {
+      if (cancelled) return;
+      console.warn('[Migration] Migration initialization timed out. Continuing with app startup.');
+      finalizeMigration('Storage initialization timed out. Continuing with limited persistence support.');
+    }, 8000);
+
     runMigration();
+    return () => {
+      cancelled = true;
+      clearTimeout(migrationGuardTimer);
+    };
   }, []);
 
   if (!migrationComplete) {
