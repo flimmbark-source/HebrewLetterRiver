@@ -40,6 +40,31 @@ import {
 let encounterIdCounter = 0;
 
 /**
+ * Tags that indicate a word can serve as a 'noun' in templates.
+ * Covers both DS-style tags (person, nature, body...) and BB-style tags (nouns, basics).
+ */
+const NOUN_QUALIFYING_TAGS = new Set([
+  // DS-style tags
+  'person', 'nature', 'body', 'object', 'animal', 'food', 'place', 'time',
+  'concrete', 'abstract', 'common', 'family',
+  // BB-style tags
+  'nouns', 'basics', 'numbers', 'colors',
+]);
+
+/**
+ * Check if a word qualifies as a noun for template matching.
+ * A word is a noun candidate if it has any noun-qualifying tag,
+ * OR if it has no verb/adjective tags (treat generic vocab as nouns).
+ */
+function isNounCandidate(word) {
+  if (!word.tags || word.tags.length === 0) return true; // no tags → treat as noun
+  if (word.tags.some(t => NOUN_QUALIFYING_TAGS.has(t))) return true;
+  // If word only has non-verb, non-adjective tags, treat as noun
+  if (!word.tags.includes('verbs') && !word.tags.includes('adjective')) return true;
+  return false;
+}
+
+/**
  * Collect all tags from a set of DS-format words.
  * @param {Object[]} words — DS word objects with .tags arrays
  * @returns {Set<string>}
@@ -51,16 +76,12 @@ function collectTags(words) {
       for (const t of w.tags) tags.add(t);
     }
   }
-  // Map common DS tags to template tags
-  // DS words use tags like 'person', 'nature', 'body', 'object', 'animal', 'food', 'place'
-  // These all qualify as 'noun' for template matching
-  const nounTags = ['person', 'nature', 'body', 'object', 'animal', 'food', 'place', 'time', 'concrete', 'abstract'];
-  for (const t of nounTags) {
-    if (tags.has(t)) {
-      tags.add('noun');
-      break;
-    }
+
+  // If any word qualifies as a noun, add the 'noun' tag
+  if (words.some(w => isNounCandidate(w))) {
+    tags.add('noun');
   }
+
   if (tags.has('adjective')) tags.add('adjective');
   return tags;
 }
@@ -73,8 +94,7 @@ function collectTags(words) {
  */
 function findWordsByTag(words, tag) {
   if (tag === 'noun') {
-    const nounTags = new Set(['person', 'nature', 'body', 'object', 'animal', 'food', 'place', 'time', 'concrete', 'abstract', 'common', 'family']);
-    return words.filter(w => w.tags && w.tags.some(t => nounTags.has(t)));
+    return words.filter(w => isNounCandidate(w));
   }
   return words.filter(w => w.tags && w.tags.includes(tag));
 }
