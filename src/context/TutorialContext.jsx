@@ -29,113 +29,12 @@ export function useTutorial() {
 /**
  * Tutorial steps definition
  *
- * - firstTime: Auto-starts for new users, full walkthrough with navigation
+ * - firstTime: DISABLED - outdated full walkthrough, kept for reference
  * - tour: Manual tutorial (triggered by ? button), no language intro
  * - gameSetup: Triggered when opening game
  * - achievements: Can be triggered manually
  */
 const TUTORIAL_DEFINITIONS = {
-  firstTime: {
-    id: 'firstTime',
-    steps: [
-      {
-        id: 'welcome',
-        translationKey: 'tutorials.firstTime.welcome',
-        icon: '👋',
-        targetSelector: '.language-onboarding-card'
-      },
-      {
-        id: 'appLanguage',
-        translationKey: 'tutorials.firstTime.appLanguage',
-        icon: '🌍',
-        targetSelector: '.onboarding-app-language-section'
-      },
-      {
-        id: 'practiceLanguage',
-        translationKey: 'tutorials.firstTime.practiceLanguage',
-        icon: '📖',
-        targetSelector: '.onboarding-practice-language-section'
-      },
-      {
-        id: 'confirmLanguages',
-        translationKey: 'tutorials.firstTime.confirmLanguages',
-        icon: '✨',
-        targetSelector: '.onboarding-continue-button',
-        waitForAction: 'click'
-      },
-      {
-        id: 'navigation',
-        translationKey: 'tutorials.firstTime.navigation',
-        icon: '🧭',
-        targetSelector: '.bottom-nav'
-      },
-      {
-        id: 'progress',
-        translationKey: 'tutorials.firstTime.progress',
-        icon: '📊',
-        targetSelector: '.progress-row'
-      },
-      {
-        id: 'quests',
-        translationKey: 'tutorials.firstTime.quests',
-        icon: '📅',
-        targetSelector: '.quest-card'
-      },
-      // Navigate to Achievements
-      {
-        id: 'navigateToAchievements',
-        translationKey: 'tutorials.firstTime.navigateToAchievements',
-        icon: '🏆',
-        navigateTo: '/achievements'
-      },
-      {
-        id: 'achievementsOverview',
-        translationKey: 'tutorials.firstTime.achievementsOverview',
-        icon: '🎖️',
-        targetSelector: '.badge-tabs'
-      },
-      {
-        id: 'badgeTiers',
-        translationKey: 'tutorials.firstTime.badgeTiers',
-        icon: '📊',
-        targetSelector: '.badge-tier-example'
-      },
-
-      // Navigate to Settings
-      {
-        id: 'navigateToSettings',
-        translationKey: 'tutorials.firstTime.navigateToSettings',
-        icon: '⚙️',
-        navigateTo: '/settings'
-      },
-      {
-        id: 'settingsIntro',
-        translationKey: 'tutorials.firstTime.settingsIntro',
-        icon: '🎨'
-      },
-      {
-        id: 'accessibilityOptions',
-        translationKey: 'tutorials.firstTime.accessibilityOptions',
-        icon: '♿',
-        targetSelector: '.progress-card-small'
-      },
-
-      // Back to home
-      {
-        id: 'backToHome',
-        translationKey: 'tutorials.firstTime.backToHome',
-        icon: '🎮',
-        navigateTo: '/home'
-      },
-      {
-        id: 'playButton',
-        translationKey: 'tutorials.firstTime.playButton',
-        icon: '▶️',
-        targetSelector: '.hero-cta'
-      }
-    ]
-  },
-
   // Manual tour (triggered by ? button)
   tour: {
     id: 'tour',
@@ -301,18 +200,18 @@ export function TutorialProvider({ children }) {
     }
   }, [currentStepIndex, currentTutorial]);
 
-  // Check if this is the user's first time
-  useEffect(() => {
-    const hasSeenFirstTime = completedTutorials.includes('firstTime');
-    const hasCurrentTutorial = storage.get('hlr.tutorials.current');
-    if (!hasSeenFirstTime && !currentTutorial && !hasCurrentTutorial) {
-      // Show first-time tutorial after a short delay
-      const timer = setTimeout(() => {
-        startTutorial('firstTime');
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [completedTutorials, currentTutorial, startTutorial]);
+  // firstTime tutorial is disabled — it was an outdated full app walkthrough.
+  // To re-enable, restore the firstTime definition and uncomment below.
+  // useEffect(() => {
+  //   const hasSeenFirstTime = completedTutorials.includes('firstTime');
+  //   const hasCurrentTutorial = storage.get('hlr.tutorials.current');
+  //   if (!hasSeenFirstTime && !currentTutorial && !hasCurrentTutorial) {
+  //     const timer = setTimeout(() => {
+  //       startTutorial('firstTime');
+  //     }, 500);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [completedTutorials, currentTutorial, startTutorial]);
 
   const nextStep = () => {
     if (!currentTutorial) return;
@@ -400,11 +299,6 @@ export function TutorialProvider({ children }) {
     // Clear tutorial state from localStorage
     storage.remove('hlr.tutorials.current');
     storage.remove('hlr.tutorials.currentStep');
-
-    // Set up chained tutorials
-    if (tutorialId === 'firstTime' && !newCompleted.includes('gameSetup')) {
-      setPendingTutorial('gameSetup');
-    }
 
     setCurrentTutorial(null);
     setCurrentTutorialId(null);

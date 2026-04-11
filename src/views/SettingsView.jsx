@@ -6,6 +6,7 @@ import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { getFormattedLanguageName } from '../lib/languageUtils.js';
 import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
+import { setSoundEnabled, isSoundEnabled, setSoundVolume, getSoundVolume } from '../lib/soundLibrary.js';
 
 const LANGUAGE_FLAGS = {
   hebrew: '🇮🇱', english: '🇬🇧', spanish: '🇪🇸', french: '🇫🇷',
@@ -62,6 +63,11 @@ export default function SettingsView() {
   const [showInfoPopup, setShowInfoPopup] = useState(false);
   const [infoPopupContent, setInfoPopupContent] = useState({ title: '', description: '' });
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+
+  // Sound & Audio settings
+  const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [uiSounds, setUiSounds] = useState(() => isSoundEnabled());
+  const [soundVolume, setSoundVolumeState] = useState(() => Math.round(getSoundVolume() * 100));
 
   useEffect(() => {
     const loadSettings = () => {
@@ -397,6 +403,39 @@ export default function SettingsView() {
                 </div>
               </div>
 
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <h3 className="px-2 text-sm font-bold uppercase tracking-widest" style={{ color: 'var(--app-muted)' }}>Sound & Audio</h3>
+          <div className="stable-card overflow-hidden rounded-xl shadow-sm" style={{ background: 'var(--app-card-bg)', border: '1px solid var(--app-card-border)' }}>
+            <div className="space-y-4 p-4">
+              <Toggle id="settings-tts-toggle" label="Pronunciation Audio" icon="record_voice_over" checked={ttsEnabled} onChange={(val) => {
+                setTtsEnabled(val);
+                try { localStorage.setItem('settings.ttsEnabled', JSON.stringify(val)); } catch (_e) { /* noop */ }
+              }} />
+              <Toggle id="settings-ui-sounds-toggle" label="Game Sounds" icon="volume_up" checked={uiSounds} onChange={(val) => {
+                setUiSounds(val);
+                setSoundEnabled(val);
+              }} />
+              <div className="flex items-center gap-4">
+                <Icon style={{ color: 'var(--app-muted)' }}>tune</Icon>
+                <span className="flex-1 font-semibold" style={{ color: 'var(--app-on-surface)' }}>Volume</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={soundVolume}
+                  onChange={(e) => {
+                    const vol = Number(e.target.value);
+                    setSoundVolumeState(vol);
+                    setSoundVolume(vol / 100);
+                  }}
+                  className="w-24"
+                />
+                <span className="w-8 text-right text-xs font-bold" style={{ color: 'var(--app-muted)' }}>{soundVolume}%</span>
+              </div>
             </div>
           </div>
         </section>

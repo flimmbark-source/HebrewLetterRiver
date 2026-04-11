@@ -108,8 +108,22 @@ const defaultActiveBadges = selectRandomBadges();
 const defaultStreak = {
   current: 0,
   best: 0,
-  lastPlayedDateKey: null
+  lastPlayedDateKey: null,
+  freezesAvailable: 0,
+  freezesUsed: 0,
+  lastFreezeEarnedDateKey: null,
+  milestonesClaimed: [],
+  repairAvailableUntil: null,
+  preBreakCurrent: null
 };
+
+export const STREAK_MILESTONES = [
+  { days: 3, stars: 15, label: '3-Day Spark' },
+  { days: 7, stars: 30, label: 'Weekly Flame' },
+  { days: 14, stars: 50, label: 'Two-Week Fire' },
+  { days: 30, stars: 100, label: 'Monthly Blaze' },
+  { days: 100, stars: 250, label: 'Century Inferno' }
+];
 
 function createLanguageAssets(languagePack, localization = {}) {
   const { t: translateFn } = localization ?? {};
@@ -700,14 +714,36 @@ export function ProgressProvider({ children }) {
 
   function updateStreakForSession(dateKey, playerSessionsCount) {
     let shouldAdvanceBadge = false;
+    let pendingMilestones = [];
     setStreak((prev) => {
       if (prev.lastPlayedDateKey === dateKey) return prev;
       const diff = prev.lastPlayedDateKey ? differenceInJerusalemDays(prev.lastPlayedDateKey, dateKey) : null;
       let current = 1;
+      let freezesAvailable = prev.freezesAvailable ?? 0;
+      let freezesUsed = prev.freezesUsed ?? 0;
+      let repairAvailableUntil = prev.repairAvailableUntil ?? null;
+      let preBreakCurrent = prev.preBreakCurrent ?? null;
+
       if (diff === 1) {
         current = prev.current + 1;
         shouldAdvanceBadge = true;
+        repairAvailableUntil = null;
+        preBreakCurrent = null;
+      } else if (diff === 2 && freezesAvailable > 0) {
+        // Freeze absorbs the missed day
+        current = prev.current + 1;
+        freezesAvailable -= 1;
+        freezesUsed += 1;
+        shouldAdvanceBadge = true;
+        repairAvailableUntil = null;
+        preBreakCurrent = null;
       } else {
+        // Streak breaks
+        preBreakCurrent = prev.current > 0 ? prev.current : null;
+        if (prev.current > 0 && diff !== null && diff > 1) {
+          // Set 24-hour repair window
+          repairAvailableUntil = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+        }
         current = 1;
         shouldAdvanceBadge = prev.lastPlayedDateKey === null;
 
@@ -717,14 +753,163 @@ export function ProgressProvider({ children }) {
         }
       }
       const best = Math.max(prev.best, current);
+
+      // Check for streak milestones
+      const milestonesClaimed = prev.milestonesClaimed ?? [];
+      for (const milestone of STREAK_MILESTONES) {
+        if (current >= milestone.days && !milestonesClaimed.includes(milestone.days)) {
+          pendingMilestones.push(milestone);
+        }
+      }
+
+      // Earn free freeze every 7 streak days (max 2 stored)
+      let lastFreezeEarnedDateKey = prev.lastFreezeEarnedDateKey ?? null;
+      if (current > 0 && current % 7 === 0 && freezesAvailable < 2) {
+        // Only earn once per 7-day threshold
+        const freezeThreshold = current;
+        const lastEarnedThreshold = lastFreezeEarnedDateKey ? parseInt(lastFreezeEarnedDateKey, 10) : 0;
+        if (freezeThreshold > lastEarnedThreshold) {
+          freezesAvailable = Math.min(2, freezesAvailable + 1);
+          lastFreezeEarnedDateKey = String(freezeThreshold);
+        }
+      }
+
       return {
+        ...prev,
         current,
         best,
-        lastPlayedDateKey: dateKey
+        lastPlayedDateKey: dateKey,
+        freezesAvailable,
+        freezesUsed,
+        lastFreezeEarnedDateKey,
+        milestonesClaimed,
+        repairAvailableUntil,
+        preBreakCurrent
       };
     });
     if (shouldAdvanceBadge) trackBadgeProgress('steady-streak', 1);
+    // Emit milestone events for unclaimed milestones
+    if (pendingMilestones.length > 0) {
+      emit('streak:milestones-pending', { milestones: pendingMilestones });
+    }
   }
+
+  const repairStreak = useCallback((starCost = 20) => {
+    let canRepair = false;
+    setStreak((prev) => {
+      const now = new Date();
+      const repairUntil = prev.repairAvailableUntil ? new Date(prev.repairAvailableUntil) : null;
+      if (!repairUntil || now > repairUntil || !prev.preBreakCurrent) {
+        return prev;
+      }
+      if ((playerRef.current?.stars ?? 0) < starCost) {
+        return prev;
+      }
+      canRepair = true;
+      return {
+        ...prev,
+        current: prev.preBreakCurrent,
+        best: Math.max(prev.best, prev.preBreakCurrent),
+        repairAvailableUntil: null,
+        preBreakCurrent: null
+      };
+    });
+    if (canRepair) {
+      setPlayer((prev) => ({
+        ...prev,
+        stars: Math.max(0, (prev.stars ?? 0) - starCost)
+      }));
+      addToast({
+        tone: 'success',
+        title: 'Streak restored!',
+        description: `Your streak has been repaired for ${starCost} stars.`,
+        icon: '🔥'
+      });
+    }
+    return { success: canRepair };
+  }, [addToast]);
+
+  const useStreakFreeze = useCallback((starCost = 15) => {
+    let success = false;
+    setStreak((prev) => {
+      const freezesAvailable = prev.freezesAvailable ?? 0;
+      if (freezesAvailable > 0) {
+        // Use a free freeze
+        success = true;
+        return {
+          ...prev,
+          freezesAvailable: freezesAvailable - 1,
+          freezesUsed: (prev.freezesUsed ?? 0) + 1
+        };
+      }
+      // Otherwise, purchase with stars
+      if ((playerRef.current?.stars ?? 0) < starCost) {
+        return prev;
+      }
+      success = true;
+      return {
+        ...prev,
+        freezesAvailable: Math.max(0, freezesAvailable) + 1,
+        freezesUsed: (prev.freezesUsed ?? 0)
+      };
+    });
+    if (success) {
+      // Deduct stars only if no free freeze was available
+      const hadFreeFreeze = (streak.freezesAvailable ?? 0) > 0;
+      if (!hadFreeFreeze) {
+        setPlayer((prev) => ({
+          ...prev,
+          stars: Math.max(0, (prev.stars ?? 0) - starCost)
+        }));
+      }
+      addToast({
+        tone: 'success',
+        title: 'Freeze activated!',
+        description: hadFreeFreeze
+          ? 'Used a free freeze. Your streak is protected for 1 missed day.'
+          : `Purchased a freeze for ${starCost} stars. Your streak is protected for 1 missed day.`,
+        icon: '🧊'
+      });
+    }
+    return { success };
+  }, [addToast, streak.freezesAvailable]);
+
+  const claimStreakMilestone = useCallback((days) => {
+    const milestone = STREAK_MILESTONES.find(m => m.days === days);
+    if (!milestone) return { success: false };
+
+    let alreadyClaimed = false;
+    setStreak((prev) => {
+      const milestonesClaimed = prev.milestonesClaimed ?? [];
+      if (milestonesClaimed.includes(days)) {
+        alreadyClaimed = true;
+        return prev;
+      }
+      return {
+        ...prev,
+        milestonesClaimed: [...milestonesClaimed, days]
+      };
+    });
+
+    if (alreadyClaimed) return { success: false };
+
+    const applyResult = applyStarsToPlayer(milestone.stars, {
+      source: 'streak-milestone',
+      metadata: { days, label: milestone.label }
+    });
+
+    if (applyResult?.success) {
+      celebrate({ particleCount: 120, spread: 80, originY: 0.55 });
+      addToast({
+        tone: 'success',
+        title: `${milestone.label}!`,
+        description: `+${milestone.stars} stars for your ${days}-day streak!`,
+        icon: '🔥'
+      });
+    }
+
+    return { success: true, stars: milestone.stars };
+  }, [applyStarsToPlayer, addToast]);
 
   const replaceCompletedBadge = useCallback((completedBadgeId) => {
     setActiveBadges((prev) => {
@@ -1380,6 +1565,11 @@ export function ProgressProvider({ children }) {
       lastSession,
       claimBadgeReward,
       claimDailyReward,
+      repairStreak,
+      useStreakFreeze,
+      claimStreakMilestone,
+      STREAK_MILESTONES,
+      applyStarsToPlayer,
       updatePlayerProfile: ({ name, avatar }) => {
         setPlayer((prev) => ({
           ...prev,
@@ -1388,7 +1578,7 @@ export function ProgressProvider({ children }) {
         }));
       }
     }),
-    [assets, player, badges, activeBadges, streak, daily, lastSession, claimBadgeReward, claimDailyReward]
+    [assets, player, badges, activeBadges, streak, daily, lastSession, claimBadgeReward, claimDailyReward, repairStreak, useStreakFreeze, claimStreakMilestone, applyStarsToPlayer]
   );
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;
