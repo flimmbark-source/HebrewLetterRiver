@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 /**
- * Minimal pre-run screen for standalone (non-guided) Deep Script runs.
- * Lets the player choose word source mode before starting.
+ * KitSelectScreen — pre-run screen for standalone (non-guided) Deep Script runs.
+ *
+ * Two-step selection flow:
+ *   Step 1: Choose expedition mode — Words or Sentences
+ *   Step 2: Choose word source — Word Pack or Random
+ *
  * Guided pack runs skip this screen entirely.
  */
 export default function KitSelectScreen({
@@ -10,12 +14,98 @@ export default function KitSelectScreen({
   onBack,
   wordSourceMode = 'pack',
   onWordSourceModeChange = () => {},
+  expeditionMode = 'words',
+  onExpeditionModeChange = () => {},
+  sentenceModeAvailable = false,
 }) {
+  const [step, setStep] = useState('mode'); // 'mode' | 'source'
+
+  const handleModeSelect = (mode) => {
+    onExpeditionModeChange(mode);
+    setStep('source');
+  };
+
+  const handleBackToMode = () => {
+    setStep('mode');
+  };
+
+  // ─── Step 1: Mode selection (Words / Sentences) ──────────
+
+  if (step === 'mode') {
+    return (
+      <div className="ds-kit-select-scroll">
+        {/* Header */}
+        <div className="ds-header">
+          <button className="ds-back-btn" onClick={onBack} type="button">
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back</span>
+          </button>
+          <h1 className="ds-screen-title">Deep Script</h1>
+        </div>
+
+        {/* Hero Section */}
+        <div className="ds-kit-hero">
+          <h2 className="ds-kit-hero-title">Begin Expedition</h2>
+          <p className="ds-kit-subtitle">Choose your expedition type</p>
+        </div>
+
+        {/* Mode Selection */}
+        <div className="ds-kit-list">
+          <button
+            type="button"
+            className={`ds-kit-card ${expeditionMode === 'words' ? 'ds-kit-card--selected' : ''}`}
+            onClick={() => handleModeSelect('words')}
+          >
+            {expeditionMode === 'words' && (
+              <div className="ds-kit-check">
+                <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+              </div>
+            )}
+            <div className={`ds-kit-icon ${expeditionMode === 'words' ? 'ds-kit-icon--selected' : ''}`}>
+              <span className="material-symbols-outlined" style={{ fontSize: 28 }}>spellcheck</span>
+            </div>
+            <div className="ds-kit-info">
+              <div className="ds-kit-name">Words</div>
+              <div className="ds-kit-desc">Spell words letter by letter</div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            className={`ds-kit-card ${expeditionMode === 'sentences' ? 'ds-kit-card--selected' : ''} ${!sentenceModeAvailable ? 'ds-kit-card--locked' : ''}`}
+            onClick={() => sentenceModeAvailable && handleModeSelect('sentences')}
+            disabled={!sentenceModeAvailable}
+          >
+            {expeditionMode === 'sentences' && sentenceModeAvailable && (
+              <div className="ds-kit-check">
+                <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+              </div>
+            )}
+            <div className={`ds-kit-icon ${expeditionMode === 'sentences' ? 'ds-kit-icon--selected' : ''} ${!sentenceModeAvailable ? 'ds-kit-icon--locked' : ''}`}>
+              <span className="material-symbols-outlined" style={{ fontSize: 28 }}>
+                {sentenceModeAvailable ? 'format_align_left' : 'lock'}
+              </span>
+            </div>
+            <div className="ds-kit-info">
+              <div className="ds-kit-name">Sentences</div>
+              <div className="ds-kit-desc">
+                {sentenceModeAvailable
+                  ? 'Build sentences from word blocks'
+                  : 'Complete a vocab pack to unlock'}
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Step 2: Source selection (Word Pack / Random) ────────
+
   return (
     <div className="ds-kit-select-scroll">
       {/* Header */}
       <div className="ds-header">
-        <button className="ds-back-btn" onClick={onBack} type="button">
+        <button className="ds-back-btn" onClick={handleBackToMode} type="button">
           <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back</span>
         </button>
         <h1 className="ds-screen-title">Deep Script</h1>
@@ -23,8 +113,14 @@ export default function KitSelectScreen({
 
       {/* Hero Section */}
       <div className="ds-kit-hero">
-        <h2 className="ds-kit-hero-title">Begin Expedition</h2>
-        <p className="ds-kit-subtitle">Explore chambers and master words</p>
+        <h2 className="ds-kit-hero-title">
+          {expeditionMode === 'words' ? 'Word Expedition' : 'Sentence Expedition'}
+        </h2>
+        <p className="ds-kit-subtitle">
+          {expeditionMode === 'words'
+            ? 'Choose your word source'
+            : 'Choose your word source'}
+        </p>
       </div>
 
       {/* Word Source Selection */}
@@ -44,7 +140,11 @@ export default function KitSelectScreen({
           </div>
           <div className="ds-kit-info">
             <div className="ds-kit-name">Word Pack</div>
-            <div className="ds-kit-desc">Draw words from a curated pack</div>
+            <div className="ds-kit-desc">
+              {expeditionMode === 'words'
+                ? 'Draw words from a curated pack'
+                : 'Use words from a learned pack'}
+            </div>
           </div>
         </button>
 
@@ -63,7 +163,11 @@ export default function KitSelectScreen({
           </div>
           <div className="ds-kit-info">
             <div className="ds-kit-name">Random</div>
-            <div className="ds-kit-desc">Draw from the full word pool</div>
+            <div className="ds-kit-desc">
+              {expeditionMode === 'words'
+                ? 'Draw from the full word pool'
+                : 'Draw from all learned words'}
+            </div>
           </div>
         </button>
       </div>

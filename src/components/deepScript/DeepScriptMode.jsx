@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { createDefaultRunStats } from './deepScriptEngine.js';
 import { generateDungeonFloor, CHAMBER_TYPES } from '../../data/deepScript/floorGenerator.js';
 import { createRunState } from './deepScriptEngine.js';
@@ -7,10 +7,13 @@ import { loadDeepScriptWords, getDeepScriptWordsSync } from '../../data/deepScri
 import { bridgeBuilderPacks } from '../../data/bridgeBuilderPacks.js';
 import { getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import { emit } from '../../lib/eventBus.js';
+import { canPlaySentenceMode, pickRandomSentencePack, getSentenceEligibleWords } from '../../lib/packProgression.js';
+import { generateSentenceExpedition } from '../../data/deepScript/sentenceGenerator.js';
 import KitSelectScreen from './KitSelectScreen.jsx';
 import ExplorationScreen from './ExplorationScreen.jsx';
 import BattleTransition from './BattleTransition.jsx';
 import CombatScreen from './CombatScreen.jsx';
+import SentenceCombatScreen from './SentenceCombatScreen.jsx';
 import RunEndScreen from './RunEndScreen.jsx';
 import './DeepScript.css';
 
@@ -69,11 +72,20 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     loadDeepScriptWords(languageId).then(() => setLangDSWordsReady(true));
   }, [languageId, isHebrew]);
   const [wordSourceMode, setWordSourceMode] = useState('pack'); // pack | random (standalone only)
-  const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | end
+  const [expeditionMode, setExpeditionMode] = useState('words'); // words | sentences
+  const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | sentence_combat | end
   const [isPauseMenuOpen, setIsPauseMenuOpen] = useState(false);
   const [runState, setRunState] = useState(null);
   const [endResult, setEndResult] = useState(null);
   const [floorNumber, setFloorNumber] = useState(1);
+
+  // ─── Sentence mode state ────────────────────────────────────
+  const [sentenceEncounters, setSentenceEncounters] = useState([]);
+  const [sentenceEncounterIndex, setSentenceEncounterIndex] = useState(0);
+  const [sentenceFinalIndex, setSentenceFinalIndex] = useState(-1);
+
+  // Check sentence mode availability
+  const sentenceModeAvailable = useMemo(() => canPlaySentenceMode(), []);
 
   // Exploration state
   const [floor, setFloor] = useState(null);
@@ -214,6 +226,84 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     setScreen('exploring');
     setIsPauseMenuOpen(false);
   }, [createFloorForNumber, pickMiniGameWords]);
+
+  // ─── Sentence Expedition Start ────────────────────────────
+
+  const handleStartSentenceRun = useCallback(() => {
+    // Get pack words for sentence mode based on source
+    let sentencePackWords;
+    if (wordSourceMode === 'pack') {
+      // Pick a random eligible learned pack
+      const pack = pickRandomSentencePack();
+      if (!pack) return; // Should not happen due to availability check
+      sentencePackWords = convertBBWordsForDS(getWordsByIds(pack.wordIds));
+    } else {
+      // Random: use all learned words across eligible packs
+      sentencePackWords = convertBBWordsForDS(getSentenceEligibleWords());
+    }
+
+    if (sentencePackWords.length === 0) return;
+
+    // Generate the sentence expedition
+    const { encounters, finalEncounterIndex } = generateSentenceExpedition(
+      sentencePackWords,
+      { encounterCount: 5, languageId: isHebrew ? 'hebrew' : languageId }
+    );
+
+    if (encounters.length === 0) return;
+
+    // Create a simple run state for sentence mode (health tracking)
+    const newRun = createRunState(createDefaultRunStats(), [], []);
+    newRun.wordsSeen = [];
+    newRun.wordsCompleted = [];
+    newRun.combatsWon = 0;
+    newRun.roomsCompleted = 0;
+
+    setRunState(newRun);
+    setSentenceEncounters(encounters);
+    setSentenceEncounterIndex(0);
+    setSentenceFinalIndex(finalEncounterIndex);
+    setScreen('sentence_combat');
+    setIsPauseMenuOpen(false);
+  }, [wordSourceMode, isHebrew, languageId]);
+
+  // ─── Sentence Combat End ──────────────────────────────────
+
+  const handleSentenceCombatEnd = useCallback((result) => {
+    if (result === 'victory') {
+      setRunState(prev => ({
+        ...prev,
+        combatsWon: prev.combatsWon + 1,
+        roomsCompleted: prev.roomsCompleted + 1,
+      }));
+
+      const isFinal = sentenceEncounterIndex >= sentenceFinalIndex;
+      if (isFinal) {
+        // Expedition complete — sentence mode does NOT affect progression
+        setEndResult('victory');
+        setScreen('end');
+      } else {
+        // Move to next encounter
+        setSentenceEncounterIndex(prev => prev + 1);
+        // Screen stays as 'sentence_combat' — new encounter will render via key change
+      }
+    } else {
+      // Defeat
+      setRunState(prev => ({
+        ...prev,
+        health: Math.max(0, (prev?.health ?? 1) - 1),
+      }));
+
+      const currentHealth = runState?.health ?? 1;
+      if (currentHealth <= 1) {
+        setEndResult('defeat');
+        setScreen('end');
+      } else {
+        // Still alive — retry same encounter
+        // Re-render with updated health
+      }
+    }
+  }, [sentenceEncounterIndex, sentenceFinalIndex, runState?.health]);
 
   // ─── Exploration: Movement ────────────────────────────────
 
@@ -521,6 +611,10 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     previousFloorWordIdsRef.current = new Set();
     hasAutoStarted.current = false;
     setIsPauseMenuOpen(false);
+    // Reset sentence state
+    setSentenceEncounters([]);
+    setSentenceEncounterIndex(0);
+    setSentenceFinalIndex(-1);
   }, []);
 
   const handleResumeGame = useCallback(() => {
@@ -546,16 +640,28 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     }
   }, [isGuidedPackRun, screen, handleStartRun]);
 
+  // Route the start action based on expedition mode
+  const handleExpeditionStart = useCallback(() => {
+    if (expeditionMode === 'sentences') {
+      handleStartSentenceRun();
+    } else {
+      handleStartRun();
+    }
+  }, [expeditionMode, handleStartRun, handleStartSentenceRun]);
+
   if (screen === 'kit_select') {
     if (isGuidedPackRun) return null; // waiting for auto-start effect
 
     return (
       <div className="ds-mode">
         <KitSelectScreen
-          onSelect={handleStartRun}
+          onSelect={handleExpeditionStart}
           onBack={onBack}
           wordSourceMode={wordSourceMode}
           onWordSourceModeChange={setWordSourceMode}
+          expeditionMode={expeditionMode}
+          onExpeditionModeChange={setExpeditionMode}
+          sentenceModeAvailable={sentenceModeAvailable}
         />
       </div>
     );
@@ -572,7 +678,45 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
           onRestart={handleRestart}
           onBack={onBack}
           canAdvanceFloor={!isGuidedPackRun}
+          isSentenceMode={expeditionMode === 'sentences'}
         />
+      </div>
+    );
+  }
+
+  // ─── Sentence Combat Screen ────────────────────────────────
+  if (screen === 'sentence_combat' && sentenceEncounters.length > 0) {
+    const currentEncounter = sentenceEncounters[sentenceEncounterIndex];
+    const isFinal = sentenceEncounterIndex >= sentenceFinalIndex;
+
+    if (!currentEncounter) {
+      // Shouldn't happen, but handle gracefully
+      setEndResult('victory');
+      setScreen('end');
+      return null;
+    }
+
+    return (
+      <div className="ds-mode">
+        <SentenceCombatScreen
+          key={`sent-${sentenceEncounterIndex}-${currentEncounter.id}`}
+          encounter={currentEncounter}
+          runState={runState}
+          onEnd={handleSentenceCombatEnd}
+          onOpenMenu={() => setIsPauseMenuOpen(true)}
+          isFinalEncounter={isFinal}
+          isPaused={isPauseMenuOpen}
+          encounterProgress={`${sentenceEncounterIndex + 1}/${sentenceEncounters.length}`}
+        />
+        {isPauseMenuOpen && (
+          <div className="ds-pause-overlay" role="dialog" aria-modal="true" aria-label="Game menu">
+            <div className="ds-pause-menu">
+              <button type="button" className="ds-pause-btn" onClick={handleResumeGame}>Resume</button>
+              <button type="button" className="ds-pause-btn" onClick={handleReturnToMenu}>Menu</button>
+              <button type="button" className="ds-pause-btn" onClick={handleOpenSettings}>Settings</button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
