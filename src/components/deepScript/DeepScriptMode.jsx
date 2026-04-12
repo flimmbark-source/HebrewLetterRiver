@@ -7,7 +7,7 @@ import { loadDeepScriptWords, getDeepScriptWordsSync } from '../../data/deepScri
 import { bridgeBuilderPacks } from '../../data/bridgeBuilderPacks.js';
 import { getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import { emit } from '../../lib/eventBus.js';
-import { canPlaySentenceMode, pickRandomSentencePack, getSentenceEligibleWords } from '../../lib/packProgression.js';
+import { canPlaySentenceMode, pickRandomSentencePack, getSentenceEligibleWords, getSentenceEligiblePacks } from '../../lib/packProgression.js';
 import { generateSentenceExpedition } from '../../data/deepScript/sentenceGenerator.js';
 import KitSelectScreen from './KitSelectScreen.jsx';
 import ExplorationScreen from './ExplorationScreen.jsx';
@@ -230,24 +230,29 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
   // ─── Sentence Expedition Start ────────────────────────────
 
   const handleStartSentenceRun = useCallback(() => {
-    // Get pack words for sentence mode based on source
+    // Get pack words and eligible pack IDs for sentence mode
     let sentencePackWords;
+    let eligiblePackIds;
+
     if (wordSourceMode === 'pack') {
       // Pick a random eligible learned pack
       const pack = pickRandomSentencePack();
       if (!pack) return; // Should not happen due to availability check
       sentencePackWords = convertBBWordsForDS(getWordsByIds(pack.wordIds));
+      eligiblePackIds = new Set([pack.id]);
     } else {
       // Random: use all learned words across eligible packs
+      const eligiblePacks = getSentenceEligiblePacks();
       sentencePackWords = convertBBWordsForDS(getSentenceEligibleWords());
+      eligiblePackIds = new Set(eligiblePacks.map(p => p.id));
     }
 
     if (sentencePackWords.length === 0) return;
 
-    // Generate the sentence expedition
+    // Generate the sentence expedition from curated sentences
     const { encounters, finalEncounterIndex } = generateSentenceExpedition(
       sentencePackWords,
-      { encounterCount: 5, languageId: isHebrew ? 'hebrew' : languageId }
+      { eligiblePackIds, encounterCount: 5, languageId: isHebrew ? 'hebrew' : languageId }
     );
 
     if (encounters.length === 0) return;
