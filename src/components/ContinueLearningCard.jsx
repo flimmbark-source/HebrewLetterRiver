@@ -56,7 +56,7 @@ export default function ContinueLearningCard() {
       onClick={handleAction}
       className="btn-press group relative w-full overflow-hidden rounded-2xl p-6 text-left shadow-lg transition-all duration-200 hover:shadow-xl"
       style={{
-        background: 'linear-gradient(135deg, var(--app-primary) 0%, #145e42 60%, #0f4a34 100%)',
+        background: 'linear-gradient(135deg, var(--app-primary) 0%, var(--app-primary-dark) 100%)',
         color: 'var(--app-on-primary)',
         border: 'none'
       }}

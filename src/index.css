@@ -54,6 +54,7 @@
   --app-muted: #7a6f5f;
   --app-primary: #1a7a55;
   --app-primary-light: #28a06e;
+  --app-primary-dark: #145e42;
   --app-on-primary: #ffffff;
   --app-primary-container: #a8e6c4;
   --app-secondary: #c07a10;
@@ -111,6 +112,7 @@ body.dark-mode {
   --app-muted: #8a8070;
   --app-primary: #4ae898;
   --app-primary-light: #6af0b0;
+  --app-primary-dark: #2a9a6a;
   --app-on-primary: #0e1210;
   --app-primary-container: rgba(74, 232, 152, 0.14);
   --app-secondary: #f0c35a;

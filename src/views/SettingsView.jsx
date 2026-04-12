@@ -8,6 +8,8 @@ import ProfileEditorModal from '../components/ProfileEditorModal.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 import { setSoundEnabled, isSoundEnabled, setSoundVolume, getSoundVolume } from '../lib/soundLibrary.js';
 
+const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.1.0';
+
 const LANGUAGE_FLAGS = {
   hebrew: '🇮🇱', english: '🇬🇧', spanish: '🇪🇸', french: '🇫🇷',
   portuguese: '🇧🇷', russian: '🇷🇺', arabic: '🇸🇦', hindi: '🇮🇳',
@@ -231,18 +233,21 @@ export default function SettingsView() {
     };
   }, [showInfoPopup]);
 
-  const getInfoHandlers = (settingKey) => ({
-    onClick: (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      showInfo(settingKey, event);
-    },
-    onTouchStart: (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      showInfo(settingKey, event);
-    }
-  });
+  const InfoButton = ({ settingKey, children }) => (
+    <button
+      type="button"
+      className="cursor-help font-semibold text-left"
+      style={{ color: 'inherit', background: 'none', border: 'none', padding: 0 }}
+      aria-label={`${children}: show info`}
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        showInfo(settingKey, event);
+      }}
+    >
+      {children}
+    </button>
+  );
 
   return (
     <div
@@ -334,7 +339,7 @@ export default function SettingsView() {
           <div className="stable-card overflow-hidden rounded-xl shadow-sm" style={{ background: 'var(--app-card-bg)', border: '1px solid var(--app-card-border)' }}>
             <div className="space-y-5 p-4">
               <div className="rounded-lg p-4" style={{ border: '1px solid var(--app-card-border)' }}>
-                <Toggle id="settings-dark-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('darkMode')}>Dark Mode</span>} icon="dark_mode" checked={darkMode} onChange={setDarkMode} />
+                <Toggle id="settings-dark-mode-toggle" label={<InfoButton settingKey="darkMode">Dark Mode</InfoButton>} icon="dark_mode" checked={darkMode} onChange={setDarkMode} />
               </div>
 
               <div className="rounded-lg" style={{ border: '1px solid var(--app-card-border)' }}>
@@ -344,7 +349,7 @@ export default function SettingsView() {
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-4">
                     <Icon style={{ color: 'var(--app-muted)' }}>text_format</Icon>
-                    <span className="cursor-help font-semibold" style={{ color: 'var(--app-on-surface)' }} {...getInfoHandlers('appFont')}>App Font</span>
+                    <InfoButton settingKey="appFont">App Font</InfoButton>
                   </div>
                   <select id="settings-app-font-select" value={appFont} onChange={(event) => setAppFont(event.target.value)} className="rounded-md px-2 py-1 font-bold" style={{ border: '1px solid var(--app-input-border)', color: 'var(--app-primary)', background: 'var(--app-input-bg)' }}>
                     {fontOptions.map((option) => (
@@ -362,7 +367,7 @@ export default function SettingsView() {
                   <div className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-4">
                       <Icon style={{ color: 'var(--app-muted)' }}>text_fields</Icon>
-                      <span className="cursor-help font-semibold" style={{ color: 'var(--app-on-surface)' }} {...getInfoHandlers('gameFont')}>Game Font</span>
+                      <InfoButton settingKey="gameFont">Game Font</InfoButton>
                     </div>
                     <select id="settings-font-select" value={gameFont} onChange={(event) => setGameFont(event.target.value)} className="rounded-md px-2 py-1 font-bold" style={{ border: '1px solid var(--app-input-border)', color: 'var(--app-primary)', background: 'var(--app-input-bg)' }}>
                       {fontOptions.map((option) => (
@@ -372,7 +377,7 @@ export default function SettingsView() {
                   </div>
                 </div>
                 <div className="p-4">
-                  <Toggle id="settings-font-shuffle-toggle" label={<span className="cursor-help" {...getInfoHandlers('fontShuffle')}>Font Shuffle</span>} icon="shuffle" checked={fontShuffle} onChange={setFontShuffle} />
+                  <Toggle id="settings-font-shuffle-toggle" label={<InfoButton settingKey="fontShuffle">Font Shuffle</InfoButton>} icon="shuffle" checked={fontShuffle} onChange={setFontShuffle} />
                 </div>
               </div>
 
@@ -384,7 +389,7 @@ export default function SettingsView() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <Icon style={{ color: 'var(--app-muted)' }}>format_list_numbered</Icon>
-                      <span className="cursor-help font-semibold" style={{ color: 'var(--app-on-surface)' }} {...getInfoHandlers('startingLetters')}>Starting Letters</span>
+                      <InfoButton settingKey="startingLetters">Starting Letters</InfoButton>
                     </div>
                     <select id="settings-starting-letters-select" value={startingLetters} onChange={(event) => setStartingLetters(parseInt(event.target.value, 10))} className="rounded-md pl-2 pr-8 py-1 font-bold" style={{ border: '1px solid var(--app-input-border)', color: 'var(--app-primary)', background: 'var(--app-input-bg)' }}>
                       {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => (
@@ -393,13 +398,13 @@ export default function SettingsView() {
                     </select>
                   </div>
 
-                  <Toggle id="settings-toggle-introductions" label={<span className="cursor-help" {...getInfoHandlers('showIntroductions')}>{t('game.accessibility.showIntroductions')}</span>} icon="info" checked={showIntroductions} onChange={setShowIntroductions} />
+                  <Toggle id="settings-toggle-introductions" label={<InfoButton settingKey="showIntroductions">{t('game.accessibility.showIntroductions')}</InfoButton>} icon="info" checked={showIntroductions} onChange={setShowIntroductions} />
 
-                  <Toggle id="settings-random-letters-toggle" label={<span className="cursor-help" {...getInfoHandlers('randomLetters')}>{t('game.accessibility.randomLetters')}</span>} icon="casino" checked={randomLetters} onChange={setRandomLetters} />
-                  <Toggle id="settings-reduced-motion-toggle" label={<span className="cursor-help" {...getInfoHandlers('reducedMotion')}>{t('game.accessibility.reducedMotion')}</span>} icon="motion_photos_off" checked={reducedMotion} onChange={setReducedMotion} />
-                  <Toggle id="settings-slow-river-toggle" label={<span className="cursor-help" {...getInfoHandlers('slowRiver')}>Slow River Mode</span>} icon="waves" checked={slowRiver} onChange={setSlowRiver} />
-                  <Toggle id="settings-click-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('clickMode')}>Click Mode</span>} icon="ads_click" checked={clickMode} onChange={setClickMode} />
-                  <Toggle id="settings-association-mode-toggle" label={<span className="cursor-help" {...getInfoHandlers('associationMode')}>Association Mode</span>} icon="hub" checked={associationMode} onChange={setAssociationMode} />
+                  <Toggle id="settings-random-letters-toggle" label={<InfoButton settingKey="randomLetters">{t('game.accessibility.randomLetters')}</InfoButton>} icon="casino" checked={randomLetters} onChange={setRandomLetters} />
+                  <Toggle id="settings-reduced-motion-toggle" label={<InfoButton settingKey="reducedMotion">{t('game.accessibility.reducedMotion')}</InfoButton>} icon="motion_photos_off" checked={reducedMotion} onChange={setReducedMotion} />
+                  <Toggle id="settings-slow-river-toggle" label={<InfoButton settingKey="slowRiver">Slow River Mode</InfoButton>} icon="waves" checked={slowRiver} onChange={setSlowRiver} />
+                  <Toggle id="settings-click-mode-toggle" label={<InfoButton settingKey="clickMode">Click Mode</InfoButton>} icon="ads_click" checked={clickMode} onChange={setClickMode} />
+                  <Toggle id="settings-association-mode-toggle" label={<InfoButton settingKey="associationMode">Association Mode</InfoButton>} icon="hub" checked={associationMode} onChange={setAssociationMode} />
                 </div>
               </div>
 
@@ -444,7 +449,7 @@ export default function SettingsView() {
           <button className="btn-press w-full rounded-xl py-4 text-sm font-extrabold uppercase tracking-widest transition-colors" style={{ background: 'var(--app-error-bg)', color: 'var(--app-error-text)' }} type="button">
             Log Out
           </button>
-          <p className="mt-8 text-center text-[10px] font-medium" style={{ color: 'var(--app-muted)' }}>River Mint Language App — Version 2.4.0</p>
+          <p className="mt-8 text-center text-[10px] font-medium" style={{ color: 'var(--app-muted)' }}>River Mint Language App — Version {APP_VERSION}</p>
         </section>
       </main>
       <ProfileEditorModal
@@ -459,10 +464,11 @@ export default function SettingsView() {
       />
       {showInfoPopup && (
         <div
+          role="tooltip"
           className="animate-scale-in fixed z-50 max-w-xs rounded-xl p-3 shadow-xl backdrop-blur-sm"
           style={{ left: `${popupPosition.x}px`, top: `${popupPosition.y}px`, background: 'var(--app-popup-bg)', border: '1px solid var(--app-popup-border)' }}
           onClick={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
+          onKeyDown={(e) => { if (e.key === 'Escape') setShowInfoPopup(false); }}
         >
           <p className="text-sm font-bold" style={{ color: 'var(--app-primary)' }}>{infoPopupContent.title}</p>
           <p className="mt-1 text-xs leading-relaxed" style={{ color: 'var(--app-muted)' }}>{infoPopupContent.description}</p>
