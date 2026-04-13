@@ -5086,6 +5086,10 @@
 }
 
 .ds-combat-controls--sentence {
+  transform: none;
+}
+
+.ds-combat-controls--sentence .ds-tile-row--solo {
   transform: translateY(-15px);
 }
 
