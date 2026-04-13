@@ -1,30 +1,20 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { readFileSync } from 'fs';
+
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
 
-      manifest: {
-        name: 'Hebrew Letter River',
-        short_name: 'Letter River',
-        description: 'Learn and practice Hebrew letters with an engaging river-catching game',
-        theme_color: '#06b6d4',
-        background_color: '#0f172a',
-        display: 'standalone',
-        orientation: 'portrait-primary',
-        categories: ['education', 'games'],
-        icons: [
-          {
-            src: '/favicon.ico',
-            sizes: '48x48',
-            type: 'image/x-icon'
-          }
-        ]
-      },
+      manifest: false,
 
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,ttf,eot,json}'],

@@ -902,7 +902,9 @@ body.no-scroll {
   }
 }
 
-.nav-item {
+/* Legacy nav classes — unused by current App shell (see index.css for active nav styles).
+   Prefixed with .legacy- to prevent conflicts. Remove entirely when safe. */
+.legacy-nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -916,53 +918,12 @@ body.no-scroll {
   transition: all 0.2s ease;
 }
 
-.nav-item:hover {
+.legacy-nav-item:hover {
   background: rgba(0, 0, 0, 0.03);
 }
 
-.nav-icon-shell {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  transition: all 0.2s ease;
-}
-
-.nav-icon-shell span {
-  font-size: 20px;
-  filter: grayscale(0.3) opacity(0.7);
-  transition: all 0.2s ease;
-}
-
-.nav-item.active {
+.legacy-nav-item.active {
   color: var(--app-primary);
-}
-
-.nav-item.active .nav-icon-shell {
-  background: var(--app-primary-container);
-}
-
-.nav-item.active .nav-icon-shell span {
-  filter: none;
-  transform: scale(1.1);
-}
-
-.nav-item.active span.label {
-  color: var(--app-primary);
-  font-weight: 700;
-}
-
-/* FAB button - no label, elevated style */
-.nav-item-fab {
-  padding: 0;
-  background: transparent;
-}
-
-.nav-item-fab:hover {
-  background: transparent;
 }
 
 /* Play FAB - elevated floating button */

@@ -2,35 +2,15 @@
    Play Mode Selection Modal
    ═══════════════════════════════════════════════════════════ */
 
-.play-mode-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  animation: play-mode-fade-in 0.2s ease;
-}
-
-@keyframes play-mode-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+/* Overlay is now handled by the shared Modal primitive (ui/Modal.jsx).
+   The .play-mode-modal class is applied to the dialog panel via className. */
 
 .play-mode-modal {
   position: relative;
-  width: 90%;
   max-width: 380px;
   padding: 28px 24px 24px;
-  border-radius: 24px;
   background: var(--app-card-bg-gradient);
   background-color: var(--app-card-bg);
-  border: 1px solid var(--app-card-border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px var(--app-card-glow);
-  animation: play-mode-slide-up 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @keyframes play-mode-slide-up {

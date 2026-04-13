@@ -308,12 +308,13 @@ function Shell() {
 
   return (
     <div className={`app-shell ${appFontClass}`}>
+      <a className="skip-link" href="#main-content">Skip to content</a>
       <LanguageOnboardingModal />
       <OnboardingFlow />
       <OfflineIndicator />
       <PWAInstallPrompt />
       <PlayModeModal />
-      <main className={`flex-1 main-content ${fontClass}`} dir={direction}>
+      <main id="main-content" className={`flex-1 main-content ${fontClass}`} dir={direction} tabIndex={-1}>
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomeView />} />

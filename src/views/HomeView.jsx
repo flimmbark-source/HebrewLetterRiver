@@ -19,13 +19,23 @@ import ContinueLearningCard from '../components/ContinueLearningCard.jsx';
 import JourneyMap from '../components/JourneyMap.jsx';
 import { loadState, saveState } from '../lib/storage.js';
 
+function useLearningStartDate() {
+  const [startDate] = React.useState(() => {
+    const stored = loadState('profile.startedAt', null);
+    if (stored) return new Date(stored);
+    const now = new Date();
+    saveState('profile.startedAt', now.toISOString());
+    return now;
+  });
+  return startDate;
+}
+
 const LANGUAGE_FLAGS = {
   hebrew: '🇮🇱', english: '🇬🇧', spanish: '🇪🇸', french: '🇫🇷',
   portuguese: '🇧🇷', russian: '🇷🇺', arabic: '🇸🇦', hindi: '🇮🇳',
   bengali: '🇧🇩', mandarin: '🇨🇳', japanese: '🇯🇵', amharic: '🇪🇹',
 };
 
-const topAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBIzHWOoiXw0a1BU87o2LewTUl8n-_HZC92abDxxI91uQwUGpDDtDgWHkTor7IjvjQUcxU7G-n8vr_x7LsbbX6UCGbzaOGQiMHvD0X0hLDyDkwxenmzAxbV13d80mSxIEbzburnmpLQI0pGLrCNFySYaPuV-i4du-NITzYGpCAUfJ6_xI-xPhTpvL3foKAaOrn9l0TeZ1FkLoJDs6MmFvm0sYR4IaDSqzapogXZiRaJ6Vtk8P5f_5-7mlXebxZLoP1TEu4n2VyOKKDq';
 function formatReminderTime(reminderTime) {
   if (typeof reminderTime !== 'string') return 'Daily';
   const [hoursRaw, minutesRaw] = reminderTime.split(':');
@@ -106,6 +116,9 @@ export default function HomeView() {
   const [isEditingReminder, setIsEditingReminder] = React.useState(false);
   const [seenWordsVersion, setSeenWordsVersion] = React.useState(0);
   const [showAllModes, setShowAllModes] = React.useState(() => loadState('onboarding.showAllModes', false));
+
+  const learningStartDate = useLearningStartDate();
+  const formattedStartDate = learningStartDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
   const isNewUser = (player.totals?.sessions === 0) && !showAllModes;
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
@@ -265,19 +278,19 @@ export default function HomeView() {
     <div className="relative min-h-screen" style={{ color: 'var(--app-on-surface)' }}>
       <main className="mx-auto max-w-2xl space-y-8 px-6 pb-48 pt-8 stagger-children">
         <section className="animate-fade-in-up">
-          <div className="relative overflow-hidden rounded-2xl p-8 text-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--app-primary) 0%, #145e42 60%, #0f4a34 100%)', color: 'var(--app-on-primary)' }}>
+          <div className="relative overflow-hidden rounded-2xl p-8 text-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--app-primary) 0%, var(--app-primary-dark) 100%)', color: 'var(--app-on-primary)' }}>
             <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full blur-3xl" style={{ background: 'rgba(255, 255, 255, 0.08)' }}></div>
             <div className="absolute -left-6 bottom-0 h-28 w-28 rounded-full blur-2xl" style={{ background: 'rgba(74, 232, 152, 0.1)' }}></div>
             <div className="relative z-10 flex flex-col items-center space-y-4">
               <div className="relative flex h-24 w-24 items-center justify-center rounded-full shadow-lg" style={{ background: 'rgba(255, 255, 255, 0.15)', border: '3px solid rgba(255, 255, 255, 0.25)' }}>
-                <img alt="Avatar Large" className="h-20 w-20 rounded-full object-cover" src={playerAvatar || topAvatar} />
+                <img alt="Avatar Large" className="h-20 w-20 rounded-full object-cover" src={playerAvatar} />
                 <button onClick={() => setIsProfileEditorOpen(true)} className="btn-press absolute bottom-0 right-0 flex items-center justify-center rounded-full border-2 p-2 shadow-lg" style={{ borderColor: 'rgba(255,255,255,0.3)', background: 'var(--app-secondary)', color: '#fff' }} type="button">
                   <Icon className="text-sm">edit</Icon>
                 </button>
               </div>
               <div>
                 <h1 className="text-2xl font-extrabold tracking-tight">{playerName}</h1>
-                <p className="line-clamp-1-stable text-sm opacity-70">Learning since January 2024</p>
+                <p className="line-clamp-1-stable text-sm opacity-70">Learning since {formattedStartDate}</p>
               </div>
               <div className="mt-4 w-full space-y-2">
                 <div className="flex justify-between text-xs font-bold opacity-80">
@@ -462,7 +475,7 @@ export default function HomeView() {
                 onClick={() => openGame({ autostart: false })}
                 className="group flex w-full items-center gap-4 rounded-2xl p-6 text-left shadow-lg transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
                 style={{
-                  background: 'linear-gradient(135deg, var(--app-primary) 0%, #145e42 60%, #0f4a34 100%)',
+                  background: 'linear-gradient(135deg, var(--app-primary) 0%, var(--app-primary-dark) 100%)',
                   color: 'var(--app-on-primary, #fff)',
                   border: 'none'
                 }}

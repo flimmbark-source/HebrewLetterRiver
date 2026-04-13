@@ -3,7 +3,11 @@ import React from 'react';
 export function Card({ className = '', children, ...props }) {
   return (
     <div
-      className={`rounded-lg border border-slate-200 bg-white shadow-sm ${className}`}
+      className={`rounded-lg shadow-sm ${className}`}
+      style={{
+        background: 'var(--app-card-bg)',
+        border: '1px solid var(--app-card-border)',
+      }}
       {...props}
     >
       {children}
@@ -21,7 +25,11 @@ export function CardHeader({ className = '', children, ...props }) {
 
 export function CardTitle({ className = '', children, ...props }) {
   return (
-    <h3 className={`text-lg font-semibold leading-none tracking-tight ${className}`} {...props}>
+    <h3
+      className={`text-lg font-semibold leading-none tracking-tight ${className}`}
+      style={{ color: 'var(--app-on-surface)' }}
+      {...props}
+    >
       {children}
     </h3>
   );

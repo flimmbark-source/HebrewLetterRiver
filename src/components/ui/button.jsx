@@ -11,9 +11,15 @@ export function Button({
   const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
 
   const variantClasses = {
-    default: 'bg-slate-900 text-white hover:bg-slate-800',
-    outline: 'border border-slate-300 bg-white hover:bg-slate-100',
-    ghost: 'hover:bg-slate-100',
+    default: '',
+    outline: '',
+    ghost: '',
+  };
+
+  const variantStyles = {
+    default: { background: 'var(--app-primary)', color: 'var(--app-on-primary)' },
+    outline: { border: '1px solid var(--app-outline-variant)', background: 'var(--app-card-bg)', color: 'var(--app-on-surface)' },
+    ghost: { background: 'transparent', color: 'var(--app-on-surface)' },
   };
 
   const sizeClasses = {
@@ -25,6 +31,7 @@ export function Button({
   return (
     <button
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      style={variantStyles[variant]}
       disabled={disabled}
       {...props}
     >
