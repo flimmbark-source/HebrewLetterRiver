@@ -5085,6 +5085,10 @@
   gap: 12px;
 }
 
+.ds-combat-controls--sentence {
+  transform: translateY(-15px);
+}
+
 .ds-tray-end-labels {
   width: min(420px, 92vw);
   display: flex;
@@ -5142,6 +5146,11 @@
 
 .ds-ability-card--mega .ds-ability-icon-center {
   font-size: 32px;
+}
+
+.ds-phase-word--target {
+  margin-top: 8px;
+  color: var(--ds-gold);
 }
 
 .ds-ability-card--mega .ds-ability-effect {

@@ -144,7 +144,7 @@ export default function SentenceCombatScreen({
   const totalSlots = combat.wordSlots.length;
   const hasSelection = !!combat.selectedTileId;
   const langId = combat.languageId || 'hebrew';
-  const latestLogEntry = [...combat.log].reverse()[0];
+  const targetSentence = combat.wordSlots.map(slot => slot.targetWord).join(' ');
 
   // Health pips
   const healthPips = [];
@@ -245,7 +245,7 @@ export default function SentenceCombatScreen({
       </div>
 
       {/* ═══ COMBAT CONTROLS ═══ */}
-      <div className="ds-combat-controls">
+      <div className="ds-combat-controls ds-combat-controls--sentence">
         {/* Word block tray */}
         <div className="ds-tile-row ds-tile-row--solo">
           <div className="ds-inv-tray">
@@ -312,6 +312,9 @@ export default function SentenceCombatScreen({
           <div className={`ds-phase-word ${getGameFontClass('sentence-victory-translation')}`}>
             {combat.translation}
           </div>
+          <div className={`ds-phase-word ds-phase-word--target ${getNativeScriptFontClass('sentence-victory-target', langId)}`}>
+            {targetSentence}
+          </div>
           <button
             type="button"
             className="ds-phase-proceed-btn"
@@ -330,12 +333,6 @@ export default function SentenceCombatScreen({
         </div>
       )}
 
-      {/* Log toast */}
-      {latestLogEntry && latestLogEntry.message && (
-        <div className="ds-log-toast" key={combat.log.length}>
-          {latestLogEntry.message}
-        </div>
-      )}
     </div>
   );
 }
