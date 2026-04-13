@@ -12,7 +12,6 @@ import DailyReviewCard from '../components/DailyReviewCard.jsx';
 import ReminderPrompt from '../components/ReminderPrompt.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
 import { languagePacks } from '../data/languages/index.js';
-import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
 import { getAllSeenWords, getSeenWordsUpdatedEventName } from '../lib/seenWordsStorage.ts';
 import { findDictionaryEntryForWord } from '../lib/sentenceDictionaryLookup.ts';
 import ContinueLearningCard from '../components/ContinueLearningCard.jsx';
@@ -216,9 +215,6 @@ export default function HomeView() {
     return Array.from(new Set(labels));
   }, [player?.modesPlayed, player?.recentModesPlayed, modeLabelById]);
 
-  const totalWordsLearned = seenWordEntries.length;
-  const totalWordTarget = bridgeBuilderWords.length;
-  const wordProgressPct = totalWordTarget > 0 ? Math.min(Math.round((totalWordsLearned / totalWordTarget) * 100), 100) : 0;
 
   const modeDisplayByName = useMemo(() => ({
     'Letter River': { icon: 'waves', color: 'var(--app-mode-river)', bg: 'var(--app-mode-river-bg)', surface: 'var(--app-mode-river-surface)', border: 'var(--app-mode-river-bg)' },
@@ -398,15 +394,6 @@ export default function HomeView() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-end justify-between">
-                <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>Total Progress</p>
-                <p className="text-xs font-bold" style={{ color: 'var(--app-primary)' }}>{totalWordsLearned} / {totalWordTarget} Words</p>
-              </div>
-              <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--app-mode-river-bg)' }}>
-                <div className="progress-fill h-full rounded-full" style={{ width: `${wordProgressPct}%`, background: 'linear-gradient(90deg, var(--app-mode-river), var(--app-mode-vocab))' }}></div>
-              </div>
-            </div>
           </div>
         </section>
 
