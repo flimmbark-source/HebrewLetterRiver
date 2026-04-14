@@ -5350,7 +5350,9 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 8px;
-  margin: 14px auto 6px;
+  /* 25px of breathing room between the target-script sentence and the
+     word-by-word breakdown chips. */
+  margin: 25px auto 6px;
   max-width: 560px;
   padding: 0 12px;
 }
