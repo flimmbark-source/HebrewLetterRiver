@@ -5090,7 +5090,18 @@
 }
 
 .ds-combat-controls--sentence .ds-tile-row--solo {
-  transform: translateY(-15px);
+  /* Desktop: .ds-tile-row is absolute-positioned with left:50% and relies on
+     translateX(-50%) to center itself. The vertical nudge has to include
+     that translateX, otherwise the tray slides off to the right. */
+  transform: translate(-50%, -15px);
+}
+
+@media (max-width: 480px) {
+  /* Mobile: .ds-tile-row is static inside a flex column, so there's no
+     translateX(-50%) to preserve — only the vertical nudge. */
+  .ds-combat-controls--sentence .ds-tile-row--solo {
+    transform: translateY(-15px);
+  }
 }
 
 .ds-tray-end-labels {
