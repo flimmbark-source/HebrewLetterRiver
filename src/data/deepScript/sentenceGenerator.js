@@ -14,9 +14,29 @@
 
 import { getNativeScript } from '../../lib/vocabLanguageAdapter.js';
 import {
+  allCuratedSentences,
   getSentencesForPacks,
-  hebrewConnectors,
 } from './sentenceTemplates.js';
+import {
+  getSentenceConnectors,
+  findUnknownConnectors,
+} from './sentenceConnectors.js';
+
+// Dev-time audit: warn (once) if any sentence uses a connector that isn't in
+// the teaching registry. This keeps sentenceConnectors.js the single source
+// of truth for both distractors and in-game hint text.
+if (typeof process === 'undefined' || process.env?.NODE_ENV !== 'production') {
+  const missing = findUnknownConnectors(allCuratedSentences);
+  if (missing.length > 0) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      '[sentenceGenerator] Sentences use connectors that are not registered ' +
+      'in sentenceConnectors.js — they will still work, but will not have ' +
+      'tap-to-peek hints or post-victory translations:',
+      missing
+    );
+  }
+}
 
 let encounterIdCounter = 0;
 
@@ -133,7 +153,7 @@ export function generateSentenceExpedition(packWords, options = {}) {
   }
 
   // Add extra connectors for variety / distractors
-  for (const conn of hebrewConnectors) {
+  for (const conn of getSentenceConnectors(languageId)) {
     allConnectorWords.add(conn.word);
   }
 

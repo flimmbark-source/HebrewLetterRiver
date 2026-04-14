@@ -5266,3 +5266,127 @@
   gap: 6px;
   justify-content: center;
 }
+
+/* ─── Connector slot styling + tap-to-peek tooltip ───────── */
+
+/* Connector slots get a subtle indigo tint so they read as "glue" words
+   that can be tapped to reveal a hint. */
+.ds-rune-slot--connector {
+  border-style: dashed;
+  border-color: rgba(129, 140, 248, 0.45);
+  position: relative;
+}
+.ds-rune-slot--connector .ds-rune-empty--word {
+  color: rgba(165, 180, 252, 0.6);
+}
+.ds-rune-slot--connector.ds-rune-slot--correct {
+  border-style: solid;
+}
+
+/* Floating tooltip that appears above a connector slot on tap */
+.ds-peek-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 10px;
+  background: rgba(15, 18, 25, 0.96);
+  border: 1px solid rgba(129, 140, 248, 0.55);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.55),
+    0 0 12px rgba(129, 140, 248, 0.25);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 20;
+  animation: ds-peek-fade-in 160ms ease-out;
+  font-family: var(--ds-font-body);
+}
+.ds-peek-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(129, 140, 248, 0.55);
+}
+.ds-peek-tooltip-meaning {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ds-parchment);
+  line-height: 1.1;
+}
+.ds-peek-tooltip-translit {
+  font-size: 11px;
+  color: rgba(165, 180, 252, 0.85);
+  font-style: italic;
+  line-height: 1.1;
+}
+@keyframes ds-peek-fade-in {
+  from { opacity: 0; transform: translate(-50%, 4px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ─── Post-victory word-by-word breakdown ───────────────── */
+
+.ds-sentence-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px auto 6px;
+  max-width: 560px;
+  padding: 0 12px;
+}
+
+.ds-breakdown-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 10px 6px;
+  min-width: 56px;
+  background: rgba(15, 18, 25, 0.72);
+  border: 1px solid rgba(129, 140, 248, 0.35);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  animation: ds-breakdown-pop 260ms ease-out both;
+}
+.ds-breakdown-chip--pack {
+  border-color: rgba(240, 198, 116, 0.45);
+  background: rgba(40, 28, 10, 0.55);
+}
+.ds-breakdown-chip--connector {
+  border-color: rgba(129, 140, 248, 0.5);
+  background: rgba(18, 22, 40, 0.72);
+}
+.ds-breakdown-word {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ds-parchment);
+  line-height: 1.1;
+}
+.ds-breakdown-translit {
+  font-size: 11px;
+  color: rgba(165, 180, 252, 0.85);
+  font-style: italic;
+  line-height: 1.1;
+}
+.ds-breakdown-meaning {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ds-parchment-dim);
+  line-height: 1.15;
+}
+.ds-breakdown-meaning--pack {
+  color: rgba(240, 198, 116, 0.85);
+}
+@keyframes ds-breakdown-pop {
+  from { opacity: 0; transform: translateY(6px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}

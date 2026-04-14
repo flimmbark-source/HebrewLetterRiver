@@ -5,6 +5,7 @@ import {
   SENTENCE_ACTIONS,
 } from './sentenceCombatEngine.js';
 import { getTextDirection } from '../../lib/vocabLanguageAdapter.js';
+import { getConnectorInfo } from '../../data/deepScript/sentenceConnectors.js';
 import { celebrate } from '../../lib/celebration.js';
 import {
   playSelect, playCorrect, playWrong,
@@ -44,6 +45,9 @@ export default function SentenceCombatScreen({
   const [justWrongSlot, setJustWrongSlot] = useState(null);
   const [activatingButton, setActivatingButton] = useState(null);
   const [recentTrayTiles, setRecentTrayTiles] = useState([]);
+  // Tap-to-peek: shows connector meaning above a slot when tapped with no
+  // tile selected. Auto-clears after a short delay.
+  const [peekSlotIndex, setPeekSlotIndex] = useState(null);
   const prevPhaseRef = useRef(combat?.phase);
   const prevTrayIdsRef = useRef((combat?.tray || []).map(t => t.id));
 
@@ -105,10 +109,28 @@ export default function SentenceCombatScreen({
     }
   }, [activatingButton]);
 
+  // Clear peek popup after a short delay so it doesn't linger
+  useEffect(() => {
+    if (peekSlotIndex !== null) {
+      const t = setTimeout(() => setPeekSlotIndex(null), 2200);
+      return () => clearTimeout(t);
+    }
+  }, [peekSlotIndex]);
+
   // ─── Handlers ─────────────────────────────────────────────
 
   const handleSlotClick = useCallback((slotIndex) => {
-    if (!combat.selectedTileId) return;
+    // No tile selected → treat tap as a "peek" request. For connector slots
+    // we reveal the English meaning as a small tooltip above the slot so the
+    // player can learn the glue word in context without leaving the screen.
+    if (!combat.selectedTileId) {
+      const slot = combat.wordSlots[slotIndex];
+      if (slot && !slot.correct && slot.source === 'connector') {
+        playSelect();
+        setPeekSlotIndex(slotIndex);
+      }
+      return;
+    }
     const tile = combat.tray.find(t => t.id === combat.selectedTileId);
     const slot = combat.wordSlots[slotIndex];
     if (tile && slot && !slot.correct) {
@@ -210,6 +232,7 @@ export default function SentenceCombatScreen({
             <div className="ds-inscription ds-inscription--sentence" dir={getTextDirection(langId)}>
               {combat.wordSlots.map((slot, index) => {
                 let slotCls = 'ds-rune-slot ds-rune-slot--word';
+                if (slot.source === 'connector') slotCls += ' ds-rune-slot--connector';
                 if (slot.correct) {
                   slotCls += ' ds-rune-slot--correct';
                   if (justCorrectSlot === index) slotCls += ' ds-rune-slot--just-correct';
@@ -219,6 +242,12 @@ export default function SentenceCombatScreen({
                   slotCls += ' ds-rune-slot--target';
                 }
 
+                const connectorInfo =
+                  !slot.correct && slot.source === 'connector'
+                    ? getConnectorInfo(slot.targetWord, langId)
+                    : null;
+                const showPeek = peekSlotIndex === index && connectorInfo;
+
                 return (
                   <button
                     key={index}
@@ -226,6 +255,11 @@ export default function SentenceCombatScreen({
                     className={slotCls}
                     onClick={() => handleSlotClick(index)}
                     disabled={slot.correct || combat.phase !== 'active'}
+                    aria-label={
+                      connectorInfo
+                        ? `Connector slot: tap to reveal meaning`
+                        : undefined
+                    }
                   >
                     {slot.correct ? (
                       <span className={`ds-rune-letter ds-rune-letter--word ${getNativeScriptFontClass(`sent-slot-${index}`, langId)}`}>
@@ -234,6 +268,16 @@ export default function SentenceCombatScreen({
                     ) : (
                       <span className="ds-rune-empty ds-rune-empty--word">
                         {slot.source === 'pack' ? '▪' : '·'}
+                      </span>
+                    )}
+                    {showPeek && (
+                      <span className="ds-peek-tooltip" dir="ltr" role="tooltip">
+                        <span className="ds-peek-tooltip-meaning">
+                          {connectorInfo.meaning}
+                        </span>
+                        <span className="ds-peek-tooltip-translit">
+                          {connectorInfo.transliteration}
+                        </span>
                       </span>
                     )}
                   </button>
@@ -315,6 +359,55 @@ export default function SentenceCombatScreen({
           <div className={`ds-phase-word ds-phase-word--target ${getNativeScriptFontClass('sentence-victory-target', langId)}`}>
             {targetSentence}
           </div>
+
+          {/* Word-by-word breakdown — teaches connectors after success */}
+          <div
+            className="ds-sentence-breakdown"
+            dir={getTextDirection(langId)}
+            aria-label="Word by word breakdown"
+          >
+            {combat.wordSlots.map((slot, index) => {
+              const info =
+                slot.source === 'connector'
+                  ? getConnectorInfo(slot.targetWord, langId)
+                  : null;
+              const isConnector = slot.source === 'connector';
+              return (
+                <div
+                  key={index}
+                  className={`ds-breakdown-chip ${
+                    isConnector
+                      ? 'ds-breakdown-chip--connector'
+                      : 'ds-breakdown-chip--pack'
+                  }`}
+                >
+                  <span
+                    className={`ds-breakdown-word ${getNativeScriptFontClass(`breakdown-${index}`, langId)}`}
+                  >
+                    {slot.targetWord}
+                  </span>
+                  {info ? (
+                    <>
+                      <span className="ds-breakdown-translit" dir="ltr">
+                        {info.transliteration}
+                      </span>
+                      <span className="ds-breakdown-meaning" dir="ltr">
+                        {info.meaning}
+                      </span>
+                    </>
+                  ) : (
+                    <span
+                      className="ds-breakdown-meaning ds-breakdown-meaning--pack"
+                      dir="ltr"
+                    >
+                      pack word
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
           <button
             type="button"
             className="ds-phase-proceed-btn"
