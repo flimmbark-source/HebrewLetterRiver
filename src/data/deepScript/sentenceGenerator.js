@@ -49,7 +49,7 @@ let encounterIdCounter = 0;
  * @param {string} languageId
  * @returns {Object} — SentenceEncounter
  */
-function curatedSentenceToEncounter(sentence, packWordPool, connectorWordPool, languageId) {
+function curatedSentenceToEncounter(sentence, packWordPool, connectorWordPool, packWordInfo, languageId) {
   encounterIdCounter++;
 
   const wordSlots = sentence.words.map((w, index) => ({
@@ -67,6 +67,7 @@ function curatedSentenceToEncounter(sentence, packWordPool, connectorWordPool, l
     wordSlots,
     packWordPool,
     connectorWordPool,
+    packWordInfo, // { [nativeWord]: { transliteration, meaning } }
     languageId,
     selectedPackWordIds: [],
   };
@@ -142,12 +143,21 @@ export function generateSentenceExpedition(packWords, options = {}) {
     }
   }
 
-  // Add distractors from the DS-format pack words
+  // Index pack words by native script so the post-victory breakdown can
+  // show per-word transliteration + meaning the same way connectors do.
+  // Also reuse this loop to populate the distractor pool.
+  /** @type {Record<string, { transliteration: string, meaning: string }>} */
+  const packWordInfo = {};
   if (packWords && packWords.length > 0) {
     for (const pw of packWords) {
       const nativeWord = getNativeScript(pw);
-      if (nativeWord) {
-        allPackWords.add(nativeWord);
+      if (!nativeWord) continue;
+      allPackWords.add(nativeWord);
+      if (!packWordInfo[nativeWord]) {
+        packWordInfo[nativeWord] = {
+          transliteration: pw.transliteration || '',
+          meaning: pw.meaning || pw.english || pw.translation || '',
+        };
       }
     }
   }
@@ -162,7 +172,7 @@ export function generateSentenceExpedition(packWords, options = {}) {
 
   // Build encounters
   const encounters = selected.map(sentence =>
-    curatedSentenceToEncounter(sentence, packWordPool, connectorWordPool, languageId)
+    curatedSentenceToEncounter(sentence, packWordPool, connectorWordPool, packWordInfo, languageId)
   );
 
   return {

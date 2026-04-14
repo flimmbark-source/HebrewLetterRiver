@@ -367,11 +367,10 @@ export default function SentenceCombatScreen({
             aria-label="Word by word breakdown"
           >
             {combat.wordSlots.map((slot, index) => {
-              const info =
-                slot.source === 'connector'
-                  ? getConnectorInfo(slot.targetWord, langId)
-                  : null;
               const isConnector = slot.source === 'connector';
+              const info = isConnector
+                ? getConnectorInfo(slot.targetWord, langId)
+                : combat.packWordInfo?.[slot.targetWord];
               return (
                 <div
                   key={index}
@@ -386,23 +385,17 @@ export default function SentenceCombatScreen({
                   >
                     {slot.targetWord}
                   </span>
-                  {info ? (
-                    <>
-                      <span className="ds-breakdown-translit" dir="ltr">
-                        {info.transliteration}
-                      </span>
-                      <span className="ds-breakdown-meaning" dir="ltr">
-                        {info.meaning}
-                      </span>
-                    </>
-                  ) : (
-                    <span
-                      className="ds-breakdown-meaning ds-breakdown-meaning--pack"
-                      dir="ltr"
-                    >
-                      pack word
+                  {info?.transliteration && (
+                    <span className="ds-breakdown-translit" dir="ltr">
+                      {info.transliteration}
                     </span>
                   )}
+                  <span
+                    className={`ds-breakdown-meaning ${!isConnector ? 'ds-breakdown-meaning--pack' : ''}`}
+                    dir="ltr"
+                  >
+                    {info?.meaning || (isConnector ? '' : 'pack word')}
+                  </span>
                 </div>
               );
             })}
