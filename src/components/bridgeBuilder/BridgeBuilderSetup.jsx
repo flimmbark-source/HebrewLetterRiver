@@ -178,7 +178,7 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
           <span className="bbs-node-title">{pack.title}</span>
           <span className="bbs-node-support">{support}</span>
           {comp.quizMastered && (
-            <span className="bbs-quiz-badge" title="Mastered via skill check quiz">✦ Quiz</span>
+            <span className="bbs-quiz-badge" title="Covered in skill check quiz">✦ Quiz</span>
           )}
         </div>
       </div>

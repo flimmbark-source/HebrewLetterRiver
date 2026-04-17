@@ -331,6 +331,22 @@ export function markPackQuizMastered(packId) {
 }
 
 /**
+ * Mark a pack as quiz-attempted (badge only, no completion flags).
+ * Used when the player answered vocab questions in the skill check but
+ * scored below the mastery threshold — the pack was tested but not passed.
+ */
+export function markPackQuizBadge(packId) {
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
+  if (!entry.quizMastered) {
+    entry.quizMastered = true;
+    entry.quizMasteredAt = new Date().toISOString();
+    all[packId] = entry;
+    saveState(PACK_COMPLETION_KEY, all);
+  }
+}
+
+/**
  * Bulk-introduce a set of words as quiz-credited.
  * Moves each word from 'new' → 'meaning_taught' so the pack shows as started
  * on the guided path and the words are eligible for spaced-repetition review.

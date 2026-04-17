@@ -6,9 +6,11 @@
  * (first-run) and BridgeBuilderSetup (retake at any time).
  *
  * Thresholds (applied independently per question type):
- *   vocab    ≥ 60% correct → module-1 vocab sections marked practiced
- *                           + overlapping bridge-builder packs fully credited
+ *   vocab  > 0% correct  → overlapping packs get the ✦ Quiz badge
+ *   vocab  ≥ 60% correct → packs fully credited (all game modes) + module-1 vocab sections practiced
  *   sentence ≥ 60% correct → module-1 sentence completion synced proportionally
+ *
+ * Two-tier: doing the quiz always marks the badge; passing (≥60%) also marks full completion.
  */
 
 import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
@@ -22,6 +24,7 @@ import {
 } from './moduleProgressStorage.ts';
 import {
   markPackQuizMastered,
+  markPackQuizBadge,
   markWordsQuizIntroduced,
 } from './bridgeBuilderStorage.js';
 
@@ -29,7 +32,7 @@ import {
  * Applies mastery credits based on a quiz breakdown object.
  *
  * @param {{ vocab: {correct: number, total: number}, sentence: {correct: number, total: number} }} breakdown
- * @returns {{ masteredPackIds: string[] }}  IDs of packs that were newly credited
+ * @returns {{ masteredPackIds: string[] }}  IDs of packs that received full mastery credit
  */
 export function applyQuizMastery(breakdown) {
   if (!breakdown) return { masteredPackIds: [] };
@@ -49,28 +52,33 @@ export function applyQuizMastery(breakdown) {
   }
 
   const vocabBreakdown = breakdown.vocab;
-  const vocabAccuracy =
-    vocabBreakdown && vocabBreakdown.total > 0
-      ? vocabBreakdown.correct / vocabBreakdown.total
-      : 0;
+  const vocabAnswered = vocabBreakdown && vocabBreakdown.total > 0;
+  const vocabAccuracy = vocabAnswered ? vocabBreakdown.correct / vocabBreakdown.total : 0;
 
-  if (vocabAccuracy >= 0.6) {
-    // Credit module-1 vocab sections
-    if (module1) {
-      module1.vocabTextIds.forEach((id) => markVocabSectionPracticed('module-1', id));
-    }
-
-    // Credit every bridge-builder pack whose words overlap the quiz pool
+  if (vocabAnswered && vocabAccuracy > 0) {
+    // Any correct vocab answer → compute the overlapping pack set
     const quizWordIdSet = new Set(
       bridgeBuilderWords.filter((w) => w.difficulty <= 2).map((w) => w.id)
     );
-    const packsToMaster = bridgeBuilderPacks.filter((pack) =>
+    const overlappingPacks = bridgeBuilderPacks.filter((pack) =>
       pack.wordIds.some((id) => quizWordIdSet.has(id))
     );
-    for (const pack of packsToMaster) {
-      markPackQuizMastered(pack.id);
-      markWordsQuizIntroduced(pack.wordIds);
-      masteredPackIds.push(pack.id);
+
+    if (vocabAccuracy >= 0.6) {
+      // Passed: full credit — all game modes complete + badge
+      if (module1) {
+        module1.vocabTextIds.forEach((id) => markVocabSectionPracticed('module-1', id));
+      }
+      for (const pack of overlappingPacks) {
+        markPackQuizMastered(pack.id);
+        markWordsQuizIntroduced(pack.wordIds);
+        masteredPackIds.push(pack.id);
+      }
+    } else {
+      // Attempted but below threshold: badge only (shows the quiz was taken)
+      for (const pack of overlappingPacks) {
+        markPackQuizBadge(pack.id);
+      }
     }
   }
 
