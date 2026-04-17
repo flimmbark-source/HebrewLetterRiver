@@ -7,19 +7,8 @@ import WhyLetterRiverScreen from './WhyLetterRiverScreen.jsx';
 import GuidedFirstSession from './GuidedFirstSession.jsx';
 import FirstSessionSuccess from './FirstSessionSuccess.jsx';
 import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
-import { bridgeBuilderPacks } from '../data/bridgeBuilderPacks.js';
 import { allSentences } from '../data/sentences/index.ts';
-import { learningModules } from '../data/modules/index.ts';
-import {
-  markVocabSectionPracticed,
-  syncSentenceCompletion,
-  initializeModuleProgress,
-  getModuleProgress,
-} from '../lib/moduleProgressStorage.ts';
-import {
-  markPackQuizMastered,
-  markWordsQuizIntroduced,
-} from '../lib/bridgeBuilderStorage.js';
+import { applyQuizMastery } from '../lib/quizMastery.js';
 
 /**
  * OnboardingFlow orchestrates the full onboarding experience.
@@ -49,72 +38,6 @@ function getQuestionTypesForGoal(goal) {
   if (goal === 'returning') return ['letter', 'vocab', 'sentence'];
   if (goal === 'familiar') return ['letter', 'vocab'];
   return ['letter'];
-}
-
-/**
- * Apply mastery to module progress based on the quiz breakdown.
- * Called after the skill-check completes when the player has a breakdown.
- *
- * Thresholds:
- *   vocab    ≥ 60% correct → mark all vocab sections in module-1 as practiced
- *   sentence ≥ 60% correct → sync sentence completion for module-1 proportionally
- */
-function applyQuizMastery(breakdown) {
-  if (!breakdown) return;
-
-  const module1 = learningModules.find((m) => m.id === 'module-1');
-  if (!module1) return;
-
-  // Ensure module-1 is initialised before we write to it
-  let existing = getModuleProgress('module-1');
-  if (!existing) {
-    initializeModuleProgress(
-      'module-1',
-      module1.sentenceIds.length,
-      module1.vocabTextIds.length
-    );
-  }
-
-  // --- Vocab mastery ---
-  const vocabBreakdown = breakdown.vocab;
-  if (vocabBreakdown && vocabBreakdown.total > 0) {
-    const accuracy = vocabBreakdown.correct / vocabBreakdown.total;
-    if (accuracy >= 0.6) {
-      module1.vocabTextIds.forEach((vocabTextId) =>
-        markVocabSectionPracticed('module-1', vocabTextId)
-      );
-    }
-  }
-
-  // --- Sentence mastery ---
-  const sentenceBreakdown = breakdown.sentence;
-  if (sentenceBreakdown && sentenceBreakdown.total > 0) {
-    const accuracy = sentenceBreakdown.correct / sentenceBreakdown.total;
-    if (accuracy >= 0.6) {
-      // Credit sentences proportionally to accuracy (rounded down, min 1)
-      const sentencesEarned = Math.max(
-        1,
-        Math.floor(accuracy * module1.sentenceIds.length)
-      );
-      syncSentenceCompletion('module-1', sentencesEarned);
-    }
-  }
-
-  // --- Bridge Builder vocab pack mastery ---
-  // When vocab accuracy ≥ 60%, find every pack whose words overlap with the
-  // quiz pool (difficulty ≤ 2) and credit them as quiz-mastered.
-  if (vocabBreakdown && vocabBreakdown.total > 0 && vocabBreakdown.correct / vocabBreakdown.total >= 0.6) {
-    const quizWordIdSet = new Set(
-      bridgeBuilderWords.filter((w) => w.difficulty <= 2).map((w) => w.id)
-    );
-    const masteredPacks = bridgeBuilderPacks.filter((pack) =>
-      pack.wordIds.some((id) => quizWordIdSet.has(id))
-    );
-    for (const pack of masteredPacks) {
-      markPackQuizMastered(pack.id);
-      markWordsQuizIntroduced(pack.wordIds);
-    }
-  }
 }
 
 export default function OnboardingFlow() {
