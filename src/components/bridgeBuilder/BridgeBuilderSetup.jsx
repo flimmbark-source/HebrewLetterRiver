@@ -545,7 +545,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
       <SkillCheckScreen
         onComplete={handleSkillCheckComplete}
         onSkip={handleSkillCheckSkip}
-        questionTypes={['letter', 'vocab', 'sentence']}
+        questionTypes={['vocab', 'sentence']}
         vocabWords={QUIZ_VOCAB_WORDS}
         sentences={QUIZ_SENTENCES}
       />

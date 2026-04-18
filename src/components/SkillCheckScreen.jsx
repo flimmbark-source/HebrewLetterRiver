@@ -135,6 +135,11 @@ function buildAllQuestions(languagePack, vocabWords, sentences, questionTypes = 
     letterCount = 2;
     vocabCount = 2;
     sentenceCount = 2;
+  } else if (!wantsLetters && wantsVocab && wantsSentences) {
+    vocabCount = 4;
+    sentenceCount = 2;
+  } else if (!wantsLetters && wantsVocab && !wantsSentences) {
+    vocabCount = 5;
   }
 
   const letterQs = wantsLetters ? buildLetterQuestions(languagePack, letterCount) : [];
