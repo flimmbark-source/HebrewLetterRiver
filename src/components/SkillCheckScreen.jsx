@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useLocalization } from '../context/LocalizationContext.jsx';
+import { getNativeScript, getMeaning } from '../lib/vocabLanguageAdapter.js';
 
 function shuffleArray(arr) {
   const copy = [...arr];
@@ -15,7 +16,7 @@ function getItemLabel(item) {
 }
 
 function getItemSymbol(item) {
-  return item.symbol ?? item.hebrew ?? item.character ?? item.glyph ?? item.id;
+  return item?.symbol || getNativeScript(item) || item?.character || item?.glyph || item?.id;
 }
 
 /** Build letter-recognition questions from the language pack. */
@@ -68,14 +69,13 @@ function buildVocabQuestions(words, count = 3) {
     const correctMeaning = correctWord.translation || correctWord.meaning || correctWord.id;
     return {
       type: 'vocab',
-      display: correctWord.hebrew || correctWord.nativeScript || correctWord.id,
+      display: getNativeScript(correctWord) || correctWord.id,
       prompt: 'What does this word mean?',
       correctId: correctWord.id,
       choices: choices.map((c) => ({
         id: c.id,
-        label: c.translation || c.meaning || c.id
+        label: getMeaning(c) || c.id
       })),
-      // Keep for potential display use
       correctMeaning
     };
   });
@@ -101,12 +101,12 @@ function buildSentenceQuestions(sentences, count = 2) {
     const choices = shuffleArray([correctSentence, ...distractors]);
     return {
       type: 'sentence',
-      display: correctSentence.hebrew,
+      display: correctSentence.nativeScript ?? correctSentence.hebrew,
       prompt: 'What does this sentence mean?',
       correctId: correctSentence.id,
       choices: choices.map((s) => ({
         id: s.id,
-        label: s.english
+        label: s.english ?? s.meaning
       }))
     };
   });
@@ -171,6 +171,7 @@ function getTypeLabel(type) {
  */
 export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = ['letter'], vocabWords = [], sentences = [] }) {
   const { languagePack } = useLocalization();
+  const textDirection = languagePack?.metadata?.textDirection ?? 'ltr';
   const questions = useMemo(
     () => buildAllQuestions(languagePack, vocabWords, sentences, questionTypes),
     [languagePack, vocabWords, sentences, questionTypes]
@@ -325,7 +326,7 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
                 border: '2px solid var(--app-primary)',
                 fontSize: question.type === 'letter' ? '3.5rem' : '2rem',
                 lineHeight: 1.2,
-                direction: 'rtl'
+                direction: textDirection
               }}
             >
               {question.display}
@@ -340,7 +341,7 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
                 border: '2px solid var(--app-primary)',
                 fontSize: '1.35rem',
                 lineHeight: 1.4,
-                direction: 'rtl'
+                direction: textDirection
               }}
             >
               {question.display}
