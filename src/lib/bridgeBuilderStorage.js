@@ -40,6 +40,8 @@ function createDefaultProgress(wordId) {
     meaningIntroduced: false,
     masteryStage: 'new',
     lastSeenAt: null,
+    quizKnown: false,
+    quizKnownAt: null,
   };
 }
 
@@ -341,6 +343,38 @@ export function markPackQuizBadge(packId) {
   if (!entry.quizMastered) {
     entry.quizMastered = true;
     entry.quizMasteredAt = new Date().toISOString();
+    all[packId] = entry;
+    saveState(PACK_COMPLETION_KEY, all);
+  }
+}
+
+/**
+ * Mark a single word as known via quiz evidence.
+ * This is distinct from gameplay mastery — it means the player correctly
+ * identified this word's meaning in a skill-check quiz.
+ */
+export function markWordQuizKnown(wordId) {
+  const all = getAllWordProgress();
+  const wp = all[wordId] || createDefaultProgress(wordId);
+  if (!wp.quizKnown) {
+    wp.quizKnown = true;
+    wp.quizKnownAt = new Date().toISOString();
+    all[wordId] = wp;
+    saveState(STORAGE_KEY, all);
+  }
+}
+
+/**
+ * Mark a pack as sentence-ready based on quiz coverage.
+ * Does NOT set game-mode completion flags — only signals that enough
+ * of the pack's words are quiz-known to support sentence scaffolding.
+ */
+export function setPackSentenceReady(packId) {
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
+  if (!entry.sentenceReady) {
+    entry.sentenceReady = true;
+    entry.sentenceReadyAt = new Date().toISOString();
     all[packId] = entry;
     saveState(PACK_COMPLETION_KEY, all);
   }

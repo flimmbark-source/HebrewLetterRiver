@@ -179,7 +179,7 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
         <div className="bbs-node-label">
           <span className="bbs-node-title">{pack.title}</span>
           <span className="bbs-node-support">{support}</span>
-          {comp.quizMastered && (
+          {(comp.quizMastered || comp.sentenceReady) && (
             <span className="bbs-quiz-badge" title="Covered in skill check quiz">✦ Quiz</span>
           )}
         </div>
@@ -520,12 +520,16 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     onPlay({ sessionType: 'due_review', packId: null, selectedWordIds: reviewIds, gameMode: 'bridge_builder', entryPoint: 'review_due' });
   }, [onPlay, dueReviewWordIds, weakWordIds]);
 
-  const handleSkillCheckComplete = useCallback(({ breakdown }) => {
-    const { masteredPackIds } = applyQuizMastery(breakdown);
+  const handleSkillCheckComplete = useCallback(({ breakdown, evidence }) => {
+    const { correctWordIds, sentenceReadyPackIds } = applyQuizMastery(evidence, breakdown);
     setProgressRevision((r) => r + 1);
     setShowSkillCheck(false);
-    setQuizResult({ masteredCount: masteredPackIds.length });
-    emit('analytics:bridge_setup', { event: 'skill_check_complete', masteredCount: masteredPackIds.length });
+    setQuizResult({ correctWordCount: correctWordIds.length, sentenceReadyPackIds });
+    emit('analytics:bridge_setup', {
+      event: 'skill_check_complete',
+      correctWordCount: correctWordIds.length,
+      sentenceReadyCount: sentenceReadyPackIds.length,
+    });
   }, []);
 
   const handleSkillCheckSkip = useCallback(() => {
@@ -613,7 +617,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
 
         {activeSubview === null && (
           <div className="bbs-guided">
-            {!Object.values(packCompletions).some(c => c.quizMastered) && (
+            {!Object.values(packCompletions).some(c => c.quizMastered || c.sentenceReady) && (
               <div className="bbs-skill-check-banner">
                 <span className="material-symbols-outlined bbs-skill-check-icon">quiz</span>
                 <div className="bbs-skill-check-text">
@@ -629,9 +633,14 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
               <div className="bbs-quiz-result-banner">
                 <span className="material-symbols-outlined" style={{ fontSize: 18, flexShrink: 0 }}>star</span>
                 <span className="bbs-quiz-result-text">
-                  {quizResult.masteredCount > 0
-                    ? `${quizResult.masteredCount} pack${quizResult.masteredCount !== 1 ? 's' : ''} credited from your skill check`
-                    : 'Skill check complete — keep practicing to unlock more!'}
+                  {quizResult.correctWordCount > 0
+                    ? `${quizResult.correctWordCount} word${quizResult.correctWordCount !== 1 ? 's' : ''} confirmed from your skill check`
+                    : 'Skill check complete — keep practicing to confirm more words!'}
+                  {quizResult.sentenceReadyPackIds?.length > 0 && (
+                    <span className="bbs-quiz-result-detail">
+                      {` · ${quizResult.sentenceReadyPackIds.length} pack${quizResult.sentenceReadyPackIds.length !== 1 ? 's' : ''} now sentence-ready`}
+                    </span>
+                  )}
                 </span>
                 <button type="button" className="bbs-quiz-result-dismiss" onClick={() => setQuizResult(null)}>✕</button>
               </div>

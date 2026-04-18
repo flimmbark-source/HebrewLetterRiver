@@ -1,95 +1,109 @@
 /**
- * Quiz mastery application.
+ * Quiz mastery application — evidence-linked.
  *
- * Called after the skill-check quiz completes to credit the player for
- * knowledge they've already demonstrated.  Used by both OnboardingFlow
- * (first-run) and BridgeBuilderSetup (retake at any time).
+ * Called after a skill-check quiz completes to credit the player only for
+ * words and packs that were directly represented in their quiz questions.
  *
- * Thresholds (applied independently per question type):
- *   vocab  > 0% correct  → overlapping packs get the ✦ Quiz badge
- *   vocab  ≥ 60% correct → packs fully credited (all game modes) + module-1 vocab sections practiced
- *   sentence ≥ 60% correct → module-1 sentence completion synced proportionally
+ * Design principle: a brief quiz proves familiarity, not full mastery.
+ * It can mark words as quiz-known and make packs sentence-ready, but it
+ * does NOT complete Bridge Builder, Loose Planks, or Deep Script modes.
  *
- * Two-tier: doing the quiz always marks the badge; passing (≥60%) also marks full completion.
+ * Credit rules:
+ *   - Correct vocab answer  → that word is marked quizKnown
+ *   - Pack coverage ≥ 80%  → pack is marked sentenceReady (not game-complete)
+ *   - Sentence questions contribute sentence IDs for future use
  */
 
-import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
 import { bridgeBuilderPacks } from '../data/bridgeBuilderPacks.js';
-import { learningModules } from '../data/modules/index.ts';
 import {
-  markVocabSectionPracticed,
-  syncSentenceCompletion,
-  initializeModuleProgress,
-  getModuleProgress,
-} from './moduleProgressStorage.ts';
-import {
-  markPackQuizMastered,
-  markPackQuizBadge,
-  markWordsQuizIntroduced,
+  getAllWordProgress,
+  markWordQuizKnown,
+  setPackSentenceReady,
 } from './bridgeBuilderStorage.js';
 
+const SENTENCE_READY_THRESHOLD = 0.8;
+
 /**
- * Applies mastery credits based on a quiz breakdown object.
+ * Build a reverse index: wordId → [packId, ...] from all bridge builder packs.
+ */
+function buildWordToPackIndex() {
+  const index = {};
+  for (const pack of bridgeBuilderPacks) {
+    for (const wordId of pack.wordIds) {
+      if (!index[wordId]) index[wordId] = [];
+      index[wordId].push(pack.id);
+    }
+  }
+  return index;
+}
+
+/**
+ * Apply quiz mastery credits based on per-question evidence.
+ *
+ * @param {Array<{
+ *   questionId: string,
+ *   type: 'letter' | 'vocab' | 'sentence',
+ *   wasCorrect: boolean,
+ *   linkedWordIds: string[],
+ *   linkedSentenceIds: string[],
+ *   skill: string,
+ * }>} evidence — one record per question shown to the player
  *
  * @param {{ vocab: {correct: number, total: number}, sentence: {correct: number, total: number} }} breakdown
- * @returns {{ masteredPackIds: string[] }}  IDs of packs that received full mastery credit
+ *   — per-type score summary (kept for routing / skill-level decisions upstream)
+ *
+ * @returns {{
+ *   correctWordIds: string[],
+ *   testedWordIds: string[],
+ *   sentenceReadyPackIds: string[],
+ * }}
  */
-export function applyQuizMastery(breakdown) {
-  if (!breakdown) return { masteredPackIds: [] };
-
-  const module1 = learningModules.find((m) => m.id === 'module-1');
-  const masteredPackIds = [];
-
-  if (module1) {
-    // Ensure module-1 progress record exists before writing to it
-    if (!getModuleProgress('module-1')) {
-      initializeModuleProgress(
-        'module-1',
-        module1.sentenceIds.length,
-        module1.vocabTextIds.length
-      );
-    }
+export function applyQuizMastery(evidence, breakdown) {
+  if (!evidence || evidence.length === 0) {
+    return { correctWordIds: [], testedWordIds: [], sentenceReadyPackIds: [] };
   }
 
-  const vocabBreakdown = breakdown.vocab;
-  const vocabAnswered = vocabBreakdown && vocabBreakdown.total > 0;
-  const vocabAccuracy = vocabAnswered ? vocabBreakdown.correct / vocabBreakdown.total : 0;
+  // ── Step 1: Collect tested and correctly-answered word IDs ──────────────
+  const correctWordIds = new Set();
+  const testedWordIds = new Set();
 
-  if (vocabAnswered && vocabAccuracy > 0) {
-    // Any correct vocab answer → compute the overlapping pack set
-    const quizWordIdSet = new Set(
-      bridgeBuilderWords.filter((w) => w.difficulty <= 2).map((w) => w.id)
-    );
-    const overlappingPacks = bridgeBuilderPacks.filter((pack) =>
-      pack.wordIds.some((id) => quizWordIdSet.has(id))
-    );
-
-    if (vocabAccuracy >= 0.6) {
-      // Passed: full credit — all game modes complete + badge
-      if (module1) {
-        module1.vocabTextIds.forEach((id) => markVocabSectionPracticed('module-1', id));
-      }
-      for (const pack of overlappingPacks) {
-        markPackQuizMastered(pack.id);
-        markWordsQuizIntroduced(pack.wordIds);
-        masteredPackIds.push(pack.id);
-      }
-    } else {
-      // Attempted but below threshold: badge only (shows the quiz was taken)
-      for (const pack of overlappingPacks) {
-        markPackQuizBadge(pack.id);
+  for (const record of evidence) {
+    for (const wordId of record.linkedWordIds) {
+      testedWordIds.add(wordId);
+      if (record.wasCorrect) {
+        correctWordIds.add(wordId);
       }
     }
   }
 
-  const sentenceBreakdown = breakdown.sentence;
-  if (sentenceBreakdown && sentenceBreakdown.total > 0 && module1) {
-    const accuracy = sentenceBreakdown.correct / sentenceBreakdown.total;
-    if (accuracy >= 0.6) {
-      const sentencesEarned = Math.max(1, Math.floor(accuracy * module1.sentenceIds.length));
-      syncSentenceCompletion('module-1', sentencesEarned);
+  // ── Step 2: Mark correctly-answered words as quiz-known ─────────────────
+  for (const wordId of correctWordIds) {
+    markWordQuizKnown(wordId);
+  }
+
+  // ── Step 3: Recompute pack coverage and mark sentence-ready packs ───────
+  // Re-read progress after the writes above so coverage is accurate.
+  const allWordProgress = getAllWordProgress();
+  const sentenceReadyPackIds = [];
+
+  for (const pack of bridgeBuilderPacks) {
+    if (!pack.wordIds || pack.wordIds.length === 0) continue;
+
+    const knownCount = pack.wordIds.filter((wId) => {
+      const wp = allWordProgress[wId];
+      return wp && (wp.quizKnown || wp.masteryStage !== 'new');
+    }).length;
+
+    const coverage = knownCount / pack.wordIds.length;
+    if (coverage >= SENTENCE_READY_THRESHOLD) {
+      setPackSentenceReady(pack.id);
+      sentenceReadyPackIds.push(pack.id);
     }
   }
 
-  return { masteredPackIds };
+  return {
+    correctWordIds: Array.from(correctWordIds),
+    testedWordIds: Array.from(testedWordIds),
+    sentenceReadyPackIds,
+  };
 }

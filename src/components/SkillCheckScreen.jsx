@@ -49,7 +49,10 @@ function buildLetterQuestions(languagePack, count = 3) {
       display: getItemSymbol(correctItem),
       prompt: 'What is this letter?',
       correctId: correctItem.id,
-      choices: choices.map((c) => ({ id: c.id, label: getItemLabel(c) }))
+      choices: choices.map((c) => ({ id: c.id, label: getItemLabel(c) })),
+      linkedWordIds: [],
+      linkedSentenceIds: [],
+      skill: 'form',
     };
   });
 }
@@ -76,7 +79,10 @@ function buildVocabQuestions(words, count = 3) {
         id: c.id,
         label: getMeaning(c) || c.id
       })),
-      correctMeaning
+      correctMeaning,
+      linkedWordIds: [correctWord.id],
+      linkedSentenceIds: [],
+      skill: 'meaning',
     };
   });
 }
@@ -107,7 +113,10 @@ function buildSentenceQuestions(sentences, count = 2) {
       choices: choices.map((s) => ({
         id: s.id,
         label: s.english ?? s.meaning
-      }))
+      })),
+      linkedWordIds: (correctSentence.words ?? []).map((w) => w.wordId).filter(Boolean),
+      linkedSentenceIds: [correctSentence.id],
+      skill: 'sentence-comprehension',
     };
   });
 }
@@ -191,6 +200,7 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
     vocab: { correct: 0, total: 0 },
     sentence: { correct: 0, total: 0 }
   });
+  const [answeredEvidence, setAnsweredEvidence] = useState([]);
 
   const question = questions[currentIndex] ?? null;
   const totalQuestions = questions.length;
@@ -218,6 +228,17 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
       setTimeout(() => {
         setFeedback(null);
         setSelectedId(null);
+        const evidenceRecord = {
+          questionId: `q${currentIndex}`,
+          type: question.type,
+          wasCorrect: isCorrect,
+          selectedId: choiceId,
+          correctId: question.correctId,
+          linkedWordIds: question.linkedWordIds ?? [],
+          linkedSentenceIds: question.linkedSentenceIds ?? [],
+          skill: question.skill ?? 'meaning',
+        };
+        const allEvidence = [...answeredEvidence, evidenceRecord];
         if (currentIndex + 1 >= totalQuestions) {
           const finalScore = isCorrect ? score + 1 : score;
           // Build final breakdown with this question included
@@ -235,13 +256,14 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
           if (finalScore >= Math.ceil(totalQuestions * 0.8)) skillLevel = 'advanced';
           else if (finalScore >= Math.ceil(totalQuestions * 0.4)) skillLevel = 'intermediate';
 
-          onComplete({ score: finalScore, total: totalQuestions, skillLevel, breakdown: finalBreakdown });
+          onComplete({ score: finalScore, total: totalQuestions, skillLevel, breakdown: finalBreakdown, evidence: allEvidence });
         } else {
+          setAnsweredEvidence(allEvidence);
           setCurrentIndex((prev) => prev + 1);
         }
       }, 800);
     },
-    [feedback, question, currentIndex, totalQuestions, score, typeResults, onComplete]
+    [feedback, question, currentIndex, totalQuestions, score, typeResults, onComplete, answeredEvidence]
   );
 
   if (!question) {

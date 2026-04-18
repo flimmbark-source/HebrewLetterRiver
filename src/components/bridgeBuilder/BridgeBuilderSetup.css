@@ -721,6 +721,10 @@ body.dark-mode .bbs-quiz-badge {
   opacity: 0.6;
 }
 .bbs-quiz-result-dismiss:hover { opacity: 1; }
+.bbs-quiz-result-detail {
+  opacity: 0.8;
+  font-size: 12px;
+}
 
 body.dark-mode .bbs-quiz-result-banner {
   background: rgba(251, 191, 36, 0.12);
