@@ -125,12 +125,11 @@ function buildSentenceQuestions(sentences, count = 2) {
  * Build a mixed question set based on the requested types.
  * questionTypes: array of 'letter' | 'vocab' | 'sentence'
  */
-function buildAllQuestions(languagePack, vocabWords, sentences, questionTypes = ['letter']) {
+function buildAllQuestions(languagePack, vocabWords, sentences, questionTypes = ['letter'], questionCounts = null) {
   const wantsLetters = questionTypes.includes('letter');
   const wantsVocab = questionTypes.includes('vocab');
   const wantsSentences = questionTypes.includes('sentence');
 
-  // Determine per-type count based on what's requested
   let letterCount = 0;
   let vocabCount = 0;
   let sentenceCount = 0;
@@ -151,11 +150,17 @@ function buildAllQuestions(languagePack, vocabWords, sentences, questionTypes = 
     vocabCount = 5;
   }
 
+  // Allow callers to override per-type counts (e.g. pack-specific quizzes)
+  if (questionCounts) {
+    if (questionCounts.letter != null) letterCount = questionCounts.letter;
+    if (questionCounts.vocab  != null) vocabCount  = questionCounts.vocab;
+    if (questionCounts.sentence != null) sentenceCount = questionCounts.sentence;
+  }
+
   const letterQs = wantsLetters ? buildLetterQuestions(languagePack, letterCount) : [];
   const vocabQs = wantsVocab ? buildVocabQuestions(vocabWords, vocabCount) : [];
   const sentenceQs = wantsSentences ? buildSentenceQuestions(sentences, sentenceCount) : [];
 
-  // Interleave question types so the quiz feels varied
   const all = [];
   const maxLen = Math.max(letterQs.length, vocabQs.length, sentenceQs.length);
   for (let i = 0; i < maxLen; i++) {
@@ -183,12 +188,12 @@ function getTypeLabel(type) {
  *   vocabWords: object[] — word objects from bridgeBuilderWords (needed for 'vocab' type)
  *   sentences: object[] — sentence objects (needed for 'sentence' type)
  */
-export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = ['letter'], vocabWords = [], sentences = [] }) {
+export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = ['letter'], vocabWords = [], sentences = [], questionCounts = null }) {
   const { languagePack } = useLocalization();
   const textDirection = languagePack?.metadata?.textDirection ?? 'ltr';
   const questions = useMemo(
-    () => buildAllQuestions(languagePack, vocabWords, sentences, questionTypes),
-    [languagePack, vocabWords, sentences, questionTypes]
+    () => buildAllQuestions(languagePack, vocabWords, sentences, questionTypes, questionCounts),
+    [languagePack, vocabWords, sentences, questionTypes, questionCounts]
   );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
