@@ -54,7 +54,7 @@ function buildLetterQuestions(languagePack, count = 3) {
   });
 }
 
-/** Build vocabulary questions: show Hebrew word → pick English meaning. */
+/** Build vocabulary questions: show target-language word → pick its meaning. */
 function buildVocabQuestions(words, count = 3) {
   if (!words || words.length < 4) return [];
 
@@ -81,7 +81,7 @@ function buildVocabQuestions(words, count = 3) {
   });
 }
 
-/** Build sentence questions: show Hebrew sentence → pick English translation. */
+/** Build sentence questions: show target-language sentence → pick its translation. */
 function buildSentenceQuestions(sentences, count = 2) {
   if (!sentences || sentences.length < 4) return [];
 
@@ -245,8 +245,8 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
     return null;
   }
 
-  // Determine display mode: letter/vocab show Hebrew in a box, sentence shows the sentence
-  const isHebrewDisplay = question.type === 'letter' || question.type === 'vocab';
+  // Letter/vocab questions show native script in a compact box; sentence uses a wider card
+  const isCompactScriptDisplay = question.type === 'letter' || question.type === 'vocab';
 
   return (
     <div
@@ -317,7 +317,7 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
           <p className="mb-3 text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--app-muted)' }}>
             {question.prompt}
           </p>
-          {isHebrewDisplay ? (
+          {isCompactScriptDisplay ? (
             <div
               className="mx-auto flex min-h-[7rem] w-auto max-w-[14rem] items-center justify-center rounded-2xl px-4 py-3 font-bold shadow-lg"
               style={{
@@ -332,7 +332,7 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
               {question.display}
             </div>
           ) : (
-            /* Sentence: show Hebrew in a wider card */
+            /* Sentence: show native-script sentence in a wider card */
             <div
               className="mx-auto flex min-h-[4rem] w-full items-center justify-center rounded-2xl px-5 py-4 font-bold shadow-lg"
               style={{
