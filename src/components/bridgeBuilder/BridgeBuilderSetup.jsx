@@ -25,6 +25,8 @@ import SkillCheckScreen from '../SkillCheckScreen.jsx';
 import { bridgeBuilderWords } from '../../data/bridgeBuilderWords.js';
 import { allSentences } from '../../data/sentences/index.ts';
 import { applyQuizMastery } from '../../lib/quizMastery.js';
+import { getLanguageName } from '../../lib/vocabLanguageAdapter.js';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 import './BridgeBuilderSetup.css';
 
 // Quiz vocab pool: difficulty ≤ 2 words, computed once at module load
@@ -423,6 +425,8 @@ function ReviewCard({ dueCount, weakCount, onPlay }) {
    ═══════════════════════════════════════════════════════════ */
 
 export default function BridgeBuilderSetup({ onPlay, onBack }) {
+  const { languageId } = useLanguage();
+  const languageName = getLanguageName(languageId);
   const [goalFilter, setGoalFilter] = useState('all');
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState('recommended');
@@ -613,7 +617,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
               <div className="bbs-skill-check-banner">
                 <span className="material-symbols-outlined bbs-skill-check-icon">quiz</span>
                 <div className="bbs-skill-check-text">
-                  <span className="bbs-skill-check-title">Already know some Hebrew?</span>
+                  <span className="bbs-skill-check-title">{`Already know some ${languageName}?`}</span>
                   <span className="bbs-skill-check-sub">Take a quick skill check to unlock packs you've mastered</span>
                 </div>
                 <button type="button" className="bbs-skill-check-btn" onClick={() => setShowSkillCheck(true)}>
