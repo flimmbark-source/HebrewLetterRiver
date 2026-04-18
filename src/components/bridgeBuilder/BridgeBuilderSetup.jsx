@@ -22,7 +22,7 @@ import {
   sortPackData,
 } from './bridgeBuilderSetupHelpers.js';
 import SkillCheckScreen from '../SkillCheckScreen.jsx';
-import { bridgeBuilderWords } from '../../data/bridgeBuilderWords.js';
+import { bridgeBuilderWords, getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import { allSentences } from '../../data/sentences/index.ts';
 import { applyQuizMastery } from '../../lib/quizMastery.js';
 import { getLanguageName } from '../../lib/vocabLanguageAdapter.js';
@@ -135,7 +135,7 @@ function getSnakePosition(index) {
    PathNode — a single node on the winding path
    ═══════════════════════════════════════════════════════════ */
 
-function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod, position, onToggle, onLaunch, accent, completion }) {
+function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod, position, onToggle, onLaunch, onQuizLaunch, accent, completion }) {
   const defaultCompletion = { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
   const comp = completion || defaultCompletion;
   const state = getNodeState(progress, unlocked, isCurrent, comp);
@@ -179,7 +179,7 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
         <div className="bbs-node-label">
           <span className="bbs-node-title">{pack.title}</span>
           <span className="bbs-node-support">{support}</span>
-          {comp.quizMastered && (
+          {(comp.quizMastered || comp.sentenceReady) && (
             <span className="bbs-quiz-badge" title="Covered in skill check quiz">✦ Quiz</span>
           )}
         </div>
@@ -217,6 +217,21 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
             </div>
             <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
           </button>
+          {pack.wordIds.length >= 4 && (
+            <button
+              type="button"
+              className={`bbs-method bbs-method--quiz`}
+              onClick={() => unlocked && onQuizLaunch(pack)}
+              disabled={!unlocked}
+            >
+              <span className="material-symbols-outlined bbs-method-ic">quiz</span>
+              <div className="bbs-method-text">
+                <span className="bbs-method-name">Quick Word Check</span>
+                <span className="bbs-method-sub">Already know these? Skip the intro</span>
+              </div>
+              <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
+            </button>
+          )}
           {lastMethod && (
             <div className="bbs-chooser-hint">
               Last used: {lastMethod === 'deep_script' ? 'Deep Script' : 'Vocab Builder'}
@@ -256,7 +271,7 @@ function PathConnector({ fromPos, toPos, state }) {
    SectionBlock — always-visible section with winding path
    ═══════════════════════════════════════════════════════════ */
 
-function SectionBlock({ section, sectionProgress, unlocked, packData, activePackId, expandedPack, lastMethods, onTogglePack, onLaunch }) {
+function SectionBlock({ section, sectionProgress, unlocked, packData, activePackId, expandedPack, lastMethods, onTogglePack, onLaunch, onQuizLaunch }) {
   const { packsCompleted, totalPacks } = sectionProgress;
   const meta = getSectionMeta(section.id);
   const accent = meta.accent;
@@ -304,6 +319,7 @@ function SectionBlock({ section, sectionProgress, unlocked, packData, activePack
                 position={pos}
                 onToggle={onTogglePack}
                 onLaunch={onLaunch}
+                onQuizLaunch={onQuizLaunch}
                 accent={accent}
                 completion={pd.completion}
               />
@@ -437,7 +453,8 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   // Incremented after quiz mastery is applied to force re-read of storage
   const [progressRevision, setProgressRevision] = useState(0);
   const [showSkillCheck, setShowSkillCheck] = useState(false);
-  const [quizResult, setQuizResult] = useState(null); // { masteredCount } after quiz completes
+  const [packQuizTarget, setPackQuizTarget] = useState(null); // pack object when running a pack-specific quiz
+  const [quizResult, setQuizResult] = useState(null);
 
   const sections = useMemo(() => getSectionsInOrder(), []);
   const allProgress = useMemo(() => getAllWordProgress(), [progressRevision]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -520,16 +537,42 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     onPlay({ sessionType: 'due_review', packId: null, selectedWordIds: reviewIds, gameMode: 'bridge_builder', entryPoint: 'review_due' });
   }, [onPlay, dueReviewWordIds, weakWordIds]);
 
-  const handleSkillCheckComplete = useCallback(({ breakdown }) => {
-    const { masteredPackIds } = applyQuizMastery(breakdown);
+  const handleSkillCheckComplete = useCallback(({ breakdown, evidence }) => {
+    const { correctWordIds, sentenceReadyPackIds } = applyQuizMastery(evidence, breakdown);
     setProgressRevision((r) => r + 1);
     setShowSkillCheck(false);
-    setQuizResult({ masteredCount: masteredPackIds.length });
-    emit('analytics:bridge_setup', { event: 'skill_check_complete', masteredCount: masteredPackIds.length });
-  }, []);
+
+    if (packQuizTarget) {
+      setQuizResult({
+        type: 'pack',
+        packTitle: packQuizTarget.title,
+        correctWordCount: correctWordIds.length,
+        testedWordCount: packQuizTarget.wordIds.length,
+        sentenceReady: sentenceReadyPackIds.includes(packQuizTarget.id),
+      });
+      setPackQuizTarget(null);
+    } else {
+      setQuizResult({ type: 'global', correctWordCount: correctWordIds.length, sentenceReadyPackIds });
+    }
+
+    emit('analytics:bridge_setup', {
+      event: 'skill_check_complete',
+      quizType: packQuizTarget ? 'pack' : 'global',
+      packId: packQuizTarget?.id ?? null,
+      correctWordCount: correctWordIds.length,
+      sentenceReadyCount: sentenceReadyPackIds.length,
+    });
+  }, [packQuizTarget]);
 
   const handleSkillCheckSkip = useCallback(() => {
     setShowSkillCheck(false);
+    setPackQuizTarget(null);
+  }, []);
+
+  const handlePackQuizLaunch = useCallback((pack) => {
+    setPackQuizTarget(pack);
+    setShowSkillCheck(true);
+    setQuizResult(null);
   }, []);
 
   const allUnlockedPackData = useMemo(() => sectionData.flatMap(sd => sd.packData).filter(pd => pd.unlocked), [sectionData]);
@@ -545,9 +588,10 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
       <SkillCheckScreen
         onComplete={handleSkillCheckComplete}
         onSkip={handleSkillCheckSkip}
-        questionTypes={['letter', 'vocab', 'sentence']}
-        vocabWords={QUIZ_VOCAB_WORDS}
+        questionTypes={packQuizTarget ? ['vocab'] : ['vocab', 'sentence']}
+        vocabWords={packQuizTarget ? getWordsByIds(packQuizTarget.wordIds) : QUIZ_VOCAB_WORDS}
         sentences={QUIZ_SENTENCES}
+        questionCounts={packQuizTarget ? { vocab: Math.min(packQuizTarget.wordIds.length, 6) } : null}
       />
     )}
     <div className="bbs-screen">
@@ -613,7 +657,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
 
         {activeSubview === null && (
           <div className="bbs-guided">
-            {!Object.values(packCompletions).some(c => c.quizMastered) && (
+            {!Object.values(packCompletions).some(c => c.quizMastered || c.sentenceReady) && (
               <div className="bbs-skill-check-banner">
                 <span className="material-symbols-outlined bbs-skill-check-icon">quiz</span>
                 <div className="bbs-skill-check-text">
@@ -629,9 +673,27 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
               <div className="bbs-quiz-result-banner">
                 <span className="material-symbols-outlined" style={{ fontSize: 18, flexShrink: 0 }}>star</span>
                 <span className="bbs-quiz-result-text">
-                  {quizResult.masteredCount > 0
-                    ? `${quizResult.masteredCount} pack${quizResult.masteredCount !== 1 ? 's' : ''} credited from your skill check`
-                    : 'Skill check complete — keep practicing to unlock more!'}
+                  {quizResult.type === 'pack' ? (
+                    <>
+                      {quizResult.correctWordCount > 0
+                        ? `${quizResult.correctWordCount}/${quizResult.testedWordCount} word${quizResult.testedWordCount !== 1 ? 's' : ''} confirmed in ${quizResult.packTitle}`
+                        : `Word check complete for ${quizResult.packTitle} — keep practicing!`}
+                      {quizResult.sentenceReady && (
+                        <span className="bbs-quiz-result-detail"> · Now sentence-ready!</span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {quizResult.correctWordCount > 0
+                        ? `${quizResult.correctWordCount} word${quizResult.correctWordCount !== 1 ? 's' : ''} confirmed from your skill check`
+                        : 'Skill check complete — keep practicing to confirm more words!'}
+                      {quizResult.sentenceReadyPackIds?.length > 0 && (
+                        <span className="bbs-quiz-result-detail">
+                          {` · ${quizResult.sentenceReadyPackIds.length} pack${quizResult.sentenceReadyPackIds.length !== 1 ? 's' : ''} now sentence-ready`}
+                        </span>
+                      )}
+                    </>
+                  )}
                 </span>
                 <button type="button" className="bbs-quiz-result-dismiss" onClick={() => setQuizResult(null)}>✕</button>
               </div>
@@ -648,6 +710,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                 lastMethods={lastMethods}
                 onTogglePack={handleTogglePack}
                 onLaunch={handleLaunchPackMethod}
+                onQuizLaunch={handlePackQuizLaunch}
               />
             ))}
           </div>

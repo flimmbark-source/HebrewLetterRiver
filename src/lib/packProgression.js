@@ -87,9 +87,12 @@ export function getSentenceEligiblePacks() {
   const allWordProgress = getAllWordProgress();
   const allCompletions = getAllPackCompletions();
 
-  return bridgeBuilderPacks.filter(pack => {
+  return bridgeBuilderPacks.filter((pack) => {
     const state = getPackState(pack, allWordProgress, allCompletions);
-    return state === PACK_STATES.LEARNED || state === PACK_STATES.MASTERED;
+    if (state === PACK_STATES.LEARNED || state === PACK_STATES.MASTERED) return true;
+    // Also include packs marked sentence-ready via quiz coverage
+    const completion = allCompletions[pack.id];
+    return completion?.sentenceReady === true;
   });
 }
 
@@ -128,4 +131,89 @@ export function pickRandomSentencePack() {
   const eligible = getSentenceEligiblePacks();
   if (eligible.length === 0) return null;
   return eligible[Math.floor(Math.random() * eligible.length)];
+}
+
+// ─── Sentence readiness ────────────────────────────────────
+
+/**
+ * Proportion of a pack's words that the player knows (quiz or gameplay).
+ * A word counts as known if quizKnown is true OR its masteryStage is beyond 'new'.
+ */
+export const SENTENCE_READINESS_THRESHOLD = 0.8;
+
+/**
+ * Get sentence readiness for a single pack.
+ *
+ * @param {Object} pack
+ * @param {{ [wordId: string]: Object }} allWordProgress
+ * @param {{ [packId: string]: Object }} allCompletions
+ * @returns {{ knownWordCount, totalWordCount, coveragePercent, unknownWordIds, isGuidedReady, isFreeReadingReady }}
+ */
+export function getPackSentenceReadiness(pack, allWordProgress, allCompletions) {
+  // Packs completed through normal gameplay are always ready
+  const packState = getPackState(pack, allWordProgress, allCompletions ?? {});
+  if (packState === PACK_STATES.LEARNED || packState === PACK_STATES.MASTERED) {
+    return {
+      knownWordCount: pack.wordIds.length,
+      totalWordCount: pack.wordIds.length,
+      coveragePercent: 100,
+      unknownWordIds: [],
+      isGuidedReady: true,
+      isFreeReadingReady: true,
+    };
+  }
+
+  const knownWordIds = pack.wordIds.filter((wordId) => {
+    const wp = allWordProgress?.[wordId];
+    return wp && (wp.quizKnown || wp.masteryStage !== 'new');
+  });
+
+  const coveragePercent =
+    pack.wordIds.length > 0 ? (knownWordIds.length / pack.wordIds.length) * 100 : 0;
+
+  return {
+    knownWordCount: knownWordIds.length,
+    totalWordCount: pack.wordIds.length,
+    coveragePercent,
+    unknownWordIds: pack.wordIds.filter((id) => !knownWordIds.includes(id)),
+    isGuidedReady: coveragePercent >= SENTENCE_READINESS_THRESHOLD * 100,
+    isFreeReadingReady: coveragePercent >= 95,
+  };
+}
+
+/**
+ * Get sentence readiness for a single sentence based on how many of its
+ * words the player currently knows.
+ *
+ * @param {{ words?: Array<{ wordId?: string }> }} sentence
+ * @param {{ [wordId: string]: Object }} allWordProgress
+ * @returns {{ knownWordCount, totalWordCount, coveragePercent, unknownWordIds, isGuidedReady, isFreeReadingReady }}
+ */
+export function getSentenceWordReadiness(sentence, allWordProgress) {
+  const wordIds = (sentence?.words ?? []).map((w) => w.wordId).filter(Boolean);
+  if (wordIds.length === 0) {
+    return {
+      knownWordCount: 0,
+      totalWordCount: 0,
+      coveragePercent: 100,
+      unknownWordIds: [],
+      isGuidedReady: true,
+      isFreeReadingReady: true,
+    };
+  }
+
+  const knownIds = wordIds.filter((wId) => {
+    const wp = allWordProgress?.[wId];
+    return wp && (wp.quizKnown || wp.masteryStage !== 'new');
+  });
+
+  const coveragePercent = (knownIds.length / wordIds.length) * 100;
+  return {
+    knownWordCount: knownIds.length,
+    totalWordCount: wordIds.length,
+    coveragePercent,
+    unknownWordIds: wordIds.filter((id) => !knownIds.includes(id)),
+    isGuidedReady: coveragePercent >= 80,
+    isFreeReadingReady: coveragePercent >= 95,
+  };
 }

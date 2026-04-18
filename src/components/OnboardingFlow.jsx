@@ -108,13 +108,13 @@ export default function OnboardingFlow() {
   }, []);
 
   const handleSkillCheckComplete = useCallback(
-    ({ score, total, skillLevel: level, breakdown }) => {
+    ({ score, total, skillLevel: level, breakdown, evidence }) => {
       setSkillLevel(level);
       saveState('onboarding.skillLevel', level);
       saveState('onboarding.skillCheckScore', score);
 
       // Apply mastery unlocks based on quiz performance
-      applyQuizMastery(breakdown);
+      applyQuizMastery(evidence, breakdown);
 
       if (level === 'advanced') {
         // Advanced users skip guided session

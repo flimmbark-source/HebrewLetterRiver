@@ -49,7 +49,10 @@ function buildLetterQuestions(languagePack, count = 3) {
       display: getItemSymbol(correctItem),
       prompt: 'What is this letter?',
       correctId: correctItem.id,
-      choices: choices.map((c) => ({ id: c.id, label: getItemLabel(c) }))
+      choices: choices.map((c) => ({ id: c.id, label: getItemLabel(c) })),
+      linkedWordIds: [],
+      linkedSentenceIds: [],
+      skill: 'form',
     };
   });
 }
@@ -76,7 +79,10 @@ function buildVocabQuestions(words, count = 3) {
         id: c.id,
         label: getMeaning(c) || c.id
       })),
-      correctMeaning
+      correctMeaning,
+      linkedWordIds: [correctWord.id],
+      linkedSentenceIds: [],
+      skill: 'meaning',
     };
   });
 }
@@ -107,7 +113,10 @@ function buildSentenceQuestions(sentences, count = 2) {
       choices: choices.map((s) => ({
         id: s.id,
         label: s.english ?? s.meaning
-      }))
+      })),
+      linkedWordIds: (correctSentence.words ?? []).map((w) => w.wordId).filter(Boolean),
+      linkedSentenceIds: [correctSentence.id],
+      skill: 'sentence-comprehension',
     };
   });
 }
@@ -116,12 +125,11 @@ function buildSentenceQuestions(sentences, count = 2) {
  * Build a mixed question set based on the requested types.
  * questionTypes: array of 'letter' | 'vocab' | 'sentence'
  */
-function buildAllQuestions(languagePack, vocabWords, sentences, questionTypes = ['letter']) {
+function buildAllQuestions(languagePack, vocabWords, sentences, questionTypes = ['letter'], questionCounts = null) {
   const wantsLetters = questionTypes.includes('letter');
   const wantsVocab = questionTypes.includes('vocab');
   const wantsSentences = questionTypes.includes('sentence');
 
-  // Determine per-type count based on what's requested
   let letterCount = 0;
   let vocabCount = 0;
   let sentenceCount = 0;
@@ -135,13 +143,24 @@ function buildAllQuestions(languagePack, vocabWords, sentences, questionTypes = 
     letterCount = 2;
     vocabCount = 2;
     sentenceCount = 2;
+  } else if (!wantsLetters && wantsVocab && wantsSentences) {
+    vocabCount = 4;
+    sentenceCount = 2;
+  } else if (!wantsLetters && wantsVocab && !wantsSentences) {
+    vocabCount = 5;
+  }
+
+  // Allow callers to override per-type counts (e.g. pack-specific quizzes)
+  if (questionCounts) {
+    if (questionCounts.letter != null) letterCount = questionCounts.letter;
+    if (questionCounts.vocab  != null) vocabCount  = questionCounts.vocab;
+    if (questionCounts.sentence != null) sentenceCount = questionCounts.sentence;
   }
 
   const letterQs = wantsLetters ? buildLetterQuestions(languagePack, letterCount) : [];
   const vocabQs = wantsVocab ? buildVocabQuestions(vocabWords, vocabCount) : [];
   const sentenceQs = wantsSentences ? buildSentenceQuestions(sentences, sentenceCount) : [];
 
-  // Interleave question types so the quiz feels varied
   const all = [];
   const maxLen = Math.max(letterQs.length, vocabQs.length, sentenceQs.length);
   for (let i = 0; i < maxLen; i++) {
@@ -169,12 +188,12 @@ function getTypeLabel(type) {
  *   vocabWords: object[] — word objects from bridgeBuilderWords (needed for 'vocab' type)
  *   sentences: object[] — sentence objects (needed for 'sentence' type)
  */
-export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = ['letter'], vocabWords = [], sentences = [] }) {
+export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = ['letter'], vocabWords = [], sentences = [], questionCounts = null }) {
   const { languagePack } = useLocalization();
   const textDirection = languagePack?.metadata?.textDirection ?? 'ltr';
   const questions = useMemo(
-    () => buildAllQuestions(languagePack, vocabWords, sentences, questionTypes),
-    [languagePack, vocabWords, sentences, questionTypes]
+    () => buildAllQuestions(languagePack, vocabWords, sentences, questionTypes, questionCounts),
+    [languagePack, vocabWords, sentences, questionTypes, questionCounts]
   );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -186,6 +205,7 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
     vocab: { correct: 0, total: 0 },
     sentence: { correct: 0, total: 0 }
   });
+  const [answeredEvidence, setAnsweredEvidence] = useState([]);
 
   const question = questions[currentIndex] ?? null;
   const totalQuestions = questions.length;
@@ -213,6 +233,17 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
       setTimeout(() => {
         setFeedback(null);
         setSelectedId(null);
+        const evidenceRecord = {
+          questionId: `q${currentIndex}`,
+          type: question.type,
+          wasCorrect: isCorrect,
+          selectedId: choiceId,
+          correctId: question.correctId,
+          linkedWordIds: question.linkedWordIds ?? [],
+          linkedSentenceIds: question.linkedSentenceIds ?? [],
+          skill: question.skill ?? 'meaning',
+        };
+        const allEvidence = [...answeredEvidence, evidenceRecord];
         if (currentIndex + 1 >= totalQuestions) {
           const finalScore = isCorrect ? score + 1 : score;
           // Build final breakdown with this question included
@@ -230,13 +261,14 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
           if (finalScore >= Math.ceil(totalQuestions * 0.8)) skillLevel = 'advanced';
           else if (finalScore >= Math.ceil(totalQuestions * 0.4)) skillLevel = 'intermediate';
 
-          onComplete({ score: finalScore, total: totalQuestions, skillLevel, breakdown: finalBreakdown });
+          onComplete({ score: finalScore, total: totalQuestions, skillLevel, breakdown: finalBreakdown, evidence: allEvidence });
         } else {
+          setAnsweredEvidence(allEvidence);
           setCurrentIndex((prev) => prev + 1);
         }
       }, 800);
     },
-    [feedback, question, currentIndex, totalQuestions, score, typeResults, onComplete]
+    [feedback, question, currentIndex, totalQuestions, score, typeResults, onComplete, answeredEvidence]
   );
 
   if (!question) {
