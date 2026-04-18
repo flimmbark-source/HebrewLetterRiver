@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { loadState, saveState } from '../lib/storage.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import OnboardingGoalScreen from './OnboardingGoalScreen.jsx';
@@ -6,6 +6,9 @@ import SkillCheckScreen from './SkillCheckScreen.jsx';
 import WhyLetterRiverScreen from './WhyLetterRiverScreen.jsx';
 import GuidedFirstSession from './GuidedFirstSession.jsx';
 import FirstSessionSuccess from './FirstSessionSuccess.jsx';
+import { bridgeBuilderWords } from '../data/bridgeBuilderWords.js';
+import { allSentences } from '../data/sentences/index.ts';
+import { applyQuizMastery } from '../lib/quizMastery.js';
 
 /**
  * OnboardingFlow orchestrates the full onboarding experience.
@@ -26,6 +29,17 @@ const STEPS = {
   COMPLETE: 'complete'
 };
 
+/**
+ * Map an onboarding goal to the question types shown in the skill check.
+ *   'familiar'  → letters + vocab  (knows some letters, testing word recognition)
+ *   'returning' → letters + vocab + sentences  (daily practice, richer test)
+ */
+function getQuestionTypesForGoal(goal) {
+  if (goal === 'returning') return ['letter', 'vocab', 'sentence'];
+  if (goal === 'familiar') return ['letter', 'vocab'];
+  return ['letter'];
+}
+
 export default function OnboardingFlow() {
   const { hasSelectedLanguage } = useLanguage();
   const [step, setStep] = useState(STEPS.IDLE);
@@ -35,6 +49,21 @@ export default function OnboardingFlow() {
 
   // Check if onboarding is already completed
   const onboardingCompleted = loadState('onboarding.completed', false);
+
+  // Derive question types from goal
+  const questionTypes = useMemo(() => getQuestionTypesForGoal(goal), [goal]);
+
+  // Filter vocab words: use greetings + basics (difficulty 1-2) for a beginner-friendly quiz
+  const quizVocabWords = useMemo(
+    () => bridgeBuilderWords.filter((w) => w.difficulty <= 2),
+    []
+  );
+
+  // Filter sentences: use difficulty-1 sentences from the first module theme
+  const quizSentences = useMemo(
+    () => allSentences.filter((s) => s.difficulty === 1),
+    []
+  );
 
   // Start the flow when language is selected and onboarding isn't done
   useEffect(() => {
@@ -78,25 +107,31 @@ export default function OnboardingFlow() {
     }
   }, []);
 
-  const handleSkillCheckComplete = useCallback(({ score, total, skillLevel: level }) => {
-    setSkillLevel(level);
-    saveState('onboarding.skillLevel', level);
-    saveState('onboarding.skillCheckScore', score);
+  const handleSkillCheckComplete = useCallback(
+    ({ score, total, skillLevel: level, breakdown }) => {
+      setSkillLevel(level);
+      saveState('onboarding.skillLevel', level);
+      saveState('onboarding.skillCheckScore', score);
 
-    if (level === 'advanced') {
-      // Advanced users skip guided session
-      saveState('onboarding.completed', true);
-      setStep(STEPS.COMPLETE);
-    } else {
-      // beginner or intermediate — show why screen then guided session
-      const whyDismissed = loadState('onboarding.whyScreenDismissed', false);
-      if (whyDismissed) {
-        setStep(STEPS.GUIDED_SESSION);
+      // Apply mastery unlocks based on quiz performance
+      applyQuizMastery(breakdown);
+
+      if (level === 'advanced') {
+        // Advanced users skip guided session
+        saveState('onboarding.completed', true);
+        setStep(STEPS.COMPLETE);
       } else {
-        setStep(STEPS.WHY_SCREEN);
+        // beginner or intermediate — show why screen then guided session
+        const whyDismissed = loadState('onboarding.whyScreenDismissed', false);
+        if (whyDismissed) {
+          setStep(STEPS.GUIDED_SESSION);
+        } else {
+          setStep(STEPS.WHY_SCREEN);
+        }
       }
-    }
-  }, []);
+    },
+    []
+  );
 
   const handleSkillCheckSkip = useCallback(() => {
     // Default to goal-based routing
@@ -150,6 +185,9 @@ export default function OnboardingFlow() {
         <SkillCheckScreen
           onComplete={handleSkillCheckComplete}
           onSkip={handleSkillCheckSkip}
+          questionTypes={questionTypes}
+          vocabWords={quizVocabWords}
+          sentences={quizSentences}
         />
       );
 

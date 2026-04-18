@@ -21,7 +21,16 @@ import {
   matchesQuery,
   sortPackData,
 } from './bridgeBuilderSetupHelpers.js';
+import SkillCheckScreen from '../SkillCheckScreen.jsx';
+import { bridgeBuilderWords } from '../../data/bridgeBuilderWords.js';
+import { allSentences } from '../../data/sentences/index.ts';
+import { applyQuizMastery } from '../../lib/quizMastery.js';
 import './BridgeBuilderSetup.css';
+
+// Quiz vocab pool: difficulty ≤ 2 words, computed once at module load
+const QUIZ_VOCAB_WORDS = bridgeBuilderWords.filter((w) => w.difficulty <= 2);
+// Quiz sentence pool: difficulty-1 sentences
+const QUIZ_SENTENCES = allSentences.filter((s) => s.difficulty === 1);
 
 /* ─── Section visual metadata ──────────────────────────────── */
 
@@ -168,6 +177,9 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
         <div className="bbs-node-label">
           <span className="bbs-node-title">{pack.title}</span>
           <span className="bbs-node-support">{support}</span>
+          {comp.quizMastered && (
+            <span className="bbs-quiz-badge" title="Covered in skill check quiz">✦ Quiz</span>
+          )}
         </div>
       </div>
 
@@ -418,12 +430,16 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const [expandedPack, setExpandedPack] = useState(null);
   const [modeOverrides, setModeOverrides] = useState({});
   const [lastMethods, setLastMethods] = useState(() => getLastStudyMethods());
+  // Incremented after quiz mastery is applied to force re-read of storage
+  const [progressRevision, setProgressRevision] = useState(0);
+  const [showSkillCheck, setShowSkillCheck] = useState(false);
+  const [quizResult, setQuizResult] = useState(null); // { masteredCount } after quiz completes
 
   const sections = useMemo(() => getSectionsInOrder(), []);
-  const allProgress = useMemo(() => getAllWordProgress(), []);
-  const dueReviewWordIds = useMemo(() => getDueReviewWordIds(), []);
-  const weakWordIds = useMemo(() => getWeakWordIds(), []);
-  const packCompletions = useMemo(() => getAllPackCompletions(), []);
+  const allProgress = useMemo(() => getAllWordProgress(), [progressRevision]); // eslint-disable-line react-hooks/exhaustive-deps
+  const dueReviewWordIds = useMemo(() => getDueReviewWordIds(), [progressRevision]); // eslint-disable-line react-hooks/exhaustive-deps
+  const weakWordIds = useMemo(() => getWeakWordIds(), [progressRevision]); // eslint-disable-line react-hooks/exhaustive-deps
+  const packCompletions = useMemo(() => getAllPackCompletions(), [progressRevision]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const sectionData = useMemo(() => {
     const allPacks = sections.flatMap(s => getPacksBySection(s.id));
@@ -500,6 +516,18 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     onPlay({ sessionType: 'due_review', packId: null, selectedWordIds: reviewIds, gameMode: 'bridge_builder', entryPoint: 'review_due' });
   }, [onPlay, dueReviewWordIds, weakWordIds]);
 
+  const handleSkillCheckComplete = useCallback(({ breakdown }) => {
+    const { masteredPackIds } = applyQuizMastery(breakdown);
+    setProgressRevision((r) => r + 1);
+    setShowSkillCheck(false);
+    setQuizResult({ masteredCount: masteredPackIds.length });
+    emit('analytics:bridge_setup', { event: 'skill_check_complete', masteredCount: masteredPackIds.length });
+  }, []);
+
+  const handleSkillCheckSkip = useCallback(() => {
+    setShowSkillCheck(false);
+  }, []);
+
   const allUnlockedPackData = useMemo(() => sectionData.flatMap(sd => sd.packData).filter(pd => pd.unlocked), [sectionData]);
   const goalModePackData = useMemo(() => allUnlockedPackData.filter(pd => matchesGoal(pd.pack, goalFilter)), [allUnlockedPackData, goalFilter]);
   const expertModePackData = useMemo(() => {
@@ -508,6 +536,16 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   }, [allUnlockedPackData, query, sortBy]);
 
   return (
+    <>
+    {showSkillCheck && (
+      <SkillCheckScreen
+        onComplete={handleSkillCheckComplete}
+        onSkip={handleSkillCheckSkip}
+        questionTypes={['letter', 'vocab', 'sentence']}
+        vocabWords={QUIZ_VOCAB_WORDS}
+        sentences={QUIZ_SENTENCES}
+      />
+    )}
     <div className="bbs-screen">
       <div className="bbs-content">
         <div className="bbs-header">
@@ -571,6 +609,29 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
 
         {activeSubview === null && (
           <div className="bbs-guided">
+            {!Object.values(packCompletions).some(c => c.quizMastered) && (
+              <div className="bbs-skill-check-banner">
+                <span className="material-symbols-outlined bbs-skill-check-icon">quiz</span>
+                <div className="bbs-skill-check-text">
+                  <span className="bbs-skill-check-title">Already know some Hebrew?</span>
+                  <span className="bbs-skill-check-sub">Take a quick skill check to unlock packs you've mastered</span>
+                </div>
+                <button type="button" className="bbs-skill-check-btn" onClick={() => setShowSkillCheck(true)}>
+                  Start
+                </button>
+              </div>
+            )}
+            {quizResult && (
+              <div className="bbs-quiz-result-banner">
+                <span className="material-symbols-outlined" style={{ fontSize: 18, flexShrink: 0 }}>star</span>
+                <span className="bbs-quiz-result-text">
+                  {quizResult.masteredCount > 0
+                    ? `${quizResult.masteredCount} pack${quizResult.masteredCount !== 1 ? 's' : ''} credited from your skill check`
+                    : 'Skill check complete — keep practicing to unlock more!'}
+                </span>
+                <button type="button" className="bbs-quiz-result-dismiss" onClick={() => setQuizResult(null)}>✕</button>
+              </div>
+            )}
             {sectionData.map(({ section, sectionProgress, unlocked, packData }) => (
               <SectionBlock
                 key={section.id}
@@ -591,5 +652,6 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
         <ReviewCard dueCount={dueReviewWordIds.length} weakCount={weakWordIds.length} onPlay={handlePlayReview} />
       </div>
     </div>
+    </>
   );
 }
