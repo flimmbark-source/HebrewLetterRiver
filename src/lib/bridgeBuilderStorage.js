@@ -313,5 +313,63 @@ export function markDeepScriptComplete(packId) {
   saveState(PACK_COMPLETION_KEY, all);
 }
 
+/**
+ * Mark a pack as mastered via the onboarding skill-check quiz.
+ * Uses the existing completion markers to fully credit all three game modes,
+ * then also stamps quizMastered so the UI can show a distinguishing badge.
+ */
+export function markPackQuizMastered(packId) {
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
+  entry.bridgeBuilderComplete = true;
+  entry.loosePlanksComplete = true;
+  entry.deepScriptComplete = true;
+  entry.quizMastered = true;
+  entry.quizMasteredAt = new Date().toISOString();
+  all[packId] = entry;
+  saveState(PACK_COMPLETION_KEY, all);
+}
+
+/**
+ * Mark a pack as quiz-attempted (badge only, no completion flags).
+ * Used when the player answered vocab questions in the skill check but
+ * scored below the mastery threshold — the pack was tested but not passed.
+ */
+export function markPackQuizBadge(packId) {
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
+  if (!entry.quizMastered) {
+    entry.quizMastered = true;
+    entry.quizMasteredAt = new Date().toISOString();
+    all[packId] = entry;
+    saveState(PACK_COMPLETION_KEY, all);
+  }
+}
+
+/**
+ * Bulk-introduce a set of words as quiz-credited.
+ * Moves each word from 'new' → 'meaning_taught' so the pack shows as started
+ * on the guided path and the words are eligible for spaced-repetition review.
+ * Words already past 'new' are left untouched.
+ *
+ * @param {string[]} wordIds
+ */
+export function markWordsQuizIntroduced(wordIds) {
+  const all = getAllWordProgress();
+  const now = new Date().toISOString();
+  let changed = false;
+  for (const wordId of wordIds) {
+    const wp = all[wordId] || createDefaultProgress(wordId);
+    if (wp.masteryStage === 'new') {
+      wp.meaningIntroduced = true;
+      wp.masteryStage = 'meaning_taught';
+      wp.lastSeenAt = now;
+      all[wordId] = wp;
+      changed = true;
+    }
+  }
+  if (changed) saveState(STORAGE_KEY, all);
+}
+
 // Future glossary hook: call getAllWordProgress() and join with bridgeBuilderWords
 // to render a full glossary view with mastery indicators.

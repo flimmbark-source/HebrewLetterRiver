@@ -21,33 +21,11 @@
  */
 
 // ─── Hebrew connector word reference ───────────────────────
-// (kept for the two-button generation system's distractor pool)
+// The canonical list lives in sentenceConnectors.js (single source of truth
+// for both distractor pools and in-game teaching UI). This re-export is
+// kept so any legacy import of `hebrewConnectors` still resolves.
 
-export const hebrewConnectors = [
-  { word: 'אני', transliteration: 'ani', meaning: 'I' },
-  { word: 'אתה', transliteration: 'atah', meaning: 'you (m)' },
-  { word: 'את', transliteration: 'at', meaning: 'you (f)' },
-  { word: 'הוא', transliteration: 'hu', meaning: 'he' },
-  { word: 'היא', transliteration: 'hi', meaning: 'she' },
-  { word: 'זה', transliteration: 'zeh', meaning: 'this' },
-  { word: 'של', transliteration: 'shel', meaning: 'of' },
-  { word: 'ה', transliteration: 'ha-', meaning: 'the' },
-  { word: 'טוב', transliteration: 'tov', meaning: 'good' },
-  { word: 'יש', transliteration: 'yesh', meaning: 'there is' },
-  { word: 'לא', transliteration: 'lo', meaning: 'no/not' },
-  { word: 'כן', transliteration: 'ken', meaning: 'yes' },
-  { word: 'עם', transliteration: 'im', meaning: 'with' },
-  { word: 'רוצה', transliteration: 'rotzeh', meaning: 'want' },
-  { word: 'אוהב', transliteration: 'ohev', meaning: 'love' },
-  { word: 'הנה', transliteration: 'hineh', meaning: 'here is' },
-  { word: 'ו', transliteration: 've-', meaning: 'and' },
-  { word: 'גר', transliteration: 'gar', meaning: 'lives' },
-  { word: 'ב', transliteration: 'b-', meaning: 'in' },
-  { word: 'אוכל', transliteration: 'ochel', meaning: 'eats' },
-  { word: 'שותה', transliteration: 'shoteh', meaning: 'drinks' },
-  { word: 'מאוד', transliteration: 'meod', meaning: 'very' },
-  { word: 'שלי', transliteration: 'sheli', meaning: 'my' },
-];
+export { hebrewSentenceConnectors as hebrewConnectors } from './sentenceConnectors.js';
 
 // ─── Curated sentence banks by pack ────────────────────────
 

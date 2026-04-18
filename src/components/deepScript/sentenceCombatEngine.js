@@ -108,6 +108,8 @@ export function createSentenceCombatState(encounter, runState) {
     // The two word pools for the buttons
     packWordPool: encounter.packWordPool || [],
     connectorWordPool: encounter.connectorWordPool || [],
+    // Metadata for the post-victory breakdown: native word → { transliteration, meaning }
+    packWordInfo: encounter.packWordInfo || {},
     languageId: encounter.languageId || 'hebrew',
     wrongGuesses: 0,
   };
