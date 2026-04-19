@@ -59,15 +59,16 @@ function buildLetterQuestions(languagePack, count = 3) {
 
 /** Build vocabulary questions: show target-language word → pick its meaning. */
 function buildVocabQuestions(words, count = 3) {
-  if (!words || words.length < 4) return [];
+  if (!words || words.length < 3) return [];
 
+  const distractorCount = Math.min(words.length - 1, 3);
   const pool = shuffleArray(words).slice(0, Math.max(count * 3, 12));
   const selected = pool.slice(0, count);
 
   return selected.map((correctWord) => {
     const distractors = shuffleArray(
       pool.filter((w) => w.id !== correctWord.id)
-    ).slice(0, 3);
+    ).slice(0, distractorCount);
     const choices = shuffleArray([correctWord, ...distractors]);
     const correctMeaning = correctWord.translation || correctWord.meaning || correctWord.id;
     return {

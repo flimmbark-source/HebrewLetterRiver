@@ -79,7 +79,6 @@ export const bridgeBuilderSections = [
       'helping_asking_02',
       'thinking_01',
       'social_actions_01',
-      'social_actions_02',
       'describing_people_01',
       'community_places_01',
       'activities_01',
