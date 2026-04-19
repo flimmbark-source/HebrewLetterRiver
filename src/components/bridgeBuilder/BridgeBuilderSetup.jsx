@@ -180,7 +180,7 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
           <span className="bbs-node-title">{pack.title}</span>
           <span className="bbs-node-support">{support}</span>
           {(comp.quizMastered || comp.sentenceReady) && (
-            <span className="bbs-quiz-badge" title="Covered in skill check quiz">✦ Quiz</span>
+            <span className="bbs-quiz-badge" title="Covered in skill check quiz">✦ Quiz Passed!</span>
           )}
         </div>
       </div>
