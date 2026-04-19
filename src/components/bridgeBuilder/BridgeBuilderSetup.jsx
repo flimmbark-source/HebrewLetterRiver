@@ -217,7 +217,7 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
             </div>
             <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
           </button>
-          {pack.wordIds.length >= 4 && (
+          {pack.wordIds.length >= 3 && (
             <button
               type="button"
               className={`bbs-method bbs-method--quiz`}
