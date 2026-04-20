@@ -2856,6 +2856,74 @@ body.dark-mode .module-card {
   border-color: var(--app-card-border) !important;
 }
 
+/* ─── Game Canvas: normalize dark mode to a clean slate palette ─────────── */
+body.dark-mode #game-container,
+body.dark-mode #play-area,
+body.dark-mode #choices-container {
+  background: linear-gradient(180deg, #0b1220 0%, #0f172a 100%) !important;
+}
+
+body.dark-mode #top-bar {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-bottom: 1px solid #334155 !important;
+}
+
+body.dark-mode #pause-button {
+  color: #cbd5e1 !important;
+  background: rgba(51, 65, 85, 0.45) !important;
+  border-color: #475569 !important;
+}
+
+body.dark-mode #level {
+  color: #60a5fa !important;
+}
+
+body.dark-mode #score {
+  color: #fbbf24 !important;
+}
+
+body.dark-mode #learn-overlay,
+body.dark-mode #bucket-info-overlay,
+body.dark-mode #accessibility-view,
+body.dark-mode #summary-tooltip,
+body.dark-mode .progress-card-small {
+  background: #111827 !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.45) !important;
+}
+
+body.dark-mode #learn-letter,
+body.dark-mode #bucket-info-symbol,
+body.dark-mode #close-accessibility-btn,
+body.dark-mode #accessibility-view h3 {
+  color: #60a5fa !important;
+}
+
+body.dark-mode #learn-name,
+body.dark-mode #bucket-info-name,
+body.dark-mode #accessibility-view,
+body.dark-mode #accessibility-view label {
+  color: #e2e8f0 !important;
+}
+
+body.dark-mode #learn-sound,
+body.dark-mode #bucket-info-sound {
+  color: #94a3b8 !important;
+}
+
+body.dark-mode #accessibility-view select,
+body.dark-mode #accessibility-view input[type='range'],
+body.dark-mode #accessibility-view input[type='checkbox'] {
+  accent-color: #60a5fa !important;
+}
+
+body.dark-mode #accessibility-view select {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+  border-color: #334155 !important;
+}
+
 #main-menu-view {
   min-height: 100vh;
 }
