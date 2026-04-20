@@ -277,6 +277,25 @@
   --app-card-border: var(--border-subtle);
   --app-card-glow: rgba(30, 164, 106, 0.06);
 
+  /* Nav / inputs / badges / popups — referenced by App.jsx, SettingsView,
+     ProfileEditorModal, main.css progress bars, etc. */
+  --app-nav-bg:         rgba(237, 245, 240, 0.92);
+  --app-nav-border:     rgba(100, 160, 130, 0.12);
+  --app-nav-shadow:     rgba(40, 100, 70, 0.08);
+  --app-active-text:    #ffffff;
+  --app-active-bg:      var(--brand-primary);
+  --app-hover-text:     var(--brand-primary);
+  --app-badge-bg:       var(--brand-primary);
+  --app-badge-text:     #ffffff;
+  --app-progress-bg:    var(--lr-green-100);
+  --app-progress-fill:  var(--brand-primary);
+  --app-error-bg:       var(--status-error-soft);
+  --app-error-text:     var(--lr-coral-600, #b13519);
+  --app-input-bg:       #ffffff;
+  --app-input-border:   rgba(100, 160, 130, 0.22);
+  --app-popup-bg:       rgba(250, 247, 240, 0.97);
+  --app-popup-border:   rgba(100, 160, 130, 0.15);
+
   --app-mode-river: var(--mode-river);
   --app-mode-river-bg: var(--mode-river-bg);
   --app-mode-river-surface: var(--mode-river-surface);
@@ -339,6 +358,26 @@ body.dark-mode, [data-theme="dark"] {
   --app-outline-variant:  rgba(255, 245, 220, 0.12);
   --app-card-glow:        rgba(74, 232, 152, 0.08);
   --app-primary-light:    var(--lr-green-300);
+
+  /* Nav / inputs / badges / popups — dark counterparts. Without these,
+     the floating nav bar, inputs, and selects fall back to transparent
+     in dark mode (makes dark mode look "extremely broken"). */
+  --app-nav-bg:         rgba(14, 18, 16, 0.94);
+  --app-nav-border:     rgba(74, 232, 152, 0.08);
+  --app-nav-shadow:     rgba(0, 0, 0, 0.5);
+  --app-active-text:    #0e1210;
+  --app-active-bg:      var(--lr-green-400);
+  --app-hover-text:     var(--lr-green-300);
+  --app-badge-bg:       var(--lr-green-400);
+  --app-badge-text:     #0e1210;
+  --app-progress-bg:    rgba(74, 232, 152, 0.12);
+  --app-progress-fill:  var(--lr-green-400);
+  --app-error-bg:       rgba(248, 113, 113, 0.12);
+  --app-error-text:     #f87171;
+  --app-input-bg:       #1e2824;
+  --app-input-border:   rgba(255, 245, 220, 0.14);
+  --app-popup-bg:       rgba(20, 28, 24, 0.97);
+  --app-popup-border:   rgba(74, 232, 152, 0.1);
 }
 
 /* =========================================================
