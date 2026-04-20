@@ -120,13 +120,12 @@ export default function SettingsView() {
       };
       localStorage.setItem('gameSettings', JSON.stringify(settings));
       window.dispatchEvent(new Event('gameSettingsChanged'));
-      if (darkMode) {
-        document.body.classList.add('dark-mode');
-        document.body.classList.remove('high-contrast');
-      } else {
-        document.body.classList.remove('dark-mode');
-        document.body.classList.remove('high-contrast');
-      }
+      const root = document.documentElement;
+      root.classList.toggle('dark-mode', darkMode);
+      document.body.classList.toggle('dark-mode', darkMode);
+      root.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+      document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+      document.body.classList.remove('high-contrast');
     } catch (e) {
       console.error('Failed to save game settings', e);
     }
@@ -251,7 +250,7 @@ export default function SettingsView() {
 
   return (
     <div
-      className="min-h-screen pb-36"
+      className="settings-view min-h-screen pb-36"
       style={{
         fontFamily: 'var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif)',
         color: 'var(--app-on-surface)'

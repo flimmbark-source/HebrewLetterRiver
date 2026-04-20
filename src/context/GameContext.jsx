@@ -404,7 +404,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
         id="game-container"
         className="relative flex h-full min-h-[calc(100vh-4rem)] flex-col sm:min-h-[600px]"
         style={{
-          background: 'linear-gradient(180deg, #fff9eb 0%, #ffe5bd 100%)',
+          background: 'var(--app-bg-gradient)',
           maxHeight: 'calc(100vh - 2rem)',
         }}
       >
@@ -412,17 +412,17 @@ function GameCanvas({ fontClass, loadedSettings }) {
           <div
             id="top-bar"
             className="relative text-sm shadow-lg sm:text-base"
-            style={{ background: 'rgba(255, 229, 201, 0.9)' }}
+            style={{ background: 'var(--app-surface-high)' }}
           >
             <button
               id="pause-button"
               className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-md px-2 py-1 text-xl font-bold transition hover:opacity-80"
               style={{
-                color: '#b07737',
+                color: 'var(--app-primary)',
                 minWidth: 'auto',
                 minHeight: 'auto',
-                background: 'rgba(235, 179, 105, 0.1)',
-                border: '2px solid rgba(235, 179, 105, 0.4)'
+                background: 'var(--app-primary-container)',
+                border: '1px solid var(--app-card-border)'
               }}
               aria-label="Pause game"
             >
@@ -430,26 +430,26 @@ function GameCanvas({ fontClass, loadedSettings }) {
             </button>
             <div className="top-bar-content flex w-full flex-wrap items-center justify-center gap-3 sm:gap-6">
               <div className="inline-flex items-center gap-2 text-center">
-                <span className="font-semibold" style={{ color: '#6c3b14' }}>
+                <span className="font-semibold" style={{ color: 'var(--app-on-surface-variant)' }}>
                   {t('game.labels.level')}
                 </span>
                 <span
                   id="level"
                   className="text-2xl font-bold"
-                  style={{ color: '#ff9247' }}
+                  style={{ color: 'var(--app-primary)' }}
                 >
                   1
                 </span>
               </div>
               <div className="score-lives-group flex items-center gap-3 text-center">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold" style={{ color: '#6c3b14' }}>
+                  <span className="font-semibold" style={{ color: 'var(--app-on-surface-variant)' }}>
                     {t('game.labels.score')}
                   </span>
                   <span
                     id="score"
                     className="text-2xl font-bold"
-                    style={{ color: '#ffce4a' }}
+                    style={{ color: 'var(--app-secondary)' }}
                   >
                     0
                   </span>
@@ -506,7 +506,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
           style={{
             touchAction: 'none',  // 👈 blocks scroll/pinch on this area
             background:
-              'linear-gradient(180deg, rgba(255, 218, 168, 0.3), rgba(255, 229, 201, 0.5))',
+              'var(--app-bg-gradient)',
             maxHeight: 'calc(100vh - 12rem)',
           }}
         >
@@ -514,28 +514,28 @@ function GameCanvas({ fontClass, loadedSettings }) {
             id="learn-overlay"
             className="absolute left-1/2 top-4 z-20 flex -translate-x-1/2 items-center gap-4 rounded-2xl px-6 py-3 shadow-lg"
             style={{
-              border: '2px solid rgba(235, 179, 105, 0.95)',
+              border: '1px solid var(--app-card-border)',
               background:
-                'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%)',
+                'var(--app-card-bg)',
               boxShadow:
-                '0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6)',
+                'var(--shadow-md)',
             }}
           >
             <div
               id="learn-letter"
               className={`text-6xl font-bold ${fontClass}`}
-              style={{ color: '#ff9247' }}
+              style={{ color: 'var(--app-primary)' }}
             />
             <div className="flex flex-col text-center">
               <div
                 id="learn-name"
                 className="text-2xl font-semibold"
-                style={{ color: '#4a2208' }}
+                style={{ color: 'var(--app-on-surface)' }}
               />
               <div
                 id="learn-sound"
                 className="text-lg"
-                style={{ color: '#6c3b14' }}
+                style={{ color: 'var(--app-on-surface-variant)' }}
               />
             </div>
           </div>
@@ -547,9 +547,9 @@ function GameCanvas({ fontClass, loadedSettings }) {
             style={{
               border: '3px solid rgba(235, 179, 105, 0.95)',
               background:
-                'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%)',
+                'var(--app-card-bg)',
               boxShadow:
-                '0 4px 0 rgba(214, 140, 64, 1), 0 8px 20px rgba(214, 140, 64, 0.7)',
+                'var(--shadow-lg)',
               minWidth: '300px',
             }}
           >
@@ -557,18 +557,18 @@ function GameCanvas({ fontClass, loadedSettings }) {
               <div
                 id="bucket-info-symbol"
                 className={`text-7xl font-bold ${fontClass}`}
-                style={{ color: '#ff9247' }}
+                style={{ color: 'var(--app-primary)' }}
               />
               <div className="flex flex-col text-left">
                 <div
                   id="bucket-info-name"
                   className="text-2xl font-semibold"
-                  style={{ color: '#4a2208' }}
+                  style={{ color: 'var(--app-on-surface)' }}
                 />
                 <div
                   id="bucket-info-sound"
                   className="text-lg"
-                  style={{ color: '#6c3b14' }}
+                  style={{ color: 'var(--app-on-surface-variant)' }}
                 />
               </div>
             </div>
@@ -587,13 +587,13 @@ function GameCanvas({ fontClass, loadedSettings }) {
         <div
           id="choices-container"
           className="grid w-full flex-shrink-0 grid-cols-2 gap-3 px-4 pb-6 pt-4 sm:grid-cols-3 sm:px-6 md:grid-cols-4 lg:grid-cols-5"
-          style={{ background: 'linear-gradient(180deg, #fff9eb 0%, #ffe5bd 100%)' }}
+          style={{ background: 'var(--app-bg-gradient)' }}
         />
 
         <div
   id="modal"
   className="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto pt-10 p-4 sm:p-6"
-  style={{ background: 'rgba(6, 78, 59, 0.85)' }}
+  style={{ background: 'rgba(0, 0, 0, 0.55)' }}
   onClick={(e) => {
     // Only trigger when clicking the dark overlay, not the inner content
     if (e.target === e.currentTarget) {
@@ -752,10 +752,10 @@ function GameCanvas({ fontClass, loadedSettings }) {
                         style={{
                           border: '2px solid #5aa838',
                           background:
-                            'linear-gradient(135deg, #e8ffd8 0%, #7bd74f 100%)',
+                            'linear-gradient(135deg, var(--app-primary-light) 0%, var(--app-primary) 100%)',
                           color: '#ffffff',
                           boxShadow:
-                            '0 6px 0 #5aa838, 0 8px 20px rgba(90, 168, 56, 0.3)',
+                            'var(--shadow-cta)',
                           textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
                         }}
                       >
@@ -875,10 +875,10 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 style={{
                   border: 0,
                   background:
-                    'radial-gradient(circle at 20% 0, #fff7cf 0, #ffd96d 45%, #e79b26 100%)',
-                  color: '#4a1a06',
+                    'linear-gradient(135deg, var(--app-secondary-container) 0%, var(--app-secondary) 100%)',
+                  color: 'var(--app-on-primary)',
                   boxShadow:
-                    '0 3px 0 rgba(176, 104, 38, 1), 0 6px 10px rgba(176, 104, 38, 0.7)',
+                    'var(--shadow-sm)',
                 }}
               >
                 {t('game.controls.install')}
@@ -892,37 +892,37 @@ function GameCanvas({ fontClass, loadedSettings }) {
           id="accessibility-view"
           className="hidden absolute right-6 top-28 z-40 w-72 rounded-2xl p-4 text-left shadow-xl overflow-y-auto max-h-[80vh]"
           style={{
-            border: '2px solid rgba(235, 179, 105, 0.95)',
-            background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%)',
-            boxShadow: '0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6)',
+            border: '1px solid var(--app-card-border)',
+            background: 'var(--app-card-bg)',
+            boxShadow: 'var(--shadow-md)',
           }}
         >
           <button
             id="close-accessibility-btn"
             className="absolute right-3 top-3 text-2xl transition"
-            style={{ color: '#b07737' }}
+            style={{ color: 'var(--app-primary)' }}
           >
             ×
           </button>
           <h3
             className="mb-4 text-center text-lg font-semibold"
-            style={{ color: '#ff9247' }}
+            style={{ color: 'var(--app-primary)' }}
           >
             {t('game.controls.accessibility')}
           </h3>
           <div
             className="space-y-4 text-sm"
-            style={{ color: '#4a2208' }}
+            style={{ color: 'var(--app-on-surface)' }}
           >
             <div
               className="border-b pb-3"
-              style={{ borderColor: '#e49b5a' }}
+              style={{ borderColor: 'var(--app-input-border)' }}
             >
               <div className="flex items-center justify-between mb-2">
                 <label
                   htmlFor="game-font-select"
                   className="text-sm"
-                  style={{ color: '#4a2208' }}
+                  style={{ color: 'var(--app-on-surface)' }}
                 >
                   <span
                     className="cursor-pointer hover:text-amber-700"
@@ -933,14 +933,14 @@ function GameCanvas({ fontClass, loadedSettings }) {
                     Game Font
                   </span>
                 </label>
-                <label className="flex items-center gap-2 text-xs" style={{ color: '#4a2208' }}>
+                <label className="flex items-center gap-2 text-xs" style={{ color: 'var(--app-on-surface)' }}>
                   <span>Shuffle</span>
                   <input
                     id="font-shuffle-toggle"
                     type="checkbox"
                     defaultChecked={loadedSettings.fontShuffle}
                     className="h-4 w-4 rounded border-2 text-orange-600 focus:ring-orange-500"
-                    style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+                    style={{ borderColor: 'var(--app-input-border)', accentColor: 'var(--app-primary)' }}
                   />
                 </label>
               </div>
@@ -949,9 +949,9 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 defaultValue={loadedSettings.gameFont}
                 className="w-full rounded-lg border px-2 py-1 text-xs"
                 style={{
-                  borderColor: '#e49b5a',
-                  background: '#fff5dd',
-                  color: '#4a2208',
+                  borderColor: 'var(--app-input-border)',
+                  background: 'var(--app-input-bg)',
+                  color: 'var(--app-on-surface)',
                 }}
               >
                 <option value="default">Default</option>
@@ -976,7 +976,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 type="checkbox"
                 defaultChecked={loadedSettings.showIntroductions}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
-                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+                style={{ borderColor: 'var(--app-input-border)', accentColor: 'var(--app-primary)' }}
               />
             </label>
 
@@ -994,7 +994,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 type="checkbox"
                 defaultChecked={loadedSettings.darkMode ?? loadedSettings.highContrast}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
-                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+                style={{ borderColor: 'var(--app-input-border)', accentColor: 'var(--app-primary)' }}
               />
             </label>
 
@@ -1012,7 +1012,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 type="checkbox"
                 defaultChecked={loadedSettings.randomLetters}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
-                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+                style={{ borderColor: 'var(--app-input-border)', accentColor: 'var(--app-primary)' }}
               />
             </label>
 
@@ -1030,7 +1030,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 type="checkbox"
                 defaultChecked={loadedSettings.reducedMotion}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
-                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+                style={{ borderColor: 'var(--app-input-border)', accentColor: 'var(--app-primary)' }}
               />
             </label>
 
@@ -1048,7 +1048,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 type="checkbox"
                 defaultChecked={loadedSettings.slowRiver}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
-                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+                style={{ borderColor: 'var(--app-input-border)', accentColor: 'var(--app-primary)' }}
               />
             </label>
 
@@ -1066,7 +1066,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 type="checkbox"
                 defaultChecked={loadedSettings.clickMode}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
-                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+                style={{ borderColor: 'var(--app-input-border)', accentColor: 'var(--app-primary)' }}
               />
             </label>
 
@@ -1084,7 +1084,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 type="checkbox"
                 defaultChecked={loadedSettings.associationMode}
                 className="h-5 w-5 rounded border-2 text-orange-600 focus:ring-orange-500"
-                style={{ borderColor: '#e49b5a', accentColor: '#ff9247' }}
+                style={{ borderColor: 'var(--app-input-border)', accentColor: 'var(--app-primary)' }}
               />
             </label>
 
@@ -1092,7 +1092,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
               <label
                 htmlFor="game-speed-slider"
                 className="text-sm"
-                style={{ color: '#4a2208' }}
+                style={{ color: 'var(--app-on-surface)' }}
               >
                 <span
                   className="cursor-pointer hover:text-amber-700"
@@ -1113,7 +1113,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                 max="24"
                 defaultValue={loadedSettings.gameSpeed}
                 className="mt-2 w-full"
-                style={{ accentColor: '#ff9247' }}
+                style={{ accentColor: 'var(--app-primary)' }}
               />
             </div>
           </div>
@@ -1132,11 +1132,11 @@ function GameCanvas({ fontClass, loadedSettings }) {
             <div
               className="progress-card-small p-4 shadow-lg pointer-events-auto"
               style={{
-                border: '2px solid rgba(235, 179, 105, 0.95)',
+                border: '1px solid var(--app-card-border)',
                 boxShadow:
-                  '0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6)',
-                background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%)',
-                color: '#4a2208',
+                  'var(--shadow-md)',
+                background: 'var(--app-card-bg)',
+                color: 'var(--app-on-surface)',
               }}
               onMouseEnter={() => setShowInfoPopup(true)}
               onMouseLeave={() => setShowInfoPopup(false)}
@@ -1154,11 +1154,11 @@ function GameCanvas({ fontClass, loadedSettings }) {
           id="summary-tooltip"
           className="pointer-events-none absolute z-50 hidden rounded-xl px-3 py-2 text-center text-sm shadow-lg"
           style={{
-            border: '2px solid rgba(235, 179, 105, 0.95)',
-            background: 'linear-gradient(180deg, #fff5dd 0%, #ffe5c2 100%)',
-            color: '#4a2208',
+            border: '1px solid var(--app-card-border)',
+            background: 'var(--app-card-bg)',
+            color: 'var(--app-on-surface)',
             boxShadow:
-              '0 4px 0 rgba(214, 140, 64, 1), 0 8px 12px rgba(214, 140, 64, 0.6)',
+              'var(--shadow-md)',
           }}
         />
         <div
@@ -1171,7 +1171,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
         <div
           id="pause-modal"
           className="fixed inset-0 z-40 hidden flex items-center justify-center p-4"
-          style={{ background: 'rgba(6, 78, 59, 0.95)' }}
+          style={{ background: 'rgba(0, 0, 0, 0.68)' }}
         >
           <div
             className="relative w-full max-w-md rounded-3xl shadow-2xl"
@@ -1203,10 +1203,10 @@ function GameCanvas({ fontClass, loadedSettings }) {
                     style={{
                       border: '2px solid #5aa838',
                       background:
-                        'linear-gradient(135deg, #e8ffd8 0%, #7bd74f 100%)',
+                        'linear-gradient(135deg, var(--app-primary-light) 0%, var(--app-primary) 100%)',
                       color: '#ffffff',
                       boxShadow:
-                        '0 6px 0 #5aa838, 0 8px 20px rgba(90, 168, 56, 0.3)',
+                        'var(--shadow-cta)',
                       textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
                     }}
                   >
@@ -1218,10 +1218,10 @@ function GameCanvas({ fontClass, loadedSettings }) {
                     style={{
                       border: '2px solid #d97706',
                       background:
-                        'linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%)',
+                        'linear-gradient(135deg, var(--app-secondary-container) 0%, var(--app-secondary) 100%)',
                       color: '#ffffff',
                       boxShadow:
-                        '0 6px 0 #d97706, 0 8px 20px rgba(217, 119, 6, 0.3)',
+                        'var(--shadow-cta)',
                       textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
                     }}
                   >
