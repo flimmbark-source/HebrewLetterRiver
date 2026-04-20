@@ -378,6 +378,29 @@ body.dark-mode, [data-theme="dark"] {
   --app-input-border:   rgba(255, 245, 220, 0.14);
   --app-popup-bg:       rgba(20, 28, 24, 0.97);
   --app-popup-border:   rgba(74, 232, 152, 0.1);
+
+  /* Game mode surfaces in dark mode.
+     Keep hues recognizable, but shift surfaces to deep tones so
+     light foreground text remains readable. */
+  --mode-river:         #60d9a0;
+  --mode-river-bg:      rgba(74, 232, 152, 0.18);
+  --mode-river-surface: linear-gradient(135deg, #173428 0%, #1c3f2f 100%);
+
+  --mode-bridge:        #f2c067;
+  --mode-bridge-bg:     rgba(245, 185, 74, 0.20);
+  --mode-bridge-surface:linear-gradient(135deg, #3a2b14 0%, #4a3518 100%);
+
+  --mode-deep:          #b996f3;
+  --mode-deep-bg:       rgba(185, 150, 243, 0.18);
+  --mode-deep-surface:  linear-gradient(135deg, #2c233f 0%, #35284a 100%);
+
+  --mode-planks:        #9dbcf9;
+  --mode-planks-bg:     rgba(141, 168, 232, 0.18);
+  --mode-planks-surface:linear-gradient(135deg, #1e2b40 0%, #263551 100%);
+
+  --mode-vocab:         #73d7e6;
+  --mode-vocab-bg:      rgba(74, 194, 221, 0.18);
+  --mode-vocab-surface: linear-gradient(135deg, #15313a 0%, #1d3e4a 100%);
 }
 
 /* =========================================================
