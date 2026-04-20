@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
-import { getPacksBySection } from '../../data/bridgeBuilderPacks.js';
+import { getPacksBySection, getPackById } from '../../data/bridgeBuilderPacks.js';
 import {
   getAllWordProgress,
   getPackProgress,
@@ -554,7 +554,16 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
       setPackQuizTarget(null);
       if (passed) setExpandedPack(null);
     } else {
-      setQuizResult({ type: 'global', correctWordCount: correctWordIds.length, sentenceReadyPackIds });
+      const sentenceReadyPackTitles = sentenceReadyPackIds
+        .map((id) => getPackById(id)?.title)
+        .filter(Boolean);
+      setQuizResult({
+        type: 'global',
+        correctWordCount: correctWordIds.length,
+        testedWordCount: evidence?.length ?? 0,
+        sentenceReadyPackIds,
+        sentenceReadyPackTitles,
+      });
     }
 
     emit('analytics:bridge_setup', {
@@ -689,9 +698,9 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                       {quizResult.correctWordCount > 0
                         ? `${quizResult.correctWordCount} word${quizResult.correctWordCount !== 1 ? 's' : ''} confirmed from your skill check`
                         : 'Skill check complete — keep practicing to confirm more words!'}
-                      {quizResult.sentenceReadyPackIds?.length > 0 && (
+                      {quizResult.sentenceReadyPackTitles?.length > 0 && (
                         <span className="bbs-quiz-result-detail">
-                          {` · ${quizResult.sentenceReadyPackIds.length} pack${quizResult.sentenceReadyPackIds.length !== 1 ? 's' : ''} now sentence-ready`}
+                          {` · Ready for sentence practice: ${quizResult.sentenceReadyPackTitles.join(', ')}`}
                         </span>
                       )}
                     </>

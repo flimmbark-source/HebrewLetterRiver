@@ -185,26 +185,41 @@ export function getPackSentenceReadiness(pack, allWordProgress, allCompletions) 
  * Get sentence readiness for a single sentence based on how many of its
  * words the player currently knows.
  *
- * @param {{ words?: Array<{ wordId?: string }> }} sentence
+ * Guided readiness: ≥80% of words known AND at most 1 unknown "target" word.
+ *   A target word is one whose role in the sentence is primary (we treat every
+ *   word as a target unless its role is explicitly a particle/function word).
+ * Free-reading readiness: ≥95% of words known.
+ *
+ * @param {{ words?: Array<{ wordId?: string, role?: string }> }} sentence
  * @param {{ [wordId: string]: Object }} allWordProgress
- * @returns {{ knownWordCount, totalWordCount, coveragePercent, unknownWordIds, isGuidedReady, isFreeReadingReady }}
+ * @returns {{ knownWordCount, totalWordCount, coveragePercent, unknownWordIds, unknownTargetWordIds, isGuidedReady, isFreeReadingReady }}
  */
 export function getSentenceWordReadiness(sentence, allWordProgress) {
-  const wordIds = (sentence?.words ?? []).map((w) => w.wordId).filter(Boolean);
+  const words = sentence?.words ?? [];
+  const wordIds = words.map((w) => w.wordId).filter(Boolean);
   if (wordIds.length === 0) {
     return {
       knownWordCount: 0,
       totalWordCount: 0,
       coveragePercent: 100,
       unknownWordIds: [],
+      unknownTargetWordIds: [],
       isGuidedReady: true,
       isFreeReadingReady: true,
     };
   }
 
+  const isFunctionRole = (role) =>
+    role === 'particle' || role === 'function' || role === 'filler';
+
   const knownIds = wordIds.filter((wId) => {
     const wp = allWordProgress?.[wId];
     return wp && (wp.quizKnown || wp.masteryStage !== 'new');
+  });
+  const unknownWordIds = wordIds.filter((id) => !knownIds.includes(id));
+  const unknownTargetWordIds = unknownWordIds.filter((id) => {
+    const w = words.find((entry) => entry.wordId === id);
+    return !isFunctionRole(w?.role);
   });
 
   const coveragePercent = (knownIds.length / wordIds.length) * 100;
@@ -212,8 +227,15 @@ export function getSentenceWordReadiness(sentence, allWordProgress) {
     knownWordCount: knownIds.length,
     totalWordCount: wordIds.length,
     coveragePercent,
-    unknownWordIds: wordIds.filter((id) => !knownIds.includes(id)),
-    isGuidedReady: coveragePercent >= 80,
+    unknownWordIds,
+    unknownTargetWordIds,
+    isGuidedReady: coveragePercent >= 80 && unknownTargetWordIds.length <= 1,
     isFreeReadingReady: coveragePercent >= 95,
   };
 }
+
+/**
+ * Alias kept for callers that want a single "is this sentence ready?" helper.
+ * Future adaptive logic can hook in here (e.g. weight by recency, skill gap).
+ */
+export const getSentenceReadiness = getSentenceWordReadiness;
