@@ -2856,6 +2856,36 @@ body.dark-mode .module-card {
   border-color: var(--app-card-border) !important;
 }
 
+/* Settings view: force consistent dark containers + text tokens. */
+body.dark-mode .settings-view {
+  color: var(--app-on-surface) !important;
+}
+
+body.dark-mode .settings-view .stable-card {
+  background: var(--app-card-bg) !important;
+  border-color: var(--app-card-border) !important;
+}
+
+body.dark-mode .settings-view select,
+body.dark-mode .settings-view input[type='range'],
+body.dark-mode .settings-view input[type='checkbox'] {
+  accent-color: var(--app-primary) !important;
+}
+
+body.dark-mode .settings-view select {
+  background: var(--app-input-bg) !important;
+  color: var(--app-on-surface) !important;
+  border-color: var(--app-input-border) !important;
+}
+
+body.dark-mode .settings-view [style*='var(--app-muted)'] {
+  color: var(--app-muted) !important;
+}
+
+body.dark-mode .settings-view [style*='var(--app-on-surface)'] {
+  color: var(--app-on-surface) !important;
+}
+
 /* ─── Game Canvas: normalize dark mode to a clean slate palette ─────────── */
 body.dark-mode #game-container,
 body.dark-mode #play-area,

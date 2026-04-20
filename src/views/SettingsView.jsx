@@ -250,7 +250,7 @@ export default function SettingsView() {
 
   return (
     <div
-      className="min-h-screen pb-36"
+      className="settings-view min-h-screen pb-36"
       style={{
         fontFamily: 'var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif)',
         color: 'var(--app-on-surface)'
