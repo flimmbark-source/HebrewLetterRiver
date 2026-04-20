@@ -537,10 +537,11 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     onPlay({ sessionType: 'due_review', packId: null, selectedWordIds: reviewIds, gameMode: 'bridge_builder', entryPoint: 'review_due' });
   }, [onPlay, dueReviewWordIds, weakWordIds]);
 
-  const handleSkillCheckComplete = useCallback(({ breakdown, evidence }) => {
+  const handleSkillCheckComplete = useCallback(({ score, total, breakdown, evidence }) => {
     const { correctWordIds, sentenceReadyPackIds } = applyQuizMastery(evidence, breakdown);
     setProgressRevision((r) => r + 1);
     setShowSkillCheck(false);
+    const passed = total > 0 && score >= Math.ceil(total * 0.8);
 
     if (packQuizTarget) {
       setQuizResult({
@@ -551,6 +552,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
         sentenceReady: sentenceReadyPackIds.includes(packQuizTarget.id),
       });
       setPackQuizTarget(null);
+      if (passed) setExpandedPack(null);
     } else {
       setQuizResult({ type: 'global', correctWordCount: correctWordIds.length, sentenceReadyPackIds });
     }

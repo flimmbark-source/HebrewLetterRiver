@@ -285,6 +285,12 @@ function Shell() {
   // Disable play button during entire firstTime tutorial to prevent accidental clicks
   const isPlayDisabled = currentTutorial?.id === 'firstTime';
 
+  // Play tab is considered active when the user is inside a game route
+  // (Letter River, Bridge/Vocab Builder, Deep Script), matching the active
+  // state the other NavLinks render via their own routes.
+  const playRoutes = ['/read', '/bridge', '/deep-script'];
+  const isPlayActive = playRoutes.includes(location.pathname);
+
   const handlePlay = React.useCallback(
     (event) => {
       event.preventDefault();
@@ -347,8 +353,8 @@ function Shell() {
               type="button"
               onClick={handlePlay}
               disabled={isPlayDisabled}
-              className="nav-item flex flex-col items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ color: 'var(--app-muted)' }}
+              className={`nav-item flex flex-col items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-50 ${isPlayActive ? 'nav-item-active' : ''}`}
+              style={isPlayActive ? {} : { color: 'var(--app-muted)' }}
             >
               <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>videogame_asset</span>
               <span>Play</span>
