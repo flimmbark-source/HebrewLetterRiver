@@ -236,12 +236,20 @@ function Shell() {
   const { appFontClass } = useFontSettings();
 
   React.useEffect(() => {
+    const applyGlobalTheme = (darkModeEnabled) => {
+      const root = document.documentElement;
+      root.classList.toggle('dark-mode', darkModeEnabled);
+      document.body.classList.toggle('dark-mode', darkModeEnabled);
+      root.setAttribute('data-theme', darkModeEnabled ? 'dark' : 'light');
+      document.body.setAttribute('data-theme', darkModeEnabled ? 'dark' : 'light');
+    };
+
     const applyThemeFromSettings = () => {
       try {
         const saved = localStorage.getItem('gameSettings');
         const parsed = saved ? JSON.parse(saved) : {};
         const darkModeEnabled = !!(parsed.darkMode ?? parsed.highContrast ?? false);
-        document.body.classList.toggle('dark-mode', darkModeEnabled);
+        applyGlobalTheme(darkModeEnabled);
       } catch (error) {
         console.error('Failed to apply theme from game settings', error);
       }

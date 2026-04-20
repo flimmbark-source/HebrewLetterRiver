@@ -2306,6 +2306,16 @@ function startClickMode(itemEl, payload) {
   }
 
   // Load settings from localStorage on game init
+  function applyGlobalTheme(enabled) {
+    const isDark = !!enabled;
+    const root = document.documentElement;
+    root.classList.toggle('dark-mode', isDark);
+    document.body.classList.toggle('dark-mode', isDark);
+    root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    document.body.classList.remove('high-contrast');
+  }
+
   function loadSettingsFromLocalStorage() {
     try {
       const saved = localStorage.getItem('gameSettings');
@@ -2338,12 +2348,7 @@ function startClickMode(itemEl, payload) {
 
         // Apply dark mode
         const isDark = settings.darkMode ?? settings.highContrast ?? false;
-        if (isDark) {
-          document.body.classList.add('dark-mode');
-        } else {
-          document.body.classList.remove('dark-mode');
-        }
-        document.body.classList.remove('high-contrast');
+        applyGlobalTheme(isDark);
 
         // Refresh drop zones to update click mode handlers
         if (dropZones && dropZones.length > 0) {
@@ -2424,8 +2429,7 @@ accessibilityBtn?.addEventListener('click', () => {
 
   closeAccessibilityBtn?.addEventListener('click', () => accessibilityView.classList.add('hidden'));
   highContrastToggle?.addEventListener('change', (e) => {
-    document.body.classList.toggle('dark-mode', e.target.checked);
-    document.body.classList.remove('high-contrast');
+    applyGlobalTheme(e.target.checked);
     syncSettingsToLocalStorage();
   });
   randomLettersToggle?.addEventListener('change', (e) => {
