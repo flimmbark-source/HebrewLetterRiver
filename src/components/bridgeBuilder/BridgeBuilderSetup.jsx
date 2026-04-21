@@ -408,6 +408,151 @@ function PackRow({ pack, progress, unlocked, completion, modeOverride, onDotClic
 }
 
 /* ═══════════════════════════════════════════════════════════
+   SectionHubCard — compact default card for a section
+   ═══════════════════════════════════════════════════════════ */
+// Replaces the full winding path as the Guided tab's default layout.
+// The old SectionBlock + PathNode are kept intact and rendered below
+// when the player taps "Open section" so the detailed path, pack
+// chooser, and quiz launch still work unchanged.
+
+const HUB_STATUS_DOT_MODIFIER = {
+  new: 'new',
+  started: 'progress',
+  introduced: 'progress',
+  learned: 'progress',
+  mastered: 'completed',
+  review: 'progress',
+  locked: 'locked',
+};
+
+function SectionHubCard({
+  sectionModel,
+  isExpanded,
+  onToggleExpand,
+  onLaunchRecommended,
+  onPreviewPackClick,
+}) {
+  const {
+    title,
+    description,
+    icon,
+    accent,
+    isUnlocked,
+    totalPacks,
+    masteredCount,
+    previewPacks,
+    remainingCount,
+    progressPercent,
+    recommendedPack,
+    nextUnlockLabel,
+  } = sectionModel;
+
+  const progressLabel = isUnlocked
+    ? `${masteredCount} of ${totalPacks} pack${totalPacks === 1 ? '' : 's'} mastered`
+    : nextUnlockLabel || `${totalPacks} pack${totalPacks === 1 ? '' : 's'} locked`;
+
+  const showContinue = isUnlocked && !!recommendedPack;
+
+  return (
+    <div
+      className={`bbs-hub bbs-hub--${accent} ${!isUnlocked ? 'bbs-hub--locked' : ''} ${isExpanded ? 'bbs-hub--expanded' : ''}`}
+    >
+      {/* Header */}
+      <div className="bbs-hub-header">
+        <div className={`bbs-hub-icon bbs-hub-icon--${accent}`} aria-hidden="true">
+          <span className="material-symbols-outlined">{icon}</span>
+        </div>
+        <div className="bbs-hub-head-text">
+          <div className="bbs-hub-head-top">
+            <h3 className="bbs-hub-title">{title}</h3>
+            <span className={`bbs-hub-count bbs-hub-count--${accent}`}>
+              {isUnlocked ? `${masteredCount}/${totalPacks}` : `${totalPacks} packs`}
+            </span>
+          </div>
+          <p className="bbs-hub-desc">{description}</p>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="bbs-hub-bar" aria-hidden="true">
+        <div className="bbs-hub-track">
+          <div
+            className={`bbs-hub-fill bbs-hub-fill--${accent}`}
+            style={{ width: `${Math.max(0, Math.min(100, progressPercent))}%` }}
+          />
+        </div>
+        <span className="bbs-hub-progress-label">{progressLabel}</span>
+      </div>
+
+      {/* Continue CTA — recommended pack */}
+      {showContinue ? (
+        <button
+          type="button"
+          className={`bbs-hub-cta bbs-hub-cta--${accent}`}
+          onClick={onLaunchRecommended}
+          aria-label={`${recommendedPack.ctaLabel} ${recommendedPack.title}`}
+        >
+          <span className="bbs-hub-cta-body">
+            <span className="bbs-hub-cta-eyebrow">{recommendedPack.ctaLabel}</span>
+            <span className="bbs-hub-cta-title">{recommendedPack.title}</span>
+            <span className="bbs-hub-cta-meta">{recommendedPack.progressLabel}</span>
+          </span>
+          <span className="bbs-hub-cta-chev" aria-hidden="true">
+            <span className="material-symbols-outlined">arrow_forward</span>
+          </span>
+        </button>
+      ) : (
+        !isUnlocked && (
+          <div className="bbs-hub-locked-note">
+            <span className="material-symbols-outlined" aria-hidden="true">lock</span>
+            <span>{nextUnlockLabel || 'Complete the previous section to unlock'}</span>
+          </div>
+        )
+      )}
+
+      {/* Preview pack chips — compact, minimal metadata */}
+      {!isExpanded && previewPacks.length > 0 && (
+        <div className="bbs-hub-preview" role="list" aria-label={`${title} preview`}>
+          {previewPacks.map((packModel) => (
+            <button
+              key={packModel.id}
+              type="button"
+              role="listitem"
+              className={`bbs-hub-chip bbs-hub-chip--${HUB_STATUS_DOT_MODIFIER[packModel.status] || 'new'}`}
+              onClick={() => onPreviewPackClick(packModel)}
+              disabled={packModel.status === 'locked'}
+              aria-label={`${packModel.title} — ${packModel.progressLabel}`}
+              title={packModel.progressLabel}
+            >
+              <span className={`bbs-hub-chip-dot bbs-hub-chip-dot--${HUB_STATUS_DOT_MODIFIER[packModel.status] || 'new'}`} />
+              <span className="bbs-hub-chip-title">{packModel.title}</span>
+            </button>
+          ))}
+          {remainingCount > 0 && (
+            <span className="bbs-hub-more">+{remainingCount} more</span>
+          )}
+        </div>
+      )}
+
+      {/* Open / Close toggle */}
+      {isUnlocked && totalPacks > 0 && (
+        <button
+          type="button"
+          className="bbs-hub-toggle"
+          onClick={onToggleExpand}
+          aria-expanded={isExpanded}
+        >
+          <span>{isExpanded ? 'Close section' : 'Open section'}</span>
+          <span className="material-symbols-outlined" aria-hidden="true">
+            {isExpanded ? 'expand_less' : 'expand_more'}
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    TopActionStrip — compact "what to do next" area above tabs
    ═══════════════════════════════════════════════════════════ */
 // Additive layer: sits above the existing Guided/Browse/Advanced tabs
@@ -533,6 +678,10 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const [sortBy, setSortBy] = useState('recommended');
   const [activeSubview, setActiveSubview] = useState(null);
   const [expandedPack, setExpandedPack] = useState(null);
+  // Which section hubs are currently expanded to show the detailed
+  // winding path. Multiple can be open at once; default is all closed
+  // so the Guided tab fits on one screen.
+  const [expandedSections, setExpandedSections] = useState(() => new Set());
   const [modeOverrides, setModeOverrides] = useState({});
   const [lastMethods, setLastMethods] = useState(() => getLastStudyMethods());
   // Incremented after quiz mastery is applied to force re-read of storage
@@ -720,6 +869,47 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     setShowSkillCheck(true);
   }, []);
 
+  const handleToggleSection = useCallback((sectionId) => {
+    setExpandedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) next.delete(sectionId);
+      else next.add(sectionId);
+      emit('analytics:bridge_setup', {
+        event: next.has(sectionId) ? 'section_hub_open' : 'section_hub_close',
+        sectionId,
+      });
+      return next;
+    });
+  }, []);
+
+  // Launch the recommended pack for a section directly from its hub,
+  // using the player's last study method so the UX matches the path
+  // node's chooser.
+  const handleLaunchRecommendedForSection = useCallback((sectionModel) => {
+    const packModel = sectionModel.recommendedPack;
+    if (!packModel) return;
+    const method = lastMethods[packModel.id] || 'vocab';
+    emit('analytics:bridge_setup', { event: 'section_hub_continue', sectionId: sectionModel.id, packId: packModel.id, method });
+    handleLaunchPackMethod(packModel.pack, method);
+  }, [lastMethods, handleLaunchPackMethod]);
+
+  // Clicking a preview chip in the hub: expand the section and open
+  // that pack's chooser inline in the detailed path below.
+  const handlePreviewPackClick = useCallback((sectionId, packModel) => {
+    if (packModel.status === 'locked') return;
+    setExpandedSections((prev) => {
+      const next = new Set(prev);
+      next.add(sectionId);
+      return next;
+    });
+    setExpandedPack(packModel.id);
+    emit('analytics:bridge_setup', {
+      event: 'section_hub_preview_click',
+      sectionId,
+      packId: packModel.id,
+    });
+  }, []);
+
   const allUnlockedPackData = useMemo(() => sectionData.flatMap(sd => sd.packData).filter(pd => pd.unlocked), [sectionData]);
   const goalModePackData = useMemo(() => allUnlockedPackData.filter(pd => matchesGoal(pd.pack, goalFilter)), [allUnlockedPackData, goalFilter]);
   const expertModePackData = useMemo(() => {
@@ -853,21 +1043,35 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                 <button type="button" className="bbs-quiz-result-dismiss" onClick={() => setQuizResult(null)}>✕</button>
               </div>
             )}
-            {sectionData.map(({ section, sectionProgress, unlocked, packData }) => (
-              <SectionBlock
-                key={section.id}
-                section={section}
-                sectionProgress={sectionProgress}
-                unlocked={unlocked}
-                packData={packData}
-                activePackId={activePackId}
-                expandedPack={expandedPack}
-                lastMethods={lastMethods}
-                onTogglePack={handleTogglePack}
-                onLaunch={handleLaunchPackMethod}
-                onQuizLaunch={handlePackQuizLaunch}
-              />
-            ))}
+            {sectionData.map(({ section, sectionProgress, unlocked, packData }, i) => {
+              const sectionModel = displayModel.sections[i];
+              const isExpanded = expandedSections.has(section.id);
+              return (
+                <div key={section.id} className="bbs-hub-wrap">
+                  <SectionHubCard
+                    sectionModel={sectionModel}
+                    isExpanded={isExpanded}
+                    onToggleExpand={() => handleToggleSection(section.id)}
+                    onLaunchRecommended={() => handleLaunchRecommendedForSection(sectionModel)}
+                    onPreviewPackClick={(packModel) => handlePreviewPackClick(section.id, packModel)}
+                  />
+                  {isExpanded && (
+                    <SectionBlock
+                      section={section}
+                      sectionProgress={sectionProgress}
+                      unlocked={unlocked}
+                      packData={packData}
+                      activePackId={activePackId}
+                      expandedPack={expandedPack}
+                      lastMethods={lastMethods}
+                      onTogglePack={handleTogglePack}
+                      onLaunch={handleLaunchPackMethod}
+                      onQuizLaunch={handlePackQuizLaunch}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 
