@@ -122,17 +122,33 @@ function buildMisspelledTransliterationDistractors(correctTransliteration, count
   return [...distractors].slice(0, count);
 }
 
-function buildMeaningChoices(word, wordPool) {
-  if (wordPool && wordPool !== defaultBridgeBuilderWords) {
-    // Generate distractors from the active word pool
-    const others = wordPool
-      .filter(w => w.id !== word.id)
-      .map(w => w.translation || w.meaning || '');
-    const distractors = shuffle(others).slice(0, MEANING_CHOICES - 1);
-    return shuffle([word.translation || word.meaning || '', ...distractors]);
+function buildMeaningChoices(word, packWords, wordPool) {
+  const correct = word.translation || word.meaning || '';
+  const needed = MEANING_CHOICES - 1;
+
+  const packDistractors = (packWords || [])
+    .filter(w => w.id !== word.id)
+    .map(w => w.translation || w.meaning || '')
+    .filter(t => t && t !== correct);
+  const uniquePack = [...new Set(packDistractors)];
+  const chosen = shuffle(uniquePack).slice(0, needed);
+
+  // Top up from the full language pool only if the pack doesn't have enough distinct words.
+  if (chosen.length < needed) {
+    const exclude = new Set([correct, ...chosen]);
+    let fallback;
+    if (wordPool && wordPool !== defaultBridgeBuilderWords) {
+      fallback = wordPool
+        .filter(w => w.id !== word.id)
+        .map(w => w.translation || w.meaning || '');
+    } else {
+      fallback = defaultGetTranslationDistractors(word.id, needed * 3);
+    }
+    const extras = shuffle(fallback).filter(t => t && !exclude.has(t));
+    chosen.push(...extras.slice(0, needed - chosen.length));
   }
-  const distractors = defaultGetTranslationDistractors(word.id, MEANING_CHOICES - 1);
-  return shuffle([word.translation, ...distractors]);
+
+  return shuffle([correct, ...chosen]);
 }
 
 /**
@@ -237,7 +253,7 @@ export default function useBridgeBuilderGame(sessionConfig, wordPool) {
           setPhase('meaningTeach');
         } else {
           // Introduced word — test meaning with multiple choices
-          const choices = buildMeaningChoices(currentWord, activeWords);
+          const choices = buildMeaningChoices(currentWord, allSessionWords, activeWords);
           setMeaningChoices(choices);
           setPhase('meaningChoice');
         }
