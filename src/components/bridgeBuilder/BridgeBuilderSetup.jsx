@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
 import { getPacksBySection, getPackById } from '../../data/bridgeBuilderPacks.js';
 import {
@@ -68,12 +68,6 @@ function setLastStudyMethod(packId, method) {
   try { localStorage.setItem(LAST_METHOD_KEY, JSON.stringify(all)); } catch {}
 }
 
-/* ─── Support line ───────────────────────────────────────── */
-
-function buildSupportLine(copy) {
-  return [copy.primaryLabel, copy.secondaryLabel].filter(Boolean).join(' · ');
-}
-
 /* ─── Node state ─────────────────────────────────────────── */
 
 function getCompletionLevel(completion) {
@@ -90,53 +84,14 @@ function getNodeState(progress, unlocked, isCurrent, completion) {
   return 'upcoming';
 }
 
-function getPathColumns(width) {
-  if (width <= 420) return 1;
-  if (width <= 820) return 2;
-  if (width <= 1200) return 3;
-  return 5;
-}
-
-function getSwitchbackPlacement(index, nodesPerRow) {
-  const rowIndex = Math.floor(index / nodesPerRow);
-  const positionInRow = index % nodesPerRow;
-  const isReverseRow = rowIndex % 2 === 1;
-  const visualColumn = isReverseRow
-    ? nodesPerRow - positionInRow
-    : positionInRow + 1;
-
-  return { rowIndex, visualColumn };
-}
-
-function buildPolylinePath(points) {
-  if (!points.length) return '';
-  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
-  return points.reduce((acc, point, index) => (
-    index === 0 ? `M ${point.x} ${point.y}` : `${acc} L ${point.x} ${point.y}`
-  ), '');
-}
-
-/* ═══════════════════════════════════════════════════════════
-   PathNode — a single node on the winding path
-   ═══════════════════════════════════════════════════════════ */
-
-function PathNode({ pack, progress, unlocked, isCurrent, isSelected, onToggle, accent, completion, status, dueReviewCount = 0, packIndex, totalPacks }) {
+function QuestPackTile({ pack, progress, unlocked, isCurrent, isSelected, onToggle, accent, completion, status, dueReviewCount = 0, packIndex, totalPacks }) {
   const defaultCompletion = { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
   const comp = completion || defaultCompletion;
   const state = getNodeState(progress, unlocked, isCurrent, comp);
-  const completionLevel = unlocked ? getCompletionLevel(comp) : 'none';
-  const copy = buildPackProgressCopy({ pack, progress, completion: comp, isUnlocked: unlocked, isGatingEnforced: false, dueReviewCount });
-  const support = buildSupportLine(copy);
   const visual = getPackVisualTokens(pack, state === 'completed' ? 'completed' : state === 'current' ? 'progress' : state);
+  const icon = !unlocked ? 'lock' : state === 'completed' ? 'check' : state === 'current' ? 'play_arrow' : visual.icon;
 
-  // Node icon
-  let icon;
-  if (state === 'locked') icon = 'lock';
-  else if (state === 'completed') icon = 'check';
-  else if (state === 'current') icon = 'play_arrow';
-  else icon = 'radio_button_unchecked';
-
-  const nodeCls = `bbs-node bbs-node--${state}`;
+  const nodeCls = `bbs-quest-tile bbs-quest-tile--${state} bbs-quest-tile--${accent}`;
   const stateLabel = !unlocked
     ? 'Suggested later'
     : dueReviewCount > 0
@@ -148,36 +103,24 @@ function PathNode({ pack, progress, unlocked, isCurrent, isSelected, onToggle, a
           : 'New';
 
   return (
-    <div className="bbs-node-cell">
-      <div className={isSelected ? `${nodeCls} bbs-node--expanded` : nodeCls}>
-        <button
-          type="button"
-          className="bbs-node-btn"
-          onClick={() => unlocked && onToggle(pack.id)}
-          disabled={!unlocked}
-          aria-label={`Pack ${packIndex + 1} of ${totalPacks}, ${pack.title}, ${stateLabel}`}
-        >
-          <span className={`bbs-node-circle bbs-node-circle--${state} bbs-node-circle--${accent}`}>
-            <span className="material-symbols-outlined bbs-node-icon">{icon}</span>
-          </span>
-          {unlocked && state !== 'locked' && (
-            <span className="bbs-completion-pips" aria-label={completionLevel === 'full' ? 'Fully completed' : completionLevel === 'partial' ? 'Partially completed' : 'Not completed'}>
-              <span className={`bbs-completion-pip ${comp.loosePlanksComplete ? 'bbs-completion-pip--done' : ''}`} title="Planks" />
-              <span className={`bbs-completion-pip ${comp.deepScriptComplete ? 'bbs-completion-pip--done' : ''}`} title="Deep Script" />
-            </span>
-          )}
-        </button>
-        <div className="bbs-node-label">
-          <span className="bbs-node-title">
-            <span className={`material-symbols-outlined bbs-node-emblem bbs-node-emblem--${visual.accent}`} aria-hidden="true">
-              {visual.icon}
-            </span>
-            <span dir="auto">{pack.title}</span>
-          </span>
-          <span className="bbs-node-support">{stateLabel}</span>
-        </div>
-      </div>
-    </div>
+    <button
+      type="button"
+      className={isSelected ? `${nodeCls} bbs-quest-tile--selected` : nodeCls}
+      onClick={() => unlocked && onToggle(pack.id)}
+      disabled={!unlocked}
+      aria-label={`Pack ${packIndex + 1} of ${totalPacks}, ${pack.title}, ${stateLabel}`}
+      aria-pressed={isSelected}
+      aria-current={isCurrent ? 'step' : undefined}
+    >
+      <span className="bbs-quest-tile-top">
+        <span className="bbs-quest-tile-index">{packIndex + 1}</span>
+        <span className={`bbs-quest-pill bbs-quest-pill--${state}`}>{stateLabel}</span>
+      </span>
+      <span className="bbs-quest-tile-main">
+        <span className={`material-symbols-outlined bbs-quest-tile-icon bbs-node-emblem--${visual.accent}`} aria-hidden="true">{icon}</span>
+        <span className="bbs-quest-tile-title" dir="auto">{pack.title}</span>
+      </span>
+    </button>
   );
 }
 
@@ -191,14 +134,15 @@ function SelectedPackPanel({ packModel, lastMethod, onLaunch, onQuizLaunch }) {
   const wordsLabel = `${pack.wordIds.length} words`;
   const activitiesLabel = '3 activities';
   const started = packModel.progress?.wordsIntroducedCount > 0 || packModel.status === 'learned' || packModel.status === 'mastered';
+  const isReview = (packModel.reviewDueCount || 0) > 0;
   const progressBits = [];
   if (started) {
     progressBits.push(`${packModel.progress.wordsIntroducedCount}/${packModel.progress.totalWords} words`);
     const doneCount = [packModel.completion.bridgeBuilderComplete, packModel.completion.loosePlanksComplete, packModel.completion.deepScriptComplete].filter(Boolean).length;
     progressBits.push(`${doneCount}/3 activities`);
   }
-  if (packModel.reviewDueCount > 0) progressBits.push('Review due');
-  const primaryLabel = started ? `Continue ${pack.title}` : `Start with ${pack.title}`;
+  if (isReview) progressBits.push('Review due');
+  const primaryLabel = isReview ? `Review ${pack.title}` : started ? `Continue ${pack.title}` : `Start with ${pack.title}`;
   const primaryMethod = lastMethod || 'vocab';
 
   return (
@@ -231,78 +175,6 @@ function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, o
   const accent = meta.accent;
   const progressPct = totalPacks > 0 ? (masteredCount / totalPacks) * 100 : 0;
   const selectedPackModel = packModels.find((pm) => pm.id === expandedPack) || packModels.find((pm) => pm.id === activePackId) || packModels[0] || null;
-  const [pathColumns, setPathColumns] = useState(() => getPathColumns(typeof window !== 'undefined' ? window.innerWidth : 1024));
-  const pathRef = useRef(null);
-  const [pathWidth, setPathWidth] = useState(0);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-    const onResize = () => setPathColumns(getPathColumns(window.innerWidth));
-    onResize();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-
-  useEffect(() => {
-    const el = pathRef.current;
-    if (!el || typeof ResizeObserver === 'undefined') return undefined;
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
-      setPathWidth(entry.contentRect.width);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const nodePlacements = useMemo(
-    () => packModels.map((packModel, index) => ({
-      packModel,
-      index,
-      ...getSwitchbackPlacement(index, pathColumns),
-    })),
-    [packModels, pathColumns],
-  );
-
-  const rowCount = useMemo(
-    () => nodePlacements.reduce((max, node) => Math.max(max, node.rowIndex + 1), 0),
-    [nodePlacements],
-  );
-
-  const activeIndex = useMemo(() => {
-    const idx = packModels.findIndex((pm) => pm.id === activePackId);
-    if (idx >= 0) return idx;
-    const expandedIndex = packModels.findIndex((pm) => pm.id === expandedPack);
-    return expandedIndex;
-  }, [packModels, activePackId, expandedPack]);
-
-  const trailData = useMemo(() => {
-    if (!nodePlacements.length) return { path: '', activePath: '', viewBox: '0 0 1 1', height: 0 };
-
-    const paddingX = 24;
-    const paddingTop = 24;
-    const paddingBottom = 28;
-    const rowGap = 78;
-    const width = Math.max(pathWidth, 1);
-    const innerWidth = Math.max(width - (paddingX * 2), 1);
-    const colStep = pathColumns > 1 ? innerWidth / (pathColumns - 1) : 0;
-    const points = nodePlacements.map((node) => ({
-      x: paddingX + (node.visualColumn - 1) * colStep,
-      y: paddingTop + (node.rowIndex * rowGap),
-    }));
-    const totalHeight = paddingTop + paddingBottom + ((rowCount - 1) * rowGap);
-    const path = buildPolylinePath(points);
-    const activePoints = activeIndex >= 0 ? points.slice(0, activeIndex + 1) : [];
-    const activePath = buildPolylinePath(activePoints);
-
-    return {
-      path,
-      activePath,
-      viewBox: `0 0 ${Math.max(width, 1)} ${Math.max(totalHeight, 1)}`,
-      height: totalHeight,
-    };
-  }, [nodePlacements, pathColumns, pathWidth, rowCount, activeIndex]);
-
   return (
     <div id={panelId} className={`bbs-block ${!isUnlocked ? 'bbs-block--locked' : ''}`}>
       {/* Section header */}
@@ -326,57 +198,11 @@ function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, o
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={Math.round(progressPct)}
-              aria-valuetext={`${masteredCount} of ${totalPacks} packs mastered`}
+              aria-valuetext={`${masteredCount}/${totalPacks}`}
             >
               <div className={`bbs-block-fill bbs-block-fill--${accent}`} style={{ width: `${progressPct}%` }} />
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Winding pack path */}
-      <div
-        ref={pathRef}
-        className="bbs-path bbs-path--switchback"
-        style={{ '--bbs-path-columns': pathColumns, '--bbs-path-rows': rowCount }}
-      >
-        <svg className="bbs-path-trail" viewBox={trailData.viewBox} preserveAspectRatio="none" aria-hidden="true">
-          {trailData.path && (
-            <>
-              <path className="bbs-trail bbs-trail--base" d={trailData.path} />
-              <path className={`bbs-trail bbs-trail--accent bbs-trail--${accent}`} d={trailData.path} />
-            </>
-          )}
-          {trailData.activePath && (
-            <path className={`bbs-trail bbs-trail--active bbs-trail--${accent}`} d={trailData.activePath} />
-          )}
-        </svg>
-        <div className="bbs-switchback-grid">
-          {nodePlacements.map(({ packModel, rowIndex, visualColumn }) => {
-            const unlocked = packModel.status !== 'locked';
-            return (
-              <div
-                key={packModel.id}
-                className="bbs-switchback-item"
-                style={{ gridRow: rowIndex + 1, gridColumn: visualColumn }}
-              >
-                <PathNode
-                  pack={packModel.pack}
-                  progress={packModel.progress}
-                  unlocked={unlocked}
-                  isCurrent={packModel.id === activePackId}
-                  isSelected={selectedPackModel?.id === packModel.id}
-                  onToggle={onTogglePack}
-                  accent={accent}
-                  completion={packModel.completion}
-                  status={packModel.status}
-                  dueReviewCount={packModel.reviewDueCount || 0}
-                  packIndex={packModel.packIndex ?? 0}
-                  totalPacks={packModels.length}
-                />
-              </div>
-            );
-          })}
         </div>
       </div>
       <SelectedPackPanel
@@ -385,6 +211,28 @@ function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, o
         onLaunch={onLaunch}
         onQuizLaunch={onQuizLaunch}
       />
+      <div className="bbs-quest-board" role="list" aria-label={`${section.title} packs`}>
+        {packModels.map((packModel) => {
+          const unlocked = packModel.status !== 'locked';
+          return (
+            <QuestPackTile
+              key={packModel.id}
+              pack={packModel.pack}
+              progress={packModel.progress}
+              unlocked={unlocked}
+              isCurrent={packModel.id === activePackId}
+              isSelected={selectedPackModel?.id === packModel.id}
+              onToggle={onTogglePack}
+              accent={accent}
+              completion={packModel.completion}
+              status={packModel.status}
+              dueReviewCount={packModel.reviewDueCount || 0}
+              packIndex={packModel.packIndex ?? 0}
+              totalPacks={packModels.length}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -486,10 +334,7 @@ function PackRow({ packModel, modeOverride, onDotClick, onPlay, compact = false,
 /* ═══════════════════════════════════════════════════════════
    SectionHubCard — compact default card for a section
    ═══════════════════════════════════════════════════════════ */
-// Replaces the full winding path as the Guided tab's default layout.
-// The old SectionBlock + PathNode are kept intact and rendered below
-// when the player taps "Open section" so the detailed path, pack
-// chooser, and quiz launch still work unchanged.
+// Compact default card for Guided mode.
 
 const HUB_STATUS_DOT_MODIFIER = {
   new: 'new',
