@@ -3,9 +3,7 @@ import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
 import { getPacksBySection, getPackById } from '../../data/bridgeBuilderPacks.js';
 import {
   getAllWordProgress,
-  getPackProgress,
   isPackUnlocked,
-  getSectionProgress,
   isSectionUnlocked,
   getDueReviewWordIds,
   getWeakWordIds,
@@ -31,6 +29,8 @@ import { allSentences } from '../../data/sentences/index.ts';
 import { applyQuizMastery } from '../../lib/quizMastery.js';
 import { getLanguageName } from '../../lib/vocabLanguageAdapter.js';
 import { useLanguage } from '../../context/LanguageContext.jsx';
+import { getPackVisualTokens } from '../../lib/packVisualTokens.js';
+import { buildPackProgressCopy } from '../../lib/packProgressCopy.js';
 import './BridgeBuilderSetup.css';
 
 // Quiz vocab pool: difficulty ≤ 2 words, computed once at module load
@@ -42,15 +42,6 @@ const QUIZ_SENTENCES = allSentences.filter((s) => s.difficulty === 1);
 // Moved to src/lib/bridgeBuilderDisplayModel.js — see SECTION_META / getSectionMeta.
 // Both the current setup screen and the future section-hub UI render
 // through that single source.
-
-/* ─── Status helpers ─────────────────────────────────────── */
-
-function getPackStatusInfo(progress, unlocked) {
-  if (!unlocked) return { label: 'Locked', modifier: 'locked' };
-  if (progress.completed) return { label: 'Done', modifier: 'completed' };
-  if (progress.wordsIntroducedCount > 0) return { label: 'Started', modifier: 'progress' };
-  return { label: 'New', modifier: 'new' };
-}
 
 /* ─── Game mode resolver ─────────────────────────────────── */
 
@@ -79,27 +70,8 @@ function setLastStudyMethod(packId, method) {
 
 /* ─── Support line ───────────────────────────────────────── */
 
-function buildSupportLine(pack, progress, completion) {
-  const comp = completion || { loosePlanksComplete: false, deepScriptComplete: false };
-  const level = getCompletionLevel(comp);
-
-  if (level === 'full') return 'Complete';
-
-  const parts = [];
-  if (level === 'partial') {
-    const done = comp.loosePlanksComplete ? 'Planks' : 'Deep Script';
-    parts.push(`${done} done`);
-  }
-
-  const newCount = pack.targetsNewCount || pack.wordIds.length;
-  const introduced = progress.wordsIntroducedCount || 0;
-  const remaining = Math.max(0, newCount - introduced);
-  if (remaining > 0) parts.push(`${remaining} new`);
-  else if (parts.length === 0) parts.push(`${newCount} words`);
-
-  if (parts.length === 0 && pack.estimatedTimeSec) parts.push(formatEstimatedMinutes(pack.estimatedTimeSec));
-
-  return parts.join(' \u00b7 ');
+function buildSupportLine(copy) {
+  return [copy.primaryLabel, copy.secondaryLabel].filter(Boolean).join(' · ');
 }
 
 /* ─── Node state ─────────────────────────────────────────── */
@@ -130,12 +102,14 @@ function getSnakePosition(index) {
    PathNode — a single node on the winding path
    ═══════════════════════════════════════════════════════════ */
 
-function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod, position, onToggle, onLaunch, onQuizLaunch, accent, completion }) {
+function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod, position, onToggle, onLaunch, onQuizLaunch, accent, completion, dueReviewCount = 0 }) {
   const defaultCompletion = { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
   const comp = completion || defaultCompletion;
   const state = getNodeState(progress, unlocked, isCurrent, comp);
   const completionLevel = unlocked ? getCompletionLevel(comp) : 'none';
-  const support = buildSupportLine(pack, progress, comp);
+  const copy = buildPackProgressCopy({ pack, progress, completion: comp, isUnlocked: unlocked, isGatingEnforced: false, dueReviewCount });
+  const support = buildSupportLine(copy);
+  const visual = getPackVisualTokens(pack, state === 'completed' ? 'completed' : state === 'current' ? 'progress' : state);
 
   const handleLaunch = (method) => {
     if (!unlocked) return;
@@ -150,6 +124,7 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
   else icon = 'radio_button_unchecked';
 
   const nodeCls = `bbs-node bbs-node--${state} bbs-node--${position}`;
+  const chooserId = `bbs-node-chooser-${pack.id}`;
 
   return (
     <div className={`bbs-node-cell bbs-node-cell--${position}`}>
@@ -160,6 +135,8 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
           onClick={() => unlocked && onToggle(pack.id)}
           disabled={!unlocked}
           aria-label={`${pack.title} — ${support}`}
+          aria-expanded={isExpanded}
+          aria-controls={chooserId}
         >
           <span className={`bbs-node-circle bbs-node-circle--${state} bbs-node-circle--${accent}`}>
             <span className="material-symbols-outlined bbs-node-icon">{icon}</span>
@@ -172,8 +149,14 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
           )}
         </button>
         <div className="bbs-node-label">
-          <span className="bbs-node-title">{pack.title}</span>
+          <span className="bbs-node-title">
+            <span className={`material-symbols-outlined bbs-node-emblem bbs-node-emblem--${visual.accent}`} aria-hidden="true">
+              {visual.icon}
+            </span>
+            <span dir="auto">{pack.title}</span>
+          </span>
           <span className="bbs-node-support">{support}</span>
+          {copy.unlockReasonLabel && <span className="bbs-node-support">{copy.unlockReasonLabel}</span>}
           {(comp.quizMastered || comp.sentenceReady) && (
             <span className="bbs-quiz-badge" title="Covered in skill check quiz">✦ Quiz Passed!</span>
           )}
@@ -182,7 +165,7 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
 
       {/* Study method chooser — appears below the node */}
       {isExpanded && (
-        <div className="bbs-chooser">
+        <div id={chooserId} className="bbs-chooser">
           {pack.description && <p className="bbs-chooser-desc">{pack.description}</p>}
           <button
             type="button"
@@ -266,14 +249,14 @@ function PathConnector({ fromPos, toPos, state }) {
    SectionBlock — always-visible section with winding path
    ═══════════════════════════════════════════════════════════ */
 
-function SectionBlock({ section, sectionProgress, unlocked, packData, activePackId, expandedPack, lastMethods, onTogglePack, onLaunch, onQuizLaunch }) {
-  const { packsCompleted, totalPacks } = sectionProgress;
-  const meta = getSectionMeta(section.id);
+function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, onTogglePack, onLaunch, onQuizLaunch, panelId }) {
+  const { section, packModels, isUnlocked, masteredCount, totalPacks } = sectionModel;
+  const meta = getSectionMeta(sectionModel.id);
   const accent = meta.accent;
-  const progressPct = totalPacks > 0 ? (packsCompleted / totalPacks) * 100 : 0;
+  const progressPct = totalPacks > 0 ? (masteredCount / totalPacks) * 100 : 0;
 
   return (
-    <div className={`bbs-block ${!unlocked ? 'bbs-block--locked' : ''}`}>
+    <div id={panelId} className={`bbs-block ${!isUnlocked ? 'bbs-block--locked' : ''}`}>
       {/* Section header */}
       <div className="bbs-block-header">
         <div className={`bbs-block-icon bbs-block-icon--${accent}`}>
@@ -281,14 +264,22 @@ function SectionBlock({ section, sectionProgress, unlocked, packData, activePack
         </div>
         <div className="bbs-block-info">
           <div className="bbs-block-top">
-            <h3 className="bbs-block-title">{section.title}</h3>
+            <h3 className="bbs-block-title" dir="auto">{section.title}</h3>
             <span className={`bbs-block-count bbs-block-count--${accent}`}>
-              {unlocked ? `${packsCompleted}/${totalPacks}` : `${totalPacks} packs`}
+              {isUnlocked ? `${masteredCount}/${totalPacks}` : `${totalPacks} packs`}
             </span>
           </div>
           <p className="bbs-block-desc">{section.description}</p>
           <div className="bbs-block-bar">
-            <div className="bbs-block-track">
+            <div
+              className="bbs-block-track"
+              role="progressbar"
+              aria-label={`${section.title} completion`}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(progressPct)}
+              aria-valuetext={`${masteredCount} of ${totalPacks} packs mastered`}
+            >
               <div className={`bbs-block-fill bbs-block-fill--${accent}`} style={{ width: `${progressPct}%` }} />
             </div>
           </div>
@@ -297,26 +288,28 @@ function SectionBlock({ section, sectionProgress, unlocked, packData, activePack
 
       {/* Winding pack path */}
       <div className="bbs-path">
-        {packData.map((pd, idx) => {
+        {packModels.map((packModel, idx) => {
+          const unlocked = packModel.status !== 'locked';
           const pos = getSnakePosition(idx);
-          const nextPos = idx < packData.length - 1 ? getSnakePosition(idx + 1) : null;
-          const connectorState = getCompletionLevel(pd.completion || {}) === 'full' ? 'done' : 'pending';
+          const nextPos = idx < packModels.length - 1 ? getSnakePosition(idx + 1) : null;
+          const connectorState = getCompletionLevel(packModel.completion || {}) === 'full' ? 'done' : 'pending';
 
           return (
-            <React.Fragment key={pd.pack.id}>
+            <React.Fragment key={packModel.id}>
               <PathNode
-                pack={pd.pack}
-                progress={pd.progress}
-                unlocked={pd.unlocked}
-                isCurrent={pd.pack.id === activePackId}
-                isExpanded={expandedPack === pd.pack.id}
-                lastMethod={lastMethods[pd.pack.id] || null}
+                pack={packModel.pack}
+                progress={packModel.progress}
+                unlocked={unlocked}
+                isCurrent={packModel.id === activePackId}
+                isExpanded={expandedPack === packModel.id}
+                lastMethod={lastMethods[packModel.id] || null}
                 position={pos}
                 onToggle={onTogglePack}
                 onLaunch={onLaunch}
                 onQuizLaunch={onQuizLaunch}
                 accent={accent}
-                completion={pd.completion}
+                completion={packModel.completion}
+                dueReviewCount={packModel.reviewDueCount || 0}
               />
               {nextPos && (
                 <PathConnector fromPos={pos} toPos={nextPos} state={connectorState} />
@@ -359,9 +352,15 @@ function ProgressDots({ completion, modeOverride, unlocked, packId, onDotClick }
   );
 }
 
-function PackRow({ pack, progress, unlocked, completion, modeOverride, onDotClick, onPlay, compact = false, entryPoint = 'guided' }) {
-  const { completed } = progress;
-  const statusInfo = getPackStatusInfo(progress, unlocked);
+function PackRow({ packModel, modeOverride, onDotClick, onPlay, compact = false, entryPoint = 'guided' }) {
+  const pack = packModel.pack;
+  const progress = packModel.progress;
+  const completion = packModel.completion;
+  const unlocked = packModel.status !== 'locked';
+  const dueReviewCount = packModel.reviewDueCount || 0;
+  const copy = buildPackProgressCopy({ pack, progress, completion, isUnlocked: unlocked, isGatingEnforced: false, dueReviewCount });
+  const statusInfo = { label: copy.stageLabel, modifier: copy.stageTone };
+  const visual = getPackVisualTokens(pack, statusInfo.modifier);
   const buttonLabel = getPackButtonLabel(progress);
   const handlePlay = (e) => {
     e.stopPropagation();
@@ -377,24 +376,34 @@ function PackRow({ pack, progress, unlocked, completion, modeOverride, onDotClic
       estimatedTimeSec: pack.estimatedTimeSec || 0,
     });
   };
-  let rowCls = 'bbs-pack-row';
+  let rowCls = `bbs-pack-row bbs-pack-row--${visual.accent} bbs-pack-row--${visual.difficultyTone}`;
   if (!unlocked) rowCls += ' bbs-pack-row--locked';
+  const rowMetaChips = [
+    copy.wordsIntroducedLabel,
+    copy.modesCompleteLabel,
+    copy.reviewDueLabel,
+    copy.sentenceReadyLabel,
+    copy.unlockReasonLabel,
+  ].filter(Boolean);
+
   return (
     <div className={rowCls}>
+      <span className={`bbs-pack-motif bbs-pack-motif--${visual.motif}`} aria-hidden="true" />
       <div className={`bbs-pack-row-icon ${compact ? 'bbs-pack-row-icon--compact' : ''}`}>
-        <span className="bbs-pack-row-emoji">{!unlocked ? '\ud83d\udd12' : completed ? '\u2705' : '\ud83d\udce6'}</span>
+        <span className={`material-symbols-outlined bbs-pack-row-emblem bbs-pack-row-emblem--${visual.accent}`} aria-hidden="true">
+          {unlocked ? visual.icon : 'lock'}
+        </span>
       </div>
       <div className="bbs-pack-row-body">
         <div className="bbs-pack-row-top">
-          <span className="bbs-pack-row-title">{pack.title}</span>
+          <span className="bbs-pack-row-title" dir="auto">{pack.title}</span>
           <span className={`bbs-status-pill bbs-status-pill--${statusInfo.modifier}`}>{statusInfo.label}</span>
         </div>
-        {!compact && <div className="bbs-pack-row-subtitle">{pack.description}</div>}
+        {!compact && <div className="bbs-pack-row-subtitle" dir="auto">{pack.description}</div>}
         <div className="bbs-pack-meta">
           <span className="bbs-pack-chip">{pack.primaryType || 'mixed'}</span>
           <span className="bbs-pack-chip">{pack.difficultyBand || 'Core'}</span>
-          <span className="bbs-pack-chip">{pack.targetsNewCount || pack.wordIds.length} new</span>
-          <span className="bbs-pack-chip">{pack.supportReviewCount || 0} review</span>
+          {rowMetaChips.map((chip) => <span key={chip} className="bbs-pack-chip" dir="auto">{chip}</span>)}
           <span className="bbs-pack-chip">{formatEstimatedMinutes(pack.estimatedTimeSec)}</span>
         </div>
         {!compact && <div className="bbs-pack-why">{pack.whyItMatters}</div>}
@@ -452,6 +461,7 @@ function SectionHubCard({
     : nextUnlockLabel || `${totalPacks} pack${totalPacks === 1 ? '' : 's'} locked`;
 
   const showContinue = isUnlocked && !!recommendedPack;
+  const panelId = `bbs-section-panel-${sectionModel.id}`;
 
   return (
     <div
@@ -464,18 +474,26 @@ function SectionHubCard({
         </div>
         <div className="bbs-hub-head-text">
           <div className="bbs-hub-head-top">
-            <h3 className="bbs-hub-title">{title}</h3>
+            <h3 className="bbs-hub-title" dir="auto">{title}</h3>
             <span className={`bbs-hub-count bbs-hub-count--${accent}`}>
               {isUnlocked ? `${masteredCount}/${totalPacks}` : `${totalPacks} packs`}
             </span>
           </div>
-          <p className="bbs-hub-desc">{description}</p>
+          <p className="bbs-hub-desc" dir="auto">{description}</p>
         </div>
       </div>
 
       {/* Progress bar */}
-      <div className="bbs-hub-bar" aria-hidden="true">
-        <div className="bbs-hub-track">
+      <div className="bbs-hub-bar">
+        <div
+          className="bbs-hub-track"
+          role="progressbar"
+          aria-label={`${title} mastered progress`}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.max(0, Math.min(100, progressPercent))}
+          aria-valuetext={`${masteredCount} of ${totalPacks} packs mastered`}
+        >
           <div
             className={`bbs-hub-fill bbs-hub-fill--${accent}`}
             style={{ width: `${Math.max(0, Math.min(100, progressPercent))}%` }}
@@ -494,8 +512,12 @@ function SectionHubCard({
         >
           <span className="bbs-hub-cta-body">
             <span className="bbs-hub-cta-eyebrow">{recommendedPack.ctaLabel}</span>
-            <span className="bbs-hub-cta-title">{recommendedPack.title}</span>
-            <span className="bbs-hub-cta-meta">{recommendedPack.progressLabel}</span>
+            <span className="bbs-hub-cta-title" dir="auto">{recommendedPack.title}</span>
+            <span className="bbs-hub-cta-meta">{recommendedPack.wordsIntroducedLabel}</span>
+            <span className="bbs-hub-cta-meta">{recommendedPack.modesCompleteLabel}</span>
+            {recommendedPack.reviewDueLabel && <span className="bbs-hub-cta-meta">{recommendedPack.reviewDueLabel}</span>}
+            {recommendedPack.sentenceReadyLabel && <span className="bbs-hub-cta-meta">{recommendedPack.sentenceReadyLabel}</span>}
+            {recommendedPack.unlockReasonLabel && <span className="bbs-hub-cta-meta">{recommendedPack.unlockReasonLabel}</span>}
           </span>
           <span className="bbs-hub-cta-chev" aria-hidden="true">
             <span className="material-symbols-outlined">arrow_forward</span>
@@ -522,10 +544,10 @@ function SectionHubCard({
               onClick={() => onPreviewPackClick(packModel)}
               disabled={packModel.status === 'locked'}
               aria-label={`${packModel.title} — ${packModel.progressLabel}`}
-              title={packModel.progressLabel}
+              title={`${packModel.stageLabel} · ${packModel.wordsIntroducedLabel} · ${packModel.modesCompleteLabel}`}
             >
               <span className={`bbs-hub-chip-dot bbs-hub-chip-dot--${HUB_STATUS_DOT_MODIFIER[packModel.status] || 'new'}`} />
-              <span className="bbs-hub-chip-title">{packModel.title}</span>
+              <span className="bbs-hub-chip-title" dir="auto">{packModel.title}</span>
             </button>
           ))}
           {remainingCount > 0 && (
@@ -541,6 +563,7 @@ function SectionHubCard({
           className="bbs-hub-toggle"
           onClick={onToggleExpand}
           aria-expanded={isExpanded}
+          aria-controls={panelId}
         >
           <span>{isExpanded ? 'Close section' : 'Open section'}</span>
           <span className="material-symbols-outlined" aria-hidden="true">
@@ -590,7 +613,7 @@ function TopActionStrip({
           </span>
           <span className="bbs-top-card-body">
             <span className="bbs-top-card-eyebrow">{recommendedPack.ctaLabel}</span>
-            <span className="bbs-top-card-title">{recommendedPack.title}</span>
+            <span className="bbs-top-card-title" dir="auto">{recommendedPack.title}</span>
             <span className="bbs-top-card-meta">{recommendedPack.progressLabel}</span>
           </span>
           <span className="bbs-top-card-chev" aria-hidden="true">
@@ -695,22 +718,6 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const dueReviewWordIds = useMemo(() => getDueReviewWordIds(), [progressRevision]); // eslint-disable-line react-hooks/exhaustive-deps
   const weakWordIds = useMemo(() => getWeakWordIds(), [progressRevision]); // eslint-disable-line react-hooks/exhaustive-deps
   const packCompletions = useMemo(() => getAllPackCompletions(), [progressRevision]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const sectionData = useMemo(() => {
-    const allPacks = sections.flatMap(s => getPacksBySection(s.id));
-    return sections.map(section => {
-      const packs = getPacksBySection(section.id);
-      const sectionProgress = getSectionProgress(section, packs, allProgress, packCompletions);
-      const unlocked = isSectionUnlocked(section, sections, allPacks, allProgress);
-      const packData = packs.map(pack => ({
-        pack,
-        progress: getPackProgress(pack, allProgress),
-        unlocked: unlocked && isPackUnlocked(pack, packs, allProgress),
-        completion: packCompletions[pack.id] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false },
-      }));
-      return { section, sectionProgress, unlocked, packData };
-    });
-  }, [sections, allProgress, packCompletions]);
 
   // Normalized display model — the single source of truth for status,
   // CTA labels, progress copy, and section-level aggregates. The current
@@ -910,12 +917,15 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     });
   }, []);
 
-  const allUnlockedPackData = useMemo(() => sectionData.flatMap(sd => sd.packData).filter(pd => pd.unlocked), [sectionData]);
-  const goalModePackData = useMemo(() => allUnlockedPackData.filter(pd => matchesGoal(pd.pack, goalFilter)), [allUnlockedPackData, goalFilter]);
+  const allUnlockedPackModels = useMemo(
+    () => displayModel.sections.flatMap((sectionModel) => sectionModel.packModels).filter((pm) => pm.status !== 'locked'),
+    [displayModel],
+  );
+  const goalModePackData = useMemo(() => allUnlockedPackModels.filter(pm => matchesGoal(pm.pack, goalFilter)), [allUnlockedPackModels, goalFilter]);
   const expertModePackData = useMemo(() => {
-    const filtered = allUnlockedPackData.filter(pd => matchesQuery(pd.pack, query));
+    const filtered = allUnlockedPackModels.filter(pm => matchesQuery(pm.pack, query));
     return sortPackData(filtered, sortBy);
-  }, [allUnlockedPackData, query, sortBy]);
+  }, [allUnlockedPackModels, query, sortBy]);
 
   return (
     <>
@@ -968,11 +978,15 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
               ))}
             </div>
             <div className="bbs-upnext-list">
-              {goalModePackData.slice(0, 12).map(pd => (
-                <PackRow key={pd.pack.id} pack={pd.pack} progress={pd.progress} unlocked={pd.unlocked}
-                  completion={pd.completion} modeOverride={modeOverrides[pd.pack.id] || null}
-                  onDotClick={handleDotClick} onPlay={handlePlayPack} compact entryPoint="goal_browse" />
-              ))}
+              {goalModePackData.length > 0 ? (
+                goalModePackData.slice(0, 12).map(pd => (
+                  <PackRow key={pd.id} packModel={pd}
+                    modeOverride={modeOverrides[pd.id] || null}
+                    onDotClick={handleDotClick} onPlay={handlePlayPack} compact entryPoint="goal_browse" />
+                ))
+              ) : (
+                <div className="bbs-empty-state">No packs match this goal yet. Try another goal filter.</div>
+              )}
             </div>
           </div>
         )}
@@ -982,20 +996,24 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
             <h3 className="bbs-mode-title">Search & filter your library</h3>
             <button type="button" className="bbs-subview-close" onClick={() => setActiveSubview(null)}>Back to guided</button>
             <div className="bbs-expert-controls">
-              <input type="search" className="bbs-search" placeholder="Search packs or goals" value={query}
+              <input type="search" className="bbs-search" placeholder="Search packs or goals" value={query} aria-label="Search packs or goals"
                 onChange={(e) => { setQuery(e.target.value); emit('analytics:bridge_setup', { event: 'expert_search_change', queryLength: e.target.value.length }); }} />
-              <select className="bbs-sort" value={sortBy} onChange={(e) => { setSortBy(e.target.value); emit('analytics:bridge_setup', { event: 'expert_sort_change', sortBy: e.target.value }); e.target.blur(); }}>
+              <select className="bbs-sort" value={sortBy} aria-label="Sort packs" onChange={(e) => { setSortBy(e.target.value); emit('analytics:bridge_setup', { event: 'expert_sort_change', sortBy: e.target.value }); e.target.blur(); }}>
                 <option value="recommended">Recommended</option>
                 <option value="time">Shortest time</option>
                 <option value="difficulty">Difficulty</option>
               </select>
             </div>
             <div className="bbs-upnext-list">
-              {expertModePackData.slice(0, 20).map(pd => (
-                <PackRow key={pd.pack.id} pack={pd.pack} progress={pd.progress} unlocked={pd.unlocked}
-                  completion={pd.completion} modeOverride={modeOverrides[pd.pack.id] || null}
-                  onDotClick={handleDotClick} onPlay={handlePlayPack} compact entryPoint="expert_browse" />
-              ))}
+              {expertModePackData.length > 0 ? (
+                expertModePackData.slice(0, 20).map(pd => (
+                  <PackRow key={pd.id} packModel={pd}
+                    modeOverride={modeOverrides[pd.id] || null}
+                    onDotClick={handleDotClick} onPlay={handlePlayPack} compact entryPoint="expert_browse" />
+                ))
+              ) : (
+                <div className="bbs-empty-state">No packs match your search. Adjust filters to find more lessons.</div>
+              )}
             </div>
           </div>
         )}
@@ -1043,24 +1061,21 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                 <button type="button" className="bbs-quiz-result-dismiss" onClick={() => setQuizResult(null)}>✕</button>
               </div>
             )}
-            {sectionData.map(({ section, sectionProgress, unlocked, packData }, i) => {
-              const sectionModel = displayModel.sections[i];
-              const isExpanded = expandedSections.has(section.id);
+            {displayModel.sections.map((sectionModel) => {
+              const isExpanded = expandedSections.has(sectionModel.id);
               return (
-                <div key={section.id} className="bbs-hub-wrap">
+                <div key={sectionModel.id} className="bbs-hub-wrap">
                   <SectionHubCard
                     sectionModel={sectionModel}
                     isExpanded={isExpanded}
-                    onToggleExpand={() => handleToggleSection(section.id)}
+                    onToggleExpand={() => handleToggleSection(sectionModel.id)}
                     onLaunchRecommended={() => handleLaunchRecommendedForSection(sectionModel)}
-                    onPreviewPackClick={(packModel) => handlePreviewPackClick(section.id, packModel)}
+                    onPreviewPackClick={(packModel) => handlePreviewPackClick(sectionModel.id, packModel)}
                   />
                   {isExpanded && (
                     <SectionBlock
-                      section={section}
-                      sectionProgress={sectionProgress}
-                      unlocked={unlocked}
-                      packData={packData}
+                      panelId={`bbs-section-panel-${sectionModel.id}`}
+                      sectionModel={sectionModel}
                       activePackId={activePackId}
                       expandedPack={expandedPack}
                       lastMethods={lastMethods}

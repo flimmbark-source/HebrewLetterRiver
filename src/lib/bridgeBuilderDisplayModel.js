@@ -18,6 +18,7 @@
 
 import { getPackProgress } from './bridgeBuilderStorage.js';
 import { getPackState, PACK_STATES } from './packProgression.js';
+import { buildPackProgressCopy } from './packProgressCopy.js';
 
 // ─── Section visual metadata ────────────────────────────────
 // Moved here from BridgeBuilderSetup.jsx so both the current setup screen
@@ -128,6 +129,7 @@ export function getPackDisplayModel(pack, context = {}) {
     totalPacksInSection = null,
     isCurrent = false,
     ctaOverrides = null,
+    isGatingEnforced = false,
   } = context;
 
   // Sanity: the underlying data should always give us these.
@@ -168,14 +170,21 @@ export function getPackDisplayModel(pack, context = {}) {
   // but the CTA is bumped to "Review" to guide the player there.
   const isReviewDue = reviewDueCount > 0 && (status === PACK_STATUS.MASTERED || status === PACK_STATUS.LEARNED);
 
+  const copy = buildPackProgressCopy({
+    pack,
+    progress,
+    completion,
+    isUnlocked,
+    isGatingEnforced,
+    dueReviewCount: reviewDueCount,
+  });
+
   const ctaLabel =
     (ctaOverrides && ctaOverrides[status]) ||
-    (isReviewDue ? 'Review' : DEFAULT_CTA_BY_STATUS[status]) ||
+    (isReviewDue ? 'Review due' : DEFAULT_CTA_BY_STATUS[status]) ||
     'Start';
 
-  const progressLabel = isUnlocked
-    ? `${progress.wordsIntroducedCount} of ${progress.totalWords} words introduced`
-    : 'Locked';
+  const progressLabel = `${copy.primaryLabel} · ${copy.secondaryLabel}`;
 
   return {
     // Identity
@@ -205,6 +214,13 @@ export function getPackDisplayModel(pack, context = {}) {
     isReviewDue,
     ctaLabel,
     progressLabel,
+    stageLabel: copy.stageLabel,
+    stageTone: copy.stageTone,
+    wordsIntroducedLabel: copy.wordsIntroducedLabel,
+    modesCompleteLabel: copy.modesCompleteLabel,
+    reviewDueLabel: copy.reviewDueLabel,
+    sentenceReadyLabel: copy.sentenceReadyLabel,
+    unlockReasonLabel: copy.unlockReasonLabel,
 
     // Mode-by-mode completion, normalized to short keys for UI rendering.
     modeCompletion: {
@@ -263,6 +279,7 @@ export function getSectionDisplayModel(section, context = {}) {
     previousSection = null,
     previewLimit = 3,
     meta = getSectionMeta(section.id),
+    isGatingEnforced = false,
   } = context;
 
   let packModels;
@@ -275,6 +292,7 @@ export function getSectionDisplayModel(section, context = {}) {
         packCompletions,
         dueReviewWordIdSet,
         isUnlocked,
+        isGatingEnforced,
         packIndex: idx,
         totalPacksInSection: packs.length,
       }),
