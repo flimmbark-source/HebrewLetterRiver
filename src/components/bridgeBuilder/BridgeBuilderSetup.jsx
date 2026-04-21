@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
 import { getPacksBySection, getPackById } from '../../data/bridgeBuilderPacks.js';
 import {
@@ -90,19 +90,17 @@ function getNodeState(progress, unlocked, isCurrent, completion) {
   return 'upcoming';
 }
 
-/* ─── Snake pattern: determines horizontal position ──────── */
-// Nodes snake: left, center, right, center, left, center, right …
-// This creates the S-curve / winding path feel.
-const SNAKE_POSITIONS = ['left', 'center', 'right', 'center'];
-function getSnakePosition(index) {
-  return SNAKE_POSITIONS[index % SNAKE_POSITIONS.length];
+function getPathColumns(width) {
+  if (width <= 420) return 1;
+  if (width <= 820) return 2;
+  return 3;
 }
 
 /* ═══════════════════════════════════════════════════════════
    PathNode — a single node on the winding path
    ═══════════════════════════════════════════════════════════ */
 
-function PathNode({ pack, progress, unlocked, isCurrent, isSelected, position, onToggle, accent, completion, status, dueReviewCount = 0 }) {
+function PathNode({ pack, progress, unlocked, isCurrent, isSelected, onToggle, accent, completion, status, dueReviewCount = 0, packIndex, totalPacks }) {
   const defaultCompletion = { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
   const comp = completion || defaultCompletion;
   const state = getNodeState(progress, unlocked, isCurrent, comp);
@@ -118,7 +116,7 @@ function PathNode({ pack, progress, unlocked, isCurrent, isSelected, position, o
   else if (state === 'current') icon = 'play_arrow';
   else icon = 'radio_button_unchecked';
 
-  const nodeCls = `bbs-node bbs-node--${state} bbs-node--${position}`;
+  const nodeCls = `bbs-node bbs-node--${state}`;
   const stateLabel = !unlocked
     ? 'Suggested later'
     : dueReviewCount > 0
@@ -130,14 +128,14 @@ function PathNode({ pack, progress, unlocked, isCurrent, isSelected, position, o
           : 'New';
 
   return (
-    <div className={`bbs-node-cell bbs-node-cell--${position}`}>
+    <div className="bbs-node-cell">
       <div className={isSelected ? `${nodeCls} bbs-node--expanded` : nodeCls}>
         <button
           type="button"
           className="bbs-node-btn"
           onClick={() => unlocked && onToggle(pack.id)}
           disabled={!unlocked}
-          aria-label={`${pack.title} — ${stateLabel}`}
+          aria-label={`Pack ${packIndex + 1} of ${totalPacks}, ${pack.title}, ${stateLabel}`}
         >
           <span className={`bbs-node-circle bbs-node-circle--${state} bbs-node-circle--${accent}`}>
             <span className="material-symbols-outlined bbs-node-icon">{icon}</span>
@@ -166,26 +164,6 @@ function PathNode({ pack, progress, unlocked, isCurrent, isSelected, position, o
 /* ═══════════════════════════════════════════════════════════
    SVG connector between two adjacent nodes
    ═══════════════════════════════════════════════════════════ */
-
-function PathConnector({ fromPos, toPos, state }) {
-  // state: 'done' | 'pending'
-  // Each cell is laid out on a 3-column grid.
-  // Positions map to x%: left=20%, center=50%, right=80%
-  const xMap = { left: 20, center: 50, right: 80 };
-  const x1 = xMap[fromPos];
-  const x2 = xMap[toPos];
-
-  return (
-    <div className="bbs-connector">
-      <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="bbs-connector-svg">
-        <path
-          d={`M ${x1} 0 C ${x1} 20, ${x2} 20, ${x2} 40`}
-          className={`bbs-connector-line bbs-connector-line--${state}`}
-        />
-      </svg>
-    </div>
-  );
-}
 
 function SelectedPackPanel({ packModel, lastMethod, onLaunch, onQuizLaunch }) {
   if (!packModel) return null;
@@ -233,6 +211,23 @@ function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, o
   const accent = meta.accent;
   const progressPct = totalPacks > 0 ? (masteredCount / totalPacks) * 100 : 0;
   const selectedPackModel = packModels.find((pm) => pm.id === expandedPack) || packModels.find((pm) => pm.id === activePackId) || packModels[0] || null;
+  const [pathColumns, setPathColumns] = useState(() => getPathColumns(typeof window !== 'undefined' ? window.innerWidth : 1024));
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const onResize = () => setPathColumns(getPathColumns(window.innerWidth));
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const rows = useMemo(() => {
+    const chunks = [];
+    for (let i = 0; i < packModels.length; i += pathColumns) {
+      chunks.push(packModels.slice(i, i + pathColumns));
+    }
+    return chunks;
+  }, [packModels, pathColumns]);
 
   return (
     <div id={panelId} className={`bbs-block ${!isUnlocked ? 'bbs-block--locked' : ''}`}>
@@ -266,30 +261,36 @@ function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, o
       </div>
 
       {/* Winding pack path */}
-      <div className="bbs-path">
-        {packModels.map((packModel, idx) => {
-          const unlocked = packModel.status !== 'locked';
-          const pos = getSnakePosition(idx);
-          const nextPos = idx < packModels.length - 1 ? getSnakePosition(idx + 1) : null;
-          const connectorState = getCompletionLevel(packModel.completion || {}) === 'full' ? 'done' : 'pending';
-
+      <div className="bbs-path bbs-path--switchback">
+        <div className={`bbs-switchback bbs-switchback--cols-${pathColumns}`} aria-hidden="true" />
+        {rows.map((row, rowIndex) => {
+          const reverse = rowIndex % 2 === 1;
           return (
-            <React.Fragment key={packModel.id}>
-              <PathNode
-                pack={packModel.pack}
-                progress={packModel.progress}
-                unlocked={unlocked}
-                isCurrent={packModel.id === activePackId}
-                isSelected={selectedPackModel?.id === packModel.id}
-                position={pos}
-                onToggle={onTogglePack}
-                accent={accent}
-                completion={packModel.completion}
-                status={packModel.status}
-                dueReviewCount={packModel.reviewDueCount || 0}
-              />
-              {nextPos && (
-                <PathConnector fromPos={pos} toPos={nextPos} state={connectorState} />
+            <React.Fragment key={`row-${rowIndex}`}>
+              <div className={`bbs-switch-row ${reverse ? 'bbs-switch-row--reverse' : ''}`}>
+                {row.map((packModel) => {
+                  const unlocked = packModel.status !== 'locked';
+                  return (
+                    <PathNode
+                      key={packModel.id}
+                      pack={packModel.pack}
+                      progress={packModel.progress}
+                      unlocked={unlocked}
+                      isCurrent={packModel.id === activePackId}
+                      isSelected={selectedPackModel?.id === packModel.id}
+                      onToggle={onTogglePack}
+                      accent={accent}
+                      completion={packModel.completion}
+                      status={packModel.status}
+                      dueReviewCount={packModel.reviewDueCount || 0}
+                      packIndex={packModel.packIndex ?? 0}
+                      totalPacks={packModels.length}
+                    />
+                  );
+                })}
+              </div>
+              {rowIndex < rows.length - 1 && (
+                <div className={`bbs-switch-turn ${reverse ? 'bbs-switch-turn--left' : 'bbs-switch-turn--right'}`} aria-hidden="true" />
               )}
             </React.Fragment>
           );
