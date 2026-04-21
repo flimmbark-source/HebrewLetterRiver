@@ -128,40 +128,89 @@ function QuestPackTile({ pack, progress, unlocked, isCurrent, isSelected, onTogg
    SVG connector between two adjacent nodes
    ═══════════════════════════════════════════════════════════ */
 
-function SelectedPackPanel({ packModel, lastMethod, onLaunch, onQuizLaunch }) {
+function SelectedPackPanel({ packModel, accent = 'primary', onLaunch, onQuizLaunch }) {
   if (!packModel) return null;
   const pack = packModel.pack;
   const wordsLabel = `${pack.wordIds.length} words`;
-  const activitiesLabel = '3 activities';
-  const started = packModel.progress?.wordsIntroducedCount > 0 || packModel.status === 'learned' || packModel.status === 'mastered';
-  const isReview = (packModel.reviewDueCount || 0) > 0;
-  const progressBits = [];
-  if (started) {
-    progressBits.push(`${packModel.progress.wordsIntroducedCount}/${packModel.progress.totalWords} words`);
-    const doneCount = [packModel.completion.bridgeBuilderComplete, packModel.completion.loosePlanksComplete, packModel.completion.deepScriptComplete].filter(Boolean).length;
-    progressBits.push(`${doneCount}/3 activities`);
-  }
-  if (isReview) progressBits.push('Review due');
-  const primaryLabel = isReview ? `Review ${pack.title}` : started ? `Continue ${pack.title}` : `Start with ${pack.title}`;
-  const primaryMethod = lastMethod || 'vocab';
+  const started = (packModel.progress?.wordsIntroducedCount || 0) > 0
+    || packModel.status === 'started'
+    || packModel.status === 'introduced'
+    || packModel.status === 'learned'
+    || packModel.status === 'mastered'
+    || packModel.status === 'review';
+  const sentenceReady = !!(packModel.completion?.sentenceReady || packModel.sentenceReady);
+  const canQuickCheck = pack.wordIds.length >= 3;
+
+  const mainAction = started
+    ? { label: 'Continue this pack', subtitle: 'Guided word matching for these words.', button: 'Continue' }
+    : { label: 'Learn this pack', subtitle: 'Guided word matching for these words.', button: 'Start' };
+
+  const quickCheckAction = sentenceReady
+    ? {
+      label: 'Ready for Sentence Mode',
+      subtitle: 'This pack can now appear in sentence practice.',
+      button: 'Check again',
+      disabled: !canQuickCheck,
+      done: true,
+    }
+    : {
+      label: 'I already know these',
+      subtitle: 'Pass the quick check so this pack can appear in Sentence Mode.',
+      button: 'Check',
+      disabled: !canQuickCheck,
+      done: false,
+    };
 
   return (
-    <div className="bbs-selected-pack">
+    <section className={`bbs-selected-pack bbs-selected-pack--${accent}`} aria-label={`Selected pack: ${pack.title}`}>
       <h4 className="bbs-selected-pack-title" dir="auto">{pack.title}</h4>
       {pack.description && <p className="bbs-selected-pack-desc" dir="auto">{pack.description}</p>}
       <div className="bbs-selected-pack-meta">
         <span className="bbs-pack-chip">{wordsLabel}</span>
-        <span className="bbs-pack-chip">{activitiesLabel}</span>
-        {progressBits.map((bit) => <span key={bit} className="bbs-pack-chip">{bit}</span>)}
       </div>
-      <div className="bbs-selected-pack-actions">
-        <button type="button" className="bbs-action-btn" onClick={() => onLaunch(pack, primaryMethod)}>{primaryLabel}</button>
-        <button type="button" className="bbs-method bbs-method--inline" onClick={() => onLaunch(pack, 'deep_script')}>Deep Script</button>
-        {pack.wordIds.length >= 3 && (
-          <button type="button" className="bbs-method bbs-method--inline bbs-method--quiz" onClick={() => onQuizLaunch(pack)}>Quick Word Check</button>
-        )}
+      <h5 className="bbs-selected-pack-heading">Choose what to do</h5>
+      <div className="bbs-activity-grid">
+        <article className="bbs-activity-card bbs-activity-card--primary">
+          <h6 className="bbs-activity-title">{mainAction.label}</h6>
+          <p className="bbs-activity-subtitle">{mainAction.subtitle}</p>
+          <button
+            type="button"
+            className="bbs-activity-cta bbs-activity-cta--primary"
+            onClick={() => onLaunch(pack, 'vocab')}
+            aria-label={`${mainAction.label}, ${mainAction.subtitle}`}
+          >
+            {mainAction.button}
+          </button>
+        </article>
+
+        <article className="bbs-activity-card">
+          <h6 className="bbs-activity-title">Use in Deep Script</h6>
+          <p className="bbs-activity-subtitle">Play the guardian challenge with this pack.</p>
+          <button
+            type="button"
+            className="bbs-activity-cta"
+            onClick={() => onLaunch(pack, 'deep_script')}
+            aria-label="Use in Deep Script, play the guardian challenge with this pack."
+          >
+            Play
+          </button>
+        </article>
+
+        <article className={`bbs-activity-card${quickCheckAction.done ? ' bbs-activity-card--done' : ''}`}>
+          <h6 className="bbs-activity-title">{quickCheckAction.label}</h6>
+          <p className="bbs-activity-subtitle">{quickCheckAction.subtitle}</p>
+          <button
+            type="button"
+            className="bbs-activity-cta"
+            onClick={() => onQuizLaunch(pack)}
+            disabled={quickCheckAction.disabled}
+            aria-label={`${quickCheckAction.label}, ${quickCheckAction.subtitle}`}
+          >
+            {quickCheckAction.button}
+          </button>
+        </article>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -169,7 +218,7 @@ function SelectedPackPanel({ packModel, lastMethod, onLaunch, onQuizLaunch }) {
    SectionBlock — always-visible section with winding path
    ═══════════════════════════════════════════════════════════ */
 
-function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, onTogglePack, onLaunch, onQuizLaunch, panelId, hideHeader = false }) {
+function SectionBlock({ sectionModel, activePackId, expandedPack, onTogglePack, onLaunch, onQuizLaunch, panelId, hideHeader = false }) {
   const { section, packModels, isUnlocked, masteredCount, totalPacks } = sectionModel;
   const meta = getSectionMeta(sectionModel.id);
   const accent = meta.accent;
@@ -208,7 +257,7 @@ function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, o
       )}
       <SelectedPackPanel
         packModel={selectedPackModel}
-        lastMethod={lastMethods[selectedPackModel?.id] || 'vocab'}
+        accent={accent}
         onLaunch={onLaunch}
         onQuizLaunch={onQuizLaunch}
       />
@@ -919,7 +968,6 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                         sectionModel={sectionModel}
                         activePackId={activePackId}
                         expandedPack={expandedPack}
-                        lastMethods={lastMethods}
                         onTogglePack={handleTogglePack}
                         onLaunch={handleLaunchPackMethod}
                         onQuizLaunch={handlePackQuizLaunch}
