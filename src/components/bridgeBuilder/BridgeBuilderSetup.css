@@ -51,6 +51,26 @@ body.dark-mode .bbs-subtitle { color: #94a3b8; }
 body.dark-mode .bbs-mode-tab { background: #0f172a; border-color: #334155; color: #94a3b8; }
 body.dark-mode .bbs-mode-tab.active { background: rgba(16, 185, 129, 0.16); color: #34d399; }
 
+/* Top action strip */
+body.dark-mode .bbs-top-card { background: #0f172a; border-color: #1e293b; color: #e2e8f0; }
+body.dark-mode .bbs-top-card:hover { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4); }
+body.dark-mode .bbs-top-card--primary {
+  background: linear-gradient(135deg, #065f46 0%, #047857 55%, #10b981 100%);
+  color: #ecfdf5;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.25);
+}
+body.dark-mode .bbs-top-card--review {
+  background: rgba(252, 185, 114, 0.14);
+  border-color: rgba(252, 185, 114, 0.25);
+}
+body.dark-mode .bbs-top-card--skillcheck {
+  background: rgba(129, 140, 248, 0.14);
+  border-color: rgba(129, 140, 248, 0.25);
+}
+body.dark-mode .bbs-top-card-icon--primary { background: rgba(255, 255, 255, 0.15); color: #ecfdf5; }
+body.dark-mode .bbs-top-card-icon--review { background: rgba(252, 185, 114, 0.20); color: #fcb972; }
+body.dark-mode .bbs-top-card-icon--skillcheck { background: rgba(129, 140, 248, 0.20); color: #a5b4fc; }
+
 body.dark-mode .bbs-mode-panel { background: #0f172a; border-color: #334155; }
 body.dark-mode .bbs-mode-title { color: #f8fafc; }
 body.dark-mode .bbs-subview-close { color: #34d399; }
@@ -170,6 +190,120 @@ body.dark-mode .bbs-review-btn { background: #10b981; color: #020617; }
   color: var(--m3-on-surface-variant);
   margin: 0;
   line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Top Action Strip — compact "what to do next" cards
+   ═══════════════════════════════════════════════════════════ */
+.bbs-top-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 8px 0 16px;
+}
+
+.bbs-top-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--m3-outline-variant-30);
+  border-radius: 16px;
+  background: var(--m3-surface-container-lowest);
+  font-family: var(--m3-font);
+  color: var(--m3-on-surface);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  /* Prevent long copy from pushing siblings out of the row on mobile. */
+  flex: 1 1 150px;
+}
+
+.bbs-top-card:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); }
+.bbs-top-card:active { transform: translateY(0); }
+.bbs-top-card:focus-visible { outline: 2px solid var(--m3-primary); outline-offset: 2px; }
+
+/* Primary = Continue. Gradient + stronger presence; takes ~2x space on wider screens. */
+.bbs-top-card--primary {
+  flex: 2.2 1 240px;
+  color: var(--m3-on-primary);
+  background: linear-gradient(135deg, var(--m3-primary) 0%, #2d8f6d 60%, #3ba37e 100%);
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(27, 107, 79, 0.28);
+}
+.bbs-top-card--primary:hover { box-shadow: 0 8px 22px rgba(27, 107, 79, 0.34); }
+
+.bbs-top-card--review { background: var(--m3-secondary-container-20); border-color: transparent; }
+.bbs-top-card--skillcheck { background: var(--m3-tertiary-container-40); border-color: transparent; }
+
+.bbs-top-card-icon {
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.bbs-top-card-icon .material-symbols-outlined { font-size: 24px; font-variation-settings: 'FILL' 1; }
+
+.bbs-top-card-icon--primary { background: rgba(255, 255, 255, 0.22); color: var(--m3-on-primary); }
+.bbs-top-card-icon--review { background: rgba(252, 185, 114, 0.35); color: var(--m3-secondary); }
+.bbs-top-card-icon--skillcheck { background: rgba(205, 232, 234, 0.55); color: var(--m3-tertiary); }
+
+.bbs-top-card-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.2;
+}
+
+.bbs-top-card-eyebrow {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 2px;
+}
+
+.bbs-top-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  /* Truncate gracefully on narrow screens instead of wrapping multiple lines. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bbs-top-card--primary .bbs-top-card-title { font-size: 17px; }
+
+.bbs-top-card-meta {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.bbs-top-card-chev {
+  flex-shrink: 0;
+  margin-left: 4px;
+  opacity: 0.9;
+  display: flex; align-items: center;
+}
+.bbs-top-card-chev .material-symbols-outlined { font-size: 20px; }
+
+@media (max-width: 560px) {
+  .bbs-top-strip { gap: 8px; }
+  /* On small screens the primary card goes full-width; review + skill
+     check sit side-by-side on the next row. */
+  .bbs-top-card--primary { flex-basis: 100%; }
+  .bbs-top-card { padding: 12px; }
+  .bbs-top-card-title { font-size: 14px; }
+  .bbs-top-card--primary .bbs-top-card-title { font-size: 16px; }
 }
 
 .bbs-mode-tabs { display: flex; gap: 8px; margin: 4px 0 16px; }

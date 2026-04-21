@@ -407,6 +407,96 @@ function PackRow({ pack, progress, unlocked, completion, modeOverride, onDotClic
   );
 }
 
+/* ═══════════════════════════════════════════════════════════
+   TopActionStrip — compact "what to do next" area above tabs
+   ═══════════════════════════════════════════════════════════ */
+// Additive layer: sits above the existing Guided/Browse/Advanced tabs
+// and surfaces the most important next actions (Continue, Review, Skill
+// Check) so the player can act without scrolling. The old guided path
+// and Review card below are intentionally left in place for now.
+
+function TopActionStrip({
+  recommendedPack,        // PackDisplayModel | null
+  dueCount,
+  weakCount,
+  showSkillCheckCta,
+  onContinue,
+  onReview,
+  onSkillCheck,
+}) {
+  const hasContinue = !!recommendedPack;
+  const hasReview = dueCount > 0;
+  const hasSkillCheck = !!showSkillCheckCta;
+
+  // Nothing to show — don't render an empty strip.
+  if (!hasContinue && !hasReview && !hasSkillCheck) return null;
+
+  return (
+    <div className="bbs-top-strip" role="group" aria-label="Next actions">
+      {hasContinue && (
+        <button
+          type="button"
+          className="bbs-top-card bbs-top-card--primary"
+          onClick={onContinue}
+          aria-label={`${recommendedPack.ctaLabel} ${recommendedPack.title}`}
+        >
+          <span className="bbs-top-card-icon bbs-top-card-icon--primary" aria-hidden="true">
+            <span className="material-symbols-outlined">play_arrow</span>
+          </span>
+          <span className="bbs-top-card-body">
+            <span className="bbs-top-card-eyebrow">{recommendedPack.ctaLabel}</span>
+            <span className="bbs-top-card-title">{recommendedPack.title}</span>
+            <span className="bbs-top-card-meta">{recommendedPack.progressLabel}</span>
+          </span>
+          <span className="bbs-top-card-chev" aria-hidden="true">
+            <span className="material-symbols-outlined">arrow_forward</span>
+          </span>
+        </button>
+      )}
+
+      {hasReview && (
+        <button
+          type="button"
+          className="bbs-top-card bbs-top-card--review"
+          onClick={onReview}
+          aria-label={`Review ${dueCount} due item${dueCount === 1 ? '' : 's'}`}
+        >
+          <span className="bbs-top-card-icon bbs-top-card-icon--review" aria-hidden="true">
+            <span className="material-symbols-outlined">casino</span>
+          </span>
+          <span className="bbs-top-card-body">
+            <span className="bbs-top-card-eyebrow">Review due</span>
+            <span className="bbs-top-card-title">
+              {dueCount} item{dueCount === 1 ? '' : 's'}
+            </span>
+            {weakCount > 0 && (
+              <span className="bbs-top-card-meta">{weakCount} weak</span>
+            )}
+          </span>
+        </button>
+      )}
+
+      {hasSkillCheck && (
+        <button
+          type="button"
+          className="bbs-top-card bbs-top-card--skillcheck"
+          onClick={onSkillCheck}
+          aria-label="Take a quick skill check"
+        >
+          <span className="bbs-top-card-icon bbs-top-card-icon--skillcheck" aria-hidden="true">
+            <span className="material-symbols-outlined">quiz</span>
+          </span>
+          <span className="bbs-top-card-body">
+            <span className="bbs-top-card-eyebrow">Skill check</span>
+            <span className="bbs-top-card-title">Quick check</span>
+            <span className="bbs-top-card-meta">Skip what you know</span>
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 /* ─── Review Card ────────────────────────────────────────── */
 
 function ReviewCard({ dueCount, weakCount, onPlay }) {
@@ -496,6 +586,23 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     }
     return null;
   }, [displayModel]);
+
+  // Recommended pack for the top action strip — mirrors activePackId but
+  // returns the full PackDisplayModel (not just id) so the strip can
+  // render title, CTA label, and progress copy straight from one source.
+  const recommendedPackModel = useMemo(() => {
+    for (const sectionModel of displayModel.sections) {
+      if (sectionModel.recommendedPack) return sectionModel.recommendedPack;
+    }
+    return null;
+  }, [displayModel]);
+
+  // Same rule as the existing skill-check banner so both appear and
+  // disappear together — feature is additive, not a replacement.
+  const showSkillCheckCta = useMemo(
+    () => !Object.values(packCompletions).some((c) => c?.quizMastered || c?.sentenceReady),
+    [packCompletions],
+  );
 
   const handleTogglePack = useCallback((packId) => {
     setExpandedPack(prev => prev === packId ? null : packId);
@@ -591,6 +698,28 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     setQuizResult(null);
   }, []);
 
+  // Top-strip Continue: launch the recommended pack using the player's
+  // last study method for that pack (falls back to 'vocab' for Vocab
+  // Builder). Reuses the existing launch path so game modes, analytics,
+  // and persistence are identical to the path-node chooser.
+  const handleContinueRecommended = useCallback(() => {
+    const pack = recommendedPackModel?.pack;
+    if (!pack) return;
+    const method = lastMethods[pack.id] || 'vocab';
+    emit('analytics:bridge_setup', { event: 'top_strip_continue', packId: pack.id, method });
+    handleLaunchPackMethod(pack, method);
+  }, [recommendedPackModel, lastMethods, handleLaunchPackMethod]);
+
+  const handleTopStripReview = useCallback(() => {
+    emit('analytics:bridge_setup', { event: 'top_strip_review' });
+    handlePlayReview();
+  }, [handlePlayReview]);
+
+  const handleTopStripSkillCheck = useCallback(() => {
+    emit('analytics:bridge_setup', { event: 'top_strip_skill_check' });
+    setShowSkillCheck(true);
+  }, []);
+
   const allUnlockedPackData = useMemo(() => sectionData.flatMap(sd => sd.packData).filter(pd => pd.unlocked), [sectionData]);
   const goalModePackData = useMemo(() => allUnlockedPackData.filter(pd => matchesGoal(pd.pack, goalFilter)), [allUnlockedPackData, goalFilter]);
   const expertModePackData = useMemo(() => {
@@ -616,6 +745,16 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
           <h1 className="bbs-title">Vocab Builder</h1>
           <p className="bbs-subtitle">Your learning path</p>
         </div>
+
+        <TopActionStrip
+          recommendedPack={recommendedPackModel}
+          dueCount={dueReviewWordIds.length}
+          weakCount={weakWordIds.length}
+          showSkillCheckCta={showSkillCheckCta}
+          onContinue={handleContinueRecommended}
+          onReview={handleTopStripReview}
+          onSkillCheck={handleTopStripSkillCheck}
+        />
 
         <div className="bbs-mode-tabs" role="tablist" aria-label="Browse modes">
           <button type="button" className={`bbs-mode-tab ${activeSubview === null ? 'active' : ''}`}
