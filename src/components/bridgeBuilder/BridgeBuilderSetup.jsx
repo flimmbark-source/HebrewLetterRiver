@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
-import { getPacksBySection } from '../../data/bridgeBuilderPacks.js';
+import { getPacksBySection, getPackById } from '../../data/bridgeBuilderPacks.js';
 import {
   getAllWordProgress,
   getPackProgress,
@@ -537,10 +537,11 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     onPlay({ sessionType: 'due_review', packId: null, selectedWordIds: reviewIds, gameMode: 'bridge_builder', entryPoint: 'review_due' });
   }, [onPlay, dueReviewWordIds, weakWordIds]);
 
-  const handleSkillCheckComplete = useCallback(({ breakdown, evidence }) => {
+  const handleSkillCheckComplete = useCallback(({ score, total, breakdown, evidence }) => {
     const { correctWordIds, sentenceReadyPackIds } = applyQuizMastery(evidence, breakdown);
     setProgressRevision((r) => r + 1);
     setShowSkillCheck(false);
+    const passed = total > 0 && score >= Math.ceil(total * 0.8);
 
     if (packQuizTarget) {
       setQuizResult({
@@ -551,8 +552,18 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
         sentenceReady: sentenceReadyPackIds.includes(packQuizTarget.id),
       });
       setPackQuizTarget(null);
+      if (passed) setExpandedPack(null);
     } else {
-      setQuizResult({ type: 'global', correctWordCount: correctWordIds.length, sentenceReadyPackIds });
+      const sentenceReadyPackTitles = sentenceReadyPackIds
+        .map((id) => getPackById(id)?.title)
+        .filter(Boolean);
+      setQuizResult({
+        type: 'global',
+        correctWordCount: correctWordIds.length,
+        testedWordCount: evidence?.length ?? 0,
+        sentenceReadyPackIds,
+        sentenceReadyPackTitles,
+      });
     }
 
     emit('analytics:bridge_setup', {
@@ -687,9 +698,9 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                       {quizResult.correctWordCount > 0
                         ? `${quizResult.correctWordCount} word${quizResult.correctWordCount !== 1 ? 's' : ''} confirmed from your skill check`
                         : 'Skill check complete — keep practicing to confirm more words!'}
-                      {quizResult.sentenceReadyPackIds?.length > 0 && (
+                      {quizResult.sentenceReadyPackTitles?.length > 0 && (
                         <span className="bbs-quiz-result-detail">
-                          {` · ${quizResult.sentenceReadyPackIds.length} pack${quizResult.sentenceReadyPackIds.length !== 1 ? 's' : ''} now sentence-ready`}
+                          {` · Ready for sentence practice: ${quizResult.sentenceReadyPackTitles.join(', ')}`}
                         </span>
                       )}
                     </>

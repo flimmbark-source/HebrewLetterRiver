@@ -316,37 +316,16 @@ export function markDeepScriptComplete(packId) {
 }
 
 /**
- * Mark a pack as mastered via the onboarding skill-check quiz.
- * Uses the existing completion markers to fully credit all three game modes,
- * then also stamps quizMastered so the UI can show a distinguishing badge.
+ * NOTE: the former `markPackQuizMastered` / `markPackQuizBadge` helpers —
+ * which flipped `bridgeBuilderComplete`, `loosePlanksComplete`, and
+ * `deepScriptComplete` based on a brief quiz — were removed. A quiz can
+ * prove enough familiarity to skip intro work (`quizKnown` on words,
+ * `sentenceReady` on packs) but it does not complete any game mode.
+ *
+ * Legacy user data that still has `quizMastered` set from the old code
+ * is read where relevant (see `quizMastered || sentenceReady` checks in
+ * the UI) so prior progress is not lost.
  */
-export function markPackQuizMastered(packId) {
-  const all = loadState(PACK_COMPLETION_KEY, {});
-  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
-  entry.bridgeBuilderComplete = true;
-  entry.loosePlanksComplete = true;
-  entry.deepScriptComplete = true;
-  entry.quizMastered = true;
-  entry.quizMasteredAt = new Date().toISOString();
-  all[packId] = entry;
-  saveState(PACK_COMPLETION_KEY, all);
-}
-
-/**
- * Mark a pack as quiz-attempted (badge only, no completion flags).
- * Used when the player answered vocab questions in the skill check but
- * scored below the mastery threshold — the pack was tested but not passed.
- */
-export function markPackQuizBadge(packId) {
-  const all = loadState(PACK_COMPLETION_KEY, {});
-  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
-  if (!entry.quizMastered) {
-    entry.quizMastered = true;
-    entry.quizMasteredAt = new Date().toISOString();
-    all[packId] = entry;
-    saveState(PACK_COMPLETION_KEY, all);
-  }
-}
 
 /**
  * Mark a single word as known via quiz evidence.

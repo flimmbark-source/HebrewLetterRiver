@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { getNativeScript, getMeaning } from '../lib/vocabLanguageAdapter.js';
 
@@ -272,9 +272,14 @@ export default function SkillCheckScreen({ onComplete, onSkip, questionTypes = [
     [feedback, question, currentIndex, totalQuestions, score, typeResults, onComplete, answeredEvidence]
   );
 
+  useEffect(() => {
+    if (totalQuestions === 0) {
+      onSkip();
+    }
+  }, [totalQuestions, onSkip]);
+
   if (!question) {
-    // Not enough data — skip
-    onSkip();
+    // Not enough data — the effect above will call onSkip on the next tick.
     return null;
   }
 
