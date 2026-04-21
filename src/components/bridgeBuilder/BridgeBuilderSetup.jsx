@@ -21,6 +21,10 @@ import {
   matchesQuery,
   sortPackData,
 } from './bridgeBuilderSetupHelpers.js';
+import {
+  buildDisplayModel,
+  getSectionMeta,
+} from '../../lib/bridgeBuilderDisplayModel.js';
 import SkillCheckScreen from '../SkillCheckScreen.jsx';
 import { bridgeBuilderWords, getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import { allSentences } from '../../data/sentences/index.ts';
@@ -35,18 +39,9 @@ const QUIZ_VOCAB_WORDS = bridgeBuilderWords.filter((w) => w.difficulty <= 2);
 const QUIZ_SENTENCES = allSentences.filter((s) => s.difficulty === 1);
 
 /* ─── Section visual metadata ──────────────────────────────── */
-
-const SECTION_META = {
-  foundations: { icon: 'school', accent: 'primary' },
-  daily_life: { icon: 'home', accent: 'secondary' },
-  people_social: { icon: 'groups', accent: 'tertiary' },
-  meaning_builders: { icon: 'auto_stories', accent: 'primary' },
-  cafe_talk: { icon: 'coffee', accent: 'secondary' },
-};
-
-function getSectionMeta(sectionId) {
-  return SECTION_META[sectionId] || { icon: 'category', accent: 'primary' };
-}
+// Moved to src/lib/bridgeBuilderDisplayModel.js — see SECTION_META / getSectionMeta.
+// Both the current setup screen and the future section-hub UI render
+// through that single source.
 
 /* ─── Status helpers ─────────────────────────────────────── */
 
@@ -478,19 +473,29 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     });
   }, [sections, allProgress, packCompletions]);
 
+  // Normalized display model — the single source of truth for status,
+  // CTA labels, progress copy, and section-level aggregates. The current
+  // setup screen only consumes `currentPack` from it (for activePackId)
+  // so the visible layout is unchanged, but a future section-hub UI can
+  // render entirely from this structure.
+  const displayModel = useMemo(() =>
+    buildDisplayModel({
+      sections,
+      getPacksForSection: (sectionId) => getPacksBySection(sectionId),
+      allWordProgress: allProgress,
+      packCompletions,
+      dueReviewWordIds,
+      isPackUnlocked: (pack) => isPackUnlocked(pack, getPacksBySection(pack.sectionId), allProgress),
+      isSectionUnlocked: (section) => isSectionUnlocked(section, sections, sections.flatMap(s => getPacksBySection(s.id)), allProgress),
+    }),
+  [sections, allProgress, packCompletions, dueReviewWordIds]);
+
   const activePackId = useMemo(() => {
-    for (const sd of sectionData) {
-      for (const pd of sd.packData) {
-        if (pd.unlocked && pd.progress.wordsIntroducedCount > 0 && !pd.progress.completed) return pd.pack.id;
-      }
-    }
-    for (const sd of sectionData) {
-      for (const pd of sd.packData) {
-        if (pd.unlocked && !pd.progress.completed) return pd.pack.id;
-      }
+    for (const sectionModel of displayModel.sections) {
+      if (sectionModel.currentPack) return sectionModel.currentPack.id;
     }
     return null;
-  }, [sectionData]);
+  }, [displayModel]);
 
   const handleTogglePack = useCallback((packId) => {
     setExpandedPack(prev => prev === packId ? null : packId);
