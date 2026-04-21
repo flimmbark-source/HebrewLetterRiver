@@ -88,8 +88,6 @@ function QuestPackTile({ pack, progress, unlocked, isCurrent, isSelected, onTogg
   const defaultCompletion = { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
   const comp = completion || defaultCompletion;
   const state = getNodeState(progress, unlocked, isCurrent, comp);
-  const visual = getPackVisualTokens(pack, state === 'completed' ? 'completed' : state === 'current' ? 'progress' : state);
-  const icon = !unlocked ? 'lock' : state === 'completed' ? 'check' : state === 'current' ? 'play_arrow' : visual.icon;
 
   const nodeCls = `bbs-quest-tile bbs-quest-tile--${state} bbs-quest-tile--${accent}`;
   const stateLabel = !unlocked
@@ -100,7 +98,10 @@ function QuestPackTile({ pack, progress, unlocked, isCurrent, isSelected, onTogg
         ? 'Done'
         : isCurrent
           ? 'Current'
-          : 'New';
+          : '';
+  const ariaLabel = stateLabel
+    ? `Pack ${packIndex + 1} of ${totalPacks}, ${pack.title}, ${stateLabel}`
+    : `Pack ${packIndex + 1} of ${totalPacks}, ${pack.title}`;
 
   return (
     <button
@@ -108,16 +109,15 @@ function QuestPackTile({ pack, progress, unlocked, isCurrent, isSelected, onTogg
       className={isSelected ? `${nodeCls} bbs-quest-tile--selected` : nodeCls}
       onClick={() => unlocked && onToggle(pack.id)}
       disabled={!unlocked}
-      aria-label={`Pack ${packIndex + 1} of ${totalPacks}, ${pack.title}, ${stateLabel}`}
+      aria-label={ariaLabel}
       aria-pressed={isSelected}
       aria-current={isCurrent ? 'step' : undefined}
     >
       <span className="bbs-quest-tile-top">
         <span className="bbs-quest-tile-index">{packIndex + 1}</span>
-        <span className={`bbs-quest-pill bbs-quest-pill--${state}`}>{stateLabel}</span>
+        {stateLabel && <span className={`bbs-quest-pill bbs-quest-pill--${state}`}>{stateLabel}</span>}
       </span>
       <span className="bbs-quest-tile-main">
-        <span className={`material-symbols-outlined bbs-quest-tile-icon bbs-node-emblem--${visual.accent}`} aria-hidden="true">{icon}</span>
         <span className="bbs-quest-tile-title" dir="auto">{pack.title}</span>
       </span>
     </button>
@@ -169,42 +169,43 @@ function SelectedPackPanel({ packModel, lastMethod, onLaunch, onQuizLaunch }) {
    SectionBlock — always-visible section with winding path
    ═══════════════════════════════════════════════════════════ */
 
-function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, onTogglePack, onLaunch, onQuizLaunch, panelId }) {
+function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, onTogglePack, onLaunch, onQuizLaunch, panelId, hideHeader = false }) {
   const { section, packModels, isUnlocked, masteredCount, totalPacks } = sectionModel;
   const meta = getSectionMeta(sectionModel.id);
   const accent = meta.accent;
   const progressPct = totalPacks > 0 ? (masteredCount / totalPacks) * 100 : 0;
   const selectedPackModel = packModels.find((pm) => pm.id === expandedPack) || packModels.find((pm) => pm.id === activePackId) || packModels[0] || null;
   return (
-    <div id={panelId} className={`bbs-block ${!isUnlocked ? 'bbs-block--locked' : ''}`}>
-      {/* Section header */}
-      <div className="bbs-block-header">
-        <div className={`bbs-block-icon bbs-block-icon--${accent}`}>
-          <span className="material-symbols-outlined" style={{ fontSize: 22 }}>{meta.icon}</span>
-        </div>
-        <div className="bbs-block-info">
-          <div className="bbs-block-top">
-            <h3 className="bbs-block-title" dir="auto">{section.title}</h3>
-            <span className={`bbs-block-count bbs-block-count--${accent}`}>
-              {isUnlocked ? `${masteredCount}/${totalPacks}` : `${totalPacks} packs`}
-            </span>
+    <div id={panelId} className={`bbs-block ${hideHeader ? 'bbs-block--embedded' : ''} ${!isUnlocked ? 'bbs-block--locked' : ''}`}>
+      {!hideHeader && (
+        <div className="bbs-block-header">
+          <div className={`bbs-block-icon bbs-block-icon--${accent}`}>
+            <span className="material-symbols-outlined" style={{ fontSize: 22 }}>{meta.icon}</span>
           </div>
-          <p className="bbs-block-desc">{section.description}</p>
-          <div className="bbs-block-bar">
-            <div
-              className="bbs-block-track"
-              role="progressbar"
-              aria-label={`${section.title} completion`}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={Math.round(progressPct)}
-              aria-valuetext={`${masteredCount}/${totalPacks}`}
-            >
-              <div className={`bbs-block-fill bbs-block-fill--${accent}`} style={{ width: `${progressPct}%` }} />
+          <div className="bbs-block-info">
+            <div className="bbs-block-top">
+              <h3 className="bbs-block-title" dir="auto">{section.title}</h3>
+              <span className={`bbs-block-count bbs-block-count--${accent}`}>
+                {isUnlocked ? `${masteredCount}/${totalPacks}` : `${totalPacks} packs`}
+              </span>
+            </div>
+            <p className="bbs-block-desc">{section.description}</p>
+            <div className="bbs-block-bar">
+              <div
+                className="bbs-block-track"
+                role="progressbar"
+                aria-label={`${section.title} completion`}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(progressPct)}
+                aria-valuetext={`${masteredCount}/${totalPacks}`}
+              >
+                <div className={`bbs-block-fill bbs-block-fill--${accent}`} style={{ width: `${progressPct}%` }} />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       <SelectedPackPanel
         packModel={selectedPackModel}
         lastMethod={lastMethods[selectedPackModel?.id] || 'vocab'}
@@ -351,6 +352,7 @@ function SectionHubCard({
   isExpanded,
   onToggleExpand,
   onLaunchRecommended,
+  expandedContent,
 }) {
   const {
     title,
@@ -369,7 +371,7 @@ function SectionHubCard({
     ? `${masteredCount} of ${totalPacks} pack${totalPacks === 1 ? '' : 's'} mastered`
     : nextUnlockLabel || `${totalPacks} pack${totalPacks === 1 ? '' : 's'} locked`;
 
-  const showContinue = isUnlocked && !!recommendedPack;
+  const showContinue = isUnlocked && !!recommendedPack && !isExpanded;
   const panelId = `bbs-section-panel-${sectionModel.id}`;
   const nextPreview = previewPacks.slice(0, 3).map((p) => p.title).join(' · ');
   const actionLabel = recommendedPack
@@ -441,6 +443,7 @@ function SectionHubCard({
           </span>
         </button>
       )}
+      {isExpanded && expandedContent}
     </div>
   );
 }
@@ -910,19 +913,20 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
                     isExpanded={isExpanded}
                     onToggleExpand={() => handleToggleSection(sectionModel.id)}
                     onLaunchRecommended={() => handleLaunchRecommendedForSection(sectionModel)}
+                    expandedContent={isExpanded ? (
+                      <SectionBlock
+                        panelId={`bbs-section-panel-${sectionModel.id}`}
+                        sectionModel={sectionModel}
+                        activePackId={activePackId}
+                        expandedPack={expandedPack}
+                        lastMethods={lastMethods}
+                        onTogglePack={handleTogglePack}
+                        onLaunch={handleLaunchPackMethod}
+                        onQuizLaunch={handlePackQuizLaunch}
+                        hideHeader
+                      />
+                    ) : null}
                   />
-                  {isExpanded && (
-                    <SectionBlock
-                      panelId={`bbs-section-panel-${sectionModel.id}`}
-                      sectionModel={sectionModel}
-                      activePackId={activePackId}
-                      expandedPack={expandedPack}
-                      lastMethods={lastMethods}
-                      onTogglePack={handleTogglePack}
-                      onLaunch={handleLaunchPackMethod}
-                      onQuizLaunch={handlePackQuizLaunch}
-                    />
-                  )}
                 </div>
               );
             })}
