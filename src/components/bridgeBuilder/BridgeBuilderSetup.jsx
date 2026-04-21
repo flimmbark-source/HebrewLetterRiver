@@ -93,7 +93,8 @@ function getNodeState(progress, unlocked, isCurrent, completion) {
 function getPathColumns(width) {
   if (width <= 420) return 1;
   if (width <= 820) return 2;
-  return 3;
+  if (width <= 1200) return 3;
+  return 5;
 }
 
 function getSwitchbackPlacement(index, nodesPerRow) {
