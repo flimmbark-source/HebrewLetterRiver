@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
 import { getPacksBySection, getPackById } from '../../data/bridgeBuilderPacks.js';
 import {
@@ -94,6 +94,25 @@ function getPathColumns(width) {
   if (width <= 420) return 1;
   if (width <= 820) return 2;
   return 3;
+}
+
+function getSwitchbackPlacement(index, nodesPerRow) {
+  const rowIndex = Math.floor(index / nodesPerRow);
+  const positionInRow = index % nodesPerRow;
+  const isReverseRow = rowIndex % 2 === 1;
+  const visualColumn = isReverseRow
+    ? nodesPerRow - positionInRow
+    : positionInRow + 1;
+
+  return { rowIndex, visualColumn };
+}
+
+function buildPolylinePath(points) {
+  if (!points.length) return '';
+  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+  return points.reduce((acc, point, index) => (
+    index === 0 ? `M ${point.x} ${point.y}` : `${acc} L ${point.x} ${point.y}`
+  ), '');
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -212,6 +231,8 @@ function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, o
   const progressPct = totalPacks > 0 ? (masteredCount / totalPacks) * 100 : 0;
   const selectedPackModel = packModels.find((pm) => pm.id === expandedPack) || packModels.find((pm) => pm.id === activePackId) || packModels[0] || null;
   const [pathColumns, setPathColumns] = useState(() => getPathColumns(typeof window !== 'undefined' ? window.innerWidth : 1024));
+  const pathRef = useRef(null);
+  const [pathWidth, setPathWidth] = useState(0);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -221,13 +242,65 @@ function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, o
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  const rows = useMemo(() => {
-    const chunks = [];
-    for (let i = 0; i < packModels.length; i += pathColumns) {
-      chunks.push(packModels.slice(i, i + pathColumns));
-    }
-    return chunks;
-  }, [packModels, pathColumns]);
+  useEffect(() => {
+    const el = pathRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return undefined;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      setPathWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const nodePlacements = useMemo(
+    () => packModels.map((packModel, index) => ({
+      packModel,
+      index,
+      ...getSwitchbackPlacement(index, pathColumns),
+    })),
+    [packModels, pathColumns],
+  );
+
+  const rowCount = useMemo(
+    () => nodePlacements.reduce((max, node) => Math.max(max, node.rowIndex + 1), 0),
+    [nodePlacements],
+  );
+
+  const activeIndex = useMemo(() => {
+    const idx = packModels.findIndex((pm) => pm.id === activePackId);
+    if (idx >= 0) return idx;
+    const expandedIndex = packModels.findIndex((pm) => pm.id === expandedPack);
+    return expandedIndex;
+  }, [packModels, activePackId, expandedPack]);
+
+  const trailData = useMemo(() => {
+    if (!nodePlacements.length) return { path: '', activePath: '', viewBox: '0 0 1 1', height: 0 };
+
+    const paddingX = 24;
+    const paddingTop = 24;
+    const paddingBottom = 28;
+    const rowGap = 78;
+    const width = Math.max(pathWidth, 1);
+    const innerWidth = Math.max(width - (paddingX * 2), 1);
+    const colStep = pathColumns > 1 ? innerWidth / (pathColumns - 1) : 0;
+    const points = nodePlacements.map((node) => ({
+      x: paddingX + (node.visualColumn - 1) * colStep,
+      y: paddingTop + (node.rowIndex * rowGap),
+    }));
+    const totalHeight = paddingTop + paddingBottom + ((rowCount - 1) * rowGap);
+    const path = buildPolylinePath(points);
+    const activePoints = activeIndex >= 0 ? points.slice(0, activeIndex + 1) : [];
+    const activePath = buildPolylinePath(activePoints);
+
+    return {
+      path,
+      activePath,
+      viewBox: `0 0 ${Math.max(width, 1)} ${Math.max(totalHeight, 1)}`,
+      height: totalHeight,
+    };
+  }, [nodePlacements, pathColumns, pathWidth, rowCount, activeIndex]);
 
   return (
     <div id={panelId} className={`bbs-block ${!isUnlocked ? 'bbs-block--locked' : ''}`}>
@@ -261,40 +334,49 @@ function SectionBlock({ sectionModel, activePackId, expandedPack, lastMethods, o
       </div>
 
       {/* Winding pack path */}
-      <div className="bbs-path bbs-path--switchback">
-        <div className={`bbs-switchback bbs-switchback--cols-${pathColumns}`} aria-hidden="true" />
-        {rows.map((row, rowIndex) => {
-          const reverse = rowIndex % 2 === 1;
-          return (
-            <React.Fragment key={`row-${rowIndex}`}>
-              <div className={`bbs-switch-row ${reverse ? 'bbs-switch-row--reverse' : ''}`}>
-                {row.map((packModel) => {
-                  const unlocked = packModel.status !== 'locked';
-                  return (
-                    <PathNode
-                      key={packModel.id}
-                      pack={packModel.pack}
-                      progress={packModel.progress}
-                      unlocked={unlocked}
-                      isCurrent={packModel.id === activePackId}
-                      isSelected={selectedPackModel?.id === packModel.id}
-                      onToggle={onTogglePack}
-                      accent={accent}
-                      completion={packModel.completion}
-                      status={packModel.status}
-                      dueReviewCount={packModel.reviewDueCount || 0}
-                      packIndex={packModel.packIndex ?? 0}
-                      totalPacks={packModels.length}
-                    />
-                  );
-                })}
+      <div
+        ref={pathRef}
+        className="bbs-path bbs-path--switchback"
+        style={{ '--bbs-path-columns': pathColumns, '--bbs-path-rows': rowCount }}
+      >
+        <svg className="bbs-path-trail" viewBox={trailData.viewBox} preserveAspectRatio="none" aria-hidden="true">
+          {trailData.path && (
+            <>
+              <path className="bbs-trail bbs-trail--base" d={trailData.path} />
+              <path className={`bbs-trail bbs-trail--accent bbs-trail--${accent}`} d={trailData.path} />
+            </>
+          )}
+          {trailData.activePath && (
+            <path className={`bbs-trail bbs-trail--active bbs-trail--${accent}`} d={trailData.activePath} />
+          )}
+        </svg>
+        <div className="bbs-switchback-grid">
+          {nodePlacements.map(({ packModel, rowIndex, visualColumn }) => {
+            const unlocked = packModel.status !== 'locked';
+            return (
+              <div
+                key={packModel.id}
+                className="bbs-switchback-item"
+                style={{ gridRow: rowIndex + 1, gridColumn: visualColumn }}
+              >
+                <PathNode
+                  pack={packModel.pack}
+                  progress={packModel.progress}
+                  unlocked={unlocked}
+                  isCurrent={packModel.id === activePackId}
+                  isSelected={selectedPackModel?.id === packModel.id}
+                  onToggle={onTogglePack}
+                  accent={accent}
+                  completion={packModel.completion}
+                  status={packModel.status}
+                  dueReviewCount={packModel.reviewDueCount || 0}
+                  packIndex={packModel.packIndex ?? 0}
+                  totalPacks={packModels.length}
+                />
               </div>
-              {rowIndex < rows.length - 1 && (
-                <div className={`bbs-switch-turn ${reverse ? 'bbs-switch-turn--left' : 'bbs-switch-turn--right'}`} aria-hidden="true" />
-              )}
-            </React.Fragment>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
       <SelectedPackPanel
         packModel={selectedPackModel}
