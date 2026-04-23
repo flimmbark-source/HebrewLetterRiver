@@ -3447,7 +3447,6 @@
 }
 
 .ds-explore-door:hover { transform: scale(1.03); }
-.ds-explore-door:active { transform: scale(0.98); }
 
 /* Forward door — centered on back wall */
 .ds-explore-door--forward {
@@ -3461,7 +3460,6 @@
 }
 
 .ds-explore-door--forward:hover { transform: translateX(-50%) scale(1.02); }
-.ds-explore-door--forward:active { transform: translateX(-50%) scale(0.98); }
 
 .ds-explore-door--forward .ds-explore-door-arch {
   width: 100%;
