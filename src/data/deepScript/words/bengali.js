@@ -20,7 +20,7 @@ export const deepScriptWordsBengali = [
   { id: 'ds-bn-chokh', nativeScript: 'চোখ', hebrew: 'চোখ', letters: ['চ','ো','খ'], transliteration: 'chokh', english: 'eye', meaning: 'eye', languageId: 'bengali', difficulty: 1, tags: ['body','concrete'] },
   { id: 'ds-bn-mon', nativeScript: 'মন', hebrew: 'মন', letters: ['ম','ন'], transliteration: 'mon', english: 'mind', meaning: 'mind', languageId: 'bengali', difficulty: 1, tags: ['abstract','common'] },
   { id: 'ds-bn-agun', nativeScript: 'আগুন', hebrew: 'আগুন', letters: ['আ','গ','ু','ন'], transliteration: 'agun', english: 'fire', meaning: 'fire', languageId: 'bengali', difficulty: 1, tags: ['nature','concrete'] },
-  { id: 'ds-bn-gach', nativeScript: 'গাছ', hebrew: 'গাছ', letters: ['গ','া','ছ'], transliteration: 'gaachh', english: 'tree', meaning: 'tree', languageId: 'bengali', difficulty: 1, tags: ['nature','concrete'] },
+  { id: 'ds-bn-gach', nativeScript: 'গাছ', hebrew: 'গাছ', letters: ['গ','া','ছ'], transliteration: 'gach', english: 'tree', meaning: 'tree', languageId: 'bengali', difficulty: 1, tags: ['nature','concrete'] },
 
   /* ═══════════════════════════════════════════════════════════
      Difficulty 2 — Common 3-4 character words
@@ -31,7 +31,7 @@ export const deepScriptWordsBengali = [
   { id: 'ds-bn-bondhu', nativeScript: 'বন্ধু', hebrew: 'বন্ধু', letters: ['ব','ন','্','ধ','ু'], transliteration: 'bondhu', english: 'friend', meaning: 'friend', languageId: 'bengali', difficulty: 2, tags: ['person','concrete'] },
   { id: 'ds-bn-phol', nativeScript: 'ফল', hebrew: 'ফল', letters: ['ফ','ল'], transliteration: 'phol', english: 'fruit', meaning: 'fruit', languageId: 'bengali', difficulty: 2, tags: ['food','concrete'] },
   { id: 'ds-bn-tara', nativeScript: 'তারা', hebrew: 'তারা', letters: ['ত','া','র','া'], transliteration: 'taara', english: 'star', meaning: 'star', languageId: 'bengali', difficulty: 2, tags: ['nature','concrete'] },
-  { id: 'ds-bn-surjo', nativeScript: 'সূর্য', hebrew: 'সূর্য', letters: ['স','ূ','র','্','য'], transliteration: 'surjo', english: 'sun', meaning: 'sun', languageId: 'bengali', difficulty: 2, tags: ['nature','concrete'] },
+  { id: 'ds-bn-surjo', nativeScript: 'সূর্য', hebrew: 'সূর্য', letters: ['স','ূ','র','্','য'], transliteration: 'shurjo', english: 'sun', meaning: 'sun', languageId: 'bengali', difficulty: 2, tags: ['nature','concrete'] },
   { id: 'ds-bn-shopno', nativeScript: 'স্বপ্ন', hebrew: 'স্বপ্ন', letters: ['স','্','ব','প','্','ন'], transliteration: 'shopno', english: 'dream', meaning: 'dream', languageId: 'bengali', difficulty: 2, tags: ['abstract','common'] },
   { id: 'ds-bn-kotha', nativeScript: 'কথা', hebrew: 'কথা', letters: ['ক','থ','া'], transliteration: 'kotha', english: 'word', meaning: 'word', languageId: 'bengali', difficulty: 2, tags: ['abstract','common'] },
   { id: 'ds-bn-rasta', nativeScript: 'রাস্তা', hebrew: 'রাস্তা', letters: ['র','া','স','্','ত','া'], transliteration: 'raasta', english: 'road', meaning: 'road', languageId: 'bengali', difficulty: 2, tags: ['place','concrete'] },
