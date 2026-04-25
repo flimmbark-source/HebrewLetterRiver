@@ -104,6 +104,11 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack, onNex
         <h2 className="bb-end-title">
           {isGameOver ? 'Bridge Collapsed!' : 'Bridge Complete!'}
         </h2>
+        {isGameOver && (
+          <p className="bb-end-status" role="status" aria-live="polite">
+            ⚠️ The bridge gave out. Regroup before heading into chat.
+          </p>
+        )}
         <div className="bb-end-bridge-mini">
           {uniqueSegments.map((seg, i) => (
             <div key={i} className="bb-end-seg">
@@ -121,7 +126,12 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack, onNex
               Next
             </button>
           )}
-          <button className={`bb-end-btn ${onNext && !isGameOver ? 'bb-end-btn--secondary' : 'bb-end-btn--primary'}`} onClick={onRestart} type="button">
+          {onNext && isGameOver && (
+            <button className="bb-end-btn bb-end-btn--primary" onClick={onNext} type="button">
+              Continue to Chat
+            </button>
+          )}
+          <button className={`bb-end-btn ${onNext ? 'bb-end-btn--secondary' : 'bb-end-btn--primary'}`} onClick={onRestart} type="button">
             Build Again
           </button>
           <button className="bb-end-btn bb-end-btn--secondary" onClick={onBack} type="button">
