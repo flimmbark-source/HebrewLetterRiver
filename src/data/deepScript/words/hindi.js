@@ -33,7 +33,7 @@ export const deepScriptWordsHindi = [
   { id: 'ds-hi-shabd', nativeScript: 'शब्द', hebrew: 'शब्द', letters: ['श','ब','्','द'], transliteration: 'shabd', english: 'word', meaning: 'word', languageId: 'hindi', difficulty: 2, tags: ['abstract','common'] },
   { id: 'ds-hi-rasta', nativeScript: 'रास्ता', hebrew: 'रास्ता', letters: ['र','ा','स','्','त','ा'], transliteration: 'raasta', english: 'road', meaning: 'road', languageId: 'hindi', difficulty: 2, tags: ['place','concrete'] },
   { id: 'ds-hi-pyaar', nativeScript: 'प्यार', hebrew: 'प्यार', letters: ['प','्','य','ा','र'], transliteration: 'pyaar', english: 'love', meaning: 'love', languageId: 'hindi', difficulty: 2, tags: ['abstract','common'] },
-  { id: 'ds-hi-suraj', nativeScript: 'सूरज', hebrew: 'सूरज', letters: ['स','ू','र','ज'], transliteration: 'sooraj', english: 'sun', meaning: 'sun', languageId: 'hindi', difficulty: 2, tags: ['nature','concrete'] },
+  { id: 'ds-hi-suraj', nativeScript: 'सूरज', hebrew: 'सूरज', letters: ['स','ू','र','ज'], transliteration: 'suraj', english: 'sun', meaning: 'sun', languageId: 'hindi', difficulty: 2, tags: ['nature','concrete'] },
   { id: 'ds-hi-taara', nativeScript: 'तारा', hebrew: 'तारा', letters: ['त','ा','र','ा'], transliteration: 'taara', english: 'star', meaning: 'star', languageId: 'hindi', difficulty: 2, tags: ['nature','concrete'] },
   { id: 'ds-hi-sapna', nativeScript: 'सपना', hebrew: 'सपना', letters: ['स','प','न','ा'], transliteration: 'sapna', english: 'dream', meaning: 'dream', languageId: 'hindi', difficulty: 2, tags: ['abstract','common'] },
 
