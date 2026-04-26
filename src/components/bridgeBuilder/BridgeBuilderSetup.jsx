@@ -151,7 +151,7 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
   let icon;
   if (state === 'locked') icon = 'lock';
   else if (state === 'completed') icon = 'check';
-  else if (state === 'current') icon = 'play_arrow';
+  else if (state === 'current') icon = 'alt_route';
   else icon = 'radio_button_unchecked';
 
   const nodeCls = `bbs-node bbs-node--${state} bbs-node--${position}`;
@@ -170,9 +170,28 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
             <span className="material-symbols-outlined bbs-node-icon">{icon}</span>
           </span>
           {unlocked && state !== 'locked' && (
-            <span className="bbs-completion-pips" aria-label={completionLevel === 'full' ? 'Fully completed' : completionLevel === 'partial' ? 'Partially completed' : 'Not completed'}>
-              <span className={`bbs-completion-pip ${comp.loosePlanksComplete ? 'bbs-completion-pip--done' : ''}`} title="Planks" />
-              <span className={`bbs-completion-pip ${comp.deepScriptComplete ? 'bbs-completion-pip--done' : ''}`} title="Deep Script" />
+            <span
+              className="bbs-completion-modes"
+              aria-label={completionLevel === 'full' ? 'Fully completed' : completionLevel === 'partial' ? 'Partially completed' : 'Not completed'}
+            >
+              <span
+                className={`bbs-completion-mode ${comp.bridgeBuilderComplete ? 'bbs-completion-mode--done' : ''}`}
+                title={comp.bridgeBuilderComplete ? 'Bridge Builder complete' : 'Bridge Builder not complete'}
+              >
+                <span className="material-symbols-outlined bbs-completion-mode-icon">conversion_path</span>
+              </span>
+              <span
+                className={`bbs-completion-mode ${comp.loosePlanksComplete ? 'bbs-completion-mode--done' : ''}`}
+                title={comp.loosePlanksComplete ? 'Floating Planks complete' : 'Floating Planks not complete'}
+              >
+                <span className="material-symbols-outlined bbs-completion-mode-icon">water</span>
+              </span>
+              <span
+                className={`bbs-completion-mode ${comp.deepScriptComplete ? 'bbs-completion-mode--done' : ''}`}
+                title={comp.deepScriptComplete ? 'Deep Script complete' : 'Deep Script not complete'}
+              >
+                <span className="material-symbols-outlined bbs-completion-mode-icon">ink_pen</span>
+              </span>
             </span>
           )}
         </button>
