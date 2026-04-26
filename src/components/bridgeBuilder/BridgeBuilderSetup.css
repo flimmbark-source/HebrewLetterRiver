@@ -102,8 +102,8 @@ body.dark-mode .bbs-node--completed .bbs-node-title { color: #64748b; }
 body.dark-mode .bbs-node-support { color: #64748b; }
 body.dark-mode .bbs-connector-line--done { stroke: #10b981; }
 body.dark-mode .bbs-connector-line--pending { stroke: #334155; }
-body.dark-mode .bbs-completion-pip { background: #334155; }
-body.dark-mode .bbs-completion-pip--done { background: #10b981; box-shadow: 0 0 4px rgba(16, 185, 129, 0.5); }
+body.dark-mode .bbs-completion-mode { background: #334155; color: #94a3b8; border-color: #475569; }
+body.dark-mode .bbs-completion-mode--done { background: #10b981; color: #020617; border-color: #10b981; box-shadow: 0 0 4px rgba(16, 185, 129, 0.5); }
 
 /* Chooser */
 body.dark-mode .bbs-chooser { background: #1e293b; border-color: #334155; }
@@ -442,33 +442,49 @@ body.dark-mode .bbs-review-btn { background: #10b981; color: #020617; }
 .bbs-node-circle--current.bbs-node-circle--secondary { background: var(--m3-secondary); border-color: var(--m3-secondary); box-shadow: 0 0 0 6px var(--m3-secondary-container-20), 0 4px 16px rgba(133, 83, 21, 0.25); }
 .bbs-node-circle--current.bbs-node-circle--tertiary { background: var(--m3-tertiary); border-color: var(--m3-tertiary); box-shadow: 0 0 0 6px var(--m3-tertiary-container-40), 0 4px 16px rgba(74, 99, 101, 0.25); }
 
-/* ─── Completion pips (Planks + Deep Script) ──────────── */
-.bbs-completion-pips {
+/* ─── Completion mode badges (Bridge Builder + Planks + Deep Script) ──────────── */
+.bbs-completion-modes {
   display: flex;
   gap: 4px;
   margin-top: 4px;
 }
 
-.bbs-completion-pip {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+.bbs-completion-mode {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: var(--m3-outline-variant-30, rgba(0,0,0,0.12));
-  transition: background 0.2s, box-shadow 0.2s;
+  color: var(--m3-outline);
+  border: 1px solid var(--m3-outline-variant-30, rgba(0,0,0,0.12));
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s, border-color 0.2s;
 }
 
-.bbs-completion-pip--done {
+.bbs-completion-mode-icon {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.bbs-completion-mode--done {
   background: var(--m3-primary);
+  color: var(--m3-on-primary);
+  border-color: var(--m3-primary);
   box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
 }
 
-/* Accent-tinted pips for completed circles */
-.bbs-node-circle--secondary ~ .bbs-completion-pips .bbs-completion-pip--done {
+/* Accent-tinted badges for completed circles */
+.bbs-node-circle--secondary ~ .bbs-completion-modes .bbs-completion-mode--done {
   background: var(--m3-secondary);
+  color: var(--m3-on-secondary);
+  border-color: var(--m3-secondary);
   box-shadow: 0 0 4px rgba(133, 83, 21, 0.4);
 }
-.bbs-node-circle--tertiary ~ .bbs-completion-pips .bbs-completion-pip--done {
+.bbs-node-circle--tertiary ~ .bbs-completion-modes .bbs-completion-mode--done {
   background: var(--m3-tertiary);
+  color: var(--m3-on-tertiary);
+  border-color: var(--m3-tertiary);
   box-shadow: 0 0 4px rgba(74, 99, 101, 0.4);
 }
 
