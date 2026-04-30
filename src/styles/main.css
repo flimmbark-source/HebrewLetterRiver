@@ -2954,6 +2954,38 @@ body.dark-mode #accessibility-view select {
   border-color: #334155 !important;
 }
 
+/* Letter River dark-mode readability */
+body.dark-mode #modal-content {
+  background: linear-gradient(180deg, #0b1220 0%, #0f172a 50%, #111827 100%) !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 20px 45px rgba(2, 6, 23, 0.6) !important;
+}
+
+body.dark-mode .mode-card {
+  background: rgba(15, 23, 42, 0.7);
+  border-color: #334155;
+}
+
+body.dark-mode .mode-card-title {
+  color: #f8fafc;
+}
+
+body.dark-mode .mode-card-description {
+  color: #cbd5e1;
+}
+
+body.dark-mode .setup-label:hover .mode-card {
+  border-color: #22d3ee;
+}
+
+body.dark-mode .setup-label input:checked ~ .mode-card > span {
+  color: #67e8f9;
+}
+
+body.dark-mode .catcher-box {
+  color: #0f172a;
+}
+
 #main-menu-view {
   min-height: 100vh;
 }
