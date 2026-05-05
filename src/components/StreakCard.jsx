@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useProgress, STREAK_MILESTONES } from '../context/ProgressContext.jsx';
+import { useLocalization } from '../context/LocalizationContext.jsx';
 import { getJerusalemDateKey } from '../lib/time.js';
 
 function Icon({ children, className = '', filled = false, style = {} }) {
