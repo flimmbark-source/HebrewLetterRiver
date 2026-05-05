@@ -1,0 +1,2060 @@
+diff --git a/scripts/validateLanguageCoverage.js b/scripts/validateLanguageCoverage.js
+index 4faf5763d50277980cc199761260861d493c7225..b77f17557f57959e516610e8a3cf8f61e5120c6e 100644
+--- a/scripts/validateLanguageCoverage.js
++++ b/scripts/validateLanguageCoverage.js
+@@ -1,40 +1,131 @@
+ import fs from 'fs';
+ import path from 'path';
+ import { fileURLToPath } from 'url';
+ import { validatePracticeLanguagePackCoverage, APP_LANGUAGES, PRACTICE_LANGUAGES } from '../src/data/journeyPackRegistry.js';
+ 
+ const __dirname = path.dirname(fileURLToPath(import.meta.url));
+-const i18nDir = path.join(__dirname, '../src/i18n');
++const repoRoot = path.join(__dirname, '..');
++const i18nDir = path.join(repoRoot, 'src/i18n');
+ const dictMap = new Map();
++
+ for (const file of fs.readdirSync(i18nDir)) {
+   if (!file.endsWith('.json')) continue;
+   const full = path.join(i18nDir, file);
+   const json = JSON.parse(fs.readFileSync(full, 'utf8'));
+-  const id = json?.language?.id || file.replace('.json','');
++  const id = json?.language?.id || file.replace('.json', '');
+   dictMap.set(id, json);
+ }
+-const fallback = dictMap.get('english') || dictMap.get('en') || {};
+-const namespaces = ['app.nav','profile','settings','dailyReview','streak','bridgeBuilder.vocabJourney','onboarding','achievements'];
+ 
+-function hasPath(obj, pathStr) {
++const requiredKeys = [
++  'dailyReview.title',
++  'dailyReview.allCaughtUp',
++  'dailyReview.checkBackTomorrow',
++  'home.sections.languageLearning',
++  'home.languagePicker.appLanguage',
++  'home.languagePicker.imLearning',
++  'home.languagePicker.active',
++  'home.sections.profileOverview',
++  'home.progress.recentMastery',
++  'home.progress.recentMasteryEmpty',
++  'home.progress.gameActivity',
++  'home.progress.gameActivityEmpty',
++  'streak.startJourney',
++  'app.nav.achievements',
++];
++
++function getPath(obj, pathStr) {
+   let cur = obj;
+   for (const part of pathStr.split('.')) {
+-    if (!cur || typeof cur !== 'object' || !(part in cur)) return false;
++    if (!cur || typeof cur !== 'object' || !(part in cur)) return undefined;
+     cur = cur[part];
+   }
+-  return true;
++  return cur;
+ }
+ 
+-console.log('App language translation coverage:');
++let hasError = false;
++console.log('App language required-key coverage:');
+ for (const lang of APP_LANGUAGES) {
+-  const dict = dictMap.get(lang) || fallback;
+-  const present = namespaces.filter((ns) => hasPath(dict, ns)).length;
+-  console.log(`- ${lang}: ${present}/${namespaces.length} namespaces`);
++  const dict = dictMap.get(lang);
++  if (!dict) {
++    hasError = true;
++    console.log(`- ${lang}: missing dictionary`);
++    continue;
++  }
++  const missing = requiredKeys.filter((k) => {
++    const v = getPath(dict, k);
++    return typeof v !== 'string' || v.trim().length === 0;
++  });
++  if (missing.length > 0) {
++    hasError = true;
++    console.log(`- ${lang}: missing ${missing.length} keys`);
++    for (const key of missing) console.log(`  - ${key}`);
++  } else {
++    console.log(`- ${lang}: OK (${requiredKeys.length}/${requiredKeys.length})`);
++  }
+ }
+ 
+ console.log('\nPractice language pack coverage:');
+ for (const row of validatePracticeLanguagePackCoverage()) {
+   console.log(`- ${row.language}: ${row.mapped} starter packs mapped (${row.valid ? 'valid' : 'invalid'})`);
++  if (!row.valid) hasError = true;
++}
++
++const SOURCE_ROOT = path.join(repoRoot, 'src');
++const COMPONENT_EXTENSIONS = new Set(['.jsx', '.tsx']);
++const IGNORE_DIR_PATTERNS = [/__tests__/, /__mocks__/, /\/test(s)?\//, /\/data\//, /\/styles\//];
++const ALLOWLIST_PATTERNS = [
++  /^label="[A-Za-z0-9\s-]+"$/, /^title="[A-Za-z0-9\s-]+"$/, /^placeholder="[A-Za-z0-9\s.,!?'()-]+"$/,
++  /^alt="[A-Za-z0-9\s-]+"$/, /^https?:\/\//, /^\w+[._-]\w+/, /^\/?[a-z0-9/_-]+$/,
++  /^\w+\(.*\)$/, /^\w+$/, /^\+?\d+\s?(XP|days?|stars?)$/i,
++];
++const LINE_IGNORE_PATTERNS = [
++  /\bt\(/, /console\./, /className=/, /material-symbols-outlined/, /<Icon/, /\baria-hidden=/,
++  /if \(/, /\?\s*['"]/, /:\s*['"]/, /=>/, /Math\./, /localStorage|sessionStorage|loadState|saveState/,
++];
++const findings = [];
++
++function shouldIgnorePath(filePath) {
++  return IGNORE_DIR_PATTERNS.some((pattern) => pattern.test(filePath));
++}
++
++function collectFiles(dir) {
++  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
++    if (entry.name.startsWith('.')) continue;
++    const fullPath = path.join(dir, entry.name);
++    if (entry.isDirectory()) {
++      if (shouldIgnorePath(fullPath)) continue;
++      collectFiles(fullPath);
++      continue;
++    }
++    if (COMPONENT_EXTENSIONS.has(path.extname(entry.name))) scanFile(fullPath);
++  }
++}
++
++function scanFile(filePath) {
++  const rel = path.relative(repoRoot, filePath);
++  const src = fs.readFileSync(filePath, 'utf8');
++  const lines = src.split(/\r?\n/);
++  for (let i = 0; i < lines.length; i += 1) {
++    const line = lines[i].trim();
++    if (!line || LINE_IGNORE_PATTERNS.some((p) => p.test(line))) continue;
++    const textNodes = [...line.matchAll(/>([^<{][^<>{]{2,})</g)].map((m) => m[1].trim());
++    const attrs = [...line.matchAll(/\b(?:label|title|placeholder|alt)="([^"]+)"/g)].map((m) => `${m[0].split('=')[0]}="${m[1]}"`);
++    const chunks = [...textNodes, ...attrs];
++    for (const chunk of chunks) {
++      if (!/[A-Za-z]{3,}/.test(chunk)) continue;
++      if (ALLOWLIST_PATTERNS.some((p) => p.test(chunk))) continue;
++      findings.push({ file: rel, line: i + 1, text: chunk });
++    }
++  }
++}
++
++collectFiles(SOURCE_ROOT);
++if (findings.length > 0) {
++  console.log('\nPotential hardcoded visible UI strings (warning):');
++  for (const finding of findings.slice(0, 200)) {
++    console.log(`- ${finding.file}:${finding.line} :: ${finding.text}`);
++  }
+ }
+ 
+ console.log(`\nTotals: app=${APP_LANGUAGES.length}, practice=${PRACTICE_LANGUAGES.length}`);
++if (hasError) process.exitCode = 1;
+diff --git a/src/App.jsx b/src/App.jsx
+index 1674329e23c16d4af700d1082d1e0530ec3418d0..a25b384e635e158462d90428ac55447fce0900f5 100644
+--- a/src/App.jsx
++++ b/src/App.jsx
+@@ -355,51 +355,51 @@ function Shell() {
+             >
+               <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>home</span>
+               <span>{t('app.nav.home', 'Home')}</span>
+             </NavLink>
+ 
+             <button
+               type="button"
+               onClick={handlePlay}
+               disabled={isPlayDisabled}
+               className={`nav-item flex flex-col items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-50 ${isPlayActive ? 'nav-item-active' : ''}`}
+               style={isPlayActive ? {} : { color: 'var(--app-muted)' }}
+             >
+               <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>videogame_asset</span>
+               <span>{t('app.nav.play', 'Play')}</span>
+             </button>
+ 
+             <NavLink
+               to="/achievements"
+               onClick={handleNavClick}
+               className={({ isActive }) =>
+                 `nav-item flex flex-col items-center justify-center px-5 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 ${isActive ? 'nav-item-active' : ''}`
+               }
+               style={({ isActive }) => isActive ? {} : { color: 'var(--app-muted)' }}
+             >
+               <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>emoji_events</span>
+-              <span>{t('app.nav.awards', 'Awards')}</span>
++              <span>{t('app.nav.achievements', 'Awards')}</span>
+             </NavLink>
+ 
+             <NavLink
+               to="/settings"
+               onClick={handleNavClick}
+               className={({ isActive }) =>
+                 `nav-item flex flex-col items-center justify-center px-5 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 ${isActive ? 'nav-item-active' : ''}`
+               }
+               style={({ isActive }) => isActive ? {} : { color: 'var(--app-muted)' }}
+             >
+               <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>settings</span>
+               <span>{t('app.nav.settings', 'Settings')}</span>
+             </NavLink>
+           </div>
+         </nav>
+       )}
+     </div>
+   );
+ }
+ 
+ export default function App() {
+   return (
+     <ErrorBoundary>
+       <MigrationInitializer>
+         <LanguageProvider>
+diff --git a/src/i18n/amharic.json b/src/i18n/amharic.json
+index 7efbcdf96453074542e28abd20c93fa81aed15fa..8fa1c440bac127f5d3c77647bb2cf4b28c435ccd 100644
+--- a/src/i18n/amharic.json
++++ b/src/i18n/amharic.json
+@@ -31,84 +31,95 @@
+     "practicePicker": {
+       "label": "የመለማመጃ ቋንቋ",
+       "helper": "ማሰስ የሚፈልጉትን የቋንቋ ፓኬት ይምረጡ።"
+     },
+     "footer": {
+       "resetNotice": "በየቀኑ በሰዓት 00:00 አሲያ/ኢየሩሳሌም ዳግም ማስጀመሪያ ይከሰታል።"
+     }
+   },
+   "home": {
+     "hero": {
+       "heading": "የወንዝ ጀብድዎን ይምረጡ",
+       "description": "በነጠላ ፊደላት ይጀምሩ ወይም ወደ ሙሉ ቃላት ይግቡ",
+       "modeSelectTitle": "ሁነታ ይምረጡ",
+       "modes": {
+         "letters": {
+           "title": "የፊደል ወንዝ",
+           "description": "የሚንሳፈፉ ፊደላትን ያዙ እና ወደ ትክክለኛው መያዣዎች ያስቀምጡ"
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "በቅርብ የተማሩ ፊደላት"
+     },
+     "languagePicker": {
+       "label": "የመለማመጃ ቋንቋ",
+-      "helper": "በማንኛውም ጊዜ ለሌላ ስክሪፕት ለመለማመድ ይቀይሩ።"
++      "helper": "በማንኛውም ጊዜ ለሌላ ስክሪፕት ለመለማመድ ይቀይሩ።",
++      "appLanguage": "App Language",
++      "imLearning": "I'm Learning",
++      "active": "Active"
+     },
+     "cta": {
+       "start": "አዲስ ሩጫ ጀምር",
+       "practice": "የትኩረት ፊደል ተለማመድ",
+       "play": "ተጫወት"
+     },
+     "progress": {
+       "heading": "ዛሬ እድገት",
+       "streak": "ተከታታይ",
+       "days": "{{count}} ቀናት",
+       "resetsAt": "በሰዓት 00:00 አሲያ/ኢየሩሳሌም ዳግም ይጀምራል ({{time}})",
+       "starLevel": "የኮከብ ደረጃ",
+       "level": "ደረጃ {{level}}",
+       "totalStars": "{{count}} ⭐ ጠቅላላ",
+       "toNextLevel": "{{current}} / {{total}} ⭐ ለቀጣይ ደረጃ",
+       "latestBadge": "የቅርብ ዓመታት አርማ",
+       "tier": "ደረጃ {{tier}}",
+-      "playToUnlock": "ስኬቶችን መክፈት ለመጀመር ክፍለ ጊዜ ይጫወቱ።"
++      "playToUnlock": "ስኬቶችን መክፈት ለመጀመር ክፍለ ጊዜ ይጫወቱ።",
++      "recentMastery": "Recent Mastery",
++      "recentMasteryEmpty": "Catch a few letters to unlock your mastery row.",
++      "gameActivity": "Game Activity",
++      "gameActivityEmpty": "Start a game and your latest activity will appear here."
+     },
+     "quest": {
+       "label": "ፍለጋ {{current}} ከ {{total}}",
+       "complete": "ፍለጋ ተጠናቀቀ",
+       "inProgress": "በሂደት ላይ...",
+       "collected": "ሽልማት ተሰብስቧል",
+       "collectedShort": "✓ ተሰብስቧል",
+       "claiming": "በማስገባት ላይ...",
+       "claim": "አስገባ",
+       "claimed": "ተገብቷል",
+       "locked": "በሂደት ላይ"
+     },
+     "dailyQuests": {
+       "title": "ዕለታዊ ፍለጋዎች",
+       "resetsAt": "በ {{time}} ዳግም ይጀምራል"
++    },
++    "sections": {
++      "languageLearning": "Language Learning",
++      "profileOverview": "Profile Overview"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "ደረጃ",
+       "score": "ነጥብ"
+     },
+     "controls": {
+       "leave": "ጨዋታን ተው",
+       "exitToMenu": "⬅",
+       "backToMenu": "ወደ ምናሌ ተመለስ",
+       "start": "ጨዋታ ጀምር",
+       "playAgain": "እንደገና ተጫወት",
+       "install": "መተግበሪያ ጫን",
+       "accessibility": "የተደራሽነት አማራጮች",
+       "close": "ዝጋ"
+     },
+     "setup": {
+       "title": "የፊደል ወንዝ",
+       "subtitleFallback": "ፊደሎቹን ወደ ትክክለኛው ሳጥኖች ይጎትቱ!",
+       "prompt": "መለማመድ የሚፈልጉትን ይምረጡ:",
+       "installDescription": "መተግበሪያ ጫን",
+       "defaultNoun": "ንጥል",
+       "defaultModeLabel": "ዋና መለማመጃ",
+       "defaultModeDescription": "ዋናውን የቁምፊዎች ስብስብ ይለማመዱ።",
+@@ -1314,27 +1325,35 @@
+       "nice": "nice",
+       "beautiful": "beautiful",
+       "ugly": "ugly",
+       "strange": "strange",
+       "food": "food",
+       "water": "water",
+       "coffee": "coffee",
+       "weather": "weather",
+       "book": "book",
+       "phone": "phone",
+       "car": "car",
+       "street": "street",
+       "city": "city",
+       "country": "country",
+       "language": "language",
+       "word": "word",
+       "thing": "thing",
+       "something": "something",
+       "nothing": "nothing",
+       "everything": "everything",
+       "problem": "problem",
+       "question": "question",
+       "answer": "answer",
+       "idea": "idea"
+     }
++  },
++  "dailyReview": {
++    "title": "Daily Review",
++    "allCaughtUp": "All caught up!",
++    "checkBackTomorrow": "Great work. Check back tomorrow."
++  },
++  "streak": {
++    "startJourney": "Start your journey!"
+   }
+ }
+diff --git a/src/i18n/arabic.json b/src/i18n/arabic.json
+index a280b8dc40ec2cf02abbafb39c969bde8bff6af6..35848d95d106e42f86f8c913ead0aff1e469169e 100644
+--- a/src/i18n/arabic.json
++++ b/src/i18n/arabic.json
+@@ -32,75 +32,86 @@
+     "hero": {
+       "heading": "اختر مغامرة النهر الخاصة بك",
+       "description": "ابدأ بالأحرف المفردة أو اغطس في الكلمات الكاملة",
+       "modeSelectTitle": "اختر وضعاً",
+       "modes": {
+         "letters": {
+           "title": "نهر الأحرف",
+           "description": "اصطد الأحرف الطافية وضعها في السلال الصحيحة"
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "الحروف المتعلمة مؤخراً"
+     },
+     "progress": {
+       "level": "المستوى {{level}}",
+       "heading": "التقدم اليوم",
+       "streak": "سلسلة",
+       "days": "{{count}} أيام",
+       "resetsAt": "يعاد التعيين في الساعة 00:00 آسيا/القدس ({{time}})",
+       "starLevel": "مستوى النجوم",
+       "totalStars": "{{count}} ⭐ المجموع",
+       "toNextLevel": "{{current}} / {{total}} ⭐ للمستوى التالي",
+       "latestBadge": "أحدث شارة",
+       "tier": "المستوى {{tier}}",
+-      "playToUnlock": "العب جلسة لبدء فتح الإنجازات."
++      "playToUnlock": "العب جلسة لبدء فتح الإنجازات.",
++      "recentMastery": "Recent Mastery",
++      "recentMasteryEmpty": "Catch a few letters to unlock your mastery row.",
++      "gameActivity": "Game Activity",
++      "gameActivityEmpty": "Start a game and your latest activity will appear here."
+     },
+     "languagePicker": {
+       "label": "ممارسة اللغة",
+-      "helper": "قم بالتبديل في أي وقت للتدريب على برنامج نصي آخر."
++      "helper": "قم بالتبديل في أي وقت للتدريب على برنامج نصي آخر.",
++      "appLanguage": "App Language",
++      "imLearning": "I'm Learning",
++      "active": "Active"
+     },
+     "cta": {
+       "start": "ابدأ جولة جديدة",
+       "practice": "ممارسة رسالة التركيز",
+       "play": "يلعب"
+     },
+     "quest": {
+       "claim": "يدعي",
+       "claimed": "مطالب",
+       "locked": "قيد التقدم",
+       "label": "المهمة {{current}} من {{total}}",
+       "complete": "المهمة مكتملة",
+       "inProgress": "قيد التقدم...",
+       "collected": "تم جمع المكافأة",
+       "collectedShort": "✓ تم الجمع",
+       "claiming": "يطالب..."
+     },
+     "dailyQuests": {
+       "title": "المهام اليومية",
+       "resetsAt": "إعادة التعيين في {{time}}"
++    },
++    "sections": {
++      "languageLearning": "Language Learning",
++      "profileOverview": "Profile Overview"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "مستوى",
+       "score": "نتيجة"
+     },
+     "controls": {
+       "leave": "ترك اللعبة",
+       "exitToMenu": "⬅",
+       "backToMenu": "العودة إلى القائمة",
+       "start": "ابدأ اللعبة",
+       "playAgain": "العب مرة أخرى",
+       "install": "تثبيت التطبيق",
+       "accessibility": "خيارات إمكانية الوصول",
+       "close": "يغلق"
+     },
+     "setup": {
+       "title": "نهر الحروف",
+       "subtitleFallback": "اسحب {{noun}} المتحرك إلى المربع الصحيح!",
+       "prompt": "اختر ما تريد ممارسته:",
+       "installDescription": "تثبيت التطبيق",
+       "defaultNoun": "حرف",
+       "defaultModeLabel": "الممارسة الأساسية",
+       "defaultModeDescription": "تدرب على المجموعة الرئيسية من الشخصيات.",
+@@ -1314,27 +1325,35 @@
+       "nice": "nice",
+       "beautiful": "beautiful",
+       "ugly": "ugly",
+       "strange": "strange",
+       "food": "food",
+       "water": "water",
+       "coffee": "coffee",
+       "weather": "weather",
+       "book": "book",
+       "phone": "phone",
+       "car": "car",
+       "street": "street",
+       "city": "city",
+       "country": "country",
+       "language": "language",
+       "word": "word",
+       "thing": "thing",
+       "something": "something",
+       "nothing": "nothing",
+       "everything": "everything",
+       "problem": "problem",
+       "question": "question",
+       "answer": "answer",
+       "idea": "idea"
+     }
++  },
++  "dailyReview": {
++    "title": "Daily Review",
++    "allCaughtUp": "All caught up!",
++    "checkBackTomorrow": "Great work. Check back tomorrow."
++  },
++  "streak": {
++    "startJourney": "Start your journey!"
+   }
+ }
+diff --git a/src/i18n/bengali.json b/src/i18n/bengali.json
+index f4d98a9a9abbb56fa8ffb37151494aff2a0af5fb..19a172f35c664c1d2230c966bb23f9de8e3793f7 100644
+--- a/src/i18n/bengali.json
++++ b/src/i18n/bengali.json
+@@ -32,75 +32,86 @@
+     "hero": {
+       "heading": "আপনার নদী অ্যাডভেঞ্চার বেছে নিন",
+       "description": "একক অক্ষর দিয়ে শুরু করুন বা সম্পূর্ণ শব্দে ঝাঁপ দিন",
+       "modeSelectTitle": "একটি মোড নির্বাচন করুন",
+       "modes": {
+         "letters": {
+           "title": "অক্ষর নদী",
+           "description": "ভাসমান অক্ষর ধরুন এবং সঠিক ঝুড়িতে রাখুন"
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "সম্প্রতি শেখা অক্ষর"
+     },
+     "progress": {
+       "level": "লেভেল {{level}}",
+       "heading": "আজকের অগ্রগতি",
+       "streak": "ধারা",
+       "days": "{{count}} দিন",
+       "resetsAt": "00:00 এশিয়া/জেরুজালেমে রিসেট হয় ({{time}})",
+       "starLevel": "তারকা স্তর",
+       "totalStars": "{{count}} ⭐ মোট",
+       "toNextLevel": "{{current}} / {{total}} ⭐ পরবর্তী স্তরে",
+       "latestBadge": "সর্বশেষ ব্যাজ",
+       "tier": "স্তর {{tier}}",
+-      "playToUnlock": "অর্জন আনলক শুরু করতে একটি সেশন খেলুন।"
++      "playToUnlock": "অর্জন আনলক শুরু করতে একটি সেশন খেলুন।",
++      "recentMastery": "Recent Mastery",
++      "recentMasteryEmpty": "Catch a few letters to unlock your mastery row.",
++      "gameActivity": "Game Activity",
++      "gameActivityEmpty": "Start a game and your latest activity will appear here."
+     },
+     "languagePicker": {
+       "label": "ভাষা অনুশীলন করুন",
+-      "helper": "অন্য স্ক্রিপ্টে প্রশিক্ষণের জন্য যে কোনো সময় পরিবর্তন করুন।"
++      "helper": "অন্য স্ক্রিপ্টে প্রশিক্ষণের জন্য যে কোনো সময় পরিবর্তন করুন।",
++      "appLanguage": "App Language",
++      "imLearning": "I'm Learning",
++      "active": "Active"
+     },
+     "cta": {
+       "start": "একটি নতুন রান শুরু করুন",
+       "practice": "ফোকাস লেটার অনুশীলন করুন",
+       "play": "খেলা"
+     },
+     "quest": {
+       "claim": "দাবি",
+       "claimed": "দাবিকৃত",
+       "locked": "চলমান",
+       "label": "অনুসন্ধান {{current}} এর {{total}}",
+       "complete": "অনুসন্ধান সম্পূর্ণ",
+       "inProgress": "চলমান...",
+       "collected": "পুরস্কার সংগৃহীত",
+       "collectedShort": "✓ সংগৃহীত",
+       "claiming": "দাবি করা হচ্ছে..."
+     },
+     "dailyQuests": {
+       "title": "দৈনিক অনুসন্ধান",
+       "resetsAt": "{{time}}-এ পুনরায় সেট করে"
++    },
++    "sections": {
++      "languageLearning": "Language Learning",
++      "profileOverview": "Profile Overview"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "স্তর",
+       "score": "স্কোর"
+     },
+     "controls": {
+       "leave": "খেলা ছেড়ে দিন",
+       "exitToMenu": "⬅",
+       "backToMenu": "মেনুতে ফিরে যান",
+       "start": "খেলা শুরু করুন",
+       "playAgain": "আবার খেলুন",
+       "install": "অ্যাপ ইনস্টল করুন",
+       "accessibility": "অ্যাক্সেসিবিলিটি বিকল্প",
+       "close": "বন্ধ"
+     },
+     "setup": {
+       "title": "চিঠি নদী",
+       "subtitleFallback": "চলমান {{noun}} সঠিক ঘরে রাখুন!",
+       "prompt": "আপনি যা অনুশীলন করতে চান তা চয়ন করুন:",
+       "installDescription": "অ্যাপ ইনস্টল করুন",
+       "defaultNoun": "অক্ষর",
+       "defaultModeLabel": "মূল অনুশীলন",
+       "defaultModeDescription": "অক্ষরের প্রধান সেট অনুশীলন করুন।",
+@@ -1314,27 +1325,35 @@
+       "nice": "nice",
+       "beautiful": "beautiful",
+       "ugly": "ugly",
+       "strange": "strange",
+       "food": "food",
+       "water": "water",
+       "coffee": "coffee",
+       "weather": "weather",
+       "book": "book",
+       "phone": "phone",
+       "car": "car",
+       "street": "street",
+       "city": "city",
+       "country": "country",
+       "language": "language",
+       "word": "word",
+       "thing": "thing",
+       "something": "something",
+       "nothing": "nothing",
+       "everything": "everything",
+       "problem": "problem",
+       "question": "question",
+       "answer": "answer",
+       "idea": "idea"
+     }
++  },
++  "dailyReview": {
++    "title": "Daily Review",
++    "allCaughtUp": "All caught up!",
++    "checkBackTomorrow": "Great work. Check back tomorrow."
++  },
++  "streak": {
++    "startJourney": "Start your journey!"
+   }
+ }
+diff --git a/src/i18n/en.json b/src/i18n/en.json
+index 8bf53a6f5a322e864221df2f721b64b0aaac5d6c..4924f98d42f982773ca6469db1d1544e3fee724f 100644
+--- a/src/i18n/en.json
++++ b/src/i18n/en.json
+@@ -11,118 +11,133 @@
+     "spanish": "Spanish",
+     "french": "French",
+     "arabic": "Arabic",
+     "bengali": "Bengali",
+     "portuguese": "Portuguese",
+     "russian": "Russian",
+     "japanese": "Japanese",
+     "amharic": "Amharic"
+   },
+   "common": {
+     "close": "Close",
+     "viewDetails": "View details",
+     "player": "Player",
+     "patientPaddler": "Patient Paddler",
+     "noneYet": "None yet",
+     "play": "Play"
+   },
+   "app": {
+     "title": "Letter River",
+     "tagline": "Flow, learn, and celebrate every catch.",
+     "nav": {
+       "home": "Home",
+       "play": "Play",
+       "achievements": "Achievements",
+       "read": "Read",
+-      "settings": "Settings"
++      "settings": "Settings",
++      "awards": "Achievements"
+     },
+     "languagePicker": {
+       "label": "App Language",
+       "helper": "Set the interface language.",
+       "onboardingTitle": "Choose Your Languages",
+       "onboardingSubtitle": "This app was developed to allow you to practice the alphabets of other langauges in your own native tongue.",
+       "confirm": "Start learning"
+     },
+     "practicePicker": {
+       "label": "Practice Language",
+       "helper": "Choose which language pack you want to explore."
+     },
+     "footer": {
+       "resetNotice": "Reset happens daily at 00:00 Asia/Jerusalem."
+     }
+   },
+   "home": {
+     "hero": {
+       "heading": "Choose your river adventure.",
+       "description": "Start with single letters or dive into full words.",
+       "modeSelectTitle": "Select a mode",
+       "modes": {
+         "letters": {
+           "title": "Letter River",
+           "description": "Catch drifting letters and drop them into the right buckets."
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "Recently Learned Letters"
+     },
+     "languagePicker": {
+       "label": "Practice Language",
+-      "helper": "Switch anytime to train in another script."
++      "helper": "Switch anytime to train in another script.",
++      "appLanguageLabel": "App Language",
++      "learningLabel": "I'm Learning",
++      "activeStatus": "Active",
++      "appLanguage": "App Language",
++      "imLearning": "I'm Learning",
++      "active": "Active"
+     },
+     "cta": {
+       "start": "Start a New Run",
+       "practice": "Practice Focus Letter",
+       "play": "Play"
+     },
+     "progress": {
+       "heading": "Progress",
+       "streak": "Streak",
+       "days": "{{count}} days",
+       "resetsAt": "Resets at 00:00 Asia/Jerusalem ({{time}})",
+       "starLevel": "Star level",
+       "level": "Level {{level}}",
+       "totalStars": "{{count}} ⭐ total",
+       "toNextLevel": "{{current}} / {{total}} ⭐ to next level",
+       "latestBadge": "Latest badge",
+       "tier": "Tier {{tier}}",
+-      "playToUnlock": "Play a session to start unlocking achievements."
++      "playToUnlock": "Play a session to start unlocking achievements.",
++      "recentMastery": "Recent Mastery",
++      "recentMasteryEmpty": "Catch a few letters to unlock your mastery row.",
++      "gameActivity": "Game Activity",
++      "gameActivityEmpty": "Start a game and your latest activity will appear here."
+     },
+     "quest": {
+       "label": "Quest {{current}} of {{total}}",
+       "complete": "Quest complete",
+       "inProgress": "In progress…",
+       "collected": "Reward collected",
+       "collectedShort": "✓ Collected",
+       "claiming": "Claiming…",
+       "claim": "Claim",
+       "claimed": "Claimed",
+       "locked": "In Progress"
+     },
+     "dailyQuests": {
+       "title": "Daily quests",
+       "resetsAt": "Resets at {{time}}"
++    },
++    "sections": {
++      "languageLearning": "Language Learning",
++      "profileOverview": "Profile Overview"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "Level",
+       "score": "Score"
+     },
+     "controls": {
+       "leave": "Leave Game",
+       "exitToMenu": "⬅",
+       "backToMenu": "Back to menu",
+       "start": "Start Game",
+       "playAgain": "Play Again",
+       "install": "Install App",
+       "accessibility": "Accessibility Options",
+       "close": "Close"
+     },
+     "pause": {
+       "title": "Paused",
+       "message": "",
+       "resume": "Resume",
+       "mainMenu": "Main Menu"
+     },
+     "setup": {
+       "title": "Letter River",
+@@ -1581,27 +1596,35 @@
+         "hint": "Tip: Listen to the audio for pronunciation help"
+       },
+       "submit": "Submit",
+       "correct": "Correct!",
+       "partial": "Close! Check the correct answer below.",
+       "incorrect": "Not quite. Here's the correct answer:"
+     },
+     "scenarios": {
+       "greetings-introductions": {
+         "title": "Greetings & Introductions",
+         "subtitle": "Meet and greet in Hebrew"
+       },
+       "at-home": {
+         "title": "At Home",
+         "subtitle": "Talk about home and family"
+       },
+       "food-eating": {
+         "title": "Food & Eating",
+         "subtitle": "Order food and talk about meals"
+       },
+       "numbers-time": {
+         "title": "Numbers & Time",
+         "subtitle": "Express time and quantities"
+       }
+     }
++  },
++  "dailyReview": {
++    "title": "Daily Review",
++    "allCaughtUp": "All caught up!",
++    "checkBackTomorrow": "Great work. Check back tomorrow."
++  },
++  "streak": {
++    "startJourney": "Start your journey!"
+   }
+ }
+diff --git a/src/i18n/french.json b/src/i18n/french.json
+index 69b65889be2374fb51a3fd5bb09e57262ebb6add..08af530f7a2846022f5f3658a578972c281f1f2f 100644
+--- a/src/i18n/french.json
++++ b/src/i18n/french.json
+@@ -46,75 +46,86 @@
+     "hero": {
+       "heading": "Choisissez votre aventure sur la rivière",
+       "description": "Commencez avec des lettres simples ou plongez dans des mots complets",
+       "modeSelectTitle": "Sélectionnez un mode",
+       "modes": {
+         "letters": {
+           "title": "Rivière des Lettres",
+           "description": "Attrapez les lettres flottantes et déposez-les dans les bons paniers"
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "Lettres récemment apprises"
+     },
+     "progress": {
+       "level": "Niveau {{level}}",
+       "heading": "Progrès aujourd'hui",
+       "streak": "Série",
+       "days": "{{count}} jours",
+       "resetsAt": "Réinitialise à 00:00 Asie/Jérusalem ({{time}})",
+       "starLevel": "Niveau d'étoiles",
+       "totalStars": "{{count}} ⭐ total",
+       "toNextLevel": "{{current}} / {{total}} ⭐ pour le niveau suivant",
+       "latestBadge": "Dernier badge",
+       "tier": "Niveau {{tier}}",
+-      "playToUnlock": "Jouez une session pour commencer à débloquer des succès."
++      "playToUnlock": "Jouez une session pour commencer à débloquer des succès.",
++      "recentMastery": "Recent Mastery",
++      "recentMasteryEmpty": "Catch a few letters to unlock your mastery row.",
++      "gameActivity": "Game Activity",
++      "gameActivityEmpty": "Start a game and your latest activity will appear here."
+     },
+     "languagePicker": {
+       "label": "Langue de pratique",
+-      "helper": "Changez à tout moment pour vous entraîner dans un autre script."
++      "helper": "Changez à tout moment pour vous entraîner dans un autre script.",
++      "appLanguage": "App Language",
++      "imLearning": "I'm Learning",
++      "active": "Active"
+     },
+     "cta": {
+       "start": "Commencer une nouvelle course",
+       "practice": "Lettre de mise au point pratique",
+       "play": "Jouer"
+     },
+     "quest": {
+       "label": "Quête {{current}} sur {{total}}",
+       "complete": "Quête terminée",
+       "inProgress": "En cours...",
+       "collected": "Récompense collectée",
+       "collectedShort": "✓ Collecté",
+       "claiming": "Réclamation...",
+       "claim": "Réclamer",
+       "claimed": "Réclamé",
+       "locked": "En Cours"
+     },
+     "dailyQuests": {
+       "title": "Quêtes quotidiennes",
+       "resetsAt": "Réinitialise à {{time}}"
++    },
++    "sections": {
++      "languageLearning": "Language Learning",
++      "profileOverview": "Profile Overview"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "Niveau",
+       "score": "Score"
+     },
+     "controls": {
+       "leave": "Quitter le jeu",
+       "exitToMenu": "⬅",
+       "backToMenu": "Retour au menu",
+       "start": "Commencer le jeu",
+       "playAgain": "Rejouer",
+       "install": "Installer l'application",
+       "accessibility": "Options d'accessibilité",
+       "close": "Fermer"
+     },
+     "setup": {
+       "title": "Rivière de lettres",
+       "subtitleFallback": "Faites glisser la {{noun}} en mouvement vers la bonne case.",
+       "prompt": "Choisissez ce que vous souhaitez pratiquer :",
+       "installDescription": "Installer l'application",
+       "defaultNoun": "lettre",
+       "defaultModeLabel": "Pratique de base",
+       "defaultModeDescription": "Pratiquez l’ensemble principal des personnages.",
+@@ -1314,27 +1325,35 @@
+       "nice": "nice",
+       "beautiful": "beautiful",
+       "ugly": "ugly",
+       "strange": "strange",
+       "food": "food",
+       "water": "water",
+       "coffee": "coffee",
+       "weather": "weather",
+       "book": "book",
+       "phone": "phone",
+       "car": "car",
+       "street": "street",
+       "city": "city",
+       "country": "country",
+       "language": "language",
+       "word": "word",
+       "thing": "thing",
+       "something": "something",
+       "nothing": "nothing",
+       "everything": "everything",
+       "problem": "problem",
+       "question": "question",
+       "answer": "answer",
+       "idea": "idea"
+     }
++  },
++  "dailyReview": {
++    "title": "Daily Review",
++    "allCaughtUp": "All caught up!",
++    "checkBackTomorrow": "Great work. Check back tomorrow."
++  },
++  "streak": {
++    "startJourney": "Start your journey!"
+   }
+ }
+diff --git a/src/i18n/he.json b/src/i18n/he.json
+index 767f533a1373e2ad6744a219a53f10ac1d28df31..c5d8abc46920d0833b25545afe98ab115d3bef53 100644
+--- a/src/i18n/he.json
++++ b/src/i18n/he.json
+@@ -46,75 +46,86 @@
+     "hero": {
+       "heading": "בחרו את הרפתקת הנהר שלכם",
+       "description": "התחילו עם אותיות בודדות או צללו למילים שלמות",
+       "modeSelectTitle": "בחרו מצב משחק",
+       "modes": {
+         "letters": {
+           "title": "נהר האותiות",
+           "description": "תפסו אותיות נסחפות והכניסו אותן לסלים הנכונים"
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "אותיות שנלמדו לאחרונה"
+     },
+     "progress": {
+       "level": "שלב {{level}}",
+       "heading": "התקדמות היום",
+       "streak": "רצף",
+       "days": "{{count}} ימים",
+       "resetsAt": "מתאפס ב-00:00 אסיה/ירושלים ({{time}})",
+       "starLevel": "רמת כוכבים",
+       "totalStars": "{{count}} ⭐ סה\"כ",
+       "toNextLevel": "{{current}} / {{total}} ⭐ לרמה הבאה",
+       "latestBadge": "תג אחרון",
+       "tier": "דרג {{tier}}",
+-      "playToUnlock": "שחק מושב כדי להתחיל לפתוח הישגים."
++      "playToUnlock": "שחק מושב כדי להתחיל לפתוח הישגים.",
++      "recentMastery": "Recent Mastery",
++      "recentMasteryEmpty": "Catch a few letters to unlock your mastery row.",
++      "gameActivity": "Game Activity",
++      "gameActivityEmpty": "Start a game and your latest activity will appear here."
+     },
+     "languagePicker": {
+       "label": "שפת תרגול",
+-      "helper": "החליפו בכל רגע כדי להתאמן בכתב אחר."
++      "helper": "החליפו בכל רגע כדי להתאמן בכתב אחר.",
++      "appLanguage": "App Language",
++      "imLearning": "I'm Learning",
++      "active": "Active"
+     },
+     "cta": {
+       "start": "התחילו ריצה חדשה",
+       "practice": "תרגלו את אות המיקוד",
+       "play": "שחק"
+     },
+     "quest": {
+       "label": "משימה {{current}} מתוך {{total}}",
+       "complete": "המשימה הושלמה",
+       "inProgress": "בתהליך...",
+       "collected": "הפרס נאסף",
+       "collectedShort": "✓ נאסף",
+       "claiming": "אוסף...",
+       "claim": "תבע",
+       "claimed": "נתבע",
+       "locked": "בתהליך"
+     },
+     "dailyQuests": {
+       "title": "משימות יומיות",
+       "resetsAt": "מתאפס ב-{{time}}"
++    },
++    "sections": {
++      "languageLearning": "Language Learning",
++      "profileOverview": "Profile Overview"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "שלב",
+       "score": "ניקוד"
+     },
+     "controls": {
+       "leave": "יציאה מהמשחק",
+       "exitToMenu": "⬅",
+       "backToMenu": "חזרה לתפריט",
+       "start": "התחל משחק",
+       "playAgain": "שחק שוב",
+       "install": "התקן אפליקציה",
+       "accessibility": "אפשרויות נגישות",
+       "close": "סגירה"
+     },
+     "setup": {
+       "title": "נהר האותיות",
+       "subtitleFallback": "גררו את הפריט הנע אל התיבה הנכונה!",
+       "prompt": "בחרו מה תרצו לתרגל:",
+       "installDescription": "התקן אפליקציה",
+       "defaultNoun": "פריט",
+       "defaultModeLabel": "תרגול בסיסי",
+       "defaultModeDescription": "תרגלו את מערך התווים המרכזי.",
+@@ -1373,27 +1384,35 @@
+         "title": "הגדרת משחק",
+         "description": "בחר מה להתאמן והגדר את המטרה שלך לפני המשחק!"
+       },
+       "practiceModes": {
+         "title": "מה להתאמן",
+         "description": "בחר עיצורים, תנועות או אותיות משולבות. אתה יכול לתרגל סוג אחד או לערבב אותם!"
+       },
+       "goalSetting": {
+         "title": "הגדר את המטרה שלך",
+         "description": "השתמש ב-+ וב- כדי להגדיר את הרמה שעליך להכות כדי לנצח במשחק. התחל נמוך אם אתה חדש, הגדל כדי להשתפר!"
+       },
+       "startGame": {
+         "title": "מוּכָן? בואו נשחק!",
+         "description": "לחץ על התחל כדי להתחיל! אותיות יזרמו על פני המסך - גררו כל אחת מהתיבה התואמת שלה בתחתית."
+       }
+     }
+   },
+   "achievementSections": {
+     "classic": "קלאסי",
+     "special": "מיוחד",
+     "polyglot": "פוליגלוט",
+     "dedication": "מסירות",
+     "letterRiver": "נהר האותיות",
+     "bridgeBuilder": "בונה מילים",
+     "deepScript": "כתב עמוק"
++  },
++  "dailyReview": {
++    "title": "Daily Review",
++    "allCaughtUp": "All caught up!",
++    "checkBackTomorrow": "Great work. Check back tomorrow."
++  },
++  "streak": {
++    "startJourney": "Start your journey!"
+   }
+ }
+diff --git a/src/i18n/hindi.json b/src/i18n/hindi.json
+index fd488a71e0f9ff8faf481f025f6854b3d9f0b1fe..019ba20e7d6bf3c35e2c1879fa0379bdf33d1292 100644
+--- a/src/i18n/hindi.json
++++ b/src/i18n/hindi.json
+@@ -32,75 +32,86 @@
+     "hero": {
+       "heading": "अपना नदी साहसिक चुनें",
+       "description": "एकल अक्षरों से शुरू करें या पूर्ण शब्दों में गोता लगाएं",
+       "modeSelectTitle": "एक मोड चुनें",
+       "modes": {
+         "letters": {
+           "title": "अक्षर नदी",
+           "description": "बहते अक्षरों को पकड़ें और सही टोकरियों में डालें"
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "हाल ही में सीखे गए अक्षर"
+     },
+     "progress": {
+       "level": "स्तर {{level}}",
+       "heading": "आज की प्रगति",
+       "streak": "स्ट्रीक",
+       "days": "{{count}} दिन",
+       "resetsAt": "00:00 एशिया/जेरूसलम पर रीसेट ({{time}})",
+       "starLevel": "स्टार स्तर",
+       "totalStars": "{{count}} ⭐ कुल",
+       "toNextLevel": "{{current}} / {{total}} ⭐ अगले स्तर के लिए",
+       "latestBadge": "नवीनतम बैज",
+       "tier": "टियर {{tier}}",
+-      "playToUnlock": "उपलब्धियों को अनलॉक करना शुरू करने के लिए एक सत्र खेलें।"
++      "playToUnlock": "उपलब्धियों को अनलॉक करना शुरू करने के लिए एक सत्र खेलें।",
++      "recentMastery": "Recent Mastery",
++      "recentMasteryEmpty": "Catch a few letters to unlock your mastery row.",
++      "gameActivity": "Game Activity",
++      "gameActivityEmpty": "Start a game and your latest activity will appear here."
+     },
+     "languagePicker": {
+       "label": "भाषा का अभ्यास करें",
+-      "helper": "किसी अन्य स्क्रिप्ट में प्रशिक्षित करने के लिए किसी भी समय स्विच करें।"
++      "helper": "किसी अन्य स्क्रिप्ट में प्रशिक्षित करने के लिए किसी भी समय स्विच करें।",
++      "appLanguage": "App Language",
++      "imLearning": "I'm Learning",
++      "active": "Active"
+     },
+     "cta": {
+       "start": "एक नया रन प्रारंभ करें",
+       "practice": "फोकस लेटर का अभ्यास करें",
+       "play": "खेलें"
+     },
+     "quest": {
+       "claim": "दावा करें",
+       "claimed": "दावा किया",
+       "locked": "प्रगति में",
+       "label": "क्वेस्ट {{current}} में से {{total}}",
+       "complete": "क्वेस्ट पूर्ण",
+       "inProgress": "प्रगति में...",
+       "collected": "पुरस्कार एकत्र किया गया",
+       "collectedShort": "✓ एकत्रित",
+       "claiming": "दावा कर रहे हैं..."
+     },
+     "dailyQuests": {
+       "title": "दैनिक क्वेस्ट",
+       "resetsAt": "{{time}} पर रीसेट होता है"
++    },
++    "sections": {
++      "languageLearning": "Language Learning",
++      "profileOverview": "Profile Overview"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "स्तर",
+       "score": "अंक"
+     },
+     "controls": {
+       "leave": "खेल छोड़ो",
+       "exitToMenu": "⬅",
+       "backToMenu": "मेनू पर वापस जाएं",
+       "start": "खेल शुरू",
+       "playAgain": "फिर से चालू करें",
+       "install": "एप्लिकेशन इंस्टॉल करो",
+       "accessibility": "अभिगम्यता के विकल्प",
+       "close": "बंद करना"
+     },
+     "setup": {
+       "title": "पत्र नदी",
+       "subtitleFallback": "चलते {{noun}} को सही खाने में ले जाएँ!",
+       "prompt": "चुनें कि आप क्या अभ्यास करना चाहते हैं:",
+       "installDescription": "एप्लिकेशन इंस्टॉल करो",
+       "defaultNoun": "अक्षर",
+       "defaultModeLabel": "मूल अभ्यास",
+       "defaultModeDescription": "पात्रों के मुख्य समूह का अभ्यास करें।",
+@@ -1314,27 +1325,35 @@
+       "nice": "nice",
+       "beautiful": "beautiful",
+       "ugly": "ugly",
+       "strange": "strange",
+       "food": "food",
+       "water": "water",
+       "coffee": "coffee",
+       "weather": "weather",
+       "book": "book",
+       "phone": "phone",
+       "car": "car",
+       "street": "street",
+       "city": "city",
+       "country": "country",
+       "language": "language",
+       "word": "word",
+       "thing": "thing",
+       "something": "something",
+       "nothing": "nothing",
+       "everything": "everything",
+       "problem": "problem",
+       "question": "question",
+       "answer": "answer",
+       "idea": "idea"
+     }
++  },
++  "dailyReview": {
++    "title": "Daily Review",
++    "allCaughtUp": "All caught up!",
++    "checkBackTomorrow": "Great work. Check back tomorrow."
++  },
++  "streak": {
++    "startJourney": "Start your journey!"
+   }
+ }
+diff --git a/src/i18n/japanese.json b/src/i18n/japanese.json
+index 77ac801e66055c505d577e84e02e02fb1c79b247..7ff166f34704d764f8a1cdcc4d2c251a6839d1ff 100644
+--- a/src/i18n/japanese.json
++++ b/src/i18n/japanese.json
+@@ -32,75 +32,86 @@
+     "hero": {
+       "heading": "川の冒険を選択",
+       "description": "単一の文字から始めるか、完全な単語に飛び込む",
+       "modeSelectTitle": "モードを選択",
+       "modes": {
+         "letters": {
+           "title": "文字の川",
+           "description": "流れる文字をキャッチして正しいバスケットに入れる"
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "最近学んだ文字"
+     },
+     "progress": {
+       "level": "レベル{{level}}",
+       "heading": "今日の進捗",
+       "streak": "ストリーク",
+       "days": "{{count}} 日",
+       "resetsAt": "00:00 アジア/エルサレムにリセット ({{time}})",
+       "starLevel": "スターレベル",
+       "totalStars": "{{count}} ⭐ 合計",
+       "toNextLevel": "{{current}} / {{total}} ⭐ 次のレベルまで",
+       "latestBadge": "最新のバッジ",
+       "tier": "ティア {{tier}}",
+-      "playToUnlock": "セッションをプレイして実績のロック解除を開始します。"
++      "playToUnlock": "セッションをプレイして実績のロック解除を開始します。",
++      "recentMastery": "Recent Mastery",
++      "recentMasteryEmpty": "Catch a few letters to unlock your mastery row.",
++      "gameActivity": "Game Activity",
++      "gameActivityEmpty": "Start a game and your latest activity will appear here."
+     },
+     "languagePicker": {
+       "label": "言語を練習する",
+-      "helper": "いつでも切り替えて、別のスクリプトでトレーニングできます。"
++      "helper": "いつでも切り替えて、別のスクリプトでトレーニングできます。",
++      "appLanguage": "App Language",
++      "imLearning": "I'm Learning",
++      "active": "Active"
+     },
+     "cta": {
+       "start": "新しい実行を開始する",
+       "practice": "練習用フォーカスレター",
+       "play": "プレイ"
+     },
+     "quest": {
+       "claim": "請求",
+       "claimed": "請求済み",
+       "locked": "進行中",
+       "label": "クエスト {{current}} / {{total}}",
+       "complete": "クエスト完了",
+       "inProgress": "進行中...",
+       "collected": "報酬を受け取りました",
+       "collectedShort": "✓ 受取済み",
+       "claiming": "請求中..."
+     },
+     "dailyQuests": {
+       "title": "デイリークエスト",
+       "resetsAt": "{{time}}にリセット"
++    },
++    "sections": {
++      "languageLearning": "Language Learning",
++      "profileOverview": "Profile Overview"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "レベル",
+       "score": "スコア"
+     },
+     "controls": {
+       "leave": "ゲームから離れる",
+       "exitToMenu": "⬅",
+       "backToMenu": "メニューに戻る",
+       "start": "ゲームを開始する",
+       "playAgain": "もう一度プレイする",
+       "install": "アプリをインストールする",
+       "accessibility": "アクセシビリティのオプション",
+       "close": "近い"
+     },
+     "setup": {
+       "title": "文字の川",
+       "subtitleFallback": "動く{{noun}}を正しい枠にドラッグしましょう。",
+       "prompt": "練習したい内容を選択してください:",
+       "installDescription": "アプリをインストールする",
+       "defaultNoun": "文字",
+       "defaultModeLabel": "コアプラクティス",
+       "defaultModeDescription": "主要な文字セットを練習します。",
+@@ -1314,27 +1325,35 @@
+       "nice": "nice",
+       "beautiful": "beautiful",
+       "ugly": "ugly",
+       "strange": "strange",
+       "food": "food",
+       "water": "water",
+       "coffee": "coffee",
+       "weather": "weather",
+       "book": "book",
+       "phone": "phone",
+       "car": "car",
+       "street": "street",
+       "city": "city",
+       "country": "country",
+       "language": "language",
+       "word": "word",
+       "thing": "thing",
+       "something": "something",
+       "nothing": "nothing",
+       "everything": "everything",
+       "problem": "problem",
+       "question": "question",
+       "answer": "answer",
+       "idea": "idea"
+     }
++  },
++  "dailyReview": {
++    "title": "Daily Review",
++    "allCaughtUp": "All caught up!",
++    "checkBackTomorrow": "Great work. Check back tomorrow."
++  },
++  "streak": {
++    "startJourney": "Start your journey!"
+   }
+ }
+diff --git a/src/i18n/mandarin.json b/src/i18n/mandarin.json
+index 873c9bb549d580fe460e009fa55415477b13c444..b3998b3ed4c91eb35e02e934dc5b691a242b8bf1 100644
+--- a/src/i18n/mandarin.json
++++ b/src/i18n/mandarin.json
+@@ -46,75 +46,86 @@
+     "hero": {
+       "heading": "选择你的河流冒险",
+       "description": "从单个字母开始或直接进入完整单词",
+       "modeSelectTitle": "选择模式",
+       "modes": {
+         "letters": {
+           "title": "字母之河",
+           "description": "捕捉漂流的字母并放入正确的篮子"
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "最近学习的字母"
+     },
+     "progress": {
+       "level": "第{{level}}级",
+       "heading": "今日进度",
+       "streak": "连胜",
+       "days": "{{count}} 天",
+       "resetsAt": "在00:00亚洲/耶路撒冷重置 ({{time}})",
+       "starLevel": "星级",
+       "totalStars": "{{count}} ⭐ 总计",
+       "toNextLevel": "{{current}} / {{total}} ⭐ 到下一级",
+       "latestBadge": "最新徽章",
+       "tier": "等级 {{tier}}",
+-      "playToUnlock": "玩一个会话以开始解锁成就。"
++      "playToUnlock": "玩一个会话以开始解锁成就。",
++      "recentMastery": "Recent Mastery",
++      "recentMasteryEmpty": "Catch a few letters to unlock your mastery row.",
++      "gameActivity": "Game Activity",
++      "gameActivityEmpty": "Start a game and your latest activity will appear here."
+     },
+     "languagePicker": {
+       "label": "练习语言",
+-      "helper": "随时切换以使用另一个脚本进行训练。"
++      "helper": "随时切换以使用另一个脚本进行训练。",
++      "appLanguage": "App Language",
++      "imLearning": "I'm Learning",
++      "active": "Active"
+     },
+     "cta": {
+       "start": "开始新的跑步",
+       "practice": "实践焦点信",
+       "play": "玩"
+     },
+     "quest": {
+       "label": "任务 {{current}} / {{total}}",
+       "complete": "任务完成",
+       "inProgress": "进行中...",
+       "collected": "奖励已收集",
+       "collectedShort": "✓ 已收集",
+       "claiming": "领取中...",
+       "claim": "领取",
+       "claimed": "已领取",
+       "locked": "进行中"
+     },
+     "dailyQuests": {
+       "title": "每日任务",
+       "resetsAt": "在{{time}}重置"
++    },
++    "sections": {
++      "languageLearning": "Language Learning",
++      "profileOverview": "Profile Overview"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "等级",
+       "score": "分数"
+     },
+     "controls": {
+       "leave": "离开游戏",
+       "exitToMenu": "⬅",
+       "backToMenu": "返回菜单",
+       "start": "开始游戏",
+       "playAgain": "再玩一次",
+       "install": "安装应用程序",
+       "accessibility": "辅助功能选项",
+       "close": "关闭"
+     },
+     "setup": {
+       "title": "字母河",
+       "subtitleFallback": "把移动的{{noun}}拖到正确的方框！",
+       "prompt": "选择你想要练习的内容：",
+       "installDescription": "安装应用程序",
+       "defaultNoun": "字",
+       "defaultModeLabel": "核心实践",
+       "defaultModeDescription": "练习主要角色。",
+@@ -1314,27 +1325,35 @@
+       "nice": "nice",
+       "beautiful": "beautiful",
+       "ugly": "ugly",
+       "strange": "strange",
+       "food": "food",
+       "water": "water",
+       "coffee": "coffee",
+       "weather": "weather",
+       "book": "book",
+       "phone": "phone",
+       "car": "car",
+       "street": "street",
+       "city": "city",
+       "country": "country",
+       "language": "language",
+       "word": "word",
+       "thing": "thing",
+       "something": "something",
+       "nothing": "nothing",
+       "everything": "everything",
+       "problem": "problem",
+       "question": "question",
+       "answer": "answer",
+       "idea": "idea"
+     }
++  },
++  "dailyReview": {
++    "title": "Daily Review",
++    "allCaughtUp": "All caught up!",
++    "checkBackTomorrow": "Great work. Check back tomorrow."
++  },
++  "streak": {
++    "startJourney": "Start your journey!"
+   }
+ }
+diff --git a/src/i18n/portuguese.json b/src/i18n/portuguese.json
+index 87f54529976a5c96dffffba0eafcca895d3b2489..c206d510e6c9d5dd8234e79d22742b981483cd99 100644
+--- a/src/i18n/portuguese.json
++++ b/src/i18n/portuguese.json
+@@ -1,106 +1,121 @@
+ {
+   "language": {
+     "id": "portuguese",
+     "name": "Português"
+   },
+   "app": {
+     "title": "Rio de Letras",
+     "tagline": "Flua, aprenda e comemore cada captura.",
+     "nav": {
+       "home": "Lar",
+       "play": "Jogar",
+-      "achievements": "Conquistas",
++      "achievements": "Prêmios",
+       "learn": "Aprender",
+-      "settings": "Configurações"
++      "settings": "Configurações",
++      "awards": "Conquistas"
+     },
+     "languagePicker": {
+       "label": "Idioma do aplicativo",
+       "helper": "Defina o idioma da interface.",
+       "onboardingTitle": "Escolha seus idiomas",
+       "onboardingSubtitle": "Escolha o idioma da interface e o alfabeto que deseja praticar.",
+       "confirm": "Comece a aprender"
+     },
+     "practicePicker": {
+       "label": "Pratique a linguagem",
+       "helper": "Escolha qual pacote de idiomas você deseja explorar."
+     },
+     "footer": {
+       "resetNotice": "O reset acontece diariamente às 00:00 Ásia/Jerusalém."
+     }
+   },
+   "home": {
+     "hero": {
+       "heading": "Escolha sua aventura no rio",
+       "description": "Comece com letras individuais ou mergulhe em palavras completas",
+       "modeSelectTitle": "Selecione um modo",
+       "modes": {
+         "letters": {
+           "title": "Rio de Letras",
+           "description": "Capture letras flutuantes e coloque-as nas cestas certas"
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "Letras Recentemente Aprendidas"
+     },
+     "progress": {
+       "level": "Nível {{level}}",
+       "heading": "Progresso hoje",
+       "streak": "Sequência",
+       "days": "{{count}} dias",
+       "resetsAt": "Reinicia às 00:00 Ásia/Jerusalém ({{time}})",
+       "starLevel": "Nível de estrelas",
+       "totalStars": "{{count}} ⭐ total",
+       "toNextLevel": "{{current}} / {{total}} ⭐ para o próximo nível",
+       "latestBadge": "Último distintivo",
+       "tier": "Camada {{tier}}",
+-      "playToUnlock": "Jogue uma sessão para começar a desbloquear conquistas."
++      "playToUnlock": "Jogue uma sessão para começar a desbloquear conquistas.",
++      "recentMastery": "Domínio recente",
++      "recentMasteryEmpty": "Aprenda algumas letras para desbloquear sua linha de domínio.",
++      "gameActivity": "Atividade de jogo",
++      "gameActivityEmpty": "Comece um jogo e sua atividade mais recente aparecerá aqui."
+     },
+     "languagePicker": {
+       "label": "Pratique a linguagem",
+-      "helper": "Mude a qualquer momento para treinar em outro script."
++      "helper": "Mude a qualquer momento para treinar em outro script.",
++      "appLanguageLabel": "Idioma do app",
++      "learningLabel": "Estou aprendendo",
++      "activeStatus": "Ativo",
++      "appLanguage": "Idioma do app",
++      "imLearning": "Estou aprendendo",
++      "active": "Ativo"
+     },
+     "cta": {
+       "start": "Comece uma nova corrida",
+       "practice": "Carta de foco prático",
+       "play": "Jogar"
+     },
+     "quest": {
+       "claim": "Reivindicar",
+       "claimed": "Reivindicado",
+       "locked": "Em Progresso",
+       "label": "Missão {{current}} de {{total}}",
+       "complete": "Missão completa",
+       "inProgress": "Em andamento...",
+       "collected": "Recompensa coletada",
+       "collectedShort": "✓ Coletado",
+       "claiming": "Reivindicando..."
+     },
+     "dailyQuests": {
+       "title": "Missões diárias",
+       "resetsAt": "Reinicia em {{time}}"
++    },
++    "sections": {
++      "languageLearning": "Aprendizagem de idiomas",
++      "profileOverview": "Visão geral do perfil"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "Nível",
+       "score": "Pontuação"
+     },
+     "controls": {
+       "leave": "Sair do jogo",
+       "exitToMenu": "⬅",
+       "backToMenu": "Voltar ao menu",
+       "start": "Iniciar jogo",
+       "playAgain": "Jogue novamente",
+       "install": "Instalar aplicativo",
+       "accessibility": "Opções de acessibilidade",
+       "close": "Fechar"
+     },
+     "setup": {
+       "title": "Rio de Letras",
+       "subtitleFallback": "Arraste a {{noun}} em movimento para o espaço correto.",
+       "prompt": "Escolha o que você quer praticar:",
+       "installDescription": "Instalar aplicativo",
+       "defaultNoun": "letra",
+       "defaultModeLabel": "Prática Básica",
+       "defaultModeDescription": "Pratique o conjunto principal de personagens.",
+@@ -1314,27 +1329,35 @@
+       "nice": "nice",
+       "beautiful": "beautiful",
+       "ugly": "ugly",
+       "strange": "strange",
+       "food": "food",
+       "water": "water",
+       "coffee": "coffee",
+       "weather": "weather",
+       "book": "book",
+       "phone": "phone",
+       "car": "car",
+       "street": "street",
+       "city": "city",
+       "country": "country",
+       "language": "language",
+       "word": "word",
+       "thing": "thing",
+       "something": "something",
+       "nothing": "nothing",
+       "everything": "everything",
+       "problem": "problem",
+       "question": "question",
+       "answer": "answer",
+       "idea": "idea"
+     }
++  },
++  "dailyReview": {
++    "title": "Revisão diária",
++    "allCaughtUp": "Tudo em dia!",
++    "checkBackTomorrow": "Ótimo trabalho. Volte amanhã."
++  },
++  "streak": {
++    "startJourney": "Comece sua jornada!"
+   }
+ }
+diff --git a/src/i18n/russian.json b/src/i18n/russian.json
+index fb9956957aa4d986384aca9659d84888058dfec7..f3167129f655dc7c365eb922e417542e70621479 100644
+--- a/src/i18n/russian.json
++++ b/src/i18n/russian.json
+@@ -32,75 +32,86 @@
+     "hero": {
+       "heading": "Выберите свое приключение на реке",
+       "description": "Начните с отдельных букв или погрузитесь в целые слова",
+       "modeSelectTitle": "Выберите режим",
+       "modes": {
+         "letters": {
+           "title": "Река Букв",
+           "description": "Ловите плывущие буквы и складывайте их в правильные корзины"
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "Недавно изученные буквы"
+     },
+     "progress": {
+       "level": "Уровень {{level}}",
+       "heading": "Прогресс сегодня",
+       "streak": "Серия",
+       "days": "{{count}} дней",
+       "resetsAt": "Сброс в 00:00 Азия/Иерусалим ({{time}})",
+       "starLevel": "Уровень звезд",
+       "totalStars": "{{count}} ⭐ всего",
+       "toNextLevel": "{{current}} / {{total}} ⭐ до следующего уровня",
+       "latestBadge": "Последний значок",
+       "tier": "Уровень {{tier}}",
+-      "playToUnlock": "Сыграйте в сеанс, чтобы начать разблокировать достижения."
++      "playToUnlock": "Сыграйте в сеанс, чтобы начать разблокировать достижения.",
++      "recentMastery": "Recent Mastery",
++      "recentMasteryEmpty": "Catch a few letters to unlock your mastery row.",
++      "gameActivity": "Game Activity",
++      "gameActivityEmpty": "Start a game and your latest activity will appear here."
+     },
+     "languagePicker": {
+       "label": "Практика языка",
+-      "helper": "В любой момент переключитесь на обучение по другому сценарию."
++      "helper": "В любой момент переключитесь на обучение по другому сценарию.",
++      "appLanguage": "App Language",
++      "imLearning": "I'm Learning",
++      "active": "Active"
+     },
+     "cta": {
+       "start": "Начать новый прогон",
+       "practice": "Письмо о практике",
+       "play": "Играть"
+     },
+     "quest": {
+       "claim": "Требовать",
+       "claimed": "Заявлено",
+       "locked": "В Процессе",
+       "label": "Задание {{current}} из {{total}}",
+       "complete": "Задание выполнено",
+       "inProgress": "В процессе...",
+       "collected": "Награда собрана",
+       "collectedShort": "✓ Собрано",
+       "claiming": "Получение..."
+     },
+     "dailyQuests": {
+       "title": "Ежедневные задания",
+       "resetsAt": "Сброс в {{time}}"
++    },
++    "sections": {
++      "languageLearning": "Language Learning",
++      "profileOverview": "Profile Overview"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "Уровень",
+       "score": "Счет"
+     },
+     "controls": {
+       "leave": "Выйти из игры",
+       "exitToMenu": "⬅",
+       "backToMenu": "Вернуться в меню",
+       "start": "Начать игру",
+       "playAgain": "Играть снова",
+       "install": "Установить приложение",
+       "accessibility": "Параметры доступности",
+       "close": "Закрывать"
+     },
+     "setup": {
+       "title": "Буквенная река",
+       "subtitleFallback": "Перетащите движущуюся {{noun}} в нужную ячейку!",
+       "prompt": "Выберите, чем вы хотите заниматься:",
+       "installDescription": "Установить приложение",
+       "defaultNoun": "буква",
+       "defaultModeLabel": "Основная практика",
+       "defaultModeDescription": "Попрактикуйтесь в основном наборе персонажей.",
+@@ -1314,27 +1325,35 @@
+       "nice": "nice",
+       "beautiful": "beautiful",
+       "ugly": "ugly",
+       "strange": "strange",
+       "food": "food",
+       "water": "water",
+       "coffee": "coffee",
+       "weather": "weather",
+       "book": "book",
+       "phone": "phone",
+       "car": "car",
+       "street": "street",
+       "city": "city",
+       "country": "country",
+       "language": "language",
+       "word": "word",
+       "thing": "thing",
+       "something": "something",
+       "nothing": "nothing",
+       "everything": "everything",
+       "problem": "problem",
+       "question": "question",
+       "answer": "answer",
+       "idea": "idea"
+     }
++  },
++  "dailyReview": {
++    "title": "Daily Review",
++    "allCaughtUp": "All caught up!",
++    "checkBackTomorrow": "Great work. Check back tomorrow."
++  },
++  "streak": {
++    "startJourney": "Start your journey!"
+   }
+ }
+diff --git a/src/i18n/spanish.json b/src/i18n/spanish.json
+index 0f5e49b44a7129e8a02e452367c160f7f858a1ae..b1fc719ac3b1ef58fca1ac7694fc76c5a6bf8b58 100644
+--- a/src/i18n/spanish.json
++++ b/src/i18n/spanish.json
+@@ -37,84 +37,95 @@
+     "practicePicker": {
+       "label": "Practica el idioma",
+       "helper": "Elija qué paquete de idioma desea explorar."
+     },
+     "footer": {
+       "resetNotice": "El reinicio se realiza diariamente a las 00:00 Asia/Jerusalén."
+     }
+   },
+   "home": {
+     "hero": {
+       "heading": "Elige tu aventura en el río",
+       "description": "Comienza con letras individuales o sumérgete en palabras completas",
+       "modeSelectTitle": "Selecciona un modo",
+       "modes": {
+         "letters": {
+           "title": "Río de Letras",
+           "description": "Atrapa letras flotantes y colócalas en las canastas correctas"
+         }
+       }
+     },
+     "recentLetters": {
+       "title": "Letras aprendidas recientemente"
+     },
+     "languagePicker": {
+       "label": "Practica el idioma",
+-      "helper": "Cambie en cualquier momento para entrenar en otro guión."
++      "helper": "Cambie en cualquier momento para entrenar en otro guión.",
++      "appLanguage": "App Language",
++      "imLearning": "I'm Learning",
++      "active": "Active"
+     },
+     "cta": {
+       "start": "Iniciar una nueva ejecución",
+       "practice": "Carta de enfoque de práctica",
+       "play": "Jugar"
+     },
+     "quest": {
+       "label": "Misión {{current}} de {{total}}",
+       "complete": "Misión completada",
+       "inProgress": "En progreso...",
+       "collected": "Recompensa recolectada",
+       "collectedShort": "✓ Recolectado",
+       "claiming": "Reclamando...",
+       "claim": "Reclamar",
+       "claimed": "Reclamado",
+       "locked": "En Progreso"
+     },
+     "dailyQuests": {
+       "title": "Misiones diarias",
+       "resetsAt": "Se reinicia a las {{time}}"
+     },
+     "progress": {
+       "heading": "Progreso de hoy",
+       "streak": "Racha",
+       "days": "{{count}} días",
+       "resetsAt": "Se reinicia a las 00:00 Asía/Jerusalén ({{time}})",
+       "starLevel": "Nivel de estrellas",
+       "totalStars": "{{count}} ⭐ total",
+       "toNextLevel": "{{current}} / {{total}} ⭐ para el próximo nivel",
+       "latestBadge": "Última insignia",
+       "tier": "Nivel {{tier}}",
+       "playToUnlock": "Juega una sesión para comenzar a desbloquear logros.",
+-      "level": "Nivel {{level}}"
++      "level": "Nivel {{level}}",
++      "recentMastery": "Recent Mastery",
++      "recentMasteryEmpty": "Catch a few letters to unlock your mastery row.",
++      "gameActivity": "Game Activity",
++      "gameActivityEmpty": "Start a game and your latest activity will appear here."
++    },
++    "sections": {
++      "languageLearning": "Language Learning",
++      "profileOverview": "Profile Overview"
+     }
+   },
+   "game": {
+     "labels": {
+       "level": "Nivel",
+       "score": "Puntaje"
+     },
+     "controls": {
+       "leave": "Salir del juego",
+       "exitToMenu": "⬅",
+       "backToMenu": "Volver al menú",
+       "start": "Iniciar juego",
+       "playAgain": "Jugar de nuevo",
+       "install": "Instalar aplicación",
+       "accessibility": "Opciones de accesibilidad",
+       "close": "Cerca"
+     },
+     "setup": {
+       "title": "Río de letras",
+       "subtitleFallback": "Arrastra la {{noun}} en movimiento a la casilla correcta.",
+       "prompt": "Elige lo que quieres practicar:",
+       "installDescription": "Instalar aplicación",
+       "defaultNoun": "letra",
+       "defaultModeLabel": "Práctica básica",
+       "defaultModeDescription": "Practica el conjunto principal de personajes.",
+@@ -1340,27 +1351,35 @@
+       "word": "palabra",
+       "thing": "cosa",
+       "something": "algo",
+       "nothing": "nada",
+       "everything": "todo",
+       "problem": "problema",
+       "question": "pregunta",
+       "answer": "respuesta",
+       "idea": "idea",
+       "shalom": "hola; paz; adiós",
+       "todah": "gracias",
+       "ken": "sí",
+       "torah": "Torá; ley judía",
+       "emet": "verdad",
+       "boker": "mañana",
+       "tov": "bueno",
+       "erev": "tarde; noche",
+       "lehitraot": "adiós; hasta luego",
+       "hello": "hola",
+       "goodbye": "adiós",
+       "please": "por favor",
+       "sorry": "lo siento; perdón",
+       "yes": "sí",
+       "no": "no"
+     }
++  },
++  "dailyReview": {
++    "title": "Daily Review",
++    "allCaughtUp": "All caught up!",
++    "checkBackTomorrow": "Great work. Check back tomorrow."
++  },
++  "streak": {
++    "startJourney": "Start your journey!"
+   }
+ }
+diff --git a/src/views/HomeProfileLocalization.test.js b/src/views/HomeProfileLocalization.test.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..31f6ec43fcb5f55e18b1cac3c5112a700a9b364c
+--- /dev/null
++++ b/src/views/HomeProfileLocalization.test.js
+@@ -0,0 +1,60 @@
++import { describe, it, expect } from 'vitest';
++import fs from 'node:fs';
++import path from 'node:path';
++
++const i18nDir = path.resolve('src/i18n');
++const homeViewPath = path.resolve('src/views/HomeView.jsx');
++const localeFiles = fs.readdirSync(i18nDir).filter((file) => file.endsWith('.json'));
++
++const requiredKeys = [
++  'dailyReview.title',
++  'dailyReview.allCaughtUp',
++  'dailyReview.checkBackTomorrow',
++  'home.sections.languageLearning',
++  'home.languagePicker.appLanguage',
++  'home.languagePicker.imLearning',
++  'home.languagePicker.active',
++  'home.sections.profileOverview',
++  'home.progress.recentMastery',
++  'home.progress.recentMasteryEmpty',
++  'home.progress.gameActivity',
++  'home.progress.gameActivityEmpty',
++  'streak.startJourney',
++  'app.nav.achievements',
++];
++
++function getPath(obj, dottedKey) {
++  return dottedKey.split('.').reduce((acc, part) => (acc && typeof acc === 'object' ? acc[part] : undefined), obj);
++}
++
++describe('Home/Profile localization coverage', () => {
++  it('does not leave known Home/Profile English strings hardcoded in HomeView JSX', () => {
++    const src = fs.readFileSync(homeViewPath, 'utf8');
++    const forbiddenTextNodes = [
++      'Language Learning',
++      'App Language',
++      "I\'m Learning",
++      'Active',
++      'Profile Overview',
++      'Recent Mastery',
++      'Catch a few letters to unlock your mastery row.',
++      'Game Activity',
++      'Start a game and your latest activity will appear here.',
++    ];
++
++    for (const phrase of forbiddenTextNodes) {
++      expect(src).not.toContain(`>${phrase}<`);
++    }
++  });
++
++  it('defines required Home/Profile keys for every app-language dictionary', () => {
++    for (const file of localeFiles) {
++      const dict = JSON.parse(fs.readFileSync(path.join(i18nDir, file), 'utf8'));
++      for (const key of requiredKeys) {
++        const value = getPath(dict, key);
++        expect(value, `${file} missing ${key}`).toBeTypeOf('string');
++        expect(value.trim().length, `${file} empty ${key}`).toBeGreaterThan(0);
++      }
++    }
++  });
++});
+diff --git a/src/views/HomeView.jsx b/src/views/HomeView.jsx
+index db8b8a93634f383212d28608e67942803748e80c..0047cc6041a637eb45572c4e2094dc99e6f85a59 100644
+--- a/src/views/HomeView.jsx
++++ b/src/views/HomeView.jsx
+@@ -293,126 +293,126 @@ export default function HomeView() {
+                   <span>LEVEL {level}</span>
+                   <span>{levelProgress.toLocaleString()} / {starsPerLevel.toLocaleString()} XP</span>
+                 </div>
+                 <div className="h-3 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255, 255, 255, 0.15)' }}>
+                   <div className="progress-fill h-full rounded-full" style={{ width: `${progressPct}%`, background: 'linear-gradient(90deg, #4ae898, #80f0b8)' }}></div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </section>
+ 
+         {/* Streak Card */}
+         <section className="animate-fade-in-up">
+           <StreakCard />
+         </section>
+ 
+         {/* Daily Review Card */}
+         <section className="animate-fade-in-up">
+           <DailyReviewCard />
+         </section>
+ 
+         {/* Reminder Prompt (shows after 2-3 sessions) */}
+         <ReminderPrompt />
+ 
+         <section className="space-y-4">
+-          <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Language Learning</h2>
++          <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>{t('home.sections.languageLearning', 'Language Learning')}</h2>
+           <div className="space-y-3">
+             <LanguageCard
+               id="home-app-language-select"
+-              label={t('home.languagePicker.appLanguageLabel', 'App Language')}
++              label={t('home.languagePicker.appLanguage', 'App Language')}
+               value={appLanguageId}
+               onChange={selectAppLanguage}
+               options={displayLanguageOptions}
+               leading={<div className="flex h-12 w-12 items-center justify-center rounded-full shadow-sm" style={{ background: 'var(--app-primary-container)' }}><Icon style={{ color: 'var(--app-primary)' }}>language</Icon></div>}
+               trailing={<Icon style={{ color: 'var(--app-outline)' }}>expand_more</Icon>}
+             />
+ 
+             <LanguageCard
+               id="home-practice-language-select"
+-              label="I'm Learning"
++              label={t('home.languagePicker.imLearning', "I'm Learning")}
+               value={languageId}
+               onChange={selectLanguage}
+               options={displayLanguageOptions}
+               leading={<div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full text-2xl shadow-sm" style={{ background: 'var(--app-secondary-container)' }}>{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>}
+-              trailing={<div className="flex items-center gap-3"><span className="rounded-full px-3 py-1 text-[10px] font-black" style={{ background: 'var(--app-primary-container)', color: 'var(--app-primary)' }}>ACTIVE</span><Icon style={{ color: 'var(--app-outline)' }}>swap_horiz</Icon></div>}
++              trailing={<div className="flex items-center gap-3"><span className="rounded-full px-3 py-1 text-[10px] font-black" style={{ background: 'var(--app-primary-container)', color: 'var(--app-primary)' }}>{t('home.languagePicker.active', 'Active')}</span><Icon style={{ color: 'var(--app-outline)' }}>swap_horiz</Icon></div>}
+             />
+           </div>
+         </section>
+ 
+         <section className="space-y-4">
+-          <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Profile Overview</h2>
++          <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>{t('home.sections.profileOverview', 'Profile Overview')}</h2>
+ 
+           <div className="card-elevated space-y-4 p-5">
+             <div className="space-y-3">
+               <div className="flex items-center justify-between">
+                 <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>{t('home.progress.recentMastery', 'Recent Mastery')}</p>
+                 <Icon style={{ color: 'var(--app-outline)' }}>account_circle</Icon>
+               </div>
+               {recentLetters.length > 0 ? (
+                 <div className="flex gap-2 overflow-x-auto pb-1">
+                   {recentLetters.map((letter) => (
+                     <div key={letter.id} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold shadow-sm" style={{ border: '1px solid var(--app-primary-container)', background: 'var(--app-primary-container)', color: 'var(--app-primary)' }} title={letter.name}>
+                       {letter.symbol}
+                     </div>
+                   ))}
+                 </div>
+               ) : (
+-                <p className="line-clamp-2-stable text-sm" style={{ color: 'var(--app-muted)' }}>Catch a few letters to unlock your mastery row.</p>
++                <p className="line-clamp-2-stable text-sm" style={{ color: 'var(--app-muted)' }}>{t('home.progress.recentMasteryEmpty', 'Catch a few letters to unlock your mastery row.')}</p>
+               )}
+               {recentWords.length > 0 && (
+                 <div className="flex gap-2 overflow-x-auto pb-1">
+                   {recentWords.map((word) => (
+                     <span key={word.id} className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold shadow-sm" style={{ background: 'var(--app-mode-deep-bg)', color: 'var(--app-mode-deep)' }}>
+                       {word.text}
+                     </span>
+                   ))}
+                 </div>
+               )}
+             </div>
+ 
+             <div className="space-y-2">
+-              <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>Game Activity</p>
++              <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>{t('home.progress.gameActivity', 'Game Activity')}</p>
+               {recentModes.length > 0 ? (
+                 recentModes.slice(0, 3).map((modeName) => {
+                   const modeUi = modeDisplayByName[modeName] ?? { icon: 'sports_esports', color: 'var(--app-primary)', bg: 'var(--app-primary-container)' };
+                   return (
+                     <div key={modeName} className="flex items-center gap-3 rounded-xl p-3 shadow-sm" style={{ background: modeUi.surface, border: `1px solid ${modeUi.border}` }}>
+                       <div className="flex h-9 w-9 items-center justify-center rounded-full shadow-sm" style={{ background: modeUi.bg }}>
+                         <Icon className="text-lg" style={{ color: modeUi.color }}>{modeUi.icon}</Icon>
+                       </div>
+                       <div className="flex flex-1 items-center justify-between">
+                         <p className="text-sm font-bold" style={{ color: 'var(--app-on-surface)' }}>{modeName}</p>
+                         <span className="text-xs font-bold" style={{ color: modeUi.color }}>
+                           +{recentAchievementXpByGame[modeName] ?? 0} XP
+                         </span>
+                       </div>
+                     </div>
+                   );
+                 })
+               ) : (
+-                <p className="line-clamp-2-stable text-sm" style={{ color: 'var(--app-muted)' }}>Start a game and your latest activity will appear here.</p>
++                <p className="line-clamp-2-stable text-sm" style={{ color: 'var(--app-muted)' }}>{t('home.progress.gameActivityEmpty', 'Start a game and your latest activity will appear here.')}</p>
+               )}
+             </div>
+ 
+           </div>
+         </section>
+ 
+         <section className="grid grid-cols-2 gap-4">
+           <div className="space-y-3 rounded-2xl p-6 shadow-sm" style={{ background: 'var(--app-mode-bridge-surface)', border: '1px solid var(--app-mode-bridge-bg)' }}>
+             <div className="flex items-start justify-between gap-2">
+               <div className="flex h-10 w-10 items-center justify-center rounded-xl shadow-sm" style={{ background: 'var(--app-mode-bridge-bg)' }}><Icon className="text-xl" style={{ color: 'var(--app-mode-bridge)' }} filled>bolt</Icon></div>
+               <button type="button" className="btn-press rounded-full p-1" style={{ background: 'rgba(255,255,255,0.5)', color: 'var(--app-mode-bridge)' }} onClick={() => setIsEditingGoal((prev) => !prev)}>
+                 <Icon className="text-sm">edit</Icon>
+               </button>
+             </div>
+             <div>
+               <h3 className="leading-tight font-bold" style={{ color: 'var(--app-on-surface)' }}>{t('home.quest.dailyGoal', 'Daily Goal')}</h3>
+               {isEditingGoal ? (
+                 <div className="mt-2 flex items-center gap-2">
+                   <input
+                     type="number"
+                     min={5}
+                     max={180}
+                     value={dailyGoalMinutes}
+                     onChange={(event) => setDailyGoalMinutes(Math.max(5, Math.min(180, Number(event.target.value) || 15)))}
+                     className="w-20 rounded-lg px-2 py-1 text-sm font-semibold"
