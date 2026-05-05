@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
 import { getPacksBySection, getPackById } from '../../data/bridgeBuilderPacks.js';
+import VocabJourneyPanel from './VocabJourneyPanel.jsx';
 import {
   getAllWordProgress,
   getPackProgress,
@@ -465,10 +466,11 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const [goalFilter, setGoalFilter] = useState('all');
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState('recommended');
-  const [activeSubview, setActiveSubview] = useState(null);
+  const [activeSubview, setActiveSubview] = useState('journey');
   const [expandedPack, setExpandedPack] = useState(null);
   const [modeOverrides, setModeOverrides] = useState({});
   const [lastMethods, setLastMethods] = useState(() => getLastStudyMethods());
+  const [selectedJourneyPackId, setSelectedJourneyPackId] = useState(null);
   // Incremented after quiz mastery is applied to force re-read of storage
   const [progressRevision, setProgressRevision] = useState(0);
   const [showSkillCheck, setShowSkillCheck] = useState(false);
@@ -511,6 +513,20 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     return null;
   }, [sectionData]);
 
+  const journeyPackId = selectedJourneyPackId || activePackId;
+
+  const handleSelectJourneyPack = useCallback((packId) => {
+    if (!packId) return;
+
+    const allPackData = sectionData.flatMap((sectionItem) => sectionItem.packData || []);
+    const target = allPackData.find((packItem) => packItem.pack?.id === packId);
+
+    if (!target || !target.unlocked) return;
+
+    setSelectedJourneyPackId(packId);
+    setActiveSubview('journey');
+  }, [sectionData]);
+
   const handleTogglePack = useCallback((packId) => {
     setExpandedPack(prev => prev === packId ? null : packId);
   }, []);
@@ -533,6 +549,8 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     let gameMode;
     if (method === 'deep_script') {
       gameMode = 'deep_script';
+    } else if (method === 'loose_planks') {
+      gameMode = 'loose_planks';
     } else {
       gameMode = resolveGameMode(completion, null);
       if (gameMode === 'deep_script') gameMode = 'bridge_builder';
@@ -624,21 +642,63 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
         questionCounts={packQuizTarget ? { vocab: Math.min(packQuizTarget.wordIds.length, 6) } : null}
       />
     )}
+    
     <div className="bbs-screen">
       <div className="bbs-content">
         <div className="bbs-header">
-          <h1 className="bbs-title">Vocab Builder</h1>
-          <p className="bbs-subtitle">Your learning path</p>
         </div>
+{activeSubview === 'journey' && (
+    <VocabJourneyPanel
+      sectionData={sectionData}
+      activePackId={journeyPackId}
+      languageId={languageId}
+      dueReviewCount={dueReviewWordIds.length}
+      weakReviewCount={weakWordIds.length}
+      onSelectPack={handleSelectJourneyPack}
+      onLaunchPackMethod={handleLaunchPackMethod}
+      onReview={handlePlayReview}
+      onOpenBrowse={() => setActiveSubview('packs')}
+    />
+)}
+<div className="bbs-mode-tabs" role="tablist" aria-label="Vocabulary views">
+  <button
+    type="button"
+    className={`bbs-mode-tab ${activeSubview === 'journey' ? 'active' : ''}`}
+    onClick={() => setActiveSubview('journey')}
+  >
+    Journey
+  </button>
 
-        <div className="bbs-mode-tabs" role="tablist" aria-label="Browse modes">
-          <button type="button" className={`bbs-mode-tab ${activeSubview === null ? 'active' : ''}`}
-            onClick={() => setActiveSubview(null)}>Guided</button>
-          <button type="button" className={`bbs-mode-tab ${activeSubview === 'goal' ? 'active' : ''}`}
-            onClick={() => { setActiveSubview('goal'); emit('analytics:bridge_setup', { event: 'open_goal_browse' }); }}>Browse by goal</button>
-          <button type="button" className={`bbs-mode-tab ${activeSubview === 'expert' ? 'active' : ''}`}
-            onClick={() => { setActiveSubview('expert'); emit('analytics:bridge_setup', { event: 'open_expert_browse' }); }}>Advanced tools</button>
-        </div>
+  <button
+    type="button"
+    className={`bbs-mode-tab ${activeSubview === 'packs' ? 'active' : ''}`}
+    onClick={() => setActiveSubview('packs')}
+  >
+    All Packs
+  </button>
+
+  <button
+    type="button"
+    className={`bbs-mode-tab ${activeSubview === 'goal' ? 'active' : ''}`}
+    onClick={() => {
+      setActiveSubview('goal');
+      emit('analytics:bridge_setup', { event: 'open_goal_browse' });
+    }}
+  >
+    Browse by goal
+  </button>
+
+  <button
+    type="button"
+    className={`bbs-mode-tab ${activeSubview === 'expert' ? 'active' : ''}`}
+    onClick={() => {
+      setActiveSubview('expert');
+      emit('analytics:bridge_setup', { event: 'open_expert_browse' });
+    }}
+  >
+    Advanced tools
+  </button>
+</div>
 
         {activeSubview === 'goal' && (
           <div className="bbs-mode-panel">
@@ -685,7 +745,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
           </div>
         )}
 
-        {activeSubview === null && (
+        {activeSubview === 'packs' && (
           <div className="bbs-guided">
             {!Object.values(packCompletions).some(c => c.quizMastered || c.sentenceReady) && (
               <div className="bbs-skill-check-banner">
@@ -745,8 +805,6 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
             ))}
           </div>
         )}
-
-        <ReviewCard dueCount={dueReviewWordIds.length} weakCount={weakWordIds.length} onPlay={handlePlayReview} />
       </div>
     </div>
     </>
