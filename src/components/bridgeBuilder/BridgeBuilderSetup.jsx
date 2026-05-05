@@ -476,6 +476,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const [showSkillCheck, setShowSkillCheck] = useState(false);
   const [packQuizTarget, setPackQuizTarget] = useState(null); // pack object when running a pack-specific quiz
   const [quizResult, setQuizResult] = useState(null);
+  const contentScrollRef = useRef(null);
 
   const sections = useMemo(() => getSectionsInOrder(), []);
   const allProgress = useMemo(() => getAllWordProgress(), [progressRevision]); // eslint-disable-line react-hooks/exhaustive-deps
