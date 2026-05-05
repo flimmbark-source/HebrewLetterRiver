@@ -108,7 +108,7 @@ export function getJourneyStops(sectionData, activePackId) {
  * Get word preview for a pack — 6-8 display words.
  * Uses actual word data from the data layer if available.
  */
-export function getPackWordPreview(pack, languageId = 'he') {
+export function getPackWordPreview(pack, languageId = 'hebrew') {
   if (!pack || !pack.wordIds || pack.wordIds.length === 0) {
     return [];
   }
@@ -122,7 +122,14 @@ export function getPackWordPreview(pack, languageId = 'he') {
       : getWordsByIds(pack.wordIds);
 
     const wordMap = new Map(wordPool.map((word) => [word.id, word]));
-    const words = pack.wordIds.map((id) => wordMap.get(id)).filter(Boolean);
+    let words = pack.wordIds.map((id) => wordMap.get(id)).filter(Boolean);
+
+    if (words.length === 0 && Array.isArray(languageWordPool) && languageWordPool.length > 0) {
+      if (import.meta.env.DEV) {
+        console.warn('[vocabJourney] Pack word IDs not found in language pool, using pool preview fallback', { languageId, packId: pack.id, wordIds: pack.wordIds?.length || 0, poolSize: languageWordPool.length });
+      }
+      words = languageWordPool.slice(0, 8);
+    }
 
     if (words && words.length > 0) {
       // Return the first 6-8 words, preferring display fields like 'hebrew' or 'nativeScript'

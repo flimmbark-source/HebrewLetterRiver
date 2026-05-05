@@ -147,25 +147,25 @@ function CurrentPackDetailSheet({
           <h3>{t('bridgeBuilder.vocabJourney.moreWaysToLearn', 'More ways to learn')}</h3>
           <button type="button" className="vj-option" onClick={onLaunchLoosePlanks}>
             <span className="vj-option-icon vj-option-icon--teal"><Icon filled>view_stream</Icon></span>
-            <span><strong>Strengthen — Loose Planks</strong><small>Reinforce with targeted practice.</small></span>
+            <span><strong>{t('bridgeBuilder.vocabJourney.optionLoosePlanksTitle', 'Strengthen — Loose Planks')}</strong><small>{t('bridgeBuilder.vocabJourney.optionLoosePlanksSubtitle', 'Reinforce with targeted practice.')}</small></span>
             <Icon>chevron_right</Icon>
           </button>
 
           <button type="button" className="vj-option" onClick={onReview} disabled={reviewCount <= 0}>
             <span className="vj-option-icon vj-option-icon--blue"><Icon filled>calendar_month</Icon></span>
-            <span><strong>Review — Today’s Review</strong><small>Review words for memory.</small></span>
+            <span><strong>{t('bridgeBuilder.vocabJourney.optionReviewTitle', 'Review — Today’s Review')}</strong><small>{t('bridgeBuilder.vocabJourney.optionReviewSubtitle', 'Review words for memory.')}</small></span>
             <Icon>chevron_right</Icon>
           </button>
 
           <button type="button" className="vj-option" onClick={onLaunchDeepScript}>
             <span className="vj-option-icon vj-option-icon--purple"><Icon filled>ink_pen</Icon></span>
-            <span><strong>Challenge — Deep Script</strong><small>Test depth with writing and recall.</small></span>
+            <span><strong>{t('bridgeBuilder.vocabJourney.optionDeepScriptTitle', 'Challenge — Deep Script')}</strong><small>{t('bridgeBuilder.vocabJourney.optionDeepScriptSubtitle', 'Test depth with writing and recall.')}</small></span>
             <Icon>chevron_right</Icon>
           </button>
 
           <button type="button" className="vj-option" disabled>
             <span className="vj-option-icon vj-option-icon--blue"><Icon filled>menu_book</Icon></span>
-            <span><strong>Read — Cafe Talk</strong><small>See the words in a real conversation.</small></span>
+            <span><strong>{t('bridgeBuilder.vocabJourney.optionReadTitle', 'Read — Cafe Talk')}</strong><small>{t('bridgeBuilder.vocabJourney.optionReadSubtitle', 'See the words in a real conversation.')}</small></span>
             <Icon>lock</Icon>
           </button>
         </div>
@@ -195,6 +195,19 @@ export default function VocabJourneyPanel({
 
   const journeyStops = useMemo(() => getJourneyStops(sectionData, activePackId), [sectionData, activePackId]);
   const displayWords = useMemo(() => getPackWordPreview(currentPack, languageId), [currentPack, languageId]);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    console.log('[language-debug][VocabJourneyPanel]', {
+      route: typeof window !== 'undefined' ? window.location.pathname : 'unknown',
+      appLanguage: (window.__LETTER_RIVER_LAST_APP_LANG__ || 'unknown'),
+      practiceLanguage: languageId,
+      requestedPackLanguage: languageId,
+      resolvedPackId: currentPack?.id ?? null,
+      resolvedWordsCount: displayWords.length,
+      usedFallbackContent: displayWords.length === 0
+    });
+  }, [languageId, currentPack?.id, displayWords.length]);
   const stageInfo = useMemo(() => getPackLearningStage(currentProgress, currentCompletion), [currentProgress, currentCompletion]);
   const recommendedAction = useMemo(() => getRecommendedJourneyAction(currentProgress, currentCompletion), [currentProgress, currentCompletion]);
   const journeyStats = useMemo(() => getJourneyStats(sectionData), [sectionData]);
@@ -263,14 +276,14 @@ export default function VocabJourneyPanel({
           }}
         >
           <div className="vj-card-copy">
-            <span className="vj-badge">Current Pack</span>
+            <span className="vj-badge">{t('bridgeBuilder.vocabJourney.currentPack', 'Current Pack')}</span>
             <h2>{currentPack.title}</h2>
             <p className="vj-learn-line">
               <Icon filled>eco</Icon>
-              Learn {currentPack.targetsNewCount || currentPack.wordIds?.length || 8} everyday words
+              {t('bridgeBuilder.vocabJourney.learnEverydayWords', 'Learn {{count}} everyday words', { count: currentPack.targetsNewCount || currentPack.wordIds?.length || 8 })}
             </p>
-            <p className="vj-goal-line">Current goal: {stageInfo.label}</p>
-            <p className="vj-card-details-hint"><Icon>expand_more</Icon>Tap for pack details</p>
+            <p className="vj-goal-line">{t('bridgeBuilder.vocabJourney.currentGoal', 'Current goal: {{goal}}', { goal: stageInfo.label })}</p>
+            <p className="vj-card-details-hint"><Icon>expand_more</Icon>{t('bridgeBuilder.vocabJourney.tapForPackDetails', 'Tap for pack details')}</p>
 
             <button
               type="button"
@@ -297,8 +310,8 @@ export default function VocabJourneyPanel({
               <Icon filled>event_available</Icon>
             </span>
             <span className="vj-row-text">
-              <strong>Today’s Review — {reviewCount} words</strong>
-              <small>{reviewCount > 0 ? 'Keep your words strong.' : 'Complete a pack to unlock review.'}</small>
+              <strong>{t('bridgeBuilder.vocabJourney.todaysReviewWords', 'Today’s Review — {{count}} words', { count: reviewCount })}</strong>
+              <small>{reviewCount > 0 ? t('bridgeBuilder.vocabJourney.keepWordsStrong', 'Keep your words strong.') : t('bridgeBuilder.vocabJourney.completePackToUnlockReview', 'Complete a pack to unlock review.')}</small>
             </span>
             <Icon>chevron_right</Icon>
           </button>
@@ -308,8 +321,8 @@ export default function VocabJourneyPanel({
               <Icon filled>menu_book</Icon>
             </span>
             <span className="vj-row-text">
-              <strong>Read in Context — Cafe Talk</strong>
-              <small>Unlocks after this pack.</small>
+              <strong>{t('bridgeBuilder.vocabJourney.readInContextTitle', 'Read in Context — Cafe Talk')}</strong>
+              <small>{t('bridgeBuilder.vocabJourney.readInContextLockedSubtitle', 'Unlocks after this pack.')}</small>
             </span>
             <Icon>lock</Icon>
           </button>
