@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useRef } from 'react';
 import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
 import { getPacksBySection, getPackById } from '../../data/bridgeBuilderPacks.js';
 import VocabJourneyPanel from './VocabJourneyPanel.jsx';
@@ -525,6 +525,12 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
 
     setSelectedJourneyPackId(packId);
     setActiveSubview('journey');
+
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 860px)').matches) {
+      requestAnimationFrame(() => {
+        contentScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
   }, [sectionData]);
 
   const handleTogglePack = useCallback((packId) => {
@@ -644,7 +650,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     )}
     
     <div className="bbs-screen">
-      <div className={`bbs-content ${activeSubview === 'journey' ? 'bbs-content--journey' : ''}`}>
+      <div ref={contentScrollRef} className={`bbs-content ${activeSubview === 'journey' ? 'bbs-content--journey' : ''}`}>
 {activeSubview === 'journey' && (
     <VocabJourneyPanel
       sectionData={sectionData}
