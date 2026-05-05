@@ -7,21 +7,8 @@
 
 import { getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import { getBridgeBuilderWordsSync } from '../../data/bridgeBuilder/words/index.js';
+import { getPackWordIds } from '../../data/journeyPackRegistry.js';
 
-
-const CURATED_PACK_WORD_IDS = {
-  russian: {
-    greetings_01: ['bb-ru-yes', 'bb-ru-no', 'bb-ru-but', 'bb-ru-we', 'bb-ru-you'],
-    pronouns_01: ['bb-ru-he', 'bb-ru-she', 'bb-ru-we'],
-    family_01: ['bb-ru-family', 'bb-ru-friend', 'bb-ru-house'],
-    food_01: ['bb-ru-food', 'bb-ru-water', 'bb-ru-coffee']
-  }
-};
-
-function resolveCuratedPackWords(languageId, pack, wordMap) {
-  const ids = CURATED_PACK_WORD_IDS[languageId]?.[pack.id] || [];
-  return ids.map((id) => wordMap.get(id)).filter(Boolean);
-}
 
 /**
  * Get the current pack to display on the journey screen.
@@ -132,9 +119,8 @@ export function getPackWordPreview(pack, languageId = 'hebrew') {
     const languageWordPool = getBridgeBuilderWordsSync(languageId);
     const wordPool = Array.isArray(languageWordPool) ? languageWordPool : [];
     const wordMap = new Map(wordPool.map((word) => [word.id, word]));
-    const directWords = pack.wordIds.map((id) => wordMap.get(id)).filter(Boolean);
-    const curatedWords = resolveCuratedPackWords(languageId, pack, wordMap);
-    const words = directWords.length > 0 ? directWords : curatedWords;
+    const resolvedWordIds = getPackWordIds(languageId, pack.id);
+    const words = resolvedWordIds.map((id) => wordMap.get(id)).filter(Boolean);
 
     if (words.length > 0) {
       return {
@@ -148,7 +134,7 @@ export function getPackWordPreview(pack, languageId = 'hebrew') {
       console.warn('[vocabJourney] Missing pack mapping for language', {
         languageId,
         packId: pack.id,
-        missingWordIds: pack.wordIds
+        missingWordIds: getPackWordIds(languageId, pack.id)
       });
     }
 
