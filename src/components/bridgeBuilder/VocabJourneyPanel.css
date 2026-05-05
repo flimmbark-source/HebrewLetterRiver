@@ -1,15 +1,17 @@
 .vj-shell {
-  overflow: hidden;
-  border-radius: 32px;
-  background: linear-gradient(180deg, rgba(246, 252, 247, 0.96), rgba(232, 247, 242, 0.96));
-  border: 1px solid var(--app-card-border);
-  box-shadow: 0 18px 46px rgba(18, 73, 61, 0.14);
+  width: 100%;
+  min-height: 100%;
+  overflow: clip;
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(246, 252, 247, 0.92), rgba(232, 247, 242, 0.94));
+  border: 0;
+  box-shadow: none;
 }
 
 .vj-hero {
   position: relative;
   min-height: 520px;
-  padding: 24px;
+  padding: 24px 24px 20px;
   background-size: cover;
   background-position: center;
 }
@@ -165,7 +167,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-  padding: 16px;
+  padding: 12px 16px 8px;
 }
 
 .vj-left-column {
@@ -368,7 +370,7 @@
 
 .vj-river-path {
   min-height: 540px;
-  border-radius: 30px;
+  border-radius: 24px;
   overflow: hidden;
   background-size: cover;
   background-position: center top;
@@ -444,9 +446,13 @@
 }
 
 @media (max-width: 560px) {
+  .vj-shell {
+    min-height: auto;
+  }
+
   .vj-hero {
     min-height: 500px;
-    padding: 18px;
+    padding: 18px 14px 14px;
   }
 
   .vj-current-card {

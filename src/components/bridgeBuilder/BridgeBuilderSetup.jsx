@@ -644,7 +644,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     )}
     
     <div className="bbs-screen">
-      <div className="bbs-content">
+      <div className={`bbs-content ${activeSubview === 'journey' ? 'bbs-content--journey' : ''}`}>
         <div className="bbs-header">
         </div>
 {activeSubview === 'journey' && (
