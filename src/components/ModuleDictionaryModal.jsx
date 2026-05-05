@@ -3,7 +3,6 @@ import { X, BookOpen } from 'lucide-react';
 import { getReadingTextById } from '../data/readingTexts/index.js';
 import { getLanguageCode } from '../lib/languageUtils';
 import { useLanguage } from '../context/LanguageContext';
-import { useLocalization } from '../context/LocalizationContext';
 import { getLanguageName } from '../lib/vocabLanguageAdapter.js';
 
 /**
@@ -11,16 +10,16 @@ import { getLanguageName } from '../lib/vocabLanguageAdapter.js';
  * Shows Hebrew word, transliteration, and English meaning in a table
  */
 export default function ModuleDictionaryModal({ module, isOpen, onClose }) {
-  const { appLanguageId, languageId } = useLanguage();
-  const langName = getLanguageName(languageId);
-  const { t } = useLocalization();
+  const { appLanguageId, languageId: practiceLanguageId } = useLanguage();
+  const practiceLanguageName = getLanguageName(practiceLanguageId);
+  const appLanguageName = getLanguageName(appLanguageId);
 
   if (!isOpen) return null;
 
   // Collect all words from vocab sections
   const vocabWords = [];
   module.vocabTextIds.forEach(vocabTextId => {
-    const text = getReadingTextById(vocabTextId, 'hebrew');
+    const text = getReadingTextById(vocabTextId, practiceLanguageId);
     if (text && text.tokens) {
       text.tokens.forEach(token => {
         if (token.type === 'word') {
@@ -29,7 +28,7 @@ export default function ModuleDictionaryModal({ module, isOpen, onClose }) {
           const meaning = text.glosses?.[langCode]?.[token.id] || text.glosses?.en?.[token.id] || '—';
 
           vocabWords.push({
-            hebrew: token.text,
+            nativeText: token.text,
             transliteration,
             meaning,
             id: token.id
@@ -46,7 +45,7 @@ export default function ModuleDictionaryModal({ module, isOpen, onClose }) {
     : [module.grammarTextId];
 
   grammarTextIds.forEach(grammarTextId => {
-    const grammarText = getReadingTextById(grammarTextId, 'hebrew');
+    const grammarText = getReadingTextById(grammarTextId, practiceLanguageId);
     if (grammarText && grammarText.tokens) {
       grammarText.tokens.forEach(token => {
         if (token.type === 'word') {
@@ -55,7 +54,7 @@ export default function ModuleDictionaryModal({ module, isOpen, onClose }) {
           const meaning = grammarText.glosses?.[langCode]?.[token.id] || grammarText.glosses?.en?.[token.id] || '—';
 
           grammarWords.push({
-            hebrew: token.text,
+            nativeText: token.text,
             transliteration,
             meaning,
             id: token.id
@@ -101,15 +100,15 @@ export default function ModuleDictionaryModal({ module, isOpen, onClose }) {
               <table className="w-full">
                 <thead className="bg-slate-800">
                   <tr className="border-b border-slate-700">
-                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">{langName}</th>
+                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">{practiceLanguageName}</th>
                     <th className="p-3 text-left font-semibold text-slate-300 text-sm">Transliteration</th>
-                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">Meaning</th>
+                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">{appLanguageName}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {vocabWords.map((word, idx) => (
                     <tr key={`${word.id}-${idx}`} className="border-b border-slate-700/50 last:border-0">
-                      <td className="p-3 text-xl text-white font-hebrew">{word.hebrew}</td>
+                      <td className="p-3 text-xl text-white font-hebrew">{word.nativeText}</td>
                       <td className="p-3 text-base text-slate-300 font-mono">{word.transliteration}</td>
                       <td className="p-3 text-base text-slate-300">{word.meaning}</td>
                     </tr>
@@ -128,15 +127,15 @@ export default function ModuleDictionaryModal({ module, isOpen, onClose }) {
               <table className="w-full">
                 <thead className="bg-slate-800">
                   <tr className="border-b border-slate-700">
-                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">{langName}</th>
+                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">{practiceLanguageName}</th>
                     <th className="p-3 text-left font-semibold text-slate-300 text-sm">Transliteration</th>
-                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">Meaning</th>
+                    <th className="p-3 text-left font-semibold text-slate-300 text-sm">{appLanguageName}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {grammarWords.map((word, idx) => (
                     <tr key={`${word.id}-${idx}`} className="border-b border-slate-700/50 last:border-0">
-                      <td className="p-3 text-xl text-white font-hebrew">{word.hebrew}</td>
+                      <td className="p-3 text-xl text-white font-hebrew">{word.nativeText}</td>
                       <td className="p-3 text-base text-slate-300 font-mono">{word.transliteration}</td>
                       <td className="p-3 text-base text-slate-300">{word.meaning}</td>
                     </tr>
