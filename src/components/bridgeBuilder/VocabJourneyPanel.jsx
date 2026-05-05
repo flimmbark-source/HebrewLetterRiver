@@ -86,6 +86,9 @@ function CurrentPackDetailSheet({
   onClose,
   currentPack,
   wordPreview,
+  missingPackMapping,
+  localizedPackTitle,
+  localizedPackDescription,
   stage,
   recommendedAction,
   reviewCount,
@@ -126,8 +129,8 @@ function CurrentPackDetailSheet({
           </button>
         </div>
         <header className="vj-sheet-title-block">
-          <h2>{currentPack.title}</h2>
-          <p>{currentPack.description || t('bridgeBuilder.vocabJourney.continueLearningWords', 'Continue learning new words.')}</p>
+          <h2>{localizedPackTitle}</h2>
+          <p>{localizedPackDescription || t('bridgeBuilder.vocabJourney.continueLearningWords', 'Continue learning new words.')}</p>
         </header>
 
         <WordChips words={wordPreview} t={t} isMissingPackMapping={missingPackMapping} />
@@ -195,6 +198,8 @@ export default function VocabJourneyPanel({
   const currentPackData = useMemo(() => getCurrentJourneyPack(sectionData, activePackId), [sectionData, activePackId]);
   const currentPack = currentPackData?.pack;
   const currentProgress = currentPackData?.progress;
+  const localizedPackTitle = currentPack ? t(`packs.${currentPack.id}.title`, currentPack.title) : '';
+  const localizedPackDescription = currentPack ? t(`packs.${currentPack.id}.description`, currentPack.description || '') : '';
   const currentCompletion = currentPackData?.completion;
 
   const journeyStops = useMemo(() => getJourneyStops(sectionData, activePackId), [sectionData, activePackId]);
@@ -273,7 +278,7 @@ export default function VocabJourneyPanel({
           className="vj-current-card vj-current-card--clickable"
           role="button"
           tabIndex={0}
-          aria-label={t('bridgeBuilder.vocabJourney.openDetailsFor', 'Open details for {{title}}', { title: currentPack.title })}
+          aria-label={t('bridgeBuilder.vocabJourney.openDetailsFor', 'Open details for {{title}}', { title: localizedPackTitle })}
           onClick={() => setIsPackSheetOpen(true)}
           onKeyDown={(event) => {
             if (event.key === 'Enter' || event.key === ' ') {
@@ -284,7 +289,7 @@ export default function VocabJourneyPanel({
         >
           <div className="vj-card-copy">
             <span className="vj-badge">{t('bridgeBuilder.vocabJourney.currentPack', 'Current Pack')}</span>
-            <h2>{currentPack.title}</h2>
+            <h2>{localizedPackTitle}</h2>
             <p className="vj-learn-line">
               <Icon filled>eco</Icon>
               {t('bridgeBuilder.vocabJourney.learnEverydayWords', 'Learn {{count}} everyday words', { count: currentPack.targetsNewCount || currentPack.wordIds?.length || 8 })}
