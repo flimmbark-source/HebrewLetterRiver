@@ -126,7 +126,7 @@ function CurrentPackDetailSheet({
           <p>{currentPack.description || t('bridgeBuilder.vocabJourney.continueLearningWords', 'Continue learning new words.')}</p>
         </header>
 
-        <WordChips words={wordPreview} />
+        <WordChips words={wordPreview} t={t} />
         <SheetProgress steps={stage.steps} t={t} />
 
         <div className="vj-recommended">

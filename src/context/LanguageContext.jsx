@@ -8,6 +8,7 @@ import { loadState, saveState } from '../lib/storage.js';
 
 const PRACTICE_STORAGE_KEY = 'preferences.practiceLanguage';
 const APP_STORAGE_KEY = 'preferences.appLanguage';
+const LEGACY_STORAGE_KEY = 'preferences.language';
 
 const LanguageContext = createContext({
   languageId: defaultLanguageId,
@@ -57,27 +58,53 @@ export function LanguageProvider({ children }) {
   const [appLanguageId, setAppLanguageIdState] = useState(initialAppId);
   const [hasSelectedLanguage, setHasSelectedLanguage] = useState(initialConfirmed);
 
-  const setLanguageId = useCallback((nextId) => {
-    setLanguageIdState((current) => getValidLanguageId(nextId, current));
+  const syncLegacyLanguagePreference = useCallback((nextPracticeId, nextAppId, isConfirmed) => {
+    saveState(LEGACY_STORAGE_KEY, {
+      id: nextPracticeId,
+      practiceId: nextPracticeId,
+      appId: nextAppId,
+      confirmed: isConfirmed
+    });
   }, []);
+
+  const setLanguageId = useCallback((nextId) => {
+    setLanguageIdState((current) => {
+      const resolved = getValidLanguageId(nextId, current);
+      syncLegacyLanguagePreference(resolved, appLanguageId, hasSelectedLanguage);
+      return resolved;
+    });
+  }, [appLanguageId, hasSelectedLanguage, syncLegacyLanguagePreference]);
 
   const selectLanguage = useCallback((nextId) => {
-    setLanguageIdState((current) => getValidLanguageId(nextId, current));
+    setLanguageIdState((current) => {
+      const resolved = getValidLanguageId(nextId, current);
+      syncLegacyLanguagePreference(resolved, appLanguageId, true);
+      return resolved;
+    });
     setHasSelectedLanguage(true);
-  }, []);
+  }, [appLanguageId, syncLegacyLanguagePreference]);
 
   const setAppLanguageId = useCallback((nextId) => {
-    setAppLanguageIdState((current) => getValidLanguageId(nextId, current));
-  }, []);
+    setAppLanguageIdState((current) => {
+      const resolved = getValidLanguageId(nextId, current);
+      syncLegacyLanguagePreference(languageId, resolved, hasSelectedLanguage);
+      return resolved;
+    });
+  }, [languageId, hasSelectedLanguage, syncLegacyLanguagePreference]);
 
   const selectAppLanguage = useCallback((nextId) => {
-    setAppLanguageIdState((current) => getValidLanguageId(nextId, current));
+    setAppLanguageIdState((current) => {
+      const resolved = getValidLanguageId(nextId, current);
+      syncLegacyLanguagePreference(languageId, resolved, true);
+      return resolved;
+    });
     setHasSelectedLanguage(true);
-  }, []);
+  }, [languageId, syncLegacyLanguagePreference]);
 
   const markLanguageSelected = useCallback(() => {
     setHasSelectedLanguage(true);
-  }, []);
+    syncLegacyLanguagePreference(languageId, appLanguageId, true);
+  }, [appLanguageId, languageId, syncLegacyLanguagePreference]);
 
   useEffect(() => {
     saveState(PRACTICE_STORAGE_KEY, { id: languageId, confirmed: hasSelectedLanguage });
