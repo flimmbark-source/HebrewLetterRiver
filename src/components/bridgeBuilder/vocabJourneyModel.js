@@ -110,40 +110,38 @@ export function getJourneyStops(sectionData, activePackId) {
  */
 export function getPackWordPreview(pack, languageId = 'hebrew') {
   if (!pack || !pack.wordIds || pack.wordIds.length === 0) {
-    return [];
+    return { words: [], usedFallback: false, missingPackMapping: false };
   }
 
   try {
-    // Use the active practice-language word pool when available.
-    // Non-Hebrew packs share pack.wordIds, so resolve through the language pool first.
     const languageWordPool = getBridgeBuilderWordsSync(languageId);
-    const wordPool = Array.isArray(languageWordPool) && languageWordPool.length > 0
-      ? languageWordPool
-      : getWordsByIds(pack.wordIds);
-
+    const wordPool = Array.isArray(languageWordPool) ? languageWordPool : [];
     const wordMap = new Map(wordPool.map((word) => [word.id, word]));
-    let words = pack.wordIds.map((id) => wordMap.get(id)).filter(Boolean);
+    const words = pack.wordIds.map((id) => wordMap.get(id)).filter(Boolean);
 
-    if (words.length === 0 && Array.isArray(languageWordPool) && languageWordPool.length > 0) {
-      if (import.meta.env.DEV) {
-        console.warn('[vocabJourney] Pack word IDs not found in language pool, using pool preview fallback', { languageId, packId: pack.id, wordIds: pack.wordIds?.length || 0, poolSize: languageWordPool.length });
-      }
-      words = languageWordPool.slice(0, 8);
+    if (words.length > 0) {
+      return {
+        words: words.slice(0, 8).map((w) => w.hebrew || w.nativeScript || w.transliteration || '?'),
+        usedFallback: false,
+        missingPackMapping: false
+      };
     }
 
-    if (words && words.length > 0) {
-      // Return the first 6-8 words, preferring display fields like 'hebrew' or 'nativeScript'
-      return words.slice(0, 8).map((w) => {
-        // Use hebrew (legacy) or nativeScript (new)
-        return w.hebrew || w.nativeScript || w.transliteration || '?';
+    if (import.meta.env.DEV) {
+      console.warn('[vocabJourney] Missing pack mapping for language', {
+        languageId,
+        packId: pack.id,
+        missingWordIds: pack.wordIds
       });
     }
-  } catch (e) {
-    // Silent fail; getWordsByIds might not exist
-  }
 
-  // Fallback: return empty array (do not hardcode words)
-  return [];
+    return { words: [], usedFallback: false, missingPackMapping: true };
+  } catch (e) {
+    if (import.meta.env.DEV) {
+      console.warn('[vocabJourney] Failed to resolve pack preview', { languageId, packId: pack?.id, error: e });
+    }
+    return { words: [], usedFallback: false, missingPackMapping: true };
+  }
 }
 
 /**

@@ -26,11 +26,15 @@ function Icon({ children, className = '', filled = false }) {
   );
 }
 
-function WordChips({ words, t }) {
+function WordChips({ words, t, isMissingPackMapping }) {
   return (
     <div className="vj-word-chips" dir="rtl">
       {words.length === 0 ? (
-        <div style={{ padding: '8px', color: '#999', fontSize: '0.875rem' }}>{t('bridgeBuilder.vocabJourney.loadingWords', 'Loading words...')}</div>
+        <div style={{ padding: '8px', color: '#999', fontSize: '0.875rem' }}>
+          {isMissingPackMapping
+            ? t('bridgeBuilder.vocabJourney.missingPackContent', 'Content for this pack is not available in the selected practice language yet.')
+            : t('bridgeBuilder.vocabJourney.loadingWords', 'Loading words...')}
+        </div>
       ) : (
         words.map((word) => (
           <span key={word} className="vj-word-chip">
@@ -126,7 +130,7 @@ function CurrentPackDetailSheet({
           <p>{currentPack.description || t('bridgeBuilder.vocabJourney.continueLearningWords', 'Continue learning new words.')}</p>
         </header>
 
-        <WordChips words={wordPreview} t={t} />
+        <WordChips words={wordPreview} t={t} isMissingPackMapping={missingPackMapping} />
         <SheetProgress steps={stage.steps} t={t} />
 
         <div className="vj-recommended">
@@ -177,7 +181,7 @@ function CurrentPackDetailSheet({
 export default function VocabJourneyPanel({
   sectionData,
   activePackId,
-  languageId = 'he',
+  languageId = 'hebrew',
   dueReviewCount,
   weakReviewCount,
   onSelectPack,
@@ -194,7 +198,9 @@ export default function VocabJourneyPanel({
   const currentCompletion = currentPackData?.completion;
 
   const journeyStops = useMemo(() => getJourneyStops(sectionData, activePackId), [sectionData, activePackId]);
-  const displayWords = useMemo(() => getPackWordPreview(currentPack, languageId), [currentPack, languageId]);
+  const preview = useMemo(() => getPackWordPreview(currentPack, languageId), [currentPack, languageId]);
+  const displayWords = preview.words;
+  const missingPackMapping = preview.missingPackMapping;
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -205,9 +211,10 @@ export default function VocabJourneyPanel({
       requestedPackLanguage: languageId,
       resolvedPackId: currentPack?.id ?? null,
       resolvedWordsCount: displayWords.length,
-      usedFallbackContent: displayWords.length === 0
+      usedFallbackContent: preview.usedFallback,
+      missingPackMapping
     });
-  }, [languageId, currentPack?.id, displayWords.length]);
+  }, [languageId, currentPack?.id, displayWords.length, preview.usedFallback, missingPackMapping]);
   const stageInfo = useMemo(() => getPackLearningStage(currentProgress, currentCompletion), [currentProgress, currentCompletion]);
   const recommendedAction = useMemo(() => getRecommendedJourneyAction(currentProgress, currentCompletion), [currentProgress, currentCompletion]);
   const journeyStats = useMemo(() => getJourneyStats(sectionData), [sectionData]);
