@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import riverHero from '../../assets/vocab-journey/river-valley-hero.webp';
 import cafeArt from '../../assets/vocab-journey/cafe-words-art.webp';
 import bridgeArt from '../../assets/vocab-journey/bridge-builder-art.webp';
@@ -60,6 +60,99 @@ function ProgressSteps({ steps }) {
   );
 }
 
+function CurrentPackDetailSheet({
+  isOpen,
+  onClose,
+  currentPack,
+  wordPreview,
+  stage,
+  recommendedAction,
+  reviewCount,
+  onLaunchRecommended,
+  onLaunchBridgeBuilder,
+  onLaunchLoosePlanks,
+  onLaunchDeepScript,
+  onReview,
+}) {
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="vj-sheet-backdrop" onClick={onClose}>
+      <section
+        className="vj-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Pack details"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="vj-sheet-handle" />
+        <div className="vj-sheet-header">
+          <div>
+            <h2>{currentPack.title}</h2>
+            <p>{currentPack.description || 'Continue learning new words.'}</p>
+          </div>
+          <button type="button" className="vj-sheet-close" onClick={onClose} aria-label="Close pack details">
+            <Icon>close</Icon>
+          </button>
+        </div>
+
+        <WordChips words={wordPreview} />
+        <ProgressSteps steps={stage.steps} />
+
+        <div className="vj-recommended">
+          <h3>Recommended next</h3>
+          <button type="button" className="vj-recommended-card" onClick={onLaunchRecommended}>
+            <img src={bridgeArt} alt="" loading="lazy" />
+            <span className="vj-recommended-copy">
+              <strong>{recommendedAction.title}</strong>
+              <small>{recommendedAction.subtitle}</small>
+            </span>
+            <span className="vj-orange-circle">
+              <Icon>chevron_right</Icon>
+            </span>
+          </button>
+        </div>
+
+        <div className="vj-option-list">
+          <h3>More ways to learn</h3>
+          <button type="button" className="vj-option" onClick={onLaunchBridgeBuilder}>
+            <span className="vj-option-icon vj-option-icon--teal"><Icon filled>conversion_path</Icon></span>
+            <span><strong>Learn — Bridge Builder</strong><small>Structured pack flow for new words.</small></span>
+            <Icon>chevron_right</Icon>
+          </button>
+
+          <button type="button" className="vj-option" onClick={onLaunchLoosePlanks}>
+            <span className="vj-option-icon vj-option-icon--teal"><Icon filled>view_stream</Icon></span>
+            <span><strong>Strengthen — Loose Planks</strong><small>Reinforce with targeted practice.</small></span>
+            <Icon>chevron_right</Icon>
+          </button>
+
+          <button type="button" className="vj-option" onClick={onReview} disabled={reviewCount <= 0}>
+            <span className="vj-option-icon vj-option-icon--blue"><Icon filled>calendar_month</Icon></span>
+            <span><strong>Review — Today’s Review</strong><small>Review words for memory.</small></span>
+            <Icon>chevron_right</Icon>
+          </button>
+
+          <button type="button" className="vj-option" onClick={onLaunchDeepScript}>
+            <span className="vj-option-icon vj-option-icon--purple"><Icon filled>ink_pen</Icon></span>
+            <span><strong>Challenge — Deep Script</strong><small>Test depth with writing and recall.</small></span>
+            <Icon>chevron_right</Icon>
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export default function VocabJourneyPanel({
   sectionData,
   activePackId,
@@ -82,6 +175,7 @@ export default function VocabJourneyPanel({
   const stageInfo = useMemo(() => getPackLearningStage(currentProgress, currentCompletion), [currentProgress, currentCompletion]);
   const recommendedAction = useMemo(() => getRecommendedJourneyAction(currentProgress, currentCompletion), [currentProgress, currentCompletion]);
   const journeyStats = useMemo(() => getJourneyStats(sectionData), [sectionData]);
+  const [isPackSheetOpen, setIsPackSheetOpen] = useState(false);
 
   if (!currentPack) {
     return (
@@ -132,7 +226,19 @@ export default function VocabJourneyPanel({
           <p>{journeyStats.currentSectionTitle} · {journeyStats.overallProgressPct}% complete</p>
         </div>
 
-        <article className="vj-current-card">
+        <article
+          className="vj-current-card vj-current-card--clickable"
+          role="button"
+          tabIndex={0}
+          aria-label={`Open details for ${currentPack.title}`}
+          onClick={() => setIsPackSheetOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              setIsPackSheetOpen(true);
+            }
+          }}
+        >
           <div className="vj-card-copy">
             <span className="vj-badge">Current Pack</span>
             <h2>{currentPack.title}</h2>
@@ -141,11 +247,15 @@ export default function VocabJourneyPanel({
               Learn {currentPack.targetsNewCount || currentPack.wordIds?.length || 8} everyday words
             </p>
             <p className="vj-goal-line">Current goal: {stageInfo.label}</p>
+            <p className="vj-card-details-hint"><Icon>expand_more</Icon>Tap for pack details</p>
 
             <button
               type="button"
               className="vj-main-cta"
-              onClick={() => onLaunchPackMethod(currentPack, recommendedAction.method)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onLaunchPackMethod(currentPack, recommendedAction.method);
+              }}
             >
               <Icon filled>conversion_path</Icon>
               <span>{recommendedAction.ctaLabel}</span>
@@ -181,53 +291,6 @@ export default function VocabJourneyPanel({
             <Icon>lock</Icon>
           </button>
 
-          <article className="vj-pack-detail">
-            <h2>{currentPack.title}</h2>
-            <p>{currentPack.description || 'Continue learning new words.'}</p>
-
-            <WordChips words={displayWords} />
-            <ProgressSteps steps={stageInfo.steps} />
-
-            <div className="vj-recommended">
-              <h3>Recommended next</h3>
-              <button
-                type="button"
-                className="vj-recommended-card"
-                onClick={() => onLaunchPackMethod(currentPack, recommendedAction.method)}
-              >
-                <img src={bridgeArt} alt="" loading="lazy" />
-                <span className="vj-recommended-copy">
-                  <strong>{recommendedAction.title}</strong>
-                  <small>{recommendedAction.subtitle}</small>
-                </span>
-                <span className="vj-orange-circle">
-                  <Icon>chevron_right</Icon>
-                </span>
-              </button>
-            </div>
-
-            <div className="vj-option-list">
-              <h3>More ways to learn</h3>
-
-              <button type="button" className="vj-option" onClick={() => onLaunchPackMethod(currentPack, 'loose_planks')}>
-                <span className="vj-option-icon vj-option-icon--teal"><Icon filled>view_stream</Icon></span>
-                <span><strong>Strengthen — Loose Planks</strong><small>Reinforce with targeted practice.</small></span>
-                <Icon>chevron_right</Icon>
-              </button>
-
-              <button type="button" className="vj-option" onClick={onReview} disabled={reviewCount <= 0}>
-                <span className="vj-option-icon vj-option-icon--blue"><Icon filled>calendar_month</Icon></span>
-                <span><strong>Review — Today’s Review</strong><small>Review words for memory.</small></span>
-                <Icon>chevron_right</Icon>
-              </button>
-
-              <button type="button" className="vj-option" onClick={() => onLaunchPackMethod(currentPack, 'deep_script')}>
-                <span className="vj-option-icon vj-option-icon--purple"><Icon filled>ink_pen</Icon></span>
-                <span><strong>Challenge — Deep Script</strong><small>Test depth with writing and recall.</small></span>
-                <Icon>chevron_right</Icon>
-              </button>
-            </div>
-          </article>
         </div>
 
         <aside className="vj-river-path" style={{ backgroundImage: `url(${riverPathMap})` }}>
@@ -260,6 +323,20 @@ export default function VocabJourneyPanel({
           </div>
         </aside>
       </div>
+      <CurrentPackDetailSheet
+        isOpen={isPackSheetOpen}
+        onClose={() => setIsPackSheetOpen(false)}
+        currentPack={currentPack}
+        wordPreview={displayWords}
+        stage={stageInfo}
+        recommendedAction={recommendedAction}
+        reviewCount={reviewCount}
+        onLaunchRecommended={() => onLaunchPackMethod(currentPack, recommendedAction.method)}
+        onLaunchBridgeBuilder={() => onLaunchPackMethod(currentPack, 'bridge_builder')}
+        onLaunchLoosePlanks={() => onLaunchPackMethod(currentPack, 'loose_planks')}
+        onLaunchDeepScript={() => onLaunchPackMethod(currentPack, 'deep_script')}
+        onReview={onReview}
+      />
     </section>
   );
 }
