@@ -226,7 +226,7 @@ function LanguageOnboardingModal() {
 
 function Shell() {
   const { openGame, closeGame, isVisible: isGameVisible, isGameRunning, showPlayModal, setShowPlayModal } = useGame();
-  const { interfaceLanguagePack } = useLocalization();
+  const { interfaceLanguagePack, t } = useLocalization();
   const { currentTutorial, currentStepIndex } = useTutorial();
   const fontClass = interfaceLanguagePack.metadata?.fontClass ?? 'language-font-hebrew';
   const direction = interfaceLanguagePack.metadata?.textDirection ?? 'ltr';
@@ -354,7 +354,7 @@ function Shell() {
               style={({ isActive }) => isActive ? {} : { color: 'var(--app-muted)' }}
             >
               <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>home</span>
-              <span>Home</span>
+              <span>{t('app.nav.home', 'Home')}</span>
             </NavLink>
 
             <button
@@ -365,7 +365,7 @@ function Shell() {
               style={isPlayActive ? {} : { color: 'var(--app-muted)' }}
             >
               <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>videogame_asset</span>
-              <span>Play</span>
+              <span>{t('app.nav.play', 'Play')}</span>
             </button>
 
             <NavLink
@@ -377,7 +377,7 @@ function Shell() {
               style={({ isActive }) => isActive ? {} : { color: 'var(--app-muted)' }}
             >
               <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>emoji_events</span>
-              <span>Awards</span>
+              <span>{t('app.nav.awards', 'Awards')}</span>
             </NavLink>
 
             <NavLink
@@ -389,7 +389,7 @@ function Shell() {
               style={({ isActive }) => isActive ? {} : { color: 'var(--app-muted)' }}
             >
               <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>settings</span>
-              <span>Settings</span>
+              <span>{t('app.nav.settings', 'Settings')}</span>
             </NavLink>
           </div>
         </nav>

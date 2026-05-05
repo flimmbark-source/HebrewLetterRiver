@@ -12,6 +12,7 @@ import {
   getJourneyStats,
 } from './vocabJourneyModel.js';
 import './VocabJourneyPanel.css';
+import { useLocalization } from '../../context/LocalizationContext.jsx';
 
 function Icon({ children, className = '', filled = false }) {
   return (
@@ -25,11 +26,11 @@ function Icon({ children, className = '', filled = false }) {
   );
 }
 
-function WordChips({ words }) {
+function WordChips({ words, t }) {
   return (
     <div className="vj-word-chips" dir="rtl">
       {words.length === 0 ? (
-        <div style={{ padding: '8px', color: '#999', fontSize: '0.875rem' }}>Loading words...</div>
+        <div style={{ padding: '8px', color: '#999', fontSize: '0.875rem' }}>{t('bridgeBuilder.vocabJourney.loadingWords', 'Loading words...')}</div>
       ) : (
         words.map((word) => (
           <span key={word} className="vj-word-chip">
@@ -41,9 +42,9 @@ function WordChips({ words }) {
   );
 }
 
-function ProgressSteps({ steps }) {
+function ProgressSteps({ steps, t }) {
   return (
-    <div className="vj-progress-steps" aria-label="Pack learning progress">
+    <div className="vj-progress-steps" aria-label={t('bridgeBuilder.vocabJourney.packLearningProgress', 'Pack learning progress')}>
       {steps.map((step) => (
         <div key={step.id} className="vj-progress-step">
           <span className={`vj-progress-node ${step.complete ? 'vj-progress-node--complete' : ''}`}>
@@ -60,9 +61,9 @@ function ProgressSteps({ steps }) {
   );
 }
 
-function SheetProgress({ steps }) {
+function SheetProgress({ steps, t }) {
   return (
-    <div className="vj-sheet-progress" aria-label="Pack learning progress">
+    <div className="vj-sheet-progress" aria-label={t('bridgeBuilder.vocabJourney.packLearningProgress', 'Pack learning progress')}>
       {steps.map((step, index) => (
         <div key={step.id} className="vj-sheet-progress-step">
           <span className={`vj-sheet-progress-node ${step.complete ? 'is-complete' : ''}`}>
@@ -76,6 +77,7 @@ function SheetProgress({ steps }) {
 }
 
 function CurrentPackDetailSheet({
+  t,
   isOpen,
   onClose,
   currentPack,
@@ -105,30 +107,30 @@ function CurrentPackDetailSheet({
         className="vj-sheet"
         role="dialog"
         aria-modal="true"
-        aria-label="Pack details"
+        aria-label={t('bridgeBuilder.vocabJourney.packDetails', 'Pack details')}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="vj-sheet-handle" />
         <div className="vj-sheet-hero">
           <img src={cafeArt} alt="" loading="lazy" />
           <div className="vj-sheet-hero-fade" />
-          <button type="button" className="vj-sheet-nav-btn vj-sheet-nav-btn--left" onClick={onClose} aria-label="Close pack details">
+          <button type="button" className="vj-sheet-nav-btn vj-sheet-nav-btn--left" onClick={onClose} aria-label={t('bridgeBuilder.vocabJourney.closePackDetails', 'Close pack details')}>
             <Icon>arrow_back</Icon>
           </button>
-          <button type="button" className="vj-sheet-nav-btn vj-sheet-nav-btn--right" aria-label="Save pack">
+          <button type="button" className="vj-sheet-nav-btn vj-sheet-nav-btn--right" aria-label={t('bridgeBuilder.vocabJourney.savePack', 'Save pack')}>
             <Icon>bookmark</Icon>
           </button>
         </div>
         <header className="vj-sheet-title-block">
           <h2>{currentPack.title}</h2>
-          <p>{currentPack.description || 'Continue learning new words.'}</p>
+          <p>{currentPack.description || t('bridgeBuilder.vocabJourney.continueLearningWords', 'Continue learning new words.')}</p>
         </header>
 
         <WordChips words={wordPreview} />
-        <SheetProgress steps={stage.steps} />
+        <SheetProgress steps={stage.steps} t={t} />
 
         <div className="vj-recommended">
-          <h3>Recommended next</h3>
+          <h3>{t('bridgeBuilder.vocabJourney.recommendedNext', 'Recommended next')}</h3>
           <button type="button" className="vj-recommended-card" onClick={onLaunchRecommended}>
             <img src={bridgeArt} alt="" loading="lazy" />
             <span className="vj-recommended-copy">
@@ -142,7 +144,7 @@ function CurrentPackDetailSheet({
         </div>
 
         <div className="vj-option-list">
-          <h3>More ways to learn</h3>
+          <h3>{t('bridgeBuilder.vocabJourney.moreWaysToLearn', 'More ways to learn')}</h3>
           <button type="button" className="vj-option" onClick={onLaunchLoosePlanks}>
             <span className="vj-option-icon vj-option-icon--teal"><Icon filled>view_stream</Icon></span>
             <span><strong>Strengthen — Loose Planks</strong><small>Reinforce with targeted practice.</small></span>
@@ -183,6 +185,8 @@ export default function VocabJourneyPanel({
   onReview,
   onOpenBrowse,
 }) {
+    const { t } = useLocalization();
+
   // Derive all data from the model
   const currentPackData = useMemo(() => getCurrentJourneyPack(sectionData, activePackId), [sectionData, activePackId]);
   const currentPack = currentPackData?.pack;
@@ -198,25 +202,25 @@ export default function VocabJourneyPanel({
 
   if (!currentPack) {
     return (
-      <section className="vj-shell" aria-label="Vocabulary Journey">
+      <section className="vj-shell" aria-label={t('bridgeBuilder.vocabJourney.title', 'Vocabulary Journey')}>
         <div className="vj-hero" style={{ backgroundImage: `url(${riverHero})` }}>
           <div className="vj-hero-scrim" />
           <div className="vj-brand-row">
             <div className="vj-brand">
               <span className="vj-logo">🌊</span>
-              <span>Letter River</span>
+              <span>{t('app.brand.name', 'Letter River')}</span>
             </div>
           </div>
           <div className="vj-hero-copy">
-            <h1>Vocabulary Journey</h1>
-            <p>Start your learning path</p>
+            <h1>{t('bridgeBuilder.vocabJourney.title', 'Vocabulary Journey')}</h1>
+            <p>{t('bridgeBuilder.vocabJourney.startPath', 'Start your learning path')}</p>
           </div>
         </div>
         <div className="vj-main-grid" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-          <p style={{ color: '#666', marginBottom: '1.5rem' }}>No packs available yet.</p>
+          <p style={{ color: '#666', marginBottom: '1.5rem' }}>{t('bridgeBuilder.vocabJourney.noPacks', 'No packs available yet.')}</p>
           <button type="button" className="vj-main-cta" onClick={onOpenBrowse}>
             <Icon filled>arrow_forward</Icon>
-            <span>All Packs</span>
+            <span>{t('bridgeBuilder.vocabJourney.allPacks', 'All Packs')}</span>
           </button>
         </div>
       </section>
@@ -226,13 +230,13 @@ export default function VocabJourneyPanel({
   const reviewCount = dueReviewCount + weakReviewCount;
 
   return (
-    <section className="vj-shell" aria-label="Vocabulary Journey">
+    <section className="vj-shell" aria-label={t('bridgeBuilder.vocabJourney.title', 'Vocabulary Journey')}>
       <div className="vj-hero" style={{ backgroundImage: `url(${riverHero})` }}>
         <div className="vj-hero-scrim" />
         <div className="vj-brand-row">
           <div className="vj-brand">
             <span className="vj-logo">🌊</span>
-            <span>Letter River</span>
+            <span>{t('app.brand.name', 'Letter River')}</span>
           </div>
           <div className="vj-streak-pill">
             <Icon filled>auto_stories</Icon>
@@ -241,7 +245,7 @@ export default function VocabJourneyPanel({
         </div>
 
         <div className="vj-hero-copy">
-          <h1>Vocabulary Journey</h1>
+          <h1>{t('bridgeBuilder.vocabJourney.title', 'Vocabulary Journey')}</h1>
           <p>{journeyStats.currentSectionTitle} · {journeyStats.overallProgressPct}% complete</p>
         </div>
 
@@ -249,7 +253,7 @@ export default function VocabJourneyPanel({
           className="vj-current-card vj-current-card--clickable"
           role="button"
           tabIndex={0}
-          aria-label={`Open details for ${currentPack.title}`}
+          aria-label={t('bridgeBuilder.vocabJourney.openDetailsFor', 'Open details for {{title}}', { title: currentPack.title })}
           onClick={() => setIsPackSheetOpen(true)}
           onKeyDown={(event) => {
             if (event.key === 'Enter' || event.key === ' ') {
@@ -348,6 +352,7 @@ export default function VocabJourneyPanel({
         </aside>
       </div>
       <CurrentPackDetailSheet
+        t={t}
         isOpen={isPackSheetOpen}
         onClose={() => setIsPackSheetOpen(false)}
         currentPack={currentPack}
