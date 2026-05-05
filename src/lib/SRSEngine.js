@@ -33,7 +33,7 @@ export const MATURITY = {
  * Priority weights for queue sorting
  */
 const PRIORITY_WEIGHTS = {
-  overdueDays: 10,      // Each day overdue adds 10 points
+  overdueDays: 20,      // Each day overdue adds 10 points
   itemType: {
     letter: 30,         // Letters get highest priority
     vocabulary: 20,     // Vocabulary second
@@ -81,7 +81,15 @@ export class SRSEngine {
     }
 
     // SM-2 formula: EF' = EF + (0.1 - (5-q) * (0.08 + (5-q) * 0.02))
-    const delta = 0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02);
+    const deltaByGrade = {
+      5: 0.1,
+      4: 0,
+      3: -0.22,
+      2: -0.68,
+      1: -1.2,
+      0: -2.8,
+    };
+    const delta = deltaByGrade[grade] ?? 0;
     const newEF = currentEF + delta;
 
     // Enforce minimum ease factor
