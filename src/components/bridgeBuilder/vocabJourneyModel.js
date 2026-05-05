@@ -43,6 +43,13 @@ export function getCurrentJourneyPack(sectionData, activePackId) {
  * Returns an array of section-level journey stops with progress tracking.
  */
 export function getJourneyStops(sectionData, activePackId) {
+  const STOP_ICONS = {
+    foundations: 'school',
+    daily_life: 'home',
+    people_social: 'groups',
+    meaning_builders: 'auto_stories',
+    cafe_talk: 'coffee',
+  };
   // Helper to find the representative pack for a section
   const getRepresentativePackId = (sectionItem) => {
     const packData = sectionItem.packData || [];
@@ -91,7 +98,7 @@ export function getJourneyStops(sectionData, activePackId) {
       packsCompleted,
       totalPacks,
       representativePackId,
-      icon: section.id === 'cafe_talk' ? 'coffee' : 'category', // Will be overridden by section metadata
+      icon: STOP_ICONS[section.id] || 'category',
     };
   });
 }

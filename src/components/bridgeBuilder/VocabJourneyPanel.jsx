@@ -297,6 +297,7 @@ export default function VocabJourneyPanel({
           <div className="vj-path-overlay">
             {journeyStops.map((stop) => {
               const locked = stop.status === 'Locked';
+              const statusLabel = stop.status === 'Open' ? 'Open path' : stop.status;
               return (
                 <button
                   key={stop.id}
@@ -314,9 +315,13 @@ export default function VocabJourneyPanel({
                   </span>
                   <span className="vj-path-copy">
                     <strong>{stop.title}</strong>
-                    <small>{stop.status}</small>
+                    <small>{statusLabel}</small>
                   </span>
-                  {!locked && stop.status === 'Complete' ? <Icon className="vj-path-check" filled>check_circle</Icon> : <Icon>chevron_right</Icon>}
+                  {locked
+                    ? <Icon>lock</Icon>
+                    : stop.status === 'Complete'
+                      ? <Icon className="vj-path-check" filled>check_circle</Icon>
+                      : <Icon>chevron_right</Icon>}
                 </button>
               );
             })}
