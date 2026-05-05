@@ -319,7 +319,7 @@ export default function HomeView() {
           <div className="space-y-3">
             <LanguageCard
               id="home-app-language-select"
-              label="App Language"
+              label={t('home.languagePicker.appLanguageLabel', 'App Language')}
               value={appLanguageId}
               onChange={selectAppLanguage}
               options={displayLanguageOptions}
@@ -345,7 +345,7 @@ export default function HomeView() {
           <div className="card-elevated space-y-4 p-5">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>Recent Mastery</p>
+                <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>{t('home.progress.recentMastery', 'Recent Mastery')}</p>
                 <Icon style={{ color: 'var(--app-outline)' }}>account_circle</Icon>
               </div>
               {recentLetters.length > 0 ? (
@@ -406,7 +406,7 @@ export default function HomeView() {
               </button>
             </div>
             <div>
-              <h3 className="leading-tight font-bold" style={{ color: 'var(--app-on-surface)' }}>Daily Goal</h3>
+              <h3 className="leading-tight font-bold" style={{ color: 'var(--app-on-surface)' }}>{t('home.quest.dailyGoal', 'Daily Goal')}</h3>
               {isEditingGoal ? (
                 <div className="mt-2 flex items-center gap-2">
                   <input
@@ -471,7 +471,7 @@ export default function HomeView() {
                   <Icon className="text-3xl" filled>waves</Icon>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-lg font-bold">Letter River</p>
+                  <p className="text-lg font-bold">{t('home.cta.letterRiver', 'Letter River')}</p>
                   <p className="mt-0.5 text-sm opacity-80">Start learning letters through play</p>
                 </div>
                 <Icon className="text-2xl shrink-0 opacity-70">arrow_forward</Icon>

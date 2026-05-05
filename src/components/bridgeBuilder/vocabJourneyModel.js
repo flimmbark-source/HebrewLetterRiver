@@ -6,6 +6,7 @@
  */
 
 import { getWordsByIds } from '../../data/bridgeBuilderWords.js';
+import { getBridgeBuilderWordsSync } from '../../data/bridgeBuilder/words/index.js';
 
 /**
  * Get the current pack to display on the journey screen.
@@ -113,8 +114,16 @@ export function getPackWordPreview(pack, languageId = 'he') {
   }
 
   try {
-    // Try to get actual word objects from data layer
-    const words = getWordsByIds(pack.wordIds);
+    // Use the active practice-language word pool when available.
+    // Non-Hebrew packs share pack.wordIds, so resolve through the language pool first.
+    const languageWordPool = getBridgeBuilderWordsSync(languageId);
+    const wordPool = Array.isArray(languageWordPool) && languageWordPool.length > 0
+      ? languageWordPool
+      : getWordsByIds(pack.wordIds);
+
+    const wordMap = new Map(wordPool.map((word) => [word.id, word]));
+    const words = pack.wordIds.map((id) => wordMap.get(id)).filter(Boolean);
+
     if (words && words.length > 0) {
       // Return the first 6-8 words, preferring display fields like 'hebrew' or 'nativeScript'
       return words.slice(0, 8).map((w) => {
