@@ -60,6 +60,21 @@ function ProgressSteps({ steps }) {
   );
 }
 
+function SheetProgress({ steps }) {
+  return (
+    <div className="vj-sheet-progress" aria-label="Pack learning progress">
+      {steps.map((step, index) => (
+        <div key={step.id} className="vj-sheet-progress-step">
+          <span className={`vj-sheet-progress-node ${step.complete ? 'is-complete' : ''}`}>
+            {step.complete ? <Icon>check</Icon> : index + 1}
+          </span>
+          <span className="vj-sheet-progress-label">{step.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function CurrentPackDetailSheet({
   isOpen,
   onClose,
@@ -69,7 +84,6 @@ function CurrentPackDetailSheet({
   recommendedAction,
   reviewCount,
   onLaunchRecommended,
-  onLaunchBridgeBuilder,
   onLaunchLoosePlanks,
   onLaunchDeepScript,
   onReview,
@@ -95,18 +109,23 @@ function CurrentPackDetailSheet({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="vj-sheet-handle" />
-        <div className="vj-sheet-header">
-          <div>
-            <h2>{currentPack.title}</h2>
-            <p>{currentPack.description || 'Continue learning new words.'}</p>
-          </div>
-          <button type="button" className="vj-sheet-close" onClick={onClose} aria-label="Close pack details">
-            <Icon>close</Icon>
+        <div className="vj-sheet-hero">
+          <img src={cafeArt} alt="" loading="lazy" />
+          <div className="vj-sheet-hero-fade" />
+          <button type="button" className="vj-sheet-nav-btn vj-sheet-nav-btn--left" onClick={onClose} aria-label="Close pack details">
+            <Icon>arrow_back</Icon>
+          </button>
+          <button type="button" className="vj-sheet-nav-btn vj-sheet-nav-btn--right" aria-label="Save pack">
+            <Icon>bookmark</Icon>
           </button>
         </div>
+        <header className="vj-sheet-title-block">
+          <h2>{currentPack.title}</h2>
+          <p>{currentPack.description || 'Continue learning new words.'}</p>
+        </header>
 
         <WordChips words={wordPreview} />
-        <ProgressSteps steps={stage.steps} />
+        <SheetProgress steps={stage.steps} />
 
         <div className="vj-recommended">
           <h3>Recommended next</h3>
@@ -124,12 +143,6 @@ function CurrentPackDetailSheet({
 
         <div className="vj-option-list">
           <h3>More ways to learn</h3>
-          <button type="button" className="vj-option" onClick={onLaunchBridgeBuilder}>
-            <span className="vj-option-icon vj-option-icon--teal"><Icon filled>conversion_path</Icon></span>
-            <span><strong>Learn — Bridge Builder</strong><small>Structured pack flow for new words.</small></span>
-            <Icon>chevron_right</Icon>
-          </button>
-
           <button type="button" className="vj-option" onClick={onLaunchLoosePlanks}>
             <span className="vj-option-icon vj-option-icon--teal"><Icon filled>view_stream</Icon></span>
             <span><strong>Strengthen — Loose Planks</strong><small>Reinforce with targeted practice.</small></span>
@@ -146,6 +159,12 @@ function CurrentPackDetailSheet({
             <span className="vj-option-icon vj-option-icon--purple"><Icon filled>ink_pen</Icon></span>
             <span><strong>Challenge — Deep Script</strong><small>Test depth with writing and recall.</small></span>
             <Icon>chevron_right</Icon>
+          </button>
+
+          <button type="button" className="vj-option" disabled>
+            <span className="vj-option-icon vj-option-icon--blue"><Icon filled>menu_book</Icon></span>
+            <span><strong>Read — Cafe Talk</strong><small>See the words in a real conversation.</small></span>
+            <Icon>lock</Icon>
           </button>
         </div>
       </section>
@@ -337,7 +356,6 @@ export default function VocabJourneyPanel({
         recommendedAction={recommendedAction}
         reviewCount={reviewCount}
         onLaunchRecommended={() => onLaunchPackMethod(currentPack, recommendedAction.method)}
-        onLaunchBridgeBuilder={() => onLaunchPackMethod(currentPack, 'bridge_builder')}
         onLaunchLoosePlanks={() => onLaunchPackMethod(currentPack, 'loose_planks')}
         onLaunchDeepScript={() => onLaunchPackMethod(currentPack, 'deep_script')}
         onReview={onReview}
