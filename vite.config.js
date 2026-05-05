@@ -2,6 +2,13 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { readFileSync } from 'fs';
+import { webcrypto } from 'node:crypto';
+
+// Some environments expose a partial global crypto object without
+// getRandomValues(), which Vite expects during startup.
+if (!globalThis.crypto || typeof globalThis.crypto.getRandomValues !== 'function') {
+  globalThis.crypto = webcrypto;
+}
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 
