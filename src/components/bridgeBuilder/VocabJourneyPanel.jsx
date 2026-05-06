@@ -13,6 +13,7 @@ import {
 } from './vocabJourneyModel.js';
 import './VocabJourneyPanel.css';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 
 function Icon({ children, className = '', filled = false }) {
   return (
@@ -101,9 +102,11 @@ function getStopStatusLabel(status, t) {
   return status;
 }
 
-function WordChips({ words, t, isMissingPackMapping }) {
+function WordChips({ words, t, isMissingPackMapping, languageId = 'hebrew' }) {
+  const direction = languageId === 'hebrew' || languageId === 'arabic' ? 'rtl' : 'ltr';
+
   return (
-    <div className="vj-word-chips" dir="rtl">
+    <div className="vj-word-chips" dir={direction}>
       {words.length === 0 ? (
         <div style={{ padding: '8px', color: '#999', fontSize: '0.875rem' }}>
           {isMissingPackMapping
@@ -142,6 +145,7 @@ function CurrentPackDetailSheet({
   onClose,
   wordPreview,
   missingPackMapping,
+  languageId,
   localizedPackTitle,
   localizedPackDescription,
   stage,
@@ -188,7 +192,7 @@ function CurrentPackDetailSheet({
           <p>{localizedPackDescription || t('bridgeBuilder.vocabJourney.continueLearningWords', 'Continue learning new words.')}</p>
         </header>
 
-        <WordChips words={wordPreview} t={t} isMissingPackMapping={missingPackMapping} />
+        <WordChips words={wordPreview} t={t} isMissingPackMapping={missingPackMapping} languageId={languageId} />
         <SheetProgress steps={stage.steps} t={t} />
 
         <div className="vj-recommended">
@@ -239,7 +243,7 @@ function CurrentPackDetailSheet({
 export default function VocabJourneyPanel({
   sectionData,
   activePackId,
-  languageId = 'hebrew',
+  languageId: languageIdProp,
   dueReviewCount,
   weakReviewCount,
   onSelectPack,
@@ -248,6 +252,8 @@ export default function VocabJourneyPanel({
   onOpenBrowse,
 }) {
   const { t } = useLocalization();
+  const { languageId: selectedPracticeLanguageId } = useLanguage();
+  const languageId = languageIdProp || selectedPracticeLanguageId || 'hebrew';
 
   const currentPackData = useMemo(() => getCurrentJourneyPack(sectionData, activePackId), [sectionData, activePackId]);
   const currentPack = currentPackData?.pack;
@@ -441,6 +447,7 @@ export default function VocabJourneyPanel({
         onClose={() => setIsPackSheetOpen(false)}
         wordPreview={displayWords}
         missingPackMapping={missingPackMapping}
+        languageId={languageId}
         localizedPackTitle={localizedPackTitle}
         localizedPackDescription={localizedPackDescription}
         stage={localizedStageInfo}
