@@ -39,8 +39,9 @@
   --font-bold: 700;
 
   --bottom-nav-height: 72px;
-  --bottom-nav-breathing-room: 24px;
-  --bottom-safe-space: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + var(--bottom-nav-breathing-room));
+  --bottom-nav-safe-space: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 24px);
+  /* Backwards-compatible alias used by existing layout rules. */
+  --bottom-safe-space: var(--bottom-nav-safe-space);
 }
 
 html,

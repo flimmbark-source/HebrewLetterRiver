@@ -329,18 +329,20 @@ function Shell() {
       <PWAInstallPrompt />
       <PlayModeModal />
       <main id="main-content" className={`flex-1 main-content app-main ${fontClass}`} dir={direction} tabIndex={-1}>
-        <Routes>
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/home" element={<HomeView />} />
-          <Route path="/achievements" element={<AchievementsView />} />
-          <Route path="/read" element={<LearnView />} />
-          <Route path="/bridge" element={<BridgeBuilderView />} />
-          <Route path="/deep-script" element={<DeepScriptView />} />
-          <Route path="/daily" element={<DailyView />} />
-          <Route path="/settings" element={<SettingsView />} />
-          <Route path="/debug" element={<DebugDashboardView />} />
-          <Route path="/play" element={<Navigate to="/home" replace />} />
-        </Routes>
+        <div className="page-scroll">
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/home" element={<HomeView />} />
+            <Route path="/achievements" element={<AchievementsView />} />
+            <Route path="/read" element={<LearnView />} />
+            <Route path="/bridge" element={<BridgeBuilderView />} />
+            <Route path="/deep-script" element={<DeepScriptView />} />
+            <Route path="/daily" element={<DailyView />} />
+            <Route path="/settings" element={<SettingsView />} />
+            <Route path="/debug" element={<DebugDashboardView />} />
+            <Route path="/play" element={<Navigate to="/home" replace />} />
+          </Routes>
+        </div>
       </main>
       {!(isGameVisible && isGameRunning) && !inConversationPractice && !inDeepScript && (
         <nav className="bottom-nav fixed bottom-0 left-0 z-50 flex w-full items-center justify-around px-4 pt-2">

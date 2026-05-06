@@ -103,19 +103,19 @@ body.no-scroll {
   border-radius: 0;
   background: var(--app-bg-gradient);
   background-color: var(--app-bg);
-  padding: 0 0 var(--bottom-safe-space);
+  padding: 0 0 var(--bottom-nav-safe-space);
   display: flex;
   flex-direction: column;
   gap: 0;
   overflow-x: hidden;
-  .app-shell button,
+}
+
+.app-shell button,
 .app-shell input,
 .app-shell select,
 .app-shell textarea {
   font-family: inherit;
 }
-}
-
 
 
 .main-content {
@@ -126,7 +126,7 @@ body.no-scroll {
   box-shadow: none;
   min-height: calc(100dvh - var(--bottom-nav-height));
   min-height: calc(100vh - var(--bottom-nav-height));
-  padding-bottom: var(--bottom-safe-space);
+  padding-bottom: var(--bottom-nav-safe-space);
 }
 
 
@@ -905,7 +905,7 @@ body.no-scroll {
 .modal-scroll,
 .pack-detail-scroll,
 .intro-screen {
-  padding-bottom: var(--bottom-safe-space);
+  padding-bottom: var(--bottom-nav-safe-space);
 }
 
 .bottom-nav {
