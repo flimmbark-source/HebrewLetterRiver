@@ -3030,3 +3030,43 @@ h1, h2, h3, h4 {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* GLOBAL MOBILE BOTTOM NAV SAFETY PATCH */
+
+:root {
+  --bottom-nav-height: 76px;
+  --bottom-nav-safe-space: calc(
+    var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 32px
+  );
+}
+
+@media (max-width: 768px) {
+  .app-main,
+  .main-content,
+  .page-scroll,
+  .screen-scroll,
+  .mobile-panel,
+  .modal-scroll,
+  .pack-detail-scroll,
+  .intro-screen,
+  .bbs-content,
+  .vj-sheet {
+    padding-bottom: var(--bottom-nav-safe-space) !important;
+    scroll-padding-bottom: var(--bottom-nav-safe-space) !important;
+    box-sizing: border-box;
+  }
+
+  .bottom-nav {
+    height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+
+  .bbs-screen {
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .vj-sheet {
+    max-height: calc(100dvh - var(--bottom-nav-safe-space)) !important;
+    overflow-y: auto !important;
+  }
+}
