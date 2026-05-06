@@ -2,11 +2,13 @@ import { languagePacks, defaultAppLanguageId } from '../data/languages/index.js'
 import { supplementalDictionaries as baseSupplementalDictionaries } from './supplemental.js';
 import { hebrewSupplementalDictionary } from './supplemental.hebrew.js';
 import { arabicSupplementalDictionary } from './supplemental.arabic.js';
+import { russianSupplementalDictionary } from './supplemental.russian.js';
 
 const supplementalDictionaries = {
   ...baseSupplementalDictionaries,
   hebrew: hebrewSupplementalDictionary,
-  arabic: arabicSupplementalDictionary
+  arabic: arabicSupplementalDictionary,
+  russian: russianSupplementalDictionary
 };
 
 const dictionaryModules = import.meta.glob('./*.json', { eager: true });
