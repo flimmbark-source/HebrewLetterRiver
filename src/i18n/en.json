@@ -23,7 +23,9 @@
     "player": "Player",
     "patientPaddler": "Patient Paddler",
     "noneYet": "None yet",
-    "play": "Play"
+    "play": "Play",
+    "day": "day",
+    "days": "days"
   },
   "app": {
     "title": "Letter River",
@@ -33,7 +35,8 @@
       "play": "Play",
       "achievements": "Achievements",
       "read": "Read",
-      "settings": "Settings"
+      "settings": "Settings",
+      "awards": "Awards"
     },
     "languagePicker": {
       "label": "App Language",
@@ -48,6 +51,9 @@
     },
     "footer": {
       "resetNotice": "Reset happens daily at 00:00 Asia/Jerusalem."
+    },
+    "brand": {
+      "name": "Letter River"
     }
   },
   "home": {
@@ -67,12 +73,14 @@
     },
     "languagePicker": {
       "label": "Practice Language",
-      "helper": "Switch anytime to train in another script."
+      "helper": "Switch anytime to train in another script.",
+      "appLanguageLabel": "App Language"
     },
     "cta": {
       "start": "Start a New Run",
       "practice": "Practice Focus Letter",
-      "play": "Play"
+      "play": "Play",
+      "letterRiver": "Letter River"
     },
     "progress": {
       "heading": "Progress",
@@ -85,7 +93,8 @@
       "toNextLevel": "{{current}} / {{total}} ⭐ to next level",
       "latestBadge": "Latest badge",
       "tier": "Tier {{tier}}",
-      "playToUnlock": "Play a session to start unlocking achievements."
+      "playToUnlock": "Play a session to start unlocking achievements.",
+      "recentMastery": "Recent Mastery"
     },
     "quest": {
       "label": "Quest {{current}} of {{total}}",
@@ -96,7 +105,8 @@
       "claiming": "Claiming…",
       "claim": "Claim",
       "claimed": "Claimed",
-      "locked": "In Progress"
+      "locked": "In Progress",
+      "dailyGoal": "Daily Goal"
     },
     "dailyQuests": {
       "title": "Daily quests",
@@ -106,7 +116,9 @@
   "game": {
     "labels": {
       "level": "Level",
-      "score": "Score"
+      "score": "Score",
+      "bestWave": "Best wave",
+      "bestStreak": "Best streak"
     },
     "controls": {
       "leave": "Leave Game",
@@ -412,7 +424,8 @@
         "progress": "practiced",
         "callToAction": "Open sentence practice"
       }
-    }
+    },
+    "sentenceReadingTitle": "Sentence Reading"
   },
   "reading": {
     "textNotFound": "Reading text not found.",
@@ -1480,7 +1493,10 @@
       "progress": "Progress",
       "continue": "Continue practicing",
       "start": "Start learning",
-      "empty": "No scenarios available yet"
+      "empty": "No scenarios available yet",
+      "titleDualRole": "Dual-Role Conversations",
+      "subtitleDualRole": "Practice both sides of a conversation",
+      "unavailable": "No conversation practice available for this language yet."
     },
     "brief": {
       "back": "Back to scenarios",
@@ -1507,7 +1523,13 @@
       "savePhrase": "Save phrase to SRS",
       "transcriptTitle": "Previous beats",
       "errorNoLine": "Line not found",
-      "errorUnknownModule": "Unknown module type"
+      "errorUnknownModule": "Unknown module type",
+      "correct": "Correct!",
+      "almostThere": "Almost there!",
+      "keepGoing": "Keep practicing!",
+      "yourAnswer": "You",
+      "correctAnswer": "Correct",
+      "next": "Next"
     },
     "recap": {
       "completed": "Session completed",
@@ -1538,7 +1560,8 @@
         "description": "Listen to Hebrew and choose the correct English translation",
         "instruction": "Listen and pick the meaning",
         "hint": "Play the audio and choose the correct English translation",
-        "playHint": "Click to hear the Hebrew phrase"
+        "playHint": "Click to hear the Hebrew phrase",
+        "submitHint": "Click the play button to submit your answer"
       },
       "shadowRepeat": {
         "name": "Shadow & Repeat",
@@ -1578,12 +1601,15 @@
         "correctAnswer": "Correct answer:",
         "hebrew": "Hebrew",
         "transliteration": "Transliteration",
-        "hint": "Tip: Listen to the audio for pronunciation help"
+        "hint": "Tip: Listen to the audio for pronunciation help",
+        "switchToEnglish": "Show English"
       },
       "submit": "Submit",
       "correct": "Correct!",
       "partial": "Close! Check the correct answer below.",
-      "incorrect": "Not quite. Here's the correct answer:"
+      "incorrect": "Not quite. Here's the correct answer:",
+      "dictionary": "Dictionary",
+      "dictionaryTitle": "Word Dictionary"
     },
     "scenarios": {
       "greetings-introductions": {
@@ -1602,6 +1628,94 @@
         "title": "Numbers & Time",
         "subtitle": "Express time and quantities"
       }
+    },
+    "modeSelector": {
+      "title": "Conversation Practice",
+      "subtitle": "Choose your practice mode"
+    },
+    "segments": {
+      "title": "Choose a Practice Segment",
+      "sentences": "sentences",
+      "exercises": "exercises",
+      "info": "Each segment has 2 short intro sentences followed by 2 longer sentences that reuse the vocabulary."
+    }
+  },
+  "dailyReview": {
+    "title": "Daily Review",
+    "allCaughtUp": "All caught up!",
+    "checkBackTomorrow": "Great work. Check back tomorrow."
+  },
+  "postGame": {
+    "title": "Session Complete!",
+    "subtitle": "Great work! Here\\",
+    "stats": {
+      "lettersLabel": "Letters",
+      "accuracyLabel": "Accuracy",
+      "scoreLabel": "Score",
+      "heartsLabel": "Hearts"
+    },
+    "missed": {
+      "title": "Letters to Review",
+      "hint": "These letters will appear more often in your next session!"
+    },
+    "levelUp": {
+      "title": "Progress Update",
+      "nextReview": "Review in",
+      "more": "+{count} more letters updated"
+    },
+    "actions": {
+      "playAgain": "Play Again",
+      "home": "Home"
+    }
+  },
+  "srs": {
+    "maturity": {
+      "learning": "Learning",
+      "young": "Young",
+      "mature": "Mature"
+    }
+  },
+  "streak": {
+    "startJourney": "Start your journey!",
+    "greatStart": "Great start! Keep it going",
+    "buildingMomentum": "You",
+    "onFire": "You",
+    "incredibleDedication": "Incredible dedication!",
+    "legendaryCommitment": "Legendary commitment!"
+  },
+  "bridgeBuilder": {
+    "vocabJourney": {
+      "missingPackContent": "Content for this pack is not available in the selected practice language yet.",
+      "loadingWords": "Loading words...",
+      "packLearningProgress": "Pack learning progress",
+      "packDetails": "Pack details",
+      "closePackDetails": "Close pack details",
+      "savePack": "Save pack",
+      "continueLearningWords": "Continue learning new words.",
+      "recommendedNext": "Recommended next",
+      "moreWaysToLearn": "More ways to learn",
+      "optionLoosePlanksTitle": "Strengthen — Loose Planks",
+      "optionLoosePlanksSubtitle": "Reinforce with targeted practice.",
+      "optionReviewTitle": "Review — Today’s Review",
+      "optionReviewSubtitle": "Review words for memory.",
+      "optionDeepScriptTitle": "Challenge — Deep Script",
+      "optionDeepScriptSubtitle": "Test depth with writing and recall.",
+      "optionReadTitle": "Read — Cafe Talk",
+      "optionReadSubtitle": "See the words in a real conversation.",
+      "title": "Vocabulary Journey",
+      "startPath": "Start your learning path",
+      "noPacks": "No packs available yet.",
+      "allPacks": "All Packs",
+      "openDetailsFor": "Open details for {{title}}",
+      "currentPack": "Current Pack",
+      "learnEverydayWords": "Learn {{count}} everyday words",
+      "currentGoal": "Current goal: {{goal}}",
+      "tapForPackDetails": "Tap for pack details",
+      "todaysReviewWords": "Today’s Review — {{count}} words",
+      "keepWordsStrong": "Keep your words strong.",
+      "completePackToUnlockReview": "Complete a pack to unlock review.",
+      "readInContextTitle": "Read in Context — Cafe Talk",
+      "readInContextLockedSubtitle": "Unlocks after this pack."
     }
   }
 }

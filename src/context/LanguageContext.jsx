@@ -144,10 +144,24 @@ export function LanguageProvider({ children }) {
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
-export function useLanguage() {
+export function useLanguageSettings() {
   const context = useContext(LanguageContext);
   if (!context) {
-    throw new Error('useLanguage must be used within LanguageProvider');
+    throw new Error('useLanguageSettings must be used within LanguageProvider');
   }
   return context;
+}
+
+export function useLanguage() {
+  return useLanguageSettings();
+}
+
+export function useAppLanguage() {
+  const { appLanguageId, setAppLanguageId, selectAppLanguage } = useLanguageSettings();
+  return { appLanguageId, setAppLanguageId, selectAppLanguage };
+}
+
+export function usePracticeLanguage() {
+  const { languageId: practiceLanguageId, setLanguageId, selectLanguage } = useLanguageSettings();
+  return { practiceLanguageId, setPracticeLanguageId: setLanguageId, selectPracticeLanguage: selectLanguage };
 }

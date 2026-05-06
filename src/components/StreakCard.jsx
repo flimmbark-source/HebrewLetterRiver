@@ -14,13 +14,13 @@ function Icon({ children, className = '', filled = false, style = {} }) {
   );
 }
 
-function getStreakMessage(current) {
-  if (current === 0) return 'Start your journey!';
-  if (current === 1) return 'Great start! Keep it going';
-  if (current < 3) return "You're building momentum!";
-  if (current < 7) return "You're on fire!";
-  if (current < 30) return 'Incredible dedication!';
-  return 'Legendary commitment!';
+function getStreakMessage(current, t) {
+  if (current === 0) return t('streak.startJourney', 'Start your journey!');
+  if (current === 1) return t('streak.greatStart', 'Great start! Keep it going');
+  if (current < 3) return t('streak.buildingMomentum', "You're building momentum!");
+  if (current < 7) return t('streak.onFire', "You're on fire!");
+  if (current < 30) return t('streak.incredibleDedication', 'Incredible dedication!');
+  return t('streak.legendaryCommitment', 'Legendary commitment!');
 }
 
 function getFlameSize(current) {
@@ -41,6 +41,7 @@ function getFlameColor(current) {
 
 export default function StreakCard() {
   const { streak, player, repairStreak, useStreakFreeze } = useProgress();
+  const { t, appLanguageId } = useLocalization();
   const todayKey = getJerusalemDateKey();
   const completedToday = streak.lastPlayedDateKey === todayKey;
 
@@ -104,14 +105,14 @@ export default function StreakCard() {
                   className="text-sm font-bold uppercase tracking-wide"
                   style={{ color: 'var(--app-muted)' }}
                 >
-                  {streak.current === 1 ? 'day' : 'days'}
+                  {streak.current === 1 ? t('common.day', 'day') : t('common.days', 'days')}
                 </span>
               </div>
               <p
                 className="text-sm font-semibold"
                 style={{ color: streak.current > 0 ? getFlameColor(streak.current) : 'var(--app-muted)' }}
               >
-                {getStreakMessage(streak.current)}
+                {getStreakMessage(streak.current, t)}
               </p>
             </div>
           </div>
@@ -197,3 +198,5 @@ export default function StreakCard() {
     </div>
   );
 }
+
+
