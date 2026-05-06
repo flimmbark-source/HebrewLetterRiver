@@ -5,6 +5,7 @@ import { arabicSupplementalDictionary } from './supplemental.arabic.js';
 import { russianSupplementalDictionary } from './supplemental.russian.js';
 import { japaneseSupplementalDictionary } from './supplemental.japanese.js';
 import { mandarinSupplementalDictionary } from './supplemental.mandarin.js';
+import { amharicSupplementalDictionary } from './supplemental.amharic.js';
 
 const supplementalDictionaries = {
   ...baseSupplementalDictionaries,
@@ -12,7 +13,8 @@ const supplementalDictionaries = {
   arabic: arabicSupplementalDictionary,
   russian: russianSupplementalDictionary,
   japanese: japaneseSupplementalDictionary,
-  mandarin: mandarinSupplementalDictionary
+  mandarin: mandarinSupplementalDictionary,
+  amharic: amharicSupplementalDictionary
 };
 
 const dictionaryModules = import.meta.glob('./*.json', { eager: true });
