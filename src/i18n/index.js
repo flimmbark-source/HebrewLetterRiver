@@ -9,28 +9,29 @@ import { amharicSupplementalDictionary } from './supplemental.amharic.js';
 import { portuguesePackMetadataSupplemental } from './supplemental.packs.portuguese.js';
 import { spanishPackMetadataSupplemental } from './supplemental.packs.spanish.js';
 import { frenchPackMetadataSupplemental } from './supplemental.packs.french.js';
+import { additionalPackMetadataSupplementals } from './supplemental.packs.additional.js';
 
-function mergeSupplementalPackMetadata(languageId, packMetadata) {
+function mergeSupplementalPackMetadata(languageId, baseDictionary, packMetadata) {
   return {
-    ...baseSupplementalDictionaries[languageId],
+    ...baseDictionary,
     packs: {
-      ...(baseSupplementalDictionaries[languageId]?.packs ?? {}),
-      ...packMetadata
+      ...(baseDictionary?.packs ?? {}),
+      ...(packMetadata ?? {})
     }
   };
 }
 
 const supplementalDictionaries = {
   ...baseSupplementalDictionaries,
-  portuguese: mergeSupplementalPackMetadata('portuguese', portuguesePackMetadataSupplemental),
-  spanish: mergeSupplementalPackMetadata('spanish', spanishPackMetadataSupplemental),
-  french: mergeSupplementalPackMetadata('french', frenchPackMetadataSupplemental),
-  hebrew: hebrewSupplementalDictionary,
-  arabic: arabicSupplementalDictionary,
-  russian: russianSupplementalDictionary,
-  japanese: japaneseSupplementalDictionary,
-  mandarin: mandarinSupplementalDictionary,
-  amharic: amharicSupplementalDictionary
+  portuguese: mergeSupplementalPackMetadata('portuguese', baseSupplementalDictionaries.portuguese, portuguesePackMetadataSupplemental),
+  spanish: mergeSupplementalPackMetadata('spanish', baseSupplementalDictionaries.spanish, spanishPackMetadataSupplemental),
+  french: mergeSupplementalPackMetadata('french', baseSupplementalDictionaries.french, frenchPackMetadataSupplemental),
+  hebrew: mergeSupplementalPackMetadata('hebrew', hebrewSupplementalDictionary, additionalPackMetadataSupplementals.hebrew),
+  arabic: mergeSupplementalPackMetadata('arabic', arabicSupplementalDictionary, additionalPackMetadataSupplementals.arabic),
+  russian: mergeSupplementalPackMetadata('russian', russianSupplementalDictionary, additionalPackMetadataSupplementals.russian),
+  japanese: mergeSupplementalPackMetadata('japanese', japaneseSupplementalDictionary, additionalPackMetadataSupplementals.japanese),
+  mandarin: mergeSupplementalPackMetadata('mandarin', mandarinSupplementalDictionary, additionalPackMetadataSupplementals.mandarin),
+  amharic: mergeSupplementalPackMetadata('amharic', amharicSupplementalDictionary, additionalPackMetadataSupplementals.amharic)
 };
 
 const dictionaryModules = import.meta.glob('./*.json', { eager: true });
