@@ -10,10 +10,10 @@ const PRACTICE_STORAGE_KEY = 'preferences.practiceLanguage';
 const APP_STORAGE_KEY = 'preferences.appLanguage';
 const LEGACY_STORAGE_KEY = 'preferences.language';
 
-// App language controls the interface dictionary, not the practice content pack.
-// Keep this list in sync with src/i18n/*.json. Practice language can still use
-// every language pack; unsupported UI languages should not silently fall back.
-const SUPPORTED_APP_LANGUAGE_IDS = ['english', 'hebrew'];
+// App language controls the interface dictionary, while practice language controls
+// the learning content pack. The repo already includes i18n JSON files for these
+// language packs, and missing individual keys still fall back through i18n/index.js.
+const SUPPORTED_APP_LANGUAGE_IDS = Object.keys(languagePacks);
 
 const LanguageContext = createContext({
   languageId: defaultLanguageId,
