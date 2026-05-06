@@ -7,16 +7,24 @@ import { japaneseSupplementalDictionary } from './supplemental.japanese.js';
 import { mandarinSupplementalDictionary } from './supplemental.mandarin.js';
 import { amharicSupplementalDictionary } from './supplemental.amharic.js';
 import { portuguesePackMetadataSupplemental } from './supplemental.packs.portuguese.js';
+import { spanishPackMetadataSupplemental } from './supplemental.packs.spanish.js';
+import { frenchPackMetadataSupplemental } from './supplemental.packs.french.js';
+
+function mergeSupplementalPackMetadata(languageId, packMetadata) {
+  return {
+    ...baseSupplementalDictionaries[languageId],
+    packs: {
+      ...(baseSupplementalDictionaries[languageId]?.packs ?? {}),
+      ...packMetadata
+    }
+  };
+}
 
 const supplementalDictionaries = {
   ...baseSupplementalDictionaries,
-  portuguese: {
-    ...baseSupplementalDictionaries.portuguese,
-    packs: {
-      ...(baseSupplementalDictionaries.portuguese?.packs ?? {}),
-      ...portuguesePackMetadataSupplemental
-    }
-  },
+  portuguese: mergeSupplementalPackMetadata('portuguese', portuguesePackMetadataSupplemental),
+  spanish: mergeSupplementalPackMetadata('spanish', spanishPackMetadataSupplemental),
+  french: mergeSupplementalPackMetadata('french', frenchPackMetadataSupplemental),
   hebrew: hebrewSupplementalDictionary,
   arabic: arabicSupplementalDictionary,
   russian: russianSupplementalDictionary,
