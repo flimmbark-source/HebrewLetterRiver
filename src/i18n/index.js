@@ -1,5 +1,11 @@
 import { languagePacks, defaultAppLanguageId } from '../data/languages/index.js';
-import { supplementalDictionaries } from './supplemental.js';
+import { supplementalDictionaries as baseSupplementalDictionaries } from './supplemental.js';
+import { hebrewSupplementalDictionary } from './supplemental.hebrew.js';
+
+const supplementalDictionaries = {
+  ...baseSupplementalDictionaries,
+  hebrew: hebrewSupplementalDictionary
+};
 
 const dictionaryModules = import.meta.glob('./*.json', { eager: true });
 
