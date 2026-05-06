@@ -25,7 +25,9 @@
       "play": "玩",
       "achievements": "成就",
       "learn": "学习",
-      "settings": "设置"
+      "settings": "设置",
+      "read": "Read",
+      "awards": "Awards"
     },
     "languagePicker": {
       "label": "应用程序语言",
@@ -40,6 +42,9 @@
     },
     "footer": {
       "resetNotice": "重置时间为每天 00:00 亚洲/耶路撒冷。"
+    },
+    "brand": {
+      "name": "Letter River"
     }
   },
   "home": {
@@ -68,16 +73,19 @@
       "toNextLevel": "{{current}} / {{total}} ⭐ 到下一级",
       "latestBadge": "最新徽章",
       "tier": "等级 {{tier}}",
-      "playToUnlock": "玩一个会话以开始解锁成就。"
+      "playToUnlock": "玩一个会话以开始解锁成就。",
+      "recentMastery": "Recent Mastery"
     },
     "languagePicker": {
       "label": "练习语言",
-      "helper": "随时切换以使用另一个脚本进行训练。"
+      "helper": "随时切换以使用另一个脚本进行训练。",
+      "appLanguageLabel": "App Language"
     },
     "cta": {
       "start": "开始新的跑步",
       "practice": "实践焦点信",
-      "play": "玩"
+      "play": "玩",
+      "letterRiver": "Letter River"
     },
     "quest": {
       "label": "任务 {{current}} / {{total}}",
@@ -88,7 +96,8 @@
       "claiming": "领取中...",
       "claim": "领取",
       "claimed": "已领取",
-      "locked": "进行中"
+      "locked": "进行中",
+      "dailyGoal": "Daily Goal"
     },
     "dailyQuests": {
       "title": "每日任务",
@@ -98,7 +107,9 @@
   "game": {
     "labels": {
       "level": "等级",
-      "score": "分数"
+      "score": "分数",
+      "bestWave": "Best wave",
+      "bestStreak": "Best streak"
     },
     "controls": {
       "leave": "离开游戏",
@@ -119,7 +130,8 @@
       "defaultModeLabel": "核心实践",
       "defaultModeDescription": "练习主要角色。",
       "goal": "目标",
-      "goalTooltip": "击败这一级别以赢得游戏！"
+      "goalTooltip": "击败这一级别以赢得游戏！",
+      "selectAtLeastOne": "Please select at least 1 option before starting the game."
     },
     "modes": {
       "letters": {
@@ -226,6 +238,21 @@
         "label": "语音学",
         "description": "练习声音模式和发音。",
         "noun": "声音"
+      },
+      "consonants-basic": {
+        "label": "Consonants",
+        "description": "Practice א–ת without niqqud or final forms.",
+        "noun": "letter"
+      },
+      "niqqud": {
+        "label": "Vowels (Niqqud)",
+        "description": "Practice vowel marks on a carrier letter.",
+        "noun": "vowel"
+      },
+      "final-forms": {
+        "label": "Final Forms",
+        "description": "Practice final letter forms: ך, ם, ן, ף, ץ",
+        "noun": "letter"
       }
     },
     "accessibility": {
@@ -322,7 +349,75 @@
     "intro": "深入学习精心策划的课程来掌握每个字母。新的学习模块即将在这里出现！",
     "body": "在那之前，继续探索河流并定期回来查看指导练习课程、发音技巧和文化见解。",
     "cafeTalk": "Cafe Talk",
-    "cafeTalkDesc": "Essential conversational vocabulary for everyday communication."
+    "cafeTalkDesc": "Essential conversational vocabulary for everyday communication.",
+    "starter": "Starter",
+    "starterDesc": "Perfect for beginners. Short, simple texts to build your foundation.",
+    "noTexts": "No reading texts available for this language yet.",
+    "comingSoon": "Check back soon for more practice content!",
+    "sentencesIntro": "Practice full sentences by tapping words for help, then try translating.",
+    "mode": {
+      "vocab": "Practice Vocab",
+      "sentences": "Sentences"
+    },
+    "dictionary": {
+      "button": "Dictionary",
+      "title": "Dictionary",
+      "words": "words",
+      "search": "Search words...",
+      "practiceWord": "Practice Word",
+      "translation": "Translation",
+      "meaning": "Meaning",
+      "noResults": "No words match your search.",
+      "noWords": "No words available in this section."
+    },
+    "sentence": {
+      "wordHelper": "Word Helper",
+      "dictionary": "Dictionary entry",
+      "dictionaryTab": "Dictionary",
+      "noDictionary": "No dictionary entry found yet.",
+      "grammarTab": "Grammar",
+      "grammarPlaceholder": "Grammar breakdown",
+      "grammarOriginal": "Original",
+      "grammarSegments": "Segments",
+      "grammarMeaning": "Combined meaning",
+      "grammarMeaningFallback": "Meaning hints coming soon",
+      "grammarComingSoon": "Detailed grammar notes coming soon.",
+      "grammarPrefixes": "Prefixes",
+      "grammarBase": "Base",
+      "grammarSuffixes": "Suffixes",
+      "grammarNotes": "Notes",
+      "grammarConfidence": "Confidence",
+      "grammarBaseMissing": "Base form not found yet",
+      "grammarFallback": "No morphology hints yet.",
+      "useHint": "Use as hint",
+      "noSentence": "No sentence available yet.",
+      "difficulty": "Tier {{level}}",
+      "lastResult": "Last: {{result}}",
+      "listeningMode": "Listening first",
+      "listeningPending": "Audio will play first when available. For now, tap to reveal the text.",
+      "showText": "Show text",
+      "translationPrompt": "Translate this sentence",
+      "guidedPlaceholder": "Build your translation...",
+      "freeResponsePlaceholder": "Type your translation...",
+      "gradeAction": "Grade",
+      "grade": {
+        "correct": "Correct",
+        "partial": "Partial",
+        "incorrect": "Incorrect"
+      },
+      "gradeHint": "Type your translation, then tap Grade",
+      "next": "Next",
+      "resultsTitle": "Sentence practice results",
+      "resultsSummary": "You finished this card! Here is how you did.",
+      "restartCard": "Restart card",
+      "yourAnswerLabel": "Your answer",
+      "noResponse": "No response",
+      "card": {
+        "progress": "practiced",
+        "callToAction": "Open sentence practice"
+      }
+    },
+    "sentenceReadingTitle": "Sentence Reading"
   },
   "settings": {
     "title": "设置",
@@ -879,6 +974,60 @@
         "2": "单词工匠",
         "3": "单词大师"
       }
+    },
+    "bridgeArchitect": {
+      "name": "Vocab Architect",
+      "summary": "Complete {{goal}} Vocab Builder sessions.",
+      "tiers": {
+        "1": "Plank Layer",
+        "2": "Vocab Builder",
+        "3": "Master Architect"
+      }
+    },
+    "bridgePerfectionist": {
+      "name": "Vocab Perfectionist",
+      "summary": "Complete {{goal}} Vocab Builder sessions without losing hearts.",
+      "tiers": {
+        "1": "Sturdy Foundation",
+        "2": "Flawless Construction",
+        "3": "Unbreakable Vocab"
+      }
+    },
+    "wordCollector": {
+      "name": "Word Collector",
+      "summary": "Complete {{goal}} words in Vocab Builder.",
+      "tiers": {
+        "1": "Novice Collector",
+        "2": "Word Enthusiast",
+        "3": "Lexicon Master"
+      }
+    },
+    "dungeonDelver": {
+      "name": "Dungeon Delver",
+      "summary": "Win {{goal}} combats in Deep Script.",
+      "tiers": {
+        "1": "Apprentice Scribe",
+        "2": "Rune Fighter",
+        "3": "Dungeon Master"
+      }
+    },
+    "runeVanquisher": {
+      "name": "Rune Vanquisher",
+      "summary": "Defeat {{goal}} minibosses in Deep Script.",
+      "tiers": {
+        "1": "Boss Slayer",
+        "2": "Rune Breaker",
+        "3": "Vanquisher Supreme"
+      }
+    },
+    "ironWill": {
+      "name": "Iron Will",
+      "summary": "Complete {{goal}} Deep Script runs with victory.",
+      "tiers": {
+        "1": "First Conquest",
+        "2": "Seasoned Warrior",
+        "3": "Legendary Champion"
+      }
     }
   },
   "daily": {
@@ -990,6 +1139,26 @@
       "doubleSession": {
         "title": "双倍会话",
         "description": "今天完成两次会话。"
+      },
+      "bridgeSession": {
+        "title": "Vocab Crossing",
+        "description": "Complete a Vocab Builder session."
+      },
+      "bridgePerfect": {
+        "title": "Perfect Vocab",
+        "description": "Complete a Vocab Builder session without losing any hearts."
+      },
+      "bridgeWords": {
+        "title": "Word Builder",
+        "description": "Complete 5 words in Vocab Builder."
+      },
+      "deepScriptCombat": {
+        "title": "Dungeon Warrior",
+        "description": "Win 3 combats in Deep Script."
+      },
+      "deepScriptRun": {
+        "title": "Dungeon Conqueror",
+        "description": "Complete a Deep Script run with victory."
       }
     },
     "constraints": {
@@ -1004,7 +1173,9 @@
     "player": "玩家",
     "patientPaddler": "耐心的桨手",
     "noneYet": "还没有",
-    "play": "玩"
+    "play": "玩",
+    "day": "day",
+    "days": "days"
   },
   "tutorial": {
     "stepCounter": "第 {{current}} 步（共 {{total}} 步）",
@@ -1126,7 +1297,10 @@
     "classic": "经典",
     "special": "特殊",
     "polyglot": "多语言者",
-    "dedication": "奉献"
+    "dedication": "奉献",
+    "letterRiver": "Letter River",
+    "bridgeBuilder": "Vocab Builder",
+    "deepScript": "Deep Script"
   },
   "dailyQuests": {
     "catch10Letters": {
@@ -1334,7 +1508,291 @@
       "problem": "problem",
       "question": "question",
       "answer": "answer",
-      "idea": "idea"
+      "idea": "idea",
+      "shalom": "hello; peace; goodbye",
+      "todah": "thank you; thanks",
+      "ken": "yes",
+      "torah": "Torah; Jewish law",
+      "emet": "truth",
+      "boker": "morning",
+      "tov": "good",
+      "erev": "evening",
+      "lehitraot": "goodbye; see you",
+      "hello": "hello; hi",
+      "goodbye": "goodbye; bye",
+      "please": "please",
+      "sorry": "sorry; excuse me",
+      "yes": "yes",
+      "no": "no"
+    },
+    "textNotFound": "Reading text not found.",
+    "back": "Back",
+    "showAnswer": "Show answer",
+    "hideAnswer": "Hide answer",
+    "word": "Word",
+    "streak": "Streak",
+    "instruction": "Type then press Space",
+    "typeHere": "Type translation...",
+    "next": "Next",
+    "mobileInstruction": "Type the translation and tap Next to continue",
+    "answer": "Answer",
+    "accepted": "accepted",
+    "results": {
+      "title": "Reading Results",
+      "practiceWord": "Practice Word",
+      "yourAnswer": "Your Answer",
+      "translation": "Translation",
+      "meaning": "Meaning",
+      "tryAgain": "Try Again",
+      "back": "Back"
+    }
+  },
+  "conversation": {
+    "card": {
+      "title": "Conversation Practice",
+      "description": "Practice real-world Hebrew conversations with interactive exercises",
+      "feature1": "Listen",
+      "feature2": "Speak",
+      "feature3": "Type",
+      "feature4": "Choose"
+    },
+    "list": {
+      "title": "Conversation Practice",
+      "subtitle": "Practice real-world Hebrew conversations",
+      "back": "Back",
+      "intro": {
+        "title": "Learn through conversation",
+        "description": "Each scenario teaches you practical phrases through listening, speaking, and typing exercises."
+      },
+      "phrases": "phrases",
+      "beats": "beats",
+      "practiced": "practiced",
+      "progress": "Progress",
+      "continue": "Continue practicing",
+      "start": "Start learning",
+      "empty": "No scenarios available yet",
+      "titleDualRole": "Dual-Role Conversations",
+      "subtitleDualRole": "Practice both sides of a conversation",
+      "unavailable": "No conversation practice available for this language yet."
+    },
+    "brief": {
+      "back": "Back to scenarios",
+      "difficulty": "Difficulty",
+      "phrases": "Phrases",
+      "totalBeats": "Total beats",
+      "practiceModules": "Practice modules",
+      "modulesDescription": "You'll practice each phrase using these exercises:",
+      "goals": "Learning goals",
+      "goal1": "Recognize and understand common Hebrew phrases",
+      "goal2": "Practice correct pronunciation",
+      "goal3": "Build recall and typing fluency",
+      "goal4": "Connect Hebrew words to real-world usage",
+      "tips": "Tips",
+      "tip1": "Use the audio button to hear native pronunciation",
+      "tip2": "Save phrases you want to review later",
+      "tip3": "Take your time - there's no rush!",
+      "start": "Start Practice"
+    },
+    "beat": {
+      "exit": "Exit",
+      "progress": "Beat {{current}} of {{total}}",
+      "transcript": "Transcript",
+      "savePhrase": "Save phrase to SRS",
+      "transcriptTitle": "Previous beats",
+      "errorNoLine": "Line not found",
+      "errorUnknownModule": "Unknown module type",
+      "correct": "Correct!",
+      "almostThere": "Almost there!",
+      "keepGoing": "Keep practicing!",
+      "yourAnswer": "You",
+      "correctAnswer": "Correct",
+      "next": "Next"
+    },
+    "recap": {
+      "completed": "Session completed",
+      "excellent": "Excellent!",
+      "excellentMsg": "You're mastering these phrases!",
+      "great": "Great job!",
+      "greatMsg": "You're making solid progress!",
+      "good": "Good effort!",
+      "goodMsg": "Keep practicing and you'll improve!",
+      "keepGoing": "Keep going!",
+      "keepGoingMsg": "Learning takes time - you're on the right track!",
+      "accuracy": "Accuracy",
+      "beatsCompleted": "Beats completed",
+      "phrasesPracticed": "Phrases practiced",
+      "breakdown": "Performance breakdown",
+      "correct": "Correct",
+      "partial": "Partial",
+      "incorrect": "Incorrect",
+      "savedPhrases": "Saved phrases",
+      "savedCount": "You saved {{count}} phrases for review",
+      "finish": "Finish",
+      "practiceAgain": "Practice again",
+      "reviewSaved": "Review saved"
+    },
+    "modules": {
+      "listenMeaningChoice": {
+        "name": "Listen & Pick Meaning",
+        "description": "Listen to Hebrew and choose the correct English translation",
+        "instruction": "Listen and pick the meaning",
+        "hint": "Play the audio and choose the correct English translation",
+        "playHint": "Click to hear the Hebrew phrase",
+        "submitHint": "Click the play button to submit your answer"
+      },
+      "shadowRepeat": {
+        "name": "Shadow & Repeat",
+        "description": "Listen and repeat the Hebrew phrase out loud",
+        "instruction": "Shadow and repeat",
+        "hint": "Listen to the phrase and repeat it out loud",
+        "playHint": "Listen as many times as needed",
+        "hideText": "Hide text",
+        "showText": "Show text to help",
+        "hebrewLabel": "Hebrew",
+        "pronunciationLabel": "Pronunciation",
+        "success": "I said it!",
+        "skip": "Skip for now",
+        "feedback": "Great job practicing!",
+        "encouragement": "Shadowing helps build muscle memory for pronunciation"
+      },
+      "guidedReplyChoice": {
+        "name": "Choose Hebrew Response",
+        "description": "Pick the correct Hebrew phrase from multiple options",
+        "instruction": "Choose the Hebrew phrase",
+        "hint": "Pick the correct Hebrew response",
+        "contextLabel": "You want to say:",
+        "showTransliterations": "Show Transliterations",
+        "hideTransliterations": "Hide Transliterations"
+      },
+      "typeInput": {
+        "name": "Type the Answer",
+        "description": "Type the Hebrew phrase or transliteration",
+        "instruction": "Type the answer",
+        "hintHebrew": "Type the Hebrew phrase",
+        "hintTranslit": "Type the transliteration (pronunciation)",
+        "contextLabel": "You want to say:",
+        "placeholderHebrew": "Type in Hebrew...",
+        "placeholderTranslit": "Type the transliteration...",
+        "switchToTranslit": "Switch to transliteration",
+        "switchToHebrew": "Switch to Hebrew",
+        "correctAnswer": "Correct answer:",
+        "hebrew": "Hebrew",
+        "transliteration": "Transliteration",
+        "hint": "Tip: Listen to the audio for pronunciation help",
+        "switchToEnglish": "Show English"
+      },
+      "submit": "Submit",
+      "correct": "Correct!",
+      "partial": "Close! Check the correct answer below.",
+      "incorrect": "Not quite. Here's the correct answer:",
+      "dictionary": "Dictionary",
+      "dictionaryTitle": "Word Dictionary"
+    },
+    "scenarios": {
+      "greetings-introductions": {
+        "title": "Greetings & Introductions",
+        "subtitle": "Meet and greet in Hebrew"
+      },
+      "at-home": {
+        "title": "At Home",
+        "subtitle": "Talk about home and family"
+      },
+      "food-eating": {
+        "title": "Food & Eating",
+        "subtitle": "Order food and talk about meals"
+      },
+      "numbers-time": {
+        "title": "Numbers & Time",
+        "subtitle": "Express time and quantities"
+      }
+    },
+    "modeSelector": {
+      "title": "Conversation Practice",
+      "subtitle": "Choose your practice mode"
+    },
+    "segments": {
+      "title": "Choose a Practice Segment",
+      "sentences": "sentences",
+      "exercises": "exercises",
+      "info": "Each segment has 2 short intro sentences followed by 2 longer sentences that reuse the vocabulary."
+    }
+  },
+  "dailyReview": {
+    "title": "Daily Review",
+    "allCaughtUp": "All caught up!",
+    "checkBackTomorrow": "Great work. Check back tomorrow."
+  },
+  "postGame": {
+    "title": "Session Complete!",
+    "subtitle": "Great work! Here\\",
+    "stats": {
+      "lettersLabel": "Letters",
+      "accuracyLabel": "Accuracy",
+      "scoreLabel": "Score",
+      "heartsLabel": "Hearts"
+    },
+    "missed": {
+      "title": "Letters to Review",
+      "hint": "These letters will appear more often in your next session!"
+    },
+    "levelUp": {
+      "title": "Progress Update",
+      "nextReview": "Review in",
+      "more": "+{count} more letters updated"
+    },
+    "actions": {
+      "playAgain": "Play Again",
+      "home": "Home"
+    }
+  },
+  "srs": {
+    "maturity": {
+      "learning": "Learning",
+      "young": "Young",
+      "mature": "Mature"
+    }
+  },
+  "streak": {
+    "startJourney": "Start your journey!",
+    "greatStart": "Great start! Keep it going",
+    "buildingMomentum": "You",
+    "onFire": "You",
+    "incredibleDedication": "Incredible dedication!",
+    "legendaryCommitment": "Legendary commitment!"
+  },
+  "bridgeBuilder": {
+    "vocabJourney": {
+      "missingPackContent": "Content for this pack is not available in the selected practice language yet.",
+      "loadingWords": "Loading words...",
+      "packLearningProgress": "Pack learning progress",
+      "packDetails": "Pack details",
+      "closePackDetails": "Close pack details",
+      "savePack": "Save pack",
+      "continueLearningWords": "Continue learning new words.",
+      "recommendedNext": "Recommended next",
+      "moreWaysToLearn": "More ways to learn",
+      "optionLoosePlanksTitle": "Strengthen — Loose Planks",
+      "optionLoosePlanksSubtitle": "Reinforce with targeted practice.",
+      "optionReviewTitle": "Review — Today’s Review",
+      "optionReviewSubtitle": "Review words for memory.",
+      "optionDeepScriptTitle": "Challenge — Deep Script",
+      "optionDeepScriptSubtitle": "Test depth with writing and recall.",
+      "optionReadTitle": "Read — Cafe Talk",
+      "optionReadSubtitle": "See the words in a real conversation.",
+      "title": "Vocabulary Journey",
+      "startPath": "Start your learning path",
+      "noPacks": "No packs available yet.",
+      "allPacks": "All Packs",
+      "openDetailsFor": "Open details for {{title}}",
+      "currentPack": "Current Pack",
+      "learnEverydayWords": "Learn {{count}} everyday words",
+      "currentGoal": "Current goal: {{goal}}",
+      "tapForPackDetails": "Tap for pack details",
+      "todaysReviewWords": "Today’s Review — {{count}} words",
+      "keepWordsStrong": "Keep your words strong.",
+      "completePackToUnlockReview": "Complete a pack to unlock review.",
+      "readInContextTitle": "Read in Context — Cafe Talk",
+      "readInContextLockedSubtitle": "Unlocks after this pack."
     }
   }
 }

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useProgress } from '../context/ProgressContext.jsx';
 import { useSRS } from '../context/SRSContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
+import { useLocalization } from '../context/LocalizationContext.jsx';
 
 function Icon({ children, className = '', filled = false, style = {} }) {
   return (
@@ -19,6 +20,7 @@ export default function DailyReviewCard() {
   const { getWeakestLetter } = useProgress();
   const { getDueItems, statistics, isLoading } = useSRS();
   const { setShowPlayModal } = useGame();
+  const { t } = useLocalization();
 
   const dueLetters = useMemo(() => {
     if (isLoading) return [];
@@ -60,7 +62,7 @@ export default function DailyReviewCard() {
           className="text-sm font-bold uppercase tracking-widest"
           style={{ color: 'var(--app-muted)' }}
         >
-          Daily Review
+          {t('dailyReview.title', 'Daily Review')}
         </h3>
         <Icon
           className="text-lg"
@@ -81,10 +83,10 @@ export default function DailyReviewCard() {
           </div>
           <div>
             <p className="text-sm font-bold" style={{ color: 'var(--app-on-surface)' }}>
-              All caught up!
+              {t('dailyReview.allCaughtUp', 'All caught up!')}
             </p>
             <p className="text-xs" style={{ color: 'var(--app-muted)' }}>
-              Great work. Check back tomorrow.
+              {t('dailyReview.checkBackTomorrow', 'Great work. Check back tomorrow.')}
             </p>
           </div>
         </div>

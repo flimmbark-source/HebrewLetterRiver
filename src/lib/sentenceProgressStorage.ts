@@ -2,6 +2,10 @@ import type { Sentence, SentenceProgressEntry, SentenceResult } from '../types/s
 
 const STORAGE_KEY = 'sentenceProgress';
 
+function scopedTheme(theme: string, practiceLanguageId = 'global') {
+  return `${practiceLanguageId}:${theme}`;
+}
+
 interface ProgressState {
   [theme: string]: Record<string, SentenceProgressEntry>;
 }
@@ -30,10 +34,12 @@ function saveState(state: ProgressState) {
 export function recordSentenceResult(
   theme: string,
   sentenceId: string,
-  result: SentenceResult
+  result: SentenceResult,
+  practiceLanguageId = 'global'
 ) {
   const state = loadState();
-  const themeEntries = state[theme] || {};
+  const scopedKey = scopedTheme(theme, practiceLanguageId);
+  const themeEntries = state[scopedKey] || {};
   const existing = themeEntries[sentenceId];
   const now = new Date().toISOString();
 
@@ -46,18 +52,18 @@ export function recordSentenceResult(
     nextReviewAt: existing?.nextReviewAt ?? null
   };
 
-  state[theme] = themeEntries;
+  state[scopedKey] = themeEntries;
   saveState(state);
 }
 
-export function getSentenceProgress(theme: string, sentenceId: string): SentenceProgressEntry | null {
+export function getSentenceProgress(theme: string, sentenceId: string, practiceLanguageId = 'global'): SentenceProgressEntry | null {
   const state = loadState();
-  return state[theme]?.[sentenceId] ?? null;
+  return state[scopedTheme(theme, practiceLanguageId)]?.[sentenceId] ?? null;
 }
 
-export function getThemeStats(theme: string, sentences: Sentence[]) {
+export function getThemeStats(theme: string, sentences: Sentence[], practiceLanguageId = 'global') {
   const state = loadState();
-  const entries = state[theme] || {};
+  const entries = state[scopedTheme(theme, practiceLanguageId)] || {};
   const practiced = Object.keys(entries).length;
   const total = sentences.length;
   const correctCount = Object.values(entries).filter(entry => entry.lastResult === 'correct').length;
@@ -69,9 +75,9 @@ export function getThemeStats(theme: string, sentences: Sentence[]) {
   };
 }
 
-export function getNextSentenceIndex(theme: string, sentences: Sentence[]): number {
+export function getNextSentenceIndex(theme: string, sentences: Sentence[], practiceLanguageId = 'global'): number {
   const state = loadState();
-  const entries = state[theme] || {};
+  const entries = state[scopedTheme(theme, practiceLanguageId)] || {};
   const firstUnseen = sentences.findIndex(sentence => !entries[sentence.id]);
   if (firstUnseen !== -1) return firstUnseen;
   if (sentences.length === 0) return -1;
