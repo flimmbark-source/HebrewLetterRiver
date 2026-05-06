@@ -26,6 +26,81 @@ function Icon({ children, className = '', filled = false }) {
   );
 }
 
+function localizeStageInfo(stageInfo, t) {
+  const stageLabelKeys = {
+    'Not started': 'bridgeBuilder.vocabJourney.stageNotStarted',
+    Complete: 'bridgeBuilder.vocabJourney.statusComplete',
+    'Ready for challenge': 'bridgeBuilder.vocabJourney.stageReadyForChallenge',
+    'Strengthening memory': 'bridgeBuilder.vocabJourney.stageStrengtheningMemory',
+    'Learning meanings': 'bridgeBuilder.vocabJourney.stageLearningMeanings',
+    'New pack': 'bridgeBuilder.vocabJourney.stageNewPack'
+  };
+
+  const stepLabelKeys = {
+    first_look: 'bridgeBuilder.vocabJourney.stageFirstLook',
+    meaning: 'bridgeBuilder.vocabJourney.stageMeaning',
+    review: 'bridgeBuilder.vocabJourney.stageReview',
+    challenge: 'bridgeBuilder.vocabJourney.stageChallenge'
+  };
+
+  return {
+    ...stageInfo,
+    label: t(stageLabelKeys[stageInfo?.label] || 'bridgeBuilder.vocabJourney.stageNotStarted', stageInfo?.label || 'Not started'),
+    steps: (stageInfo?.steps || []).map((step) => ({
+      ...step,
+      label: t(stepLabelKeys[step.id] || 'bridgeBuilder.vocabJourney.stageNotStarted', step.label)
+    }))
+  };
+}
+
+function localizeRecommendedAction(action, t) {
+  if (!action) return action;
+
+  if (action.method === 'loose_planks') {
+    return {
+      ...action,
+      title: t('bridgeBuilder.vocabJourney.actionLoosePlanksTitle', action.title),
+      subtitle: t('bridgeBuilder.vocabJourney.actionLoosePlanksSubtitle', action.subtitle),
+      ctaLabel: t('bridgeBuilder.vocabJourney.actionContinueLoosePlanks', action.ctaLabel)
+    };
+  }
+
+  if (action.method === 'deep_script') {
+    return {
+      ...action,
+      title: t('bridgeBuilder.vocabJourney.actionDeepScriptTitle', action.title),
+      subtitle: t('bridgeBuilder.vocabJourney.actionDeepScriptSubtitle', action.subtitle),
+      ctaLabel: t('bridgeBuilder.vocabJourney.actionContinueDeepScript', action.ctaLabel)
+    };
+  }
+
+  if (action.method === 'review') {
+    return {
+      ...action,
+      title: t('bridgeBuilder.vocabJourney.actionReviewTitle', action.title),
+      subtitle: t('bridgeBuilder.vocabJourney.actionReviewSubtitle', action.subtitle),
+      ctaLabel: t('bridgeBuilder.vocabJourney.actionReviewPack', action.ctaLabel)
+    };
+  }
+
+  return {
+    ...action,
+    title: t('bridgeBuilder.vocabJourney.actionBridgeTitle', action.title),
+    subtitle: t('bridgeBuilder.vocabJourney.actionBridgeSubtitle', action.subtitle),
+    ctaLabel: action.ctaLabel?.toLowerCase().startsWith('start')
+      ? t('bridgeBuilder.vocabJourney.actionStartBridge', action.ctaLabel)
+      : t('bridgeBuilder.vocabJourney.actionContinueBridge', action.ctaLabel)
+  };
+}
+
+function getStopStatusLabel(status, t) {
+  if (status === 'Open') return t('bridgeBuilder.vocabJourney.statusOpenPath', 'Open path');
+  if (status === 'Locked') return t('bridgeBuilder.vocabJourney.statusLocked', 'Locked');
+  if (status === 'Complete') return t('bridgeBuilder.vocabJourney.statusComplete', 'Complete');
+  if (status === 'Current') return t('bridgeBuilder.vocabJourney.statusCurrent', 'Current');
+  return status;
+}
+
 function WordChips({ words, t, isMissingPackMapping }) {
   return (
     <div className="vj-word-chips" dir="rtl">
@@ -42,25 +117,6 @@ function WordChips({ words, t, isMissingPackMapping }) {
           </span>
         ))
       )}
-    </div>
-  );
-}
-
-function ProgressSteps({ steps, t }) {
-  return (
-    <div className="vj-progress-steps" aria-label={t('bridgeBuilder.vocabJourney.packLearningProgress', 'Pack learning progress')}>
-      {steps.map((step) => (
-        <div key={step.id} className="vj-progress-step">
-          <span className={`vj-progress-node ${step.complete ? 'vj-progress-node--complete' : ''}`}>
-            {step.complete ? (
-              <Icon className="vj-progress-check">check</Icon>
-            ) : (
-              step.label.split(' ')[0][0]
-            )}
-          </span>
-          <span className="vj-progress-label">{step.label}</span>
-        </div>
-      ))}
     </div>
   );
 }
@@ -84,7 +140,6 @@ function CurrentPackDetailSheet({
   t,
   isOpen,
   onClose,
-  currentPack,
   wordPreview,
   missingPackMapping,
   localizedPackTitle,
@@ -192,9 +247,8 @@ export default function VocabJourneyPanel({
   onReview,
   onOpenBrowse,
 }) {
-    const { t } = useLocalization();
+  const { t } = useLocalization();
 
-  // Derive all data from the model
   const currentPackData = useMemo(() => getCurrentJourneyPack(sectionData, activePackId), [sectionData, activePackId]);
   const currentPack = currentPackData?.pack;
   const currentProgress = currentPackData?.progress;
@@ -220,8 +274,11 @@ export default function VocabJourneyPanel({
       missingPackMapping
     });
   }, [languageId, currentPack?.id, displayWords.length, preview.usedFallback, missingPackMapping]);
+
   const stageInfo = useMemo(() => getPackLearningStage(currentProgress, currentCompletion), [currentProgress, currentCompletion]);
+  const localizedStageInfo = useMemo(() => localizeStageInfo(stageInfo, t), [stageInfo, t]);
   const recommendedAction = useMemo(() => getRecommendedJourneyAction(currentProgress, currentCompletion), [currentProgress, currentCompletion]);
+  const localizedRecommendedAction = useMemo(() => localizeRecommendedAction(recommendedAction, t), [recommendedAction, t]);
   const journeyStats = useMemo(() => getJourneyStats(sectionData), [sectionData]);
   const [isPackSheetOpen, setIsPackSheetOpen] = useState(false);
 
@@ -271,7 +328,10 @@ export default function VocabJourneyPanel({
 
         <div className="vj-hero-copy">
           <h1>{t('bridgeBuilder.vocabJourney.title', 'Vocabulary Journey')}</h1>
-          <p>{journeyStats.currentSectionTitle} · {journeyStats.overallProgressPct}% complete</p>
+          <p>{t('bridgeBuilder.vocabJourney.currentSectionProgress', '{{section}} · {{percent}}% complete', {
+            section: journeyStats.currentSectionTitle,
+            percent: journeyStats.overallProgressPct
+          })}</p>
         </div>
 
         <article
@@ -294,7 +354,7 @@ export default function VocabJourneyPanel({
               <Icon filled>eco</Icon>
               {t('bridgeBuilder.vocabJourney.learnEverydayWords', 'Learn {{count}} everyday words', { count: currentPack.targetsNewCount || currentPack.wordIds?.length || 8 })}
             </p>
-            <p className="vj-goal-line">{t('bridgeBuilder.vocabJourney.currentGoal', 'Current goal: {{goal}}', { goal: stageInfo.label })}</p>
+            <p className="vj-goal-line">{t('bridgeBuilder.vocabJourney.currentGoal', 'Current goal: {{goal}}', { goal: localizedStageInfo.label })}</p>
             <p className="vj-card-details-hint"><Icon>expand_more</Icon>{t('bridgeBuilder.vocabJourney.tapForPackDetails', 'Tap for pack details')}</p>
 
             <button
@@ -306,7 +366,7 @@ export default function VocabJourneyPanel({
               }}
             >
               <Icon filled>conversion_path</Icon>
-              <span>{recommendedAction.ctaLabel}</span>
+              <span>{localizedRecommendedAction.ctaLabel}</span>
               <Icon>chevron_right</Icon>
             </button>
           </div>
@@ -338,14 +398,13 @@ export default function VocabJourneyPanel({
             </span>
             <Icon>lock</Icon>
           </button>
-
         </div>
 
         <aside className="vj-river-path" style={{ backgroundImage: `url(${riverPathMap})` }}>
           <div className="vj-path-overlay">
             {journeyStops.map((stop) => {
               const locked = stop.status === 'Locked';
-              const statusLabel = stop.status === 'Open' ? 'Open path' : stop.status;
+              const statusLabel = getStopStatusLabel(stop.status, t);
               return (
                 <button
                   key={stop.id}
@@ -362,7 +421,7 @@ export default function VocabJourneyPanel({
                     <Icon filled>{locked ? 'lock' : stop.icon}</Icon>
                   </span>
                   <span className="vj-path-copy">
-                    <strong>{stop.title}</strong>
+                    <strong>{t(`bridgeBuilder.sections.${stop.id}.title`, stop.title)}</strong>
                     <small>{statusLabel}</small>
                   </span>
                   {locked
@@ -380,10 +439,12 @@ export default function VocabJourneyPanel({
         t={t}
         isOpen={isPackSheetOpen}
         onClose={() => setIsPackSheetOpen(false)}
-        currentPack={currentPack}
         wordPreview={displayWords}
-        stage={stageInfo}
-        recommendedAction={recommendedAction}
+        missingPackMapping={missingPackMapping}
+        localizedPackTitle={localizedPackTitle}
+        localizedPackDescription={localizedPackDescription}
+        stage={localizedStageInfo}
+        recommendedAction={localizedRecommendedAction}
         reviewCount={reviewCount}
         onLaunchRecommended={() => onLaunchPackMethod(currentPack, recommendedAction.method)}
         onLaunchLoosePlanks={() => onLaunchPackMethod(currentPack, 'loose_planks')}
