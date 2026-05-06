@@ -328,7 +328,7 @@ function Shell() {
       <OfflineIndicator />
       <PWAInstallPrompt />
       <PlayModeModal />
-      <main id="main-content" className={`flex-1 main-content ${fontClass}`} dir={direction} tabIndex={-1}>
+      <main id="main-content" className={`flex-1 main-content app-main ${fontClass}`} dir={direction} tabIndex={-1}>
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomeView />} />
@@ -343,8 +343,8 @@ function Shell() {
         </Routes>
       </main>
       {!(isGameVisible && isGameRunning) && !inConversationPractice && !inDeepScript && (
-        <nav className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around px-4 pb-8 pt-2">
-          <div className="fixed bottom-6 left-6 right-6 flex h-16 items-center justify-around rounded-full px-2 backdrop-blur-xl" style={{ background: 'var(--app-nav-bg)', border: '1px solid var(--app-nav-border)', boxShadow: '0 4px 24px var(--app-nav-shadow), 0 1px 4px var(--app-nav-shadow)' }}>
+        <nav className="bottom-nav fixed bottom-0 left-0 z-50 flex w-full items-center justify-around px-4 pt-2">
+          <div className="bottom-nav__pill fixed left-6 right-6 flex items-center justify-around rounded-full px-2 backdrop-blur-xl" style={{ background: 'var(--app-nav-bg)', border: '1px solid var(--app-nav-border)', boxShadow: '0 4px 24px var(--app-nav-shadow), 0 1px 4px var(--app-nav-shadow)' }}>
             <NavLink
               to="/home"
               onClick={handleNavClick}

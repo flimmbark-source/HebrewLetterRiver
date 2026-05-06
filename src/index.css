@@ -37,6 +37,10 @@
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
+
+  --bottom-nav-height: 72px;
+  --bottom-nav-breathing-room: 24px;
+  --bottom-safe-space: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + var(--bottom-nav-breathing-room));
 }
 
 html,

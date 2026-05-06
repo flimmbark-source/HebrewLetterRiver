@@ -97,12 +97,13 @@ body.no-scroll {
 .app-shell {
   width: 100%;
   max-width: 100%;
+  min-height: 100dvh;
   min-height: 100vh;
   font-family: var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   border-radius: 0;
   background: var(--app-bg-gradient);
   background-color: var(--app-bg);
-  padding: 0 0 80px;
+  padding: 0 0 var(--bottom-safe-space);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -123,8 +124,11 @@ body.no-scroll {
   border-radius: 0;
   padding: 12px;
   box-shadow: none;
-  min-height: calc(100vh - 80px);
+  min-height: calc(100dvh - var(--bottom-nav-height));
+  min-height: calc(100vh - var(--bottom-nav-height));
+  padding-bottom: var(--bottom-safe-space);
 }
+
 
 /* Desktop styling */
 @media (min-width: 768px) {
@@ -133,7 +137,7 @@ body.no-scroll {
     margin: 0 auto;
     border-radius: 0;
     min-height: auto;
-    padding: 20px 20px 80px;
+    padding: 20px;
     gap: 20px;
   }
 
@@ -891,6 +895,40 @@ body.no-scroll {
   box-shadow: 0 -2px 8px 0 rgba(0, 0, 0, 0.1);
   border-top: 1px solid var(--app-nav-border);
   z-index: 100;
+}
+
+
+.app-main,
+.page-scroll,
+.screen-scroll,
+.mobile-panel,
+.modal-scroll,
+.pack-detail-scroll,
+.intro-screen {
+  padding-bottom: var(--bottom-safe-space);
+}
+
+.bottom-nav {
+  height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.bottom-nav__pill {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+  height: var(--bottom-nav-height);
+}
+
+@media (min-width: 768px) {
+  .app-main,
+  .page-scroll,
+  .screen-scroll,
+  .mobile-panel,
+  .modal-scroll,
+  .pack-detail-scroll,
+  .intro-screen,
+  .main-content {
+    padding-bottom: 20px;
+  }
 }
 
 /* Desktop styling */
@@ -2955,6 +2993,7 @@ body.dark-mode #accessibility-view select {
 }
 
 #main-menu-view {
+  min-height: 100dvh;
   min-height: 100vh;
 }
 #main-menu-view .menu-card {
