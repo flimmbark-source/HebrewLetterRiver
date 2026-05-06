@@ -6,9 +6,17 @@ import { russianSupplementalDictionary } from './supplemental.russian.js';
 import { japaneseSupplementalDictionary } from './supplemental.japanese.js';
 import { mandarinSupplementalDictionary } from './supplemental.mandarin.js';
 import { amharicSupplementalDictionary } from './supplemental.amharic.js';
+import { portuguesePackMetadataSupplemental } from './supplemental.packs.portuguese.js';
 
 const supplementalDictionaries = {
   ...baseSupplementalDictionaries,
+  portuguese: {
+    ...baseSupplementalDictionaries.portuguese,
+    packs: {
+      ...(baseSupplementalDictionaries.portuguese?.packs ?? {}),
+      ...portuguesePackMetadataSupplemental
+    }
+  },
   hebrew: hebrewSupplementalDictionary,
   arabic: arabicSupplementalDictionary,
   russian: russianSupplementalDictionary,
