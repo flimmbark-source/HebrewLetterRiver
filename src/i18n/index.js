@@ -100,6 +100,13 @@ const supplementalDictionaries = {
       freezeAvailable_other: '{{count}} proteções de sequência disponíveis'
     },
     bridgeBuilder: {
+      sections: {
+        foundations: { title: 'Fundamentos' },
+        daily_life: { title: 'Vida diária' },
+        people_social: { title: 'Pessoas e vida social' },
+        meaning_builders: { title: 'Construtores de significado' },
+        cafe_talk: { title: 'Conversa de café' }
+      },
       vocabJourney: {
         title: 'Jornada de vocabulário',
         startPath: 'Comece seu caminho de aprendizagem',
@@ -159,6 +166,64 @@ const supplementalDictionaries = {
         actionReviewTitle: 'Revisão',
         actionReviewSubtitle: 'Mantenha estas palavras frescas.',
         actionReviewPack: 'Revisar este pacote'
+      }
+    },
+    packs: {
+      greetings_01: {
+        title: 'Saudações',
+        description: 'Olá, obrigado e cortesia básica'
+      },
+      pronouns_01: {
+        title: 'Pronomes',
+        description: 'Eu, você e pronomes básicos'
+      },
+      pronouns_02: {
+        title: 'Pronomes 2',
+        description: 'Ele, ela, nós e eles'
+      },
+      family_01: {
+        title: 'Família',
+        description: 'Mãe, pai, família e casa'
+      },
+      family_02: {
+        title: 'Família 2',
+        description: 'Amigo, criança, pai ou mãe, vizinho e mais'
+      },
+      food_01: {
+        title: 'Comida e bebida',
+        description: 'Pão, água, café e mais'
+      },
+      food_02: {
+        title: 'Comida e bebida 2',
+        description: 'Comida, água e café'
+      },
+      adjectives_01: {
+        title: 'Adjetivos',
+        description: 'Bom, grande, pequeno e bonito'
+      },
+      adjectives_02: {
+        title: 'Adjetivos 2',
+        description: 'Ótimo, legal, bonito, ruim e mais'
+      },
+      adjectives_03: {
+        title: 'Adjetivos 3',
+        description: 'Feio e estranho'
+      },
+      numbers_01: {
+        title: 'Números',
+        description: 'Contando de um a cinco'
+      },
+      colors_01: {
+        title: 'Cores',
+        description: 'Vermelho, azul, verde e mais'
+      },
+      everyday_objects_01: {
+        title: 'Objetos do dia a dia',
+        description: 'Livro, telefone, mesa e porta'
+      },
+      everyday_objects_02: {
+        title: 'Objetos do dia a dia 2',
+        description: 'Livro, telefone e coisa'
       }
     }
   }
