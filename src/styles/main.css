@@ -102,7 +102,7 @@ body.no-scroll {
   border-radius: 0;
   background: var(--app-bg-gradient);
   background-color: var(--app-bg);
-  padding: 0 0 80px;
+  padding: 0 0 var(--bottom-nav-safe-space);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -123,7 +123,13 @@ body.no-scroll {
   border-radius: 0;
   padding: 12px;
   box-shadow: none;
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - var(--bottom-nav-height));
+  padding-bottom: var(--bottom-nav-safe-space);
+}
+
+
+.app-scroll-safe-bottom {
+  padding-bottom: var(--bottom-nav-safe-space);
 }
 
 /* Desktop styling */
@@ -133,7 +139,7 @@ body.no-scroll {
     margin: 0 auto;
     border-radius: 0;
     min-height: auto;
-    padding: 20px 20px 80px;
+    padding: 20px 20px var(--bottom-nav-safe-space);
     gap: 20px;
   }
 
@@ -2299,6 +2305,8 @@ body.no-scroll {
 
 /* Modern design system variables */
 :root {
+  --bottom-nav-height: 72px;
+  --bottom-nav-safe-space: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 24px);
   /* Neutral shadows - crisp elevation */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);

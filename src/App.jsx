@@ -138,7 +138,7 @@ function LanguageOnboardingModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 language-onboarding-overlay animate-fade-in" style={{
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 language-onboarding-overlay app-scroll-safe-bottom animate-fade-in" style={{
       background: 'var(--app-bg)'
     }}>
       <div className="animate-scale-in w-full max-w-lg rounded-3xl p-6 text-center sm:p-8 language-onboarding-card" style={{

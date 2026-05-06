@@ -31,7 +31,7 @@ export default function WhyLetterRiverScreen({ onContinue }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 app-scroll-safe-bottom animate-fade-in"
       style={{ background: 'var(--app-bg)' }}
     >
       <div
