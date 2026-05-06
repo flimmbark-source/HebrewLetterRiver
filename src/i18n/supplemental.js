@@ -420,5 +420,214 @@ export const supplementalDictionaries = {
         description: 'Libro, teléfono y cosa'
       }
     }
+  },
+  french: {
+    common: {
+      active: 'ACTIF',
+      day: 'jour',
+      days: 'jours'
+    },
+    app: {
+      brand: { name: 'Rivière des Lettres' },
+      playMode: {
+        title: 'Choisis ton mode',
+        close: 'Fermer',
+        letterRiver: {
+          name: 'Rivière des Lettres',
+          description: 'Attrape les lettres pendant qu’elles descendent la rivière'
+        },
+        vocabBuilder: {
+          name: 'Constructeur de vocabulaire',
+          description: 'Joue pour apprendre et pratiquer le vocabulaire'
+        },
+        deepScript: {
+          name: 'Écriture profonde',
+          description: 'Explore un donjon sans fin avec des mots de vocabulaire'
+        }
+      }
+    },
+    home: {
+      languageLearning: { title: 'Apprentissage des langues' },
+      profile: { learningSince: 'Apprentissage depuis {{date}}' },
+      profileOverview: { title: 'Aperçu du profil' },
+      gameActivity: {
+        title: 'Activité de jeu',
+        empty: 'Commence une partie et ton activité récente apparaîtra ici.'
+      },
+      progress: {
+        levelLabel: 'NIVEAU {{level}}',
+        recentMastery: 'Maîtrise récente',
+        emptyMastery: 'Attrape quelques lettres pour débloquer ta rangée de maîtrise.'
+      },
+      quest: {
+        dailyGoal: 'Objectif quotidien',
+        minutesPerDay: 'min/jour',
+        minutesPerDayValue: '{{minutes}} min / jour'
+      },
+      reminders: { title: 'Rappels' },
+      cta: {
+        letterRiver: 'Rivière des Lettres',
+        startLetters: 'Commence à apprendre les lettres en jouant',
+        showAllModes: 'Afficher tous les modes'
+      },
+      footer: {
+        syncNotice: 'Ta progression est automatiquement synchronisée avec ton compte cloud.',
+        privacyPolicy: 'Politique de confidentialité'
+      }
+    },
+    dailyReview: {
+      title: 'Révision quotidienne',
+      allCaughtUp: 'Tout est à jour !',
+      checkBackTomorrow: 'Beau travail. Reviens demain.',
+      lettersDue_one: '{{count}} lettre à réviser',
+      lettersDue_other: '{{count}} lettres à réviser',
+      wordsDue_one: '{{count}} mot à pratiquer',
+      wordsDue_other: '{{count}} mots à pratiquer',
+      focusOn: 'Concentre-toi sur : {{symbol}} ({{name}})'
+    },
+    streak: {
+      startJourney: 'Commence ton parcours !',
+      greatStart: 'Très bon début ! Continue comme ça',
+      buildingMomentum: 'Tu prends de l’élan !',
+      onFire: 'Tu es lancé !',
+      incredibleDedication: 'Dévouement incroyable !',
+      legendaryCommitment: 'Engagement légendaire !',
+      todayComplete: 'Aujourd’hui : terminé',
+      todayNotYet: 'Aujourd’hui : pas encore',
+      daysUntilMilestone_one: 'Encore {{count}} jour avant {{label}} !',
+      daysUntilMilestone_other: 'Encore {{count}} jours avant {{label}} !',
+      repair: 'Réparer la série (20 étoiles)',
+      restoreTo: 'restaurer à {{count}} jours',
+      personalBest: 'Meilleure série : {{count}} jours',
+      freezeAvailable_one: '{{count}} protection de série disponible',
+      freezeAvailable_other: '{{count}} protections de série disponibles'
+    },
+    bridgeBuilder: {
+      sections: {
+        foundations: { title: 'Fondations' },
+        daily_life: { title: 'Vie quotidienne' },
+        people_social: { title: 'Personnes et vie sociale' },
+        meaning_builders: { title: 'Constructeurs de sens' },
+        cafe_talk: { title: 'Conversation au café' }
+      },
+      vocabJourney: {
+        title: 'Parcours de vocabulaire',
+        startPath: 'Commence ton parcours d’apprentissage',
+        noPacks: 'Aucun pack disponible pour le moment.',
+        allPacks: 'Tous les packs',
+        currentPack: 'Pack actuel',
+        currentGoal: 'Objectif actuel : {{goal}}',
+        learnEverydayWords: 'Apprends {{count}} mots du quotidien',
+        tapForPackDetails: 'Touche pour voir les détails du pack',
+        openDetailsFor: 'Ouvrir les détails de {{title}}',
+        packDetails: 'Détails du pack',
+        closePackDetails: 'Fermer les détails du pack',
+        savePack: 'Enregistrer le pack',
+        continueLearningWords: 'Continue à apprendre de nouveaux mots.',
+        recommendedNext: 'Prochaine étape recommandée',
+        moreWaysToLearn: 'Plus de façons d’apprendre',
+        optionLoosePlanksTitle: 'Renforcer — Planches libres',
+        optionLoosePlanksSubtitle: 'Renforce avec une pratique ciblée.',
+        optionReviewTitle: 'Réviser — Révision du jour',
+        optionReviewSubtitle: 'Révise les mots pour les mémoriser.',
+        optionDeepScriptTitle: 'Défi — Écriture profonde',
+        optionDeepScriptSubtitle: 'Teste ta maîtrise par l’écriture et le rappel.',
+        optionReadTitle: 'Lire — Conversation au café',
+        optionReadSubtitle: 'Vois les mots dans une vraie conversation.',
+        todaysReviewWords: 'Révision du jour — {{count}} mots',
+        keepWordsStrong: 'Garde tes mots bien ancrés.',
+        completePackToUnlockReview: 'Termine un pack pour débloquer la révision.',
+        readInContextTitle: 'Lire en contexte — Conversation au café',
+        readInContextLockedSubtitle: 'Se débloque après ce pack.',
+        missingPackContent: 'Le contenu de ce pack n’est pas encore disponible dans la langue de pratique sélectionnée.',
+        loadingWords: 'Chargement des mots...',
+        packLearningProgress: 'Progression d’apprentissage du pack',
+        currentSectionProgress: '{{section}} · {{percent}}% terminé',
+        statusOpenPath: 'Parcours ouvert',
+        statusLocked: 'Verrouillé',
+        statusComplete: 'Terminé',
+        statusCurrent: 'Actuel',
+        stageNotStarted: 'Non commencé',
+        stageFirstLook: 'Premier aperçu',
+        stageMeaning: 'Sens',
+        stageReview: 'Révision',
+        stageChallenge: 'Défi',
+        stageReadyForChallenge: 'Prêt pour le défi',
+        stageStrengtheningMemory: 'Renforcement de la mémoire',
+        stageLearningMeanings: 'Apprentissage des sens',
+        stageNewPack: 'Nouveau pack',
+        actionBridgeTitle: 'Constructeur de vocabulaire',
+        actionBridgeSubtitle: 'Idéal pour voir d’abord le mot, le son et le sens.',
+        actionStartBridge: 'Commencer : Constructeur de vocabulaire',
+        actionContinueBridge: 'Continuer : Constructeur de vocabulaire',
+        actionLoosePlanksTitle: 'Renforcer — Planches libres',
+        actionLoosePlanksSubtitle: 'Renforce avec une pratique ciblée.',
+        actionContinueLoosePlanks: 'Continuer : Planches libres',
+        actionDeepScriptTitle: 'Défi — Écriture profonde',
+        actionDeepScriptSubtitle: 'Teste ta maîtrise par l’écriture et le rappel.',
+        actionContinueDeepScript: 'Continuer : Écriture profonde',
+        actionReviewTitle: 'Révision',
+        actionReviewSubtitle: 'Garde ces mots bien frais.',
+        actionReviewPack: 'Réviser ce pack'
+      }
+    },
+    packs: {
+      greetings_01: {
+        title: 'Salutations',
+        description: 'Bonjour, merci et politesse de base'
+      },
+      pronouns_01: {
+        title: 'Pronoms',
+        description: 'Je, tu et les pronoms de base'
+      },
+      pronouns_02: {
+        title: 'Pronoms 2',
+        description: 'Il, elle, nous et ils'
+      },
+      family_01: {
+        title: 'Famille',
+        description: 'Maman, papa, famille et maison'
+      },
+      family_02: {
+        title: 'Famille 2',
+        description: 'Ami, enfant, parent, voisin et plus encore'
+      },
+      food_01: {
+        title: 'Nourriture et boisson',
+        description: 'Pain, eau, café et plus encore'
+      },
+      food_02: {
+        title: 'Nourriture et boisson 2',
+        description: 'Nourriture, eau et café'
+      },
+      adjectives_01: {
+        title: 'Adjectifs',
+        description: 'Bon, grand, petit et beau'
+      },
+      adjectives_02: {
+        title: 'Adjectifs 2',
+        description: 'Excellent, gentil, beau, mauvais et plus encore'
+      },
+      adjectives_03: {
+        title: 'Adjectifs 3',
+        description: 'Laid et étrange'
+      },
+      numbers_01: {
+        title: 'Nombres',
+        description: 'Compter de un à cinq'
+      },
+      colors_01: {
+        title: 'Couleurs',
+        description: 'Rouge, bleu, vert et plus encore'
+      },
+      everyday_objects_01: {
+        title: 'Objets du quotidien',
+        description: 'Livre, téléphone, table et porte'
+      },
+      everyday_objects_02: {
+        title: 'Objets du quotidien 2',
+        description: 'Livre, téléphone et chose'
+      }
+    }
   }
 };
