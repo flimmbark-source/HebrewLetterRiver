@@ -10,10 +10,16 @@ const PRACTICE_STORAGE_KEY = 'preferences.practiceLanguage';
 const APP_STORAGE_KEY = 'preferences.appLanguage';
 const LEGACY_STORAGE_KEY = 'preferences.language';
 
+// App language controls the interface dictionary, not the practice content pack.
+// Keep this list in sync with src/i18n/*.json. Practice language can still use
+// every language pack; unsupported UI languages should not silently fall back.
+const SUPPORTED_APP_LANGUAGE_IDS = ['english', 'hebrew'];
+
 const LanguageContext = createContext({
   languageId: defaultLanguageId,
   appLanguageId: defaultAppLanguageId,
   languageOptions: [],
+  appLanguageOptions: [],
   setLanguageId: () => {},
   selectLanguage: () => {},
   setAppLanguageId: () => {},
@@ -22,8 +28,12 @@ const LanguageContext = createContext({
   hasSelectedLanguage: false
 });
 
-function buildLanguageOptions() {
-  return Object.values(languagePacks)
+function buildLanguageOptions(languageIds = null) {
+  const packs = Array.isArray(languageIds)
+    ? languageIds.map((id) => languagePacks[id]).filter(Boolean)
+    : Object.values(languagePacks);
+
+  return packs
     .map((pack) => ({ id: pack.id, name: pack.name, metadata: pack.metadata ?? {} }))
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 }
@@ -37,17 +47,23 @@ function getValidLanguageId(candidateId, fallbackId) {
   return languagePacks[normalized] ? normalized : fallbackId;
 }
 
+function getValidAppLanguageId(candidateId, fallbackId = defaultAppLanguageId) {
+  const normalized = normalizeLanguageId(candidateId);
+  const isSupported = SUPPORTED_APP_LANGUAGE_IDS.includes(normalized);
+  return isSupported && languagePacks[normalized] ? normalized : fallbackId;
+}
+
 export function LanguageProvider({ children }) {
   const storedPractice = loadState(PRACTICE_STORAGE_KEY, null);
   const storedApp = loadState(APP_STORAGE_KEY, null);
   const legacyPreferences = loadState('preferences.language', null);
 
   const initialPracticeId = getValidLanguageId(
-    storedPractice?.id ?? legacyPreferences?.id,
+    storedPractice?.id ?? legacyPreferences?.practiceId ?? legacyPreferences?.id,
     defaultLanguageId
   );
-  const initialAppId = getValidLanguageId(
-    storedApp?.id ?? legacyPreferences?.id,
+  const initialAppId = getValidAppLanguageId(
+    storedApp?.id ?? legacyPreferences?.appId ?? legacyPreferences?.id,
     defaultAppLanguageId
   );
   const initialConfirmed =
@@ -86,7 +102,7 @@ export function LanguageProvider({ children }) {
 
   const setAppLanguageId = useCallback((nextId) => {
     setAppLanguageIdState((current) => {
-      const resolved = getValidLanguageId(nextId, current);
+      const resolved = getValidAppLanguageId(nextId, current);
       syncLegacyLanguagePreference(languageId, resolved, hasSelectedLanguage);
       return resolved;
     });
@@ -94,7 +110,7 @@ export function LanguageProvider({ children }) {
 
   const selectAppLanguage = useCallback((nextId) => {
     setAppLanguageIdState((current) => {
-      const resolved = getValidLanguageId(nextId, current);
+      const resolved = getValidAppLanguageId(nextId, current);
       syncLegacyLanguagePreference(languageId, resolved, true);
       return resolved;
     });
@@ -115,12 +131,14 @@ export function LanguageProvider({ children }) {
   }, [appLanguageId, hasSelectedLanguage]);
 
   const languageOptions = useMemo(() => buildLanguageOptions(), []);
+  const appLanguageOptions = useMemo(() => buildLanguageOptions(SUPPORTED_APP_LANGUAGE_IDS), []);
 
   const value = useMemo(
     () => ({
       languageId,
       appLanguageId,
       languageOptions,
+      appLanguageOptions,
       hasSelectedLanguage,
       setLanguageId,
       selectLanguage,
@@ -132,6 +150,7 @@ export function LanguageProvider({ children }) {
       languageId,
       appLanguageId,
       languageOptions,
+      appLanguageOptions,
       hasSelectedLanguage,
       setLanguageId,
       selectLanguage,
