@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -14,8 +13,6 @@ import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js
 import { languagePacks } from '../data/languages/index.js';
 import { getAllSeenWords, getSeenWordsUpdatedEventName } from '../lib/seenWordsStorage.ts';
 import { findDictionaryEntryForWord } from '../lib/sentenceDictionaryLookup.ts';
-import ContinueLearningCard from '../components/ContinueLearningCard.jsx';
-import JourneyMap from '../components/JourneyMap.jsx';
 import { loadState, saveState } from '../lib/storage.js';
 
 function useLearningStartDate() {
@@ -94,13 +91,17 @@ function LanguageCard({ id, label, value, onChange, options, leading, trailing }
 export default function HomeView() {
   const { player, starLevelSize, updatePlayerProfile } = useProgress();
   const { openGame, setShowPlayModal } = useGame();
-  const { languageId, appLanguageId, languageOptions, selectLanguage, selectAppLanguage } = useLanguage();
+  const { languageId, appLanguageId, languageOptions, appLanguageOptions, selectLanguage, selectAppLanguage } = useLanguage();
   const { t } = useLocalization();
-  const navigate = useNavigate();
 
   const displayLanguageOptions = useMemo(
     () => languageOptions.map((option) => ({ ...option, name: getFormattedLanguageName(option, t) })),
     [languageOptions, t]
+  );
+
+  const displayAppLanguageOptions = useMemo(
+    () => appLanguageOptions.map((option) => ({ ...option, name: getFormattedLanguageName(option, t) })),
+    [appLanguageOptions, t]
   );
 
   const starsPerLevel = starLevelSize ?? STAR_LEVEL_SIZE;
@@ -198,7 +199,6 @@ export default function HomeView() {
       const explicitLabel = modeLabelById[modeId];
       if (explicitLabel) return explicitLabel;
 
-      // Letter River practice submodes should display as the parent game name.
       if (
         modeId?.includes('consonants') ||
         modeId?.includes('forms') ||
@@ -211,10 +211,8 @@ export default function HomeView() {
       return modeId;
     });
 
-    // Show only one entry per game mode in profile activity.
     return Array.from(new Set(labels));
   }, [player?.modesPlayed, player?.recentModesPlayed, modeLabelById]);
-
 
   const modeDisplayByName = useMemo(() => ({
     'Letter River': { icon: 'waves', color: 'var(--app-mode-river)', bg: 'var(--app-mode-river-bg)', surface: 'var(--app-mode-river-surface)', border: 'var(--app-mode-river-bg)' },
@@ -286,11 +284,11 @@ export default function HomeView() {
               </div>
               <div>
                 <h1 className="text-2xl font-extrabold tracking-tight">{playerName}</h1>
-                <p className="line-clamp-1-stable text-sm opacity-70">Learning since {formattedStartDate}</p>
+                <p className="line-clamp-1-stable text-sm opacity-70">{t('home.profile.learningSince', 'Learning since {{date}}', { date: formattedStartDate })}</p>
               </div>
               <div className="mt-4 w-full space-y-2">
                 <div className="flex justify-between text-xs font-bold opacity-80">
-                  <span>LEVEL {level}</span>
+                  <span>{t('home.progress.levelLabel', 'LEVEL {{level}}', { level })}</span>
                   <span>{levelProgress.toLocaleString()} / {starsPerLevel.toLocaleString()} XP</span>
                 </div>
                 <div className="h-3 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255, 255, 255, 0.15)' }}>
@@ -301,46 +299,43 @@ export default function HomeView() {
           </div>
         </section>
 
-        {/* Streak Card */}
         <section className="animate-fade-in-up">
           <StreakCard />
         </section>
 
-        {/* Daily Review Card */}
         <section className="animate-fade-in-up">
           <DailyReviewCard />
         </section>
 
-        {/* Reminder Prompt (shows after 2-3 sessions) */}
         <ReminderPrompt />
 
         <section className="space-y-4">
-          <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Language Learning</h2>
+          <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>{t('home.languageLearning.title', 'Language Learning')}</h2>
           <div className="space-y-3">
             <LanguageCard
               id="home-app-language-select"
-              label={t('home.languagePicker.appLanguageLabel', 'App Language')}
+              label={t('app.languagePicker.label', 'App Language')}
               value={appLanguageId}
               onChange={selectAppLanguage}
-              options={displayLanguageOptions}
+              options={displayAppLanguageOptions}
               leading={<div className="flex h-12 w-12 items-center justify-center rounded-full shadow-sm" style={{ background: 'var(--app-primary-container)' }}><Icon style={{ color: 'var(--app-primary)' }}>language</Icon></div>}
               trailing={<Icon style={{ color: 'var(--app-outline)' }}>expand_more</Icon>}
             />
 
             <LanguageCard
               id="home-practice-language-select"
-              label="I'm Learning"
+              label={t('app.practicePicker.label', "I'm Learning")}
               value={languageId}
               onChange={selectLanguage}
               options={displayLanguageOptions}
               leading={<div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full text-2xl shadow-sm" style={{ background: 'var(--app-secondary-container)' }}>{LANGUAGE_FLAGS[languageId] ?? '🌐'}</div>}
-              trailing={<div className="flex items-center gap-3"><span className="rounded-full px-3 py-1 text-[10px] font-black" style={{ background: 'var(--app-primary-container)', color: 'var(--app-primary)' }}>ACTIVE</span><Icon style={{ color: 'var(--app-outline)' }}>swap_horiz</Icon></div>}
+              trailing={<div className="flex items-center gap-3"><span className="rounded-full px-3 py-1 text-[10px] font-black" style={{ background: 'var(--app-primary-container)', color: 'var(--app-primary)' }}>{t('common.active', 'ACTIVE')}</span><Icon style={{ color: 'var(--app-outline)' }}>swap_horiz</Icon></div>}
             />
           </div>
         </section>
 
         <section className="space-y-4">
-          <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>Profile Overview</h2>
+          <h2 className="px-2 text-xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>{t('home.profileOverview.title', 'Profile Overview')}</h2>
 
           <div className="card-elevated space-y-4 p-5">
             <div className="space-y-3">
@@ -357,7 +352,7 @@ export default function HomeView() {
                   ))}
                 </div>
               ) : (
-                <p className="line-clamp-2-stable text-sm" style={{ color: 'var(--app-muted)' }}>Catch a few letters to unlock your mastery row.</p>
+                <p className="line-clamp-2-stable text-sm" style={{ color: 'var(--app-muted)' }}>{t('home.progress.emptyMastery', 'Catch a few letters to unlock your mastery row.')}</p>
               )}
               {recentWords.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto pb-1">
@@ -371,7 +366,7 @@ export default function HomeView() {
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>Game Activity</p>
+              <p className="text-sm font-bold" style={{ color: 'var(--app-muted)' }}>{t('home.gameActivity.title', 'Game Activity')}</p>
               {recentModes.length > 0 ? (
                 recentModes.slice(0, 3).map((modeName) => {
                   const modeUi = modeDisplayByName[modeName] ?? { icon: 'sports_esports', color: 'var(--app-primary)', bg: 'var(--app-primary-container)' };
@@ -390,10 +385,9 @@ export default function HomeView() {
                   );
                 })
               ) : (
-                <p className="line-clamp-2-stable text-sm" style={{ color: 'var(--app-muted)' }}>Start a game and your latest activity will appear here.</p>
+                <p className="line-clamp-2-stable text-sm" style={{ color: 'var(--app-muted)' }}>{t('home.gameActivity.empty', 'Start a game and your latest activity will appear here.')}</p>
               )}
             </div>
-
           </div>
         </section>
 
@@ -418,10 +412,10 @@ export default function HomeView() {
                     className="w-20 rounded-lg px-2 py-1 text-sm font-semibold"
                     style={{ border: '1px solid var(--app-mode-bridge-bg)', background: 'rgba(255,255,255,0.7)', color: 'var(--app-on-surface)' }}
                   />
-                  <span className="text-xs font-semibold" style={{ color: 'var(--app-mode-bridge)' }}>mins/day</span>
+                  <span className="text-xs font-semibold" style={{ color: 'var(--app-mode-bridge)' }}>{t('home.quest.minutesPerDay', 'mins/day')}</span>
                 </div>
               ) : (
-                <p className="line-clamp-1-stable text-sm font-semibold" style={{ color: 'var(--app-mode-bridge)' }}>{dailyGoalMinutes} mins / day</p>
+                <p className="line-clamp-1-stable text-sm font-semibold" style={{ color: 'var(--app-mode-bridge)' }}>{t('home.quest.minutesPerDayValue', '{{minutes}} mins / day', { minutes: dailyGoalMinutes })}</p>
               )}
             </div>
           </div>
@@ -433,7 +427,7 @@ export default function HomeView() {
               </button>
             </div>
             <div>
-              <h3 className="leading-tight font-bold" style={{ color: 'var(--app-on-surface)' }}>Reminders</h3>
+              <h3 className="leading-tight font-bold" style={{ color: 'var(--app-on-surface)' }}>{t('home.reminders.title', 'Reminders')}</h3>
               {isEditingReminder ? (
                 <div className="mt-2 flex items-center gap-2">
                   <input
@@ -456,7 +450,6 @@ export default function HomeView() {
         <section className="pt-4 space-y-4">
           {isNewUser ? (
             <>
-              {/* Dominant Letter River card for new users */}
               <button
                 type="button"
                 onClick={() => openGame({ autostart: false })}
@@ -472,12 +465,11 @@ export default function HomeView() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-lg font-bold">{t('home.cta.letterRiver', 'Letter River')}</p>
-                  <p className="mt-0.5 text-sm opacity-80">Start learning letters through play</p>
+                  <p className="mt-0.5 text-sm opacity-80">{t('home.cta.startLetters', 'Start learning letters through play')}</p>
                 </div>
                 <Icon className="text-2xl shrink-0 opacity-70">arrow_forward</Icon>
               </button>
 
-              {/* Collapsed "More modes" section */}
               <div className="text-center">
                 <button
                   type="button"
@@ -489,7 +481,7 @@ export default function HomeView() {
                   style={{ color: 'var(--app-muted)', background: 'var(--app-surface, transparent)' }}
                 >
                   <Icon className="text-sm">expand_more</Icon>
-                  Show all modes
+                  {t('home.cta.showAllModes', 'Show all modes')}
                 </button>
               </div>
             </>
@@ -499,14 +491,14 @@ export default function HomeView() {
               className="btn-cta flex w-full items-center justify-center gap-3 py-5 text-lg"
               type="button"
             >
-              Start learning
+              {t('app.languagePicker.confirm', 'Start learning')}
               <Icon>arrow_forward</Icon>
             </button>
           )}
           <p className="mt-6 px-8 text-center text-xs leading-relaxed" style={{ color: 'var(--app-muted)' }}>
-            Your progress is automatically synced with your cloud account.
+            {t('home.footer.syncNotice', 'Your progress is automatically synced with your cloud account.')}
             {' '}
-            <a className="font-bold underline underline-offset-4" style={{ color: 'var(--app-primary)' }} href="#">Privacy Policy</a>
+            <a className="font-bold underline underline-offset-4" style={{ color: 'var(--app-primary)' }} href="#">{t('home.footer.privacyPolicy', 'Privacy Policy')}</a>
           </p>
         </section>
       </main>
