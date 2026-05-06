@@ -906,6 +906,7 @@ body.no-scroll {
 .pack-detail-scroll,
 .intro-screen {
   padding-bottom: var(--bottom-nav-safe-space);
+  scroll-padding-bottom: var(--bottom-nav-safe-space);
 }
 
 .bottom-nav {
@@ -938,6 +939,14 @@ body.no-scroll {
     margin: 0 auto;
     border-radius: 0;
   }
+}
+
+/* Route-level full-screen Tailwind containers can bypass app-shell spacing.
+   Ensure they reserve the same bottom-safe area on mobile. */
+.page-scroll > [class*="min-h-screen"],
+.page-scroll > [class*="h-screen"] {
+  padding-bottom: var(--bottom-nav-safe-space);
+  scroll-padding-bottom: var(--bottom-nav-safe-space);
 }
 
 /* Legacy nav classes — unused by current App shell (see index.css for active nav styles).

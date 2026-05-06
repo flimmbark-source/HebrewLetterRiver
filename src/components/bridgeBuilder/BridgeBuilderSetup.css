@@ -135,7 +135,7 @@ body.dark-mode .bbs-review-btn { background: #10b981; color: #020617; }
 .bbs-screen {
   position: fixed;
   inset: 0;
-  bottom: 64px;
+  bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   font-family: var(--m3-font);
@@ -148,6 +148,8 @@ body.dark-mode .bbs-review-btn { background: #10b981; color: #020617; }
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 24px;
+  padding-bottom: var(--bottom-nav-safe-space);
+  scroll-padding-bottom: var(--bottom-nav-safe-space);
 }
 
 .bbs-content--journey {
