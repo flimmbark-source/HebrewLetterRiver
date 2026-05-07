@@ -11,22 +11,25 @@ body.scenic-home-route .main-content,
 body.scenic-home-route .page-scroll {
   min-height: auto !important;
   padding-bottom: 0 !important;
-  scroll-padding-bottom: 0 !important;
+  scroll-padding-bottom: calc(var(--bottom-nav-height, 76px) + env(safe-area-inset-bottom, 0px) + 12px) !important;
 }
 
 body.scenic-home-route .scenic-home {
   min-height: auto !important;
-  padding-bottom: 0 !important;
+  padding-bottom: calc(var(--bottom-nav-height, 76px) + env(safe-area-inset-bottom, 0px) + 12px) !important;
 }
 
 body.scenic-home-route .scenic-home__frame,
 body.scenic-home-route .scenic-home__content {
   margin-bottom: 0 !important;
+}
+
+body.scenic-home-route .scenic-home__content {
   padding-bottom: 0 !important;
 }
 
 body.scenic-home-route .scenic-stats-row {
-  margin-bottom: 8px !important;
+  margin-bottom: 0 !important;
 }
 
 body.scenic-home-route .scenic-home-hero__copy {
@@ -54,11 +57,15 @@ body.scenic-home-route .scenic-home-hero__subtitle {
   body.scenic-home-route .app-shell,
   body.scenic-home-route .app-main,
   body.scenic-home-route .main-content,
-  body.scenic-home-route .page-scroll,
-  body.scenic-home-route .scenic-home {
+  body.scenic-home-route .page-scroll {
     min-height: auto !important;
     padding-bottom: 0 !important;
-    scroll-padding-bottom: 0 !important;
+    scroll-padding-bottom: calc(var(--bottom-nav-height, 76px) + env(safe-area-inset-bottom, 0px) + 10px) !important;
+  }
+
+  body.scenic-home-route .scenic-home {
+    min-height: auto !important;
+    padding-bottom: calc(var(--bottom-nav-height, 76px) + env(safe-area-inset-bottom, 0px) + 10px) !important;
   }
 
   body.scenic-home-route .scenic-home__content {
@@ -67,7 +74,7 @@ body.scenic-home-route .scenic-home-hero__subtitle {
   }
 
   body.scenic-home-route .scenic-stats-row {
-    margin-bottom: 6px !important;
+    margin-bottom: 0 !important;
   }
 
   body.scenic-home-route .scenic-home-hero__copy {
