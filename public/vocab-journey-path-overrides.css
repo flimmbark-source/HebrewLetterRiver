@@ -1,0 +1,113 @@
+/* Temporary journey-map refinement layer.
+   Loaded from index.html so it can safely override the existing bundled component CSS. */
+
+.vj-river-path {
+  min-height: 620px !important;
+}
+
+.vj-path-overlay {
+  min-height: 620px !important;
+  align-items: stretch !important;
+}
+
+.vj-path-stop--current:has(.vj-pack-tray) {
+  min-height: 248px !important;
+  margin-bottom: 10px !important;
+}
+
+.vj-path-stop--current:has(.vj-pack-tray) .vj-path-stop-action {
+  min-height: 86px !important;
+}
+
+.vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray {
+  top: 98px !important;
+  left: 22px !important;
+  right: 22px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding: 12px !important;
+  border-radius: 20px !important;
+}
+
+.vj-pack-tray h3 {
+  font-size: 0.82rem !important;
+  margin-bottom: 9px !important;
+}
+
+.vj-pack-tray-row--compact {
+  grid-template-columns: 22px minmax(0, 1fr) auto !important;
+  min-height: 38px !important;
+  gap: 8px !important;
+  padding: 7px 8px !important;
+}
+
+.vj-pack-tray-row--compact .vj-pack-tray-status {
+  grid-column: auto !important;
+  font-size: 0.68rem !important;
+}
+
+.vj-pack-tray-title {
+  font-size: 0.82rem !important;
+}
+
+.vj-pack-tray-more {
+  min-height: 36px !important;
+  margin-top: 9px !important;
+}
+
+.vj-river-path:has(.vj-pack-drawer) .vj-path-stop--current {
+  min-height: 410px !important;
+  margin-bottom: 12px !important;
+}
+
+.vj-river-path:has(.vj-pack-drawer) .vj-path-stop--current .vj-path-stop-action {
+  min-height: 86px !important;
+}
+
+.vj-river-path:has(.vj-pack-drawer) .vj-pack-drawer {
+  top: calc(50% + 54px) !important;
+  bottom: auto !important;
+  left: 22px !important;
+  right: 22px !important;
+  max-height: 330px !important;
+  border-radius: 24px !important;
+}
+
+@media (max-width: 560px) {
+  .vj-river-path {
+    min-height: 650px !important;
+  }
+
+  .vj-path-overlay {
+    min-height: 650px !important;
+    padding-top: 42px !important;
+    padding-bottom: 58px !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-tray) {
+    min-height: 270px !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray {
+    top: 88px !important;
+    left: 12px !important;
+    right: 12px !important;
+    padding: 11px !important;
+  }
+
+  .vj-river-path:has(.vj-pack-drawer) .vj-path-stop--current {
+    min-height: 430px !important;
+  }
+
+  .vj-river-path:has(.vj-pack-drawer) .vj-pack-drawer {
+    top: calc(50% + 42px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    max-height: 360px !important;
+  }
+
+  .vj-pack-drawer-list .vj-pack-tray-row {
+    min-height: 48px !important;
+  }
+}
