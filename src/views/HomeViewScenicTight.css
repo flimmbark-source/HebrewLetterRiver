@@ -1,79 +1,101 @@
 /* Route-specific scenic home refinements.
    Loaded after HomeViewScenic.css so these rules intentionally override the base scenic layout. */
 
+.app-shell:has(.scenic-home) {
+  padding-bottom: 0 !important;
+}
+
 .app-main:has(.scenic-home),
-.page-scroll:has(> .scenic-home) {
-  padding-bottom: 0;
-  scroll-padding-bottom: 0;
+.main-content:has(.scenic-home),
+.page-scroll:has(.scenic-home) {
+  min-height: 0 !important;
+  padding-bottom: 0 !important;
+  scroll-padding-bottom: 0 !important;
+}
+
+.page-scroll:has(.scenic-home) > .scenic-home {
+  padding-bottom: 0 !important;
 }
 
 .scenic-home {
-  min-height: auto;
-  padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));
+  min-height: auto !important;
+  padding-bottom: 0 !important;
 }
 
 .scenic-home__frame,
 .scenic-home__content {
-  margin-bottom: 0;
-  padding-bottom: 0;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .scenic-stats-row {
-  margin-bottom: 0;
+  margin-bottom: max(10px, env(safe-area-inset-bottom, 0px)) !important;
 }
 
 .scenic-home-hero__copy {
-  padding-top: 26px;
-  padding-bottom: 126px;
+  padding-top: 30px !important;
+  padding-bottom: 126px !important;
 }
 
 .scenic-language-row {
-  margin-bottom: 18px;
+  margin-bottom: 20px !important;
 }
 
 .scenic-home-hero__copy h1 {
-  line-height: 1.14;
+  line-height: 1.16 !important;
   padding-inline: 10px;
 }
 
 .scenic-home-hero__subtitle {
-  margin-top: 12px;
+  display: block;
+  margin-top: 24px !important;
   padding-inline: 10px;
-  line-height: 1.28;
+  line-height: 1.35 !important;
 }
 
 @media (max-width: 430px) {
+  .app-shell:has(.scenic-home) {
+    padding-bottom: 0 !important;
+  }
+
   .app-main:has(.scenic-home),
-  .page-scroll:has(> .scenic-home) {
-    padding-bottom: 0;
-    scroll-padding-bottom: 0;
+  .main-content:has(.scenic-home),
+  .page-scroll:has(.scenic-home) {
+    min-height: 0 !important;
+    padding-bottom: 0 !important;
+    scroll-padding-bottom: 0 !important;
   }
 
   .scenic-home {
-    padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    padding-bottom: 0 !important;
   }
 
   .scenic-home__content {
     margin-top: -76px;
-    padding-bottom: 0;
+    padding-bottom: 0 !important;
+  }
+
+  .scenic-stats-row {
+    margin-bottom: max(8px, env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .scenic-home-hero__copy {
-    padding-top: 22px;
-    padding-bottom: 118px;
+    padding-top: 26px !important;
+    padding-bottom: 118px !important;
   }
 
   .scenic-language-row {
-    margin-bottom: 16px;
+    margin-bottom: 18px !important;
   }
 
   .scenic-home-hero__copy h1 {
-    line-height: 1.16;
+    line-height: 1.18 !important;
     padding-inline: 14px;
   }
 
   .scenic-home-hero__subtitle {
-    margin-top: 13px;
+    margin-top: 26px !important;
     padding-inline: 16px;
+    line-height: 1.35 !important;
   }
 }
