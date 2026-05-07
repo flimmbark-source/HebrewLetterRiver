@@ -56,21 +56,21 @@
   margin-top: 9px !important;
 }
 
-.vj-river-path:has(.vj-pack-drawer) .vj-path-stop--current {
+.vj-path-stop--current:has(.vj-pack-drawer) {
   min-height: 430px !important;
   margin-bottom: 10px !important;
 }
 
-.vj-river-path:has(.vj-pack-drawer) .vj-path-stop--current .vj-path-stop-action {
+.vj-path-stop--current:has(.vj-pack-drawer) .vj-path-stop-action {
   min-height: 86px !important;
 }
 
-.vj-river-path:has(.vj-pack-drawer) .vj-pack-drawer {
-  top: calc(50% - 10px) !important;
+.vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
+  top: 98px !important;
   bottom: auto !important;
   left: 22px !important;
   right: 22px !important;
-  max-height: 330px !important;
+  max-height: 320px !important;
   border-radius: 24px !important;
 }
 
@@ -96,15 +96,15 @@
     padding: 11px !important;
   }
 
-  .vj-river-path:has(.vj-pack-drawer) .vj-path-stop--current {
+  .vj-path-stop--current:has(.vj-pack-drawer) {
     min-height: 450px !important;
   }
 
-  .vj-river-path:has(.vj-pack-drawer) .vj-pack-drawer {
-    top: calc(50% - 8px) !important;
+  .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
+    top: 88px !important;
     left: 12px !important;
     right: 12px !important;
-    max-height: 360px !important;
+    max-height: 350px !important;
   }
 
   .vj-pack-drawer-list .vj-pack-tray-row {
