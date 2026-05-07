@@ -399,6 +399,7 @@ export default function VocabJourneyPanel({
   const languageId = languageIdProp || selectedPracticeLanguageId || 'hebrew';
   const [previewWordsReady, setPreviewWordsReady] = useState(languageId === 'hebrew');
   const [isPackTrayExpanded, setIsPackTrayExpanded] = useState(false);
+  const [focusedSectionId, setFocusedSectionId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -432,12 +433,27 @@ export default function VocabJourneyPanel({
   const localizedPackDescription = currentPack ? t(`packs.${currentPack.id}.description`, currentPack.description || '') : '';
   const currentCompletion = currentPackData?.completion;
 
-  const selectedSectionItem = useMemo(() => {
-    if (!currentPack) return sectionData.find((sectionItem) => sectionItem.unlocked) || sectionData[0] || null;
+  const currentPackSectionId = useMemo(() => {
+    if (!currentPack) return null;
     return sectionData.find((sectionItem) =>
       (sectionItem.packData || []).some((packItem) => packItem.pack?.id === currentPack.id)
-    ) || sectionData.find((sectionItem) => sectionItem.unlocked) || sectionData[0] || null;
+    )?.section?.id || null;
   }, [currentPack, sectionData]);
+
+  useEffect(() => {
+    if (currentPackSectionId) {
+      setFocusedSectionId(currentPackSectionId);
+    }
+  }, [currentPackSectionId, currentPack?.id]);
+
+  const activePathSectionId = focusedSectionId || currentPackSectionId;
+  const selectedSectionItem = useMemo(() => {
+    if (activePathSectionId) {
+      const focusedSection = sectionData.find((sectionItem) => sectionItem.section?.id === activePathSectionId);
+      if (focusedSection) return focusedSection;
+    }
+    return sectionData.find((sectionItem) => sectionItem.unlocked) || sectionData[0] || null;
+  }, [activePathSectionId, sectionData]);
 
   useEffect(() => {
     setIsPackTrayExpanded(false);
@@ -462,11 +478,12 @@ export default function VocabJourneyPanel({
       requestedPackLanguage: languageId,
       previewWordsReady,
       resolvedPackId: currentPack?.id ?? null,
+      focusedSectionId,
       resolvedWordsCount: displayWords.length,
       usedFallbackContent: preview.usedFallback,
       missingPackMapping
     });
-  }, [languageId, previewWordsReady, currentPack?.id, displayWords.length, preview.usedFallback, missingPackMapping]);
+  }, [languageId, previewWordsReady, currentPack?.id, focusedSectionId, displayWords.length, preview.usedFallback, missingPackMapping]);
 
   const stageInfo = useMemo(() => getPackLearningStage(currentProgress, currentCompletion), [currentProgress, currentCompletion]);
   const localizedStageInfo = useMemo(() => localizeStageInfo(stageInfo, t), [stageInfo, t]);
@@ -597,20 +614,24 @@ export default function VocabJourneyPanel({
           <div className="vj-path-overlay">
             {journeyStops.map((stop) => {
               const locked = stop.status === 'Locked';
-              const statusLabel = getStopStatusLabel(stop.status, t);
-              const isCurrentStop = stop.status === 'Current';
-              const showSectionPacks = isCurrentStop && selectedSectionItem?.section?.id === stop.id;
+              const isCurrentPackStop = stop.status === 'Current';
+              const isFocusedStop = activePathSectionId ? stop.id === activePathSectionId : isCurrentPackStop;
+              const statusLabel = isFocusedStop && isCurrentPackStop
+                ? getStopStatusLabel('Current', t)
+                : getStopStatusLabel(stop.status === 'Current' ? 'Open' : stop.status, t);
+              const showSectionPacks = isFocusedStop && selectedSectionItem?.section?.id === stop.id;
               return (
                 <div
                   key={stop.id}
-                  className={`vj-path-stop ${isCurrentStop ? 'vj-path-stop--current' : ''} ${locked ? 'vj-path-stop--locked' : ''}`}
+                  className={`vj-path-stop ${isFocusedStop ? 'vj-path-stop--current' : ''} ${locked ? 'vj-path-stop--locked' : ''}`}
                 >
                   <button
                     type="button"
                     className="vj-path-stop-action"
                     onClick={() => {
-                      if (!locked && stop.representativePackId && onSelectPack) {
-                        onSelectPack(stop.representativePackId);
+                      if (!locked) {
+                        setFocusedSectionId(stop.id);
+                        setIsPackTrayExpanded(false);
                       }
                     }}
                     disabled={locked}
