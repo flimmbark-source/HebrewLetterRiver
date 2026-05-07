@@ -599,6 +599,7 @@ export default function VocabJourneyPanel({
               const locked = stop.status === 'Locked';
               const statusLabel = getStopStatusLabel(stop.status, t);
               const isCurrentStop = stop.status === 'Current';
+              const showSectionPacks = isCurrentStop && selectedSectionItem?.section?.id === stop.id;
               return (
                 <div
                   key={stop.id}
@@ -627,30 +628,20 @@ export default function VocabJourneyPanel({
                         ? <Icon className="vj-path-check" filled>check_circle</Icon>
                         : <Icon>chevron_right</Icon>}
                   </button>
-                  {isCurrentStop && selectedSectionItem?.section?.id === stop.id && !isPackTrayExpanded && (
+                  {showSectionPacks && (
                     <SectionPackTray
                       sectionItem={selectedSectionItem}
                       currentPackId={currentPack.id}
                       t={t}
                       onSelectPack={onSelectPack}
-                      expanded={false}
-                      onToggleExpanded={() => setIsPackTrayExpanded(true)}
+                      expanded={isPackTrayExpanded}
+                      onToggleExpanded={() => setIsPackTrayExpanded((value) => !value)}
                     />
                   )}
                 </div>
               );
             })}
           </div>
-          {isPackTrayExpanded && selectedSectionItem && (
-            <SectionPackTray
-              sectionItem={selectedSectionItem}
-              currentPackId={currentPack.id}
-              t={t}
-              onSelectPack={onSelectPack}
-              expanded
-              onToggleExpanded={() => setIsPackTrayExpanded(false)}
-            />
-          )}
         </aside>
       </div>
       <CurrentPackDetailSheet
