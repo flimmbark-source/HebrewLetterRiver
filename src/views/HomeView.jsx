@@ -34,7 +34,7 @@ export default function HomeView() {
     selectLanguage,
     selectAppLanguage
   } = useLanguage();
-  const { t } = useLocalization();
+  const { t, languagePack } = useLocalization();
   const navigate = useNavigate();
   const [isProfileEditorOpen, setIsProfileEditorOpen] = React.useState(false);
 
@@ -64,24 +64,40 @@ export default function HomeView() {
     [appLanguageOptions, t]
   );
 
+  const practiceLanguageName = useMemo(() => {
+    const selectedOption = displayLanguageOptions.find((option) => option.id === languageId);
+    return selectedOption?.name ?? languagePack?.name ?? languageId;
+  }, [displayLanguageOptions, languageId, languagePack]);
+
   const primaryState = useMemo(
-    () => getHomeStateForStage({ selectedStage, player, statistics, daily, streak, openGame, navigate }),
-    [selectedStage, player, statistics, daily, streak, openGame, navigate]
+    () => getHomeStateForStage({
+      selectedStage,
+      player,
+      statistics,
+      daily,
+      streak,
+      languagePack,
+      practiceLanguageName,
+      t,
+      openGame,
+      navigate
+    }),
+    [selectedStage, player, statistics, daily, streak, languagePack, practiceLanguageName, t, openGame, navigate]
   );
 
   const planRows = useMemo(
-    () => getTodayPlanRows({ primaryState, statistics, navigate, openGame }),
-    [primaryState, statistics, navigate, openGame]
+    () => getTodayPlanRows({ primaryState, statistics, navigate, openGame, t }),
+    [primaryState, statistics, navigate, openGame, t]
   );
 
   const stats = useMemo(
-    () => getHomeStats({ statistics, streak, daily }),
-    [statistics, streak, daily]
+    () => getHomeStats({ statistics, streak, daily, t }),
+    [statistics, streak, daily, t]
   );
 
   return (
     <div className="scenic-home">
-      <main className="scenic-home__frame stagger-children" aria-label="Letter River home">
+      <main className="scenic-home__frame stagger-children" aria-label={t('home.scenic.brand', 'Letter River')}>
         <ScenicHomeHero
           streakDays={streak?.current || 12}
           appLanguageId={appLanguageId}
@@ -91,17 +107,19 @@ export default function HomeView() {
           onAppLanguageChange={selectAppLanguage}
           onPracticeLanguageChange={selectLanguage}
           onProfileClick={() => setIsProfileEditorOpen(true)}
+          t={t}
         />
 
         <div className="scenic-home__content">
-          <ContinueJourneyCard state={primaryState} />
-          <TodayPlanCard rows={planRows} />
+          <ContinueJourneyCard state={primaryState} t={t} />
+          <TodayPlanCard rows={planRows} t={t} />
           <HomeLearningPath
             currentStage={currentStage}
             selectedStage={selectedStage}
             onSelectStage={setSelectedStage}
+            t={t}
           />
-          <HomeStatsRow stats={stats} />
+          <HomeStatsRow stats={stats} t={t} />
         </div>
       </main>
 
