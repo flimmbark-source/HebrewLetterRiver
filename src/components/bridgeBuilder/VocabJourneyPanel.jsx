@@ -12,6 +12,7 @@ import {
   getJourneyStats,
 } from './vocabJourneyModel.js';
 import './VocabJourneyPanel.css';
+import './VocabJourneyMobileTray.css';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import { useLanguage } from '../../context/LanguageContext.jsx';
 import { loadBridgeBuilderWords } from '../../data/bridgeBuilder/words/index.js';
