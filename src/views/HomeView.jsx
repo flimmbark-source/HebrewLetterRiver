@@ -13,7 +13,12 @@ import ContinueJourneyCard from '../components/home/ContinueJourneyCard.jsx';
 import TodayPlanCard from '../components/home/TodayPlanCard.jsx';
 import HomeLearningPath from '../components/home/HomeLearningPath.jsx';
 import HomeStatsRow from '../components/home/HomeStatsRow.jsx';
-import { getHomePrimaryState, getHomeStats, getTodayPlanRows } from '../components/home/homeState.js';
+import {
+  getCurrentHomeStage,
+  getHomeStateForStage,
+  getHomeStats,
+  getTodayPlanRows
+} from '../components/home/homeState.js';
 import './HomeViewScenic.css';
 import './HomeViewScenicTight.css';
 
@@ -38,6 +43,17 @@ export default function HomeView() {
     return () => document.body.classList.remove('scenic-home-route');
   }, []);
 
+  const currentStage = useMemo(
+    () => getCurrentHomeStage({ player, statistics }),
+    [player, statistics]
+  );
+
+  const [selectedStage, setSelectedStage] = React.useState(currentStage);
+
+  React.useEffect(() => {
+    setSelectedStage(currentStage);
+  }, [currentStage, languageId]);
+
   const displayLanguageOptions = useMemo(
     () => languageOptions.map((option) => ({ ...option, name: getFormattedLanguageName(option, t) })),
     [languageOptions, t]
@@ -49,8 +65,8 @@ export default function HomeView() {
   );
 
   const primaryState = useMemo(
-    () => getHomePrimaryState({ player, statistics, daily, streak, openGame, navigate }),
-    [player, statistics, daily, streak, openGame, navigate]
+    () => getHomeStateForStage({ selectedStage, player, statistics, daily, streak, openGame, navigate }),
+    [selectedStage, player, statistics, daily, streak, openGame, navigate]
   );
 
   const planRows = useMemo(
@@ -80,7 +96,11 @@ export default function HomeView() {
         <div className="scenic-home__content">
           <ContinueJourneyCard state={primaryState} />
           <TodayPlanCard rows={planRows} />
-          <HomeLearningPath currentStage={primaryState.currentStage} />
+          <HomeLearningPath
+            currentStage={currentStage}
+            selectedStage={selectedStage}
+            onSelectStage={setSelectedStage}
+          />
           <HomeStatsRow stats={stats} />
         </div>
       </main>
