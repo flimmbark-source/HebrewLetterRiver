@@ -529,7 +529,8 @@
 .vj-option-icon--purple { background: #8062ba; }
 
 .vj-river-path {
-  min-height: 540px;
+  position: relative;
+  min-height: 560px;
   border-radius: 24px;
   overflow: hidden;
   background-size: cover;
@@ -537,54 +538,114 @@
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35), 0 10px 28px rgba(18,73,61,0.1);
 }
 
+.vj-river-path::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(14,76,83,0.16)),
+    radial-gradient(circle at 50% 8%, rgba(255,255,255,0.32), transparent 32%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .vj-path-overlay {
-  display: grid;
-  gap: 10px;
-  min-height: 540px;
-  padding: 220px 14px 28px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(14,76,83,0.08));
+  --route-line-x: 54px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-height: 560px;
+  padding: 170px 18px 34px;
+}
+
+.vj-path-overlay::before {
+  content: "";
+  position: absolute;
+  left: var(--route-line-x);
+  top: 194px;
+  bottom: 62px;
+  width: 6px;
+  border-radius: 999px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.95) 0 8px,
+    rgba(255, 255, 255, 0) 8px 17px
+  );
+  filter: drop-shadow(0 2px 3px rgba(18, 73, 61, 0.28));
+  pointer-events: none;
 }
 
 .vj-path-stop {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
-  min-height: 60px;
+  gap: 10px;
+  width: min(86%, 330px);
+  min-height: 66px;
+  margin: 0 0 0 calc(var(--route-line-x) - 22px);
   border-radius: 999px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.9);
+  padding: 10px 14px 10px 62px;
+  background: rgba(255, 255, 255, 0.91);
   color: #173b31;
-  box-shadow: 0 8px 20px rgba(18, 73, 61, 0.14);
+  box-shadow:
+    0 10px 24px rgba(18, 73, 61, 0.18),
+    inset 0 0 0 1px rgba(255,255,255,0.72);
   backdrop-filter: blur(10px);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.vj-path-stop:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 30px rgba(18, 73, 61, 0.22),
+    inset 0 0 0 1px rgba(255,255,255,0.78);
 }
 
 .vj-path-stop:nth-child(even) {
-  margin-left: 46px;
+  margin-left: calc(var(--route-line-x) + 16px);
 }
 
 .vj-path-stop:nth-child(odd) {
-  margin-right: 46px;
+  margin-right: 0;
 }
 
 .vj-path-stop--current {
-  outline: 3px solid rgba(69, 146, 204, 0.35);
+  background: rgba(255, 255, 255, 0.96);
+  outline: 4px solid rgba(69, 146, 204, 0.4);
+  box-shadow:
+    0 14px 34px rgba(18, 73, 61, 0.24),
+    inset 0 0 0 1px rgba(255,255,255,0.8);
 }
 
 .vj-path-stop--locked {
-  opacity: 0.72;
-  filter: saturate(0.45);
+  opacity: 0.78;
+  filter: saturate(0.58);
 }
 
 .vj-path-icon {
+  position: absolute;
+  left: 0;
+  top: 50%;
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
+  width: 58px;
+  height: 58px;
   border-radius: 999px;
+  transform: translate(-4px, -50%);
   background: #4f9b65;
   color: white;
-  box-shadow: 0 4px 12px rgba(23, 59, 49, 0.18);
+  border: 5px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 8px 18px rgba(23, 59, 49, 0.22),
+    0 0 0 1px rgba(18, 73, 61, 0.1);
+}
+
+.vj-path-icon .material-symbols-outlined {
+  font-size: 26px;
 }
 
 .vj-path-stop--current .vj-path-icon {
@@ -592,7 +653,7 @@
 }
 
 .vj-path-stop--locked .vj-path-icon {
-  background: #8f9ca2;
+  background: #988c6d;
 }
 
 .vj-path-check {
@@ -600,7 +661,8 @@
 }
 
 .vj-path-copy strong {
-  font-size: 0.93rem;
+  font-size: 0.95rem;
+  line-height: 1.05;
 }
 
 .vj-path-copy small {
@@ -651,7 +713,31 @@
   }
 
   .vj-path-overlay {
+    --route-line-x: 48px;
     min-height: 500px;
-    padding-top: 190px;
+    padding: 158px 14px 28px;
+    gap: 18px;
+  }
+
+  .vj-path-overlay::before {
+    top: 178px;
+    bottom: 56px;
+  }
+
+  .vj-path-stop {
+    width: calc(100% - 42px);
+    min-height: 58px;
+    margin-left: calc(var(--route-line-x) - 18px);
+    padding: 8px 12px 8px 56px;
+  }
+
+  .vj-path-stop:nth-child(even) {
+    margin-left: calc(var(--route-line-x) + 8px);
+  }
+
+  .vj-path-icon {
+    width: 52px;
+    height: 52px;
+    border-width: 4px;
   }
 }
