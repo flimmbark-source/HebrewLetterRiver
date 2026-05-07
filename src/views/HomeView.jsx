@@ -15,6 +15,7 @@ import HomeLearningPath from '../components/home/HomeLearningPath.jsx';
 import HomeStatsRow from '../components/home/HomeStatsRow.jsx';
 import { getHomePrimaryState, getHomeStats, getTodayPlanRows } from '../components/home/homeState.js';
 import './HomeViewScenic.css';
+import './HomeViewScenicTight.css';
 
 export default function HomeView() {
   const { player, streak, daily, updatePlayerProfile } = useProgress();
