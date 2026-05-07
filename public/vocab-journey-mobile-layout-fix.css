@@ -1,0 +1,128 @@
+/* Mobile layout fix for the Vocabulary Journey pack tray/drawer.
+   The older override positioned the tray absolutely inside the current path stop,
+   which could make the tray overlap the next section node and bottom path label on phones.
+   On mobile, keep the tray/drawer in normal flow below the selected section header. */
+
+@media (max-width: 560px) {
+  .vj-river-path {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .vj-river-path::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .vj-path-overlay {
+    min-height: 0 !important;
+    justify-content: flex-start !important;
+    gap: 24px !important;
+    padding: 38px 10px 72px !important;
+  }
+
+  .vj-path-overlay::before {
+    top: 52px !important;
+    bottom: 76px !important;
+  }
+
+  .vj-path-stop,
+  .vj-path-stop--current,
+  .vj-path-stop--current:has(.vj-pack-tray),
+  .vj-path-stop--current:has(.vj-pack-drawer) {
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  .vj-path-stop-action,
+  .vj-path-stop--current:has(.vj-pack-tray) .vj-path-stop-action,
+  .vj-path-stop--current:has(.vj-pack-drawer) .vj-path-stop-action {
+    min-height: 78px !important;
+  }
+
+  .vj-path-copy {
+    width: calc(100% - var(--route-line-x) - 38px) !important;
+    margin-left: calc(var(--route-line-x) + 32px) !important;
+  }
+
+  .vj-path-stop-action > .material-symbols-outlined:last-child {
+    right: 12px !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray,
+  .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: calc(100% - 18px) !important;
+    max-width: none !important;
+    margin: 10px auto 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .vj-pack-tray {
+    padding: 13px 12px 12px !important;
+    border-radius: 24px !important;
+    overflow: visible !important;
+  }
+
+  .vj-pack-tray h3 {
+    margin: 0 0 12px !important;
+    padding-inline: 3px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .vj-pack-tray-list,
+  .vj-pack-drawer-list {
+    gap: 13px !important;
+  }
+
+  .vj-pack-tray-row,
+  .vj-pack-tray-row--compact,
+  .vj-pack-drawer-list .vj-pack-tray-row {
+    grid-template-columns: 36px minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    min-height: 48px !important;
+    transform: none !important;
+  }
+
+  .vj-pack-tray-row:nth-child(even),
+  .vj-pack-drawer-list .vj-pack-tray-row:nth-child(even) {
+    transform: none !important;
+  }
+
+  .vj-pack-tray-title {
+    min-height: 46px !important;
+    padding: 8px 11px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .vj-pack-tray-status {
+    min-width: 46px !important;
+    padding: 4px 6px !important;
+    font-size: 0.62rem !important;
+  }
+
+  .vj-pack-tray-more {
+    width: 100% !important;
+    margin: 14px 0 0 !important;
+  }
+
+  .vj-pack-drawer {
+    max-height: min(58vh, 420px) !important;
+    padding: 13px !important;
+    border-radius: 24px !important;
+  }
+
+  .vj-pack-drawer-list {
+    max-height: min(44vh, 310px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 4px 4px 12px 0 !important;
+  }
+}
