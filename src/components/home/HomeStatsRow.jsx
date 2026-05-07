@@ -12,9 +12,9 @@ function Icon({ children, filled = true }) {
   );
 }
 
-export default function HomeStatsRow({ stats }) {
+export default function HomeStatsRow({ stats, t }) {
   return (
-    <section className="scenic-stats-row" aria-label="Daily progress summary">
+    <section className="scenic-stats-row" aria-label={t('home.scenic.statsAria', 'Daily progress summary')}>
       {stats.map((stat) => (
         <div key={stat.id} className="scenic-stat-card">
           <span className={`scenic-stat-card__icon scenic-tone-${stat.tone}`}>
