@@ -11,6 +11,7 @@ import { spanishPackMetadataSupplemental } from './supplemental.packs.spanish.js
 import { frenchPackMetadataSupplemental } from './supplemental.packs.french.js';
 import { additionalPackMetadataSupplementals } from './supplemental.packs.additional.js';
 import { scenicHomeSupplementalDictionaries } from './supplemental.scenicHome.js';
+import { extraScenicHomeSupplementalDictionaries } from './supplemental.scenicHome.extra.js';
 
 function deepMergeSupplemental(...sources) {
   return sources.reduce((merged, source) => {
@@ -43,7 +44,11 @@ function mergeSupplementalPackMetadata(languageId, baseDictionary, packMetadata)
 }
 
 function withScenicHome(languageId, dictionary) {
-  return deepMergeSupplemental(dictionary, scenicHomeSupplementalDictionaries[languageId]);
+  return deepMergeSupplemental(
+    dictionary,
+    scenicHomeSupplementalDictionaries[languageId],
+    extraScenicHomeSupplementalDictionaries[languageId]
+  );
 }
 
 const supplementalDictionaries = {
