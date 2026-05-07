@@ -1,0 +1,442 @@
+/* Temporary journey-map refinement layer.
+   Loaded from index.html so it can safely override the existing bundled component CSS. */
+
+.vj-river-path {
+  height: clamp(560px, 78vh, 680px) !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior-y: auto !important;
+  overscroll-behavior-x: contain !important;
+  touch-action: pan-y !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin !important;
+}
+
+.vj-river-path::after {
+  content: "" !important;
+  position: sticky !important;
+  display: block !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 34px !important;
+  margin-top: -34px !important;
+  background: linear-gradient(180deg, rgba(232, 247, 242, 0), rgba(21, 92, 84, 0.16)) !important;
+  pointer-events: none !important;
+  z-index: 20 !important;
+}
+
+.vj-path-overlay {
+  min-height: 700px !important;
+  align-items: stretch !important;
+  gap: 34px !important;
+  padding-bottom: 96px !important;
+}
+
+.vj-path-stop--current:has(.vj-pack-tray) {
+  min-height: 372px !important;
+  margin-bottom: 24px !important;
+}
+
+.vj-path-stop--current:has(.vj-pack-tray) .vj-path-stop-action {
+  min-height: 86px !important;
+}
+
+.vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray,
+.vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
+  overflow: hidden !important;
+}
+
+.vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray {
+  top: 98px !important;
+  left: 22px !important;
+  right: 22px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding: 15px !important;
+  border-radius: 25px !important;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(103, 170, 111, 0.16), transparent 22%),
+    radial-gradient(circle at 90% 85%, rgba(92, 148, 72, 0.13), transparent 24%),
+    linear-gradient(180deg, rgba(255, 253, 237, 0.97), rgba(241, 250, 242, 0.95)) !important;
+  border: 1px solid rgba(75, 121, 74, 0.22) !important;
+  box-shadow:
+    0 16px 34px rgba(18, 73, 61, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.78) !important;
+}
+
+.vj-pack-tray::before,
+.vj-pack-drawer::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 7px !important;
+  border-radius: inherit !important;
+  border: 1px dashed rgba(75, 121, 74, 0.16) !important;
+  pointer-events: none !important;
+}
+
+.vj-pack-tray::after,
+.vj-pack-drawer::after {
+  content: "" !important;
+  position: absolute !important;
+  right: -18px !important;
+  bottom: -12px !important;
+  width: 92px !important;
+  height: 68px !important;
+  opacity: 0.26 !important;
+  background:
+    radial-gradient(ellipse at 22% 58%, rgba(53, 136, 75, 0.7) 0 14px, transparent 15px),
+    radial-gradient(ellipse at 53% 36%, rgba(53, 136, 75, 0.58) 0 16px, transparent 17px),
+    radial-gradient(ellipse at 78% 67%, rgba(53, 136, 75, 0.55) 0 13px, transparent 14px) !important;
+  transform: rotate(-18deg) !important;
+  pointer-events: none !important;
+}
+
+.vj-pack-tray h3 {
+  position: relative !important;
+  z-index: 2 !important;
+  font-size: 0.82rem !important;
+  margin: 0 0 12px !important;
+  color: #173b31 !important;
+}
+
+.vj-pack-tray h3::before,
+.vj-pack-drawer-header h3::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  border-radius: 999px;
+  vertical-align: -4px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(79, 155, 101, 0.28) 0 3px, transparent 4px),
+    rgba(79, 155, 101, 0.14);
+}
+
+.vj-pack-tray-list,
+.vj-pack-drawer-list {
+  position: relative !important;
+  display: grid !important;
+  gap: 14px !important;
+  padding: 2px 0 2px !important;
+}
+
+.vj-pack-tray-list::before,
+.vj-pack-drawer-list::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 16px !important;
+  top: 18px !important;
+  bottom: 18px !important;
+  width: 5px !important;
+  border-radius: 999px !important;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(77, 142, 112, 0.58) 0 7px,
+    rgba(77, 142, 112, 0) 7px 15px
+  ) !important;
+  filter: drop-shadow(0 1px 1px rgba(255,255,255,0.8)) !important;
+  pointer-events: none !important;
+}
+
+.vj-pack-tray-list::after,
+.vj-pack-drawer-list::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 4px !important;
+  top: 2px !important;
+  bottom: 2px !important;
+  width: 30px !important;
+  pointer-events: none !important;
+  background:
+    radial-gradient(circle at 18px 20px, rgba(111, 111, 78, 0.34) 0 4px, transparent 5px),
+    radial-gradient(circle at 8px 70px, rgba(111, 111, 78, 0.26) 0 3px, transparent 4px),
+    radial-gradient(circle at 22px 118px, rgba(111, 111, 78, 0.3) 0 4px, transparent 5px),
+    radial-gradient(circle at 10px 170px, rgba(111, 111, 78, 0.22) 0 3px, transparent 4px) !important;
+}
+
+.vj-pack-tray-row,
+.vj-pack-tray-row--compact,
+.vj-pack-drawer-list .vj-pack-tray-row {
+  position: relative !important;
+  z-index: 1 !important;
+  display: grid !important;
+  grid-template-columns: 36px minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  min-height: 50px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border-radius: 18px !important;
+  color: #173b31 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.vj-pack-tray-row:nth-child(even) {
+  transform: translateX(8px) !important;
+}
+
+.vj-pack-drawer-list .vj-pack-tray-row:nth-child(even) {
+  transform: translateX(10px) !important;
+}
+
+.vj-pack-tray-row::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 5px !important;
+  top: 50% !important;
+  width: 26px !important;
+  height: 15px !important;
+  border-radius: 999px !important;
+  background:
+    radial-gradient(circle at 28% 50%, rgba(131, 128, 83, 0.52) 0 4px, transparent 5px),
+    radial-gradient(circle at 72% 50%, rgba(131, 128, 83, 0.35) 0 3px, transparent 4px) !important;
+  transform: translateY(11px) rotate(-8deg) !important;
+  pointer-events: none !important;
+}
+
+.vj-pack-tray-row::after,
+.vj-pack-tray-title::after {
+  content: none !important;
+  display: none !important;
+}
+
+.vj-pack-tray-index {
+  position: relative !important;
+  z-index: 3 !important;
+  display: grid !important;
+  place-items: center !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(180deg, #49a7dc, #287fbd) !important;
+  color: white !important;
+  font-size: 0.78rem !important;
+  font-weight: 1000 !important;
+  border: 3px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow:
+    0 6px 14px rgba(18, 73, 61, 0.22),
+    0 0 0 4px rgba(49, 144, 200, 0.12) !important;
+}
+
+.vj-pack-tray-title {
+  display: grid !important;
+  align-content: center !important;
+  min-height: 50px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  border-radius: 18px !important;
+  padding: 9px 12px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 248, 231, 0.88)) !important;
+  color: #173b31 !important;
+  font-size: 0.84rem !important;
+  font-weight: 950 !important;
+  box-shadow:
+    0 8px 18px rgba(18, 73, 61, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.82) !important;
+}
+
+.vj-pack-tray-status {
+  justify-self: end !important;
+  align-self: center !important;
+  min-width: 54px !important;
+  border-radius: 999px !important;
+  padding: 5px 8px !important;
+  background: rgba(232, 247, 242, 0.9) !important;
+  color: #2476a8 !important;
+  font-size: 0.68rem !important;
+  font-weight: 950 !important;
+  text-align: center !important;
+  box-shadow: inset 0 0 0 1px rgba(42, 117, 102, 0.12) !important;
+}
+
+.vj-pack-tray-row--current .vj-pack-tray-title {
+  box-shadow:
+    0 8px 18px rgba(18, 73, 61, 0.12),
+    inset 0 0 0 2px rgba(49, 144, 200, 0.24) !important;
+}
+
+.vj-pack-tray-row--current .vj-pack-tray-status {
+  background: rgba(49, 144, 200, 0.13) !important;
+  color: #17648d !important;
+}
+
+.vj-pack-tray-row--complete .vj-pack-tray-index {
+  background: linear-gradient(180deg, #65b678, #3f905b) !important;
+}
+
+.vj-pack-tray-row--complete .vj-pack-tray-status {
+  background: rgba(63, 144, 91, 0.13) !important;
+  color: #2f7650 !important;
+}
+
+.vj-pack-tray-row--locked .vj-pack-tray-index {
+  background: linear-gradient(180deg, #b9ab8a, #8f8060) !important;
+  box-shadow: 0 6px 14px rgba(18, 73, 61, 0.16) !important;
+}
+
+.vj-pack-tray-row--locked .vj-pack-tray-title,
+.vj-pack-tray-row--locked .vj-pack-tray-status {
+  opacity: 0.7 !important;
+}
+
+.vj-pack-tray-more {
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  width: calc(100% - 12px) !important;
+  min-height: 44px !important;
+  margin: 15px 0 0 6px !important;
+  border-radius: 8px 8px 15px 15px !important;
+  padding: 9px 12px !important;
+  background:
+    linear-gradient(90deg, rgba(121, 84, 36, 0.18), transparent 15%, transparent 85%, rgba(121, 84, 36, 0.18)),
+    linear-gradient(180deg, rgba(255, 230, 169, 0.98), rgba(224, 176, 97, 0.98)) !important;
+  color: #174c54 !important;
+  font-size: 0.78rem !important;
+  font-weight: 1000 !important;
+  box-shadow:
+    0 5px 0 rgba(126, 91, 35, 0.25),
+    0 10px 18px rgba(18, 73, 61, 0.14) !important;
+}
+
+.vj-pack-tray-more::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 16px !important;
+  top: -18px !important;
+  width: 5px !important;
+  height: 18px !important;
+  border-radius: 999px !important;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(77, 142, 112, 0.5) 0 6px,
+    rgba(77, 142, 112, 0) 6px 12px
+  ) !important;
+}
+
+.vj-pack-tray-more::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 12px !important;
+  right: 12px !important;
+  top: 5px !important;
+  height: 1px !important;
+  background: rgba(255, 255, 255, 0.46) !important;
+  pointer-events: none !important;
+}
+
+.vj-pack-tray-more span {
+  display: grid !important;
+  place-items: center !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.66) !important;
+  color: #2476a8 !important;
+  box-shadow: inset 0 0 0 1px rgba(126, 91, 35, 0.12) !important;
+}
+
+.vj-path-stop--current:has(.vj-pack-drawer) {
+  min-height: 590px !important;
+  margin-bottom: 28px !important;
+}
+
+.vj-path-stop--current:has(.vj-pack-drawer) .vj-path-stop-action {
+  min-height: 86px !important;
+}
+
+.vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
+  top: 98px !important;
+  bottom: auto !important;
+  left: 22px !important;
+  right: 22px !important;
+  max-height: 450px !important;
+  border-radius: 26px !important;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(103, 170, 111, 0.16), transparent 22%),
+    radial-gradient(circle at 90% 85%, rgba(92, 148, 72, 0.13), transparent 24%),
+    linear-gradient(180deg, rgba(255, 253, 237, 0.98), rgba(241, 250, 242, 0.96)) !important;
+  border: 1px solid rgba(75, 121, 74, 0.2) !important;
+}
+
+.vj-pack-drawer-header {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.vj-pack-drawer-list {
+  padding: 4px 4px 10px 0 !important;
+}
+
+@media (max-width: 560px) {
+  .vj-river-path {
+    height: min(680px, 76vh) !important;
+    min-height: 0 !important;
+  }
+
+  .vj-path-overlay {
+    min-height: 800px !important;
+    padding-top: 42px !important;
+    padding-bottom: 108px !important;
+    gap: 30px !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-tray) {
+    min-height: 374px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray {
+    top: 88px !important;
+    left: 12px !important;
+    right: 12px !important;
+    padding: 13px !important;
+  }
+
+  .vj-pack-tray-row,
+  .vj-pack-tray-row--compact,
+  .vj-pack-drawer-list .vj-pack-tray-row {
+    grid-template-columns: 34px minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    min-height: 50px !important;
+  }
+
+  .vj-pack-tray-row:nth-child(even) {
+    transform: translateX(5px) !important;
+  }
+
+  .vj-pack-tray-title {
+    min-height: 48px !important;
+    font-size: 0.8rem !important;
+    padding: 8px 10px !important;
+  }
+
+  .vj-pack-tray-status {
+    min-width: 48px !important;
+    padding: 4px 6px !important;
+    font-size: 0.64rem !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-drawer) {
+    min-height: 612px !important;
+    margin-bottom: 30px !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
+    top: 88px !important;
+    left: 12px !important;
+    right: 12px !important;
+    max-height: 480px !important;
+  }
+}

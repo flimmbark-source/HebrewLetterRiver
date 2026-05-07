@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useRef } from 'react';
 import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
 import { getPacksBySection, getPackById } from '../../data/bridgeBuilderPacks.js';
 import VocabJourneyPanel from './VocabJourneyPanel.jsx';
@@ -476,6 +476,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const [showSkillCheck, setShowSkillCheck] = useState(false);
   const [packQuizTarget, setPackQuizTarget] = useState(null); // pack object when running a pack-specific quiz
   const [quizResult, setQuizResult] = useState(null);
+  const contentScrollRef = useRef(null);
 
   const sections = useMemo(() => getSectionsInOrder(), []);
   const allProgress = useMemo(() => getAllWordProgress(), [progressRevision]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -525,6 +526,12 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
 
     setSelectedJourneyPackId(packId);
     setActiveSubview('journey');
+
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 860px)').matches) {
+      requestAnimationFrame(() => {
+        contentScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
   }, [sectionData]);
 
   const handleTogglePack = useCallback((packId) => {
@@ -644,9 +651,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     )}
     
     <div className="bbs-screen">
-      <div className="bbs-content">
-        <div className="bbs-header">
-        </div>
+      <div ref={contentScrollRef} className={`bbs-content ${activeSubview === 'journey' ? 'bbs-content--journey' : ''}`}>
 {activeSubview === 'journey' && (
     <VocabJourneyPanel
       sectionData={sectionData}

@@ -27,7 +27,7 @@ import { useGame } from '../context/GameContext.jsx';
  *         Sentences (bottom, full width)
  */
 export default function ModuleCard({ module, isLocked, onModuleComplete, onPracticeChange }) {
-  const { languageId: practiceLanguageId } = useLanguage();
+  const { languageId: practiceLanguageId, appLanguageId } = useLanguage();
   const vocabTextIds = module.vocabTextIds || [];
   const grammarTextIds = module.grammarTextIds || [];
   const [activeSection, setActiveSection] = useState(null); // 'grammar', 'sentences', or a vocab text ID
@@ -153,7 +153,7 @@ export default function ModuleCard({ module, isLocked, onModuleComplete, onPract
   };
 
   const handlePlayGame = (vocabTextId) => {
-    const vocabText = getReadingTextById(vocabTextId, 'hebrew');
+    const vocabText = getReadingTextById(vocabTextId, practiceLanguageId);
     if (!vocabText) {
       console.error('Vocab text not found:', vocabTextId);
       return;
@@ -281,9 +281,9 @@ export default function ModuleCard({ module, isLocked, onModuleComplete, onPract
           <div className="grid gap-3 md:grid-cols-2">
             <div className="space-y-3">
               {vocabTextIds.map((vocabTextId, index) => {
-                const vocabText = getReadingTextById(vocabTextId, 'hebrew');
-                const vocabTitle = vocabText?.title?.en || `Vocabulary Part ${index + 1}`;
-                const vocabSubtitle = vocabText?.subtitle?.en || 'Practice vocabulary words';
+                const vocabText = getReadingTextById(vocabTextId, practiceLanguageId);
+                const vocabTitle = vocabText?.title?.[appLanguageId] || vocabText?.title?.en || `Vocabulary Part ${index + 1}`;
+                const vocabSubtitle = vocabText?.subtitle?.[appLanguageId] || vocabText?.subtitle?.en || 'Practice vocabulary words';
 
                 const cardProgress = cardProgressMap[vocabTextId] || { correct: 0, total: 0 };
                 const isComplete = isCardComplete(vocabTextId, practiceLanguageId);
@@ -329,9 +329,9 @@ export default function ModuleCard({ module, isLocked, onModuleComplete, onPract
                       return null;
                     }
 
-                    const grammarText = getReadingTextById(grammarTextId, 'hebrew');
-                    const grammarTitle = grammarText?.title?.en || `Grammar Part ${index + 1}`;
-                    const grammarSubtitle = grammarText?.subtitle?.en || 'Practice grammar with vocabulary words';
+                    const grammarText = getReadingTextById(grammarTextId, practiceLanguageId);
+                    const grammarTitle = grammarText?.title?.[appLanguageId] || grammarText?.title?.en || `Grammar Part ${index + 1}`;
+                    const grammarSubtitle = grammarText?.subtitle?.[appLanguageId] || grammarText?.subtitle?.en || 'Practice grammar with vocabulary words';
 
                     const cardProgress = cardProgressMap[grammarTextId] || { correct: 0, total: 0 };
                     const isComplete = isCardComplete(grammarTextId, practiceLanguageId);

@@ -37,6 +37,11 @@
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
+
+  --bottom-nav-height: 72px;
+  --bottom-nav-safe-space: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 24px);
+  /* Backwards-compatible alias used by existing layout rules. */
+  --bottom-safe-space: var(--bottom-nav-safe-space);
 }
 
 html,

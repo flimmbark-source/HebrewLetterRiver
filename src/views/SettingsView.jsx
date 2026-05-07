@@ -72,6 +72,16 @@ export default function SettingsView() {
   const [soundVolume, setSoundVolumeState] = useState(() => Math.round(getSoundVolume() * 100));
 
   useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    window.__LETTER_RIVER_LAST_APP_LANG__ = appLanguageId;
+    console.log('[language-debug][SettingsView]', {
+      route: '/settings',
+      appLanguage: appLanguageId,
+      practiceLanguage: languageId
+    });
+  }, [appLanguageId, languageId]);
+
+  useEffect(() => {
     const loadSettings = () => {
       try {
         const saved = localStorage.getItem('gameSettings');

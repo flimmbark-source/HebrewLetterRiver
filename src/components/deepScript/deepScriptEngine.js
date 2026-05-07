@@ -526,7 +526,7 @@ export function combatReducer(state, action) {
           log: [...state.log, { type: 'correct', letter: tile.letter, slot: slotIndex }],
         };
       } else {
-        const cursedTile = isScribe ? { ...tile, cursed: false } : { ...tile, cursed: true };
+        const cursedTile = { ...tile, cursed: true };
         let newTray = fromTray
           ? state.tray.map(t => t.id === tileId ? cursedTile : t)
           : [...state.tray, cursedTile];
@@ -544,13 +544,20 @@ export function combatReducer(state, action) {
           }
         }
 
-        return {
+        let postMistakeState = {
           ...state,
           tray: newTray,
           satchel: newSatchel,
           selectedTrayTile: null,
           selectedSatchelTile: null,
           log: logEntries,
+        };
+
+        postMistakeState = executeEnemyIntent(postMistakeState);
+
+        return {
+          ...postMistakeState,
+          enemyIntent: rollEnemyIntent(postMistakeState.turn, postMistakeState.word?.isMiniboss || false, postMistakeState.enemyType),
         };
       }
     }
@@ -731,6 +738,12 @@ export function combatReducer(state, action) {
         selectedTrayTile: null,
         selectedSatchelTile: null,
       };
+
+      const confusedOverride = state.confusedGearCosts?.[gearId];
+      const escalatingBonus = gearDef.escalatingCost ? (gearState.turnUses || 0) : 0;
+      const energyCost = Math.max(0, (confusedOverride ?? gearDef.energyCost ?? 0) + escalatingBonus);
+      if (state.energy < energyCost) return state;
+      updates.energy = state.energy - energyCost;
 
       switch (gearDef.type) {
         case 'generate-random': {
@@ -1095,11 +1108,11 @@ export function createRunState(kit, sharedGearIds, runMap) {
     kitId: kit.id,
     health: kit.health,
     maxHealth: kit.health,
-    traySize: kit.traySize + 1,
-    satchelSize: 0,
-    maxEnergy: 0,
-    gearIds: [],
-    passives: {},
+    traySize: kit.traySize,
+    satchelSize: kit.satchelSize,
+    maxEnergy: kit.maxEnergy,
+    gearIds: [...(kit.gearIds || []), ...(sharedGearIds || [])],
+    passives: { ...(kit.passives || {}) },
     upgrades: {},
     roomIndex: 0,
     runMap,

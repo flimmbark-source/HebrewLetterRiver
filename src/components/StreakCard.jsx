@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useProgress, STREAK_MILESTONES } from '../context/ProgressContext.jsx';
+import { useLocalization } from '../context/LocalizationContext.jsx';
 import { getJerusalemDateKey } from '../lib/time.js';
 
 function Icon({ children, className = '', filled = false, style = {} }) {
@@ -14,13 +15,13 @@ function Icon({ children, className = '', filled = false, style = {} }) {
   );
 }
 
-function getStreakMessage(current) {
-  if (current === 0) return 'Start your journey!';
-  if (current === 1) return 'Great start! Keep it going';
-  if (current < 3) return "You're building momentum!";
-  if (current < 7) return "You're on fire!";
-  if (current < 30) return 'Incredible dedication!';
-  return 'Legendary commitment!';
+function getStreakMessage(current, t) {
+  if (current === 0) return t('streak.startJourney', 'Start your journey!');
+  if (current === 1) return t('streak.greatStart', 'Great start! Keep it going');
+  if (current < 3) return t('streak.buildingMomentum', "You're building momentum!");
+  if (current < 7) return t('streak.onFire', "You're on fire!");
+  if (current < 30) return t('streak.incredibleDedication', 'Incredible dedication!');
+  return t('streak.legendaryCommitment', 'Legendary commitment!');
 }
 
 function getFlameSize(current) {
@@ -40,13 +41,13 @@ function getFlameColor(current) {
 }
 
 export default function StreakCard() {
-  const { streak, player, repairStreak, useStreakFreeze } = useProgress();
+  const { streak, player, repairStreak } = useProgress();
+  const { t } = useLocalization();
   const todayKey = getJerusalemDateKey();
   const completedToday = streak.lastPlayedDateKey === todayKey;
 
   const nextMilestone = useMemo(() => {
     const milestones = STREAK_MILESTONES;
-    const claimed = streak.milestonesClaimed ?? [];
     for (const m of milestones) {
       if (streak.current < m.days) {
         const daysLeft = m.days - streak.current;
@@ -54,7 +55,7 @@ export default function StreakCard() {
       }
     }
     return null;
-  }, [streak.current, streak.milestonesClaimed]);
+  }, [streak.current]);
 
   const repairAvailable = useMemo(() => {
     if (!streak.repairAvailableUntil) return false;
@@ -66,7 +67,6 @@ export default function StreakCard() {
 
   return (
     <div className="card-elevated relative overflow-hidden rounded-2xl p-6">
-      {/* Warm gradient overlay */}
       <div
         className="absolute inset-0 opacity-[0.07]"
         style={{
@@ -77,10 +77,8 @@ export default function StreakCard() {
       />
 
       <div className="relative z-10">
-        {/* Header row */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            {/* Flame icon */}
             <div className="flex items-center justify-center">
               <Icon
                 className={getFlameSize(streak.current)}
@@ -91,7 +89,6 @@ export default function StreakCard() {
               </Icon>
             </div>
 
-            {/* Streak count */}
             <div>
               <div className="flex items-baseline gap-2">
                 <span
@@ -104,24 +101,27 @@ export default function StreakCard() {
                   className="text-sm font-bold uppercase tracking-wide"
                   style={{ color: 'var(--app-muted)' }}
                 >
-                  {streak.current === 1 ? 'day' : 'days'}
+                  {streak.current === 1 ? t('common.day', 'day') : t('common.days', 'days')}
                 </span>
               </div>
               <p
                 className="text-sm font-semibold"
                 style={{ color: streak.current > 0 ? getFlameColor(streak.current) : 'var(--app-muted)' }}
               >
-                {getStreakMessage(streak.current)}
+                {getStreakMessage(streak.current, t)}
               </p>
             </div>
           </div>
 
-          {/* Freeze indicator */}
           {freezesAvailable > 0 && (
             <div
               className="flex items-center gap-1 rounded-full px-2.5 py-1"
               style={{ background: 'var(--app-primary-container)' }}
-              title={`${freezesAvailable} streak freeze${freezesAvailable > 1 ? 's' : ''} available`}
+              title={t(
+                freezesAvailable === 1 ? 'streak.freezeAvailable_one' : 'streak.freezeAvailable_other',
+                freezesAvailable === 1 ? '{{count}} streak freeze available' : '{{count}} streak freezes available',
+                { count: freezesAvailable }
+              )}
             >
               <Icon className="text-base" style={{ color: 'var(--app-primary)' }}>ac_unit</Icon>
               <span className="text-xs font-bold" style={{ color: 'var(--app-primary)' }}>
@@ -131,9 +131,7 @@ export default function StreakCard() {
           )}
         </div>
 
-        {/* Status + milestone row */}
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          {/* Today status */}
           <div
             className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
             style={{
@@ -152,19 +150,21 @@ export default function StreakCard() {
               className="text-xs font-bold"
               style={{ color: completedToday ? '#22c55e' : '#f59e0b' }}
             >
-              {completedToday ? 'Today: Complete' : 'Today: Not yet'}
+              {completedToday ? t('streak.todayComplete', 'Today: Complete') : t('streak.todayNotYet', 'Today: Not yet')}
             </span>
           </div>
 
-          {/* Next milestone */}
           {nextMilestone && (
             <span className="text-xs font-medium" style={{ color: 'var(--app-muted)' }}>
-              {nextMilestone.daysLeft} more {nextMilestone.daysLeft === 1 ? 'day' : 'days'} until {nextMilestone.label}!
+              {t(
+                nextMilestone.daysLeft === 1 ? 'streak.daysUntilMilestone_one' : 'streak.daysUntilMilestone_other',
+                nextMilestone.daysLeft === 1 ? '{{count}} more day until {{label}}!' : '{{count}} more days until {{label}}!',
+                { count: nextMilestone.daysLeft, label: nextMilestone.label }
+              )}
             </span>
           )}
         </div>
 
-        {/* Repair button */}
         {repairAvailable && (
           <button
             type="button"
@@ -178,19 +178,18 @@ export default function StreakCard() {
             }}
           >
             <Icon className="text-base" filled>build</Icon>
-            <span>Repair streak (20 stars)</span>
+            <span>{t('streak.repair', 'Repair streak (20 stars)')}</span>
             {streak.preBreakCurrent && (
               <span className="opacity-80">
-                &mdash; restore to {streak.preBreakCurrent} days
+                — {t('streak.restoreTo', 'restore to {{count}} days', { count: streak.preBreakCurrent })}
               </span>
             )}
           </button>
         )}
 
-        {/* Best streak */}
         {streak.best > streak.current && streak.best > 1 && (
           <p className="mt-3 text-xs font-medium" style={{ color: 'var(--app-muted)' }}>
-            Personal best: {streak.best} days
+            {t('streak.personalBest', 'Personal best: {{count}} days', { count: streak.best })}
           </p>
         )}
       </div>

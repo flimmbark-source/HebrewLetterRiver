@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext.jsx';
+import { useLocalization } from '../context/LocalizationContext.jsx';
 import Modal from './ui/Modal.jsx';
 import './PlayModeModal.css';
 
@@ -18,6 +19,7 @@ function ModeIcon({ children, className = '' }) {
 
 export default function PlayModeModal() {
   const { showPlayModal, setShowPlayModal, openGame } = useGame();
+  const { t } = useLocalization();
   const navigate = useNavigate();
 
   const handleClose = () => setShowPlayModal(false);
@@ -44,10 +46,10 @@ export default function PlayModeModal() {
       titleId="play-mode-title"
       className="play-mode-modal"
     >
-      <button className="play-mode-close" onClick={handleClose} type="button" aria-label="Close">
+      <button className="play-mode-close" onClick={handleClose} type="button" aria-label={t('app.playMode.close', 'Close')}>
         <ModeIcon className="text-lg">close</ModeIcon>
       </button>
-      <h2 id="play-mode-title" className="play-mode-title">Choose Your Mode</h2>
+      <h2 id="play-mode-title" className="play-mode-title">{t('app.playMode.title', 'Choose Your Mode')}</h2>
 
       <div className="play-mode-options">
         <button type="button" className="play-mode-card play-mode-card--river" onClick={handleLetterRiver}>
@@ -55,8 +57,8 @@ export default function PlayModeModal() {
             <ModeIcon className="text-2xl">waves</ModeIcon>
           </div>
           <div className="play-mode-info">
-            <div className="play-mode-name">Letter River</div>
-            <div className="play-mode-desc">Catch letters as they flow down the river</div>
+            <div className="play-mode-name">{t('app.playMode.letterRiver.name', 'Letter River')}</div>
+            <div className="play-mode-desc">{t('app.playMode.letterRiver.description', 'Catch letters as they flow down the river')}</div>
           </div>
         </button>
 
@@ -65,8 +67,8 @@ export default function PlayModeModal() {
             <ModeIcon className="text-2xl">extension</ModeIcon>
           </div>
           <div className="play-mode-info">
-            <div className="play-mode-name">Vocab Builder</div>
-            <div className="play-mode-desc">Play games to learn and practice vocabulary</div>
+            <div className="play-mode-name">{t('app.playMode.vocabBuilder.name', 'Vocab Builder')}</div>
+            <div className="play-mode-desc">{t('app.playMode.vocabBuilder.description', 'Play games to learn and practice vocabulary')}</div>
           </div>
         </button>
 
@@ -75,8 +77,8 @@ export default function PlayModeModal() {
             <ModeIcon className="text-2xl">explore</ModeIcon>
           </div>
           <div className="play-mode-info">
-            <div className="play-mode-name">Deep Script</div>
-            <div className="play-mode-desc">Endless dungeon-crawl through vocabulary words</div>
+            <div className="play-mode-name">{t('app.playMode.deepScript.name', 'Deep Script')}</div>
+            <div className="play-mode-desc">{t('app.playMode.deepScript.description', 'Endless dungeon-crawl through vocabulary words')}</div>
           </div>
         </button>
       </div>

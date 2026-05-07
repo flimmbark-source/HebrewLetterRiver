@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useProgress } from '../context/ProgressContext.jsx';
 import { useSRS } from '../context/SRSContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
+import { useLocalization } from '../context/LocalizationContext.jsx';
 
 function Icon({ children, className = '', filled = false, style = {} }) {
   return (
@@ -17,8 +18,9 @@ function Icon({ children, className = '', filled = false, style = {} }) {
 
 export default function DailyReviewCard() {
   const { getWeakestLetter } = useProgress();
-  const { getDueItems, statistics, isLoading } = useSRS();
+  const { getDueItems, isLoading } = useSRS();
   const { setShowPlayModal } = useGame();
+  const { t } = useLocalization();
 
   const dueLetters = useMemo(() => {
     if (isLoading) return [];
@@ -60,7 +62,7 @@ export default function DailyReviewCard() {
           className="text-sm font-bold uppercase tracking-widest"
           style={{ color: 'var(--app-muted)' }}
         >
-          Daily Review
+          {t('dailyReview.title', 'Daily Review')}
         </h3>
         <Icon
           className="text-lg"
@@ -81,16 +83,15 @@ export default function DailyReviewCard() {
           </div>
           <div>
             <p className="text-sm font-bold" style={{ color: 'var(--app-on-surface)' }}>
-              All caught up!
+              {t('dailyReview.allCaughtUp', 'All caught up!')}
             </p>
             <p className="text-xs" style={{ color: 'var(--app-muted)' }}>
-              Great work. Check back tomorrow.
+              {t('dailyReview.checkBackTomorrow', 'Great work. Check back tomorrow.')}
             </p>
           </div>
         </div>
       ) : (
         <div className="space-y-3">
-          {/* Due letters */}
           {dueLetterCount > 0 && (
             <button
               type="button"
@@ -109,11 +110,18 @@ export default function DailyReviewCard() {
               </div>
               <div className="flex-1">
                 <p className="text-sm font-bold" style={{ color: 'var(--app-on-surface)' }}>
-                  {dueLetterCount} {dueLetterCount === 1 ? 'letter' : 'letters'} due for review
+                  {t(
+                    dueLetterCount === 1 ? 'dailyReview.lettersDue_one' : 'dailyReview.lettersDue_other',
+                    dueLetterCount === 1 ? '{{count}} letter due for review' : '{{count}} letters due for review',
+                    { count: dueLetterCount }
+                  )}
                 </p>
                 {weakestLetter?.hebrew && weakestLetter?.name && (
                   <p className="text-xs" style={{ color: 'var(--app-muted)' }}>
-                    Focus on: {weakestLetter.hebrew} ({weakestLetter.name})
+                    {t('dailyReview.focusOn', 'Focus on: {{symbol}} ({{name}})', {
+                      symbol: weakestLetter.hebrew,
+                      name: weakestLetter.name
+                    })}
                   </p>
                 )}
               </div>
@@ -123,7 +131,6 @@ export default function DailyReviewCard() {
             </button>
           )}
 
-          {/* Due vocabulary */}
           {dueVocabCount > 0 && (
             <button
               type="button"
@@ -142,7 +149,11 @@ export default function DailyReviewCard() {
               </div>
               <div className="flex-1">
                 <p className="text-sm font-bold" style={{ color: 'var(--app-on-surface)' }}>
-                  {dueVocabCount} {dueVocabCount === 1 ? 'word' : 'words'} to practice
+                  {t(
+                    dueVocabCount === 1 ? 'dailyReview.wordsDue_one' : 'dailyReview.wordsDue_other',
+                    dueVocabCount === 1 ? '{{count}} word to practice' : '{{count}} words to practice',
+                    { count: dueVocabCount }
+                  )}
                 </p>
               </div>
               <Icon className="text-base" style={{ color: 'var(--app-mode-bridge)' }}>
