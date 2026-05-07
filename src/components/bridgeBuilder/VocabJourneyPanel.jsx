@@ -241,6 +241,148 @@ function CurrentPackDetailSheet({
   );
 }
 
+function sortPackItems(packItems = []) {
+  return [...packItems].sort((a, b) => (a.pack?.order ?? 0) - (b.pack?.order ?? 0));
+}
+
+function getPackItemState(packItem, currentPackId, t) {
+  if (!packItem?.unlocked) {
+    return {
+      status: t('bridgeBuilder.vocabJourney.packStatusLocked', 'Locked'),
+      action: '🔒',
+      modifier: 'locked',
+      disabled: true,
+    };
+  }
+
+  if (packItem.pack?.id === currentPackId) {
+    return {
+      status: t('bridgeBuilder.vocabJourney.packStatusCurrent', 'Current'),
+      action: t('bridgeBuilder.vocabJourney.packActionContinue', 'Continue'),
+      modifier: 'current',
+      disabled: false,
+    };
+  }
+
+  if (packItem.progress?.completed) {
+    return {
+      status: t('bridgeBuilder.vocabJourney.packStatusComplete', 'Complete'),
+      action: t('bridgeBuilder.vocabJourney.packActionReview', 'Review'),
+      modifier: 'complete',
+      disabled: false,
+    };
+  }
+
+  return {
+    status: t('bridgeBuilder.vocabJourney.packStatusNext', 'Next'),
+    action: t('bridgeBuilder.vocabJourney.packActionStart', 'Start'),
+    modifier: 'next',
+    disabled: false,
+  };
+}
+
+function getCompactPackItems(packItems, currentPackId) {
+  if (packItems.length <= 3) return packItems;
+  const currentIndex = packItems.findIndex((item) => item.pack?.id === currentPackId);
+
+  if (currentIndex <= 1) return packItems.slice(0, 3);
+  if (currentIndex >= packItems.length - 2) return packItems.slice(-3);
+  return packItems.slice(currentIndex - 1, currentIndex + 2);
+}
+
+function PackTrayRow({ packItem, index, currentPackId, t, onSelectPack, compact = false }) {
+  const state = getPackItemState(packItem, currentPackId, t);
+  const pack = packItem.pack;
+  const localizedTitle = t(`packs.${pack.id}.title`, pack.title);
+
+  return (
+    <button
+      type="button"
+      className={`vj-pack-tray-row vj-pack-tray-row--${state.modifier} ${compact ? 'vj-pack-tray-row--compact' : ''}`}
+      onClick={() => {
+        if (!state.disabled && onSelectPack) onSelectPack(pack.id);
+      }}
+      disabled={state.disabled}
+    >
+      <span className="vj-pack-tray-index">{index + 1}</span>
+      <span className="vj-pack-tray-title">{localizedTitle}</span>
+      <span className="vj-pack-tray-status">{compact ? state.status : state.action}</span>
+    </button>
+  );
+}
+
+function SectionPackTray({
+  sectionItem,
+  currentPackId,
+  t,
+  onSelectPack,
+  expanded,
+  onToggleExpanded,
+}) {
+  if (!sectionItem) return null;
+
+  const packItems = sortPackItems(sectionItem.packData || []);
+  const compactItems = getCompactPackItems(packItems, currentPackId);
+  const hiddenCount = Math.max(0, packItems.length - compactItems.length);
+  const sectionTitle = t(`bridgeBuilder.sections.${sectionItem.section.id}.title`, sectionItem.section.title);
+
+  if (expanded) {
+    return (
+      <section className="vj-pack-drawer" aria-label={t('bridgeBuilder.vocabJourney.sectionPackDrawer', '{{section}} packs', { section: sectionTitle })}>
+        <header className="vj-pack-drawer-header">
+          <div>
+            <h3>{t('bridgeBuilder.vocabJourney.sectionPackCount', '{{section}} · {{count}} packs', { section: sectionTitle, count: packItems.length })}</h3>
+            <p>{t('bridgeBuilder.vocabJourney.pickPackInSection', 'Pick a pack from this section.')}</p>
+          </div>
+          <button type="button" className="vj-pack-drawer-close" onClick={onToggleExpanded} aria-label={t('common.close', 'Close')}>
+            <Icon>close</Icon>
+          </button>
+        </header>
+        <div className="vj-pack-drawer-list">
+          {packItems.map((packItem, index) => (
+            <PackTrayRow
+              key={packItem.pack.id}
+              packItem={packItem}
+              index={index}
+              currentPackId={currentPackId}
+              t={t}
+              onSelectPack={onSelectPack}
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="vj-pack-tray" aria-label={t('bridgeBuilder.vocabJourney.sectionPackTray', 'Packs in {{section}}', { section: sectionTitle })}>
+      <h3>{t('bridgeBuilder.vocabJourney.packsInSection', 'Packs in {{section}}', { section: sectionTitle })}</h3>
+      <div className="vj-pack-tray-list">
+        {compactItems.map((packItem) => {
+          const index = packItems.findIndex((item) => item.pack?.id === packItem.pack?.id);
+          return (
+            <PackTrayRow
+              key={packItem.pack.id}
+              packItem={packItem}
+              index={index}
+              currentPackId={currentPackId}
+              t={t}
+              onSelectPack={onSelectPack}
+              compact
+            />
+          );
+        })}
+      </div>
+      {hiddenCount > 0 && (
+        <button type="button" className="vj-pack-tray-more" onClick={onToggleExpanded}>
+          {t('bridgeBuilder.vocabJourney.morePacks', 'More…')}
+          <span>{packItems.length}</span>
+        </button>
+      )}
+    </section>
+  );
+}
+
 export default function VocabJourneyPanel({
   sectionData,
   activePackId,
@@ -256,6 +398,7 @@ export default function VocabJourneyPanel({
   const { languageId: selectedPracticeLanguageId } = useLanguage();
   const languageId = languageIdProp || selectedPracticeLanguageId || 'hebrew';
   const [previewWordsReady, setPreviewWordsReady] = useState(languageId === 'hebrew');
+  const [isPackTrayExpanded, setIsPackTrayExpanded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -288,6 +431,17 @@ export default function VocabJourneyPanel({
   const localizedPackTitle = currentPack ? t(`packs.${currentPack.id}.title`, currentPack.title) : '';
   const localizedPackDescription = currentPack ? t(`packs.${currentPack.id}.description`, currentPack.description || '') : '';
   const currentCompletion = currentPackData?.completion;
+
+  const selectedSectionItem = useMemo(() => {
+    if (!currentPack) return sectionData.find((sectionItem) => sectionItem.unlocked) || sectionData[0] || null;
+    return sectionData.find((sectionItem) =>
+      (sectionItem.packData || []).some((packItem) => packItem.pack?.id === currentPack.id)
+    ) || sectionData.find((sectionItem) => sectionItem.unlocked) || sectionData[0] || null;
+  }, [currentPack, sectionData]);
+
+  useEffect(() => {
+    setIsPackTrayExpanded(false);
+  }, [selectedSectionItem?.section?.id]);
 
   const journeyStops = useMemo(() => getJourneyStops(sectionData, activePackId), [sectionData, activePackId]);
   const preview = useMemo(() => {
@@ -444,34 +598,59 @@ export default function VocabJourneyPanel({
             {journeyStops.map((stop) => {
               const locked = stop.status === 'Locked';
               const statusLabel = getStopStatusLabel(stop.status, t);
+              const isCurrentStop = stop.status === 'Current';
               return (
-                <button
+                <div
                   key={stop.id}
-                  type="button"
-                  className={`vj-path-stop ${stop.status === 'Current' ? 'vj-path-stop--current' : ''} ${locked ? 'vj-path-stop--locked' : ''}`}
-                  onClick={() => {
-                    if (!locked && stop.representativePackId && onSelectPack) {
-                      onSelectPack(stop.representativePackId);
-                    }
-                  }}
-                  disabled={locked}
+                  className={`vj-path-stop ${isCurrentStop ? 'vj-path-stop--current' : ''} ${locked ? 'vj-path-stop--locked' : ''}`}
                 >
-                  <span className="vj-path-icon">
-                    <Icon filled>{locked ? 'lock' : stop.icon}</Icon>
-                  </span>
-                  <span className="vj-path-copy">
-                    <strong>{t(`bridgeBuilder.sections.${stop.id}.title`, stop.title)}</strong>
-                    <small>{statusLabel}</small>
-                  </span>
-                  {locked
-                    ? <Icon>lock</Icon>
-                    : stop.status === 'Complete'
-                      ? <Icon className="vj-path-check" filled>check_circle</Icon>
-                      : <Icon>chevron_right</Icon>}
-                </button>
+                  <button
+                    type="button"
+                    className="vj-path-stop-action"
+                    onClick={() => {
+                      if (!locked && stop.representativePackId && onSelectPack) {
+                        onSelectPack(stop.representativePackId);
+                      }
+                    }}
+                    disabled={locked}
+                  >
+                    <span className="vj-path-icon">
+                      <Icon filled>{locked ? 'lock' : stop.icon}</Icon>
+                    </span>
+                    <span className="vj-path-copy">
+                      <strong>{t(`bridgeBuilder.sections.${stop.id}.title`, stop.title)}</strong>
+                      <small>{statusLabel}</small>
+                    </span>
+                    {locked
+                      ? <Icon>lock</Icon>
+                      : stop.status === 'Complete'
+                        ? <Icon className="vj-path-check" filled>check_circle</Icon>
+                        : <Icon>chevron_right</Icon>}
+                  </button>
+                  {isCurrentStop && selectedSectionItem?.section?.id === stop.id && !isPackTrayExpanded && (
+                    <SectionPackTray
+                      sectionItem={selectedSectionItem}
+                      currentPackId={currentPack.id}
+                      t={t}
+                      onSelectPack={onSelectPack}
+                      expanded={false}
+                      onToggleExpanded={() => setIsPackTrayExpanded(true)}
+                    />
+                  )}
+                </div>
               );
             })}
           </div>
+          {isPackTrayExpanded && selectedSectionItem && (
+            <SectionPackTray
+              sectionItem={selectedSectionItem}
+              currentPackId={currentPack.id}
+              t={t}
+              onSelectPack={onSelectPack}
+              expanded
+              onToggleExpanded={() => setIsPackTrayExpanded(false)}
+            />
+          )}
         </aside>
       </div>
       <CurrentPackDetailSheet
