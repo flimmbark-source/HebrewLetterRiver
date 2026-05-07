@@ -8,68 +8,23 @@
     bottom: 92px !important;
   }
 
-  .vj-path-stop--with-packs {
-    margin-bottom: 30px !important;
+  /* Problem solved: prevent the next path node from crowding the open tray/drawer. */
+  .vj-path-stop--current:has(.vj-pack-tray),
+  .vj-path-stop--current:has(.vj-pack-drawer) {
+    margin-bottom: 24px !important;
   }
 
-  .vj-active-section-card {
-    position: relative;
-    width: calc(100% - 10px);
-    margin: 0 auto;
-    padding: 0 10px 14px;
-    border: 1px solid rgba(58, 135, 118, 0.12);
-    border-radius: 30px;
-    background: rgba(250, 255, 242, 0.84);
-    box-shadow: 0 16px 30px rgba(18, 73, 61, 0.14);
-    backdrop-filter: blur(8px);
-  }
-
-  .vj-active-section-card::before {
-    content: "";
-    position: absolute;
-    left: calc(var(--route-line-x) + 8px);
-    top: 76px;
-    bottom: 18px;
-    width: 4px;
-    border-radius: 999px;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(71, 152, 129, 0.68) 0 7px,
-      transparent 7px 14px
-    );
-    pointer-events: none;
-  }
-
-  .vj-active-section-card .vj-path-stop-action {
-    min-height: 78px !important;
-    margin: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-  }
-
-  .vj-active-section-card .vj-path-icon {
-    transform: translateY(-6px);
-  }
-
-  .vj-active-section-card .vj-path-copy {
-    width: calc(100% - var(--route-line-x) - 38px) !important;
-    margin-left: calc(var(--route-line-x) + 32px) !important;
-  }
-
-  .vj-active-section-card .vj-path-stop-action > .material-symbols-outlined:last-child {
-    right: 12px !important;
-  }
-
-  .vj-active-section-card .vj-pack-tray,
-  .vj-active-section-card .vj-pack-drawer {
+  /* Problem solved: keep the tray/drawer aligned inside the river card instead of floating right. */
+  .vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray,
+  .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
     position: relative !important;
     top: auto !important;
     bottom: auto !important;
     left: auto !important;
     right: auto !important;
-    width: 100% !important;
+    width: calc(100% - 18px) !important;
     max-width: none !important;
-    margin: -4px auto 0 !important;
+    margin: 10px auto 0 !important;
     box-sizing: border-box !important;
   }
 
@@ -155,16 +110,24 @@
     font-size: 0.84rem !important;
   }
 
+  .vj-pack-tray-row,
+  .vj-pack-tray-row--compact,
+  .vj-pack-drawer-list .vj-pack-tray-row {
+    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) auto !important;
+  }
+
+  /* Problem solved: keep the Current pill inside the row, not hanging off the card. */
   .vj-pack-tray-status {
     position: static !important;
-    grid-column: 2 !important;
+    grid-column: 3 !important;
     grid-row: 1 !important;
     justify-self: end !important;
     align-self: center !important;
-    margin-right: 8px !important;
+    margin-right: 0 !important;
     pointer-events: none !important;
   }
 
+  /* Problem solved: reduce compact-tray noise by showing only the meaningful current state. */
   .vj-pack-tray-row--compact:not(.vj-pack-tray-row--current) .vj-pack-tray-status {
     display: none !important;
   }
@@ -174,7 +137,7 @@
   }
 
   .vj-pack-tray-row--current .vj-pack-tray-title {
-    padding-right: 74px !important;
+    padding-right: 12px !important;
   }
 
   .vj-pack-tray-more {
