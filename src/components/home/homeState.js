@@ -1,0 +1,247 @@
+import { HOME_ASSETS } from './homeAssets.js';
+import { getStageForUser } from '../../lib/progressTerms.js';
+
+const STAGE_ORDER = ['letters', 'words', 'reading', 'conversation'];
+
+function getLetterProgress(player) {
+  const letterCount = Object.keys(player?.letters ?? {}).length;
+  const learned = Math.max(0, letterCount);
+  const total = 20;
+  return {
+    learned,
+    total,
+    percent: Math.max(12, Math.min(100, Math.round((learned / total) * 100)))
+  };
+}
+
+function getDailyCounts(daily) {
+  const tasks = Array.isArray(daily?.tasks) ? daily.tasks : [];
+  const completed = tasks.filter((task) => task.completed).length;
+  const total = tasks.length || 3;
+  return { completed, total };
+}
+
+function getRecentModeIds(player) {
+  return player?.recentModesPlayed ?? player?.modesPlayed ?? [];
+}
+
+function hasRecentDeepScript(player) {
+  return getRecentModeIds(player)
+    .slice(-4)
+    .some((mode) => mode === 'deep_script' || mode === 'deepScript' || mode === 'Deep Script');
+}
+
+export function getHomePrimaryState({ player, statistics, daily, streak, openGame, navigate }) {
+  const stage = getStageForUser(player, statistics);
+  const letterProgress = getLetterProgress(player);
+  const dailyCounts = getDailyCounts(daily);
+
+  if (hasRecentDeepScript(player)) {
+    return {
+      kind: 'deepScript',
+      currentStage: 'words',
+      image: HOME_ASSETS.cardDeepScript,
+      title: 'Deep Script Run',
+      subtitle: 'Floor 2 of 5 cleared',
+      detail: 'Next: continue your dungeon run',
+      progress: 45,
+      cta: 'Resume Deep Script',
+      action: () => navigate('/deep-script')
+    };
+  }
+
+  if (stage === 'reading' || stage === 'conversation') {
+    return {
+      kind: 'reading',
+      currentStage: stage === 'conversation' ? 'conversation' : 'reading',
+      image: HOME_ASSETS.cardReading,
+      title: stage === 'conversation' ? 'Conversation Practice' : 'Read in Context',
+      subtitle: stage === 'conversation' ? 'Cafe Talk' : 'Cafe Talk 1',
+      detail: stage === 'conversation' ? 'Practice both roles in context' : '9/18 lines completed',
+      progress: stage === 'conversation' ? 72 : 50,
+      cta: stage === 'conversation' ? 'Continue Conversation' : 'Continue Reading',
+      action: () => navigate('/read')
+    };
+  }
+
+  if (stage === 'words') {
+    const totalItems = statistics?.totalItems ?? 12;
+    const matureItems = statistics?.matureItems ?? Math.min(8, totalItems);
+    const percent = totalItems > 0 ? Math.round((matureItems / totalItems) * 100) : 42;
+
+    return {
+      kind: 'words',
+      currentStage: 'words',
+      image: HOME_ASSETS.cardLetters,
+      title: 'Bridge Builder Pack 3',
+      subtitle: `${matureItems || 8}/${totalItems || 12} items learned`,
+      detail: 'Next: strengthen your word set',
+      progress: Math.max(20, Math.min(85, percent || 66)),
+      cta: 'Continue Learning',
+      action: () => navigate('/bridge')
+    };
+  }
+
+  return {
+    kind: 'letters',
+    currentStage: 'letters',
+    image: HOME_ASSETS.cardLetters,
+    title: 'First Letters',
+    subtitle: `${letterProgress.learned || 6}/${letterProgress.total} letters learned`,
+    detail: 'Next: practice א, ב, ג',
+    progress: letterProgress.learned ? letterProgress.percent : 30,
+    cta: 'Continue Letter River',
+    action: () => openGame({ autostart: false })
+  };
+}
+
+export function getLearningPathItems(currentStage) {
+  const currentIndex = Math.max(0, STAGE_ORDER.indexOf(currentStage));
+
+  return STAGE_ORDER.map((stage, index) => ({
+    stage,
+    label: {
+      letters: 'Letters',
+      words: 'Words',
+      reading: 'Reading',
+      conversation: 'Conversation'
+    }[stage],
+    icon: {
+      letters: 'waves',
+      words: 'landscape',
+      reading: 'menu_book',
+      conversation: 'chat_bubble'
+    }[stage],
+    status: index < currentIndex ? 'Complete' : index === currentIndex ? 'In Progress' : 'Upcoming',
+    state: index < currentIndex ? 'complete' : index === currentIndex ? 'current' : 'upcoming'
+  }));
+}
+
+export function getTodayPlanRows({ primaryState, statistics, navigate, openGame }) {
+  const reviewCount = statistics?.dueToday ?? 5;
+  const reviewLabel = `${reviewCount || 5} items ready to review`;
+  const rows = [
+    {
+      id: 'review',
+      icon: 'event_available',
+      tone: 'green',
+      title: 'Today’s Review',
+      subtitle: reviewLabel,
+      action: () => openGame({ autostart: false })
+    }
+  ];
+
+  if (primaryState.kind === 'letters') {
+    rows.push(
+      {
+        id: 'letter-river',
+        icon: 'waves',
+        tone: 'blue',
+        title: 'Letter River Practice',
+        subtitle: 'Alphabet foundations',
+        action: () => openGame({ autostart: false })
+      },
+      {
+        id: 'reading-locked',
+        icon: 'menu_book',
+        tone: 'purple',
+        title: 'Read in Context',
+        subtitle: 'Unlocks after words',
+        locked: true
+      }
+    );
+    return rows;
+  }
+
+  if (primaryState.kind === 'deepScript') {
+    rows.push(
+      {
+        id: 'deep-script',
+        icon: 'explore',
+        tone: 'blue',
+        title: 'Resume Deep Script',
+        subtitle: 'Continue your vocab run',
+        action: () => navigate('/deep-script')
+      },
+      {
+        id: 'bridge-builder',
+        icon: 'foundation',
+        tone: 'purple',
+        title: 'Bridge Builder Pack 3',
+        subtitle: 'Strengthen your word set',
+        action: () => navigate('/bridge')
+      }
+    );
+    return rows;
+  }
+
+  if (primaryState.kind === 'reading') {
+    rows.push(
+      {
+        id: 'reading',
+        icon: 'menu_book',
+        tone: 'blue',
+        title: 'Continue Reading',
+        subtitle: 'Cafe Talk 1',
+        action: () => navigate('/read')
+      },
+      {
+        id: 'conversation-locked',
+        icon: 'chat_bubble',
+        tone: 'purple',
+        title: 'Conversation Practice',
+        subtitle: 'Unlocks after this reading set',
+        locked: true
+      }
+    );
+    return rows;
+  }
+
+  rows.push(
+    {
+      id: 'bridge-builder',
+      icon: 'foundation',
+      tone: 'blue',
+      title: 'Bridge Builder Pack 3',
+      subtitle: 'Strengthen your word set',
+      action: () => navigate('/bridge')
+    },
+    {
+      id: 'deep-script',
+      icon: 'explore',
+      tone: 'purple',
+      title: 'Deep Script',
+      subtitle: 'Practice words in a dungeon run',
+      action: () => navigate('/deep-script')
+    }
+  );
+
+  return rows;
+}
+
+export function getHomeStats({ statistics, streak, daily }) {
+  const dailyCounts = getDailyCounts(daily);
+  return [
+    {
+      id: 'review',
+      icon: 'event_available',
+      tone: 'green',
+      title: 'Daily Review',
+      value: `${statistics?.dueToday ?? 5} ready`
+    },
+    {
+      id: 'streak',
+      icon: 'local_fire_department',
+      tone: 'orange',
+      title: 'Streak',
+      value: `${streak?.current || 12} days`
+    },
+    {
+      id: 'goal',
+      icon: 'star',
+      tone: 'purple',
+      title: 'Daily Goal',
+      value: `${dailyCounts.completed}/${dailyCounts.total} today`
+    }
+  ];
+}
