@@ -1,0 +1,226 @@
+/* Mobile layout fix for the Vocabulary Journey pack tray/drawer.
+   The collapsed tray uses a clear two-column layout: path rail on the left,
+   pack cards on the right. The expanded drawer becomes a compact scrollable panel. */
+
+@media (max-width: 560px) {
+  .vj-river-path {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .vj-river-path::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .vj-path-overlay {
+    min-height: 0 !important;
+    justify-content: flex-start !important;
+    gap: 24px !important;
+    padding: 38px 10px 72px !important;
+  }
+
+  .vj-path-overlay::before {
+    top: 52px !important;
+    bottom: 76px !important;
+  }
+
+  .vj-path-stop,
+  .vj-path-stop--current,
+  .vj-path-stop--current:has(.vj-pack-tray),
+  .vj-path-stop--current:has(.vj-pack-drawer) {
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  .vj-path-stop-action,
+  .vj-path-stop--current:has(.vj-pack-tray) .vj-path-stop-action,
+  .vj-path-stop--current:has(.vj-pack-drawer) .vj-path-stop-action {
+    min-height: 78px !important;
+  }
+
+  .vj-path-copy {
+    width: calc(100% - var(--route-line-x) - 38px) !important;
+    margin-left: calc(var(--route-line-x) + 32px) !important;
+  }
+
+  .vj-path-stop-action > .material-symbols-outlined:last-child {
+    right: 12px !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray,
+  .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: calc(100% - 18px) !important;
+    max-width: none !important;
+    margin: 10px auto 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .vj-pack-tray,
+  .vj-pack-drawer {
+    --tray-rail-width: 48px;
+  }
+
+  .vj-pack-tray {
+    padding: 13px 12px 12px !important;
+    border-radius: 24px !important;
+    overflow: hidden !important;
+  }
+
+  .vj-pack-tray::before,
+  .vj-pack-drawer::before {
+    inset: 7px !important;
+    border-color: rgba(75, 121, 74, 0.1) !important;
+  }
+
+  .vj-pack-tray::after,
+  .vj-pack-drawer::after {
+    opacity: 0.14 !important;
+  }
+
+  .vj-pack-tray h3 {
+    margin: 0 0 12px !important;
+    padding-inline: 3px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .vj-pack-tray-list,
+  .vj-pack-drawer-list {
+    position: relative !important;
+    display: grid !important;
+    gap: 13px !important;
+    padding: 2px 0 !important;
+  }
+
+  .vj-pack-tray-list::before,
+  .vj-pack-drawer-list::before {
+    left: 18px !important;
+    top: 18px !important;
+    bottom: 18px !important;
+    width: 4px !important;
+    opacity: 0.74 !important;
+  }
+
+  .vj-pack-tray-list::after,
+  .vj-pack-drawer-list::after {
+    opacity: 0.52 !important;
+  }
+
+  .vj-pack-tray-row,
+  .vj-pack-tray-row--compact,
+  .vj-pack-drawer-list .vj-pack-tray-row {
+    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) !important;
+    gap: 8px !important;
+    min-height: 50px !important;
+    padding: 0 !important;
+    transform: none !important;
+  }
+
+  .vj-pack-tray-row:nth-child(even),
+  .vj-pack-drawer-list .vj-pack-tray-row:nth-child(even) {
+    transform: none !important;
+  }
+
+  .vj-pack-tray-row::before {
+    left: 8px !important;
+    opacity: 0.48 !important;
+  }
+
+  .vj-pack-tray-index {
+    justify-self: start !important;
+    align-self: center !important;
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .vj-pack-tray-title {
+    min-height: 50px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    border-radius: 17px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .vj-pack-tray-status {
+    position: absolute !important;
+    right: 9px !important;
+    bottom: -9px !important;
+    min-width: 54px !important;
+    padding: 4px 7px !important;
+    font-size: 0.62rem !important;
+  }
+
+  .vj-pack-tray-row--compact:not(.vj-pack-tray-row--current) .vj-pack-tray-status {
+    display: none !important;
+  }
+
+  .vj-pack-tray-row--current {
+    margin-bottom: 10px !important;
+  }
+
+  .vj-pack-tray-more {
+    width: 100% !important;
+    min-height: 42px !important;
+    margin: 14px 0 0 !important;
+    border-radius: 14px !important;
+    padding: 8px 12px !important;
+    background: rgba(255, 230, 169, 0.78) !important;
+    color: #174c54 !important;
+    box-shadow: 0 6px 14px rgba(18, 73, 61, 0.12) !important;
+  }
+
+  .vj-pack-tray-more::before,
+  .vj-pack-tray-more::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .vj-pack-tray-more-label {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .vj-pack-tray-more-count {
+    display: grid !important;
+    place-items: center !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.72) !important;
+    color: #2476a8 !important;
+  }
+
+  .vj-pack-drawer {
+    max-height: min(58vh, 420px) !important;
+    padding: 13px !important;
+    border-radius: 24px !important;
+  }
+
+  .vj-pack-drawer-list {
+    max-height: min(44vh, 310px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 4px 4px 12px 0 !important;
+  }
+
+  .vj-pack-drawer-list .vj-pack-tray-row {
+    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) auto !important;
+    margin-bottom: 0 !important;
+  }
+
+  .vj-pack-drawer-list .vj-pack-tray-status {
+    position: static !important;
+    display: inline-grid !important;
+  }
+}

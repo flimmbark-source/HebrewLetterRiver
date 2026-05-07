@@ -1,4 +1,64 @@
 import { languagePacks, defaultAppLanguageId } from '../data/languages/index.js';
+import { supplementalDictionaries as baseSupplementalDictionaries } from './supplemental.js';
+import { hebrewSupplementalDictionary } from './supplemental.hebrew.js';
+import { arabicSupplementalDictionary } from './supplemental.arabic.js';
+import { russianSupplementalDictionary } from './supplemental.russian.js';
+import { japaneseSupplementalDictionary } from './supplemental.japanese.js';
+import { mandarinSupplementalDictionary } from './supplemental.mandarin.js';
+import { amharicSupplementalDictionary } from './supplemental.amharic.js';
+import { portuguesePackMetadataSupplemental } from './supplemental.packs.portuguese.js';
+import { spanishPackMetadataSupplemental } from './supplemental.packs.spanish.js';
+import { frenchPackMetadataSupplemental } from './supplemental.packs.french.js';
+import { additionalPackMetadataSupplementals } from './supplemental.packs.additional.js';
+import { scenicHomeSupplementalDictionaries } from './supplemental.scenicHome.js';
+
+function deepMergeSupplemental(...sources) {
+  return sources.reduce((merged, source) => {
+    if (!source || typeof source !== 'object') return merged;
+
+    Object.entries(source).forEach(([key, value]) => {
+      const existing = merged[key];
+      if (
+        value &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        existing &&
+        typeof existing === 'object' &&
+        !Array.isArray(existing)
+      ) {
+        merged[key] = deepMergeSupplemental(existing, value);
+      } else {
+        merged[key] = value;
+      }
+    });
+
+    return merged;
+  }, {});
+}
+
+function mergeSupplementalPackMetadata(languageId, baseDictionary, packMetadata) {
+  return deepMergeSupplemental(baseDictionary, {
+    packs: packMetadata ?? {}
+  });
+}
+
+function withScenicHome(languageId, dictionary) {
+  return deepMergeSupplemental(dictionary, scenicHomeSupplementalDictionaries[languageId]);
+}
+
+const supplementalDictionaries = {
+  ...baseSupplementalDictionaries,
+  english: withScenicHome('english', baseSupplementalDictionaries.english),
+  portuguese: withScenicHome('portuguese', mergeSupplementalPackMetadata('portuguese', baseSupplementalDictionaries.portuguese, portuguesePackMetadataSupplemental)),
+  spanish: withScenicHome('spanish', mergeSupplementalPackMetadata('spanish', baseSupplementalDictionaries.spanish, spanishPackMetadataSupplemental)),
+  french: withScenicHome('french', mergeSupplementalPackMetadata('french', baseSupplementalDictionaries.french, frenchPackMetadataSupplemental)),
+  hebrew: withScenicHome('hebrew', mergeSupplementalPackMetadata('hebrew', hebrewSupplementalDictionary, additionalPackMetadataSupplementals.hebrew)),
+  arabic: mergeSupplementalPackMetadata('arabic', arabicSupplementalDictionary, additionalPackMetadataSupplementals.arabic),
+  russian: mergeSupplementalPackMetadata('russian', russianSupplementalDictionary, additionalPackMetadataSupplementals.russian),
+  japanese: mergeSupplementalPackMetadata('japanese', japaneseSupplementalDictionary, additionalPackMetadataSupplementals.japanese),
+  mandarin: mergeSupplementalPackMetadata('mandarin', mandarinSupplementalDictionary, additionalPackMetadataSupplementals.mandarin),
+  amharic: mergeSupplementalPackMetadata('amharic', amharicSupplementalDictionary, additionalPackMetadataSupplementals.amharic)
+};
 
 const dictionaryModules = import.meta.glob('./*.json', { eager: true });
 
@@ -31,6 +91,18 @@ function resolveDictionaryId(languageId) {
   return availableIds.length > 0 ? availableIds[0] : null;
 }
 
+function lookupValue(source, segments) {
+  let value = source;
+  for (const segment of segments) {
+    if (value && typeof value === 'object' && segment in value) {
+      value = value[segment];
+    } else {
+      return null;
+    }
+  }
+  return value;
+}
+
 export function getDictionary(languageId) {
   const dictionaryId = resolveDictionaryId(languageId);
   if (dictionaryId && dictionaryId in loadedDictionaries) {
@@ -42,38 +114,20 @@ export function getDictionary(languageId) {
 export function translate(dictionary, key, replacements = {}) {
   if (!dictionary) return key;
   const segments = Array.isArray(key) ? key : String(key).split('.');
+  const dictionaryId = dictionary?.language?.id;
 
-  // Try to find the value in the current dictionary
-  let value = dictionary;
-  for (const segment of segments) {
-    if (value && typeof value === 'object' && segment in value) {
-      value = value[segment];
-    } else {
-      value = null;
-      break;
-    }
+  let value = lookupValue(supplementalDictionaries[dictionaryId], segments);
+
+  if (typeof value !== 'string') {
+    value = lookupValue(dictionary, segments);
   }
 
-  // If not found, try fallback dictionary (English)
   if (typeof value !== 'string' && dictionary !== fallbackDictionary) {
-    let fallbackValue = fallbackDictionary;
-    for (const segment of segments) {
-      if (fallbackValue && typeof fallbackValue === 'object' && segment in fallbackValue) {
-        fallbackValue = fallbackValue[segment];
-      } else {
-        fallbackValue = null;
-        break;
-      }
-    }
-    if (typeof fallbackValue === 'string') {
-      value = fallbackValue;
-    }
+    value = lookupValue(fallbackDictionary, segments);
   }
 
-  // If still not found, return the key itself
   if (typeof value !== 'string') return key;
 
-  // Replace placeholders with actual values
   return value.replace(/{{\s*(.+?)\s*}}/g, (match, token) => {
     const replacementKey = token.trim();
     return replacements[replacementKey] ?? match;
@@ -87,4 +141,3 @@ export function formatTemplate(template, replacements = {}) {
     return replacements[replacementKey] ?? match;
   });
 }
-

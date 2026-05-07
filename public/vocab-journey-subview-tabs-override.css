@@ -1,0 +1,4 @@
+/* Hide the extra setup subview buttons at the bottom of the Vocabulary Journey page. */
+.bbs-screen .bbs-mode-tabs {
+  display: none !important;
+}

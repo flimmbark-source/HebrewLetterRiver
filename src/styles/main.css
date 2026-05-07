@@ -97,24 +97,25 @@ body.no-scroll {
 .app-shell {
   width: 100%;
   max-width: 100%;
+  min-height: 100dvh;
   min-height: 100vh;
   font-family: var(--app-language-font, "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   border-radius: 0;
   background: var(--app-bg-gradient);
   background-color: var(--app-bg);
-  padding: 0 0 80px;
+  padding: 0 0 var(--bottom-nav-safe-space);
   display: flex;
   flex-direction: column;
   gap: 0;
   overflow-x: hidden;
-  .app-shell button,
+}
+
+.app-shell button,
 .app-shell input,
 .app-shell select,
 .app-shell textarea {
   font-family: inherit;
 }
-}
-
 
 
 .main-content {
@@ -123,8 +124,11 @@ body.no-scroll {
   border-radius: 0;
   padding: 12px;
   box-shadow: none;
-  min-height: calc(100vh - 80px);
+  min-height: calc(100dvh - var(--bottom-nav-height));
+  min-height: calc(100vh - var(--bottom-nav-height));
+  padding-bottom: var(--bottom-nav-safe-space);
 }
+
 
 /* Desktop styling */
 @media (min-width: 768px) {
@@ -133,7 +137,7 @@ body.no-scroll {
     margin: 0 auto;
     border-radius: 0;
     min-height: auto;
-    padding: 20px 20px 80px;
+    padding: 20px;
     gap: 20px;
   }
 
@@ -893,6 +897,41 @@ body.no-scroll {
   z-index: 100;
 }
 
+
+.app-main,
+.page-scroll,
+.screen-scroll,
+.mobile-panel,
+.modal-scroll,
+.pack-detail-scroll,
+.intro-screen {
+  padding-bottom: var(--bottom-nav-safe-space);
+  scroll-padding-bottom: var(--bottom-nav-safe-space);
+}
+
+.bottom-nav {
+  height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.bottom-nav__pill {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+  height: var(--bottom-nav-height);
+}
+
+@media (min-width: 768px) {
+  .app-main,
+  .page-scroll,
+  .screen-scroll,
+  .mobile-panel,
+  .modal-scroll,
+  .pack-detail-scroll,
+  .intro-screen,
+  .main-content {
+    padding-bottom: 20px;
+  }
+}
+
 /* Desktop styling */
 @media (min-width: 768px) {
   .bottom-nav {
@@ -900,6 +939,14 @@ body.no-scroll {
     margin: 0 auto;
     border-radius: 0;
   }
+}
+
+/* Route-level full-screen Tailwind containers can bypass app-shell spacing.
+   Ensure they reserve the same bottom-safe area on mobile. */
+.page-scroll > [class*="min-h-screen"],
+.page-scroll > [class*="h-screen"] {
+  padding-bottom: var(--bottom-nav-safe-space);
+  scroll-padding-bottom: var(--bottom-nav-safe-space);
 }
 
 /* Legacy nav classes — unused by current App shell (see index.css for active nav styles).
@@ -2955,6 +3002,7 @@ body.dark-mode #accessibility-view select {
 }
 
 #main-menu-view {
+  min-height: 100dvh;
   min-height: 100vh;
 }
 #main-menu-view .menu-card {
@@ -2990,4 +3038,44 @@ h1, h2, h3, h4 {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* GLOBAL MOBILE BOTTOM NAV SAFETY PATCH */
+
+:root {
+  --bottom-nav-height: 76px;
+  --bottom-nav-safe-space: calc(
+    var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 32px
+  );
+}
+
+@media (max-width: 768px) {
+  .app-main,
+  .main-content,
+  .page-scroll,
+  .screen-scroll,
+  .mobile-panel,
+  .modal-scroll,
+  .pack-detail-scroll,
+  .intro-screen,
+  .bbs-content,
+  .vj-sheet {
+    padding-bottom: var(--bottom-nav-safe-space) !important;
+    scroll-padding-bottom: var(--bottom-nav-safe-space) !important;
+    box-sizing: border-box;
+  }
+
+  .bottom-nav {
+    height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+
+  .bbs-screen {
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .vj-sheet {
+    max-height: calc(100dvh - var(--bottom-nav-safe-space)) !important;
+    overflow-y: auto !important;
+  }
 }
