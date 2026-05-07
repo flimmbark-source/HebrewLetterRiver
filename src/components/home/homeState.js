@@ -61,30 +61,14 @@ export function getHomeStateForStage({ selectedStage, player, statistics, daily,
     const totalItems = statistics?.totalItems ?? 12;
     const matureItems = statistics?.matureItems ?? Math.min(8, totalItems);
     const percent = totalItems > 0 ? Math.round((matureItems / totalItems) * 100) : 42;
-    const useDeepScript = hasRecentDeepScript(player);
-
-    if (useDeepScript) {
-      return {
-        kind: 'deepScript',
-        selectedStage: 'words',
-        currentStage: 'words',
-        image: HOME_ASSETS.cardDeepScript,
-        title: 'Deep Script Run',
-        subtitle: 'Floor 2 of 5 cleared',
-        detail: 'Next: continue your dungeon run',
-        progress: 45,
-        cta: 'Resume Deep Script',
-        action: () => navigate('/deep-script')
-      };
-    }
 
     return {
       kind: 'words',
       selectedStage: 'words',
       currentStage: 'words',
       image: HOME_ASSETS.cardLetters,
-      title: 'Bridge Builder Pack 3',
-      subtitle: `${matureItems || 8}/${totalItems || 12} items learned`,
+      title: 'Bridge Builder',
+      subtitle: `Pack 3 · ${matureItems || 8}/${totalItems || 12} items learned`,
       detail: 'Next: strengthen your word set',
       progress: Math.max(20, Math.min(85, percent || 66)),
       cta: 'Continue Learning',
@@ -94,16 +78,16 @@ export function getHomeStateForStage({ selectedStage, player, statistics, daily,
 
   if (selectedStage === 'reading') {
     return {
-      kind: 'reading',
+      kind: 'deepScript',
       selectedStage: 'reading',
       currentStage: 'reading',
-      image: HOME_ASSETS.cardReading,
-      title: 'Read in Context',
-      subtitle: 'Cafe Talk 1',
-      detail: '9/18 lines completed',
-      progress: 50,
-      cta: 'Continue Reading',
-      action: () => navigate('/read')
+      image: HOME_ASSETS.cardDeepScript,
+      title: 'Deep Script',
+      subtitle: 'Dungeon vocabulary run',
+      detail: 'Next: continue your script run',
+      progress: 45,
+      cta: 'Resume Deep Script',
+      action: () => navigate('/deep-script')
     };
   }
 
@@ -134,13 +118,13 @@ export function getLearningPathItems(currentStage, selectedStage = currentStage)
     label: {
       letters: 'Letters',
       words: 'Words',
-      reading: 'Reading',
+      reading: 'Deep Script',
       conversation: 'Conversation'
     }[stage],
     icon: {
       letters: 'waves',
       words: 'landscape',
-      reading: 'menu_book',
+      reading: 'explore',
       conversation: 'chat_bubble'
     }[stage],
     status: index < currentIndex ? 'Complete' : index === currentIndex ? 'In Progress' : 'Upcoming',
@@ -174,10 +158,10 @@ export function getTodayPlanRows({ primaryState, statistics, navigate, openGame 
         action: () => openGame({ autostart: false })
       },
       {
-        id: 'reading-locked',
-        icon: 'menu_book',
+        id: 'deep-script-locked',
+        icon: 'explore',
         tone: 'purple',
-        title: 'Read in Context',
+        title: 'Deep Script',
         subtitle: 'Unlocks after words',
         locked: true
       }
@@ -199,31 +183,9 @@ export function getTodayPlanRows({ primaryState, statistics, navigate, openGame 
         id: 'bridge-builder',
         icon: 'foundation',
         tone: 'purple',
-        title: 'Bridge Builder Pack 3',
+        title: 'Bridge Builder',
         subtitle: 'Strengthen your word set',
         action: () => navigate('/bridge')
-      }
-    );
-    return rows;
-  }
-
-  if (primaryState.kind === 'reading') {
-    rows.push(
-      {
-        id: 'reading',
-        icon: 'menu_book',
-        tone: 'blue',
-        title: 'Continue Reading',
-        subtitle: 'Cafe Talk 1',
-        action: () => navigate('/read')
-      },
-      {
-        id: 'conversation-locked',
-        icon: 'chat_bubble',
-        tone: 'purple',
-        title: 'Conversation Practice',
-        subtitle: 'Unlocks after this reading set',
-        locked: true
       }
     );
     return rows;
@@ -256,7 +218,7 @@ export function getTodayPlanRows({ primaryState, statistics, navigate, openGame 
       id: 'bridge-builder',
       icon: 'foundation',
       tone: 'blue',
-      title: 'Bridge Builder Pack 3',
+      title: 'Bridge Builder',
       subtitle: 'Strengthen your word set',
       action: () => navigate('/bridge')
     },
