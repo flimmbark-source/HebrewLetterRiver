@@ -31,46 +31,56 @@ function hasRecentDeepScript(player) {
     .some((mode) => mode === 'deep_script' || mode === 'deepScript' || mode === 'Deep Script');
 }
 
-export function getHomePrimaryState({ player, statistics, daily, streak, openGame, navigate }) {
+export function getCurrentHomeStage({ player, statistics }) {
   const stage = getStageForUser(player, statistics);
+  if (stage === 'conversation') return 'conversation';
+  if (stage === 'reading') return 'reading';
+  if (stage === 'words' || hasRecentDeepScript(player)) return 'words';
+  return 'letters';
+}
+
+export function getHomeStateForStage({ selectedStage, player, statistics, daily, openGame, navigate }) {
   const letterProgress = getLetterProgress(player);
-  const dailyCounts = getDailyCounts(daily);
 
-  if (hasRecentDeepScript(player)) {
+  if (selectedStage === 'letters') {
     return {
-      kind: 'deepScript',
-      currentStage: 'words',
-      image: HOME_ASSETS.cardDeepScript,
-      title: 'Deep Script Run',
-      subtitle: 'Floor 2 of 5 cleared',
-      detail: 'Next: continue your dungeon run',
-      progress: 45,
-      cta: 'Resume Deep Script',
-      action: () => navigate('/deep-script')
+      kind: 'letters',
+      selectedStage: 'letters',
+      currentStage: 'letters',
+      image: HOME_ASSETS.cardLetters,
+      title: 'First Letters',
+      subtitle: `${letterProgress.learned || 6}/${letterProgress.total} letters learned`,
+      detail: 'Next: practice א, ב, ג',
+      progress: letterProgress.learned ? letterProgress.percent : 30,
+      cta: 'Continue Letter River',
+      action: () => openGame({ autostart: false })
     };
   }
 
-  if (stage === 'reading' || stage === 'conversation') {
-    return {
-      kind: 'reading',
-      currentStage: stage === 'conversation' ? 'conversation' : 'reading',
-      image: HOME_ASSETS.cardReading,
-      title: stage === 'conversation' ? 'Conversation Practice' : 'Read in Context',
-      subtitle: stage === 'conversation' ? 'Cafe Talk' : 'Cafe Talk 1',
-      detail: stage === 'conversation' ? 'Practice both roles in context' : '9/18 lines completed',
-      progress: stage === 'conversation' ? 72 : 50,
-      cta: stage === 'conversation' ? 'Continue Conversation' : 'Continue Reading',
-      action: () => navigate('/read')
-    };
-  }
-
-  if (stage === 'words') {
+  if (selectedStage === 'words') {
     const totalItems = statistics?.totalItems ?? 12;
     const matureItems = statistics?.matureItems ?? Math.min(8, totalItems);
     const percent = totalItems > 0 ? Math.round((matureItems / totalItems) * 100) : 42;
+    const useDeepScript = hasRecentDeepScript(player);
+
+    if (useDeepScript) {
+      return {
+        kind: 'deepScript',
+        selectedStage: 'words',
+        currentStage: 'words',
+        image: HOME_ASSETS.cardDeepScript,
+        title: 'Deep Script Run',
+        subtitle: 'Floor 2 of 5 cleared',
+        detail: 'Next: continue your dungeon run',
+        progress: 45,
+        cta: 'Resume Deep Script',
+        action: () => navigate('/deep-script')
+      };
+    }
 
     return {
       kind: 'words',
+      selectedStage: 'words',
       currentStage: 'words',
       image: HOME_ASSETS.cardLetters,
       title: 'Bridge Builder Pack 3',
@@ -82,20 +92,41 @@ export function getHomePrimaryState({ player, statistics, daily, streak, openGam
     };
   }
 
+  if (selectedStage === 'reading') {
+    return {
+      kind: 'reading',
+      selectedStage: 'reading',
+      currentStage: 'reading',
+      image: HOME_ASSETS.cardReading,
+      title: 'Read in Context',
+      subtitle: 'Cafe Talk 1',
+      detail: '9/18 lines completed',
+      progress: 50,
+      cta: 'Continue Reading',
+      action: () => navigate('/read')
+    };
+  }
+
   return {
-    kind: 'letters',
-    currentStage: 'letters',
-    image: HOME_ASSETS.cardLetters,
-    title: 'First Letters',
-    subtitle: `${letterProgress.learned || 6}/${letterProgress.total} letters learned`,
-    detail: 'Next: practice א, ב, ג',
-    progress: letterProgress.learned ? letterProgress.percent : 30,
-    cta: 'Continue Letter River',
-    action: () => openGame({ autostart: false })
+    kind: 'conversation',
+    selectedStage: 'conversation',
+    currentStage: 'conversation',
+    image: HOME_ASSETS.cardReading,
+    title: 'Conversation Practice',
+    subtitle: 'Cafe Talk',
+    detail: 'Practice both roles in context',
+    progress: 72,
+    cta: 'Continue Conversation',
+    action: () => navigate('/read')
   };
 }
 
-export function getLearningPathItems(currentStage) {
+export function getHomePrimaryState({ player, statistics, daily, streak, openGame, navigate }) {
+  const selectedStage = getCurrentHomeStage({ player, statistics });
+  return getHomeStateForStage({ selectedStage, player, statistics, daily, streak, openGame, navigate });
+}
+
+export function getLearningPathItems(currentStage, selectedStage = currentStage) {
   const currentIndex = Math.max(0, STAGE_ORDER.indexOf(currentStage));
 
   return STAGE_ORDER.map((stage, index) => ({
@@ -113,7 +144,8 @@ export function getLearningPathItems(currentStage) {
       conversation: 'chat_bubble'
     }[stage],
     status: index < currentIndex ? 'Complete' : index === currentIndex ? 'In Progress' : 'Upcoming',
-    state: index < currentIndex ? 'complete' : index === currentIndex ? 'current' : 'upcoming'
+    state: index < currentIndex ? 'complete' : index === currentIndex ? 'current' : 'upcoming',
+    isSelected: stage === selectedStage
   }));
 }
 
@@ -192,6 +224,28 @@ export function getTodayPlanRows({ primaryState, statistics, navigate, openGame 
         title: 'Conversation Practice',
         subtitle: 'Unlocks after this reading set',
         locked: true
+      }
+    );
+    return rows;
+  }
+
+  if (primaryState.kind === 'conversation') {
+    rows.push(
+      {
+        id: 'conversation',
+        icon: 'chat_bubble',
+        tone: 'blue',
+        title: 'Conversation Practice',
+        subtitle: 'Practice both roles',
+        action: () => navigate('/read')
+      },
+      {
+        id: 'reading-review',
+        icon: 'menu_book',
+        tone: 'purple',
+        title: 'Reading Review',
+        subtitle: 'Revisit Cafe Talk',
+        action: () => navigate('/read')
       }
     );
     return rows;
