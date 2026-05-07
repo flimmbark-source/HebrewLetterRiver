@@ -6,7 +6,9 @@
   min-height: 0 !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  overscroll-behavior: contain !important;
+  overscroll-behavior-y: auto !important;
+  overscroll-behavior-x: contain !important;
+  touch-action: pan-y !important;
   -webkit-overflow-scrolling: touch !important;
   scrollbar-width: thin !important;
 }
