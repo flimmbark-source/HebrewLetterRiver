@@ -57,8 +57,8 @@
 }
 
 .vj-river-path:has(.vj-pack-drawer) .vj-path-stop--current {
-  min-height: 410px !important;
-  margin-bottom: 12px !important;
+  min-height: 430px !important;
+  margin-bottom: 10px !important;
 }
 
 .vj-river-path:has(.vj-pack-drawer) .vj-path-stop--current .vj-path-stop-action {
@@ -66,7 +66,7 @@
 }
 
 .vj-river-path:has(.vj-pack-drawer) .vj-pack-drawer {
-  top: calc(50% + 54px) !important;
+  top: calc(50% - 10px) !important;
   bottom: auto !important;
   left: 22px !important;
   right: 22px !important;
@@ -97,11 +97,11 @@
   }
 
   .vj-river-path:has(.vj-pack-drawer) .vj-path-stop--current {
-    min-height: 430px !important;
+    min-height: 450px !important;
   }
 
   .vj-river-path:has(.vj-pack-drawer) .vj-pack-drawer {
-    top: calc(50% + 42px) !important;
+    top: calc(50% - 8px) !important;
     left: 12px !important;
     right: 12px !important;
     max-height: 360px !important;
