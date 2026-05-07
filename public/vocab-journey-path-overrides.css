@@ -2,17 +2,18 @@
    Loaded from index.html so it can safely override the existing bundled component CSS. */
 
 .vj-river-path {
-  min-height: 620px !important;
+  min-height: 700px !important;
 }
 
 .vj-path-overlay {
-  min-height: 620px !important;
+  min-height: 700px !important;
   align-items: stretch !important;
+  gap: 34px !important;
 }
 
 .vj-path-stop--current:has(.vj-pack-tray) {
-  min-height: 248px !important;
-  margin-bottom: 10px !important;
+  min-height: 340px !important;
+  margin-bottom: 22px !important;
 }
 
 .vj-path-stop--current:has(.vj-pack-tray) .vj-path-stop-action {
@@ -57,8 +58,8 @@
 }
 
 .vj-path-stop--current:has(.vj-pack-drawer) {
-  min-height: 430px !important;
-  margin-bottom: 10px !important;
+  min-height: 560px !important;
+  margin-bottom: 26px !important;
 }
 
 .vj-path-stop--current:has(.vj-pack-drawer) .vj-path-stop-action {
@@ -70,23 +71,25 @@
   bottom: auto !important;
   left: 22px !important;
   right: 22px !important;
-  max-height: 320px !important;
+  max-height: 420px !important;
   border-radius: 24px !important;
 }
 
 @media (max-width: 560px) {
   .vj-river-path {
-    min-height: 650px !important;
+    min-height: 760px !important;
   }
 
   .vj-path-overlay {
-    min-height: 650px !important;
+    min-height: 760px !important;
     padding-top: 42px !important;
-    padding-bottom: 58px !important;
+    padding-bottom: 70px !important;
+    gap: 30px !important;
   }
 
   .vj-path-stop--current:has(.vj-pack-tray) {
-    min-height: 270px !important;
+    min-height: 340px !important;
+    margin-bottom: 24px !important;
   }
 
   .vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray {
@@ -97,14 +100,15 @@
   }
 
   .vj-path-stop--current:has(.vj-pack-drawer) {
-    min-height: 450px !important;
+    min-height: 560px !important;
+    margin-bottom: 28px !important;
   }
 
   .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
     top: 88px !important;
     left: 12px !important;
     right: 12px !important;
-    max-height: 350px !important;
+    max-height: 430px !important;
   }
 
   .vj-pack-drawer-list .vj-pack-tray-row {
