@@ -8,15 +8,29 @@
     bottom: 92px !important;
   }
 
+  /* Problem solved: prevent the next path node from crowding the open tray/drawer. */
   .vj-path-stop--current:has(.vj-pack-tray),
   .vj-path-stop--current:has(.vj-pack-drawer) {
-    margin-bottom: 26px !important;
+    margin-bottom: 24px !important;
   }
 
+  /* Problem solved: keep the tray/drawer aligned inside the river card instead of floating right. */
   .vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray,
   .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
-    width: min(86%, 284px) !important;
-    margin: 4px 12px 0 auto !important;
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: calc(100% - 18px) !important;
+    max-width: none !important;
+    margin: 10px auto 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .vj-pack-tray,
+  .vj-pack-drawer {
+    --tray-rail-width: 48px;
   }
 
   .vj-pack-tray {
@@ -44,14 +58,26 @@
     opacity: 0.32 !important;
   }
 
+  .vj-pack-tray-row,
+  .vj-pack-tray-row--compact,
+  .vj-pack-drawer-list .vj-pack-tray-row {
+    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) auto !important;
+  }
+
+  /* Problem solved: keep the Current pill inside the row, not hanging off the card. */
   .vj-pack-tray-status {
     position: static !important;
-    grid-column: 2 !important;
+    grid-column: 3 !important;
     grid-row: 1 !important;
     justify-self: end !important;
     align-self: center !important;
-    margin-right: 8px !important;
+    margin-right: 0 !important;
     pointer-events: none !important;
+  }
+
+  /* Problem solved: reduce compact-tray noise by showing only the meaningful current state. */
+  .vj-pack-tray-row--compact:not(.vj-pack-tray-row--current) .vj-pack-tray-status {
+    display: none !important;
   }
 
   .vj-pack-tray-row--current {
@@ -59,7 +85,7 @@
   }
 
   .vj-pack-tray-row--current .vj-pack-tray-title {
-    padding-right: 74px !important;
+    padding-right: 12px !important;
   }
 
   .vj-pack-tray-more {
