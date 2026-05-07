@@ -33,6 +33,11 @@ export default function HomeView() {
   const navigate = useNavigate();
   const [isProfileEditorOpen, setIsProfileEditorOpen] = React.useState(false);
 
+  React.useEffect(() => {
+    document.body.classList.add('scenic-home-route');
+    return () => document.body.classList.remove('scenic-home-route');
+  }, []);
+
   const displayLanguageOptions = useMemo(
     () => languageOptions.map((option) => ({ ...option, name: getFormattedLanguageName(option, t) })),
     [languageOptions, t]
