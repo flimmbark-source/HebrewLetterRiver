@@ -222,14 +222,15 @@
 
 .scenic-continue-card__body {
   display: grid;
-  grid-template-columns: 132px minmax(0, 1fr);
+  grid-template-columns: minmax(94px, 132px) minmax(0, 1fr);
   gap: 16px;
   align-items: center;
 }
 
 .scenic-continue-card__thumb {
-  width: 132px;
-  height: 132px;
+  width: 100%;
+  max-width: 132px;
+  aspect-ratio: 1;
   object-fit: cover;
   border-radius: 17px;
   box-shadow: 0 10px 20px rgba(30, 75, 55, 0.16);
@@ -243,9 +244,9 @@
   margin: 0;
   color: #123b2c;
   font-family: "Lora", Georgia, serif;
-  font-size: clamp(22px, 6vw, 28px);
+  font-size: clamp(20px, 5.4vw, 28px);
   font-weight: 800;
-  line-height: 1.08;
+  line-height: 1.02;
   letter-spacing: -0.04em;
 }
 
@@ -557,24 +558,47 @@
     font-size: 16px;
   }
 
+  .scenic-continue-card {
+    padding: 14px;
+  }
+
   .scenic-continue-card__body {
-    grid-template-columns: 104px minmax(0, 1fr);
-    gap: 12px;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 11px;
   }
 
   .scenic-continue-card__thumb {
-    width: 104px;
-    height: 104px;
+    width: 92px;
+    height: 92px;
+  }
+
+  .scenic-continue-card__content h3 {
+    font-size: clamp(18px, 6vw, 23px);
+    line-height: 1.02;
   }
 
   .scenic-continue-card__subtitle,
   .scenic-continue-card__detail {
-    font-size: 12.5px;
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.12;
+  }
+
+  .scenic-progress {
+    height: 6px;
+    margin: 8px 0;
   }
 
   .scenic-cta {
-    min-height: 42px;
-    font-size: 14px;
+    min-height: 40px;
+    border-radius: 12px;
+    font-size: 13px;
+    gap: 4px;
+    padding-inline: 8px;
+  }
+
+  .scenic-cta .material-symbols-outlined {
+    font-size: 19px;
   }
 
   .scenic-path-node__icon {
