@@ -1,100 +1,91 @@
 /* Route-specific scenic home refinements.
-   Loaded after HomeViewScenic.css so these rules intentionally override the base scenic layout. */
+   Uses the body.scenic-home-route class set by HomeView so these overrides are reliable
+   even when browser support for :has() or route wrappers behaves differently. */
 
-.app-shell:has(.scenic-home) {
+body.scenic-home-route .app-shell {
   padding-bottom: 0 !important;
 }
 
-.app-main:has(.scenic-home),
-.main-content:has(.scenic-home),
-.page-scroll:has(.scenic-home) {
-  min-height: 0 !important;
+body.scenic-home-route .app-main,
+body.scenic-home-route .main-content,
+body.scenic-home-route .page-scroll {
+  min-height: auto !important;
   padding-bottom: 0 !important;
   scroll-padding-bottom: 0 !important;
 }
 
-.page-scroll:has(.scenic-home) > .scenic-home {
-  padding-bottom: 0 !important;
-}
-
-.scenic-home {
+body.scenic-home-route .scenic-home {
   min-height: auto !important;
   padding-bottom: 0 !important;
 }
 
-.scenic-home__frame,
-.scenic-home__content {
+body.scenic-home-route .scenic-home__frame,
+body.scenic-home-route .scenic-home__content {
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
 }
 
-.scenic-stats-row {
-  margin-bottom: max(10px, env(safe-area-inset-bottom, 0px)) !important;
+body.scenic-home-route .scenic-stats-row {
+  margin-bottom: 8px !important;
 }
 
-.scenic-home-hero__copy {
+body.scenic-home-route .scenic-home-hero__copy {
   padding-top: 30px !important;
   padding-bottom: 126px !important;
 }
 
-.scenic-language-row {
+body.scenic-home-route .scenic-language-row {
   margin-bottom: 20px !important;
 }
 
-.scenic-home-hero__copy h1 {
+body.scenic-home-route .scenic-home-hero__copy h1 {
   line-height: 1.16 !important;
   padding-inline: 10px;
 }
 
-.scenic-home-hero__subtitle {
+body.scenic-home-route .scenic-home-hero__subtitle {
   display: block;
-  margin-top: 24px !important;
+  margin-top: 32px !important;
   padding-inline: 10px;
   line-height: 1.35 !important;
 }
 
 @media (max-width: 430px) {
-  .app-shell:has(.scenic-home) {
-    padding-bottom: 0 !important;
-  }
-
-  .app-main:has(.scenic-home),
-  .main-content:has(.scenic-home),
-  .page-scroll:has(.scenic-home) {
-    min-height: 0 !important;
+  body.scenic-home-route .app-shell,
+  body.scenic-home-route .app-main,
+  body.scenic-home-route .main-content,
+  body.scenic-home-route .page-scroll,
+  body.scenic-home-route .scenic-home {
+    min-height: auto !important;
     padding-bottom: 0 !important;
     scroll-padding-bottom: 0 !important;
   }
 
-  .scenic-home {
-    padding-bottom: 0 !important;
-  }
-
-  .scenic-home__content {
+  body.scenic-home-route .scenic-home__content {
     margin-top: -76px;
     padding-bottom: 0 !important;
   }
 
-  .scenic-stats-row {
-    margin-bottom: max(8px, env(safe-area-inset-bottom, 0px)) !important;
+  body.scenic-home-route .scenic-stats-row {
+    margin-bottom: 6px !important;
   }
 
-  .scenic-home-hero__copy {
+  body.scenic-home-route .scenic-home-hero__copy {
     padding-top: 26px !important;
     padding-bottom: 118px !important;
   }
 
-  .scenic-language-row {
+  body.scenic-home-route .scenic-language-row {
     margin-bottom: 18px !important;
   }
 
-  .scenic-home-hero__copy h1 {
+  body.scenic-home-route .scenic-home-hero__copy h1 {
     line-height: 1.18 !important;
     padding-inline: 14px;
   }
 
-  .scenic-home-hero__subtitle {
-    margin-top: 26px !important;
+  body.scenic-home-route .scenic-home-hero__subtitle {
+    margin-top: 34px !important;
     padding-inline: 16px;
     line-height: 1.35 !important;
   }
