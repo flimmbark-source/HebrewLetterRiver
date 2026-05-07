@@ -48,7 +48,8 @@ export default function ScenicHomeHero({
   appLanguageOptions,
   practiceLanguageOptions,
   onAppLanguageChange,
-  onPracticeLanguageChange
+  onPracticeLanguageChange,
+  t
 }) {
   return (
     <section
@@ -56,13 +57,16 @@ export default function ScenicHomeHero({
       style={{ backgroundImage: `url(${HOME_ASSETS.heroRiverValley})` }}
     >
       <div className="scenic-home-hero__topbar">
-        <div className="scenic-home-hero__brand" aria-label="Letter River">
+        <div className="scenic-home-hero__brand" aria-label={t('home.scenic.brand', 'Letter River')}>
           <Icon filled>waves</Icon>
-          <span>Letter River</span>
+          <span>{t('home.scenic.brand', 'Letter River')}</span>
         </div>
 
         <div className="scenic-home-hero__actions">
-          <div className="scenic-home-hero__streak" aria-label={`${streakDays} day streak`}>
+          <div
+            className="scenic-home-hero__streak"
+            aria-label={t('home.scenic.streakAria', '{{count}} day streak', { count: streakDays })}
+          >
             <Icon filled>local_fire_department</Icon>
             <span>{streakDays}</span>
           </div>
@@ -70,7 +74,7 @@ export default function ScenicHomeHero({
             type="button"
             className="scenic-home-hero__profile btn-press"
             onClick={onProfileClick}
-            aria-label="Edit profile"
+            aria-label={t('home.scenic.profileAria', 'Edit profile')}
           >
             <Icon filled>person</Icon>
           </button>
@@ -78,10 +82,10 @@ export default function ScenicHomeHero({
       </div>
 
       <div className="scenic-home-hero__copy">
-        <div className="scenic-language-row" aria-label="Language settings">
+        <div className="scenic-language-row" aria-label={t('home.scenic.languageSettings', 'Language settings')}>
           <CompactLanguageSelect
             id="home-scenic-app-language"
-            label="App"
+            label={t('home.scenic.appLanguage', 'App')}
             value={appLanguageId}
             options={appLanguageOptions}
             onChange={onAppLanguageChange}
@@ -89,15 +93,15 @@ export default function ScenicHomeHero({
           />
           <CompactLanguageSelect
             id="home-scenic-practice-language"
-            label="Learning"
+            label={t('home.scenic.practiceLanguage', 'Learning')}
             value={practiceLanguageId}
             options={practiceLanguageOptions}
             onChange={onPracticeLanguageChange}
             icon="🌊"
           />
         </div>
-        <h1>Good morning, Explorer!</h1>
-        <p className="scenic-home-hero__subtitle">Keep your river flowing.</p>
+        <h1>{t('home.scenic.greeting', 'Good morning, Explorer!')}</h1>
+        <p className="scenic-home-hero__subtitle">{t('home.scenic.subtitle', 'Keep your river flowing.')}</p>
       </div>
     </section>
   );
