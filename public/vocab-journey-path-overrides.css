@@ -81,16 +81,16 @@
 
 .vj-pack-tray h3::before,
 .vj-pack-drawer-header h3::before {
-  content: "✦";
-  display: inline-grid;
-  place-items: center;
+  content: "";
+  display: inline-block;
   width: 18px;
   height: 18px;
   margin-right: 6px;
   border-radius: 999px;
-  background: rgba(79, 155, 101, 0.14);
-  color: #4f9b65;
-  font-size: 0.68rem;
+  vertical-align: -4px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(79, 155, 101, 0.28) 0 3px, transparent 4px),
+    rgba(79, 155, 101, 0.14);
 }
 
 .vj-pack-tray-list,
