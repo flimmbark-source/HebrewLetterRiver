@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo } from 'react';
 import { loadLanguage } from '../lib/languageLoader.js';
 import {
+  formatTemplate,
   getDictionary,
   translate as translateFromDictionary
 } from '../i18n/index.js';
@@ -11,13 +12,13 @@ const LocalizationContext = createContext({
   languagePack: loadLanguage(),
   interfaceLanguagePack: loadLanguage(defaultAppLanguageId),
   dictionary: getDictionary(defaultAppLanguageId),
-    t: (key, fallbackOrReplacements = {}, replacements = {}) => {
+  t: (key, fallbackOrReplacements = {}, replacements = {}) => {
     const hasFallback = typeof fallbackOrReplacements === 'string';
     const fallback = hasFallback ? fallbackOrReplacements : undefined;
     const params = hasFallback ? replacements : fallbackOrReplacements;
 
     const translated = translateFromDictionary(getDictionary(defaultAppLanguageId), key, params);
-    if (!translated || translated === key) return fallback ?? key;
+    if (!translated || translated === key) return fallback ? formatTemplate(fallback, params) : key;
     return translated;
   }
 });
@@ -27,7 +28,6 @@ export function LocalizationProvider({ children }) {
   const languagePack = useMemo(() => loadLanguage(practiceLanguageId), [practiceLanguageId]);
   const interfaceLanguagePack = useMemo(() => loadLanguage(appLanguageId), [appLanguageId]);
   const dictionary = useMemo(() => getDictionary(appLanguageId), [appLanguageId]);
-
 
   const t = useCallback((key, fallbackOrReplacements = {}, replacements = {}) => {
     const hasFallback = typeof fallbackOrReplacements === 'string';
@@ -40,7 +40,7 @@ export function LocalizationProvider({ children }) {
     if (import.meta.env.DEV) {
       console.warn('[i18n] Missing translation key', { key, appLanguageId });
     }
-    return fallback ?? key;
+    return fallback ? formatTemplate(fallback, params) : key;
   }, [dictionary, appLanguageId]);
 
   const value = useMemo(
