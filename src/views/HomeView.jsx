@@ -20,16 +20,27 @@ export default function HomeView() {
   const { player, streak, daily, updatePlayerProfile } = useProgress();
   const { statistics } = useSRS();
   const { openGame } = useGame();
-  const { languageId, languageOptions } = useLanguage();
+  const {
+    languageId,
+    appLanguageId,
+    languageOptions,
+    appLanguageOptions,
+    selectLanguage,
+    selectAppLanguage
+  } = useLanguage();
   const { t } = useLocalization();
   const navigate = useNavigate();
   const [isProfileEditorOpen, setIsProfileEditorOpen] = React.useState(false);
 
-  const learningLabel = useMemo(() => {
-    const option = languageOptions.find((entry) => entry.id === languageId);
-    const name = option ? getFormattedLanguageName(option, t) : languageId;
-    return `${t('home.scenic.learning', 'Learning')} ${name}`;
-  }, [languageId, languageOptions, t]);
+  const displayLanguageOptions = useMemo(
+    () => languageOptions.map((option) => ({ ...option, name: getFormattedLanguageName(option, t) })),
+    [languageOptions, t]
+  );
+
+  const displayAppLanguageOptions = useMemo(
+    () => appLanguageOptions.map((option) => ({ ...option, name: getFormattedLanguageName(option, t) })),
+    [appLanguageOptions, t]
+  );
 
   const primaryState = useMemo(
     () => getHomePrimaryState({ player, statistics, daily, streak, openGame, navigate }),
@@ -51,7 +62,12 @@ export default function HomeView() {
       <main className="scenic-home__frame stagger-children" aria-label="Letter River home">
         <ScenicHomeHero
           streakDays={streak?.current || 12}
-          learningLabel={learningLabel}
+          appLanguageId={appLanguageId}
+          practiceLanguageId={languageId}
+          appLanguageOptions={displayAppLanguageOptions}
+          practiceLanguageOptions={displayLanguageOptions}
+          onAppLanguageChange={selectAppLanguage}
+          onPracticeLanguageChange={selectLanguage}
           onProfileClick={() => setIsProfileEditorOpen(true)}
         />
 
