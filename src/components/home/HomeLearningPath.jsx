@@ -13,8 +13,8 @@ function Icon({ children, filled = false }) {
   );
 }
 
-export default function HomeLearningPath({ currentStage }) {
-  const items = getLearningPathItems(currentStage);
+export default function HomeLearningPath({ currentStage, selectedStage, onSelectStage }) {
+  const items = getLearningPathItems(currentStage, selectedStage);
 
   return (
     <section className="scenic-panel scenic-path-card">
@@ -23,13 +23,19 @@ export default function HomeLearningPath({ currentStage }) {
         {items.map((item, index) => (
           <React.Fragment key={item.stage}>
             {index > 0 && <span className={`scenic-path-card__connector scenic-path-card__connector--${item.state}`} aria-hidden="true" />}
-            <div className={`scenic-path-node scenic-path-node--${item.state}`}>
+            <button
+              type="button"
+              className={`scenic-path-node scenic-path-node--${item.state} ${item.isSelected ? 'scenic-path-node--selected' : ''}`}
+              onClick={() => onSelectStage?.(item.stage)}
+              aria-pressed={item.isSelected}
+              aria-label={`Show ${item.label} progress, ${item.status}`}
+            >
               <div className="scenic-path-node__icon">
-                <Icon filled={item.state !== 'upcoming'}>{item.icon}</Icon>
+                <Icon filled={item.state !== 'upcoming' || item.isSelected}>{item.icon}</Icon>
               </div>
               <strong>{item.label}</strong>
-              <small>{item.status}</small>
-            </div>
+              <small>{item.isSelected ? 'Selected' : item.status}</small>
+            </button>
           </React.Fragment>
         ))}
       </div>
