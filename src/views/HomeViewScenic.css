@@ -404,7 +404,17 @@
   flex-direction: column;
   align-items: center;
   gap: 3px;
+  border: 0;
+  background: transparent;
+  padding: 0;
   text-align: center;
+  cursor: pointer;
+}
+
+.scenic-path-node:focus-visible {
+  outline: 3px solid rgba(255, 153, 10, 0.7);
+  outline-offset: 5px;
+  border-radius: 16px;
 }
 
 .scenic-path-node__icon {
@@ -418,6 +428,12 @@
   background: #d9c7a6;
   color: #102f25;
   box-shadow: 0 8px 18px rgba(30, 75, 55, 0.14);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.scenic-path-node:hover .scenic-path-node__icon {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(30, 75, 55, 0.2);
 }
 
 .scenic-path-node--complete .scenic-path-node__icon {
@@ -428,6 +444,16 @@
 .scenic-path-node--current .scenic-path-node__icon {
   background: linear-gradient(180deg, #2e8fbd, #1e6b9a);
   color: white;
+}
+
+.scenic-path-node--selected .scenic-path-node__icon {
+  border-color: #ff990a;
+  box-shadow: 0 0 0 5px rgba(255, 153, 10, 0.22), 0 12px 24px rgba(30, 75, 55, 0.18);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.scenic-path-node--selected small {
+  color: #f27600;
 }
 
 .scenic-path-node strong {
