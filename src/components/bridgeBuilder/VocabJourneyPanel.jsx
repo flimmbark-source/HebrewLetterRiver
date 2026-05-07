@@ -294,6 +294,7 @@ function PackTrayRow({ packItem, index, currentPackId, t, onSelectPack, compact 
   const state = getPackItemState(packItem, currentPackId, t);
   const pack = packItem.pack;
   const localizedTitle = t(`packs.${pack.id}.title`, pack.title);
+  const showStatus = !compact || state.modifier === 'current';
 
   return (
     <button
@@ -306,7 +307,7 @@ function PackTrayRow({ packItem, index, currentPackId, t, onSelectPack, compact 
     >
       <span className="vj-pack-tray-index">{index + 1}</span>
       <span className="vj-pack-tray-title">{localizedTitle}</span>
-      <span className="vj-pack-tray-status">{compact ? state.status : state.action}</span>
+      {showStatus && <span className="vj-pack-tray-status">{compact ? state.status : state.action}</span>}
     </button>
   );
 }
@@ -375,8 +376,8 @@ function SectionPackTray({
       </div>
       {hiddenCount > 0 && (
         <button type="button" className="vj-pack-tray-more" onClick={onToggleExpanded}>
-          {t('bridgeBuilder.vocabJourney.morePacks', 'More…')}
-          <span>{packItems.length}</span>
+          <span className="vj-pack-tray-more-label">{t('bridgeBuilder.vocabJourney.showAllPacks', 'Show all packs')}</span>
+          <span className="vj-pack-tray-more-count">{packItems.length}</span>
         </button>
       )}
     </section>
