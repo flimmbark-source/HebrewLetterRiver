@@ -1,0 +1,79 @@
+/* Route-specific scenic home refinements.
+   Loaded after HomeViewScenic.css so these rules intentionally override the base scenic layout. */
+
+.app-main:has(.scenic-home),
+.page-scroll:has(> .scenic-home) {
+  padding-bottom: 0;
+  scroll-padding-bottom: 0;
+}
+
+.scenic-home {
+  min-height: auto;
+  padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));
+}
+
+.scenic-home__frame,
+.scenic-home__content {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.scenic-stats-row {
+  margin-bottom: 0;
+}
+
+.scenic-home-hero__copy {
+  padding-top: 26px;
+  padding-bottom: 126px;
+}
+
+.scenic-language-row {
+  margin-bottom: 18px;
+}
+
+.scenic-home-hero__copy h1 {
+  line-height: 1.14;
+  padding-inline: 10px;
+}
+
+.scenic-home-hero__subtitle {
+  margin-top: 12px;
+  padding-inline: 10px;
+  line-height: 1.28;
+}
+
+@media (max-width: 430px) {
+  .app-main:has(.scenic-home),
+  .page-scroll:has(> .scenic-home) {
+    padding-bottom: 0;
+    scroll-padding-bottom: 0;
+  }
+
+  .scenic-home {
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .scenic-home__content {
+    margin-top: -76px;
+    padding-bottom: 0;
+  }
+
+  .scenic-home-hero__copy {
+    padding-top: 22px;
+    padding-bottom: 118px;
+  }
+
+  .scenic-language-row {
+    margin-bottom: 16px;
+  }
+
+  .scenic-home-hero__copy h1 {
+    line-height: 1.16;
+    padding-inline: 14px;
+  }
+
+  .scenic-home-hero__subtitle {
+    margin-top: 13px;
+    padding-inline: 16px;
+  }
+}
