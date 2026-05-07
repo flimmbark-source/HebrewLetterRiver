@@ -10,23 +10,49 @@ import { portuguesePackMetadataSupplemental } from './supplemental.packs.portugu
 import { spanishPackMetadataSupplemental } from './supplemental.packs.spanish.js';
 import { frenchPackMetadataSupplemental } from './supplemental.packs.french.js';
 import { additionalPackMetadataSupplementals } from './supplemental.packs.additional.js';
+import { scenicHomeSupplementalDictionaries } from './supplemental.scenicHome.js';
+
+function deepMergeSupplemental(...sources) {
+  return sources.reduce((merged, source) => {
+    if (!source || typeof source !== 'object') return merged;
+
+    Object.entries(source).forEach(([key, value]) => {
+      const existing = merged[key];
+      if (
+        value &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        existing &&
+        typeof existing === 'object' &&
+        !Array.isArray(existing)
+      ) {
+        merged[key] = deepMergeSupplemental(existing, value);
+      } else {
+        merged[key] = value;
+      }
+    });
+
+    return merged;
+  }, {});
+}
 
 function mergeSupplementalPackMetadata(languageId, baseDictionary, packMetadata) {
-  return {
-    ...baseDictionary,
-    packs: {
-      ...(baseDictionary?.packs ?? {}),
-      ...(packMetadata ?? {})
-    }
-  };
+  return deepMergeSupplemental(baseDictionary, {
+    packs: packMetadata ?? {}
+  });
+}
+
+function withScenicHome(languageId, dictionary) {
+  return deepMergeSupplemental(dictionary, scenicHomeSupplementalDictionaries[languageId]);
 }
 
 const supplementalDictionaries = {
   ...baseSupplementalDictionaries,
-  portuguese: mergeSupplementalPackMetadata('portuguese', baseSupplementalDictionaries.portuguese, portuguesePackMetadataSupplemental),
-  spanish: mergeSupplementalPackMetadata('spanish', baseSupplementalDictionaries.spanish, spanishPackMetadataSupplemental),
-  french: mergeSupplementalPackMetadata('french', baseSupplementalDictionaries.french, frenchPackMetadataSupplemental),
-  hebrew: mergeSupplementalPackMetadata('hebrew', hebrewSupplementalDictionary, additionalPackMetadataSupplementals.hebrew),
+  english: withScenicHome('english', baseSupplementalDictionaries.english),
+  portuguese: withScenicHome('portuguese', mergeSupplementalPackMetadata('portuguese', baseSupplementalDictionaries.portuguese, portuguesePackMetadataSupplemental)),
+  spanish: withScenicHome('spanish', mergeSupplementalPackMetadata('spanish', baseSupplementalDictionaries.spanish, spanishPackMetadataSupplemental)),
+  french: withScenicHome('french', mergeSupplementalPackMetadata('french', baseSupplementalDictionaries.french, frenchPackMetadataSupplemental)),
+  hebrew: withScenicHome('hebrew', mergeSupplementalPackMetadata('hebrew', hebrewSupplementalDictionary, additionalPackMetadataSupplementals.hebrew)),
   arabic: mergeSupplementalPackMetadata('arabic', arabicSupplementalDictionary, additionalPackMetadataSupplementals.arabic),
   russian: mergeSupplementalPackMetadata('russian', russianSupplementalDictionary, additionalPackMetadataSupplementals.russian),
   japanese: mergeSupplementalPackMetadata('japanese', japaneseSupplementalDictionary, additionalPackMetadataSupplementals.japanese),
