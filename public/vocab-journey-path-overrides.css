@@ -2,13 +2,34 @@
    Loaded from index.html so it can safely override the existing bundled component CSS. */
 
 .vj-river-path {
-  min-height: 700px !important;
+  height: clamp(560px, 78vh, 680px) !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin !important;
+}
+
+.vj-river-path::after {
+  content: "" !important;
+  position: sticky !important;
+  display: block !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 34px !important;
+  margin-top: -34px !important;
+  background: linear-gradient(180deg, rgba(232, 247, 242, 0), rgba(21, 92, 84, 0.16)) !important;
+  pointer-events: none !important;
+  z-index: 20 !important;
 }
 
 .vj-path-overlay {
   min-height: 700px !important;
   align-items: stretch !important;
   gap: 34px !important;
+  padding-bottom: 96px !important;
 }
 
 .vj-path-stop--current:has(.vj-pack-tray) {
@@ -358,13 +379,14 @@
 
 @media (max-width: 560px) {
   .vj-river-path {
-    min-height: 800px !important;
+    height: min(680px, 76vh) !important;
+    min-height: 0 !important;
   }
 
   .vj-path-overlay {
     min-height: 800px !important;
     padding-top: 42px !important;
-    padding-bottom: 70px !important;
+    padding-bottom: 108px !important;
     gap: 30px !important;
   }
 
