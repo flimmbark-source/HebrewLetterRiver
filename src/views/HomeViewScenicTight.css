@@ -1,0 +1,143 @@
+/* Route-specific scenic home refinements.
+   Uses the body.scenic-home-route class set by HomeView so these overrides are reliable
+   even when browser support for :has() or route wrappers behaves differently. */
+
+body.scenic-home-route .app-shell {
+  padding-bottom: 0 !important;
+}
+
+body.scenic-home-route .app-main,
+body.scenic-home-route .main-content,
+body.scenic-home-route .page-scroll {
+  min-height: auto !important;
+  padding-bottom: 0 !important;
+  scroll-padding-bottom: calc(var(--bottom-nav-height, 76px) + env(safe-area-inset-bottom, 0px) + 12px) !important;
+}
+
+body.scenic-home-route .scenic-home {
+  min-height: auto !important;
+  padding-bottom: calc(var(--bottom-nav-height, 76px) + env(safe-area-inset-bottom, 0px) + 12px) !important;
+}
+
+body.scenic-home-route .scenic-home__frame,
+body.scenic-home-route .scenic-home__content {
+  margin-bottom: 0 !important;
+}
+
+body.scenic-home-route .scenic-home__content {
+  padding-bottom: 0 !important;
+}
+
+body.scenic-home-route .scenic-stats-row {
+  margin-bottom: 0 !important;
+}
+
+body.scenic-home-route .scenic-home-hero__copy {
+  padding-top: 30px !important;
+  padding-bottom: 126px !important;
+}
+
+body.scenic-home-route .scenic-language-row {
+  margin-bottom: 20px !important;
+}
+
+body.scenic-home-route .scenic-home-hero__copy h1 {
+  line-height: 1.16 !important;
+  padding-inline: 10px;
+}
+
+body.scenic-home-route .scenic-home-hero__subtitle {
+  display: block;
+  margin-top: 32px !important;
+  padding-inline: 10px;
+  line-height: 1.35 !important;
+}
+
+/* Put the navigation items directly into the fixed bottom bar.
+   This visually removes the floating rounded pill/container without changing App.jsx yet. */
+body.scenic-home-route .bottom-nav {
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: space-around !important;
+  gap: 0 !important;
+  padding: 6px 10px env(safe-area-inset-bottom, 0px) !important;
+  background: var(--app-nav-bg) !important;
+  border-top: 1px solid var(--app-nav-border) !important;
+  box-shadow: 0 -2px 12px var(--app-nav-shadow) !important;
+}
+
+body.scenic-home-route .bottom-nav__pill {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: space-around !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+body.scenic-home-route .bottom-nav .nav-item {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  border-radius: 14px !important;
+}
+
+body.scenic-home-route .bottom-nav .nav-item-active {
+  border-radius: 14px !important;
+}
+
+@media (max-width: 430px) {
+  body.scenic-home-route .app-shell,
+  body.scenic-home-route .app-main,
+  body.scenic-home-route .main-content,
+  body.scenic-home-route .page-scroll {
+    min-height: auto !important;
+    padding-bottom: 0 !important;
+    scroll-padding-bottom: calc(var(--bottom-nav-height, 76px) + env(safe-area-inset-bottom, 0px) + 10px) !important;
+  }
+
+  body.scenic-home-route .scenic-home {
+    min-height: auto !important;
+    padding-bottom: calc(var(--bottom-nav-height, 76px) + env(safe-area-inset-bottom, 0px) + 10px) !important;
+  }
+
+  body.scenic-home-route .scenic-home__content {
+    margin-top: -76px;
+    padding-bottom: 0 !important;
+  }
+
+  body.scenic-home-route .scenic-stats-row {
+    margin-bottom: 0 !important;
+  }
+
+  body.scenic-home-route .scenic-home-hero__copy {
+    padding-top: 26px !important;
+    padding-bottom: 118px !important;
+  }
+
+  body.scenic-home-route .scenic-language-row {
+    margin-bottom: 18px !important;
+  }
+
+  body.scenic-home-route .scenic-home-hero__copy h1 {
+    line-height: 1.18 !important;
+    padding-inline: 14px;
+  }
+
+  body.scenic-home-route .scenic-home-hero__subtitle {
+    margin-top: 34px !important;
+    padding-inline: 16px;
+    line-height: 1.35 !important;
+  }
+
+  body.scenic-home-route .bottom-nav {
+    padding-inline: 6px !important;
+  }
+}

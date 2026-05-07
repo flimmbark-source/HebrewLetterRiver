@@ -1,0 +1,239 @@
+@media (max-width: 560px) {
+  .vj-path-overlay {
+    gap: 34px !important;
+    padding-bottom: 86px !important;
+  }
+
+  .vj-path-overlay::before {
+    bottom: 92px !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-tray),
+  .vj-path-stop--current:has(.vj-pack-drawer),
+  .vj-path-stop--with-packs {
+    margin-bottom: 24px !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray,
+  .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer,
+  .vj-active-section-card .vj-pack-tray,
+  .vj-active-section-card .vj-pack-drawer {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: calc(100% - 18px) !important;
+    max-width: none !important;
+    margin: 10px auto 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .vj-pack-tray,
+  .vj-pack-drawer {
+    --tray-rail-width: 46px;
+  }
+
+  .vj-pack-tray {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .vj-pack-tray::before,
+  .vj-pack-tray::after,
+  .vj-pack-drawer::before,
+  .vj-pack-drawer::after,
+  .vj-pack-tray-list::before,
+  .vj-pack-tray-list::after,
+  .vj-pack-drawer-list::before,
+  .vj-pack-drawer-list::after,
+  .vj-pack-tray-row::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  .vj-pack-tray h3 {
+    margin: 0 0 12px !important;
+    padding-left: calc(var(--tray-rail-width) + 3px) !important;
+    color: #174336 !important;
+    font-size: 0.86rem !important;
+  }
+
+  .vj-pack-tray-list,
+  .vj-pack-drawer-list {
+    position: relative !important;
+    display: grid !important;
+    gap: 13px !important;
+    padding: 2px 0 !important;
+  }
+
+  .vj-pack-tray-row,
+  .vj-pack-tray-row--compact,
+  .vj-pack-drawer-list .vj-pack-tray-row {
+    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    min-height: 50px !important;
+    padding: 0 !important;
+    transform: none !important;
+  }
+
+  .vj-pack-tray-row:nth-child(even),
+  .vj-pack-drawer-list .vj-pack-tray-row:nth-child(even) {
+    transform: none !important;
+  }
+
+  .vj-pack-tray-index {
+    justify-self: center !important;
+    align-self: center !important;
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .vj-pack-tray-title {
+    min-height: 50px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    border-radius: 17px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .vj-pack-tray-status {
+    position: static !important;
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+    align-self: center !important;
+    margin-right: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .vj-pack-tray-row--compact:not(.vj-pack-tray-row--current) .vj-pack-tray-status {
+    display: none !important;
+  }
+
+  .vj-pack-tray-row--current {
+    margin-bottom: 4px !important;
+  }
+
+  .vj-pack-tray-row--current .vj-pack-tray-title {
+    padding-right: 12px !important;
+  }
+
+  .vj-pack-tray-more {
+    width: 100% !important;
+    min-height: 42px !important;
+    margin: 14px 0 0 !important;
+    border-radius: 16px !important;
+    padding: 8px 12px !important;
+    background: rgba(255, 255, 248, 0.9) !important;
+    border: 1px solid rgba(58, 135, 118, 0.12) !important;
+    color: #17648d !important;
+    box-shadow: 0 5px 12px rgba(18, 73, 61, 0.08) !important;
+  }
+
+  .vj-pack-tray-more::before,
+  .vj-pack-tray-more::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .vj-pack-tray-more-count {
+    background: rgba(49, 144, 200, 0.12) !important;
+  }
+
+  .vj-pack-drawer {
+    max-height: min(58vh, 420px) !important;
+    padding: 12px 10px 12px !important;
+    border: 1px solid rgba(58, 135, 118, 0.12) !important;
+    border-radius: 24px !important;
+    background: rgba(250, 255, 242, 0.94) !important;
+    box-shadow: 0 12px 26px rgba(18, 73, 61, 0.16) !important;
+    overflow: hidden !important;
+  }
+
+  .vj-pack-drawer-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 38px !important;
+    align-items: start !important;
+    column-gap: 10px !important;
+    min-height: 0 !important;
+    margin: 0 0 12px !important;
+    padding: 0 0 12px !important;
+    border-bottom: 1px solid rgba(58, 135, 118, 0.12) !important;
+  }
+
+  .vj-pack-drawer-header > div {
+    display: grid !important;
+    gap: 4px !important;
+    min-width: 0 !important;
+    padding-left: var(--tray-rail-width) !important;
+  }
+
+  .vj-pack-drawer-header h3 {
+    margin: 0 !important;
+    overflow: hidden !important;
+    color: #174336 !important;
+    font-size: 0.98rem !important;
+    font-weight: 950 !important;
+    line-height: 1.15 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .vj-pack-drawer-header p {
+    margin: 0 !important;
+    overflow: hidden !important;
+    color: rgba(23, 59, 49, 0.66) !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .vj-pack-drawer-close {
+    position: static !important;
+    justify-self: end !important;
+    align-self: start !important;
+    width: 36px !important;
+    height: 36px !important;
+    margin: 0 !important;
+  }
+
+  .vj-pack-drawer-list {
+    max-height: min(44vh, 310px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 2px 8px 12px 0 !important;
+    scrollbar-gutter: stable !important;
+  }
+
+  .vj-pack-drawer-list .vj-pack-tray-row {
+    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) 66px !important;
+    gap: 8px !important;
+    margin-bottom: 0 !important;
+    min-height: 50px !important;
+  }
+
+  .vj-pack-drawer-list .vj-pack-tray-title {
+    min-width: 0 !important;
+  }
+
+  .vj-pack-drawer-list .vj-pack-tray-status {
+    position: static !important;
+    display: inline-grid !important;
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+    align-self: center !important;
+    min-width: 58px !important;
+    margin-right: 0 !important;
+    text-align: center !important;
+  }
+}
