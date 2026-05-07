@@ -53,6 +53,46 @@ body.scenic-home-route .scenic-home-hero__subtitle {
   line-height: 1.35 !important;
 }
 
+/* Put the navigation items directly into the fixed bottom bar.
+   This visually removes the floating rounded pill/container without changing App.jsx yet. */
+body.scenic-home-route .bottom-nav {
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: space-around !important;
+  gap: 0 !important;
+  padding: 6px 10px env(safe-area-inset-bottom, 0px) !important;
+  background: var(--app-nav-bg) !important;
+  border-top: 1px solid var(--app-nav-border) !important;
+  box-shadow: 0 -2px 12px var(--app-nav-shadow) !important;
+}
+
+body.scenic-home-route .bottom-nav__pill {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: space-around !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+body.scenic-home-route .bottom-nav .nav-item {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  border-radius: 14px !important;
+}
+
+body.scenic-home-route .bottom-nav .nav-item-active {
+  border-radius: 14px !important;
+}
+
 @media (max-width: 430px) {
   body.scenic-home-route .app-shell,
   body.scenic-home-route .app-main,
@@ -95,5 +135,9 @@ body.scenic-home-route .scenic-home-hero__subtitle {
     margin-top: 34px !important;
     padding-inline: 16px;
     line-height: 1.35 !important;
+  }
+
+  body.scenic-home-route .bottom-nav {
+    padding-inline: 6px !important;
   }
 }
