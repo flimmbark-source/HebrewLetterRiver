@@ -4,10 +4,10 @@ function Icon({ children }) {
   return <span className="material-symbols-outlined" aria-hidden="true">{children}</span>;
 }
 
-export default function ContinueJourneyCard({ state }) {
+export default function ContinueJourneyCard({ state, t }) {
   return (
     <section className="scenic-panel scenic-continue-card">
-      <h2>Continue Your Journey</h2>
+      <h2>{t('home.scenic.continueTitle', 'Continue Your Journey')}</h2>
       <div className="scenic-continue-card__body">
         <img className="scenic-continue-card__thumb" src={state.image} alt="" aria-hidden="true" />
         <div className="scenic-continue-card__content">
