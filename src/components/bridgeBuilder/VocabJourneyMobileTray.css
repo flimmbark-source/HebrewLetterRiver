@@ -34,7 +34,7 @@
   }
 
   .vj-pack-tray {
-    padding: 0 0 0 !important;
+    padding: 0 !important;
     border: 0 !important;
     border-radius: 0 !important;
     overflow: visible !important;
@@ -76,7 +76,7 @@
   .vj-pack-tray-row,
   .vj-pack-tray-row--compact,
   .vj-pack-drawer-list .vj-pack-tray-row {
-    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) !important;
+    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) auto !important;
     gap: 8px !important;
     min-height: 50px !important;
     padding: 0 !important;
@@ -108,12 +108,6 @@
     padding: 8px 12px !important;
     border-radius: 17px !important;
     font-size: 0.84rem !important;
-  }
-
-  .vj-pack-tray-row,
-  .vj-pack-tray-row--compact,
-  .vj-pack-drawer-list .vj-pack-tray-row {
-    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) auto !important;
   }
 
   /* Problem solved: keep the Current pill inside the row, not hanging off the card. */
@@ -162,52 +156,87 @@
     background: rgba(49, 144, 200, 0.12) !important;
   }
 
+  /* Drawer-only fix: the expanded drawer needs its own contained panel and header rhythm. */
   .vj-pack-drawer {
     max-height: min(58vh, 420px) !important;
-    padding: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
+    padding: 12px 10px 12px !important;
+    border: 1px solid rgba(58, 135, 118, 0.12) !important;
+    border-radius: 24px !important;
+    background: rgba(250, 255, 242, 0.92) !important;
+    box-shadow: 0 12px 26px rgba(18, 73, 61, 0.16) !important;
+    overflow: hidden !important;
   }
 
   .vj-pack-drawer-header {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) 42px !important;
-    gap: 8px !important;
-    align-items: center !important;
+    position: relative !important;
+    display: block !important;
+    min-height: 46px !important;
     margin: 0 0 12px !important;
-    padding-left: calc(var(--tray-rail-width) + 3px) !important;
+    padding: 0 46px 10px var(--tray-rail-width) !important;
+    border-bottom: 1px solid rgba(58, 135, 118, 0.1) !important;
   }
 
   .vj-pack-drawer-header h3 {
     margin: 0 !important;
+    overflow: hidden !important;
+    color: #174336 !important;
     font-size: 0.96rem !important;
+    font-weight: 950 !important;
+    line-height: 1.08 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
   }
 
   .vj-pack-drawer-header p {
-    margin: 2px 0 0 !important;
+    margin: 4px 0 0 !important;
+    overflow: hidden !important;
+    color: rgba(23, 59, 49, 0.64) !important;
     font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    line-height: 1.12 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .vj-pack-drawer-close {
+    position: absolute !important;
+    top: -2px !important;
+    right: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
   }
 
   .vj-pack-drawer-list {
     max-height: min(44vh, 310px) !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    padding: 4px 4px 12px 0 !important;
+    padding: 2px 4px 12px 0 !important;
   }
 
   .vj-pack-drawer-list .vj-pack-tray-row {
-    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) auto !important;
+    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) 64px !important;
+    gap: 8px !important;
     margin-bottom: 0 !important;
+    min-height: 50px !important;
+  }
+
+  .vj-pack-drawer-list .vj-pack-tray-index {
+    justify-self: center !important;
+  }
+
+  .vj-pack-drawer-list .vj-pack-tray-title {
+    min-width: 0 !important;
   }
 
   .vj-pack-drawer-list .vj-pack-tray-status {
     position: static !important;
     display: inline-grid !important;
-    grid-column: auto !important;
-    grid-row: auto !important;
-    justify-self: auto !important;
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+    align-self: center !important;
+    min-width: 58px !important;
     margin-right: 0 !important;
+    text-align: center !important;
   }
 }
