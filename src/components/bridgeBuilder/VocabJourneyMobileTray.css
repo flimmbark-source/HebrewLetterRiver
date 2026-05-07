@@ -8,40 +8,151 @@
     bottom: 92px !important;
   }
 
-  .vj-path-stop--current:has(.vj-pack-tray),
-  .vj-path-stop--current:has(.vj-pack-drawer) {
-    margin-bottom: 26px !important;
+  .vj-path-stop--with-packs {
+    margin-bottom: 30px !important;
   }
 
-  .vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray,
-  .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
-    width: min(86%, 284px) !important;
-    margin: 4px 12px 0 auto !important;
+  .vj-active-section-card {
+    position: relative;
+    width: calc(100% - 10px);
+    margin: 0 auto;
+    padding: 0 10px 14px;
+    border: 1px solid rgba(58, 135, 118, 0.12);
+    border-radius: 30px;
+    background: rgba(250, 255, 242, 0.84);
+    box-shadow: 0 16px 30px rgba(18, 73, 61, 0.14);
+    backdrop-filter: blur(8px);
+  }
+
+  .vj-active-section-card::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--route-line-x) + 8px);
+    top: 76px;
+    bottom: 18px;
+    width: 4px;
+    border-radius: 999px;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(71, 152, 129, 0.68) 0 7px,
+      transparent 7px 14px
+    );
+    pointer-events: none;
+  }
+
+  .vj-active-section-card .vj-path-stop-action {
+    min-height: 78px !important;
+    margin: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .vj-active-section-card .vj-path-icon {
+    transform: translateY(-6px);
+  }
+
+  .vj-active-section-card .vj-path-copy {
+    width: calc(100% - var(--route-line-x) - 38px) !important;
+    margin-left: calc(var(--route-line-x) + 32px) !important;
+  }
+
+  .vj-active-section-card .vj-path-stop-action > .material-symbols-outlined:last-child {
+    right: 12px !important;
+  }
+
+  .vj-active-section-card .vj-pack-tray,
+  .vj-active-section-card .vj-pack-drawer {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: -4px auto 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .vj-pack-tray,
+  .vj-pack-drawer {
+    --tray-rail-width: 48px;
   }
 
   .vj-pack-tray {
+    padding: 0 0 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
     overflow: visible !important;
-    border-radius: 22px !important;
-    background: rgba(250, 255, 242, 0.9) !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
   .vj-pack-tray::before,
-  .vj-pack-tray::after {
+  .vj-pack-tray::after,
+  .vj-pack-drawer::before,
+  .vj-pack-drawer::after {
     content: none !important;
     display: none !important;
   }
 
-  .vj-pack-tray-list::before {
-    opacity: 0.6 !important;
+  .vj-pack-tray h3 {
+    margin: 0 0 12px !important;
+    padding-left: calc(var(--tray-rail-width) + 3px) !important;
+    color: #174336 !important;
+    font-size: 0.86rem !important;
   }
 
-  .vj-pack-tray-list::after {
+  .vj-pack-tray-list,
+  .vj-pack-drawer-list {
+    position: relative !important;
+    display: grid !important;
+    gap: 13px !important;
+    padding: 2px 0 !important;
+  }
+
+  .vj-pack-tray-list::before,
+  .vj-pack-tray-list::after,
+  .vj-pack-drawer-list::before,
+  .vj-pack-drawer-list::after {
     content: none !important;
     display: none !important;
+  }
+
+  .vj-pack-tray-row,
+  .vj-pack-tray-row--compact,
+  .vj-pack-drawer-list .vj-pack-tray-row {
+    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) !important;
+    gap: 8px !important;
+    min-height: 50px !important;
+    padding: 0 !important;
+    transform: none !important;
+  }
+
+  .vj-pack-tray-row:nth-child(even),
+  .vj-pack-drawer-list .vj-pack-tray-row:nth-child(even) {
+    transform: none !important;
   }
 
   .vj-pack-tray-row::before {
-    opacity: 0.32 !important;
+    content: none !important;
+    display: none !important;
+  }
+
+  .vj-pack-tray-index {
+    justify-self: start !important;
+    align-self: center !important;
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .vj-pack-tray-title {
+    min-height: 50px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    border-radius: 17px !important;
+    font-size: 0.84rem !important;
   }
 
   .vj-pack-tray-status {
@@ -54,6 +165,10 @@
     pointer-events: none !important;
   }
 
+  .vj-pack-tray-row--compact:not(.vj-pack-tray-row--current) .vj-pack-tray-status {
+    display: none !important;
+  }
+
   .vj-pack-tray-row--current {
     margin-bottom: 4px !important;
   }
@@ -63,19 +178,70 @@
   }
 
   .vj-pack-tray-more {
+    width: 100% !important;
+    min-height: 42px !important;
+    margin: 14px 0 0 !important;
     border-radius: 16px !important;
+    padding: 8px 12px !important;
     background: rgba(255, 255, 248, 0.9) !important;
     border: 1px solid rgba(58, 135, 118, 0.12) !important;
     color: #17648d !important;
     box-shadow: 0 5px 12px rgba(18, 73, 61, 0.08) !important;
   }
 
+  .vj-pack-tray-more::before,
+  .vj-pack-tray-more::after {
+    content: none !important;
+    display: none !important;
+  }
+
   .vj-pack-tray-more-count {
     background: rgba(49, 144, 200, 0.12) !important;
   }
 
+  .vj-pack-drawer {
+    max-height: min(58vh, 420px) !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .vj-pack-drawer-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 42px !important;
+    gap: 8px !important;
+    align-items: center !important;
+    margin: 0 0 12px !important;
+    padding-left: calc(var(--tray-rail-width) + 3px) !important;
+  }
+
+  .vj-pack-drawer-header h3 {
+    margin: 0 !important;
+    font-size: 0.96rem !important;
+  }
+
+  .vj-pack-drawer-header p {
+    margin: 2px 0 0 !important;
+    font-size: 0.72rem !important;
+  }
+
+  .vj-pack-drawer-list {
+    max-height: min(44vh, 310px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 4px 4px 12px 0 !important;
+  }
+
+  .vj-pack-drawer-list .vj-pack-tray-row {
+    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) auto !important;
+    margin-bottom: 0 !important;
+  }
+
   .vj-pack-drawer-list .vj-pack-tray-status {
     position: static !important;
+    display: inline-grid !important;
     grid-column: auto !important;
     grid-row: auto !important;
     justify-self: auto !important;
