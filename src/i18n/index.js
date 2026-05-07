@@ -53,11 +53,13 @@ const supplementalDictionaries = {
   spanish: withScenicHome('spanish', mergeSupplementalPackMetadata('spanish', baseSupplementalDictionaries.spanish, spanishPackMetadataSupplemental)),
   french: withScenicHome('french', mergeSupplementalPackMetadata('french', baseSupplementalDictionaries.french, frenchPackMetadataSupplemental)),
   hebrew: withScenicHome('hebrew', mergeSupplementalPackMetadata('hebrew', hebrewSupplementalDictionary, additionalPackMetadataSupplementals.hebrew)),
-  arabic: mergeSupplementalPackMetadata('arabic', arabicSupplementalDictionary, additionalPackMetadataSupplementals.arabic),
-  russian: mergeSupplementalPackMetadata('russian', russianSupplementalDictionary, additionalPackMetadataSupplementals.russian),
-  japanese: mergeSupplementalPackMetadata('japanese', japaneseSupplementalDictionary, additionalPackMetadataSupplementals.japanese),
-  mandarin: mergeSupplementalPackMetadata('mandarin', mandarinSupplementalDictionary, additionalPackMetadataSupplementals.mandarin),
-  amharic: mergeSupplementalPackMetadata('amharic', amharicSupplementalDictionary, additionalPackMetadataSupplementals.amharic)
+  arabic: withScenicHome('arabic', mergeSupplementalPackMetadata('arabic', arabicSupplementalDictionary, additionalPackMetadataSupplementals.arabic)),
+  russian: withScenicHome('russian', mergeSupplementalPackMetadata('russian', russianSupplementalDictionary, additionalPackMetadataSupplementals.russian)),
+  japanese: withScenicHome('japanese', mergeSupplementalPackMetadata('japanese', japaneseSupplementalDictionary, additionalPackMetadataSupplementals.japanese)),
+  mandarin: withScenicHome('mandarin', mergeSupplementalPackMetadata('mandarin', mandarinSupplementalDictionary, additionalPackMetadataSupplementals.mandarin)),
+  amharic: withScenicHome('amharic', mergeSupplementalPackMetadata('amharic', amharicSupplementalDictionary, additionalPackMetadataSupplementals.amharic)),
+  hindi: withScenicHome('hindi', mergeSupplementalPackMetadata('hindi', baseSupplementalDictionaries.hindi, additionalPackMetadataSupplementals.hindi)),
+  bengali: withScenicHome('bengali', mergeSupplementalPackMetadata('bengali', baseSupplementalDictionaries.bengali, additionalPackMetadataSupplementals.bengali))
 };
 
 const dictionaryModules = import.meta.glob('./*.json', { eager: true });
