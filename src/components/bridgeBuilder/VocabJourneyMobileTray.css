@@ -1,0 +1,84 @@
+@media (max-width: 560px) {
+  .vj-path-overlay {
+    gap: 34px !important;
+    padding-bottom: 86px !important;
+  }
+
+  .vj-path-overlay::before {
+    bottom: 92px !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-tray),
+  .vj-path-stop--current:has(.vj-pack-drawer) {
+    margin-bottom: 26px !important;
+  }
+
+  .vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray,
+  .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
+    width: min(86%, 284px) !important;
+    margin: 4px 12px 0 auto !important;
+  }
+
+  .vj-pack-tray {
+    overflow: visible !important;
+    border-radius: 22px !important;
+    background: rgba(250, 255, 242, 0.9) !important;
+  }
+
+  .vj-pack-tray::before,
+  .vj-pack-tray::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .vj-pack-tray-list::before {
+    opacity: 0.6 !important;
+  }
+
+  .vj-pack-tray-list::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .vj-pack-tray-row::before {
+    opacity: 0.32 !important;
+  }
+
+  .vj-pack-tray-status {
+    position: static !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+    align-self: center !important;
+    margin-right: 8px !important;
+    pointer-events: none !important;
+  }
+
+  .vj-pack-tray-row--current {
+    margin-bottom: 4px !important;
+  }
+
+  .vj-pack-tray-row--current .vj-pack-tray-title {
+    padding-right: 74px !important;
+  }
+
+  .vj-pack-tray-more {
+    border-radius: 16px !important;
+    background: rgba(255, 255, 248, 0.9) !important;
+    border: 1px solid rgba(58, 135, 118, 0.12) !important;
+    color: #17648d !important;
+    box-shadow: 0 5px 12px rgba(18, 73, 61, 0.08) !important;
+  }
+
+  .vj-pack-tray-more-count {
+    background: rgba(49, 144, 200, 0.12) !important;
+  }
+
+  .vj-pack-drawer-list .vj-pack-tray-status {
+    position: static !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    justify-self: auto !important;
+    margin-right: 0 !important;
+  }
+}
