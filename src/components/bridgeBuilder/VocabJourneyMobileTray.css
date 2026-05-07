@@ -8,15 +8,16 @@
     bottom: 92px !important;
   }
 
-  /* Problem solved: prevent the next path node from crowding the open tray/drawer. */
   .vj-path-stop--current:has(.vj-pack-tray),
-  .vj-path-stop--current:has(.vj-pack-drawer) {
+  .vj-path-stop--current:has(.vj-pack-drawer),
+  .vj-path-stop--with-packs {
     margin-bottom: 24px !important;
   }
 
-  /* Problem solved: keep the tray/drawer aligned inside the river card instead of floating right. */
   .vj-path-stop--current:has(.vj-pack-tray) .vj-pack-tray,
-  .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer {
+  .vj-path-stop--current:has(.vj-pack-drawer) .vj-pack-drawer,
+  .vj-active-section-card .vj-pack-tray,
+  .vj-active-section-card .vj-pack-drawer {
     position: relative !important;
     top: auto !important;
     bottom: auto !important;
@@ -30,7 +31,7 @@
 
   .vj-pack-tray,
   .vj-pack-drawer {
-    --tray-rail-width: 48px;
+    --tray-rail-width: 46px;
   }
 
   .vj-pack-tray {
@@ -45,7 +46,12 @@
   .vj-pack-tray::before,
   .vj-pack-tray::after,
   .vj-pack-drawer::before,
-  .vj-pack-drawer::after {
+  .vj-pack-drawer::after,
+  .vj-pack-tray-list::before,
+  .vj-pack-tray-list::after,
+  .vj-pack-drawer-list::before,
+  .vj-pack-drawer-list::after,
+  .vj-pack-tray-row::before {
     content: none !important;
     display: none !important;
   }
@@ -65,14 +71,6 @@
     padding: 2px 0 !important;
   }
 
-  .vj-pack-tray-list::before,
-  .vj-pack-tray-list::after,
-  .vj-pack-drawer-list::before,
-  .vj-pack-drawer-list::after {
-    content: none !important;
-    display: none !important;
-  }
-
   .vj-pack-tray-row,
   .vj-pack-tray-row--compact,
   .vj-pack-drawer-list .vj-pack-tray-row {
@@ -88,13 +86,8 @@
     transform: none !important;
   }
 
-  .vj-pack-tray-row::before {
-    content: none !important;
-    display: none !important;
-  }
-
   .vj-pack-tray-index {
-    justify-self: start !important;
+    justify-self: center !important;
     align-self: center !important;
     width: 34px !important;
     height: 34px !important;
@@ -110,7 +103,6 @@
     font-size: 0.84rem !important;
   }
 
-  /* Problem solved: keep the Current pill inside the row, not hanging off the card. */
   .vj-pack-tray-status {
     position: static !important;
     grid-column: 3 !important;
@@ -121,7 +113,6 @@
     pointer-events: none !important;
   }
 
-  /* Problem solved: reduce compact-tray noise by showing only the meaningful current state. */
   .vj-pack-tray-row--compact:not(.vj-pack-tray-row--current) .vj-pack-tray-status {
     display: none !important;
   }
@@ -156,72 +147,78 @@
     background: rgba(49, 144, 200, 0.12) !important;
   }
 
-  /* Drawer-only fix: the expanded drawer needs its own contained panel and header rhythm. */
   .vj-pack-drawer {
     max-height: min(58vh, 420px) !important;
     padding: 12px 10px 12px !important;
     border: 1px solid rgba(58, 135, 118, 0.12) !important;
     border-radius: 24px !important;
-    background: rgba(250, 255, 242, 0.92) !important;
+    background: rgba(250, 255, 242, 0.94) !important;
     box-shadow: 0 12px 26px rgba(18, 73, 61, 0.16) !important;
     overflow: hidden !important;
   }
 
   .vj-pack-drawer-header {
-    position: relative !important;
-    display: block !important;
-    min-height: 46px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 38px !important;
+    align-items: start !important;
+    column-gap: 10px !important;
+    min-height: 0 !important;
     margin: 0 0 12px !important;
-    padding: 0 46px 10px var(--tray-rail-width) !important;
-    border-bottom: 1px solid rgba(58, 135, 118, 0.1) !important;
+    padding: 0 0 12px !important;
+    border-bottom: 1px solid rgba(58, 135, 118, 0.12) !important;
+  }
+
+  .vj-pack-drawer-header > div {
+    display: grid !important;
+    gap: 4px !important;
+    min-width: 0 !important;
+    padding-left: var(--tray-rail-width) !important;
   }
 
   .vj-pack-drawer-header h3 {
     margin: 0 !important;
     overflow: hidden !important;
     color: #174336 !important;
-    font-size: 0.96rem !important;
+    font-size: 0.98rem !important;
     font-weight: 950 !important;
-    line-height: 1.08 !important;
+    line-height: 1.15 !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
   }
 
   .vj-pack-drawer-header p {
-    margin: 4px 0 0 !important;
+    margin: 0 !important;
     overflow: hidden !important;
-    color: rgba(23, 59, 49, 0.64) !important;
+    color: rgba(23, 59, 49, 0.66) !important;
     font-size: 0.72rem !important;
     font-weight: 800 !important;
-    line-height: 1.12 !important;
+    line-height: 1.2 !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
   }
 
   .vj-pack-drawer-close {
-    position: absolute !important;
-    top: -2px !important;
-    right: 0 !important;
+    position: static !important;
+    justify-self: end !important;
+    align-self: start !important;
     width: 36px !important;
     height: 36px !important;
+    margin: 0 !important;
   }
 
   .vj-pack-drawer-list {
     max-height: min(44vh, 310px) !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    padding: 2px 4px 12px 0 !important;
+    padding: 2px 8px 12px 0 !important;
+    scrollbar-gutter: stable !important;
   }
 
   .vj-pack-drawer-list .vj-pack-tray-row {
-    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) 64px !important;
+    grid-template-columns: var(--tray-rail-width) minmax(0, 1fr) 66px !important;
     gap: 8px !important;
     margin-bottom: 0 !important;
     min-height: 50px !important;
-  }
-
-  .vj-pack-drawer-list .vj-pack-tray-index {
-    justify-self: center !important;
   }
 
   .vj-pack-drawer-list .vj-pack-tray-title {
