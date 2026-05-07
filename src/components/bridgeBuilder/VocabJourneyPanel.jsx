@@ -14,6 +14,7 @@ import {
 import './VocabJourneyPanel.css';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import { useLanguage } from '../../context/LanguageContext.jsx';
+import { loadBridgeBuilderWords } from '../../data/bridgeBuilder/words/index.js';
 
 function Icon({ children, className = '', filled = false }) {
   return (
@@ -254,6 +255,32 @@ export default function VocabJourneyPanel({
   const { t } = useLocalization();
   const { languageId: selectedPracticeLanguageId } = useLanguage();
   const languageId = languageIdProp || selectedPracticeLanguageId || 'hebrew';
+  const [previewWordsReady, setPreviewWordsReady] = useState(languageId === 'hebrew');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (languageId === 'hebrew') {
+      setPreviewWordsReady(true);
+      return undefined;
+    }
+
+    setPreviewWordsReady(false);
+    loadBridgeBuilderWords(languageId)
+      .then(() => {
+        if (!cancelled) setPreviewWordsReady(true);
+      })
+      .catch((error) => {
+        if (import.meta.env.DEV) {
+          console.warn('[vocabJourney] Failed to load preview words for selected language', { languageId, error });
+        }
+        if (!cancelled) setPreviewWordsReady(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [languageId]);
 
   const currentPackData = useMemo(() => getCurrentJourneyPack(sectionData, activePackId), [sectionData, activePackId]);
   const currentPack = currentPackData?.pack;
@@ -263,7 +290,12 @@ export default function VocabJourneyPanel({
   const currentCompletion = currentPackData?.completion;
 
   const journeyStops = useMemo(() => getJourneyStops(sectionData, activePackId), [sectionData, activePackId]);
-  const preview = useMemo(() => getPackWordPreview(currentPack, languageId), [currentPack, languageId]);
+  const preview = useMemo(() => {
+    if (!previewWordsReady) {
+      return { words: [], usedFallback: false, missingPackMapping: false };
+    }
+    return getPackWordPreview(currentPack, languageId);
+  }, [currentPack, languageId, previewWordsReady]);
   const displayWords = preview.words;
   const missingPackMapping = preview.missingPackMapping;
 
@@ -274,12 +306,13 @@ export default function VocabJourneyPanel({
       appLanguage: (window.__LETTER_RIVER_LAST_APP_LANG__ || 'unknown'),
       practiceLanguage: languageId,
       requestedPackLanguage: languageId,
+      previewWordsReady,
       resolvedPackId: currentPack?.id ?? null,
       resolvedWordsCount: displayWords.length,
       usedFallbackContent: preview.usedFallback,
       missingPackMapping
     });
-  }, [languageId, currentPack?.id, displayWords.length, preview.usedFallback, missingPackMapping]);
+  }, [languageId, previewWordsReady, currentPack?.id, displayWords.length, preview.usedFallback, missingPackMapping]);
 
   const stageInfo = useMemo(() => getPackLearningStage(currentProgress, currentCompletion), [currentProgress, currentCompletion]);
   const localizedStageInfo = useMemo(() => localizeStageInfo(stageInfo, t), [stageInfo, t]);
