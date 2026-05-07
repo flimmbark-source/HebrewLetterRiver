@@ -25,6 +25,7 @@ import PWAInstallPrompt from './components/PWAInstallPrompt.jsx';
 import PlayModeModal from './components/PlayModeModal.jsx';
 import OnboardingFlow from './components/OnboardingFlow.jsx';
 import { useFontSettings } from './hooks/useFontSettings.js';
+import './components/AppBottomNav.css';
 
 function LanguageOnboardingModal() {
   const {
@@ -255,49 +256,43 @@ function Shell() {
         </div>
       </main>
       {!(isGameVisible && isGameRunning) && !inConversationPractice && !inDeepScript && (
-        <nav className="bottom-nav fixed bottom-0 left-0 z-50 flex w-full items-center justify-around px-4 pt-2">
-          <div className="bottom-nav__pill fixed left-6 right-6 flex items-center justify-around rounded-full px-2 backdrop-blur-xl" style={{ background: 'var(--app-nav-bg)', border: '1px solid var(--app-nav-border)', boxShadow: '0 4px 24px var(--app-nav-shadow), 0 1px 4px var(--app-nav-shadow)' }}>
-            <NavLink
-              to="/home"
-              onClick={handleNavClick}
-              className={({ isActive }) => `nav-item flex flex-col items-center justify-center px-5 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 ${isActive ? 'nav-item-active' : ''}`}
-              style={({ isActive }) => (isActive ? {} : { color: 'var(--app-muted)' })}
-            >
-              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>home</span>
-              <span>{t('app.nav.home', 'Home')}</span>
-            </NavLink>
+        <nav className="bottom-nav" aria-label={t('app.nav.primary', 'Primary navigation')}>
+          <NavLink
+            to="/home"
+            onClick={handleNavClick}
+            className={({ isActive }) => `bottom-nav__item nav-item flex flex-col items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95 ${isActive ? 'nav-item-active' : ''}`}
+          >
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>home</span>
+            <span>{t('app.nav.home', 'Home')}</span>
+          </NavLink>
 
-            <button
-              type="button"
-              onClick={handlePlay}
-              disabled={isPlayDisabled}
-              className={`nav-item flex flex-col items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 disabled:cursor-not-allowed disabled:opacity-50 ${isPlayActive ? 'nav-item-active' : ''}`}
-              style={isPlayActive ? {} : { color: 'var(--app-muted)' }}
-            >
-              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>videogame_asset</span>
-              <span>{t('app.nav.play', 'Play')}</span>
-            </button>
+          <button
+            type="button"
+            onClick={handlePlay}
+            disabled={isPlayDisabled}
+            className={`bottom-nav__item nav-item flex flex-col items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 ${isPlayActive ? 'nav-item-active' : ''}`}
+          >
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>videogame_asset</span>
+            <span>{t('app.nav.play', 'Play')}</span>
+          </button>
 
-            <NavLink
-              to="/achievements"
-              onClick={handleNavClick}
-              className={({ isActive }) => `nav-item flex flex-col items-center justify-center px-5 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 ${isActive ? 'nav-item-active' : ''}`}
-              style={({ isActive }) => (isActive ? {} : { color: 'var(--app-muted)' })}
-            >
-              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>emoji_events</span>
-              <span>{t('app.nav.achievements', 'Awards')}</span>
-            </NavLink>
+          <NavLink
+            to="/achievements"
+            onClick={handleNavClick}
+            className={({ isActive }) => `bottom-nav__item nav-item flex flex-col items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95 ${isActive ? 'nav-item-active' : ''}`}
+          >
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>emoji_events</span>
+            <span>{t('app.nav.achievements', 'Awards')}</span>
+          </NavLink>
 
-            <NavLink
-              to="/settings"
-              onClick={handleNavClick}
-              className={({ isActive }) => `nav-item flex flex-col items-center justify-center px-5 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-90 ${isActive ? 'nav-item-active' : ''}`}
-              style={({ isActive }) => (isActive ? {} : { color: 'var(--app-muted)' })}
-            >
-              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>settings</span>
-              <span>{t('app.nav.settings', 'Settings')}</span>
-            </NavLink>
-          </div>
+          <NavLink
+            to="/settings"
+            onClick={handleNavClick}
+            className={({ isActive }) => `bottom-nav__item nav-item flex flex-col items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95 ${isActive ? 'nav-item-active' : ''}`}
+          >
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>settings</span>
+            <span>{t('app.nav.settings', 'Settings')}</span>
+          </NavLink>
         </nav>
       )}
     </div>
