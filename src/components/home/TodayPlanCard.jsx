@@ -12,10 +12,10 @@ function Icon({ children, filled = false }) {
   );
 }
 
-export default function TodayPlanCard({ rows }) {
+export default function TodayPlanCard({ rows, t }) {
   return (
     <section className="scenic-panel scenic-plan-card">
-      <h2>Today’s Plan</h2>
+      <h2>{t('home.scenic.todayPlanTitle', 'Today’s Plan')}</h2>
       <div className="scenic-plan-card__rows">
         {rows.map((row) => {
           const Element = row.locked ? 'div' : 'button';
