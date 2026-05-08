@@ -109,7 +109,7 @@ export function getHomeStateForStage({
       kind: 'words',
       selectedStage: 'words',
       currentStage: 'words',
-      image: HOME_ASSETS.cardLetters,
+      image: HOME_ASSETS.cardBridgeBuilder,
       title: t('home.scenic.words.title', 'Bridge Builder'),
       subtitle: t('home.scenic.words.subtitle', 'Pack 3 · {{learned}}/{{total}} {{language}} items learned', {
         learned: matureItems || 8,
@@ -203,7 +203,7 @@ export function getTodayPlanRows({ primaryState, statistics, navigate, openGame,
       tone: 'green',
       title: t('home.scenic.dailyReview', 'Daily Review'),
       subtitle: reviewLabel,
-      action: () => openGame({ autostart: false })
+      action: () => navigate('/daily')
     }
   ];
 
