@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import LetterRiverBrand from '../LetterRiverBrand.jsx';
 import riverHero from '../../assets/vocab-journey/river-valley-hero.webp';
 import cafeArt from '../../assets/vocab-journey/cafe-words-art.webp';
 import bridgeArt from '../../assets/vocab-journey/bridge-builder-art.webp';
@@ -13,9 +14,12 @@ import {
 } from './vocabJourneyModel.js';
 import './VocabJourneyPanel.css';
 import './VocabJourneyMobileTray.css';
+import './VocabJourneyWordPopup.css';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import { useLanguage } from '../../context/LanguageContext.jsx';
 import { loadBridgeBuilderWords } from '../../data/bridgeBuilder/words/index.js';
+
+const MAX_TODAYS_REVIEW_WORDS = 6;
 
 function Icon({ children, className = '', filled = false }) {
   return (
@@ -105,19 +109,43 @@ function getStopStatusLabel(status, t) {
   return status;
 }
 
-function WordChips({ words, t, isMissingPackMapping, languageId = 'hebrew' }) {
+function WordChips({ items, t, isMissingPackMapping, languageId = 'hebrew' }) {
+  const [selectedWordId, setSelectedWordId] = useState(null);
   const direction = languageId === 'hebrew' || languageId === 'arabic' ? 'rtl' : 'ltr';
+  const selectedWord = items.find((word) => word.id === selectedWordId);
+
+  useEffect(() => {
+    setSelectedWordId(null);
+  }, [items]);
 
   return (
     <div className="vj-word-chips" dir={direction}>
-      {words.length === 0 ? (
+      {items.length === 0 ? (
         <div style={{ padding: '8px', color: '#999', fontSize: '0.875rem' }}>
           {isMissingPackMapping
             ? t('bridgeBuilder.vocabJourney.missingPackContent', 'Content for this pack is not available in the selected practice language yet.')
             : t('bridgeBuilder.vocabJourney.loadingWords', 'Loading words...')}
         </div>
       ) : (
-        words.map((word) => <span key={word} className="vj-word-chip">{word}</span>)
+        items.map((word) => (
+          <span key={word.id} className="vj-word-chip-wrap">
+            <button
+              type="button"
+              className={`vj-word-chip ${selectedWordId === word.id ? 'vj-word-chip--active' : ''}`}
+              onClick={() => setSelectedWordId((current) => current === word.id ? null : word.id)}
+              aria-expanded={selectedWordId === word.id}
+            >
+              {word.native}
+            </button>
+            {selectedWord?.id === word.id && (
+              <span className="vj-word-popover" dir="ltr" role="tooltip">
+                {word.transliteration && <strong>{word.transliteration}</strong>}
+                {word.translation && <small>{word.translation}</small>}
+                {!word.transliteration && !word.translation && <small>{t('bridgeBuilder.vocabJourney.wordDetailsUnavailable', 'Details unavailable')}</small>}
+              </span>
+            )}
+          </span>
+        ))
       )}
     </div>
   );
@@ -142,18 +170,17 @@ function CurrentPackDetailSheet({
   t,
   isOpen,
   onClose,
-  wordPreview,
+  wordPreviewItems,
   missingPackMapping,
   languageId,
   localizedPackTitle,
   localizedPackDescription,
   stage,
   recommendedAction,
-  reviewCount,
   onLaunchRecommended,
   onLaunchLoosePlanks,
   onLaunchDeepScript,
-  onReview,
+  onLaunchReadContext,
 }) {
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -192,7 +219,7 @@ function CurrentPackDetailSheet({
           <p>{localizedPackDescription || t('bridgeBuilder.vocabJourney.continueLearningWords', 'Continue learning new words.')}</p>
         </header>
 
-        <WordChips words={wordPreview} t={t} isMissingPackMapping={missingPackMapping} languageId={languageId} />
+        <WordChips items={wordPreviewItems} t={t} isMissingPackMapping={missingPackMapping} languageId={languageId} />
         <SheetProgress steps={stage.steps} t={t} />
 
         <div className="vj-recommended">
@@ -214,20 +241,15 @@ function CurrentPackDetailSheet({
             <span><strong>{t('bridgeBuilder.vocabJourney.optionLoosePlanksTitle', 'Strengthen — Loose Planks')}</strong><small>{t('bridgeBuilder.vocabJourney.optionLoosePlanksSubtitle', 'Reinforce with targeted practice.')}</small></span>
             <Icon>chevron_right</Icon>
           </button>
-          <button type="button" className="vj-option" onClick={onReview} disabled={reviewCount <= 0}>
-            <span className="vj-option-icon vj-option-icon--blue"><Icon filled>calendar_month</Icon></span>
-            <span><strong>{t('bridgeBuilder.vocabJourney.optionReviewTitle', 'Review — Today’s Review')}</strong><small>{t('bridgeBuilder.vocabJourney.optionReviewSubtitle', 'Review words for memory.')}</small></span>
-            <Icon>chevron_right</Icon>
-          </button>
           <button type="button" className="vj-option" onClick={onLaunchDeepScript}>
             <span className="vj-option-icon vj-option-icon--purple"><Icon filled>ink_pen</Icon></span>
             <span><strong>{t('bridgeBuilder.vocabJourney.optionDeepScriptTitle', 'Challenge — Deep Script')}</strong><small>{t('bridgeBuilder.vocabJourney.optionDeepScriptSubtitle', 'Test depth with writing and recall.')}</small></span>
             <Icon>chevron_right</Icon>
           </button>
-          <button type="button" className="vj-option" disabled>
+          <button type="button" className="vj-option" onClick={onLaunchReadContext}>
             <span className="vj-option-icon vj-option-icon--blue"><Icon filled>menu_book</Icon></span>
-            <span><strong>{t('bridgeBuilder.vocabJourney.optionReadTitle', 'Read — Cafe Talk')}</strong><small>{t('bridgeBuilder.vocabJourney.optionReadSubtitle', 'See the words in a real conversation.')}</small></span>
-            <Icon>lock</Icon>
+            <span><strong>{t('bridgeBuilder.vocabJourney.optionReadTitle', 'Read in Context')}</strong><small>{t('bridgeBuilder.vocabJourney.optionReadSubtitle', 'Practice this pack in sentence context.')}</small></span>
+            <Icon>chevron_right</Icon>
           </button>
         </div>
       </section>
@@ -473,10 +495,11 @@ export default function VocabJourneyPanel({
 
   const journeyStops = useMemo(() => getJourneyStops(sectionData, activePackId), [sectionData, activePackId]);
   const preview = useMemo(() => {
-    if (!previewWordsReady) return { words: [], usedFallback: false, missingPackMapping: false };
+    if (!previewWordsReady) return { words: [], items: [], usedFallback: false, missingPackMapping: false };
     return getPackWordPreview(currentPack, languageId);
   }, [currentPack, languageId, previewWordsReady]);
-  const displayWords = preview.words;
+  const displayWords = preview.words || [];
+  const displayWordItems = preview.items || displayWords.map((word) => ({ id: word, native: word, transliteration: '', translation: '' }));
   const missingPackMapping = preview.missingPackMapping;
 
   useEffect(() => {
@@ -501,13 +524,15 @@ export default function VocabJourneyPanel({
   const localizedRecommendedAction = useMemo(() => localizeRecommendedAction(recommendedAction, t), [recommendedAction, t]);
   const journeyStats = useMemo(() => getJourneyStats(sectionData), [sectionData]);
   const [isPackSheetOpen, setIsPackSheetOpen] = useState(false);
+  const rawReviewCount = (dueReviewCount || 0) + (weakReviewCount || 0);
+  const reviewCount = Math.min(rawReviewCount, MAX_TODAYS_REVIEW_WORDS);
 
   if (!currentPack) {
     return (
       <section className="vj-shell" aria-label={t('bridgeBuilder.vocabJourney.title', 'Vocabulary Journey')}>
         <div className="vj-hero" style={{ backgroundImage: `url(${riverHero})` }}>
           <div className="vj-hero-scrim" />
-          <div className="vj-brand-row"><div className="vj-brand"><span className="vj-logo">🌊</span><span>{t('app.brand.name', 'Letter River')}</span></div></div>
+          <div className="vj-brand-row"><LetterRiverBrand label={t('app.brand.name', 'Letter River')} className="vj-brand" /></div>
           <div className="vj-hero-copy"><h1>{t('bridgeBuilder.vocabJourney.title', 'Vocabulary Journey')}</h1><p>{t('bridgeBuilder.vocabJourney.startPath', 'Start your learning path')}</p></div>
         </div>
         <div className="vj-main-grid" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
@@ -518,14 +543,12 @@ export default function VocabJourneyPanel({
     );
   }
 
-  const reviewCount = dueReviewCount + weakReviewCount;
-
   return (
     <section className="vj-shell" aria-label={t('bridgeBuilder.vocabJourney.title', 'Vocabulary Journey')}>
       <div className="vj-hero" style={{ backgroundImage: `url(${riverHero})` }}>
         <div className="vj-hero-scrim" />
         <div className="vj-brand-row">
-          <div className="vj-brand"><span className="vj-logo">🌊</span><span>{t('app.brand.name', 'Letter River')}</span></div>
+          <LetterRiverBrand label={t('app.brand.name', 'Letter River')} className="vj-brand" />
           <div className="vj-streak-pill"><Icon filled>auto_stories</Icon><span>{journeyStats.completedPacks}</span></div>
         </div>
 
@@ -581,10 +604,10 @@ export default function VocabJourneyPanel({
             </span>
             <Icon>chevron_right</Icon>
           </button>
-          <button type="button" className="vj-support-row vj-support-row--locked">
+          <button type="button" className="vj-support-row" onClick={() => onLaunchPackMethod(currentPack, 'read_context')}>
             <span className="vj-row-icon vj-row-icon--blue"><Icon filled>menu_book</Icon></span>
-            <span className="vj-row-text"><strong>{t('bridgeBuilder.vocabJourney.readInContextTitle', 'Read in Context — Cafe Talk')}</strong><small>{t('bridgeBuilder.vocabJourney.readInContextLockedSubtitle', 'Unlocks after this pack.')}</small></span>
-            <Icon>lock</Icon>
+            <span className="vj-row-text"><strong>{t('bridgeBuilder.vocabJourney.readInContextTitle', 'Read in Context')}</strong><small>{t('bridgeBuilder.vocabJourney.readInContextSubtitle', 'Practice this pack in sentence context.')}</small></span>
+            <Icon>chevron_right</Icon>
           </button>
         </div>
 
@@ -635,18 +658,17 @@ export default function VocabJourneyPanel({
         t={t}
         isOpen={isPackSheetOpen}
         onClose={() => setIsPackSheetOpen(false)}
-        wordPreview={displayWords}
+        wordPreviewItems={displayWordItems}
         missingPackMapping={missingPackMapping}
         languageId={languageId}
         localizedPackTitle={localizedPackTitle}
         localizedPackDescription={localizedPackDescription}
         stage={localizedStageInfo}
         recommendedAction={localizedRecommendedAction}
-        reviewCount={reviewCount}
         onLaunchRecommended={() => onLaunchPackMethod(currentPack, recommendedAction.method)}
         onLaunchLoosePlanks={() => onLaunchPackMethod(currentPack, 'loose_planks')}
         onLaunchDeepScript={() => onLaunchPackMethod(currentPack, 'deep_script')}
-        onReview={onReview}
+        onLaunchReadContext={() => onLaunchPackMethod(currentPack, 'read_context')}
       />
     </section>
   );

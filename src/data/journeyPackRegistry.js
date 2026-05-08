@@ -13,11 +13,9 @@ export const JOURNEY_PACKS = [
   { id: 'food_01', category: 'starter', stepOrder: 4 }
 ];
 
-const THEME_BY_PACK = Object.fromEntries(
-  bridgeBuilderPacks.map((p) => [p.id, p.theme])
+const PACK_BY_ID = Object.fromEntries(
+  bridgeBuilderPacks.map((pack) => [pack.id, pack])
 );
-
-const STARTER_COUNT = 5;
 
 export function canonicalLanguageId(input) {
   const value = String(input || '').trim().toLowerCase();
@@ -25,30 +23,56 @@ export function canonicalLanguageId(input) {
   return aliases[value] || value;
 }
 
-export function getPackWordIds(practiceLanguage, packId) {
+function getWordPool(practiceLanguage) {
   const lang = canonicalLanguageId(practiceLanguage);
-  const theme = THEME_BY_PACK[packId];
-  if (!theme) return [];
+  return lang === 'hebrew' ? bridgeBuilderWords : getBridgeBuilderWordsSync(lang);
+}
 
-  const pool = lang === 'hebrew' ? bridgeBuilderWords : getBridgeBuilderWordsSync(lang);
-  const matching = (Array.isArray(pool) ? pool : []).filter((w) => w.theme === theme);
-  return matching.slice(0, STARTER_COUNT).map((w) => w.id);
+function getEquivalentWordId(wordId, targetPool) {
+  if (!wordId) return null;
+  const idSet = new Set((targetPool || []).map((word) => word.id));
+  if (idSet.has(wordId)) return wordId;
+
+  const canonicalKey = String(wordId)
+    .replace(/^bbct-/, '')
+    .replace(/^bb-/, '');
+
+  const equivalent = (targetPool || []).find((word) => {
+    const poolKey = String(word.id || '')
+      .replace(/^bbct-/, '')
+      .replace(/^bb-/, '');
+    return poolKey === canonicalKey;
+  });
+
+  return equivalent?.id || null;
+}
+
+export function getPackWordIds(practiceLanguage, packId) {
+  const pack = PACK_BY_ID[packId];
+  if (!pack?.wordIds?.length) return [];
+
+  const pool = getWordPool(practiceLanguage);
+  const resolvedIds = pack.wordIds
+    .map((wordId) => getEquivalentWordId(wordId, pool))
+    .filter(Boolean);
+
+  return Array.from(new Set(resolvedIds));
 }
 
 export function validatePracticeLanguagePackCoverage() {
   const rows = [];
   for (const lang of PRACTICE_LANGUAGES) {
-    const pool = lang === 'hebrew' ? bridgeBuilderWords : getBridgeBuilderWordsSync(lang);
+    const pool = getWordPool(lang);
     const idSet = new Set((pool || []).map((w) => w.id));
     let mapped = 0;
     let valid = true;
-    for (const pack of JOURNEY_PACKS) {
+    for (const pack of bridgeBuilderPacks) {
       const ids = getPackWordIds(lang, pack.id);
       if (ids.length > 0) mapped += 1;
       const missing = ids.filter((id) => !idSet.has(id));
       if (missing.length) valid = false;
     }
-    rows.push({ language: lang, mapped: `${mapped}/${JOURNEY_PACKS.length}`, valid });
+    rows.push({ language: lang, mapped: `${mapped}/${bridgeBuilderPacks.length}`, valid });
   }
   return rows;
 }

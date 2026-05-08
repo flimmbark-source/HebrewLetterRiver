@@ -12,6 +12,7 @@ import { frenchPackMetadataSupplemental } from './supplemental.packs.french.js';
 import { additionalPackMetadataSupplementals } from './supplemental.packs.additional.js';
 import { scenicHomeSupplementalDictionaries } from './supplemental.scenicHome.js';
 import { extraScenicHomeSupplementalDictionaries } from './supplemental.scenicHome.extra.js';
+import { scenicHomeConversationLabelOverrides } from './supplemental.scenicHome.conversationLabels.js';
 
 function deepMergeSupplemental(...sources) {
   return sources.reduce((merged, source) => {
@@ -47,7 +48,8 @@ function withScenicHome(languageId, dictionary) {
   return deepMergeSupplemental(
     dictionary,
     scenicHomeSupplementalDictionaries[languageId],
-    extraScenicHomeSupplementalDictionaries[languageId]
+    extraScenicHomeSupplementalDictionaries[languageId],
+    scenicHomeConversationLabelOverrides[languageId]
   );
 }
 
@@ -110,6 +112,14 @@ function lookupValue(source, segments) {
   return value;
 }
 
+function renderValue(value, replacements) {
+  if (typeof value !== 'string') return null;
+  return value.replace(/{{\s*(.+?)\s*}}/g, (match, token) => {
+    const replacementKey = token.trim();
+    return replacements[replacementKey] ?? match;
+  });
+}
+
 export function getDictionary(languageId) {
   const dictionaryId = resolveDictionaryId(languageId);
   if (dictionaryId && dictionaryId in loadedDictionaries) {
@@ -123,22 +133,19 @@ export function translate(dictionary, key, replacements = {}) {
   const segments = Array.isArray(key) ? key : String(key).split('.');
   const dictionaryId = dictionary?.language?.id;
 
-  let value = lookupValue(supplementalDictionaries[dictionaryId], segments);
+  const sources = [
+    supplementalDictionaries[dictionaryId],
+    dictionary,
+    dictionary === fallbackDictionary ? null : supplementalDictionaries[fallbackId],
+    dictionary === fallbackDictionary ? null : fallbackDictionary
+  ];
 
-  if (typeof value !== 'string') {
-    value = lookupValue(dictionary, segments);
+  for (const source of sources) {
+    const rendered = renderValue(lookupValue(source, segments), replacements);
+    if (rendered !== null) return rendered;
   }
 
-  if (typeof value !== 'string' && dictionary !== fallbackDictionary) {
-    value = lookupValue(fallbackDictionary, segments);
-  }
-
-  if (typeof value !== 'string') return key;
-
-  return value.replace(/{{\s*(.+?)\s*}}/g, (match, token) => {
-    const replacementKey = token.trim();
-    return replacements[replacementKey] ?? match;
-  });
+  return key;
 }
 
 export function formatTemplate(template, replacements = {}) {

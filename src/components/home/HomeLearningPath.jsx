@@ -29,12 +29,12 @@ export default function HomeLearningPath({ currentStage, selectedStage, onSelect
               onClick={() => onSelectStage?.(item.stage)}
               aria-pressed={item.isSelected}
               aria-label={item.ariaLabel}
+              title={item.status}
             >
               <div className="scenic-path-node__icon">
                 <Icon filled={item.state !== 'upcoming' || item.isSelected}>{item.icon}</Icon>
               </div>
               <strong>{item.label}</strong>
-              <small>{item.isSelected ? item.selectedLabel : item.status}</small>
             </button>
           </React.Fragment>
         ))}
