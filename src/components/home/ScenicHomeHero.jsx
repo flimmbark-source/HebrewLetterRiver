@@ -1,4 +1,5 @@
 import React from 'react';
+import LetterRiverBrand from '../LetterRiverBrand.jsx';
 import { HOME_ASSETS } from './homeAssets.js';
 
 function Icon({ children, className = '', filled = false }) {
@@ -51,16 +52,18 @@ export default function ScenicHomeHero({
   onPracticeLanguageChange,
   t
 }) {
+  const brandLabel = t('home.scenic.brand', 'Letter River');
+
   return (
     <section
       className="scenic-home-hero"
       style={{ backgroundImage: `url(${HOME_ASSETS.heroRiverValley})` }}
     >
       <div className="scenic-home-hero__topbar">
-        <div className="scenic-home-hero__brand" aria-label={t('home.scenic.brand', 'Letter River')}>
-          <Icon filled>waves</Icon>
-          <span>{t('home.scenic.brand', 'Letter River')}</span>
-        </div>
+        <LetterRiverBrand
+          label={brandLabel}
+          className="scenic-home-hero__brand"
+        />
 
         <div className="scenic-home-hero__actions">
           <div
