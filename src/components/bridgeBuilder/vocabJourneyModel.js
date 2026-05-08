@@ -5,10 +5,8 @@
  * Converts raw pack/progress/completion data into journey visualization data.
  */
 
-import { getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import { getBridgeBuilderWordsSync } from '../../data/bridgeBuilder/words/index.js';
 import { getPackWordIds } from '../../data/journeyPackRegistry.js';
-
 
 /**
  * Get the current pack to display on the journey screen.
@@ -21,23 +19,19 @@ import { getPackWordIds } from '../../data/journeyPackRegistry.js';
 export function getCurrentJourneyPack(sectionData, activePackId) {
   const allPackData = sectionData.flatMap((section) => section.packData);
 
-  // Priority 1: activePackId
   if (activePackId) {
     const active = allPackData.find((item) => item.pack.id === activePackId);
     if (active) return active;
   }
 
-  // Priority 2: first unlocked incomplete
   const unlockedIncomplete = allPackData.find(
     (item) => item.unlocked && !item.progress.completed
   );
   if (unlockedIncomplete) return unlockedIncomplete;
 
-  // Priority 3: first unlocked
   const unlocked = allPackData.find((item) => item.unlocked);
   if (unlocked) return unlocked;
 
-  // Priority 4: first pack (even if locked)
   return allPackData[0] || null;
 }
 
@@ -53,7 +47,7 @@ export function getJourneyStops(sectionData, activePackId) {
     meaning_builders: 'auto_stories',
     cafe_talk: 'coffee',
   };
-  // Helper to find the representative pack for a section
+
   const getRepresentativePackId = (sectionItem) => {
     const packData = sectionItem.packData || [];
 
@@ -69,16 +63,14 @@ export function getJourneyStops(sectionData, activePackId) {
     return firstUnlocked?.pack?.id || null;
   };
 
-  return sectionData.map((sectionItem, index) => {
+  return sectionData.map((sectionItem) => {
     const { section, sectionProgress, unlocked, packData } = sectionItem;
     const { packsCompleted, totalPacks } = sectionProgress;
 
-    // Check if this section contains the active pack
     const containsActivePack = packData.some(
       (packItem) => packItem.pack?.id === activePackId
     );
 
-    // Determine status
     let status = 'Open';
     if (!unlocked) {
       status = 'Locked';
@@ -88,7 +80,6 @@ export function getJourneyStops(sectionData, activePackId) {
       status = 'Current';
     }
 
-    // Calculate progress percentage
     const progressPct = totalPacks > 0 ? (packsCompleted / totalPacks) * 100 : 0;
     const representativePackId = getRepresentativePackId(sectionItem);
 
@@ -106,13 +97,21 @@ export function getJourneyStops(sectionData, activePackId) {
   });
 }
 
+function getWordNativeText(word) {
+  return word?.hebrew || word?.nativeScript || word?.script || word?.word || word?.target || word?.transliteration || '?';
+}
+
+function getWordTranslation(word) {
+  return word?.translation || word?.english || word?.meaning || word?.definition || '';
+}
+
 /**
- * Get word preview for a pack — 6-8 display words.
+ * Get word preview for a pack — 6-8 display words with tap details.
  * Uses actual word data from the data layer if available.
  */
 export function getPackWordPreview(pack, languageId = 'hebrew') {
   if (!pack || !pack.wordIds || pack.wordIds.length === 0) {
-    return { words: [], usedFallback: false, missingPackMapping: false };
+    return { words: [], items: [], usedFallback: false, missingPackMapping: false };
   }
 
   try {
@@ -123,8 +122,16 @@ export function getPackWordPreview(pack, languageId = 'hebrew') {
     const words = resolvedWordIds.map((id) => wordMap.get(id)).filter(Boolean);
 
     if (words.length > 0) {
+      const items = words.slice(0, 8).map((word) => ({
+        id: word.id,
+        native: getWordNativeText(word),
+        transliteration: word.transliteration || '',
+        translation: getWordTranslation(word),
+      }));
+
       return {
-        words: words.slice(0, 8).map((w) => w.hebrew || w.nativeScript || w.transliteration || '?'),
+        words: items.map((item) => item.native),
+        items,
         usedFallback: false,
         missingPackMapping: false
       };
@@ -138,12 +145,12 @@ export function getPackWordPreview(pack, languageId = 'hebrew') {
       });
     }
 
-    return { words: [], usedFallback: false, missingPackMapping: true };
+    return { words: [], items: [], usedFallback: false, missingPackMapping: true };
   } catch (e) {
     if (import.meta.env.DEV) {
       console.warn('[vocabJourney] Failed to resolve pack preview', { languageId, packId: pack?.id, error: e });
     }
-    return { words: [], usedFallback: false, missingPackMapping: true };
+    return { words: [], items: [], usedFallback: false, missingPackMapping: true };
   }
 }
 
@@ -167,7 +174,6 @@ export function getPackLearningStage(packProgress, packCompletion) {
   const { wordsIntroducedCount, totalWords } = packProgress;
   const { bridgeBuilderComplete, loosePlanksComplete, deepScriptComplete } = packCompletion;
 
-  // Compute step completion
   const steps = [
     {
       id: 'first_look',
@@ -195,13 +201,11 @@ export function getPackLearningStage(packProgress, packCompletion) {
     },
   ];
 
-  // Mark first incomplete as current
   const firstIncomplete = steps.findIndex((s) => !s.complete);
   if (firstIncomplete >= 0) {
     steps[firstIncomplete].current = true;
   }
 
-  // Compute overall label
   let label = 'Not started';
   if (deepScriptComplete) {
     label = 'Complete';
@@ -235,7 +239,6 @@ export function getRecommendedJourneyAction(packProgress, packCompletion) {
 
   const { bridgeBuilderComplete, loosePlanksComplete, deepScriptComplete } = packCompletion;
 
-  // Priority order: Bridge Builder → Loose Planks → Deep Script → Review
   if (!bridgeBuilderComplete) {
     return {
       method: 'vocab',
@@ -266,7 +269,6 @@ export function getRecommendedJourneyAction(packProgress, packCompletion) {
     };
   }
 
-  // All complete — offer review
   return {
     method: 'review',
     mode: 'Review',
@@ -290,7 +292,6 @@ export function getJourneyStats(sectionData) {
   const overallProgressPct =
     totalPacks > 0 ? Math.round((completedPacks / totalPacks) * 100) : 0;
 
-  // Find current section (first unlocked incomplete)
   const currentSection = sectionData.find(
     (sd) =>
       sd.unlocked &&
