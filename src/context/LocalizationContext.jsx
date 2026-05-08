@@ -8,6 +8,16 @@ import {
 import { defaultAppLanguageId } from '../data/languages/index.js';
 import { useLanguage } from './LanguageContext.jsx';
 
+const warnedMissingTranslationKeys = new Set();
+
+function warnMissingTranslationKey(key, appLanguageId) {
+  if (!import.meta.env.DEV) return;
+  const warningId = `${appLanguageId}:${key}`;
+  if (warnedMissingTranslationKeys.has(warningId)) return;
+  warnedMissingTranslationKeys.add(warningId);
+  console.warn('[i18n] Missing translation key', { key, appLanguageId });
+}
+
 const LocalizationContext = createContext({
   languagePack: loadLanguage(),
   interfaceLanguagePack: loadLanguage(defaultAppLanguageId),
@@ -37,9 +47,7 @@ export function LocalizationProvider({ children }) {
     const translated = translateFromDictionary(dictionary, key, params);
     if (translated && translated !== key) return translated;
 
-    if (import.meta.env.DEV) {
-      console.warn('[i18n] Missing translation key', { key, appLanguageId });
-    }
+    warnMissingTranslationKey(key, appLanguageId);
     return fallback ? formatTemplate(fallback, params) : key;
   }, [dictionary, appLanguageId]);
 
