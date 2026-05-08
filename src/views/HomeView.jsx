@@ -69,25 +69,37 @@ export default function HomeView() {
     return selectedOption?.name ?? languagePack?.name ?? languageId;
   }, [displayLanguageOptions, languageId, languagePack]);
 
+  const sharedHomeStateArgs = {
+    player,
+    statistics,
+    daily,
+    streak,
+    languagePack,
+    practiceLanguageName,
+    t,
+    openGame,
+    navigate
+  };
+
   const primaryState = useMemo(
     () => getHomeStateForStage({
-      selectedStage,
-      player,
-      statistics,
-      daily,
-      streak,
-      languagePack,
-      practiceLanguageName,
-      t,
-      openGame,
-      navigate
+      ...sharedHomeStateArgs,
+      selectedStage
     }),
     [selectedStage, player, statistics, daily, streak, languagePack, practiceLanguageName, t, openGame, navigate]
   );
 
+  const actualTodayState = useMemo(
+    () => getHomeStateForStage({
+      ...sharedHomeStateArgs,
+      selectedStage: currentStage
+    }),
+    [currentStage, player, statistics, daily, streak, languagePack, practiceLanguageName, t, openGame, navigate]
+  );
+
   const planRows = useMemo(
-    () => getTodayPlanRows({ primaryState, statistics, navigate, openGame, t }),
-    [primaryState, statistics, navigate, openGame, t]
+    () => getTodayPlanRows({ primaryState: actualTodayState, statistics, navigate, openGame, t }),
+    [actualTodayState, statistics, navigate, openGame, t]
   );
 
   const stats = useMemo(
