@@ -104,7 +104,6 @@ export default function ScenicHomeHero({
           />
         </div>
         <h1>{t('home.scenic.greeting', 'Good morning, Explorer!')}</h1>
-        <p className="scenic-home-hero__subtitle">{t('home.scenic.subtitle', 'Keep your river flowing.')}</p>
       </div>
     </section>
   );
