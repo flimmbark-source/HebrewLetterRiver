@@ -6,7 +6,11 @@ import { useTutorial } from '../context/TutorialContext.jsx';
 import DualRoleConversationSession from '../components/conversation/DualRoleConversationSession.jsx';
 import DualRoleConversationCardGrid from '../components/conversation/DualRoleConversationCardGrid.jsx';
 import { buildDualRoleConversationCardItems } from '../components/conversation/dualRoleConversationCardData.js';
-import { getPackById } from '../data/bridgeBuilderPacks.js';
+import { bridgeBuilderPacks } from '../data/bridgeBuilderPacks.js';
+
+function getPackById(packId) {
+  return bridgeBuilderPacks.find((pack) => pack.id === packId) || null;
+}
 
 function getContextualReadItem(pack, dualRoleItems) {
   if (!pack || !dualRoleItems.length) return null;
@@ -21,7 +25,7 @@ function getContextualReadItem(pack, dualRoleItems) {
         : 'greeting';
 
   return dualRoleItems.find((item) => {
-    const haystack = `${item.metadata?.title || ''} ${item.metadata?.subtitle || ''}`.toLowerCase();
+    const haystack = `${item.metadata?.title || ''} ${item.metadata?.subtitle || ''} ${item.title || ''} ${item.subtitle || ''}`.toLowerCase();
     return haystack.includes(preferredTheme);
   }) || dualRoleItems[0] || null;
 }
