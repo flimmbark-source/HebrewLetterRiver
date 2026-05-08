@@ -12,6 +12,7 @@ import { frenchPackMetadataSupplemental } from './supplemental.packs.french.js';
 import { additionalPackMetadataSupplementals } from './supplemental.packs.additional.js';
 import { scenicHomeSupplementalDictionaries } from './supplemental.scenicHome.js';
 import { extraScenicHomeSupplementalDictionaries } from './supplemental.scenicHome.extra.js';
+import { scenicHomeConversationLabelOverrides } from './supplemental.scenicHome.conversationLabels.js';
 
 function deepMergeSupplemental(...sources) {
   return sources.reduce((merged, source) => {
@@ -47,7 +48,8 @@ function withScenicHome(languageId, dictionary) {
   return deepMergeSupplemental(
     dictionary,
     scenicHomeSupplementalDictionaries[languageId],
-    extraScenicHomeSupplementalDictionaries[languageId]
+    extraScenicHomeSupplementalDictionaries[languageId],
+    scenicHomeConversationLabelOverrides[languageId]
   );
 }
 
