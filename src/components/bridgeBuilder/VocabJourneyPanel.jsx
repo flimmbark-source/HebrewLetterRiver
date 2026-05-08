@@ -248,7 +248,7 @@ function CurrentPackDetailSheet({
           </button>
           <button type="button" className="vj-option" onClick={onLaunchReadContext}>
             <span className="vj-option-icon vj-option-icon--blue"><Icon filled>menu_book</Icon></span>
-            <span><strong>{t('bridgeBuilder.vocabJourney.optionReadTitle', 'Read — Cafe Talk')}</strong><small>{t('bridgeBuilder.vocabJourney.optionReadSubtitle', 'See the words in a real conversation.')}</small></span>
+            <span><strong>{t('bridgeBuilder.vocabJourney.optionReadTitle', 'Read in Context')}</strong><small>{t('bridgeBuilder.vocabJourney.optionReadSubtitle', 'Practice this pack in sentence context.')}</small></span>
             <Icon>chevron_right</Icon>
           </button>
         </div>
@@ -606,7 +606,7 @@ export default function VocabJourneyPanel({
           </button>
           <button type="button" className="vj-support-row" onClick={() => onLaunchPackMethod(currentPack, 'read_context')}>
             <span className="vj-row-icon vj-row-icon--blue"><Icon filled>menu_book</Icon></span>
-            <span className="vj-row-text"><strong>{t('bridgeBuilder.vocabJourney.readInContextTitle', 'Read in Context — Cafe Talk')}</strong><small>{t('bridgeBuilder.vocabJourney.readInContextSubtitle', 'Practice this pack in sentence context.')}</small></span>
+            <span className="vj-row-text"><strong>{t('bridgeBuilder.vocabJourney.readInContextTitle', 'Read in Context')}</strong><small>{t('bridgeBuilder.vocabJourney.readInContextSubtitle', 'Practice this pack in sentence context.')}</small></span>
             <Icon>chevron_right</Icon>
           </button>
         </div>
