@@ -1,7 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="/manifest.webmanifest" />
+  <script>
+    (function bootstrapLetterRiverDevConsole() {
+      var hostname = window.location.hostname;
+      var isDevHost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.github.dev') || hostname.endsWith('.app.github.dev');
+      var showDebugLogs = false;
+
+      try {
+        showDebugLogs = window.localStorage.getItem('LETTER_RIVER_DEBUG_LOGS') === '1';
+      } catch (error) {
+        showDebugLogs = false;
+      }
+
+      if (isDevHost && !showDebugLogs) {
+        var originalLog = console.log.bind(console);
+        var originalInfo = console.info.bind(console);
+        var noisyPatterns = [
+          /^Generated Segment\b/,
+          /^\[TTS\]/,
+          /^\[Bootstrap\]/,
+          /^\[Migration\] No migration needed/,
+          /^✓ Cafe Talk validation passed/,
+          /^✓ Section Dictionary validation passed/
+        ];
+
+        function shouldSuppress(args) {
+          var first = args && args.length > 0 ? String(args[0]) : '';
+          return noisyPatterns.some(function(pattern) { return pattern.test(first); });
+        }
+
+        console.log = function() {
+          if (shouldSuppress(arguments)) return;
+          originalLog.apply(console, arguments);
+        };
+
+        console.info = function() {
+          if (shouldSuppress(arguments)) return;
+          originalInfo.apply(console, arguments);
+        };
+      }
+
+      // GitHub Codespaces/dev tunnels often redirect /manifest.webmanifest through
+      // github.dev sign-in, which produces a CORS console error before the app loads.
+      // Inject the manifest everywhere except those tunneled dev hosts.
+      if (!hostname.endsWith('.app.github.dev')) {
+        var manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = '/manifest.webmanifest';
+        document.head.appendChild(manifestLink);
+      }
+    })();
+  </script>
   <meta name="theme-color" content="#1a7a55" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
