@@ -9,6 +9,7 @@ import { bridgeBuilderWords, getWordsByIds } from '../data/bridgeBuilderWords.js
 import { convertBBWordsForDS } from '../data/deepScript/words.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { loadBridgeBuilderWords, getBridgeBuilderWordsSync } from '../data/bridgeBuilder/words/index.js';
+import { getPackWordIds } from '../data/journeyPackRegistry.js';
 
 const MAX_DAILY_REVIEW_WORDS = 6;
 const LAST_METHOD_KEY = 'bbs_last_study_method';
@@ -63,6 +64,20 @@ export default function BridgeBuilderView() {
     [isHebrew, languageId, langWordsReady] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
+  const getLanguageAwareWordIds = (config) => {
+    if (isHebrew) return config?.selectedWordIds || [];
+
+    if (config?.sessionType === 'guided_pack' && config?.packId) {
+      const mappedPackIds = getPackWordIds(languageId, config.packId);
+      if (mappedPackIds.length > 0) return mappedPackIds;
+    }
+
+    // Review sessions do not currently carry language-specific review IDs.
+    // Keep the requested session size capped instead of expanding to the whole pool.
+    const requestedCount = Math.max(1, config?.selectedWordIds?.length || MAX_DAILY_REVIEW_WORDS);
+    return activeWordPool.slice(0, requestedCount).map(w => w.id);
+  };
+
   const handlePlay = (config) => {
     const isReviewSession = config?.sessionType === 'due_review' || config?.entryPoint === 'review_due';
     const preparedConfig = isReviewSession
@@ -75,13 +90,9 @@ export default function BridgeBuilderView() {
     }
 
     if (!isHebrew) {
-      // For non-Hebrew languages, map the session to the active language pool.
-      // Preserve the requested session size so daily review does not balloon into the whole word list.
-      const requestedCount = Math.max(1, preparedConfig?.selectedWordIds?.length || activeWordPool.length);
-      const langWordIds = activeWordPool.slice(0, requestedCount).map(w => w.id);
       setSessionConfig({
         ...preparedConfig,
-        selectedWordIds: langWordIds,
+        selectedWordIds: getLanguageAwareWordIds(preparedConfig),
       });
     } else {
       setSessionConfig(preparedConfig);
