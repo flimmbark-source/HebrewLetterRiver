@@ -52,13 +52,13 @@ function hasRecentDeepScript(player) {
 function stageStatusKey(index, currentIndex) {
   if (index < currentIndex) return 'complete';
   if (index === currentIndex) return 'inProgress';
-  return 'upcoming';
+  return 'available';
 }
 
 function stageState(index, currentIndex) {
   if (index < currentIndex) return 'complete';
   if (index === currentIndex) return 'current';
-  return 'upcoming';
+  return 'available';
 }
 
 function getCurrentBridgePackSummary(t) {
@@ -199,7 +199,7 @@ export function getLearningPathItems(currentStage, selectedStage = currentStage,
     const status = t(`home.scenic.${statusKey}`, {
       complete: 'Complete',
       inProgress: 'In Progress',
-      upcoming: 'Upcoming'
+      available: 'Available'
     }[statusKey]);
     const label = t(`home.scenic.stages.${labelKey}`, {
       letters: 'Letters',
@@ -251,12 +251,12 @@ export function getTodayPlanRows({ primaryState, statistics, navigate, openGame,
         action: () => openGame({ autostart: false })
       },
       {
-        id: 'bridge-builder-locked',
+        id: 'bridge-builder',
         icon: 'foundation',
         tone: 'purple',
         title: t('home.scenic.words.planTitle', 'Bridge Builder'),
-        subtitle: t('home.scenic.words.lockedSubtitle', 'Unlocks after letters'),
-        locked: true
+        subtitle: bridgePack.continueLine,
+        action: () => navigate('/bridge')
       }
     );
     return rows;
