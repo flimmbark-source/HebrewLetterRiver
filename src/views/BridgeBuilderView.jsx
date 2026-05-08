@@ -10,6 +10,23 @@ import { convertBBWordsForDS } from '../data/deepScript/words.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { loadBridgeBuilderWords, getBridgeBuilderWordsSync } from '../data/bridgeBuilder/words/index.js';
 
+const MAX_DAILY_REVIEW_WORDS = 6;
+const LAST_METHOD_KEY = 'bbs_last_study_method';
+
+function uniqueLimitedWordIds(ids = [], limit = MAX_DAILY_REVIEW_WORDS) {
+  return Array.from(new Set((ids || []).filter(Boolean))).slice(0, limit);
+}
+
+function getLastMethodForPack(packId) {
+  if (!packId || typeof localStorage === 'undefined') return null;
+  try {
+    const all = JSON.parse(localStorage.getItem(LAST_METHOD_KEY) || '{}');
+    return all?.[packId] || null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * BridgeBuilderView — routes between setup screen, Bridge Builder gameplay,
  * Loose Planks gameplay, and Deep Script mode.
@@ -47,17 +64,27 @@ export default function BridgeBuilderView() {
   );
 
   const handlePlay = (config) => {
+    const isReviewSession = config?.sessionType === 'due_review' || config?.entryPoint === 'review_due';
+    const preparedConfig = isReviewSession
+      ? { ...config, selectedWordIds: uniqueLimitedWordIds(config.selectedWordIds) }
+      : config;
+
+    if (preparedConfig?.packId && getLastMethodForPack(preparedConfig.packId) === 'read_context') {
+      navigate(`/read?packId=${encodeURIComponent(preparedConfig.packId)}`);
+      return;
+    }
+
     if (!isHebrew) {
-      // For non-Hebrew languages, override selectedWordIds to use language pool
-      // since pack word IDs reference Hebrew-specific words
-      const langWords = activeWordPool;
-      const langWordIds = langWords.map(w => w.id);
+      // For non-Hebrew languages, map the session to the active language pool.
+      // Preserve the requested session size so daily review does not balloon into the whole word list.
+      const requestedCount = Math.max(1, preparedConfig?.selectedWordIds?.length || activeWordPool.length);
+      const langWordIds = activeWordPool.slice(0, requestedCount).map(w => w.id);
       setSessionConfig({
-        ...config,
+        ...preparedConfig,
         selectedWordIds: langWordIds,
       });
     } else {
-      setSessionConfig(config);
+      setSessionConfig(preparedConfig);
     }
   };
 
