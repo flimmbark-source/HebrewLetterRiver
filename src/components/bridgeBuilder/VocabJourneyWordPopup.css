@@ -1,0 +1,75 @@
+.vj-word-chip-wrap {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+.vj-word-chip-wrap .vj-word-chip {
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+}
+
+.vj-word-chip-wrap .vj-word-chip:hover,
+.vj-word-chip-wrap .vj-word-chip:focus-visible,
+.vj-word-chip--active {
+  transform: translateY(-1px);
+  border-color: rgba(49, 144, 200, 0.48);
+  background: rgba(239, 249, 255, 0.98);
+  box-shadow: 0 8px 18px rgba(18, 73, 61, 0.12);
+  outline: none;
+}
+
+.vj-word-popover {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 8px);
+  z-index: 30;
+  display: grid;
+  gap: 2px;
+  min-width: 132px;
+  max-width: 190px;
+  transform: translateX(-50%);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: rgba(23, 59, 49, 0.96);
+  color: white;
+  text-align: center;
+  box-shadow: 0 14px 28px rgba(10, 37, 32, 0.28);
+  pointer-events: none;
+}
+
+.vj-word-popover::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  transform: translateX(-50%) rotate(45deg);
+  border-radius: 2px;
+  background: rgba(23, 59, 49, 0.96);
+}
+
+.vj-word-popover strong {
+  color: white;
+  font-size: 0.82rem;
+  line-height: 1.15;
+  font-weight: 950;
+}
+
+.vj-word-popover small {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.76rem;
+  line-height: 1.2;
+  font-weight: 750;
+}
+
+@media (max-width: 560px) {
+  .vj-word-popover {
+    min-width: 120px;
+    max-width: 160px;
+    padding: 9px 10px;
+  }
+}
