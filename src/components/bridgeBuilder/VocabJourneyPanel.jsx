@@ -181,6 +181,7 @@ function CurrentPackDetailSheet({
   onLaunchLoosePlanks,
   onLaunchDeepScript,
   onLaunchReadContext,
+  packSceneComplete,
 }) {
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -248,7 +249,19 @@ function CurrentPackDetailSheet({
           </button>
           <button type="button" className="vj-option" onClick={onLaunchReadContext}>
             <span className="vj-option-icon vj-option-icon--blue"><Icon filled>menu_book</Icon></span>
-            <span><strong>{t('bridgeBuilder.vocabJourney.optionReadTitle', 'Read in Context')}</strong><small>{t('bridgeBuilder.vocabJourney.optionReadSubtitle', 'Practice this pack in sentence context.')}</small></span>
+            <span>
+              <strong>{t('bridgeBuilder.vocabJourney.optionReadTitle', 'Read in Context')}</strong>
+              <small>
+                {packSceneComplete
+                  ? t('bridgeBuilder.vocabJourney.readInContextDone', 'Scene complete — play again anytime.')
+                  : t('bridgeBuilder.vocabJourney.optionReadSubtitle', 'Practice this pack in sentence context.')}
+              </small>
+            </span>
+            {packSceneComplete && (
+              <span className="vj-row-done" aria-label={t('bridgeBuilder.vocabJourney.packSceneDone', 'Completed')}>
+                <Icon filled>check_circle</Icon>
+              </span>
+            )}
             <Icon>chevron_right</Icon>
           </button>
         </div>
@@ -606,7 +619,19 @@ export default function VocabJourneyPanel({
           </button>
           <button type="button" className="vj-support-row" onClick={() => onLaunchPackMethod(currentPack, 'read_context')}>
             <span className="vj-row-icon vj-row-icon--blue"><Icon filled>menu_book</Icon></span>
-            <span className="vj-row-text"><strong>{t('bridgeBuilder.vocabJourney.readInContextTitle', 'Read in Context')}</strong><small>{t('bridgeBuilder.vocabJourney.readInContextSubtitle', 'Practice this pack in sentence context.')}</small></span>
+            <span className="vj-row-text">
+              <strong>{t('bridgeBuilder.vocabJourney.readInContextTitle', 'Read in Context')}</strong>
+              <small>
+                {currentCompletion?.packSceneComplete
+                  ? t('bridgeBuilder.vocabJourney.readInContextDone', 'Scene complete — play again anytime.')
+                  : t('bridgeBuilder.vocabJourney.readInContextSubtitle', 'Practice this pack in sentence context.')}
+              </small>
+            </span>
+            {currentCompletion?.packSceneComplete && (
+              <span className="vj-row-done" aria-label={t('bridgeBuilder.vocabJourney.packSceneDone', 'Completed')}>
+                <Icon filled>check_circle</Icon>
+              </span>
+            )}
             <Icon>chevron_right</Icon>
           </button>
         </div>
@@ -669,6 +694,7 @@ export default function VocabJourneyPanel({
         onLaunchLoosePlanks={() => onLaunchPackMethod(currentPack, 'loose_planks')}
         onLaunchDeepScript={() => onLaunchPackMethod(currentPack, 'deep_script')}
         onLaunchReadContext={() => onLaunchPackMethod(currentPack, 'read_context')}
+        packSceneComplete={currentCompletion?.packSceneComplete || false}
       />
     </section>
   );
