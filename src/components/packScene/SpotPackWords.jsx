@@ -8,7 +8,7 @@ import { useLocalization } from '../../context/LocalizationContext.jsx';
  * Non-target tokens briefly flash amber but do not hard-fail the beat.
  * When all targetConceptIds are found a Continue button appears to advance.
  */
-export default function SpotPackWords({ beat, line, onResult }) {
+export default function SpotPackWords({ beat, line, onResult, suppressHeader = false }) {
   const { t } = useLocalization();
   const [tappedConceptIds, setTappedConceptIds] = useState(new Set());
   const [nonTargetFlash, setNonTargetFlash] = useState(null);
@@ -43,17 +43,19 @@ export default function SpotPackWords({ beat, line, onResult }) {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4">
-      <div className="text-center">
-        <h3
-          className="text-xl font-bold text-[#183d2e]"
-          style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}
-        >
-          {t('packScene.spotWords.instruction', 'Spot the Pack Words')}
-        </h3>
-        <p className="mt-1 text-sm font-medium text-[#4e665b]">
-          {t('packScene.spotWords.hint', 'Tap the words from your pack.')}
-        </p>
-      </div>
+      {!suppressHeader && (
+        <div className="text-center">
+          <h3
+            className="text-xl font-bold text-[#183d2e]"
+            style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}
+          >
+            {t('packScene.spotWords.instruction', 'Spot the Pack Words')}
+          </h3>
+          <p className="mt-1 text-sm font-medium text-[#4e665b]">
+            {t('packScene.spotWords.hint', 'Tap the words from your pack.')}
+          </p>
+        </div>
+      )}
 
       <div
         className="text-center text-sm font-bold text-[#2f6b4c]"

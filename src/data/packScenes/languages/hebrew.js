@@ -53,4 +53,13 @@ export const hebrewPackSceneLines = {
       { text: 'תודה.', conceptId: 'thank-you' },
     ],
   },
+
+  'cafe-server-here-you-go': {
+    targetText: 'בבקשה.',
+    transliteration: 'bevakasha.',
+    supportText: 'Here you go.',
+    tokens: [
+      { text: 'בבקשה.', conceptId: 'please' },
+    ],
+  },
 };

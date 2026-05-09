@@ -8,13 +8,38 @@ import {
 } from '../../data/packScenes/packSceneAdapter.js';
 import { markPackSceneComplete } from '../../lib/bridgeBuilderStorage.js';
 
-// ─── Interaction: Meaning Choice ─────────────────────────────────────────────
-// Simple option list — no Hebrew re-display; the dialogue bubble already shows it.
+// ─── Dialogue Cue ─────────────────────────────────────────────────────────────
+// Shows the one prior line that makes the current task meaningful.
 
-function MeaningChoiceInteraction({ interaction, onResult }) {
+function DialogueCue({ line, cueLabel }) {
+  if (!line) return null;
+  return (
+    <div className="rounded-[1.25rem] border border-[#e8cfa0] bg-[#fff8e8] px-4 py-3 shadow-sm">
+      {cueLabel && (
+        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#7b6b47]">
+          {cueLabel}
+        </div>
+      )}
+      <div className="text-xl font-bold leading-snug text-[#183d2e]" dir="rtl">
+        {line.targetText}
+      </div>
+      {line.transliteration && (
+        <div className="mt-0.5 text-xs italic text-[#4e665b]">{line.transliteration}</div>
+      )}
+      {line.supportText && (
+        <div className="mt-1 text-sm font-medium text-[#4e665b]">{line.supportText}</div>
+      )}
+    </div>
+  );
+}
+
+// ─── Interaction: Meaning Choice ──────────────────────────────────────────────
+// Options are English meanings — no Hebrew re-display; the cue already shows the line.
+
+function MeaningChoiceInteraction({ beat, onResult }) {
   const [selectedId, setSelectedId] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const options = interaction.options || [];
+  const options = beat.options || [];
 
   const handleClick = (opt) => {
     if (submitted) return;
@@ -24,7 +49,7 @@ function MeaningChoiceInteraction({ interaction, onResult }) {
         onResult({
           type: 'meaningChoice',
           isCorrect: opt.isCorrect,
-          understoodConceptIds: opt.isCorrect ? (interaction.targetConceptIds || []) : [],
+          understoodConceptIds: opt.isCorrect ? (beat.targetConceptIds || []) : [],
         });
       }, 700);
     } else {
@@ -39,8 +64,7 @@ function MeaningChoiceInteraction({ interaction, onResult }) {
         const isCorrectChoice = submitted && opt.isCorrect;
         const isWrongSelected = submitted && isSelected && !opt.isCorrect;
 
-        let cls =
-          'w-full rounded-2xl border px-3 py-3 text-left font-semibold transition-all duration-200 active:scale-[0.99] ';
+        let cls = 'w-full rounded-2xl border px-3 py-3 text-left font-semibold transition-all duration-200 active:scale-[0.99] ';
         if (!submitted) {
           cls += isSelected
             ? 'border-[#2f6b4c] bg-[#e4f0df] text-[#183d2e] ring-2 ring-[#2f6b4c]/15 shadow-md'
@@ -81,9 +105,8 @@ function MeaningChoiceInteraction({ interaction, onResult }) {
 
 // ─── Interaction: Build Line ──────────────────────────────────────────────────
 
-function BuildLineInteraction({ interaction, line, onResult }) {
-  const convLine = packSceneLineToConversationLine(line, 'pack-build');
-
+function BuildLineInteraction({ beat, activeLine, onResult }) {
+  const convLine = packSceneLineToConversationLine(activeLine, beat.activeLineId || 'pack-build');
   return (
     <BuildLine
       line={convLine}
@@ -91,7 +114,7 @@ function BuildLineInteraction({ interaction, line, onResult }) {
         onResult({
           type: 'buildLine',
           isCorrect: res.isCorrect,
-          producedConceptIds: res.isCorrect ? (interaction.targetConceptIds || []) : [],
+          producedConceptIds: res.isCorrect ? (beat.targetConceptIds || []) : [],
         })
       }
     />
@@ -99,12 +122,13 @@ function BuildLineInteraction({ interaction, line, onResult }) {
 }
 
 // ─── Interaction: Choose Reply ────────────────────────────────────────────────
+// Options carry targetText (Hebrew) + supportText (English) — in-scene utterances.
 
-function ChooseReplyInteraction({ interaction, line, onResult }) {
+function ChooseReplyInteraction({ beat, onResult }) {
   const { t } = useLocalization();
   const [selectedId, setSelectedId] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const options = interaction.options || [];
+  const options = beat.options || [];
 
   const handleClick = (opt) => {
     if (submitted) return;
@@ -113,9 +137,8 @@ function ChooseReplyInteraction({ interaction, line, onResult }) {
       setTimeout(() => {
         onResult({
           type: 'chooseReply',
-          selectedOptionId: opt.id,
           isCorrect: opt.isCorrect,
-          producedConceptIds: opt.isCorrect ? (interaction.targetConceptIds || []) : [],
+          producedConceptIds: opt.isCorrect ? (beat.targetConceptIds || []) : [],
         });
       }, 900);
     } else {
@@ -123,117 +146,68 @@ function ChooseReplyInteraction({ interaction, line, onResult }) {
     }
   };
 
-  const correctOpt = options.find((o) => o.isCorrect);
-
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-3">
-      <div className="flex flex-col gap-2">
-        {options.map((opt) => {
-          const isSelected = selectedId === opt.id;
-          const isCorrectChoice = submitted && opt.isCorrect;
-          const isWrongSelected = submitted && isSelected && !opt.isCorrect;
+    <div className="mx-auto flex max-w-2xl flex-col gap-2">
+      {options.map((opt) => {
+        const isSelected = selectedId === opt.id;
+        const isCorrectChoice = submitted && opt.isCorrect;
+        const isWrongSelected = submitted && isSelected && !opt.isCorrect;
 
-          let cls =
-            'w-full rounded-2xl border px-3 py-3 text-left font-semibold transition-all duration-200 active:scale-[0.99] ';
-          if (!submitted) {
-            cls += isSelected
-              ? 'border-[#2f6b4c] bg-[#e4f0df] text-[#183d2e] ring-2 ring-[#2f6b4c]/15 shadow-md'
-              : 'border-[#d8cdb7] bg-white/72 text-[#253d35] shadow-sm hover:-translate-y-0.5 hover:bg-white hover:shadow-md';
-          } else if (isCorrectChoice) {
-            cls += 'border-[#2f6b4c] bg-[#e4f0df] text-[#183d2e] ring-2 ring-[#2f6b4c]/15 shadow-md';
-          } else if (isWrongSelected) {
-            cls += 'border-[#c77912] bg-[#fff0d8] text-[#6d4213] ring-2 ring-[#c77912]/15 shadow-md';
-          } else {
-            cls += 'border-[#d8cdb7]/70 bg-white/45 text-[#7b8077] opacity-65';
-          }
+        let cls = 'w-full rounded-2xl border px-3 py-3 text-left transition-all duration-200 active:scale-[0.99] ';
+        if (!submitted) {
+          cls += isSelected
+            ? 'border-[#2f6b4c] bg-[#e4f0df] ring-2 ring-[#2f6b4c]/15 shadow-md'
+            : 'border-[#d8cdb7] bg-white/72 shadow-sm hover:-translate-y-0.5 hover:bg-white hover:shadow-md';
+        } else if (isCorrectChoice) {
+          cls += 'border-[#2f6b4c] bg-[#e4f0df] ring-2 ring-[#2f6b4c]/15 shadow-md';
+        } else if (isWrongSelected) {
+          cls += 'border-[#c77912] bg-[#fff0d8] ring-2 ring-[#c77912]/15 shadow-md';
+        } else {
+          cls += 'border-[#d8cdb7]/70 bg-white/45 opacity-65';
+        }
 
-          return (
-            <button
-              key={opt.id}
-              type="button"
-              onClick={() => handleClick(opt)}
-              disabled={submitted}
-              className={cls}
-            >
-              <div className="flex items-center gap-3">
-                <span
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
-                    isCorrectChoice
-                      ? 'border-[#2f6b4c] bg-[#2f6b4c] text-white'
-                      : isWrongSelected
-                        ? 'border-[#c77912] bg-[#c77912] text-white'
-                        : isSelected
-                          ? 'border-[#2f6b4c] bg-[#2f6b4c] text-white'
-                          : 'border-[#b8ad97] bg-[#fffaf0] text-transparent'
-                  }`}
-                  aria-hidden="true"
-                >
-                  {isCorrectChoice ? '✓' : isWrongSelected ? '×' : isSelected ? '●' : '•'}
-                </span>
-                <span className="text-base sm:text-lg">{opt.text}</span>
+        const textColor = isCorrectChoice ? 'text-[#183d2e]' : isWrongSelected ? 'text-[#6d4213]' : 'text-[#183d2e]';
+        const subColor = isCorrectChoice ? 'text-[#2f6b4c]' : isWrongSelected ? 'text-[#c07a10]' : 'text-[#4e665b]';
+
+        return (
+          <button key={opt.id} type="button" onClick={() => handleClick(opt)} disabled={submitted} className={cls}>
+            <div className="flex items-start gap-3">
+              <span
+                className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
+                  isCorrectChoice
+                    ? 'border-[#2f6b4c] bg-[#2f6b4c] text-white'
+                    : isWrongSelected
+                      ? 'border-[#c77912] bg-[#c77912] text-white'
+                      : isSelected
+                        ? 'border-[#2f6b4c] bg-[#2f6b4c] text-white'
+                        : 'border-[#b8ad97] bg-[#fffaf0] text-transparent'
+                }`}
+                aria-hidden="true"
+              >
+                {isCorrectChoice ? '✓' : isWrongSelected ? '×' : isSelected ? '●' : '•'}
+              </span>
+              <div className="flex-1 min-w-0">
+                {opt.targetText ? (
+                  <>
+                    <div className={`text-lg font-bold ${textColor}`} dir="rtl">{opt.targetText}</div>
+                    {opt.supportText && (
+                      <div className={`text-sm font-medium ${subColor}`}>{opt.supportText}</div>
+                    )}
+                  </>
+                ) : (
+                  <span className={`text-base font-semibold ${textColor}`}>{opt.text}</span>
+                )}
               </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {submitted && correctOpt && (
-        <div className="rounded-[1.35rem] border border-[#2f6b4c]/30 bg-[#e4f0df] p-4 text-center">
-          <div className="text-2xl font-bold text-[#183d2e]" dir="rtl">
-            {line.targetText}
-          </div>
-          {line.transliteration && (
-            <div className="mt-1 text-sm italic text-[#2f6b4c]">{line.transliteration}</div>
-          )}
-        </div>
-      )}
+            </div>
+          </button>
+        );
+      })}
 
       {!submitted && selectedId && (
         <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff8e8]/70 px-3 py-2 text-center text-xs font-semibold text-[#4e665b]">
-          {t('packScene.chooseReply.submitHint', 'Tap the selected answer again to submit')}
+          {t('packScene.chooseReply.submitHint', 'Tap again to confirm')}
         </div>
       )}
-    </div>
-  );
-}
-
-// ─── Dialogue Bubble ─────────────────────────────────────────────────────────
-
-function DialogueBubble({ moment, line, isActive }) {
-  const isOther = moment.speaker === 'other';
-  const showPlaceholder = isActive && !isOther;
-
-  return (
-    <div className={`flex flex-col gap-0.5 ${isOther ? 'items-start' : 'items-end'}`}>
-      <div
-        className={`text-[10px] font-bold uppercase tracking-[0.12em] transition-opacity ${
-          isOther ? 'pl-1 text-[#7b6b47]' : 'pr-1 text-[#4e665b]'
-        } ${!isActive ? 'opacity-50' : ''}`}
-      >
-        {moment.speakerLabel}
-      </div>
-      <div
-        className={`max-w-[80%] rounded-2xl px-4 py-3 transition-opacity ${
-          isOther
-            ? `bg-[#fff0d8] border border-[#e8cfa0] ${!isActive ? 'opacity-50' : ''}`
-            : `bg-[#e4f0df] border border-[#b8d9c4] ${!isActive ? 'opacity-50' : ''}`
-        }`}
-      >
-        {showPlaceholder ? (
-          <span className="text-xl tracking-widest text-[#8aaa90]" aria-label="Composing reply">
-            · · ·
-          </span>
-        ) : (
-          <>
-            <div className="text-xl font-bold text-[#183d2e]" dir="rtl">
-              {line.targetText}
-            </div>
-            {line.transliteration && (
-              <div className="mt-0.5 text-xs italic text-[#4e665b]">{line.transliteration}</div>
-            )}
-          </>
-        )}
-      </div>
     </div>
   );
 }
@@ -255,10 +229,7 @@ function PackSceneBrief({ definition, onStart, onExit }) {
           >
             <span className="material-symbols-outlined text-xl" aria-hidden="true">arrow_back</span>
           </button>
-          <h1
-            className="text-lg font-bold text-[#1b352b]"
-            style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}
-          >
+          <h1 className="text-lg font-bold text-[#1b352b]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
             {t('packScene.brief.title', 'Practice in Context')}
           </h1>
           <div className="w-9" aria-hidden="true" />
@@ -269,10 +240,7 @@ function PackSceneBrief({ definition, onStart, onExit }) {
             <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#2a6a44]">
               {t('packScene.brief.sceneLabel', 'Scene')}
             </div>
-            <h2
-              className="text-2xl font-bold text-[#183d2e]"
-              style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}
-            >
+            <h2 className="text-2xl font-bold text-[#183d2e]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
               {definition.title}
             </h2>
             {definition.goal && (
@@ -289,10 +257,7 @@ function PackSceneBrief({ definition, onStart, onExit }) {
             </div>
             <div className="flex flex-wrap gap-2">
               {definition.targetConceptIds.map((id) => (
-                <span
-                  key={id}
-                  className="rounded-full border border-[#d8cdb7] bg-[#fff8e8] px-3 py-1 text-sm font-semibold text-[#315846]"
-                >
+                <span key={id} className="rounded-full border border-[#d8cdb7] bg-[#fff8e8] px-3 py-1 text-sm font-semibold text-[#315846]">
                   {id}
                 </span>
               ))}
@@ -327,10 +292,7 @@ function PackSceneRecap({ definition, conceptResults, onFinish }) {
       <div className="mx-auto flex w-full max-w-[430px] flex-1 flex-col px-5 pb-[calc(var(--bottom-nav-safe-space)+1rem)] pt-10 md:max-w-[560px]">
         <div className="text-center">
           <div className="mb-2 text-5xl" aria-hidden="true">✦</div>
-          <h1
-            className="text-2xl font-bold text-[#183d2e]"
-            style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}
-          >
+          <h1 className="text-2xl font-bold text-[#183d2e]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
             {t('packScene.recap.title', 'Scene complete!')}
           </h1>
           <p className="mt-1 text-sm font-medium text-[#4e665b]">{definition.title}</p>
@@ -351,7 +313,6 @@ function PackSceneRecap({ definition, conceptResults, onFinish }) {
               </div>
             </div>
           )}
-
           {produced.length > 0 && (
             <div className="rounded-[1.5rem] border border-[#d8cdb7] bg-[#fff9ea]/90 p-4 shadow-sm">
               <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#2a6a44]">
@@ -383,38 +344,28 @@ function PackSceneRecap({ definition, conceptResults, onFinish }) {
   );
 }
 
-// ─── Scene Screen ─────────────────────────────────────────────────────────────
+// ─── Beat Screen ──────────────────────────────────────────────────────────────
+// Layout: header → dialogue cue → prompt → interaction UI
 
-function PackSceneScreen({
-  resolvedMoments,
-  momentIndex,
-  interactionIndex,
-  onInteractionResult,
-  onExit,
-  definition,
-  totalInteractions,
-  completedInteractions,
-}) {
+function PackSceneBeatScreen({ beat, onResult, onExit, beatIndex, totalBeats, definition }) {
   const { t } = useLocalization();
-  const currentMoment = resolvedMoments[momentIndex];
-  const currentInteraction = currentMoment?.interactions[interactionIndex];
+  const [resultReceived, setResultReceived] = useState(false);
 
-  const progress = totalInteractions > 0 ? (completedInteractions / totalInteractions) * 100 : 0;
+  const handleResult = useCallback((res) => {
+    if (resultReceived) return;
+    setResultReceived(true);
+    // buildLine calls onResult immediately on success — add a pause so the result state is visible
+    const delay = res.type === 'buildLine' ? 900 : 0;
+    setTimeout(() => onResult(res), delay);
+  }, [resultReceived, onResult]);
+
+  const progress = ((beatIndex + 1) / totalBeats) * 100;
 
   return (
     <div className="fixed inset-0 z-30 flex flex-col overflow-hidden bg-[#fbf4e4] text-[#173d2e]">
       {/* Progress bar */}
-      <div
-        className="h-1 w-full shrink-0 bg-[#e8dfc8]"
-        role="progressbar"
-        aria-valuenow={Math.round(progress)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-      >
-        <div
-          className="h-full bg-[#2f6b4c] transition-all duration-500"
-          style={{ width: `${progress}%` }}
-        />
+      <div className="h-1 w-full shrink-0 bg-[#e8dfc8]" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
+        <div className="h-full bg-[#2f6b4c] transition-all duration-500" style={{ width: `${progress}%` }} />
       </div>
 
       {/* Header */}
@@ -428,10 +379,7 @@ function PackSceneScreen({
           <span className="material-symbols-outlined text-xl" aria-hidden="true">close</span>
         </button>
         <div className="text-center">
-          <div
-            className="text-sm font-bold text-[#183d2e]"
-            style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}
-          >
+          <div className="text-sm font-bold text-[#183d2e]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
             {definition.title}
           </div>
           {definition.goal && (
@@ -441,62 +389,40 @@ function PackSceneScreen({
         <div className="w-9" aria-hidden="true" />
       </header>
 
-      {/* Current moment bubble */}
-      <div className="shrink-0 px-5 py-3">
-        {currentMoment && (
-          <DialogueBubble
-            moment={currentMoment}
-            line={currentMoment.line}
-            isActive
-          />
-        )}
-      </div>
-
-      {/* Divider */}
-      <div className="shrink-0 border-t border-[#d8cdb7]" />
-
-      {/* Task area */}
+      {/* Scrollable content area */}
       <div className="flex-1 overflow-y-auto px-5 py-4 pb-[calc(var(--bottom-nav-safe-space)+1rem)]">
-        {currentInteraction && (
-          <>
-            {currentInteraction.prompt && (
-              <p className="mb-4 text-center text-sm font-bold text-[#4e665b]">
-                {currentInteraction.prompt}
-              </p>
-            )}
 
-            {currentInteraction.type === 'spotPackWords' && (
-              <SpotPackWords
-                key={`${currentMoment.id}-spot-${interactionIndex}`}
-                beat={currentInteraction}
-                line={currentMoment.line}
-                onResult={onInteractionResult}
-              />
-            )}
-            {currentInteraction.type === 'meaningChoice' && (
-              <MeaningChoiceInteraction
-                key={`${currentMoment.id}-meaning-${interactionIndex}`}
-                interaction={currentInteraction}
-                onResult={onInteractionResult}
-              />
-            )}
-            {currentInteraction.type === 'buildLine' && (
-              <BuildLineInteraction
-                key={`${currentMoment.id}-build-${interactionIndex}`}
-                interaction={currentInteraction}
-                line={currentMoment.line}
-                onResult={onInteractionResult}
-              />
-            )}
-            {currentInteraction.type === 'chooseReply' && (
-              <ChooseReplyInteraction
-                key={`${currentMoment.id}-reply-${interactionIndex}`}
-                interaction={currentInteraction}
-                line={currentMoment.line}
-                onResult={onInteractionResult}
-              />
-            )}
-          </>
+        {/* Dialogue cue: shown for all non-spotPackWords beats (cueLine is the prior line) */}
+        {beat.cueLine && (
+          <DialogueCue line={beat.cueLine} cueLabel={beat.cueLabel} />
+        )}
+
+        {/* For spotPackWords, show cue label inline above the tokens (no full cueLine card) */}
+        {!beat.cueLine && beat.cueLabel && beat.actionType === 'spotPackWords' && (
+          <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#7b6b47]">
+            {beat.cueLabel}
+          </div>
+        )}
+
+        {/* Task prompt */}
+        {beat.prompt && (
+          <p className={`text-center text-sm font-bold text-[#4e665b] ${beat.cueLine ? 'mt-4 mb-3' : 'mb-3'}`}>
+            {beat.prompt}
+          </p>
+        )}
+
+        {/* Interaction */}
+        {beat.actionType === 'spotPackWords' && (
+          <SpotPackWords beat={beat} line={beat.activeLine} onResult={handleResult} suppressHeader />
+        )}
+        {beat.actionType === 'meaningChoice' && (
+          <MeaningChoiceInteraction beat={beat} onResult={handleResult} />
+        )}
+        {beat.actionType === 'buildLine' && (
+          <BuildLineInteraction beat={beat} activeLine={beat.activeLine} onResult={handleResult} />
+        )}
+        {beat.actionType === 'chooseReply' && (
+          <ChooseReplyInteraction beat={beat} onResult={handleResult} />
         )}
       </div>
     </div>
@@ -506,10 +432,8 @@ function PackSceneScreen({
 // ─── Session Orchestrator ─────────────────────────────────────────────────────
 
 export default function PackSceneSession({ packId, practiceLanguageId, onExit }) {
-  const [phase, setPhase] = useState('brief'); // 'brief' | 'scene' | 'recap'
-  const [momentIndex, setMomentIndex] = useState(0);
-  const [interactionIndex, setInteractionIndex] = useState(0);
-  const [completedMomentIds, setCompletedMomentIds] = useState([]);
+  const [phase, setPhase] = useState('brief'); // 'brief' | 'beat' | 'recap'
+  const [beatIndex, setBeatIndex] = useState(0);
   const conceptResultsRef = useRef({});
 
   const packScene = useMemo(
@@ -517,98 +441,58 @@ export default function PackSceneSession({ packId, practiceLanguageId, onExit })
     [packId, practiceLanguageId],
   );
 
-  const totalInteractions = useMemo(() => {
-    if (!packScene) return 0;
-    return packScene.resolvedMoments.reduce((sum, m) => sum + m.interactions.length, 0);
-  }, [packScene]);
-
-  const completedInteractions = useMemo(() => {
-    if (!packScene) return 0;
-    let count = 0;
-    packScene.resolvedMoments.forEach((m, mIdx) => {
-      if (completedMomentIds.includes(m.id)) {
-        count += m.interactions.length;
-      } else if (mIdx === momentIndex) {
-        count += interactionIndex;
-      }
-    });
-    return count;
-  }, [packScene, completedMomentIds, momentIndex, interactionIndex]);
-
-  const handleInteractionResult = useCallback((result) => {
+  const handleBeatResult = useCallback((result) => {
     const cr = conceptResultsRef.current;
     if (result.seenConceptIds) result.seenConceptIds.forEach((id) => { cr[id] = { ...cr[id], seen: true }; });
     if (result.understoodConceptIds) result.understoodConceptIds.forEach((id) => { cr[id] = { ...cr[id], understood: true }; });
     if (result.producedConceptIds) result.producedConceptIds.forEach((id) => { cr[id] = { ...cr[id], produced: true }; });
 
     if (!packScene) return;
-    const { resolvedMoments } = packScene;
-    const currentMoment = resolvedMoments[momentIndex];
-    if (!currentMoment) return;
-
-    // meaningChoice and buildLine need a brief pause so the result state is visible
-    const resultType = result.type || result.actionType;
-    const delay = (resultType === 'meaningChoice' || resultType === 'buildLine') ? 900 : 0;
-
-    setTimeout(() => {
-      const nextInteractionIdx = interactionIndex + 1;
-
-      if (nextInteractionIdx < currentMoment.interactions.length) {
-        setInteractionIndex(nextInteractionIdx);
-        return;
-      }
-
-      // Moment complete — advance
-      const updatedCompleted = [...completedMomentIds, currentMoment.id];
-      setCompletedMomentIds(updatedCompleted);
-
-      const nextMomentIdx = momentIndex + 1;
-      if (nextMomentIdx >= resolvedMoments.length) {
-        markPackSceneComplete(packId, {
-          sceneId: packScene.definition.id,
-          conceptResults: { ...cr },
-        });
-        setPhase('recap');
-      } else {
-        setMomentIndex(nextMomentIdx);
-        setInteractionIndex(0);
-      }
-    }, delay);
-  }, [packScene, momentIndex, interactionIndex, completedMomentIds, packId]);
+    const next = beatIndex + 1;
+    if (next >= packScene.resolvedBeats.length) {
+      markPackSceneComplete(packId, {
+        sceneId: packScene.definition.id,
+        conceptResults: { ...cr },
+      });
+      setPhase('recap');
+    } else {
+      setBeatIndex(next);
+    }
+  }, [packScene, beatIndex, packId]);
 
   if (!packScene) {
     return (
       <div className="fixed inset-0 z-30 flex items-center justify-center bg-[#fbf4e4] px-5 text-center">
         <div>
           <p className="text-lg font-bold text-[#183d2e]">No scene available for this pack yet.</p>
-          <button type="button" onClick={onExit} className="mt-4 text-sm font-bold text-[#2f6b4c] underline">
-            Go back
-          </button>
+          <button type="button" onClick={onExit} className="mt-4 text-sm font-bold text-[#2f6b4c] underline">Go back</button>
         </div>
       </div>
     );
   }
 
-  const { definition, resolvedMoments } = packScene;
+  const { definition, resolvedBeats } = packScene;
+  const currentBeat = resolvedBeats[beatIndex];
 
   if (phase === 'brief') {
-    return <PackSceneBrief definition={definition} onStart={() => setPhase('scene')} onExit={onExit} />;
+    return <PackSceneBrief definition={definition} onStart={() => setPhase('beat')} onExit={onExit} />;
   }
 
   if (phase === 'recap') {
     return <PackSceneRecap definition={definition} conceptResults={conceptResultsRef.current} onFinish={onExit} />;
   }
 
+  if (!currentBeat) return null;
+
   return (
-    <PackSceneScreen
-      resolvedMoments={resolvedMoments}
-      momentIndex={momentIndex}
-      interactionIndex={interactionIndex}
-      onInteractionResult={handleInteractionResult}
+    <PackSceneBeatScreen
+      key={currentBeat.id}
+      beat={currentBeat}
+      beatIndex={beatIndex}
+      totalBeats={resolvedBeats.length}
+      onResult={handleBeatResult}
       onExit={onExit}
       definition={definition}
-      totalInteractions={totalInteractions}
-      completedInteractions={completedInteractions}
     />
   );
 }
