@@ -1,25 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import SpeakButton from '../../SpeakButton.jsx';
 import { useLocalization } from '../../../context/LocalizationContext.jsx';
-import { useLanguage } from '../../../context/LanguageContext.jsx';
-import { getLanguageName } from '../../../lib/vocabLanguageAdapter.js';
 
-/**
- * GuidedReplyChoice Module
- *
- * Show a context (English meaning) and multiple Hebrew options.
- * The learner picks the correct Hebrew phrase.
- */
 export default function GuidedReplyChoice({ line, distractorLines = [], onResult }) {
   const { t } = useLocalization();
-  const { languageId } = useLanguage();
-  const langName = getLanguageName(languageId);
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showTransliterations, setShowTransliterations] = useState(false);
   const [choices, setChoices] = useState([]);
 
-  // Generate multiple choice options
   useEffect(() => {
     const correctAnswer = line.he;
 
@@ -88,17 +77,17 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-3">
       <div className="text-center">
-        <h3 className="text-lg font-bold text-[#183d2e]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
-          {t('conversation.modules.guidedReplyChoice.instruction', `Choose the ${langName} phrase`)}
+        <h3 className="text-xl font-bold text-[#183d2e]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
+          {t('conversation.modules.chooseReply.instruction', 'Choose the Reply')}
         </h3>
         <p className="mt-1 text-sm font-medium text-[#4e665b]">
-          {t('conversation.modules.guidedReplyChoice.hint', `Pick the correct ${langName} response`)}
+          {t('conversation.modules.chooseReply.hint', 'Pick the line that fits this moment.')}
         </p>
       </div>
 
       <div className="rounded-[1.5rem] border border-[#d8cdb7] bg-[#fff8e8]/90 p-4 text-center shadow-sm">
         <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#2f6b4c]">
-          {t('conversation.modules.guidedReplyChoice.contextLabel', 'You want to say:')}
+          {t('conversation.modules.chooseReply.contextLabel', 'How would you respond?')}
         </div>
         <div className="text-lg font-bold text-[#183d2e]">
           {line.en}
@@ -172,8 +161,8 @@ export default function GuidedReplyChoice({ line, distractorLines = [], onResult
           className="rounded-full border border-[#d8cdb7] bg-white/72 px-4 py-2 text-sm font-bold text-[#315846] shadow-sm transition hover:bg-white"
         >
           {showTransliterations
-            ? t('conversation.modules.guidedReplyChoice.hideTransliterations', 'Hide Transliterations')
-            : t('conversation.modules.guidedReplyChoice.showTransliterations', 'Show Transliterations')}
+            ? t('conversation.modules.chooseReply.hideTransliterations', 'Hide pronunciation')
+            : t('conversation.modules.chooseReply.showTransliterations', 'Show pronunciation')}
         </button>
       </div>
     </div>
