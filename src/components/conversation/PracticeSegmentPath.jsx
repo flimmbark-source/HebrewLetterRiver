@@ -1,4 +1,5 @@
 import { useLocalization } from '../../context/LocalizationContext.jsx';
+import verticalRiverRoutePath from '../../assets/Reading/vertical-river-route-path.png';
 
 function getDefaultStopTitle(index, segment) {
   if (index === 0) return 'Warm-up Phrases';
@@ -29,22 +30,22 @@ export default function PracticeSegmentPath({ scenario, segments, onSelectSegmen
         <span className="h-px w-8 bg-[#a6a06f]" aria-hidden="true" />
       </div>
 
-      <div className="relative pl-[4.25rem]">
-        <div className="pointer-events-none absolute bottom-0 left-0 top-0 w-[4rem] overflow-hidden" aria-hidden="true">
-          <div className="absolute left-3 top-0 h-full w-8 rounded-full bg-gradient-to-b from-[#9ed0d8] via-[#5aa6a5] to-[#2f7d83] opacity-65 blur-[0.2px]" />
-          <div className="absolute left-1 top-2 h-10 w-10 rounded-full bg-[#d8e6dd]/70 blur-md" />
-          <div className="absolute left-0 top-20 h-10 w-10 rounded-full bg-[#d8e6dd]/60 blur-md" />
-          <div className="absolute bottom-3 left-0 h-14 w-14 rounded-full bg-[#d8e6dd]/70 blur-md" />
-        </div>
+      <div className="relative min-h-[265px] pl-[4.9rem]">
+        <img
+          src={verticalRiverRoutePath}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-4 top-[-0.75rem] h-[calc(100%+2rem)] w-[6.25rem] object-cover object-left opacity-95"
+        />
 
         <div className="space-y-3">
           {segments.map((segment, index) => (
             <button
               key={segment.id}
               onClick={() => onSelectSegment(segment)}
-              className={`group relative w-full rounded-2xl border bg-[#fff8e8]/88 p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-lg active:scale-[0.99] ${index === 1 ? 'border-[#2f6b4c]' : 'border-[#ded3ba]'}`}
+              className={`group relative w-full rounded-2xl border bg-[#fff8e8]/90 p-4 text-left shadow-sm backdrop-blur-[1px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-lg active:scale-[0.99] ${index === 1 ? 'border-[#2f6b4c]' : 'border-[#ded3ba]'}`}
             >
-              <div className="absolute -left-[3.15rem] top-1/2 flex -translate-y-1/2 items-center">
+              <div className="absolute -left-[3.65rem] top-1/2 flex -translate-y-1/2 items-center">
                 <span className="h-2 w-3 bg-[#2f6b4c]" aria-hidden="true" />
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2f6b4c] text-sm font-bold text-white shadow-md ring-4 ring-[#fbf4e4]">
                   {index + 1}
