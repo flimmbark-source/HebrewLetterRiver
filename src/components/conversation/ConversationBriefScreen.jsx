@@ -34,7 +34,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
   const routeIcon = getRouteIcon(`${scenario.metadata.theme || ''} ${routeTitle}`);
 
   return (
-    <div className="min-h-screen bg-[#fbf4e4] text-[#173d2e]">
+    <div className="relative left-1/2 min-h-screen w-screen -translate-x-1/2 bg-[#fbf4e4] text-[#173d2e]">
       <div className="relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-5 pt-4">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-36 overflow-hidden" aria-hidden="true">
           <div
