@@ -11,8 +11,6 @@ import {
 import {
   expandScriptToSteps,
   getCurrentStep,
-  isSessionComplete,
-  getSessionStats,
   generateDualRoleScript
 } from '../../data/conversation/dualRoleConversation.ts';
 import { generateSegmentsFromSentences } from '../../data/conversation/scenarioFactory.ts';
@@ -23,11 +21,6 @@ import { generateSegmentsFromSentences } from '../../data/conversation/scenarioF
  * Orchestrates dual-role conversation practice where the learner plays both
  * sides of a dialogue (Speaker A and Speaker B). Each turn alternates roles
  * and uses paired Introduce+Reinforce module sequences.
- *
- * Flow:
- * 1. Brief screen (overview)
- * 2. Beat screens (practice each step in expanded script)
- * 3. Recap screen (summary)
  */
 export default function DualRoleConversationSession({
   scenario,
@@ -42,10 +35,8 @@ export default function DualRoleConversationSession({
   const [expandedSteps, setExpandedSteps] = useState([]);
   const [activeSteps, setActiveSteps] = useState([]);
 
-  // Expand script into steps on mount or when script changes
   useEffect(() => {
     if (script) {
-      // Skip reinforce for known lines to keep sessions short
       const steps = expandScriptToSteps(script, true);
       setExpandedSteps(steps);
     }
@@ -76,7 +67,6 @@ export default function DualRoleConversationSession({
     );
   }, [expandedSteps.length, script, scenario.lines, scenario.metadata.id]);
 
-  // Create a practice plan from expanded steps
   const createPlanFromSteps = useCallback((steps) => {
     return {
       scenarioId: scenario.metadata.id,
@@ -93,7 +83,6 @@ export default function DualRoleConversationSession({
     };
   }, [scenario]);
 
-  // Initialize session
   useEffect(() => {
     if (!sessionId && activeSteps.length > 0) {
       const plan = createPlanFromSteps(activeSteps);
@@ -109,58 +98,65 @@ export default function DualRoleConversationSession({
     }
   }, [sessionId, activeSteps, scenario, createPlanFromSteps]);
 
-  // Start practice from brief screen
-  const handleStart = useCallback(() => {
-    setActiveSteps(expandedSteps);
+  const resetToBeatScreen = useCallback((steps) => {
+    setActiveSteps(steps);
     setSessionId(null);
     setScreen('beat');
     setCurrentBeatIndex(0);
     setAttemptHistory([]);
     setSavedLineIds([]);
-  }, [expandedSteps]);
+  }, []);
 
-  const handleStartSegment = useCallback((segment) => {
+  const handleStart = useCallback(() => {
+    resetToBeatScreen(expandedSteps);
+  }, [expandedSteps, resetToBeatScreen]);
+
+  const buildStepsForSegments = useCallback((selectedSegments) => {
+    const segmentsToUse = Array.isArray(selectedSegments)
+      ? selectedSegments
+      : [selectedSegments];
     const lineMap = new Map(scenario.lines.map(line => [line.id, line]));
-    const segmentLineIds = segment.pairs.flatMap(pair => [
+    const seenLineIds = new Set();
+    const segmentLineIds = segmentsToUse.flatMap(segment => segment?.pairs?.flatMap(pair => [
       pair.shortSentenceId,
       pair.longSentenceId
-    ]);
+    ]) || []);
     const segmentSentences = segmentLineIds
+      .filter(lineId => {
+        if (!lineId || seenLineIds.has(lineId)) return false;
+        seenLineIds.add(lineId);
+        return true;
+      })
       .map(lineId => lineMap.get(lineId)?.sentenceData)
       .filter(Boolean);
 
     if (segmentSentences.length === 0) {
-      setActiveSteps(expandedSteps);
-      setSessionId(null);
-      setScreen('beat');
-      setCurrentBeatIndex(0);
-      setAttemptHistory([]);
-      setSavedLineIds([]);
-      return;
+      return expandedSteps;
     }
 
     const segmentScript = generateDualRoleScript(
       segmentSentences,
-      `${segment.id}-dual`,
+      `${segmentsToUse[0]?.id || 'route-stop'}-dual`,
       scenario.metadata.theme,
       `Practice ${scenario.metadata.theme.toLowerCase()} in dual-role mode`,
       scenario.metadata.id
     );
-    const segmentSteps = expandScriptToSteps(segmentScript, true);
-    setActiveSteps(segmentSteps);
-    setSessionId(null);
-    setScreen('beat');
-    setCurrentBeatIndex(0);
-    setAttemptHistory([]);
-    setSavedLineIds([]);
+
+    return expandScriptToSteps(segmentScript, true);
   }, [expandedSteps, scenario.lines, scenario.metadata.id, scenario.metadata.theme]);
 
-  // Handle beat completion
+  const handleStartSegment = useCallback((segmentOrRouteStop) => {
+    const selectedSegments = Array.isArray(segmentOrRouteStop?.segments)
+      ? segmentOrRouteStop.segments
+      : [segmentOrRouteStop];
+    const segmentSteps = buildStepsForSegments(selectedSegments);
+    resetToBeatScreen(segmentSteps);
+  }, [buildStepsForSegments, resetToBeatScreen]);
+
   const handleBeatComplete = useCallback((attemptResult) => {
     const updatedHistory = [...attemptHistory, attemptResult];
     setAttemptHistory(updatedHistory);
 
-    // Update session in storage
     if (sessionId) {
       updateSession(sessionId, {
         attemptHistory: updatedHistory,
@@ -168,12 +164,10 @@ export default function DualRoleConversationSession({
       });
     }
 
-    // Move to next beat or recap
     const nextIndex = currentBeatIndex + 1;
     if (nextIndex < activeSteps.length) {
       setCurrentBeatIndex(nextIndex);
     } else {
-      // Session complete
       if (sessionId) {
         completeSession(sessionId);
       }
@@ -181,7 +175,6 @@ export default function DualRoleConversationSession({
     }
   }, [attemptHistory, currentBeatIndex, activeSteps.length, sessionId]);
 
-  // Save phrase to SRS
   const handleSavePhrase = useCallback((lineId) => {
     if (!savedLineIds.includes(lineId)) {
       const updatedSaved = [...savedLineIds, lineId];
@@ -193,7 +186,6 @@ export default function DualRoleConversationSession({
     }
   }, [savedLineIds, sessionId, scenario.metadata.id]);
 
-  // Practice again
   const handlePracticeAgain = useCallback(() => {
     setScreen('brief');
     setCurrentBeatIndex(0);
@@ -203,33 +195,28 @@ export default function DualRoleConversationSession({
     setSessionId(null);
   }, [expandedSteps]);
 
-  // Review saved phrases
   const handleReviewSaved = useCallback(() => {
     console.log('Review saved phrases:', savedLineIds);
     onExit();
   }, [savedLineIds, onExit]);
 
-  // Go back to brief from beat screen
   const handleBackToBrief = useCallback(() => {
     setScreen('brief');
     setActiveSteps(expandedSteps);
   }, [expandedSteps]);
 
-  // Check if steps are ready
   if (expandedSteps.length === 0) {
     return (
-      <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-[#fbf4e4] text-[#173d2e] flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4">⏳</div>
-          <p className="text-lg text-slate-400">Loading conversation...</p>
+          <div className="text-4xl mb-4">⌛</div>
+          <p className="text-lg text-[#4e665b]">Loading conversation...</p>
         </div>
       </div>
     );
   }
 
-  // Render brief screen
   if (screen === 'brief') {
-    // Create a modified scenario object for the brief screen
     const briefScenario = {
       ...scenario,
       metadata: {
@@ -239,7 +226,7 @@ export default function DualRoleConversationSession({
         subtitleKey: script.description
       },
       defaultPlan: createPlanFromSteps(expandedSteps),
-      segments: scenario.segments
+      segments: scriptSegments || scenario.segments
     };
 
     return (
@@ -252,7 +239,6 @@ export default function DualRoleConversationSession({
     );
   }
 
-  // Render beat screen
   if (screen === 'beat') {
     const currentStep = getCurrentStep(activeSteps, currentBeatIndex);
 
@@ -261,7 +247,6 @@ export default function DualRoleConversationSession({
       return null;
     }
 
-    // Convert step to beat format
     const currentBeat = {
       lineId: currentStep.lineId,
       moduleId: currentStep.moduleId,
@@ -282,7 +267,6 @@ export default function DualRoleConversationSession({
     );
   }
 
-  // Render recap screen
   if (screen === 'recap') {
     return (
       <ConversationRecapScreen
