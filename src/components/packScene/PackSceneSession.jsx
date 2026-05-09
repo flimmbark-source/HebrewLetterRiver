@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import SpotPackWords from './SpotPackWords.jsx';
 import ListenMeaningChoice from '../conversation/modules/ListenMeaningChoice.jsx';
@@ -342,7 +342,6 @@ function PackSceneScreen({
   resolvedMoments,
   momentIndex,
   interactionIndex,
-  completedMomentIds,
   onInteractionResult,
   onExit,
   definition,
@@ -350,15 +349,8 @@ function PackSceneScreen({
   completedInteractions,
 }) {
   const { t } = useLocalization();
-  const threadRef = useRef(null);
   const currentMoment = resolvedMoments[momentIndex];
   const currentInteraction = currentMoment?.interactions[interactionIndex];
-
-  useEffect(() => {
-    if (threadRef.current) {
-      threadRef.current.scrollTop = threadRef.current.scrollHeight;
-    }
-  }, [momentIndex, completedMomentIds.length]);
 
   const progress = totalInteractions > 0 ? (completedInteractions / totalInteractions) * 100 : 0;
 
@@ -402,26 +394,15 @@ function PackSceneScreen({
         <div className="w-9" aria-hidden="true" />
       </header>
 
-      {/* Conversation thread */}
-      <div
-        ref={threadRef}
-        className="shrink-0 overflow-y-auto"
-        style={{ maxHeight: '38vh' }}
-      >
-        <div className="flex flex-col gap-3 px-5 py-3">
-          {resolvedMoments.map((moment, idx) => {
-            if (idx > momentIndex) return null;
-            const isActive = idx === momentIndex;
-            return (
-              <DialogueBubble
-                key={moment.id}
-                moment={moment}
-                line={moment.line}
-                isActive={isActive}
-              />
-            );
-          })}
-        </div>
+      {/* Current moment bubble */}
+      <div className="shrink-0 px-5 py-3">
+        {currentMoment && (
+          <DialogueBubble
+            moment={currentMoment}
+            line={currentMoment.line}
+            isActive
+          />
+        )}
       </div>
 
       {/* Divider */}
@@ -577,7 +558,6 @@ export default function PackSceneSession({ packId, practiceLanguageId, onExit })
       resolvedMoments={resolvedMoments}
       momentIndex={momentIndex}
       interactionIndex={interactionIndex}
-      completedMomentIds={completedMomentIds}
       onInteractionResult={handleInteractionResult}
       onExit={onExit}
       definition={definition}
