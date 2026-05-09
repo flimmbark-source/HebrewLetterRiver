@@ -35,7 +35,7 @@ export default function PracticeSegmentPath({ scenario, segments, onSelectSegmen
           src={verticalRiverRoutePath}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -left-8 top-[-0.75rem] h-[calc(100%+2rem)] w-[6.25rem] object-cover object-left opacity-95"
+          className="pointer-events-none absolute -left-16 top-[-0.75rem] h-[calc(100%+2rem)] w-[12.40rem] object-cover object-left opacity-95"
         />
 
         <div className="space-y-3">
