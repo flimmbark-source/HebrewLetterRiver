@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import PracticeSegmentPath from './PracticeSegmentPath.jsx';
 import riverBackground from '../../assets/Reading/River-Background.png';
@@ -19,6 +19,7 @@ function getRouteIcon(theme = '') {
 
 export default function ConversationBriefScreen({ scenario, onStartSegment, onBack }) {
   const { t } = useLocalization();
+  const [selectedRouteStop, setSelectedRouteStop] = useState(null);
   const hasSegments = scenario.segments && scenario.segments.length > 0;
   const canSelectSegments = hasSegments && typeof onStartSegment === 'function';
 
@@ -33,8 +34,13 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
   );
   const routeIcon = getRouteIcon(`${scenario.metadata.theme || ''} ${routeTitle}`);
 
+  const handleBeginRoute = () => {
+    if (!selectedRouteStop) return;
+    onStartSegment(selectedRouteStop);
+  };
+
   return (
-    <div className="relative left-1/2 min-h-screen w-screen -translate-x-1/2 bg-[#fbf4e4] text-[#173d2e]">
+    <div className="relative left-1/2 min-h-screen w-screen -translate-x-1/2 bg-[#fbf4e4] text-[#173d2e] -mt-4">
       <div className="relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-5 pt-4">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-36 overflow-hidden" aria-hidden="true">
           <div
@@ -95,7 +101,8 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
               <PracticeSegmentPath
                 scenario={scenario}
                 segments={scenario.segments}
-                onSelectSegment={onStartSegment}
+                selectedRouteStopId={selectedRouteStop?.id}
+                onSelectRouteStop={setSelectedRouteStop}
               />
             ) : (
               <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-4 py-4 text-center text-sm font-semibold text-[#4e665b]">
@@ -103,6 +110,19 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
               </div>
             )}
           </section>
+
+          {canSelectSegments && (
+            <button
+              type="button"
+              onClick={handleBeginRoute}
+              disabled={!selectedRouteStop}
+              className="relative z-10 mt-3 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              style={{ background: 'linear-gradient(180deg, #d98818, #b96a10)', boxShadow: '0 12px 28px rgba(175, 101, 14, 0.28)' }}
+            >
+              <span>{t('read.route.begin', 'Begin Route')}</span>
+              <span className="material-symbols-outlined text-xl" aria-hidden="true">eco</span>
+            </button>
+          )}
         </main>
       </div>
     </div>
