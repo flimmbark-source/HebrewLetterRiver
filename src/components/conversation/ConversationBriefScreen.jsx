@@ -33,7 +33,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
   };
 
   return (
-    <div className="fixed inset-x-0 top-0 bottom-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom,0px)+16px)] z-30 overflow-hidden bg-[#fbf4e4] text-[#173d2e]">
+    <div className="fixed inset-x-0 top-0 bottom-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom,0px)+16px)] z-30 overflow-hidden bg-[#fbf4e4] text-[#173d2e] md:bottom-[calc(var(--bottom-nav-height)+96px)]">
       <div className="relative mx-auto flex h-full w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-3 pt-10">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-36 overflow-hidden" aria-hidden="true">
           <div
