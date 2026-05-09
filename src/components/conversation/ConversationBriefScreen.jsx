@@ -36,12 +36,14 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
   return (
     <div className="min-h-screen bg-[#fbf4e4] text-[#173d2e]">
       <div className="relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-5 pt-4">
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-cover bg-center opacity-72"
-          style={{ backgroundImage: `url(${riverBackground})` }}
-          aria-hidden="true"
-        />
-        <div className="pointer-events-none absolute inset-x-0 top-5 h-36 bg-gradient-to-b from-[#fbf4e4]/10 via-[#fbf4e4]/100 to-[#fbf4e4]" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-36 overflow-hidden" aria-hidden="true">
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-82"
+            style={{ backgroundImage: `url(${riverBackground})` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#fbf4e4]/0 via-[#fbf4e4]/50 to-[#fbf4e4]" />
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#fbf4e4] to-[#fbf4e4]/0" />
+        </div>
 
         <header className="relative z-10 grid grid-cols-[2.5rem_1fr_2.5rem] items-center">
           <button
