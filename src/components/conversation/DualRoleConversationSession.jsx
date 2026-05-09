@@ -217,6 +217,9 @@ export default function DualRoleConversationSession({
   }
 
   if (screen === 'brief') {
+    const routeSegments = scenario.segments?.length
+      ? scenario.segments
+      : scriptSegments;
     const briefScenario = {
       ...scenario,
       metadata: {
@@ -226,7 +229,7 @@ export default function DualRoleConversationSession({
         subtitleKey: script.description
       },
       defaultPlan: createPlanFromSteps(expandedSteps),
-      segments: scriptSegments || scenario.segments
+      segments: routeSegments
     };
 
     return (
