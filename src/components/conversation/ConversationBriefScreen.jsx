@@ -17,12 +17,10 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
-    document.body.classList.add('in-conversation-practice');
     document.body.style.overflow = 'hidden';
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 
     return () => {
-      document.body.classList.remove('in-conversation-practice');
       document.body.style.overflow = previousOverflow;
     };
   }, []);
@@ -35,8 +33,8 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
   };
 
   return (
-    <div className="fixed inset-0 z-30 overflow-hidden bg-[#fbf4e4] text-[#173d2e]">
-      <div className="relative mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-4 pt-10">
+    <div className="fixed inset-x-0 top-0 bottom-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom,0px)+16px)] z-30 overflow-hidden bg-[#fbf4e4] text-[#173d2e]">
+      <div className="relative mx-auto flex h-full w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-3 pt-10">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-36 overflow-hidden" aria-hidden="true">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-82"
@@ -64,8 +62,8 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
           </div>
         </header>
 
-        <main className="relative z-10 flex min-h-0 flex-1 flex-col pt-5">
-          <div className="mt-auto">
+        <main className="relative z-10 flex min-h-0 flex-1 flex-col pt-3">
+          <div className="mt-0">
             <section className="text-center">
               <div className="mt-1 grid grid-cols-3 gap-2">
                 <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm">
@@ -106,7 +104,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
               type="button"
               onClick={handleBeginRoute}
               disabled={!selectedRouteStop}
-              className="relative z-10 mt-3 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              className="relative z-10 mt-auto flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
               style={{ background: 'linear-gradient(180deg, #d98818, #b96a10)', boxShadow: '0 12px 28px rgba(175, 101, 14, 0.28)' }}
             >
               <span>{t('read.route.begin', 'Begin Route')}</span>
