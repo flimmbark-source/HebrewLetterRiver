@@ -1,50 +1,102 @@
-// Pack Scene scene and beat definitions.
+// Pack Scene scene and moment definitions.
 // Concept IDs bridge across languages — they are not sentence generators.
-// Options for meaningChoice / chooseReply beats are defined here in English (supportText).
+// Each moment = one speaker's utterance with one or more nested interactions.
 // Coverage matters, but naturalness matters more: 3 natural concepts > 5 forced ones.
 
 export const packSceneDefinitions = {
   'food_01.cafe_order_basic': {
     id: 'food_01.cafe_order_basic',
     packId: 'food_01',
-    title: 'At the café',
+    title: 'At the Café',
+    goal: 'Order the thing you actually want.',
     sceneType: 'dialogue',
     difficulty: 1,
-    targetConceptIds: ['coffee', 'water', 'bread', 'please'],
+    targetConceptIds: ['coffee', 'water', 'bread', 'please', 'yes', 'thank-you'],
 
-    beats: [
+    moments: [
       {
-        id: 'spot-request',
-        actionType: 'spotPackWords',
-        lineId: 'cafe-request-coffee-water',
-        targetConceptIds: ['coffee', 'water'],
-      },
-      {
-        id: 'understand-request',
-        actionType: 'meaningChoice',
-        lineId: 'cafe-request-coffee-water',
-        options: [
-          { id: 'correct', text: 'Can I get coffee and water?', isCorrect: true },
-          { id: 'near-scene', text: 'Yes, bread please.', isCorrect: false },
-          { id: 'wrong-scene', text: 'I am going home now.', isCorrect: false },
+        id: 'server-asks',
+        speaker: 'other',
+        speakerLabel: 'Server',
+        lineId: 'cafe-choice-coffee-water',
+        interactions: [
+          {
+            type: 'spotPackWords',
+            targetConceptIds: ['coffee', 'water'],
+            prompt: 'Tap the words you recognize.',
+          },
+          {
+            type: 'meaningChoice',
+            targetConceptIds: ['coffee', 'water'],
+            prompt: 'What did the server ask?',
+            options: [
+              { id: 'correct', text: 'Coffee or water?', isCorrect: true },
+              { id: 'near', text: 'Coffee and bread?', isCorrect: false },
+              { id: 'wrong', text: 'Are you ready to order?', isCorrect: false },
+            ],
+          },
         ],
       },
       {
-        id: 'build-bread-reply',
-        actionType: 'buildLine',
-        lineId: 'cafe-yes-bread-please',
-        targetConceptIds: ['bread', 'please'],
+        id: 'player-coffee',
+        speaker: 'you',
+        speakerLabel: 'You',
+        lineId: 'cafe-player-coffee-please',
+        interactions: [
+          {
+            type: 'buildLine',
+            targetConceptIds: ['coffee', 'please'],
+            prompt: 'Order your drink.',
+          },
+        ],
       },
       {
-        id: 'choose-close',
-        actionType: 'chooseReply',
-        prompt: 'What should you say next?',
-        lineId: 'cafe-thank-you',
-        targetConceptIds: ['thank-you'],
-        options: [
-          { id: 'correct-thanks', lineId: 'cafe-thank-you', text: 'Thank you.', isCorrect: true },
-          { id: 'near-bread', lineId: 'cafe-yes-bread-please', text: 'Yes, bread please.', isCorrect: false },
-          { id: 'wrong-home', text: 'I am going home now.', isCorrect: false },
+        id: 'server-adds-bread',
+        speaker: 'other',
+        speakerLabel: 'Server',
+        lineId: 'cafe-server-bread-too',
+        interactions: [
+          {
+            type: 'spotPackWords',
+            targetConceptIds: ['bread'],
+            prompt: 'Tap the word you recognize.',
+          },
+        ],
+      },
+      {
+        id: 'player-accepts',
+        speaker: 'you',
+        speakerLabel: 'You',
+        lineId: 'cafe-player-yes-bread',
+        interactions: [
+          {
+            type: 'chooseReply',
+            targetConceptIds: ['yes', 'bread', 'please'],
+            prompt: 'What should you say?',
+            options: [
+              { id: 'correct', text: 'Yes, bread please.', isCorrect: true },
+              { id: 'near', text: 'No thank you.', isCorrect: false },
+              { id: 'wrong', text: 'What is bread?', isCorrect: false },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'player-closes',
+        speaker: 'you',
+        speakerLabel: 'You',
+        lineId: 'cafe-player-thank-you',
+        interactions: [
+          {
+            type: 'chooseReply',
+            targetConceptIds: ['thank-you'],
+            prompt: 'Close the exchange.',
+            options: [
+              { id: 'correct', text: 'Thank you.', isCorrect: true },
+              { id: 'near', text: 'Yes please.', isCorrect: false },
+              { id: 'wrong', text: 'I want more coffee.', isCorrect: false },
+            ],
+          },
         ],
       },
     ],

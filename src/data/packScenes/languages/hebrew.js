@@ -3,19 +3,38 @@
 // Those aliases exist only at the adapter boundary.
 
 export const hebrewPackSceneLines = {
-  'cafe-request-coffee-water': {
-    targetText: 'אפשר קפה ומים?',
-    transliteration: 'efshar kafe ve-mayim?',
-    supportText: 'Can I get coffee and water?',
+  'cafe-choice-coffee-water': {
+    targetText: 'קפה או מים?',
+    transliteration: 'kafe o mayim?',
+    supportText: 'Coffee or water?',
     tokens: [
-      { text: 'אפשר', conceptId: 'can-get' },
       { text: 'קפה', conceptId: 'coffee' },
-      { text: 'ו', conceptId: 'and' },
-      { text: 'מים', conceptId: 'water' },
+      { text: 'או', conceptId: 'or' },
+      { text: 'מים?', conceptId: 'water' },
     ],
   },
 
-  'cafe-yes-bread-please': {
+  'cafe-player-coffee-please': {
+    targetText: 'קפה בבקשה.',
+    transliteration: 'kafe bevakasha.',
+    supportText: 'Coffee please.',
+    tokens: [
+      { text: 'קפה', conceptId: 'coffee' },
+      { text: 'בבקשה.', conceptId: 'please' },
+    ],
+  },
+
+  'cafe-server-bread-too': {
+    targetText: 'גם לחם?',
+    transliteration: 'gam lechem?',
+    supportText: 'Also bread?',
+    tokens: [
+      { text: 'גם', conceptId: 'also' },
+      { text: 'לחם?', conceptId: 'bread' },
+    ],
+  },
+
+  'cafe-player-yes-bread': {
     targetText: 'כן, לחם בבקשה.',
     transliteration: 'ken, lechem bevakasha.',
     supportText: 'Yes, bread please.',
@@ -26,7 +45,7 @@ export const hebrewPackSceneLines = {
     ],
   },
 
-  'cafe-thank-you': {
+  'cafe-player-thank-you': {
     targetText: 'תודה.',
     transliteration: 'todah.',
     supportText: 'Thank you.',

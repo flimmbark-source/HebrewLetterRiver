@@ -17,7 +17,7 @@ function resolveSceneId(packId) {
  *
  * @param {string} packId
  * @param {string} practiceLanguageId
- * @returns {{ definition, lines, resolvedBeats, coverage } | null}
+ * @returns {{ definition, lines, resolvedMoments, coverage } | null}
  */
 export function getPackSceneForPack(packId, practiceLanguageId) {
   const sceneId = resolveSceneId(packId);
@@ -29,18 +29,18 @@ export function getPackSceneForPack(packId, practiceLanguageId) {
   const lines = linesByLanguage[practiceLanguageId];
   if (!lines) return null;
 
-  const resolvedBeats = definition.beats
-    .map((beat) => {
-      const line = lines[beat.lineId];
+  const resolvedMoments = definition.moments
+    .map((moment) => {
+      const line = lines[moment.lineId];
       if (!line) return null;
-      return { ...beat, line };
+      return { ...moment, line };
     })
     .filter(Boolean);
 
   return {
     definition,
     lines,
-    resolvedBeats,
+    resolvedMoments,
     coverage: definition.targetConceptIds,
   };
 }

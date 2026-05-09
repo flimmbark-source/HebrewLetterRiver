@@ -10,4 +10,6 @@ export const CONCEPTS = {
   'thank-you': 'thank-you',
   'can-get': 'can-get',
   and: 'and',
+  or: 'or',
+  also: 'also',
 };
