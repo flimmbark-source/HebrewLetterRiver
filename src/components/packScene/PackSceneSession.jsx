@@ -226,7 +226,7 @@ function PackSceneBrief({ definition, onStart, onExit }) {
 
           <section className="rounded-[1.75rem] border border-[#d8cdb7] bg-white/60 p-4 shadow-sm">
             <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#2a6a44]">
-              {t('packScene.brief.youWillPractice', 'You'll practice')}
+              {t('packScene.brief.youWillPractice', "You'll practice")}
             </div>
             <div className="flex flex-wrap gap-2">
               {definition.targetConceptIds.map((id) => (
