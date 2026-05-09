@@ -69,7 +69,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
         </header>
 
         <main className="relative z-10 flex min-h-0 flex-1 flex-col pt-3 md:items-center md:justify-center md:pt-8">
-          <div className="mt-auto md:mt-0 md:grid md:w-full md:max-w-[850px] md:grid-cols-[minmax(0,590px)_210px] md:items-center md:justify-center md:gap-6 md:rounded-[2rem] md:border md:border-[#d8cdb7]/70 md:bg-[#fff8e8]/45 md:p-5 md:shadow-[0_16px_36px_rgba(25,68,55,0.10)] md:backdrop-blur-[1px]">
+          <div className="mt-auto md:mt-0 md:grid md:w-full md:max-w-[850px] md:grid-cols-[minmax(0,590px)_210px] md:items-center md:justify-center md:gap-6">
             <div className="min-w-0">
               <section className="text-center md:mx-auto md:max-w-[590px]">
                 <div className="mt-1 grid grid-cols-3 gap-2 md:mt-0 md:gap-3">
