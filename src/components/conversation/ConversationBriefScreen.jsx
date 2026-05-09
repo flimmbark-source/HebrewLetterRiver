@@ -41,7 +41,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
           style={{ backgroundImage: `url(${riverBackground})` }}
           aria-hidden="true"
         />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-[#fbf4e4]/10 via-[#fbf4e4]/70 to-[#fbf4e4]" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-x-0 top-5 h-36 bg-gradient-to-b from-[#fbf4e4]/10 via-[#fbf4e4]/100 to-[#fbf4e4]" aria-hidden="true" />
 
         <header className="relative z-10 grid grid-cols-[2.5rem_1fr_2.5rem] items-center">
           <button
