@@ -34,7 +34,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
 
   return (
     <div className="fixed inset-0 z-30 overflow-hidden bg-[#fbf4e4] text-[#173d2e]">
-      <div className="relative mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-[calc(var(--bottom-nav-safe-space)+8px)] pt-10 md:max-w-[920px] md:px-8 md:pb-[calc(var(--bottom-nav-height)+28px)]">
+      <div className="relative mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-[calc(var(--bottom-nav-safe-space)+8px)] pt-10 md:max-w-[980px] md:px-8 md:pb-[calc(var(--bottom-nav-height)+44px)]">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-36 overflow-hidden md:h-44" aria-hidden="true">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-82"
@@ -44,7 +44,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
           <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#fbf4e4] to-[#fbf4e4]/0" />
         </div>
 
-        <header className="relative z-10 grid grid-cols-[2.5rem_1fr_2.5rem] items-center md:mx-auto md:w-full md:max-w-[640px]">
+        <header className="relative z-10 grid grid-cols-[2.5rem_1fr_2.5rem] items-center md:mx-auto md:w-full md:max-w-[680px]">
           <button
             onClick={onBack}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-white/78 text-[#315846] shadow-sm transition hover:bg-white"
@@ -63,9 +63,9 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
         </header>
 
         <main className="relative z-10 flex min-h-0 flex-1 flex-col pt-3 md:pt-8">
-          <div className="mt-auto md:mt-0 md:grid md:min-h-0 md:flex-1 md:grid-cols-[minmax(0,1fr)_240px] md:items-end md:gap-6">
+          <div className="mt-auto md:mx-auto md:mt-0 md:grid md:min-h-0 md:w-full md:max-w-[880px] md:flex-1 md:grid-cols-[minmax(0,620px)_220px] md:items-center md:justify-center md:gap-6">
             <div className="min-w-0">
-              <section className="text-center md:mx-auto md:max-w-[640px]">
+              <section className="text-center md:mx-auto md:max-w-[620px]">
                 <div className="mt-1 grid grid-cols-3 gap-2 md:gap-3">
                   <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
                     <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">eco</span>
@@ -101,12 +101,12 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
             </div>
 
             {canSelectSegments && (
-              <aside className="mt-3 md:mb-1 md:mt-0 md:flex md:h-full md:items-end">
+              <aside className="mt-3 md:mt-0 md:flex md:h-full md:items-center">
                 <button
                   type="button"
                   onClick={handleBeginRoute}
                   disabled={!selectedRouteStop}
-                  className="relative z-10 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 md:min-h-[96px] md:flex-col md:px-5 md:py-5 md:text-xl"
+                  className="relative z-10 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 md:min-h-[132px] md:flex-col md:px-5 md:py-6 md:text-xl"
                   style={{ background: 'linear-gradient(180deg, #d98818, #b96a10)', boxShadow: '0 12px 28px rgba(175, 101, 14, 0.28)' }}
                 >
                   <span>{t('read.route.begin', 'Begin Route')}</span>
