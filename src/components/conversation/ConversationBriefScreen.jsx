@@ -16,7 +16,15 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
   const canSelectSegments = hasSegments && typeof onStartSegment === 'function';
 
   useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.classList.add('in-conversation-practice');
+    document.body.style.overflow = 'hidden';
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+    return () => {
+      document.body.classList.remove('in-conversation-practice');
+      document.body.style.overflow = previousOverflow;
+    };
   }, []);
 
   const routeTitle = t(scenario.metadata.titleKey, scenario.metadata.theme);
@@ -27,7 +35,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
   };
 
   return (
-    <div className="relative left-1/2 h-[100dvh] w-screen -translate-x-1/2 overflow-hidden bg-[#fbf4e4] text-[#173d2e] -mt-5">
+    <div className="fixed inset-0 z-30 overflow-hidden bg-[#fbf4e4] text-[#173d2e]">
       <div className="relative mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-4 pt-10">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-36 overflow-hidden" aria-hidden="true">
           <div
