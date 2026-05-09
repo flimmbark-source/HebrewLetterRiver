@@ -1,90 +1,79 @@
-import { useMemo } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 
 /**
  * PracticeSegmentPath
  *
- * Displays a vertical path of practice segments, each representing
- * a pair of sentences (short + long) for progressive vocabulary learning.
+ * Displays a downriver-style list of practice route stops. The path is visual;
+ * the stop cards remain real UI controls so content stays responsive and localizable.
  */
 export default function PracticeSegmentPath({ scenario, segments, onSelectSegment }) {
   const { t } = useLocalization();
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-sm sm:text-base font-semibold mb-3 text-slate-200 text-center">
-        {t('conversation.segments.title', 'Choose a Practice Segment')}
-      </h3>
+    <div className="space-y-4">
+      <div className="text-center">
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#2f6b4c]">
+          {t('read.route.chooseStop', 'Choose a Route Stop')}
+        </p>
+        <h3 className="mt-1 text-xl font-bold text-[#183d2e]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
+          {t('conversation.segments.title', 'Today’s Route')}
+        </h3>
+      </div>
 
-      <div className="flex flex-col items-center gap-2">
-        {segments.map((segment, index) => {
-          const isFirst = index === 0;
-          const isLast = index === segments.length - 1;
+      <div className="relative grid grid-cols-[3.5rem_1fr] gap-3 sm:grid-cols-[4.25rem_1fr] sm:gap-4">
+        <div className="absolute left-[1.7rem] top-3 bottom-3 w-2 -translate-x-1/2 rounded-full bg-gradient-to-b from-[#9dcfdd] via-[#5aa6a5] to-[#2f7d83] opacity-70 sm:left-[2.1rem]" aria-hidden="true" />
+        <div className="absolute left-[1.2rem] top-8 bottom-8 w-6 rounded-full bg-[#e2f1ec]/50 blur-md sm:left-[1.6rem]" aria-hidden="true" />
 
-          return (
-            <div key={segment.id} className="w-full flex flex-col items-center">
-              {/* Connector line (above segment, except for first) */}
-              {!isFirst && (
-                <div className="w-1 h-4 bg-gradient-to-b from-slate-600 to-slate-700" />
-              )}
+        {segments.map((segment, index) => (
+          <div key={segment.id} className="contents">
+            <div className="relative flex justify-center pt-4">
+              <div className="z-10 flex h-10 w-10 items-center justify-center rounded-full border-4 border-[#fff8e8] bg-[#2f6b4c] text-sm font-bold text-white shadow-lg">
+                {index + 1}
+              </div>
+            </div>
 
-              {/* Segment button */}
-              <button
-                onClick={() => {
-                  console.log('[PracticeSegmentPath] Clicked segment:', {
-                    id: segment.id,
-                    pairs: segment.pairs,
-                    firstBeatLineId: segment.plan.beats[0]?.lineId,
-                    first5BeatLineIds: segment.plan.beats.slice(0, 5).map(b => b.lineId)
-                  });
-                  onSelectSegment(segment);
-                }}
-                className="w-full max-w-md group relative bg-gradient-to-r from-slate-800 to-slate-900 hover:from-blue-900/50 hover:to-purple-900/50 border-2 border-slate-700 hover:border-blue-500/50 rounded-xl p-4 sm:p-5 transition-all duration-200 active:scale-98 shadow-lg hover:shadow-xl"
-              >
-                {/* Segment number badge */}
-                <div className="absolute -left-3 -top-3 w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg border-2 border-slate-900">
-                  {index + 1}
-                </div>
-
-                <div className="space-y-2">
-                  {/* Header */}
-                  <h4 className="text-base sm:text-lg font-bold text-slate-100">
+            <button
+              onClick={() => onSelectSegment(segment)}
+              className="group relative mb-3 w-full rounded-[1.35rem] border bg-white/88 p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-lg active:scale-[0.99] sm:p-5"
+              style={{ borderColor: 'rgba(56, 93, 72, 0.14)' }}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2f6b4c]">
+                    {t('read.route.stopLabel', 'Stop {{number}}', { number: index + 1 })}
+                  </p>
+                  <h4 className="mt-1 text-base font-bold leading-tight text-[#183d2e] sm:text-lg">
                     {t(`conversation.segments.${index + 1}.title`, segment.title || `Segment ${index + 1}`)}
                   </h4>
-
-                  {/* Subheader */}
-                  <p className="text-xs sm:text-sm text-slate-400">
+                  <p className="mt-1 text-xs leading-snug text-[#4e665b] sm:text-sm">
                     {t(
                       `conversation.segments.${index + 1}.description`,
                       `Practice ${segment.pairs.length} sentence pairs with progressive vocabulary`
                     )}
                   </p>
-
-                  {/* Stats */}
-                  <div className="flex items-center gap-3 text-xs text-slate-500 pt-1">
-                    <span>📝 {segment.pairs.length * 2} {t('conversation.segments.sentences', 'sentences')}</span>
-                    <span>•</span>
-                    <span>🎯 {segment.plan.beats.length} {t('conversation.segments.exercises', 'exercises')}</span>
-                  </div>
                 </div>
 
-                {/* Hover arrow */}
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity text-xl">
-                  →
-                </div>
-              </button>
+                <span className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#edf6ec] text-[#2f6b4c] transition group-hover:translate-x-0.5">
+                  <span className="material-symbols-outlined text-xl" aria-hidden="true">chevron_right</span>
+                </span>
+              </div>
 
-              {/* Connector line (below segment, except for last) */}
-              {!isLast && (
-                <div className="w-1 h-4 bg-gradient-to-b from-slate-700 to-slate-600" />
-              )}
-            </div>
-          );
-        })}
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-semibold text-[#5a6d62] sm:text-xs">
+                <span className="inline-flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm" aria-hidden="true">notes</span>
+                  {segment.pairs.length * 2} {t('conversation.segments.sentences', 'sentences')}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm" aria-hidden="true">flag</span>
+                  {segment.plan.beats.length} {t('conversation.segments.exercises', 'exercises')}
+                </span>
+              </div>
+            </button>
+          </div>
+        ))}
       </div>
 
-      {/* Info footer */}
-      <div className="mt-4 text-center text-xs sm:text-sm text-slate-400 px-4">
+      <div className="rounded-2xl border bg-[#fff8e8]/75 px-4 py-3 text-center text-xs font-medium leading-relaxed text-[#5a6d62] sm:text-sm" style={{ borderColor: 'rgba(56, 93, 72, 0.10)' }}>
         {t(
           'conversation.segments.info',
           'Each segment has 2 short intro sentences followed by 2 longer sentences that reuse the vocabulary.'
