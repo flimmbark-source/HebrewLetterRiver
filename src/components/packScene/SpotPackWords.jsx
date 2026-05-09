@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 
 /**
@@ -6,13 +6,12 @@ import { useLocalization } from '../../context/LocalizationContext.jsx';
  *
  * Tokens with a conceptId in beat.targetConceptIds are target tokens.
  * Non-target tokens briefly flash amber but do not hard-fail the beat.
- * The beat completes when all targetConceptIds have been found (one tap per concept).
+ * When all targetConceptIds are found a Continue button appears to advance.
  */
 export default function SpotPackWords({ beat, line, onResult }) {
   const { t } = useLocalization();
   const [tappedConceptIds, setTappedConceptIds] = useState(new Set());
   const [nonTargetFlash, setNonTargetFlash] = useState(null);
-  const [done, setDone] = useState(false);
   const flashTimer = useRef(null);
 
   const targetSet = new Set(beat.targetConceptIds);
@@ -20,24 +19,8 @@ export default function SpotPackWords({ beat, line, onResult }) {
   const totalTarget = beat.targetConceptIds.length;
   const allFound = foundCount === totalTarget;
 
-  useEffect(() => {
-    if (allFound && !done) {
-      setDone(true);
-      const seenConceptIds = beat.targetConceptIds.filter((id) => tappedConceptIds.has(id));
-      const timer = setTimeout(() => {
-        onResult({
-          actionType: 'spotPackWords',
-          seenConceptIds,
-          missedConceptIds: [],
-          isCorrect: true,
-        });
-      }, 700);
-      return () => clearTimeout(timer);
-    }
-  }, [allFound, done]); // eslint-disable-line react-hooks/exhaustive-deps
-
   const handleTokenTap = useCallback((token) => {
-    if (done || !token.conceptId) return;
+    if (!token.conceptId) return;
 
     if (targetSet.has(token.conceptId)) {
       setTappedConceptIds((prev) => new Set([...prev, token.conceptId]));
@@ -46,7 +29,17 @@ export default function SpotPackWords({ beat, line, onResult }) {
       setNonTargetFlash(token.text);
       flashTimer.current = setTimeout(() => setNonTargetFlash(null), 650);
     }
-  }, [done, targetSet]);
+  }, [targetSet]);
+
+  const handleContinue = useCallback(() => {
+    const seenConceptIds = beat.targetConceptIds.filter((id) => tappedConceptIds.has(id));
+    onResult({
+      actionType: 'spotPackWords',
+      seenConceptIds,
+      missedConceptIds: [],
+      isCorrect: true,
+    });
+  }, [beat.targetConceptIds, tappedConceptIds, onResult]);
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4">
@@ -97,7 +90,7 @@ export default function SpotPackWords({ beat, line, onResult }) {
                 type="button"
                 aria-pressed={isTapped}
                 onClick={() => handleTokenTap(token)}
-                disabled={done}
+                disabled={allFound}
                 className={cls}
               >
                 {token.text}
@@ -113,9 +106,18 @@ export default function SpotPackWords({ beat, line, onResult }) {
         )}
       </div>
 
-      {allFound && (
-        <div className="rounded-2xl border border-[#2f6b4c] bg-[#e4f0df] px-4 py-3 text-center text-sm font-bold text-[#183d2e]">
-          {t('packScene.spotWords.allFound', 'All pack words found!')}
+      {allFound ? (
+        <button
+          type="button"
+          onClick={handleContinue}
+          className="w-full rounded-2xl px-5 py-4 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99]"
+          style={{ background: 'linear-gradient(180deg, #2f6b4c, #1e4d35)', boxShadow: '0 12px 28px rgba(31,77,53,0.28)' }}
+        >
+          {t('packScene.spotWords.continue', 'Continue')}
+        </button>
+      ) : (
+        <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff8e8]/70 px-3 py-2 text-center text-xs font-semibold text-[#4e665b]">
+          {t('packScene.spotWords.tapHint', 'Tap the words you recognise from this pack.')}
         </div>
       )}
     </div>

@@ -265,8 +265,10 @@ function PackSceneBeatScreen({ beat, line, onResult, onExit, beatIndex, totalBea
   const handleResult = useCallback((res) => {
     if (resultReceived) return;
     setResultReceived(true);
-    // Brief pause so the user sees the final state before advancing
-    setTimeout(() => onResult(res), beat.actionType === 'spotPackWords' ? 0 : 900);
+    // For beats that already show a final state (spotPackWords has its own Continue button),
+    // advance immediately. For other beats, pause briefly so the user sees the result.
+    const delay = beat.actionType === 'spotPackWords' ? 0 : 900;
+    setTimeout(() => onResult(res), delay);
   }, [resultReceived, onResult, beat.actionType]);
 
   const progress = ((beatIndex + 1) / totalBeats) * 100;
