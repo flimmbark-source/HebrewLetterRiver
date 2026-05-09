@@ -20,6 +20,12 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
     document.body.style.overflow = 'hidden';
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 
+    requestAnimationFrame(() => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    });
+
     return () => {
       document.body.style.overflow = previousOverflow;
     };
@@ -34,7 +40,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
 
   return (
     <div className="fixed inset-0 z-30 overflow-hidden bg-[#fbf4e4] text-[#173d2e]">
-      <div className="relative mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-[calc(var(--bottom-nav-safe-space)+8px)] pt-10 md:max-w-[980px] md:px-8 md:pb-[calc(var(--bottom-nav-height)+44px)]">
+      <div className="relative mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-[calc(var(--bottom-nav-safe-space)+8px)] pt-10 md:max-w-[980px] md:px-8 md:pb-[calc(var(--bottom-nav-height)+76px)]">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-36 overflow-hidden md:h-44" aria-hidden="true">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-82"
@@ -62,11 +68,11 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
           </div>
         </header>
 
-        <main className="relative z-10 flex min-h-0 flex-1 flex-col pt-3 md:pt-8">
-          <div className="mt-auto md:mx-auto md:mt-0 md:grid md:min-h-0 md:w-full md:max-w-[880px] md:flex-1 md:grid-cols-[minmax(0,620px)_220px] md:items-center md:justify-center md:gap-6">
+        <main className="relative z-10 flex min-h-0 flex-1 flex-col pt-3 md:items-center md:justify-center md:pt-8">
+          <div className="mt-auto md:mt-0 md:grid md:w-full md:max-w-[850px] md:grid-cols-[minmax(0,590px)_210px] md:items-center md:justify-center md:gap-6 md:rounded-[2rem] md:border md:border-[#d8cdb7]/70 md:bg-[#fff8e8]/45 md:p-5 md:shadow-[0_16px_36px_rgba(25,68,55,0.10)] md:backdrop-blur-[1px]">
             <div className="min-w-0">
-              <section className="text-center md:mx-auto md:max-w-[620px]">
-                <div className="mt-1 grid grid-cols-3 gap-2 md:gap-3">
+              <section className="text-center md:mx-auto md:max-w-[590px]">
+                <div className="mt-1 grid grid-cols-3 gap-2 md:mt-0 md:gap-3">
                   <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
                     <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">eco</span>
                     <div className="mt-0 text-sm font-bold text-[#183d2e] md:text-base">{getDifficultyLabel(scenario.metadata.difficulty, t)}</div>
