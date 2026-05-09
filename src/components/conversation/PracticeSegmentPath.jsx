@@ -72,7 +72,7 @@ export default function PracticeSegmentPath({ scenario, segments, onSelectSegmen
           {routeStops.map((routeStop, index) => (
             <button
               key={routeStop.id}
-              onClick={() => onSelectSegment(routeStop.startSegment)}
+              onClick={() => onSelectSegment(routeStop)}
               className={`group relative min-h-[76px] w-full rounded-2xl border bg-[#fff8e8]/90 px-4 py-3 text-left shadow-sm backdrop-blur-[1px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-lg active:scale-[0.99] ${index === 1 ? 'border-[#2f6b4c]' : 'border-[#ded3ba]'}`}
             >
               <div className="absolute -left-[3.45rem] top-1/2 flex -translate-y-1/2 items-center">
