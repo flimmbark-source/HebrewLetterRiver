@@ -6,6 +6,7 @@ import ListenMeaningChoice from './modules/ListenMeaningChoice.jsx';
 import ShadowRepeat from './modules/ShadowRepeat.jsx';
 import GuidedReplyChoice from './modules/GuidedReplyChoice.jsx';
 import TypeInput from './modules/TypeInput.jsx';
+import BuildLine from './modules/BuildLine.jsx';
 import { findDictionaryEntryForWord } from '../../lib/sentenceDictionaryLookup.ts';
 import { sentenceTransliterationLookup, sentenceMeaningsLookup } from '../../data/conversation/scenarioFactory.ts';
 import SentenceIntroPopup from '../SentenceIntroPopup.jsx';
@@ -16,6 +17,8 @@ function getBeatTaskLabel(moduleId, t) {
   switch (moduleId) {
     case 'listenMeaningChoice':
       return t('conversation.beat.task.readAndMatch', 'Read and Match');
+    case 'buildLine':
+      return t('conversation.beat.task.buildLine', 'Build the Line');
     case 'shadowRepeat':
       return t('conversation.beat.task.listenRepeat', 'Listen and Repeat');
     case 'guidedReplyChoice':
@@ -31,6 +34,8 @@ function getBeatTaskHint(moduleId, t) {
   switch (moduleId) {
     case 'listenMeaningChoice':
       return t('conversation.beat.hint.readAndMatch', 'Read the full line, then choose what it means.');
+    case 'buildLine':
+      return t('conversation.beat.hint.buildLine', 'Tap the word chips in the right order.');
     case 'shadowRepeat':
       return t('conversation.beat.hint.listenRepeat', 'Listen closely, then read the line aloud.');
     case 'guidedReplyChoice':
@@ -72,7 +77,6 @@ export default function ConversationBeatScreen({
   const mainContentRef = useRef(null);
   const dictionaryPopupRef = useRef(null);
 
-  // Hide main app navigation bar while in conversation practice
   useEffect(() => {
     document.body.classList.add('in-conversation-practice');
     return () => {
@@ -80,7 +84,6 @@ export default function ConversationBeatScreen({
     };
   }, []);
 
-  // Scroll to top when beat changes
   useEffect(() => {
     requestAnimationFrame(() => {
       if (mainContentRef.current) {
@@ -90,7 +93,6 @@ export default function ConversationBeatScreen({
     });
   }, [beatIndex]);
 
-  // Click outside to close dictionary popup
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dictionaryPopupRef.current && !dictionaryPopupRef.current.contains(event.target)) {
@@ -106,17 +108,14 @@ export default function ConversationBeatScreen({
     }
   }, [showDictionary]);
 
-  // Find the line for this beat
   const currentLine = useMemo(() => {
     return scenario.lines.find(l => l.id === beat.lineId);
   }, [scenario.lines, beat.lineId]);
 
-  // Get distractor lines for choice modules
   const distractorLines = useMemo(() => {
     return scenario.lines.filter(l => l.id !== beat.lineId);
   }, [scenario.lines, beat.lineId]);
 
-  // Sentence introduction popup hook - shows word-match game for new sentences
   const sentenceIntro = useConversationIntro({
     line: currentLine,
     enabled: true
@@ -155,7 +154,6 @@ export default function ConversationBeatScreen({
     setShowDictionary(prev => !prev);
   }, []);
 
-  // Render the appropriate module
   const renderModule = useCallback(() => {
     if (!currentLine) {
       return (
@@ -171,6 +169,13 @@ export default function ConversationBeatScreen({
           <ListenMeaningChoice
             line={currentLine}
             distractorLines={distractorLines}
+            onResult={handleModuleResult}
+          />
+        );
+      case 'buildLine':
+        return (
+          <BuildLine
+            line={currentLine}
             onResult={handleModuleResult}
           />
         );
@@ -221,7 +226,6 @@ export default function ConversationBeatScreen({
         <div className="absolute inset-0 bg-gradient-to-b from-[#fbf4e4]/5 via-[#fbf4e4]/74 to-[#fbf4e4]" />
       </div>
 
-      {/* Route header */}
       <header className="relative z-10 border-b border-[#d8cdb7]/70 bg-[#fff8e8]/80 backdrop-blur-sm">
         <div className="mx-auto w-full max-w-[768px] px-4 py-3">
           <div className="grid grid-cols-[2.5rem_1fr_auto] items-center gap-3">
@@ -291,7 +295,6 @@ export default function ConversationBeatScreen({
         </div>
       </header>
 
-      {/* Dictionary / travel notes popup */}
       {showDictionary && currentLine && (
         <div ref={dictionaryPopupRef} className="fixed left-1/2 top-[5.75rem] z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 px-0">
           <div className="max-h-[65dvh] overflow-y-auto rounded-[1.5rem] border-2 border-[#2f6b4c]/30 bg-[#fff8e8] p-4 shadow-2xl">
@@ -357,7 +360,6 @@ export default function ConversationBeatScreen({
         </div>
       )}
 
-      {/* Main content */}
       <div ref={mainContentRef} className="relative z-10 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[768px] px-4 py-4 pb-24">
           <section className="mb-4 rounded-[1.5rem] border border-[#d8cdb7] bg-[#fff8e8]/88 p-4 shadow-sm">
@@ -421,7 +423,6 @@ export default function ConversationBeatScreen({
         </div>
       </div>
 
-      {/* Feedback banner */}
       <div
         className={`fixed left-1/2 top-3 z-40 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-[1.35rem] border bg-[#fff8e8] shadow-2xl transition-all duration-300 ease-out ${
           showFeedbackBanner ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0 pointer-events-none'
@@ -449,7 +450,6 @@ export default function ConversationBeatScreen({
         </div>
       </div>
 
-      {/* Next button banner */}
       <div
         className={`fixed bottom-0 left-1/2 z-30 w-full max-w-[768px] -translate-x-1/2 border-t border-[#d8cdb7] bg-[#fff8e8]/96 shadow-2xl backdrop-blur-sm transition-all duration-300 ease-out ${
           showNextBanner ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
