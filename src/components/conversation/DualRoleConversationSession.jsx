@@ -10,9 +10,9 @@ import {
 } from '../../lib/conversationProgressStorage.ts';
 import {
   expandScriptToSteps,
-  getCurrentStep,
-  generateDualRoleScript
+  getCurrentStep
 } from '../../data/conversation/dualRoleConversation.ts';
+import { buildRouteStopBeatPlan } from '../../data/conversation/routeBeatPlanner.js';
 
 /**
  * DualRoleConversationSession
@@ -89,47 +89,25 @@ export default function DualRoleConversationSession({
     resetToBeatScreen(expandedSteps);
   }, [expandedSteps, resetToBeatScreen]);
 
-  const buildStepsForSegments = useCallback((selectedSegments) => {
-    const segmentsToUse = Array.isArray(selectedSegments)
-      ? selectedSegments
-      : [selectedSegments];
-    const lineMap = new Map(scenario.lines.map(line => [line.id, line]));
-    const seenLineIds = new Set();
-    const segmentLineIds = segmentsToUse.flatMap(segment => segment?.pairs?.flatMap(pair => [
-      pair.shortSentenceId,
-      pair.longSentenceId
-    ]) || []);
-    const segmentSentences = segmentLineIds
-      .filter(lineId => {
-        if (!lineId || seenLineIds.has(lineId)) return false;
-        seenLineIds.add(lineId);
-        return true;
-      })
-      .map(lineId => lineMap.get(lineId)?.sentenceData)
-      .filter(Boolean);
+  const buildStepsForRouteStop = useCallback((routeStop) => {
+    const selectedSegments = Array.isArray(routeStop?.segments)
+      ? routeStop.segments
+      : [routeStop].filter(Boolean);
 
-    if (segmentSentences.length === 0) {
-      return expandedSteps;
-    }
+    const routeStopSteps = buildRouteStopBeatPlan({
+      scenario,
+      routeStop,
+      segments: selectedSegments,
+      fallbackSteps: expandedSteps
+    });
 
-    const segmentScript = generateDualRoleScript(
-      segmentSentences,
-      `${segmentsToUse[0]?.id || 'route-stop'}-dual`,
-      scenario.metadata.theme,
-      `Practice ${scenario.metadata.theme.toLowerCase()} in dual-role mode`,
-      scenario.metadata.id
-    );
-
-    return expandScriptToSteps(segmentScript, true);
-  }, [expandedSteps, scenario.lines, scenario.metadata.id, scenario.metadata.theme]);
+    return routeStopSteps.length > 0 ? routeStopSteps : expandedSteps;
+  }, [expandedSteps, scenario]);
 
   const handleStartSegment = useCallback((segmentOrRouteStop) => {
-    const selectedSegments = Array.isArray(segmentOrRouteStop?.segments)
-      ? segmentOrRouteStop.segments
-      : [segmentOrRouteStop];
-    const segmentSteps = buildStepsForSegments(selectedSegments);
+    const segmentSteps = buildStepsForRouteStop(segmentOrRouteStop);
     resetToBeatScreen(segmentSteps);
-  }, [buildStepsForSegments, resetToBeatScreen]);
+  }, [buildStepsForRouteStop, resetToBeatScreen]);
 
   const handleBeatComplete = useCallback((attemptResult) => {
     const updatedHistory = [...attemptHistory, attemptResult];
