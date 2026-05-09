@@ -48,6 +48,18 @@ export default function LearnView() {
     }
   }, [hasCompletedTutorial, startTutorial, currentTutorial]);
 
+  useEffect(() => {
+    if (selectedScenario && selectedScript) {
+      document.body.classList.remove('read-logbook-active');
+      return undefined;
+    }
+
+    document.body.classList.add('read-logbook-active');
+    return () => {
+      document.body.classList.remove('read-logbook-active');
+    };
+  }, [selectedScenario, selectedScript]);
+
   const dualRoleItems = useMemo(() => buildDualRoleConversationCardItems(), []);
   const contextualReadItem = useMemo(
     () => getContextualReadItem(contextPack, dualRoleItems),
@@ -74,10 +86,7 @@ export default function LearnView() {
   }
 
   return (
-    <div
-      className="-mx-3 -mt-2 space-y-5 pb-0 sm:mx-0 sm:mt-0"
-      style={{ marginBottom: 'calc(-1 * var(--bottom-nav-safe-space))' }}
-    >
+    <div className="river-logbook-page -mx-3 -mt-2 space-y-5 sm:mx-0 sm:mt-0">
       <section
         className="relative overflow-hidden rounded-[2rem] border px-5 pb-5 pt-8 shadow-xl sm:px-6 sm:pt-10"
         style={{
@@ -160,7 +169,7 @@ export default function LearnView() {
         </section>
       )}
 
-      <section className="mx-3 space-y-3 pb-2 sm:mx-0">
+      <section className="mx-3 space-y-3 sm:mx-0">
         <div className="flex items-end justify-between gap-3 px-1">
           <div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em]" style={{ color: '#2f6b4c' }}>
