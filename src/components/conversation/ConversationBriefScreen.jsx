@@ -68,29 +68,29 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
           </div>
         </header>
 
-        <main className="relative z-10 flex min-h-0 flex-1 flex-col pt-3 md:items-center md:justify-start md:pt-10">
-          <div className="mt-auto md:mt-0 md:grid md:w-full md:max-w-[820px] md:grid-cols-[minmax(0,560px)_220px] md:items-center md:justify-center md:gap-6">
-            <div className="min-w-0">
-              <section className="text-center md:mx-auto md:max-w-[560px]">
-                <div className="mt-1 grid grid-cols-3 gap-2 md:mt-0 md:gap-3">
-                  <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
-                    <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">eco</span>
-                    <div className="mt-0 text-sm font-bold text-[#183d2e] md:text-base">{getDifficultyLabel(scenario.metadata.difficulty, t)}</div>
-                  </div>
-                  <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
-                    <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">eco</span>
-                    <div className="mt-0 text-base font-bold leading-none text-[#183d2e] md:text-lg">{scenario.metadata.lineCount}</div>
-                    <div className="text-[10px] font-semibold text-[#4e665b] md:text-xs">{t('conversation.brief.phrases', 'Phrases')}</div>
-                  </div>
-                  <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
-                    <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">waves</span>
-                    <div className="mt-0 text-base font-bold leading-none text-[#183d2e] md:text-lg">{scenario.defaultPlan.beats.length}</div>
-                    <div className="text-[10px] font-semibold text-[#4e665b] md:text-xs">{t('conversation.brief.totalBeats', 'Beats')}</div>
-                  </div>
+        <main className="relative z-10 flex min-h-0 flex-1 flex-col pt-3 md:items-center md:pt-4">
+          <div className="mt-auto md:mt-0 md:w-full md:max-w-[820px]">
+            <section className="text-center md:mx-auto md:max-w-[560px]">
+              <div className="mt-1 grid grid-cols-3 gap-2 md:mt-0 md:gap-3">
+                <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
+                  <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">eco</span>
+                  <div className="mt-0 text-sm font-bold text-[#183d2e] md:text-base">{getDifficultyLabel(scenario.metadata.difficulty, t)}</div>
                 </div>
-              </section>
+                <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
+                  <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">eco</span>
+                  <div className="mt-0 text-base font-bold leading-none text-[#183d2e] md:text-lg">{scenario.metadata.lineCount}</div>
+                  <div className="text-[10px] font-semibold text-[#4e665b] md:text-xs">{t('conversation.brief.phrases', 'Phrases')}</div>
+                </div>
+                <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
+                  <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">waves</span>
+                  <div className="mt-0 text-base font-bold leading-none text-[#183d2e] md:text-lg">{scenario.defaultPlan.beats.length}</div>
+                  <div className="text-[10px] font-semibold text-[#4e665b] md:text-xs">{t('conversation.brief.totalBeats', 'Beats')}</div>
+                </div>
+              </div>
+            </section>
 
-              <section className="mt-3 shrink-0 md:mt-4">
+            <div className="md:mt-4 md:grid md:w-full md:grid-cols-[minmax(0,560px)_220px] md:items-start md:justify-center md:gap-6">
+              <section className="mt-3 shrink-0 md:mt-0">
                 {canSelectSegments ? (
                   <PracticeSegmentPath
                     scenario={scenario}
@@ -104,22 +104,22 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
                   </div>
                 )}
               </section>
-            </div>
 
-            {canSelectSegments && (
-              <aside className="mt-3 md:mt-[5.4rem] md:flex md:self-start">
-                <button
-                  type="button"
-                  onClick={handleBeginRoute}
-                  disabled={!selectedRouteStop}
-                  className="relative z-10 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 md:min-h-[160px] md:flex-col md:px-5 md:py-6 md:text-xl"
-                  style={{ background: 'linear-gradient(180deg, #d98818, #b96a10)', boxShadow: '0 12px 28px rgba(175, 101, 14, 0.28)' }}
-                >
-                  <span>{t('read.route.begin', 'Begin Route')}</span>
-                  <span className="material-symbols-outlined text-xl md:text-3xl" aria-hidden="true">eco</span>
-                </button>
-              </aside>
-            )}
+              {canSelectSegments && (
+                <aside className="mt-3 md:mt-[2.2rem] md:flex md:self-start">
+                  <button
+                    type="button"
+                    onClick={handleBeginRoute}
+                    disabled={!selectedRouteStop}
+                    className="relative z-10 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 md:min-h-[76px] md:px-5 md:py-3 md:text-lg"
+                    style={{ background: 'linear-gradient(180deg, #d98818, #b96a10)', boxShadow: '0 12px 28px rgba(175, 101, 14, 0.28)' }}
+                  >
+                    <span>{t('read.route.begin', 'Begin Route')}</span>
+                    <span className="material-symbols-outlined text-xl" aria-hidden="true">eco</span>
+                  </button>
+                </aside>
+              )}
+            </div>
           </div>
         </main>
       </div>
