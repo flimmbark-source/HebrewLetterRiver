@@ -39,6 +39,11 @@ export default function PlayModeModal() {
     navigate('/deep-script');
   };
 
+  const handleConversation = () => {
+    setShowPlayModal(false);
+    navigate('/read');
+  };
+
   return (
     <Modal
       isOpen={showPlayModal}
@@ -79,6 +84,16 @@ export default function PlayModeModal() {
           <div className="play-mode-info">
             <div className="play-mode-name">{t('app.playMode.deepScript.name', 'Deep Script')}</div>
             <div className="play-mode-desc">{t('app.playMode.deepScript.description', 'Endless dungeon-crawl through vocabulary words')}</div>
+          </div>
+        </button>
+
+        <button type="button" className="play-mode-card play-mode-card--read" onClick={handleConversation}>
+          <div className="play-mode-icon">
+            <ModeIcon className="text-2xl">forum</ModeIcon>
+          </div>
+          <div className="play-mode-info">
+            <div className="play-mode-name">{t('app.playMode.conversation.name', 'Conversation')}</div>
+            <div className="play-mode-desc">{t('app.playMode.conversation.description', 'Practice real conversations and read in context')}</div>
           </div>
         </button>
       </div>

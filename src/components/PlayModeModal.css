@@ -83,6 +83,7 @@
 .play-mode-card--river:hover { border-color: var(--app-mode-river); }
 .play-mode-card--bridge:hover { border-color: var(--app-mode-bridge); }
 .play-mode-card--deep:hover { border-color: var(--app-mode-deep); }
+.play-mode-card--read:hover { border-color: var(--app-mode-read); }
 
 .play-mode-icon {
   flex-shrink: 0;
@@ -107,6 +108,11 @@
 .play-mode-card--deep .play-mode-icon {
   background: var(--app-mode-deep-bg);
   color: var(--app-mode-deep);
+}
+
+.play-mode-card--read .play-mode-icon {
+  background: var(--app-mode-read-bg);
+  color: var(--app-mode-read);
 }
 
 .play-mode-info {
