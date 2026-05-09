@@ -1,6 +1,5 @@
-import { useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
-import { getModuleById } from '../../data/conversation/index.ts';
 import PracticeSegmentPath from './PracticeSegmentPath.jsx';
 import riverBackground from '../../assets/Reading/River-Background.png';
 
@@ -15,30 +14,17 @@ function getRouteIcon(theme = '') {
   if (normalized.includes('food') || normalized.includes('cafe') || normalized.includes('café')) return 'local_cafe';
   if (normalized.includes('home') || normalized.includes('family')) return 'home';
   if (normalized.includes('time') || normalized.includes('number')) return 'hourglass_empty';
-  return 'map';
+  return 'eco';
 }
 
-/**
- * ConversationBriefScreen
- *
- * Shows the selected conversation route before starting practice.
- */
 export default function ConversationBriefScreen({ scenario, onStart, onStartSegment, onBack }) {
   const { t } = useLocalization();
-
   const hasSegments = scenario.segments && scenario.segments.length > 0;
   const canSelectSegments = hasSegments && typeof onStartSegment === 'function';
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, []);
-
-  const modulesUsed = useMemo(() => {
-    const moduleIds = new Set(scenario.defaultPlan.beats.map(b => b.moduleId));
-    return Array.from(moduleIds)
-      .map(id => getModuleById(id))
-      .filter(Boolean);
-  }, [scenario]);
 
   const routeTitle = t(scenario.metadata.titleKey, scenario.metadata.theme);
   const routeSubtitle = t(
@@ -47,98 +33,88 @@ export default function ConversationBriefScreen({ scenario, onStart, onStartSegm
   );
   const routeIcon = getRouteIcon(`${scenario.metadata.theme || ''} ${routeTitle}`);
 
+  const handleBeginRoute = () => {
+    if (canSelectSegments && scenario.segments[0]) {
+      onStartSegment(scenario.segments[0]);
+    } else {
+      onStart();
+    }
+  };
+
   return (
-    <div className="min-h-screen px-3 pb-5 pt-3 sm:px-4 sm:py-6" style={{ background: 'linear-gradient(180deg, #f8f1df, #eef7ee)' }}>
-      <div className="mx-auto w-full max-w-2xl space-y-4">
-        <button
-          onClick={onBack}
-          className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-sm font-semibold text-[#315846] shadow-sm transition hover:bg-white"
-        >
-          <span className="material-symbols-outlined text-lg" aria-hidden="true">arrow_back</span>
-          <span>{t('conversation.brief.back', 'Back to scenarios')}</span>
-        </button>
+    <div className="min-h-screen bg-[#fbf4e4] text-[#173d2e]">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-5 pt-4">
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-cover bg-bottom opacity-70"
+          style={{ backgroundImage: `url(${riverBackground})` }}
+          aria-hidden="true"
+        />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#fbf4e4]/10 via-[#fbf4e4]/65 to-[#fbf4e4]" aria-hidden="true" />
 
-        <section className="relative overflow-hidden rounded-[2rem] border shadow-xl" style={{ borderColor: 'rgba(35, 90, 72, 0.12)', boxShadow: '0 18px 44px rgba(25, 68, 55, 0.14)' }}>
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-60"
-            style={{ backgroundImage: `url(${riverBackground})` }}
-            aria-hidden="true"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#fff8e8]/95 via-[#fff8e8]/80 to-[#f1f8ef]/96" aria-hidden="true" />
-
-          <div className="relative p-5 sm:p-6">
-            <div className="text-center">
-              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-3xl border bg-white/80 text-[#315846] shadow-inner" style={{ borderColor: 'rgba(56, 93, 72, 0.12)' }}>
-                <span className="material-symbols-outlined text-4xl" aria-hidden="true">{routeIcon}</span>
-              </div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#2f6b4c]">
-                {t('read.route.briefEyebrow', 'Route Brief')}
-              </p>
-              <h1 className="mt-1 text-3xl font-bold leading-tight text-[#163d2e] sm:text-4xl" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
-                {routeTitle}
-              </h1>
-              <p className="mx-auto mt-2 max-w-lg text-sm font-medium leading-relaxed text-[#4e665b] sm:text-base">
-                {routeSubtitle}
-              </p>
-            </div>
-
-            <div className="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
-              <div className="rounded-2xl border bg-white/80 p-3 text-center shadow-sm" style={{ borderColor: 'rgba(56, 93, 72, 0.10)' }}>
-                <div className="text-xs font-semibold text-[#5a6d62]">{t('conversation.brief.difficulty', 'Difficulty')}</div>
-                <div className="mt-1 text-sm font-bold text-[#183d2e]">{getDifficultyLabel(scenario.metadata.difficulty, t)}</div>
-              </div>
-              <div className="rounded-2xl border bg-white/80 p-3 text-center shadow-sm" style={{ borderColor: 'rgba(56, 93, 72, 0.10)' }}>
-                <div className="text-xs font-semibold text-[#5a6d62]">{t('conversation.brief.phrases', 'Phrases')}</div>
-                <div className="mt-1 text-sm font-bold text-[#183d2e]">{scenario.metadata.lineCount}</div>
-              </div>
-              <div className="rounded-2xl border bg-white/80 p-3 text-center shadow-sm" style={{ borderColor: 'rgba(56, 93, 72, 0.10)' }}>
-                <div className="text-xs font-semibold text-[#5a6d62]">{t('conversation.brief.totalBeats', 'Beats')}</div>
-                <div className="mt-1 text-sm font-bold text-[#183d2e]">{scenario.defaultPlan.beats.length}</div>
-              </div>
-            </div>
-
-            {modulesUsed.length > 0 && (
-              <div className="mt-5 rounded-[1.5rem] border bg-white/65 p-4 shadow-sm" style={{ borderColor: 'rgba(56, 93, 72, 0.10)' }}>
-                <h3 className="mb-3 text-sm font-bold text-[#183d2e]">
-                  {t('conversation.brief.practiceModules', 'Practice modules')}
-                </h3>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {modulesUsed.map(module => (
-                    <div
-                      key={module.id}
-                      className="flex flex-col items-center gap-1 rounded-2xl border bg-[#fffaf0]/80 p-3 text-center"
-                      style={{ borderColor: 'rgba(56, 93, 72, 0.10)' }}
-                    >
-                      <div className="text-2xl">{module.icon}</div>
-                      <div className="text-[11px] font-semibold leading-tight text-[#51685d]">
-                        {t(module.nameKey, module.id)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+        <header className="relative z-10 grid grid-cols-[2.5rem_1fr_2.5rem] items-center">
+          <button
+            onClick={onBack}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/75 text-[#315846] shadow-sm transition hover:bg-white"
+            aria-label={t('conversation.brief.back', 'Back to scenarios')}
+          >
+            <span className="material-symbols-outlined text-xl" aria-hidden="true">arrow_back</span>
+          </button>
+          <h1 className="truncate text-center text-lg font-bold text-[#1b352b]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
+            {routeTitle}
+          </h1>
+          <div className="flex justify-end">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/75 text-[#315846] shadow-sm">
+              <span className="material-symbols-outlined text-xl" aria-hidden="true">menu_book</span>
+            </span>
           </div>
+        </header>
 
-          <div className="relative border-t p-4 sm:p-6" style={{ borderColor: 'rgba(56, 93, 72, 0.10)', background: 'rgba(255, 250, 240, 0.72)' }}>
+        <main className="relative z-10 flex flex-1 flex-col pt-6">
+          <section className="text-center">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[1.4rem] bg-[#fff8e8]/80 text-[#315846] shadow-inner">
+              <span className="material-symbols-outlined text-5xl" aria-hidden="true">{routeIcon}</span>
+            </div>
+            <p className="mx-auto mt-5 max-w-[280px] text-[15px] font-medium leading-relaxed text-[#253d35]">
+              {routeSubtitle}
+            </p>
+
+            <div className="mt-5 grid grid-cols-3 gap-2">
+              <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/88 px-2 py-3 shadow-sm">
+                <span className="material-symbols-outlined text-lg text-[#2f6b4c]" aria-hidden="true">eco</span>
+                <div className="mt-0.5 text-sm font-bold text-[#183d2e]">{getDifficultyLabel(scenario.metadata.difficulty, t)}</div>
+              </div>
+              <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/88 px-2 py-3 shadow-sm">
+                <span className="material-symbols-outlined text-lg text-[#2f6b4c]" aria-hidden="true">eco</span>
+                <div className="mt-0.5 text-lg font-bold leading-none text-[#183d2e]">{scenario.metadata.lineCount}</div>
+                <div className="text-[11px] font-semibold text-[#4e665b]">{t('conversation.brief.phrases', 'Phrases')}</div>
+              </div>
+              <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/88 px-2 py-3 shadow-sm">
+                <span className="material-symbols-outlined text-lg text-[#2f6b4c]" aria-hidden="true">waves</span>
+                <div className="mt-0.5 text-lg font-bold leading-none text-[#183d2e]">{scenario.defaultPlan.beats.length}</div>
+                <div className="text-[11px] font-semibold text-[#4e665b]">{t('conversation.brief.totalBeats', 'Beats')}</div>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-5 flex-1">
             {canSelectSegments ? (
               <PracticeSegmentPath
                 scenario={scenario}
                 segments={scenario.segments}
                 onSelectSegment={onStartSegment}
               />
-            ) : (
-              <button
-                onClick={onStart}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-base font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99]"
-                style={{ background: 'linear-gradient(180deg, #c77912, #af650e)', boxShadow: '0 10px 24px rgba(175, 101, 14, 0.25)' }}
-              >
-                <span>{t('conversation.brief.start', 'Start Practice')}</span>
-                <span className="material-symbols-outlined" aria-hidden="true">chevron_right</span>
-              </button>
-            )}
-          </div>
-        </section>
+            ) : null}
+          </section>
+
+          <button
+            onClick={handleBeginRoute}
+            className="relative z-10 mt-4 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99]"
+            style={{ background: 'linear-gradient(180deg, #d98818, #b96a10)', boxShadow: '0 12px 28px rgba(175, 101, 14, 0.28)' }}
+          >
+            <span>{t('read.route.begin', 'Begin Route')}</span>
+            <span className="material-symbols-outlined text-xl" aria-hidden="true">eco</span>
+          </button>
+        </main>
       </div>
     </div>
   );
