@@ -9,14 +9,6 @@ function getDifficultyLabel(difficulty, t) {
   return t('conversation.list.difficulty.hard', 'Hard');
 }
 
-function getRouteIcon(theme = '') {
-  const normalized = theme.toLowerCase();
-  if (normalized.includes('food') || normalized.includes('cafe') || normalized.includes('café')) return 'local_cafe';
-  if (normalized.includes('home') || normalized.includes('family')) return 'home';
-  if (normalized.includes('time') || normalized.includes('number')) return 'hourglass_empty';
-  return 'eco';
-}
-
 export default function ConversationBriefScreen({ scenario, onStartSegment, onBack }) {
   const { t } = useLocalization();
   const [selectedRouteStop, setSelectedRouteStop] = useState(null);
@@ -28,11 +20,6 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
   }, []);
 
   const routeTitle = t(scenario.metadata.titleKey, scenario.metadata.theme);
-  const routeSubtitle = t(
-    scenario.metadata.subtitleKey,
-    `Practice ${scenario.metadata.theme.toLowerCase()}`
-  );
-  const routeIcon = getRouteIcon(`${scenario.metadata.theme || ''} ${routeTitle}`);
 
   const handleBeginRoute = () => {
     if (!selectedRouteStop) return;
@@ -40,15 +27,15 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
   };
 
   return (
-    <div className="relative left-1/2 min-h-screen w-screen -translate-x-1/2 bg-[#fbf4e4] text-[#173d2e] -mt-4">
-      <div className="relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-5 pt-4">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-36 overflow-hidden" aria-hidden="true">
+    <div className="relative left-1/2 w-screen -translate-x-1/2 bg-[#fbf4e4] text-[#173d2e] -mt-5">
+      <div className="relative mx-auto w-full max-w-[430px] overflow-hidden bg-[#fbf4e4] px-5 pb-4 pt-5">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 overflow-hidden" aria-hidden="true">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-82"
             style={{ backgroundImage: `url(${riverBackground})` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#fbf4e4]/0 via-[#fbf4e4]/50 to-[#fbf4e4]" />
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#fbf4e4] to-[#fbf4e4]/0" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#fbf4e4]/0 via-[#fbf4e4]/52 to-[#fbf4e4]" />
+          <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#fbf4e4] to-[#fbf4e4]/0" />
         </div>
 
         <header className="relative z-10 grid grid-cols-[2.5rem_1fr_2.5rem] items-center">
@@ -69,16 +56,9 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
           </div>
         </header>
 
-        <main className="relative z-10 flex flex-1 flex-col pt-3">
+        <main className="relative z-10 flex flex-col pt-3">
           <section className="text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff8e8]/88 text-[#315846] shadow-inner">
-              <span className="material-symbols-outlined text-3xl" aria-hidden="true">{routeIcon}</span>
-            </div>
-            <p className="mx-auto mt-2 max-w-[300px] text-[13px] font-medium leading-snug text-[#253d35]">
-              {routeSubtitle}
-            </p>
-
-            <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="mt-1 grid grid-cols-3 gap-2">
               <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm">
                 <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">eco</span>
                 <div className="mt-0 text-sm font-bold text-[#183d2e]">{getDifficultyLabel(scenario.metadata.difficulty, t)}</div>
@@ -96,7 +76,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
             </div>
           </section>
 
-          <section className="mt-3 flex-1">
+          <section className="mt-3">
             {canSelectSegments ? (
               <PracticeSegmentPath
                 scenario={scenario}
@@ -116,7 +96,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
               type="button"
               onClick={handleBeginRoute}
               disabled={!selectedRouteStop}
-              className="relative z-10 mt-3 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              className="relative z-10 mt-2 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
               style={{ background: 'linear-gradient(180deg, #d98818, #b96a10)', boxShadow: '0 12px 28px rgba(175, 101, 14, 0.28)' }}
             >
               <span>{t('read.route.begin', 'Begin Route')}</span>
