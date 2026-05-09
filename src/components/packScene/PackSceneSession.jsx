@@ -1,7 +1,6 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import SpotPackWords from './SpotPackWords.jsx';
-import ListenMeaningChoice from '../conversation/modules/ListenMeaningChoice.jsx';
 import BuildLine from '../conversation/modules/BuildLine.jsx';
 import {
   getPackSceneForPack,
@@ -10,25 +9,73 @@ import {
 import { markPackSceneComplete } from '../../lib/bridgeBuilderStorage.js';
 
 // ─── Interaction: Meaning Choice ─────────────────────────────────────────────
+// Simple option list — no Hebrew re-display; the dialogue bubble already shows it.
 
-function MeaningChoiceInteraction({ interaction, line, onResult }) {
-  const convLine = packSceneLineToConversationLine(line, 'pack-meaning');
-  const distractorLines = (interaction.options || [])
-    .filter((o) => !o.isCorrect)
-    .map((o) => ({ en: o.text, he: '', tl: '' }));
+function MeaningChoiceInteraction({ interaction, onResult }) {
+  const [selectedId, setSelectedId] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  const options = interaction.options || [];
 
-  return (
-    <ListenMeaningChoice
-      line={convLine}
-      distractorLines={distractorLines}
-      onResult={(res) =>
+  const handleClick = (opt) => {
+    if (submitted) return;
+    if (selectedId === opt.id) {
+      setSubmitted(true);
+      setTimeout(() => {
         onResult({
           type: 'meaningChoice',
-          isCorrect: res.isCorrect,
-          understoodConceptIds: res.isCorrect ? (interaction.targetConceptIds || []) : [],
-        })
-      }
-    />
+          isCorrect: opt.isCorrect,
+          understoodConceptIds: opt.isCorrect ? (interaction.targetConceptIds || []) : [],
+        });
+      }, 700);
+    } else {
+      setSelectedId(opt.id);
+    }
+  };
+
+  return (
+    <div className="mx-auto flex max-w-2xl flex-col gap-2">
+      {options.map((opt) => {
+        const isSelected = selectedId === opt.id;
+        const isCorrectChoice = submitted && opt.isCorrect;
+        const isWrongSelected = submitted && isSelected && !opt.isCorrect;
+
+        let cls =
+          'w-full rounded-2xl border px-3 py-3 text-left font-semibold transition-all duration-200 active:scale-[0.99] ';
+        if (!submitted) {
+          cls += isSelected
+            ? 'border-[#2f6b4c] bg-[#e4f0df] text-[#183d2e] ring-2 ring-[#2f6b4c]/15 shadow-md'
+            : 'border-[#d8cdb7] bg-white/72 text-[#253d35] shadow-sm hover:-translate-y-0.5 hover:bg-white hover:shadow-md';
+        } else if (isCorrectChoice) {
+          cls += 'border-[#2f6b4c] bg-[#e4f0df] text-[#183d2e] ring-2 ring-[#2f6b4c]/15 shadow-md';
+        } else if (isWrongSelected) {
+          cls += 'border-[#c77912] bg-[#fff0d8] text-[#6d4213] ring-2 ring-[#c77912]/15 shadow-md';
+        } else {
+          cls += 'border-[#d8cdb7]/70 bg-white/45 text-[#7b8077] opacity-65';
+        }
+
+        return (
+          <button key={opt.id} type="button" onClick={() => handleClick(opt)} disabled={submitted} className={cls}>
+            <div className="flex items-center gap-3">
+              <span
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
+                  isCorrectChoice
+                    ? 'border-[#2f6b4c] bg-[#2f6b4c] text-white'
+                    : isWrongSelected
+                      ? 'border-[#c77912] bg-[#c77912] text-white'
+                      : isSelected
+                        ? 'border-[#2f6b4c] bg-[#2f6b4c] text-white'
+                        : 'border-[#b8ad97] bg-[#fffaf0] text-transparent'
+                }`}
+                aria-hidden="true"
+              >
+                {isCorrectChoice ? '✓' : isWrongSelected ? '×' : isSelected ? '●' : '•'}
+              </span>
+              <span className="text-base sm:text-lg">{opt.text}</span>
+            </div>
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -430,7 +477,6 @@ function PackSceneScreen({
               <MeaningChoiceInteraction
                 key={`${currentMoment.id}-meaning-${interactionIndex}`}
                 interaction={currentInteraction}
-                line={currentMoment.line}
                 onResult={onInteractionResult}
               />
             )}
