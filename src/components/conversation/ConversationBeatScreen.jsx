@@ -13,40 +13,6 @@ import SentenceIntroPopup from '../SentenceIntroPopup.jsx';
 import { useConversationIntro } from '../../hooks/useConversationIntro.js';
 import riverBackground from '../../assets/Reading/River-Background.png';
 
-function getBeatTaskLabel(moduleId, t) {
-  switch (moduleId) {
-    case 'listenMeaningChoice':
-      return t('conversation.beat.task.readAndMatch', 'Read and Match');
-    case 'buildLine':
-      return t('conversation.beat.task.buildLine', 'Build the Line');
-    case 'shadowRepeat':
-      return t('conversation.beat.task.listenRepeat', 'Listen and Repeat');
-    case 'guidedReplyChoice':
-      return t('conversation.beat.task.chooseReply', 'Choose the Reply');
-    case 'typeInput':
-      return t('conversation.beat.task.typeLine', 'Type the Line');
-    default:
-      return t('conversation.beat.task.practiceLine', 'Practice the Line');
-  }
-}
-
-function getBeatTaskHint(moduleId, t) {
-  switch (moduleId) {
-    case 'listenMeaningChoice':
-      return t('conversation.beat.hint.readAndMatch', 'Read the full line, then choose what it means.');
-    case 'buildLine':
-      return t('conversation.beat.hint.buildLine', 'Tap the word chips in the right order.');
-    case 'shadowRepeat':
-      return t('conversation.beat.hint.listenRepeat', 'Listen closely, then read the line aloud.');
-    case 'guidedReplyChoice':
-      return t('conversation.beat.hint.chooseReply', 'Use the conversation context to pick your response.');
-    case 'typeInput':
-      return t('conversation.beat.hint.typeLine', 'Produce the line from memory as best you can.');
-    default:
-      return t('conversation.beat.hint.practiceLine', 'Use what you know to complete this step.');
-  }
-}
-
 function getWordSupportRows(words, langName, t) {
   return words.map((word, index) => {
     const wordId = word.wordId;
@@ -87,7 +53,6 @@ export default function ConversationBeatScreen({
   totalBeats,
   attemptHistory,
   onBeatComplete,
-  onSavePhrase,
   onExit
 }) {
   const { t } = useLocalization();
@@ -148,12 +113,6 @@ export default function ConversationBeatScreen({
       setPendingResult(null);
     }
   }, [pendingResult, onBeatComplete]);
-
-  const handleSavePhrase = useCallback(() => {
-    if (currentLine) {
-      onSavePhrase(currentLine.id);
-    }
-  }, [currentLine, onSavePhrase]);
 
   const openTravelNotes = useCallback((tab = 'words') => {
     setTravelNotesTab(tab);
@@ -218,8 +177,6 @@ export default function ConversationBeatScreen({
 
   const progressPercent = totalBeats > 0 ? ((beatIndex + 1) / totalBeats) * 100 : 0;
   const routeTitle = t(scenario.metadata.titleKey, scenario.metadata.theme);
-  const taskLabel = getBeatTaskLabel(beat.moduleId, t);
-  const taskHint = getBeatTaskHint(beat.moduleId, t);
   const words = currentLine?.sentenceData?.words || [];
   const wordRows = getWordSupportRows(words, langName, t);
 
@@ -289,26 +246,6 @@ export default function ConversationBeatScreen({
 
       <div ref={mainContentRef} className="relative z-10 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[768px] px-4 py-4 pb-28">
-          <section className="mb-4 rounded-[1.5rem] border border-[#d8cdb7] bg-[#fff8e8]/88 p-4 shadow-sm">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#2f6b4c]">
-                  {taskLabel}
-                </p>
-                <p className="mt-1 text-sm font-semibold leading-snug text-[#4e665b]">
-                  {taskHint}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleSavePhrase}
-                className="shrink-0 rounded-full border border-[#d8cdb7] bg-white/80 px-3 py-2 text-xs font-bold text-[#315846] shadow-sm transition hover:bg-white"
-              >
-                {t('conversation.beat.savePhrase', 'Save')}
-              </button>
-            </div>
-          </section>
-
           <section className="rounded-[1.75rem] border border-[#d8cdb7] bg-[#fffaf0]/92 p-3 shadow-lg sm:p-4">
             {renderModule()}
           </section>
