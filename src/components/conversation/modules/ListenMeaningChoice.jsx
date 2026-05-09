@@ -2,34 +2,24 @@ import { useState, useEffect, useCallback } from 'react';
 import SpeakButton from '../../SpeakButton.jsx';
 import { useLocalization } from '../../../context/LocalizationContext.jsx';
 
-/**
- * ListenMeaningChoice Module
- *
- * Play Hebrew audio and show multiple-choice English meanings.
- * The learner picks the correct English translation.
- */
 export default function ListenMeaningChoice({ line, distractorLines = [], onResult }) {
   const { t } = useLocalization();
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [choices, setChoices] = useState([]);
 
-  // Generate multiple choice options
   useEffect(() => {
     const correctAnswer = line.en;
 
-    // Get distractor answers from other lines
     const distractors = distractorLines
       .filter(dl => dl.en !== correctAnswer)
       .slice(0, 3)
       .map(dl => dl.en);
 
-    // If we don't have enough distractors, use placeholder
     while (distractors.length < 3) {
       distractors.push(`[Placeholder ${distractors.length + 1}]`);
     }
 
-    // Shuffle choices
     const allChoices = [correctAnswer, ...distractors]
       .map(choice => ({ text: choice, id: Math.random() }))
       .sort(() => Math.random() - 0.5);
@@ -40,12 +30,10 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
   const handleChoiceClick = useCallback((choice) => {
     if (isSubmitted) return;
 
-    // If clicking the already selected choice, submit it
     if (selectedChoice?.id === choice.id) {
       const isCorrect = choice.text === line.en;
       setIsSubmitted(true);
 
-      // Emit result immediately - feedback will be shown in top banner
       onResult({
         userResponse: choice.text,
         isCorrect,
@@ -53,118 +41,101 @@ export default function ListenMeaningChoice({ line, distractorLines = [], onResu
         suggestedAnswer: isCorrect ? undefined : line.en
       });
     } else {
-      // Otherwise, just select it
       setSelectedChoice(choice);
     }
   }, [isSubmitted, selectedChoice, line, onResult]);
 
   const getChoiceStyles = useCallback((choice) => {
     const baseStyles = `
-      w-full p-2 sm:p-3 md:p-3 rounded-lg border-2
-      text-left font-medium transition-all duration-200
-      cursor-pointer hover:scale-102
+      w-full rounded-2xl border px-3 py-3 text-left font-semibold
+      transition-all duration-200 active:scale-[0.99]
     `;
 
     if (!isSubmitted) {
       if (selectedChoice?.id === choice.id) {
-        return `${baseStyles} bg-blue-500/20 border-blue-500 ring-2 ring-blue-500/50`;
+        return `${baseStyles} border-[#2f6b4c] bg-[#e4f0df] text-[#183d2e] ring-2 ring-[#2f6b4c]/15 shadow-md`;
       }
-      return `${baseStyles} bg-slate-800/50 border-slate-700 hover:bg-slate-700 hover:border-slate-600`;
+      return `${baseStyles} border-[#d8cdb7] bg-white/72 text-[#253d35] shadow-sm hover:-translate-y-0.5 hover:bg-white hover:shadow-md`;
     }
 
-    // After submission, show correct/incorrect
     if (choice.text === line.en) {
-      return `${baseStyles} bg-emerald-500/20 border-emerald-500 ring-2 ring-emerald-500/50`;
+      return `${baseStyles} border-[#2f6b4c] bg-[#e4f0df] text-[#183d2e] ring-2 ring-[#2f6b4c]/15 shadow-md`;
     }
     if (selectedChoice?.id === choice.id) {
-      return `${baseStyles} bg-red-500/20 border-red-500 ring-2 ring-red-500/50`;
+      return `${baseStyles} border-[#c77912] bg-[#fff0d8] text-[#6d4213] ring-2 ring-[#c77912]/15 shadow-md`;
     }
-    return `${baseStyles} bg-slate-800/30 border-slate-700/50 opacity-50`;
+    return `${baseStyles} border-[#d8cdb7]/70 bg-white/45 text-[#7b8077] opacity-65`;
   }, [selectedChoice, isSubmitted, line]);
 
   return (
-    <div className="flex flex-col gap-2 md:gap-3 max-w-2xl mx-auto">
-      {/* Instructions */}
+    <div className="mx-auto flex max-w-2xl flex-col gap-3">
       <div className="text-center">
-        <h3 className="text-base sm:text-lg md:text-lg font-semibold text-slate-200 mb-1">
-          {t('conversation.modules.listenMeaningChoice.instruction', 'Listen and pick the meaning')}
+        <h3 className="text-xl font-bold text-[#183d2e]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
+          {t('conversation.modules.readAndMatch.instruction', 'Read and Match')}
         </h3>
-        <p className="text-xs sm:text-sm text-slate-400">
-          {t('conversation.modules.listenMeaningChoice.hint', 'Play the audio and choose the correct English translation')}
+        <p className="mt-1 text-sm font-medium text-[#4e665b]">
+          {t('conversation.modules.readAndMatch.hint', 'Read the full line, then choose the match.')}
         </p>
       </div>
 
-      {/* Audio player */}
-      <div className="flex justify-center items-center gap-3 p-2 sm:p-3 md:p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-        <SpeakButton
-          nativeText={line.he}
-          nativeLocale="he-IL"
-          transliteration={line.tl}
-          variant="iconWithLabel"
-          className="!py-1.5 sm:!py-2 md:!py-2 !px-2 sm:!px-3 md:!px-3 !text-sm"
-        />
-        <div className="text-slate-200 text-lg sm:text-xl md:text-2xl font-semibold" dir="rtl">
+      <div className="rounded-[1.35rem] border border-[#d8cdb7] bg-[#fff8e8]/90 p-4 text-center shadow-sm">
+        <div className="text-3xl font-bold tracking-wide text-[#183d2e] sm:text-4xl" dir="rtl">
           {line.he}
+        </div>
+        <div className="mt-3 flex justify-center">
+          <SpeakButton
+            nativeText={line.he}
+            nativeLocale="he-IL"
+            transliteration={line.tl}
+            variant="iconWithLabel"
+            className="!px-3 !py-2 !text-sm"
+          />
         </div>
       </div>
 
-      {/* Multiple choice options */}
-      <div className="flex flex-col gap-1.5 sm:gap-2 md:gap-2">
-        {choices.map((choice) => (
-          <button
-            key={choice.id}
-            onClick={() => handleChoiceClick(choice)}
-            className={getChoiceStyles(choice)}
-            disabled={isSubmitted}
-          >
-            <div className="flex items-center gap-3">
-              {/* Radio/Play indicator */}
-              <div className={`
-                w-8 h-8 rounded-full border-2 flex-shrink-0
-                flex items-center justify-center transition-all
-                ${selectedChoice?.id === choice.id && !isSubmitted
-                  ? 'border-blue-500 bg-blue-500 hover:bg-blue-400 cursor-pointer'
-                  : !isSubmitted
-                  ? 'border-slate-500 bg-transparent'
-                  : ''
-                }
-                ${isSubmitted && choice.text === line.en ? 'border-emerald-500 bg-emerald-500' : ''}
-              `}>
-                {/* Show play triangle when selected but not submitted */}
-                {selectedChoice?.id === choice.id && !isSubmitted && (
-                  <svg className="w-4 h-4 ml-0.5" viewBox="0 0 24 24" fill="white">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
+      <div className="flex flex-col gap-2">
+        {choices.map((choice) => {
+          const isSelected = selectedChoice?.id === choice.id;
+          const isCorrectChoice = isSubmitted && choice.text === line.en;
+          const isIncorrectSelected = isSubmitted && isSelected && choice.text !== line.en;
+
+          return (
+            <button
+              key={choice.id}
+              onClick={() => handleChoiceClick(choice)}
+              className={getChoiceStyles(choice)}
+              disabled={isSubmitted}
+            >
+              <div className="flex items-center gap-3">
+                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
+                  isCorrectChoice
+                    ? 'border-[#2f6b4c] bg-[#2f6b4c] text-white'
+                    : isIncorrectSelected
+                      ? 'border-[#c77912] bg-[#c77912] text-white'
+                      : isSelected
+                        ? 'border-[#2f6b4c] bg-[#2f6b4c] text-white'
+                        : 'border-[#b8ad97] bg-[#fffaf0] text-transparent'
+                }`} aria-hidden="true">
+                  {isCorrectChoice ? '✓' : isIncorrectSelected ? '×' : isSelected ? '●' : '•'}
+                </span>
+
+                <span className="text-base sm:text-lg">{choice.text}</span>
+
+                {isCorrectChoice && (
+                  <span className="ml-auto text-xl text-[#2f6b4c]" aria-hidden="true">✓</span>
                 )}
-                {/* Show dot when not selected */}
-                {selectedChoice?.id !== choice.id && !isSubmitted && (
-                  <div className="w-0 h-0" />
-                )}
-                {/* Show checkmark when submitted and correct */}
-                {isSubmitted && choice.text === line.en && (
-                  <div className="w-2 h-2 bg-white rounded-full" />
+                {isIncorrectSelected && (
+                  <span className="ml-auto text-xl text-[#c77912]" aria-hidden="true">×</span>
                 )}
               </div>
-
-              {/* Choice text */}
-              <span className="text-base sm:text-lg">{choice.text}</span>
-
-              {/* Feedback icons */}
-              {isSubmitted && choice.text === line.en && (
-                <span className="ml-auto text-xl sm:text-2xl">✅</span>
-              )}
-              {isSubmitted && selectedChoice?.id === choice.id && choice.text !== line.en && (
-                <span className="ml-auto text-xl sm:text-2xl">❌</span>
-              )}
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Instruction hint */}
       {!isSubmitted && selectedChoice && (
-        <div className="text-center text-xs sm:text-sm text-slate-400">
-          {t('conversation.modules.listenMeaningChoice.submitHint', 'Click the play button to submit your answer')}
+        <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff8e8]/70 px-3 py-2 text-center text-xs font-semibold text-[#4e665b]">
+          {t('conversation.modules.readAndMatch.submitHint', 'Tap the selected answer again to submit')}
         </div>
       )}
     </div>

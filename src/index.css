@@ -53,6 +53,36 @@ body {
   font-family: var(--font-body);
 }
 
+body.read-logbook-active .app-shell {
+  padding-bottom: 0;
+}
+
+body.read-logbook-active .main-content,
+body.read-logbook-active .page-scroll {
+  padding-bottom: 0 !important;
+  scroll-padding-bottom: 0 !important;
+}
+
+body.read-logbook-active .river-logbook-page {
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 8px);
+}
+
+@media (min-width: 768px) {
+  body.read-logbook-active .app-shell {
+    padding-bottom: 20px;
+  }
+
+  body.read-logbook-active .main-content,
+  body.read-logbook-active .page-scroll {
+    padding-bottom: 20px !important;
+    scroll-padding-bottom: 20px !important;
+  }
+
+  body.read-logbook-active .river-logbook-page {
+    padding-bottom: 0;
+  }
+}
+
 .arcade-bg {
   background: var(--app-bg-gradient);
   background-color: var(--app-bg);
@@ -231,7 +261,7 @@ body.dark-mode .card-elevated:hover {
 }
 
 .btn-press:active {
-  transform: scale(0.97);
+  transform: translateY(1px) scale(0.98);
 }
 
 /* CTA button — signature "sticker" shadow from the design system */

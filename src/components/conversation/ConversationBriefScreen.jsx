@@ -1,178 +1,127 @@
-import { useMemo, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
-import { getModuleById } from '../../data/conversation/index.ts';
 import PracticeSegmentPath from './PracticeSegmentPath.jsx';
+import riverBackground from '../../assets/Reading/River-Background.png';
 
-/**
- * ConversationBriefScreen
- *
- * Shows scenario overview before starting:
- * - Scenario title and subtitle
- * - Difficulty level
- * - Number of lines/beats
- * - Modules that will be used
- * - Start button
- */
-export default function ConversationBriefScreen({ scenario, onStart, onStartSegment, onBack }) {
+function getDifficultyLabel(difficulty, t) {
+  if (difficulty <= 2) return t('conversation.list.difficulty.easy', 'Easy');
+  if (difficulty <= 4) return t('conversation.list.difficulty.medium', 'Medium');
+  return t('conversation.list.difficulty.hard', 'Hard');
+}
+
+export default function ConversationBriefScreen({ scenario, onStartSegment, onBack }) {
   const { t } = useLocalization();
-
-  // DEBUG: Check if onStartSegment is actually defined
-  console.log('[ConversationBriefScreen] Props received:', {
-    hasOnStart: !!onStart,
-    hasOnStartSegment: !!onStartSegment,
-    onStartSegmentType: typeof onStartSegment
-  });
-
-  // Check if this scenario has segments (progressive vocabulary mode)
+  const [selectedRouteStop, setSelectedRouteStop] = useState(null);
   const hasSegments = scenario.segments && scenario.segments.length > 0;
   const canSelectSegments = hasSegments && typeof onStartSegment === 'function';
 
-  // DEBUG: Log detailed segment data
-  if (scenario.segments) {
-    console.log('[ConversationBriefScreen] DETAILED SEGMENT ANALYSIS:');
-    console.log('Segment count:', scenario.segments.length);
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 
-    scenario.segments.forEach((seg, idx) => {
-      console.log(`\n--- SEGMENT ${idx + 1} (${seg.id}) ---`);
-      console.log('Pairs:', JSON.stringify(seg.pairs, null, 2));
-      console.log('Beat count:', seg.plan.beats.length);
-      console.log('First 8 beat lineIds:', seg.plan.beats.slice(0, 8).map(b => b.lineId).join(', '));
-      console.log('Plan name:', seg.plan.planName);
+    requestAnimationFrame(() => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
     });
 
-    // Also check if all segments point to the same plan object
-    if (scenario.segments.length > 1) {
-      const samePlan = scenario.segments[0].plan === scenario.segments[1].plan;
-      console.log('\n⚠️  All segments share same plan object?', samePlan);
-    }
-  } else {
-    console.log('[ConversationBriefScreen] NO SEGMENTS FOUND');
-  }
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
   }, []);
 
-  // Get unique modules used in this scenario's plan
-  const modulesUsed = useMemo(() => {
-    const moduleIds = new Set(scenario.defaultPlan.beats.map(b => b.moduleId));
-    return Array.from(moduleIds)
-      .map(id => getModuleById(id))
-      .filter(Boolean);
-  }, [scenario]);
+  const routeTitle = t(scenario.metadata.titleKey, scenario.metadata.theme);
 
-  // Difficulty stars
-  const difficultyStars = '★'.repeat(scenario.metadata.difficulty) +
-                         '☆'.repeat(5 - scenario.metadata.difficulty);
+  const handleBeginRoute = () => {
+    if (!selectedRouteStop) return;
+    onStartSegment(selectedRouteStop);
+  };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-start justify-center px-3 sm:px-4 pt-3 pb-3 sm:pb-6">
-      <div className="max-w-2xl w-full">
-        {/* Back button */}
-        <button
-          onClick={onBack}
-          className="mb-3 sm:mb-4 flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-colors"
-        >
-          <span className="text-lg sm:text-xl">←</span>
-          <span className="text-sm sm:text-base">{t('conversation.brief.back', 'Back to scenarios')}</span>
-        </button>
-
-        {/* Card */}
-        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl sm:rounded-2xl border border-slate-700 shadow-2xl overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-b border-slate-700 p-4 sm:p-6">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">
-              {t(scenario.metadata.titleKey, scenario.metadata.theme)}
-            </h1>
-            <p className="text-sm sm:text-base text-slate-300">
-              {t(scenario.metadata.subtitleKey, `Practice ${scenario.metadata.theme.toLowerCase()}`)}
-            </p>
-
-            {/* Difficulty + stats */}
-            <div className="mt-2 sm:mt-3 flex flex-wrap items-center gap-3 sm:gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-medium text-slate-400">
-                  {t('conversation.brief.difficulty', 'Difficulty')}:
-                </span>
-                <span className="text-base sm:text-lg text-amber-400">
-                  {difficultyStars}
-                </span>
-                <span className="text-xs sm:text-sm text-slate-500">
-                  ({scenario.metadata.difficulty}/5)
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-medium text-slate-400">
-                  {t('conversation.brief.phrases', 'Phrases')}:
-                </span>
-                <span className="text-base sm:text-lg text-slate-200">
-                  {scenario.metadata.lineCount}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-medium text-slate-400">
-                  {t('conversation.brief.totalBeats', 'Total beats')}:
-                </span>
-                <span className="text-base sm:text-lg text-slate-200">
-                  {scenario.defaultPlan.beats.length}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
-            {/* Practice modules - compact */}
-            <div>
-              <h3 className="text-sm sm:text-base font-semibold mb-2 text-slate-200">
-                {t('conversation.brief.practiceModules', 'Practice modules')}
-              </h3>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {modulesUsed.map(module => (
-                  <div
-                    key={module.id}
-                    className="flex flex-col items-center gap-1 p-2 sm:p-3 bg-slate-800/50 rounded-lg border border-slate-700"
-                  >
-                    <div className="text-2xl sm:text-3xl">{module.icon}</div>
-                    <div className="text-[10px] sm:text-xs text-slate-300 text-center font-medium">
-                      {t(module.nameKey, module.id)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-          </div>
-
-          {/* Footer - Segments path or Start button */}
-          <div className="p-4 sm:p-6 bg-slate-800/50 border-t border-slate-700">
-            {(() => {
-              console.log('[ConversationBriefScreen] RENDERING:', canSelectSegments ? 'SEGMENT PATH' : 'START BUTTON');
-              if (hasSegments && !canSelectSegments) {
-                console.warn('[ConversationBriefScreen] Segments available but no onStartSegment handler provided.');
-              }
-
-              return canSelectSegments ? (
-                <PracticeSegmentPath
-                  scenario={scenario}
-                  segments={scenario.segments}
-                  onSelectSegment={onStartSegment}
-                />
-              ) : (
-                <button
-                  onClick={() => {
-                    console.log('[ConversationBriefScreen] CLICKED START BUTTON (not a segment)');
-                    onStart();
-                  }}
-                  className="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-base sm:text-lg rounded-lg transition-all duration-200 active:scale-95 shadow-lg"
-                >
-                  {t('conversation.brief.start', 'Start Practice')} →
-                </button>
-              );
-            })()}
-          </div>
+    <div className="fixed inset-0 z-30 overflow-hidden bg-[#fbf4e4] text-[#173d2e]">
+      <div className="relative mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf4e4] px-5 pb-[calc(var(--bottom-nav-safe-space)+8px)] pt-10 md:max-w-[960px] md:px-8 md:pb-[calc(var(--bottom-nav-height)+96px)]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-36 overflow-hidden md:h-44" aria-hidden="true">
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-82"
+            style={{ backgroundImage: `url(${riverBackground})` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#fbf4e4]/0 via-[#fbf4e4]/52 to-[#fbf4e4]" />
+          <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#fbf4e4] to-[#fbf4e4]/0" />
         </div>
+
+        <header className="relative z-10 grid grid-cols-[2.5rem_1fr_2.5rem] items-center md:mx-auto md:w-full md:max-w-[680px]">
+          <button
+            onClick={onBack}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/78 text-[#315846] shadow-sm transition hover:bg-white"
+            aria-label={t('conversation.brief.back', 'Back to scenarios')}
+          >
+            <span className="material-symbols-outlined text-xl" aria-hidden="true">arrow_back</span>
+          </button>
+          <h1 className="truncate text-center text-lg font-bold text-[#1b352b] md:text-2xl" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
+            {routeTitle}
+          </h1>
+          <div className="flex justify-end">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/78 text-[#315846] shadow-sm">
+              <span className="material-symbols-outlined text-xl" aria-hidden="true">menu_book</span>
+            </span>
+          </div>
+        </header>
+
+        <main className="relative z-10 flex min-h-0 flex-1 flex-col pt-3 md:items-center md:pt-4">
+          <div className="mt-auto md:mt-0 md:w-full md:max-w-[820px]">
+            <section className="text-center md:mx-auto md:max-w-[560px]">
+              <div className="mt-1 grid grid-cols-3 gap-2 md:mt-0 md:gap-3">
+                <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
+                  <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">eco</span>
+                  <div className="mt-0 text-sm font-bold text-[#183d2e] md:text-base">{getDifficultyLabel(scenario.metadata.difficulty, t)}</div>
+                </div>
+                <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
+                  <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">eco</span>
+                  <div className="mt-0 text-base font-bold leading-none text-[#183d2e] md:text-lg">{scenario.metadata.lineCount}</div>
+                  <div className="text-[10px] font-semibold text-[#4e665b] md:text-xs">{t('conversation.brief.phrases', 'Phrases')}</div>
+                </div>
+                <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
+                  <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">waves</span>
+                  <div className="mt-0 text-base font-bold leading-none text-[#183d2e] md:text-lg">{scenario.defaultPlan.beats.length}</div>
+                  <div className="text-[10px] font-semibold text-[#4e665b] md:text-xs">{t('conversation.brief.totalBeats', 'Beats')}</div>
+                </div>
+              </div>
+            </section>
+
+            <div className="md:mt-4 md:grid md:w-full md:grid-cols-[minmax(0,560px)_220px] md:items-start md:justify-center md:gap-6">
+              <section className="mt-3 shrink-0 md:mt-0">
+                {canSelectSegments ? (
+                  <PracticeSegmentPath
+                    scenario={scenario}
+                    segments={scenario.segments}
+                    selectedRouteStopId={selectedRouteStop?.id}
+                    onSelectRouteStop={setSelectedRouteStop}
+                  />
+                ) : (
+                  <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-4 py-4 text-center text-sm font-semibold text-[#4e665b]">
+                    {t('conversation.brief.noRouteStops', 'No route stops are available for this conversation yet.')}
+                  </div>
+                )}
+              </section>
+
+              {canSelectSegments && (
+                <aside className="mt-3 md:mt-[2.2rem] md:flex md:self-start">
+                  <button
+                    type="button"
+                    onClick={handleBeginRoute}
+                    disabled={!selectedRouteStop}
+                    className="relative z-10 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 md:min-h-[76px] md:px-5 md:py-3 md:text-lg"
+                    style={{ background: 'linear-gradient(180deg, #d98818, #b96a10)', boxShadow: '0 12px 28px rgba(175, 101, 14, 0.28)' }}
+                  >
+                    <span>{t('read.route.begin', 'Begin Route')}</span>
+                    <span className="material-symbols-outlined text-xl" aria-hidden="true">eco</span>
+                  </button>
+                </aside>
+              )}
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   );
