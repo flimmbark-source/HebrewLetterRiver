@@ -140,21 +140,21 @@ function ChooseReplyInteraction({ beat, onResult }) {
   const [selectedId, setSelectedId] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const options = beat.options || [];
+  const selectedOption = options.find((opt) => opt.id === selectedId);
 
   const handleClick = (opt) => {
     if (submitted) return;
-    if (selectedId === opt.id) {
-      setSubmitted(true);
-      setTimeout(() => {
-        onResult({
-          type: 'chooseReply',
-          isCorrect: opt.isCorrect,
-          producedConceptIds: opt.isCorrect ? (beat.targetConceptIds || []) : [],
-        });
-      }, 900);
-    } else {
-      setSelectedId(opt.id);
-    }
+    setSelectedId(opt.id);
+    setSubmitted(true);
+  };
+
+  const handleContinue = () => {
+    if (!selectedOption) return;
+    onResult({
+      type: 'chooseReply',
+      isCorrect: selectedOption.isCorrect,
+      producedConceptIds: selectedOption.isCorrect ? (beat.targetConceptIds || []) : [],
+    });
   };
 
   return (
@@ -166,15 +166,13 @@ function ChooseReplyInteraction({ beat, onResult }) {
 
         let cls = 'w-full rounded-2xl border px-3 py-3 text-left transition-all duration-200 active:scale-[0.99] ';
         if (!submitted) {
-          cls += isSelected
-            ? 'border-[#2f6b4c] bg-[#e4f0df] ring-2 ring-[#2f6b4c]/15 shadow-md'
-            : 'border-[#d8cdb7] bg-white/72 shadow-sm hover:-translate-y-0.5 hover:bg-white hover:shadow-md';
+          cls += 'border-[#d8cdb7] bg-white/72 shadow-sm hover:-translate-y-0.5 hover:bg-white hover:shadow-md';
         } else if (isCorrectChoice) {
           cls += 'border-[#2f6b4c] bg-[#e4f0df] ring-2 ring-[#2f6b4c]/15 shadow-md';
         } else if (isWrongSelected) {
           cls += 'border-[#c77912] bg-[#fff0d8] ring-2 ring-[#c77912]/15 shadow-md';
         } else {
-          cls += 'border-[#d8cdb7]/70 bg-white/45 opacity-65';
+          cls += 'border-[#d8cdb7]/70 bg-white/45 opacity-55';
         }
 
         const textColor = isCorrectChoice ? 'text-[#183d2e]' : isWrongSelected ? 'text-[#6d4213]' : 'text-[#183d2e]';
@@ -214,10 +212,28 @@ function ChooseReplyInteraction({ beat, onResult }) {
         );
       })}
 
-      {!submitted && selectedId && (
-        <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff8e8]/70 px-3 py-2 text-center text-xs font-semibold text-[#4e665b]">
-          {t('packScene.chooseReply.submitHint', 'Tap again to confirm')}
+      {submitted && selectedOption && (
+        <div className={`rounded-2xl border px-3 py-2 text-center text-sm font-semibold ${
+          selectedOption.isCorrect
+            ? 'border-[#2f6b4c]/30 bg-[#e4f0df] text-[#183d2e]'
+            : 'border-[#c77912]/35 bg-[#fff0d8] text-[#6d4213]'
+        }`}
+        >
+          {selectedOption.feedback || (selectedOption.isCorrect
+            ? t('packScene.chooseReply.correctMessage', 'That works in the scene.')
+            : t('packScene.chooseReply.wrongMessage', 'That is a possible reply, but it does not match this goal.'))}
         </div>
+      )}
+
+      {submitted && selectedOption && (
+        <button
+          type="button"
+          onClick={handleContinue}
+          className="w-full rounded-2xl px-5 py-4 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99]"
+          style={{ background: 'linear-gradient(180deg, #2f6b4c, #1e4d35)', boxShadow: '0 12px 28px rgba(31,77,53,0.28)' }}
+        >
+          {t('packScene.chooseReply.continue', 'Continue')}
+        </button>
       )}
     </div>
   );
