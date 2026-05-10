@@ -53,8 +53,31 @@ function isExpectedTokenSet(selected, expectedTokens) {
   return selectedKeys.every((key, index) => key === expectedKeys[index]);
 }
 
-function isAcceptableAnswer(selected, expectedTokens) {
+function getSelectedConceptIds(selected) {
+  return selected
+    .map((token) => token.conceptId)
+    .filter(Boolean);
+}
+
+function conceptSequenceMatches(selected, acceptedSequence) {
+  const selectedConcepts = getSelectedConceptIds(selected);
+  if (selectedConcepts.length !== acceptedSequence.length) return false;
+
+  const selectedKey = selectedConcepts.join('|');
+  const acceptedKey = acceptedSequence.join('|');
+  const reversedAcceptedKey = [...acceptedSequence].reverse().join('|');
+
+  return selectedKey === acceptedKey || selectedKey === reversedAcceptedKey;
+}
+
+function matchesAcceptedConceptSequence(selected, acceptedSequences = []) {
+  return acceptedSequences.some((sequence) => conceptSequenceMatches(selected, sequence));
+}
+
+function isAcceptableAnswer(selected, expectedTokens, acceptedSequences = []) {
   if (selected.length !== expectedTokens.length) return false;
+
+  if (matchesAcceptedConceptSequence(selected, acceptedSequences)) return true;
 
   const selectedText = buildKey(selected);
   const expectedText = buildKey(expectedTokens);
@@ -100,6 +123,7 @@ export default function PackSceneBuildLine({ beat, line, onStateChange }) {
 
   const selectedKeys = new Set(selected.map((token) => token.sourceIndex));
   const complete = selected.length === expectedTokens.length;
+  const producedConceptIds = isCorrect ? getSelectedConceptIds(selected) : [];
 
   function addTile(tile) {
     if (submitted || selectedKeys.has(tile.sourceIndex)) return;
@@ -114,19 +138,19 @@ export default function PackSceneBuildLine({ beat, line, onStateChange }) {
   useEffect(() => {
     if (!complete || submitted) return;
 
-    const correct = isAcceptableAnswer(selected, expectedTokens);
+    const correct = isAcceptableAnswer(selected, expectedTokens, beat.acceptedConceptSequences || []);
     setIsCorrect(correct);
     setSubmitted(true);
-  }, [complete, selected, expectedTokens, submitted]);
+  }, [complete, selected, expectedTokens, submitted, beat.acceptedConceptSequences]);
 
   useEffect(() => {
     onStateChange?.({
       complete,
       submitted,
       isCorrect,
-      producedConceptIds: isCorrect ? (beat.targetConceptIds || []) : [],
+      producedConceptIds,
     });
-  }, [complete, submitted, isCorrect, beat.targetConceptIds, onStateChange]);
+  }, [complete, submitted, isCorrect, producedConceptIds, onStateChange]);
 
   function tryAgain() {
     setSubmitted(false);
