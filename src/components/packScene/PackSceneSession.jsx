@@ -125,12 +125,12 @@ function MeaningChoiceInteraction({ beat, onResult }) {
   );
 }
 
-function BuildLineInteraction({ beat, activeLine, onResult }) {
+function BuildLineInteraction({ beat, activeLine, onStateChange }) {
   return (
     <PackSceneBuildLine
       beat={beat}
       line={activeLine}
-      onResult={onResult}
+      onStateChange={onStateChange}
     />
   );
 }
@@ -354,13 +354,22 @@ function PackSceneRecap({ definition, conceptResults, onFinish }) {
 function PackSceneBeatScreen({ beat, onResult, onExit, beatIndex, totalBeats, definition }) {
   const { t } = useLocalization();
   const [resultReceived, setResultReceived] = useState(false);
+  const [buildState, setBuildState] = useState(null);
 
   const handleResult = useCallback((res) => {
     if (resultReceived) return;
     setResultReceived(true);
-    const delay = res.type === 'buildLine' ? 650 : 0;
+    const delay = res.type === 'buildLine' ? 250 : 0;
     setTimeout(() => onResult(res), delay);
   }, [resultReceived, onResult]);
+
+  const handleBuildContinue = useCallback(() => {
+    handleResult({
+      type: 'buildLine',
+      isCorrect: Boolean(buildState?.isCorrect),
+      producedConceptIds: buildState?.producedConceptIds || [],
+    });
+  }, [buildState, handleResult]);
 
   const progress = ((beatIndex + 1) / totalBeats) * 100;
   const cueDisplay = getCueDisplayForBeat(beat);
@@ -408,7 +417,19 @@ function PackSceneBeatScreen({ beat, onResult, onExit, beatIndex, totalBeats, de
           <MeaningChoiceInteraction beat={beat} onResult={handleResult} />
         )}
         {beat.actionType === 'buildLine' && (
-          <BuildLineInteraction beat={beat} activeLine={beat.activeLine} onResult={handleResult} />
+          <>
+            <BuildLineInteraction beat={beat} activeLine={beat.activeLine} onStateChange={setBuildState} />
+            {buildState?.submitted && (
+              <button
+                type="button"
+                onClick={handleBuildContinue}
+                className="mx-auto mt-3 block w-full max-w-2xl rounded-2xl px-5 py-4 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99]"
+                style={{ background: 'linear-gradient(180deg, #2f6b4c, #1e4d35)', boxShadow: '0 12px 28px rgba(31,77,53,0.28)' }}
+              >
+                {t('packScene.buildLine.continue', 'Continue')}
+              </button>
+            )}
+          </>
         )}
         {beat.actionType === 'chooseReply' && (
           <ChooseReplyInteraction beat={beat} onResult={handleResult} />
