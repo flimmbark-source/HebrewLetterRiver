@@ -38,9 +38,6 @@ function isAcceptableAnswer(selected, expectedTokens) {
 
   if (selectedConcepts === expectedConcepts || selectedConcepts === reversedExpectedConcepts) return true;
 
-  // MVP safety net: the build step currently has no distractor tiles. If the
-  // player used every expected tile exactly once, advance rather than trapping
-  // them because of RTL visual-order ambiguity.
   return sameTokenSet(selected, expectedTokens);
 }
 
@@ -66,29 +63,24 @@ export default function PackSceneBuildLine({ beat, line, onResult }) {
   }
 
   useEffect(() => {
-    if (!complete || submitted) return undefined;
+    if (!complete || submitted) return;
 
-    const correct = isAcceptableAnswer(selected, expectedTokens);
+    setIsCorrect(isAcceptableAnswer(selected, expectedTokens));
     setSubmitted(true);
-    setIsCorrect(correct);
-
-    if (!correct) return undefined;
-
-    const timer = window.setTimeout(() => {
-      onResult({
-        type: 'buildLine',
-        isCorrect: true,
-        producedConceptIds: beat.targetConceptIds || [],
-      });
-    }, 450);
-
-    return () => window.clearTimeout(timer);
-  }, [complete, selected, expectedTokens, submitted, beat.targetConceptIds, onResult]);
+  }, [complete, selected, expectedTokens, submitted]);
 
   function tryAgain() {
     setSubmitted(false);
     setIsCorrect(false);
     setSelected([]);
+  }
+
+  function continueScene() {
+    onResult({
+      type: 'buildLine',
+      isCorrect,
+      producedConceptIds: isCorrect ? (beat.targetConceptIds || []) : [],
+    });
   }
 
   return (
@@ -147,26 +139,42 @@ export default function PackSceneBuildLine({ beat, line, onResult }) {
         })}
       </div>
 
-      {submitted && !isCorrect && (
-        <div className="rounded-2xl border border-[#c77912]/35 bg-[#fff0d8] px-3 py-2 text-center text-sm font-semibold text-[#6d4213]">
-          {t('packScene.buildLine.tryAgainMessage', 'That is not quite the answer. Try again.')}
+      {submitted && (
+        <div className={`rounded-2xl border px-3 py-2 text-center text-sm font-semibold ${
+          isCorrect
+            ? 'border-[#2f6b4c]/30 bg-[#e4f0df] text-[#183d2e]'
+            : 'border-[#c77912]/35 bg-[#fff0d8] text-[#6d4213]'
+        }`}
+        >
+          {isCorrect
+            ? t('packScene.buildLine.correctMessage', 'Nice answer.')
+            : t('packScene.buildLine.tryAgainMessage', 'That is not quite the answer. You can try again or continue.')}
         </div>
       )}
 
-      {submitted && !isCorrect ? (
-        <button
-          type="button"
-          onClick={tryAgain}
-          className="w-full rounded-2xl px-5 py-4 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99]"
-          style={{ background: 'linear-gradient(180deg, #2f6b4c, #1e4d35)', boxShadow: '0 12px 28px rgba(31,77,53,0.28)' }}
-        >
-          {t('packScene.buildLine.tryAgain', 'Try again')}
-        </button>
+      {submitted ? (
+        <div className="flex gap-2">
+          {!isCorrect && (
+            <button
+              type="button"
+              onClick={tryAgain}
+              className="flex-1 rounded-2xl border border-[#d8cdb7] bg-white/72 px-4 py-4 text-base font-bold text-[#315846] shadow-sm transition hover:bg-white active:scale-[0.99]"
+            >
+              {t('packScene.buildLine.tryAgain', 'Try again')}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={continueScene}
+            className="flex-1 rounded-2xl px-5 py-4 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99]"
+            style={{ background: 'linear-gradient(180deg, #2f6b4c, #1e4d35)', boxShadow: '0 12px 28px rgba(31,77,53,0.28)' }}
+          >
+            {t('packScene.buildLine.continue', 'Continue')}
+          </button>
+        </div>
       ) : (
         <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff8e8]/70 px-3 py-2 text-center text-xs font-semibold text-[#4e665b]">
-          {complete
-            ? t('packScene.buildLine.correctHint', 'Nice — moving on...')
-            : t('packScene.buildLine.tapHint', 'Tap the words in order.')}
+          {t('packScene.buildLine.tapHint', 'Tap the words in order.')}
         </div>
       )}
     </div>
