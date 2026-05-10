@@ -79,7 +79,6 @@ export default function LearnView() {
     return (
       <PackSceneSession
         packId={contextPackId}
-        practiceLanguageId={practiceLanguageId}
         onExit={() => navigate('/bridge')}
       />
     );

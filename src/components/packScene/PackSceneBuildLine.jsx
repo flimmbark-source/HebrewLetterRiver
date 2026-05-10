@@ -1,13 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 
-const FOOD_SCENE_DISTRACTOR_TILES = [
-  { text: 'מים', conceptId: 'water' },
-  { text: 'לחם', conceptId: 'bread' },
-  { text: 'תודה', conceptId: 'thank-you' },
-  { text: 'כן', conceptId: 'yes' },
-];
-
 function shuffleItems(items) {
   return [...items]
     .map((item, index) => ({ item, index, sort: Math.sin(index + 1) }))
@@ -16,113 +9,112 @@ function shuffleItems(items) {
 }
 
 function hasRtlText(text) {
-  return /[\u0590-\u05ff\u0600-\u06ff]/.test(String(text || ''));
+  return /[֐-׿؀-ۿ]/.test(String(text || ''));
 }
 
-function getLineDirection(tokens = []) {
+function getDirectionFromTokens(tokens = []) {
   return tokens.some((token) => hasRtlText(token.text)) ? 'rtl' : 'ltr';
-}
-
-function buildKey(items) {
-  return items.map((token) => token.text).join('|');
-}
-
-function buildConceptKey(items) {
-  return items.map((token) => token.conceptId || token.text).join('|');
-}
-
-function sameTokenSet(a, b) {
-  if (a.length !== b.length) return false;
-  const aKeys = a.map((token) => `${token.text}::${token.conceptId || ''}`).sort();
-  const bKeys = b.map((token) => `${token.text}::${token.conceptId || ''}`).sort();
-  return aKeys.every((key, index) => key === bKeys[index]);
 }
 
 function normalizeTokenText(text) {
   return String(text || '').replace(/[?.!,]/g, '').trim();
 }
 
-function isExpectedTokenSet(selected, expectedTokens) {
-  if (selected.length !== expectedTokens.length) return false;
-  const selectedKeys = selected
-    .map((token) => `${normalizeTokenText(token.text)}::${token.conceptId || ''}`)
-    .sort();
-  const expectedKeys = expectedTokens
-    .map((token) => `${normalizeTokenText(token.text)}::${token.conceptId || ''}`)
-    .sort();
-  return selectedKeys.every((key, index) => key === expectedKeys[index]);
-}
-
 function getSelectedConceptIds(selected) {
-  return selected
-    .map((token) => token.conceptId)
-    .filter(Boolean);
+  return selected.map((token) => token.conceptId).filter(Boolean);
 }
 
 function conceptSequenceMatches(selected, acceptedSequence) {
   const selectedConcepts = getSelectedConceptIds(selected);
   if (selectedConcepts.length !== acceptedSequence.length) return false;
-
   const selectedKey = selectedConcepts.join('|');
   const acceptedKey = acceptedSequence.join('|');
   const reversedAcceptedKey = [...acceptedSequence].reverse().join('|');
-
   return selectedKey === acceptedKey || selectedKey === reversedAcceptedKey;
 }
 
-function matchesAcceptedConceptSequence(selected, acceptedSequences = []) {
-  return acceptedSequences.some((sequence) => conceptSequenceMatches(selected, sequence));
+function conceptSetMatches(selected, acceptedSet) {
+  const selectedConcepts = getSelectedConceptIds(selected);
+  if (selectedConcepts.length !== acceptedSet.length) return false;
+  const a = [...selectedConcepts].sort();
+  const b = [...acceptedSet].sort();
+  return a.every((c, i) => c === b[i]);
 }
 
-function isAcceptableAnswer(selected, expectedTokens, acceptedSequences = []) {
-  if (selected.length !== expectedTokens.length) return false;
-
-  if (matchesAcceptedConceptSequence(selected, acceptedSequences)) return true;
-
-  const selectedText = buildKey(selected);
-  const expectedText = buildKey(expectedTokens);
-  const reversedExpectedText = buildKey([...expectedTokens].reverse());
-
-  if (selectedText === expectedText || selectedText === reversedExpectedText) return true;
-
-  const selectedConcepts = buildConceptKey(selected);
-  const expectedConcepts = buildConceptKey(expectedTokens);
-  const reversedExpectedConcepts = buildConceptKey([...expectedTokens].reverse());
-
-  if (selectedConcepts === expectedConcepts || selectedConcepts === reversedExpectedConcepts) return true;
-
-  return sameTokenSet(selected, expectedTokens) || isExpectedTokenSet(selected, expectedTokens);
+function answerLineTokensMatch(selected, answerLine) {
+  const expected = answerLine.tokens || [];
+  if (selected.length !== expected.length) return false;
+  const sel = selected.map((t) => normalizeTokenText(t.text)).sort();
+  const exp = expected.map((t) => normalizeTokenText(t.text)).sort();
+  return sel.every((v, i) => v === exp[i]);
 }
 
-function buildTileBank(expectedTokens) {
+function isAcceptableAnswer(selected, beat) {
+  const sets = beat.acceptedConceptSets || [];
+  for (const set of sets) {
+    if (conceptSetMatches(selected, set)) return true;
+  }
+  const sequences = beat.acceptedConceptSequences || [];
+  for (const seq of sequences) {
+    if (conceptSequenceMatches(selected, seq)) return true;
+  }
+  for (const line of beat.answerLines || []) {
+    if (answerLineTokensMatch(selected, line)) return true;
+  }
+  return false;
+}
+
+function buildTilePool(beat) {
+  if (Array.isArray(beat.tileBankTokens) && beat.tileBankTokens.length > 0) {
+    return beat.tileBankTokens.map((token) => ({
+      text: token.text,
+      conceptId: token.conceptId || null,
+    }));
+  }
+  // Fallback: derive from answer lines (defensive — resolver normally
+  // populates tileBankTokens).
   const seen = new Set();
-  const addUnique = (token) => {
-    const key = `${normalizeTokenText(token.text)}::${token.conceptId || ''}`;
-    if (seen.has(key)) return null;
-    seen.add(key);
-    return token;
-  };
-
-  const answerTiles = expectedTokens.map(addUnique).filter(Boolean);
-  const needsDistractors = expectedTokens.length <= 3;
-  if (!needsDistractors) return answerTiles;
-
-  const distractors = FOOD_SCENE_DISTRACTOR_TILES.map(addUnique).filter(Boolean);
-  return [...answerTiles, ...distractors];
+  const tiles = [];
+  for (const line of beat.answerLines || []) {
+    for (const token of line.tokens || []) {
+      const key = `${normalizeTokenText(token.text)}::${token.conceptId || ''}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      tiles.push({ text: token.text, conceptId: token.conceptId || null });
+    }
+  }
+  return tiles;
 }
 
-export default function PackSceneBuildLine({ beat, line, onStateChange }) {
+function getMaxAnswerLength(beat) {
+  let max = 0;
+  for (const line of beat.answerLines || []) {
+    if (Array.isArray(line.tokens) && line.tokens.length > max) max = line.tokens.length;
+  }
+  for (const set of beat.acceptedConceptSets || []) {
+    if (set.length > max) max = set.length;
+  }
+  for (const seq of beat.acceptedConceptSequences || []) {
+    if (seq.length > max) max = seq.length;
+  }
+  return max;
+}
+
+export default function PackSceneBuildLine({ beat, direction: directionProp, onStateChange }) {
   const { t } = useLocalization();
-  const expectedTokens = useMemo(() => line.tokens || [], [line]);
-  const allTiles = useMemo(() => buildTileBank(expectedTokens), [expectedTokens]);
-  const tiles = useMemo(() => shuffleItems(allTiles), [allTiles]);
-  const direction = getLineDirection(expectedTokens);
+  const tilePool = useMemo(() => buildTilePool(beat), [beat]);
+  const tiles = useMemo(() => shuffleItems(tilePool), [tilePool]);
+  const direction = directionProp
+    || (beat.answerLines?.[0]?.direction)
+    || getDirectionFromTokens(beat.answerLines?.[0]?.tokens || []);
+  const maxLength = useMemo(() => getMaxAnswerLength(beat), [beat]);
+
   const [selected, setSelected] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
   const selectedKeys = new Set(selected.map((token) => token.sourceIndex));
-  const complete = selected.length === expectedTokens.length;
+  const complete = maxLength > 0 && selected.length >= maxLength;
   const producedConceptIds = isCorrect ? getSelectedConceptIds(selected) : [];
 
   function addTile(tile) {
@@ -137,11 +129,10 @@ export default function PackSceneBuildLine({ beat, line, onStateChange }) {
 
   useEffect(() => {
     if (!complete || submitted) return;
-
-    const correct = isAcceptableAnswer(selected, expectedTokens, beat.acceptedConceptSequences || []);
+    const correct = isAcceptableAnswer(selected, beat);
     setIsCorrect(correct);
     setSubmitted(true);
-  }, [complete, selected, expectedTokens, submitted, beat.acceptedConceptSequences]);
+  }, [complete, selected, beat, submitted]);
 
   useEffect(() => {
     onStateChange?.({
