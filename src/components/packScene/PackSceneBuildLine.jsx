@@ -8,17 +8,52 @@ function shuffleItems(items) {
     .map(({ item, index }) => ({ ...item, sourceIndex: index }));
 }
 
+function buildKey(items) {
+  return items.map((token) => token.text).join('|');
+}
+
+function buildConceptKey(items) {
+  return items.map((token) => token.conceptId || token.text).join('|');
+}
+
+function sameTokenSet(a, b) {
+  if (a.length !== b.length) return false;
+  const aKeys = a.map((token) => `${token.text}::${token.conceptId || ''}`).sort();
+  const bKeys = b.map((token) => `${token.text}::${token.conceptId || ''}`).sort();
+  return aKeys.every((key, index) => key === bKeys[index]);
+}
+
+function isAcceptableAnswer(selected, expectedTokens) {
+  if (selected.length !== expectedTokens.length) return false;
+
+  const selectedText = buildKey(selected);
+  const expectedText = buildKey(expectedTokens);
+  const reversedExpectedText = buildKey([...expectedTokens].reverse());
+
+  if (selectedText === expectedText || selectedText === reversedExpectedText) return true;
+
+  const selectedConcepts = buildConceptKey(selected);
+  const expectedConcepts = buildConceptKey(expectedTokens);
+  const reversedExpectedConcepts = buildConceptKey([...expectedTokens].reverse());
+
+  if (selectedConcepts === expectedConcepts || selectedConcepts === reversedExpectedConcepts) return true;
+
+  // MVP safety net: the build step currently has no distractor tiles. If the
+  // player used every expected tile exactly once, advance rather than trapping
+  // them because of RTL visual-order ambiguity.
+  return sameTokenSet(selected, expectedTokens);
+}
+
 export default function PackSceneBuildLine({ beat, line, onResult }) {
   const { t } = useLocalization();
-  const tiles = useMemo(() => shuffleItems(line.tokens || []), [line]);
+  const expectedTokens = useMemo(() => line.tokens || [], [line]);
+  const tiles = useMemo(() => shuffleItems(expectedTokens), [expectedTokens]);
   const [selected, setSelected] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
   const selectedKeys = new Set(selected.map((token) => token.sourceIndex));
-  const expected = (line.tokens || []).map((token) => token.text).join('|');
-  const current = selected.map((token) => token.text).join('|');
-  const complete = selected.length === (line.tokens || []).length;
+  const complete = selected.length === expectedTokens.length;
 
   function addTile(tile) {
     if (submitted || selectedKeys.has(tile.sourceIndex)) return;
@@ -33,7 +68,7 @@ export default function PackSceneBuildLine({ beat, line, onResult }) {
   useEffect(() => {
     if (!complete || submitted) return undefined;
 
-    const correct = current === expected;
+    const correct = isAcceptableAnswer(selected, expectedTokens);
     setSubmitted(true);
     setIsCorrect(correct);
 
@@ -45,10 +80,10 @@ export default function PackSceneBuildLine({ beat, line, onResult }) {
         isCorrect: true,
         producedConceptIds: beat.targetConceptIds || [],
       });
-    }, 500);
+    }, 450);
 
     return () => window.clearTimeout(timer);
-  }, [complete, current, expected, submitted, beat.targetConceptIds, onResult]);
+  }, [complete, selected, expectedTokens, submitted, beat.targetConceptIds, onResult]);
 
   function tryAgain() {
     setSubmitted(false);
