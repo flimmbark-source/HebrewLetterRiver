@@ -15,6 +15,14 @@ function shuffleItems(items) {
     .map(({ item, index }) => ({ ...item, sourceIndex: index }));
 }
 
+function hasRtlText(text) {
+  return /[\u0590-\u05ff\u0600-\u06ff]/.test(String(text || ''));
+}
+
+function getLineDirection(tokens = []) {
+  return tokens.some((token) => hasRtlText(token.text)) ? 'rtl' : 'ltr';
+}
+
 function buildKey(items) {
   return items.map((token) => token.text).join('|');
 }
@@ -85,6 +93,7 @@ export default function PackSceneBuildLine({ beat, line, onStateChange }) {
   const expectedTokens = useMemo(() => line.tokens || [], [line]);
   const allTiles = useMemo(() => buildTileBank(expectedTokens), [expectedTokens]);
   const tiles = useMemo(() => shuffleItems(allTiles), [allTiles]);
+  const direction = getLineDirection(expectedTokens);
   const [selected, setSelected] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -133,7 +142,7 @@ export default function PackSceneBuildLine({ beat, line, onStateChange }) {
             {t('packScene.buildLine.answerPlaceholder', 'Tap words to build your answer')}
           </div>
         ) : (
-          <div className="flex flex-row-reverse flex-wrap justify-center gap-2" dir="rtl">
+          <div className="flex flex-wrap justify-center gap-2" dir={direction}>
             {selected.map((token, index) => (
               <button
                 key={`${token.text}-${token.sourceIndex}`}
@@ -154,7 +163,7 @@ export default function PackSceneBuildLine({ beat, line, onStateChange }) {
         )}
       </div>
 
-      <div className="flex flex-row-reverse flex-wrap justify-center gap-2" dir="rtl">
+      <div className="flex flex-wrap justify-center gap-2" dir={direction}>
         {tiles.map((tile) => {
           const used = selectedKeys.has(tile.sourceIndex);
           return (
