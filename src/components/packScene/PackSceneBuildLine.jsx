@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 
+const FOOD_SCENE_DISTRACTOR_TILES = [
+  { text: 'מים', conceptId: 'water' },
+  { text: 'לחם', conceptId: 'bread' },
+  { text: 'תודה', conceptId: 'thank-you' },
+  { text: 'כן', conceptId: 'yes' },
+];
+
 function shuffleItems(items) {
   return [...items]
     .map((item, index) => ({ item, index, sort: Math.sin(index + 1) }))
@@ -23,6 +30,21 @@ function sameTokenSet(a, b) {
   return aKeys.every((key, index) => key === bKeys[index]);
 }
 
+function normalizeTokenText(text) {
+  return String(text || '').replace(/[?.!,]/g, '').trim();
+}
+
+function isExpectedTokenSet(selected, expectedTokens) {
+  if (selected.length !== expectedTokens.length) return false;
+  const selectedKeys = selected
+    .map((token) => `${normalizeTokenText(token.text)}::${token.conceptId || ''}`)
+    .sort();
+  const expectedKeys = expectedTokens
+    .map((token) => `${normalizeTokenText(token.text)}::${token.conceptId || ''}`)
+    .sort();
+  return selectedKeys.every((key, index) => key === expectedKeys[index]);
+}
+
 function isAcceptableAnswer(selected, expectedTokens) {
   if (selected.length !== expectedTokens.length) return false;
 
@@ -38,13 +60,31 @@ function isAcceptableAnswer(selected, expectedTokens) {
 
   if (selectedConcepts === expectedConcepts || selectedConcepts === reversedExpectedConcepts) return true;
 
-  return sameTokenSet(selected, expectedTokens);
+  return sameTokenSet(selected, expectedTokens) || isExpectedTokenSet(selected, expectedTokens);
+}
+
+function buildTileBank(expectedTokens) {
+  const seen = new Set();
+  const addUnique = (token) => {
+    const key = `${normalizeTokenText(token.text)}::${token.conceptId || ''}`;
+    if (seen.has(key)) return null;
+    seen.add(key);
+    return token;
+  };
+
+  const answerTiles = expectedTokens.map(addUnique).filter(Boolean);
+  const needsDistractors = expectedTokens.length <= 3;
+  if (!needsDistractors) return answerTiles;
+
+  const distractors = FOOD_SCENE_DISTRACTOR_TILES.map(addUnique).filter(Boolean);
+  return [...answerTiles, ...distractors];
 }
 
 export default function PackSceneBuildLine({ beat, line, onStateChange }) {
   const { t } = useLocalization();
   const expectedTokens = useMemo(() => line.tokens || [], [line]);
-  const tiles = useMemo(() => shuffleItems(expectedTokens), [expectedTokens]);
+  const allTiles = useMemo(() => buildTileBank(expectedTokens), [expectedTokens]);
+  const tiles = useMemo(() => shuffleItems(allTiles), [allTiles]);
   const [selected, setSelected] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -87,12 +127,6 @@ export default function PackSceneBuildLine({ beat, line, onStateChange }) {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-3">
-      {beat.buildMeaning && (
-        <p className="text-center text-sm font-semibold text-[#4e665b]">
-          {beat.buildMeaning}
-        </p>
-      )}
-
       <div className="min-h-[4rem] rounded-[1.25rem] border border-[#d8cdb7] bg-white/72 p-3 shadow-sm">
         {selected.length === 0 ? (
           <div className="flex h-full min-h-[2.5rem] items-center justify-center text-sm font-semibold text-[#7b8077]">
@@ -164,7 +198,7 @@ export default function PackSceneBuildLine({ beat, line, onStateChange }) {
         </button>
       ) : !submitted ? (
         <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff8e8]/70 px-3 py-2 text-center text-xs font-semibold text-[#4e665b]">
-          {t('packScene.buildLine.tapHint', 'Tap the words in order.')}
+          {t('packScene.buildLine.tapHint', 'Pick the words for your answer.')}
         </div>
       ) : null}
     </div>
