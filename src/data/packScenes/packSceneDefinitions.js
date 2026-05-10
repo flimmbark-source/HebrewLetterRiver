@@ -22,7 +22,7 @@ export const packSceneDefinitions = {
         activeLineId: 'cafe-choice-coffee-water',
         cueLabel: 'Server asks:',
         targetConceptIds: ['coffee', 'water'],
-        prompt: 'Tap the words you recognize.',
+        prompt: 'Find the choice words.',
       },
       {
         id: 'understand-drink-offer',
@@ -31,7 +31,7 @@ export const packSceneDefinitions = {
         activeLineId: 'cafe-choice-coffee-water',
         cueLabel: 'Server asks:',
         targetConceptIds: ['coffee', 'water'],
-        prompt: 'What did the server ask?',
+        prompt: 'What choice did the server give you?',
         options: [
           { id: 'correct', text: 'Coffee or water?', isCorrect: true },
           { id: 'near', text: 'Bread too?', isCorrect: false },
@@ -45,7 +45,8 @@ export const packSceneDefinitions = {
         activeLineId: 'cafe-player-coffee-please',
         cueLabel: 'Server asks:',
         targetConceptIds: ['coffee', 'please'],
-        prompt: 'Order your drink.',
+        prompt: 'Answer the server.',
+        buildMeaning: 'Coffee, please.',
       },
       {
         id: 'spot-bread-offer',
@@ -53,7 +54,7 @@ export const packSceneDefinitions = {
         activeLineId: 'cafe-server-bread-too',
         cueLabel: 'Server asks:',
         targetConceptIds: ['bread'],
-        prompt: 'Tap the word you recognize.',
+        prompt: 'Find the extra item.',
       },
       {
         id: 'accept-bread',
