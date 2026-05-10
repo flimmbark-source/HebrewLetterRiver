@@ -8,22 +8,30 @@
 import { getBridgeBuilderWordsSync } from '../../data/bridgeBuilder/words/index.js';
 import { getPackWordIds } from '../../data/journeyPackRegistry.js';
 
-/**
- * Get the current pack to display on the journey screen.
- * Priority:
- * 1. The pack matching activePackId (if provided and unlocked)
- * 2. First unlocked incomplete pack
- * 3. First unlocked pack
- * 4. First pack (even if locked)
- */
-export function getCurrentJourneyPack(sectionData, activePackId) {
-  const allPackData = sectionData.flatMap((section) => section.packData);
+const LAST_JOURNEY_PACK_KEY = 'bbs_last_journey_pack_id';
 
-  if (activePackId) {
-    const active = allPackData.find((item) => item.pack.id === activePackId);
-    if (active) return active;
+function readRememberedPackId() {
+  try {
+    return typeof window !== 'undefined'
+      ? window.localStorage.getItem(LAST_JOURNEY_PACK_KEY)
+      : null;
+  } catch (error) {
+    return null;
   }
+}
 
+function writeRememberedPackId(packId) {
+  if (!packId) return;
+  try {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(LAST_JOURNEY_PACK_KEY, packId);
+    }
+  } catch (error) {
+    // Ignore storage failures.
+  }
+}
+
+function getDefaultJourneyPack(allPackData) {
   const unlockedIncomplete = allPackData.find(
     (item) => item.unlocked && !item.progress.completed
   );
@@ -33,6 +41,47 @@ export function getCurrentJourneyPack(sectionData, activePackId) {
   if (unlocked) return unlocked;
 
   return allPackData[0] || null;
+}
+
+function findUnlockedPack(allPackData, packId) {
+  if (!packId) return null;
+  const item = allPackData.find((packItem) => packItem.pack?.id === packId);
+  if (!item || !item.unlocked) return null;
+  return item;
+}
+
+/**
+ * Get the current pack to display on the journey screen.
+ * Priority:
+ * 1. A non-default activePackId, which means the player selected a pack in this session
+ * 2. A remembered selected pack from localStorage
+ * 3. The active/default pack passed in by setup
+ * 4. First unlocked incomplete pack
+ * 5. First unlocked pack
+ * 6. First pack (even if locked)
+ */
+export function getCurrentJourneyPack(sectionData, activePackId) {
+  const allPackData = sectionData.flatMap((section) => section.packData);
+  const defaultPack = getDefaultJourneyPack(allPackData);
+  const rememberedPack = findUnlockedPack(allPackData, readRememberedPackId());
+
+  if (activePackId) {
+    const active = allPackData.find((item) => item.pack.id === activePackId);
+    if (active) {
+      const activeIsDefault = active.pack?.id === defaultPack?.pack?.id;
+      if (!activeIsDefault) {
+        writeRememberedPackId(active.pack.id);
+        return active;
+      }
+      if (rememberedPack) return rememberedPack;
+      if (active.unlocked) writeRememberedPackId(active.pack.id);
+      return active;
+    }
+  }
+
+  if (rememberedPack) return rememberedPack;
+  if (defaultPack?.unlocked) writeRememberedPackId(defaultPack.pack.id);
+  return defaultPack;
 }
 
 /**
@@ -47,6 +96,8 @@ export function getJourneyStops(sectionData, activePackId) {
     meaning_builders: 'auto_stories',
     cafe_talk: 'coffee',
   };
+
+  const resolvedActivePackId = getCurrentJourneyPack(sectionData, activePackId)?.pack?.id || activePackId;
 
   const getRepresentativePackId = (sectionItem) => {
     const packData = sectionItem.packData || [];
@@ -68,7 +119,7 @@ export function getJourneyStops(sectionData, activePackId) {
     const { packsCompleted, totalPacks } = sectionProgress;
 
     const containsActivePack = packData.some(
-      (packItem) => packItem.pack?.id === activePackId
+      (packItem) => packItem.pack?.id === resolvedActivePackId
     );
 
     let status = 'Open';
