@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 
 function shuffleItems(items) {
@@ -30,21 +30,25 @@ export default function PackSceneBuildLine({ beat, line, onResult }) {
     setSelected((prev) => prev.filter((_, idx) => idx !== index));
   }
 
-  function submitAnswer() {
-    if (!complete || submitted) return;
+  useEffect(() => {
+    if (!complete || submitted) return undefined;
+
     const correct = current === expected;
     setSubmitted(true);
     setIsCorrect(correct);
-    if (correct) {
-      window.setTimeout(() => {
-        onResult({
-          type: 'buildLine',
-          isCorrect: true,
-          producedConceptIds: beat.targetConceptIds || [],
-        });
-      }, 650);
-    }
-  }
+
+    if (!correct) return undefined;
+
+    const timer = window.setTimeout(() => {
+      onResult({
+        type: 'buildLine',
+        isCorrect: true,
+        producedConceptIds: beat.targetConceptIds || [],
+      });
+    }, 500);
+
+    return () => window.clearTimeout(timer);
+  }, [complete, current, expected, submitted, beat.targetConceptIds, onResult]);
 
   function tryAgain() {
     setSubmitted(false);
@@ -72,7 +76,13 @@ export default function PackSceneBuildLine({ beat, line, onResult }) {
                 key={`${token.text}-${token.sourceIndex}`}
                 type="button"
                 onClick={() => removeTile(index)}
-                className="rounded-2xl border border-[#2f6b4c]/35 bg-[#e4f0df] px-3 py-2 text-xl font-bold text-[#183d2e] shadow-sm active:scale-[0.97]"
+                className={`rounded-2xl border px-3 py-2 text-xl font-bold shadow-sm active:scale-[0.97] ${
+                  submitted && isCorrect
+                    ? 'border-[#2f6b4c] bg-[#e4f0df] text-[#183d2e] ring-2 ring-[#2f6b4c]/20'
+                    : submitted && !isCorrect
+                      ? 'border-[#c77912] bg-[#fff0d8] text-[#6d4213]'
+                      : 'border-[#2f6b4c]/35 bg-[#e4f0df] text-[#183d2e]'
+                }`}
               >
                 {token.text}
               </button>
@@ -108,21 +118,22 @@ export default function PackSceneBuildLine({ beat, line, onResult }) {
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={submitted && !isCorrect ? tryAgain : submitAnswer}
-        disabled={!complete && !submitted}
-        className={`w-full rounded-2xl px-5 py-4 text-lg font-bold shadow-lg transition active:scale-[0.99] ${
-          complete || submitted
-            ? 'text-white hover:brightness-105'
-            : 'bg-[#d8cdb7] text-[#7b8077] shadow-none'
-        }`}
-        style={complete || submitted ? { background: 'linear-gradient(180deg, #2f6b4c, #1e4d35)', boxShadow: '0 12px 28px rgba(31,77,53,0.28)' } : undefined}
-      >
-        {submitted && !isCorrect
-          ? t('packScene.buildLine.tryAgain', 'Try again')
-          : t('packScene.buildLine.check', 'Check answer')}
-      </button>
+      {submitted && !isCorrect ? (
+        <button
+          type="button"
+          onClick={tryAgain}
+          className="w-full rounded-2xl px-5 py-4 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99]"
+          style={{ background: 'linear-gradient(180deg, #2f6b4c, #1e4d35)', boxShadow: '0 12px 28px rgba(31,77,53,0.28)' }}
+        >
+          {t('packScene.buildLine.tryAgain', 'Try again')}
+        </button>
+      ) : (
+        <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff8e8]/70 px-3 py-2 text-center text-xs font-semibold text-[#4e665b]">
+          {complete
+            ? t('packScene.buildLine.correctHint', 'Nice — moving on...')
+            : t('packScene.buildLine.tapHint', 'Tap the words in order.')}
+        </div>
+      )}
     </div>
   );
 }
