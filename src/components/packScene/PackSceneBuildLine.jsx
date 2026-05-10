@@ -41,7 +41,7 @@ function isAcceptableAnswer(selected, expectedTokens) {
   return sameTokenSet(selected, expectedTokens);
 }
 
-export default function PackSceneBuildLine({ beat, line, onResult }) {
+export default function PackSceneBuildLine({ beat, line, onStateChange }) {
   const { t } = useLocalization();
   const expectedTokens = useMemo(() => line.tokens || [], [line]);
   const tiles = useMemo(() => shuffleItems(expectedTokens), [expectedTokens]);
@@ -65,22 +65,24 @@ export default function PackSceneBuildLine({ beat, line, onResult }) {
   useEffect(() => {
     if (!complete || submitted) return;
 
-    setIsCorrect(isAcceptableAnswer(selected, expectedTokens));
+    const correct = isAcceptableAnswer(selected, expectedTokens);
+    setIsCorrect(correct);
     setSubmitted(true);
   }, [complete, selected, expectedTokens, submitted]);
+
+  useEffect(() => {
+    onStateChange?.({
+      complete,
+      submitted,
+      isCorrect,
+      producedConceptIds: isCorrect ? (beat.targetConceptIds || []) : [],
+    });
+  }, [complete, submitted, isCorrect, beat.targetConceptIds, onStateChange]);
 
   function tryAgain() {
     setSubmitted(false);
     setIsCorrect(false);
     setSelected([]);
-  }
-
-  function continueScene() {
-    onResult({
-      type: 'buildLine',
-      isCorrect,
-      producedConceptIds: isCorrect ? (beat.targetConceptIds || []) : [],
-    });
   }
 
   return (
@@ -152,31 +154,19 @@ export default function PackSceneBuildLine({ beat, line, onResult }) {
         </div>
       )}
 
-      {submitted ? (
-        <div className="flex gap-2">
-          {!isCorrect && (
-            <button
-              type="button"
-              onClick={tryAgain}
-              className="flex-1 rounded-2xl border border-[#d8cdb7] bg-white/72 px-4 py-4 text-base font-bold text-[#315846] shadow-sm transition hover:bg-white active:scale-[0.99]"
-            >
-              {t('packScene.buildLine.tryAgain', 'Try again')}
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={continueScene}
-            className="flex-1 rounded-2xl px-5 py-4 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-[0.99]"
-            style={{ background: 'linear-gradient(180deg, #2f6b4c, #1e4d35)', boxShadow: '0 12px 28px rgba(31,77,53,0.28)' }}
-          >
-            {t('packScene.buildLine.continue', 'Continue')}
-          </button>
-        </div>
-      ) : (
+      {submitted && !isCorrect ? (
+        <button
+          type="button"
+          onClick={tryAgain}
+          className="w-full rounded-2xl border border-[#d8cdb7] bg-white/72 px-4 py-4 text-base font-bold text-[#315846] shadow-sm transition hover:bg-white active:scale-[0.99]"
+        >
+          {t('packScene.buildLine.tryAgain', 'Try again')}
+        </button>
+      ) : !submitted ? (
         <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff8e8]/70 px-3 py-2 text-center text-xs font-semibold text-[#4e665b]">
           {t('packScene.buildLine.tapHint', 'Tap the words in order.')}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
