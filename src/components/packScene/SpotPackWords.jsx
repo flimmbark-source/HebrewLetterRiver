@@ -1,13 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 
-/**
- * SpotPackWords — tap the tokens in the line that belong to this beat's pack concepts.
- *
- * Tokens with a conceptId in beat.targetConceptIds are target tokens.
- * Non-target tokens briefly flash amber but do not hard-fail the beat.
- * When all targetConceptIds are found a Continue button appears to advance.
- */
 export default function SpotPackWords({ beat, line, onResult, suppressHeader = false }) {
   const { t } = useLocalization();
   const [tappedConceptIds, setTappedConceptIds] = useState(new Set());
@@ -21,35 +14,30 @@ export default function SpotPackWords({ beat, line, onResult, suppressHeader = f
 
   const handleTokenTap = useCallback((token) => {
     if (!token.conceptId) return;
-
     if (targetSet.has(token.conceptId)) {
       setTappedConceptIds((prev) => new Set([...prev, token.conceptId]));
-    } else {
-      clearTimeout(flashTimer.current);
-      setNonTargetFlash(token.text);
-      flashTimer.current = setTimeout(() => setNonTargetFlash(null), 650);
+      return;
     }
+    clearTimeout(flashTimer.current);
+    setNonTargetFlash(token.text);
+    flashTimer.current = setTimeout(() => setNonTargetFlash(null), 650);
   }, [targetSet]);
 
   const handleContinue = useCallback(() => {
-    const seenConceptIds = beat.targetConceptIds.filter((id) => tappedConceptIds.has(id));
     onResult({
       actionType: 'spotPackWords',
-      seenConceptIds,
+      seenConceptIds: beat.targetConceptIds.filter((id) => tappedConceptIds.has(id)),
       missedConceptIds: [],
       isCorrect: true,
     });
   }, [beat.targetConceptIds, tappedConceptIds, onResult]);
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-4">
+    <div className="mx-auto flex max-w-2xl flex-col gap-3">
       {!suppressHeader && (
         <div className="text-center">
-          <h3
-            className="text-xl font-bold text-[#183d2e]"
-            style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}
-          >
-            {t('packScene.spotWords.instruction', 'Spot the Pack Words')}
+          <h3 className="text-xl font-bold text-[#183d2e]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
+            {t('packScene.spotWords.instruction', 'Find the words you know')}
           </h3>
           <p className="mt-1 text-sm font-medium text-[#4e665b]">
             {t('packScene.spotWords.hint', 'Tap the words from your pack.')}
@@ -57,37 +45,23 @@ export default function SpotPackWords({ beat, line, onResult, suppressHeader = f
         </div>
       )}
 
-      <div
-        className="text-center text-sm font-bold text-[#2f6b4c]"
-        aria-live="polite"
-        aria-atomic="true"
-      >
+      <div className="text-center text-sm font-bold text-[#2f6b4c]" aria-live="polite" aria-atomic="true">
         {foundCount} / {totalTarget} {t('packScene.spotWords.packWordsFound', 'pack words found')}
       </div>
 
-      <div
-        className="rounded-[1.5rem] border border-[#d8cdb7] bg-[#fff8e8]/90 p-5 shadow-sm"
-        aria-label={t('packScene.spotWords.lineLabel', 'Target line — tap words you recognise from your pack')}
-      >
+      <div className="rounded-[1.25rem] border border-[#d8cdb7] bg-white/72 p-4 shadow-sm" aria-label={t('packScene.spotWords.lineLabel', 'Tap words you recognise from your pack')}>
         <div className="flex flex-row-reverse flex-wrap justify-center gap-2" dir="rtl">
           {line.tokens.map((token, idx) => {
             const isTarget = targetSet.has(token.conceptId);
             const isTapped = isTarget && tappedConceptIds.has(token.conceptId);
             const isFlashing = nonTargetFlash === token.text;
-
-            let cls =
-              'rounded-2xl border px-3 py-2 text-xl font-bold transition-all duration-200 active:scale-[0.97] ';
-            if (isTapped) {
-              cls += 'border-[#2f6b4c] bg-[#e4f0df] text-[#183d2e] ring-2 ring-[#2f6b4c]/20 shadow-md';
-            } else if (isFlashing) {
-              cls += 'border-[#c77912] bg-[#fff0d8] text-[#6d4213]';
-            } else {
-              cls += 'border-[#d8cdb7] bg-white/80 text-[#183d2e] shadow-sm hover:bg-white hover:shadow-md';
-            }
+            let cls = 'rounded-2xl border px-3 py-2 text-xl font-bold transition-all duration-200 active:scale-[0.97] ';
+            if (isTapped) cls += 'border-[#2f6b4c] bg-[#e4f0df] text-[#183d2e] ring-2 ring-[#2f6b4c]/20 shadow-md';
+            else if (isFlashing) cls += 'border-[#c77912] bg-[#fff0d8] text-[#6d4213]';
+            else cls += 'border-[#d8cdb7] bg-white/86 text-[#183d2e] shadow-sm hover:bg-white hover:shadow-md';
 
             return (
               <button
-                // eslint-disable-next-line react/no-array-index-key
                 key={`${token.text}-${idx}`}
                 type="button"
                 aria-pressed={isTapped}
@@ -100,12 +74,6 @@ export default function SpotPackWords({ beat, line, onResult, suppressHeader = f
             );
           })}
         </div>
-
-        {line.transliteration && (
-          <p className="mt-3 text-center text-sm italic text-[#4e665b]">
-            {line.transliteration}
-          </p>
-        )}
       </div>
 
       {allFound ? (
