@@ -4,6 +4,7 @@
 //   cueLineId   — the prior line that makes this task meaningful (omit for opening beats)
 //   cueLabel    — speaker context shown above the cue, e.g. 'Server asks:'
 // chooseReply options carry targetText + supportText so choices are in-scene utterances.
+// Beginner distractors should be clearly out-of-scene, not alternate valid replies.
 
 export const packSceneDefinitions = {
   'food_01.cafe_order_basic': {
@@ -52,14 +53,6 @@ export const packSceneDefinitions = {
         prompt: 'Answer the server.',
       },
       {
-        id: 'spot-bread-offer',
-        actionType: 'spotPackWords',
-        activeLineId: 'cafe-server-bread-too',
-        cueLabel: 'Server asks:',
-        targetConceptIds: ['bread'],
-        prompt: 'Find the extra item.',
-      },
-      {
         id: 'accept-bread',
         actionType: 'chooseReply',
         cueLineId: 'cafe-server-bread-too',
@@ -68,9 +61,24 @@ export const packSceneDefinitions = {
         targetConceptIds: ['yes', 'bread', 'please'],
         prompt: 'How do you answer?',
         options: [
-          { id: 'accept', targetText: 'כן, לחם בבקשה.', supportText: 'Yes, bread please.', isCorrect: true },
-          { id: 'decline', targetText: 'לא, תודה.', supportText: 'No, thank you.', isCorrect: false },
-          { id: 'only-coffee', targetText: 'רק קפה, תודה.', supportText: 'Just coffee, thanks.', isCorrect: false },
+          {
+            id: 'accept',
+            targetText: 'כן, לחם בבקשה.',
+            supportText: 'Yes, bread please.',
+            isCorrect: true,
+          },
+          {
+            id: 'at-home',
+            targetText: 'אני בבית.',
+            supportText: 'I am at home.',
+            isCorrect: false,
+          },
+          {
+            id: 'my-father',
+            targetText: 'אבא שלי.',
+            supportText: 'My father.',
+            isCorrect: false,
+          },
         ],
       },
       {
@@ -82,9 +90,24 @@ export const packSceneDefinitions = {
         targetConceptIds: ['thank-you'],
         prompt: 'Close politely.',
         options: [
-          { id: 'thanks', targetText: 'תודה.', supportText: 'Thank you.', isCorrect: true },
-          { id: 'more-coffee', targetText: 'עוד קפה, בבקשה.', supportText: 'More coffee, please.', isCorrect: false },
-          { id: 'yes-please', targetText: 'כן, בבקשה.', supportText: 'Yes, please.', isCorrect: false },
+          {
+            id: 'thanks',
+            targetText: 'תודה.',
+            supportText: 'Thank you.',
+            isCorrect: true,
+          },
+          {
+            id: 'the-house-is-big',
+            targetText: 'הבית גדול.',
+            supportText: 'The house is big.',
+            isCorrect: false,
+          },
+          {
+            id: 'my-father-close',
+            targetText: 'אבא שלי.',
+            supportText: 'My father.',
+            isCorrect: false,
+          },
         ],
       },
     ],
