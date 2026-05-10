@@ -34,10 +34,19 @@ function getCueLineForBeat(beat) {
   return null;
 }
 
+function shuffleArray(items) {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 function MeaningChoiceInteraction({ beat, onResult, supportDirection }) {
   const [selectedId, setSelectedId] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const options = beat.options || [];
+  const options = useMemo(() => shuffleArray(beat.options || []), [beat]);
 
   const handleClick = (opt) => {
     if (submitted) return;
@@ -105,7 +114,7 @@ function ChooseReplyInteraction({ beat, onResult, supportDirection }) {
   const { t } = useLocalization();
   const [selectedId, setSelectedId] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const options = beat.options || [];
+  const options = useMemo(() => shuffleArray(beat.options || []), [beat]);
   const selectedOption = options.find((opt) => opt.id === selectedId);
 
   const handleClick = (opt) => {

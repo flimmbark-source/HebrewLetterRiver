@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 
 function shuffleItems(items) {
-  return [...items]
-    .map((item, index) => ({ item, index, sort: Math.sin(index + 1) }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ item, index }) => ({ ...item, sourceIndex: index }));
+  const indexed = items.map((item, sourceIndex) => ({ ...item, sourceIndex }));
+  for (let i = indexed.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
+  }
+  return indexed;
 }
 
 function hasRtlText(text) {
