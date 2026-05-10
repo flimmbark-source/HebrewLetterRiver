@@ -39,13 +39,11 @@ function getCueLineForBeat(beat) {
 }
 
 function getCueDisplayForBeat(beat) {
-  const line = getCueLineForBeat(beat);
-  const shouldHideSupport = beat.actionType === 'spotPackWords' || beat.actionType === 'meaningChoice';
   return {
-    line,
+    line: getCueLineForBeat(beat),
     cueLabel: beat.cueLabel,
-    showTransliteration: !shouldHideSupport,
-    showSupportText: !shouldHideSupport,
+    showTransliteration: false,
+    showSupportText: false,
   };
 }
 
@@ -199,7 +197,7 @@ function ChooseReplyInteraction({ beat, onResult }) {
                 {opt.targetText ? (
                   <>
                     <div className={`text-lg font-bold ${textColor}`} dir="rtl">{opt.targetText}</div>
-                    {opt.supportText && (
+                    {submitted && isSelected && opt.supportText && (
                       <div className={`text-sm font-medium ${subColor}`}>{opt.supportText}</div>
                     )}
                   </>
