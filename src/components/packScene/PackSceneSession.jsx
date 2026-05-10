@@ -1,17 +1,16 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import SpotPackWords from './SpotPackWords.jsx';
-import BuildLine from '../conversation/modules/BuildLine.jsx';
-import {
-  getPackSceneForPack,
-  packSceneLineToConversationLine,
-} from '../../data/packScenes/packSceneAdapter.js';
+import PackSceneBuildLine from './PackSceneBuildLine.jsx';
+import { getPackSceneForPack } from '../../data/packScenes/packSceneAdapter.js';
 import { markPackSceneComplete } from '../../lib/bridgeBuilderStorage.js';
 
-// ─── Dialogue Cue ─────────────────────────────────────────────────────────────
-// Shows the one prior line that makes the current task meaningful.
-
-function DialogueCue({ line, cueLabel }) {
+function DialogueCue({
+  line,
+  cueLabel,
+  showTransliteration = false,
+  showSupportText = false,
+}) {
   if (!line) return null;
   return (
     <div className="rounded-[1.25rem] border border-[#e8cfa0] bg-[#fff8e8] px-4 py-3 shadow-sm">
@@ -23,18 +22,41 @@ function DialogueCue({ line, cueLabel }) {
       <div className="text-xl font-bold leading-snug text-[#183d2e]" dir="rtl">
         {line.targetText}
       </div>
-      {line.transliteration && (
+      {showTransliteration && line.transliteration && (
         <div className="mt-0.5 text-xs italic text-[#4e665b]">{line.transliteration}</div>
       )}
-      {line.supportText && (
+      {showSupportText && line.supportText && (
         <div className="mt-1 text-sm font-medium text-[#4e665b]">{line.supportText}</div>
       )}
     </div>
   );
 }
 
-// ─── Interaction: Meaning Choice ──────────────────────────────────────────────
-// Options are English meanings — no Hebrew re-display; the cue already shows the line.
+function getCueLineForBeat(beat) {
+  if (beat.cueLine) return beat.cueLine;
+  if (beat.actionType === 'spotPackWords') return beat.activeLine;
+  return null;
+}
+
+function getCueDisplayForBeat(beat) {
+  const line = getCueLineForBeat(beat);
+  const shouldHideSupport = beat.actionType === 'spotPackWords' || beat.actionType === 'meaningChoice';
+  return {
+    line,
+    cueLabel: beat.cueLabel,
+    showTransliteration: !shouldHideSupport,
+    showSupportText: !shouldHideSupport,
+  };
+}
+
+function stripLineSupport(line) {
+  if (!line) return line;
+  return {
+    ...line,
+    transliteration: null,
+    supportText: null,
+  };
+}
 
 function MeaningChoiceInteraction({ beat, onResult }) {
   const [selectedId, setSelectedId] = useState(null);
@@ -103,26 +125,15 @@ function MeaningChoiceInteraction({ beat, onResult }) {
   );
 }
 
-// ─── Interaction: Build Line ──────────────────────────────────────────────────
-
 function BuildLineInteraction({ beat, activeLine, onResult }) {
-  const convLine = packSceneLineToConversationLine(activeLine, beat.activeLineId || 'pack-build');
   return (
-    <BuildLine
-      line={convLine}
-      onResult={(res) =>
-        onResult({
-          type: 'buildLine',
-          isCorrect: res.isCorrect,
-          producedConceptIds: res.isCorrect ? (beat.targetConceptIds || []) : [],
-        })
-      }
+    <PackSceneBuildLine
+      beat={beat}
+      line={activeLine}
+      onResult={onResult}
     />
   );
 }
-
-// ─── Interaction: Choose Reply ────────────────────────────────────────────────
-// Options carry targetText (Hebrew) + supportText (English) — in-scene utterances.
 
 function ChooseReplyInteraction({ beat, onResult }) {
   const { t } = useLocalization();
@@ -212,8 +223,6 @@ function ChooseReplyInteraction({ beat, onResult }) {
   );
 }
 
-// ─── Brief Screen ─────────────────────────────────────────────────────────────
-
 function PackSceneBrief({ definition, onStart, onExit }) {
   const { t } = useLocalization();
 
@@ -280,8 +289,6 @@ function PackSceneBrief({ definition, onStart, onExit }) {
   );
 }
 
-// ─── Recap Screen ─────────────────────────────────────────────────────────────
-
 function PackSceneRecap({ definition, conceptResults, onFinish }) {
   const { t } = useLocalization();
   const seen = Object.keys(conceptResults).filter((id) => conceptResults[id]?.seen);
@@ -344,9 +351,6 @@ function PackSceneRecap({ definition, conceptResults, onFinish }) {
   );
 }
 
-// ─── Beat Screen ──────────────────────────────────────────────────────────────
-// Layout: header → dialogue cue → prompt → interaction UI
-
 function PackSceneBeatScreen({ beat, onResult, onExit, beatIndex, totalBeats, definition }) {
   const { t } = useLocalization();
   const [resultReceived, setResultReceived] = useState(false);
@@ -354,21 +358,20 @@ function PackSceneBeatScreen({ beat, onResult, onExit, beatIndex, totalBeats, de
   const handleResult = useCallback((res) => {
     if (resultReceived) return;
     setResultReceived(true);
-    // buildLine calls onResult immediately on success — add a pause so the result state is visible
-    const delay = res.type === 'buildLine' ? 900 : 0;
+    const delay = res.type === 'buildLine' ? 650 : 0;
     setTimeout(() => onResult(res), delay);
   }, [resultReceived, onResult]);
 
   const progress = ((beatIndex + 1) / totalBeats) * 100;
+  const cueDisplay = getCueDisplayForBeat(beat);
+  const spotLine = beat.actionType === 'spotPackWords' ? stripLineSupport(beat.activeLine) : beat.activeLine;
 
   return (
     <div className="fixed inset-0 z-30 flex flex-col overflow-hidden bg-[#fbf4e4] text-[#173d2e]">
-      {/* Progress bar */}
       <div className="h-1 w-full shrink-0 bg-[#e8dfc8]" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
         <div className="h-full bg-[#2f6b4c] transition-all duration-500" style={{ width: `${progress}%` }} />
       </div>
 
-      {/* Header */}
       <header className="flex shrink-0 items-center justify-between px-5 py-3">
         <button
           type="button"
@@ -389,31 +392,17 @@ function PackSceneBeatScreen({ beat, onResult, onExit, beatIndex, totalBeats, de
         <div className="w-9" aria-hidden="true" />
       </header>
 
-      {/* Scrollable content area */}
       <div className="flex-1 overflow-y-auto px-5 py-4 pb-[calc(var(--bottom-nav-safe-space)+1rem)]">
+        <DialogueCue {...cueDisplay} />
 
-        {/* Dialogue cue: shown for all non-spotPackWords beats (cueLine is the prior line) */}
-        {beat.cueLine && (
-          <DialogueCue line={beat.cueLine} cueLabel={beat.cueLabel} />
-        )}
-
-        {/* For spotPackWords, show cue label inline above the tokens (no full cueLine card) */}
-        {!beat.cueLine && beat.cueLabel && beat.actionType === 'spotPackWords' && (
-          <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#7b6b47]">
-            {beat.cueLabel}
-          </div>
-        )}
-
-        {/* Task prompt */}
         {beat.prompt && (
-          <p className={`text-center text-sm font-bold text-[#4e665b] ${beat.cueLine ? 'mt-4 mb-3' : 'mb-3'}`}>
+          <p className="mt-4 mb-3 text-center text-sm font-bold text-[#4e665b]">
             {beat.prompt}
           </p>
         )}
 
-        {/* Interaction */}
         {beat.actionType === 'spotPackWords' && (
-          <SpotPackWords beat={beat} line={beat.activeLine} onResult={handleResult} suppressHeader />
+          <SpotPackWords beat={beat} line={spotLine} onResult={handleResult} suppressHeader />
         )}
         {beat.actionType === 'meaningChoice' && (
           <MeaningChoiceInteraction beat={beat} onResult={handleResult} />
@@ -429,10 +418,8 @@ function PackSceneBeatScreen({ beat, onResult, onExit, beatIndex, totalBeats, de
   );
 }
 
-// ─── Session Orchestrator ─────────────────────────────────────────────────────
-
 export default function PackSceneSession({ packId, practiceLanguageId, onExit }) {
-  const [phase, setPhase] = useState('brief'); // 'brief' | 'beat' | 'recap'
+  const [phase, setPhase] = useState('brief');
   const [beatIndex, setBeatIndex] = useState(0);
   const conceptResultsRef = useRef({});
 
