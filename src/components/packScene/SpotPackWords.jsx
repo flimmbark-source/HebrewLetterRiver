@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 
-export default function SpotPackWords({ beat, line, onResult, suppressHeader = false }) {
+export default function SpotPackWords({ beat, line, onResult, suppressHeader = false, direction = 'ltr' }) {
   const { t } = useLocalization();
   const [tappedConceptIds, setTappedConceptIds] = useState(new Set());
   const [nonTargetFlash, setNonTargetFlash] = useState(null);
@@ -50,7 +50,7 @@ export default function SpotPackWords({ beat, line, onResult, suppressHeader = f
       </div>
 
       <div className="rounded-[1.25rem] border border-[#d8cdb7] bg-white/72 p-4 shadow-sm" aria-label={t('packScene.spotWords.lineLabel', 'Tap words you recognise from your pack')}>
-        <div className="flex flex-row-reverse flex-wrap justify-center gap-2" dir="rtl">
+        <div className="flex flex-wrap justify-center gap-2" dir={direction}>
           {line.tokens.map((token, idx) => {
             const isTarget = targetSet.has(token.conceptId);
             const isTapped = isTarget && tappedConceptIds.has(token.conceptId);

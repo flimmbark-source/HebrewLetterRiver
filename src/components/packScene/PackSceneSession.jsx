@@ -280,12 +280,13 @@ function PackSceneBrief({ scene, onStart, onExit }) {
 
 function PackSceneRecap({ scene, conceptResults, onFinish }) {
   const { t } = useLocalization();
-  const { appStrings, directionConfig } = scene;
+  const { appStrings, directionConfig, blueprint } = scene;
   const conceptDisplayNames = appStrings.shared?.conceptDisplayNames || {};
   const recapTemplates = appStrings.recapTemplates || {};
 
-  const seen = Object.keys(conceptResults).filter((id) => conceptResults[id]?.seen);
-  const produced = Object.keys(conceptResults).filter((id) => conceptResults[id]?.produced);
+  const packConceptIds = blueprint.packConceptIds || [];
+  const seen = packConceptIds.filter((id) => conceptResults[id]?.seen);
+  const produced = packConceptIds.filter((id) => conceptResults[id]?.produced);
   const display = (id) => conceptDisplayNames[id] || id;
 
   return (
@@ -413,7 +414,13 @@ function PackSceneBeatScreen({ scene, beat, onResult, onExit, beatIndex, totalBe
         )}
 
         {beat.actionType === 'spotPackWords' && (
-          <SpotPackWords beat={beat} line={beat.activeLine} onResult={handleResult} suppressHeader />
+          <SpotPackWords
+            beat={beat}
+            line={beat.activeLine}
+            onResult={handleResult}
+            suppressHeader
+            direction={directionConfig.tileDirection}
+          />
         )}
         {beat.actionType === 'meaningChoice' && (
           <MeaningChoiceInteraction beat={beat} onResult={handleResult} supportDirection={directionConfig.supportDirection} />

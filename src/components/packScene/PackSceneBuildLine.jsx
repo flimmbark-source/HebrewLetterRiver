@@ -117,7 +117,6 @@ export default function PackSceneBuildLine({ beat, direction: directionProp, onS
 
   const selectedKeys = new Set(selected.map((token) => token.sourceIndex));
   const complete = maxLength > 0 && selected.length >= maxLength;
-  const producedConceptIds = isCorrect ? getSelectedConceptIds(selected) : [];
 
   function addTile(tile) {
     if (submitted || selectedKeys.has(tile.sourceIndex)) return;
@@ -141,9 +140,9 @@ export default function PackSceneBuildLine({ beat, direction: directionProp, onS
       complete,
       submitted,
       isCorrect,
-      producedConceptIds,
+      producedConceptIds: isCorrect ? getSelectedConceptIds(selected) : [],
     });
-  }, [complete, submitted, isCorrect, producedConceptIds, onStateChange]);
+  }, [complete, submitted, isCorrect, selected, onStateChange]);
 
   function tryAgain() {
     setSubmitted(false);

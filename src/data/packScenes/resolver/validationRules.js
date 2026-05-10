@@ -49,27 +49,25 @@ const universalRules = [
     return null;
   },
 
-  function chooseReplyRequiresOptionsOrPolicy(beat) {
+  function chooseReplyRequiresOptions(beat) {
     if (beat.actionType !== 'chooseReply') return null;
-    const hasOptions = isNonEmptyArray(beat.options);
-    const hasPolicy = !!beat.replyDistractorPolicy;
-    if (!hasOptions && !hasPolicy) {
+    if (!isNonEmptyArray(beat.options)) {
       return err(
         'missing_reply_source',
         beat.id,
-        'chooseReply beat must have options or replyDistractorPolicy'
+        'chooseReply beat must have options'
       );
     }
     return null;
   },
 
-  function chooseReplyForbidsBothOptionsAndPolicy(beat) {
+  function chooseReplyForbidsReplyDistractorPolicy(beat) {
     if (beat.actionType !== 'chooseReply') return null;
-    if (isNonEmptyArray(beat.options) && beat.replyDistractorPolicy) {
+    if (beat.replyDistractorPolicy) {
       return err(
-        'conflicting_reply_source',
+        'unsupported_reply_distractor_policy',
         beat.id,
-        'chooseReply beat cannot have both options and replyDistractorPolicy'
+        'replyDistractorPolicy is not yet supported; use explicit options instead'
       );
     }
     return null;
@@ -93,9 +91,9 @@ const universalRules = [
     if (beat.actionType !== 'buildLine') return null;
     if (beat.replyDistractorPolicy) {
       return err(
-        'misplaced_distractor_policy',
+        'unsupported_reply_distractor_policy',
         beat.id,
-        'buildLine beat cannot have replyDistractorPolicy'
+        'replyDistractorPolicy is not yet supported and cannot appear on a buildLine beat'
       );
     }
     return null;
@@ -115,11 +113,18 @@ const universalRules = [
 
   function nonInteractiveBeatsForbidDistractorPolicies(beat) {
     if (beat.actionType !== 'spotPackWords' && beat.actionType !== 'meaningChoice') return null;
-    if (beat.tileDistractorPolicy || beat.replyDistractorPolicy) {
+    if (beat.tileDistractorPolicy) {
       return err(
         'misplaced_distractor_policy',
         beat.id,
-        `${beat.actionType} beat cannot have tile or reply distractor policies`
+        `${beat.actionType} beat cannot have tileDistractorPolicy`
+      );
+    }
+    if (beat.replyDistractorPolicy) {
+      return err(
+        'unsupported_reply_distractor_policy',
+        beat.id,
+        'replyDistractorPolicy is not yet supported'
       );
     }
     return null;

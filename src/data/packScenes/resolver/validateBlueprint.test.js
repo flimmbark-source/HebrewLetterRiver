@@ -72,16 +72,16 @@ describe('Phase 2A: validateBlueprint', () => {
     expect(result.errors.some((e) => e.code === 'missing_accepted_concepts')).toBe(true);
   });
 
-  it('fails when chooseReply has both options and replyDistractorPolicy', () => {
+  it('rejects replyDistractorPolicy on chooseReply (unsupported)', () => {
     const bp = clone(food_01Blueprint);
     const beat = bp.beats.find((b) => b.actionType === 'chooseReply');
     beat.replyDistractorPolicy = { count: 2 };
     const result = validateBlueprint(bp);
     expect(result.status).toBe('invalid_blueprint');
-    expect(result.errors.some((e) => e.code === 'conflicting_reply_source')).toBe(true);
+    expect(result.errors.some((e) => e.code === 'unsupported_reply_distractor_policy')).toBe(true);
   });
 
-  it('fails when chooseReply has neither options nor replyDistractorPolicy', () => {
+  it('fails when chooseReply has no options', () => {
     const bp = clone(food_01Blueprint);
     const beat = bp.beats.find((b) => b.actionType === 'chooseReply');
     delete beat.options;
@@ -123,7 +123,7 @@ describe('Phase 2A: validateBlueprint', () => {
     beat.replyDistractorPolicy = { count: 2 };
     const result = validateBlueprint(bp);
     expect(result.status).toBe('invalid_blueprint');
-    expect(result.errors.some((e) => e.code === 'misplaced_distractor_policy')).toBe(true);
+    expect(result.errors.some((e) => e.code === 'unsupported_reply_distractor_policy')).toBe(true);
   });
 
   it('fails when chooseReply has tileDistractorPolicy', () => {
