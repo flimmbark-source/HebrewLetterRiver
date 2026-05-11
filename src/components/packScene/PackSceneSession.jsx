@@ -9,8 +9,29 @@ import { markPackSceneComplete } from '../../lib/bridgeBuilderStorage.js';
 
 const SPEAKER_LABEL_KEYS = {
   server: { key: 'packScene.speaker.server', fallback: 'Server:' },
+  friend: { key: 'packScene.speaker.friend', fallback: 'Friend:' },
   player: { key: 'packScene.speaker.player', fallback: 'You:' },
 };
+
+const COLOR_CIRCLE_STYLES = {
+  red: '#d94b3d',
+  blue: '#3275d1',
+  green: '#2f9d62',
+  yellow: '#f0c84b',
+};
+
+function VisualCue({ visualCue }) {
+  if (!visualCue || visualCue.type !== 'colorCircle') return null;
+  const fill = COLOR_CIRCLE_STYLES[visualCue.colorConceptId] || '#9ca3af';
+  return (
+    <div className="my-4 flex justify-center" aria-hidden="true">
+      <div
+        className="h-24 w-24 rounded-full border-[6px] border-white shadow-xl ring-1 ring-black/10"
+        style={{ backgroundColor: fill }}
+      />
+    </div>
+  );
+}
 
 function DialogueCue({ line, cueLabel, direction }) {
   if (!line) return null;
@@ -194,7 +215,7 @@ function ChooseReplyInteraction({ beat, onResult, supportDirection }) {
         >
           {selectedOption.isCorrect
             ? t('packScene.chooseReply.correctMessage', 'That works in the scene.')
-            : t('packScene.chooseReply.wrongMessage', 'That is a possible reply, but it does not match this goal.')}
+            : t('packScene.chooseReply.wrongMessage', 'That does not fit this moment.')}
         </div>
       )}
 
@@ -406,6 +427,7 @@ function PackSceneBeatScreen({ scene, beat, onResult, onExit, beatIndex, totalBe
 
       <div className="flex-1 overflow-y-auto px-5 py-4 pb-[calc(var(--bottom-nav-safe-space)+1rem)]">
         <DialogueCue line={cueLine} cueLabel={cueLabel} direction={directionConfig.cueDirection} />
+        <VisualCue visualCue={beat.visualCue} />
 
         {beat.prompt && (
           <p className="mt-4 mb-3 text-center text-sm font-bold text-[#4e665b]" dir={directionConfig.promptDirection}>
