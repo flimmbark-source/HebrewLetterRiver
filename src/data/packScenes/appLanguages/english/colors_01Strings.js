@@ -9,10 +9,12 @@ export const colors_01Strings = {
     'Your friend shows colored items and asks what color each one is. Answer with the matching Hebrew color word.',
 
   prompts: {
-    identify_red: 'What color is this?',
-    identify_blue: 'What color is this?',
-    identify_green: 'What color is this?',
-    identify_yellow: 'What color is this?',
+    // Keep app-language answer hints off the color-identification beats.
+    // The learner should answer from the Hebrew cue line and visual color cue.
+    identify_red: '',
+    identify_blue: '',
+    identify_green: '',
+    identify_yellow: '',
     close_exchange: 'Close politely.',
   },
 
