@@ -3,51 +3,72 @@
 // shared distractor pool, not here.
 
 export const colors_01Lines = {
-  seller_color_choice: {
-    id: 'seller_color_choice',
-    speaker: 'seller',
-    targetText: 'אדום או כחול?',
+  friend_what_color_is_this: {
+    id: 'friend_what_color_is_this',
+    speaker: 'friend',
+    targetText: 'איזה צבע זה?',
     direction: 'rtl',
-    transliteration: 'adom o kachol?',
+    transliteration: 'eize tseva ze?',
     tokens: [
-      { text: 'אדום', conceptId: 'red' },
-      { text: 'או', conceptId: 'or' },
-      { text: 'כחול?', conceptId: 'blue' },
+      { text: 'איזה' },
+      { text: 'צבע' },
+      { text: 'זה?' },
     ],
   },
 
-  player_red_please: {
-    id: 'player_red_please',
+  player_red: {
+    id: 'player_red',
     speaker: 'player',
-    targetText: 'אדום בבקשה.',
+    targetText: 'אדום.',
     direction: 'rtl',
-    transliteration: 'adom bevakasha.',
+    transliteration: 'adom.',
     tokens: [
-      { text: 'אדום', conceptId: 'red' },
-      { text: 'בבקשה.', conceptId: 'please' },
+      { text: 'אדום.', conceptId: 'red' },
     ],
   },
 
-  player_blue_please: {
-    id: 'player_blue_please',
+  player_blue: {
+    id: 'player_blue',
     speaker: 'player',
-    targetText: 'כחול בבקשה.',
+    targetText: 'כחול.',
     direction: 'rtl',
-    transliteration: 'kachol bevakasha.',
+    transliteration: 'kachol.',
     tokens: [
-      { text: 'כחול', conceptId: 'blue' },
-      { text: 'בבקשה.', conceptId: 'please' },
+      { text: 'כחול.', conceptId: 'blue' },
     ],
   },
 
-  seller_here_you_go: {
-    id: 'seller_here_you_go',
-    speaker: 'seller',
-    targetText: 'בבקשה.',
+  player_green: {
+    id: 'player_green',
+    speaker: 'player',
+    targetText: 'ירוק.',
     direction: 'rtl',
-    transliteration: 'bevakasha.',
+    transliteration: 'yarok.',
     tokens: [
-      { text: 'בבקשה.', conceptId: 'please' },
+      { text: 'ירוק.', conceptId: 'green' },
+    ],
+  },
+
+  player_yellow: {
+    id: 'player_yellow',
+    speaker: 'player',
+    targetText: 'צהוב.',
+    direction: 'rtl',
+    transliteration: 'tsahov.',
+    tokens: [
+      { text: 'צהוב.', conceptId: 'yellow' },
+    ],
+  },
+
+  friend_nice: {
+    id: 'friend_nice',
+    speaker: 'friend',
+    targetText: 'יפה מאוד.',
+    direction: 'rtl',
+    transliteration: 'yafe meod.',
+    tokens: [
+      { text: 'יפה' },
+      { text: 'מאוד.' },
     ],
   },
 
