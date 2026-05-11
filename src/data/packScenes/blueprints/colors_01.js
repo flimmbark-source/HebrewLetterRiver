@@ -1,57 +1,52 @@
-// Pack Scene blueprint for colors_01 — canary scene built entirely on the
-// new Pack Scene architecture. Language-independent: no target-language
-// text or app-language strings live here.
+// Pack Scene blueprint for colors_01.
+// Language-independent: no target-language text or app-language strings live here.
+// Colors are grounded-reference vocabulary, so each answer beat is determined
+// by a visual cue rather than by a free preference choice.
+
+const colorOptions = [
+  { id: 'red', lineId: 'player_red' },
+  { id: 'blue', lineId: 'player_blue' },
+  { id: 'green', lineId: 'player_green' },
+  { id: 'yellow', lineId: 'player_yellow' },
+];
+
+function colorIdentifyBeat(colorConceptId) {
+  return {
+    id: `identify_${colorConceptId}`,
+    role: 'choose_or_build_response',
+    actionType: 'chooseReply',
+    cueLineId: 'friend_what_color_is_this',
+    visualCue: {
+      type: 'colorCircle',
+      colorConceptId,
+    },
+    targetConceptIds: [colorConceptId],
+    options: colorOptions.map((option) => ({
+      id: option.id,
+      lineId: option.lineId,
+      isCorrect: option.id === colorConceptId,
+    })),
+  };
+}
 
 export const colors_01Blueprint = {
   packId: 'colors_01',
-  archetype: 'choice',
+  archetype: 'identify',
   domainId: 'colors',
-  goalId: 'choose_color_basic',
-  packConceptIds: ['red', 'blue'],
-  supportConceptIds: ['please', 'thank-you', 'or'],
+  goalId: 'identify_basic_colors',
+  packConceptIds: ['red', 'blue', 'green', 'yellow'],
+  supportConceptIds: ['thank-you'],
 
   beats: [
-    {
-      id: 'spot_color_choice',
-      role: 'notice_options',
-      actionType: 'spotPackWords',
-      activeLineId: 'seller_color_choice',
-      targetConceptIds: ['red', 'blue'],
-    },
-    {
-      id: 'understand_color_choice',
-      role: 'understand_cue',
-      actionType: 'meaningChoice',
-      cueLineId: 'seller_color_choice',
-      activeLineId: 'seller_color_choice',
-      targetConceptIds: ['red', 'blue'],
-      options: [
-        { id: 'correct', meaningId: 'red_or_blue', isCorrect: true },
-        { id: 'wrong_drink', meaningId: 'coffee_or_water', isCorrect: false },
-        { id: 'wrong_home', meaningId: 'i_am_home', isCorrect: false },
-      ],
-    },
-    {
-      id: 'answer_color',
-      role: 'choose_or_build_response',
-      actionType: 'buildLine',
-      cueLineId: 'seller_color_choice',
-      answerLineIds: ['player_red_please', 'player_blue_please'],
-      targetConceptIds: ['red', 'blue', 'please'],
-      acceptedConceptSets: [
-        ['red', 'please'],
-        ['blue', 'please'],
-      ],
-      tileDistractorPolicy: {
-        count: 2,
-        domainExclusions: ['colors', 'market', 'clothing'],
-      },
-    },
+    colorIdentifyBeat('red'),
+    colorIdentifyBeat('blue'),
+    colorIdentifyBeat('green'),
+    colorIdentifyBeat('yellow'),
     {
       id: 'close_exchange',
       role: 'close_exchange',
       actionType: 'chooseReply',
-      cueLineId: 'seller_here_you_go',
+      cueLineId: 'friend_nice',
       targetConceptIds: ['thank-you'],
       options: [
         { id: 'correct', lineId: 'player_thank_you', isCorrect: true },
