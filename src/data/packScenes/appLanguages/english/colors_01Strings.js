@@ -4,28 +4,27 @@
 // prompts are keyed by beat id.
 
 export const colors_01Strings = {
-  goalText: 'Pick a color at the stall.',
+  goalText: 'Name the colors your friend shows you.',
   briefDescription:
-    'A seller at the market asks if you want red or blue. Choose a color and finish politely.',
+    'Your friend shows colored items and asks what color each one is. Answer with the matching Hebrew color word.',
 
   prompts: {
-    spot_color_choice: 'Find the choice words.',
-    understand_color_choice: 'What choice did the seller give you?',
-    answer_color: 'Answer the seller.',
+    identify_red: 'What color is this?',
+    identify_blue: 'What color is this?',
+    identify_green: 'What color is this?',
+    identify_yellow: 'What color is this?',
     close_exchange: 'Close politely.',
   },
 
-  supportMeanings: {
-    red_or_blue: 'Red or blue?',
-    coffee_or_water: 'Coffee or water?',
-    i_am_home: 'I am at home.',
-  },
+  supportMeanings: {},
 
   lineSupportMeanings: {
-    seller_color_choice: 'Red or blue?',
-    seller_here_you_go: 'Here you go.',
-    player_red_please: 'Red, please.',
-    player_blue_please: 'Blue, please.',
+    friend_what_color_is_this: 'What color is this?',
+    friend_nice: 'Very nice.',
+    player_red: 'Red.',
+    player_blue: 'Blue.',
+    player_green: 'Green.',
+    player_yellow: 'Yellow.',
     player_thank_you: 'Thank you.',
     distractor_i_am_home: 'I am at home.',
     distractor_my_father: 'My father.',
@@ -34,7 +33,7 @@ export const colors_01Strings = {
   },
 
   recapTemplates: {
-    intro: 'Nice work at the stall!',
+    intro: 'Nice work naming the colors!',
     learnedPrefix: 'You used:',
   },
 };
