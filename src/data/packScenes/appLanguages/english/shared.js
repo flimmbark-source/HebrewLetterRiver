@@ -15,6 +15,8 @@ export const englishShared = {
     bread: 'bread',
     red: 'red',
     blue: 'blue',
+    green: 'green',
+    yellow: 'yellow',
     please: 'please',
     yes: 'yes',
     'thank-you': 'thank you',
