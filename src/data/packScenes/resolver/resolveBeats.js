@@ -145,6 +145,7 @@ export function resolveBeats(blueprint, targetLines, distractorPool, appStrings)
       prompt: prompts[beat.id] || '',
       cueLine: cueLine || null,
       activeLine: activeLine || null,
+      visualCue: beat.visualCue || null,
       targetConceptIds: beat.targetConceptIds || [],
       options: [],
       answerLines: [],
