@@ -22,5 +22,10 @@ export const englishShared = {
     'thank-you': 'thank you',
     also: 'also',
     or: 'or',
+    one: 'one',
+    two: 'two',
+    three: 'three',
+    four: 'four',
+    five: 'five',
   },
 };
