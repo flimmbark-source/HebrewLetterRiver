@@ -29,6 +29,13 @@ export const CONCEPTS = {
   blue: 'blue',
   green: 'green',
   yellow: 'yellow',
+
+  // Cardinal numbers 1..5 (grounded via countDots cue)
+  one: 'one',
+  two: 'two',
+  three: 'three',
+  four: 'four',
+  five: 'five',
 };
 
 export function isKnownConceptId(conceptId) {
