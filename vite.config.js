@@ -2,43 +2,10 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { readFileSync } from 'fs';
-import { webcrypto } from 'node:crypto';
 
-// Some environments expose a partial global crypto object without
-// getRandomValues() (or without crypto at all), which Vite expects
-// during startup. globalThis.crypto is a non-writable accessor in
-// newer Node, so we must defineProperty or patch in place rather than
-// reassign.
-(function ensureGlobalCrypto() {
-  if (!globalThis.crypto) {
-    try {
-      Object.defineProperty(globalThis, 'crypto', {
-        value: webcrypto,
-        writable: true,
-        configurable: true,
-      });
-    } catch {
-      globalThis.crypto = webcrypto;
-    }
-    return;
-  }
-  if (typeof globalThis.crypto.getRandomValues !== 'function') {
-    try {
-      globalThis.crypto.getRandomValues = webcrypto.getRandomValues.bind(webcrypto);
-    } catch {
-      try {
-        Object.defineProperty(globalThis, 'crypto', {
-          value: webcrypto,
-          writable: true,
-          configurable: true,
-        });
-      } catch {
-        // Last resort — best-effort assignment.
-        globalThis.crypto = webcrypto;
-      }
-    }
-  }
-})();
+// NOTE: the globalThis.crypto polyfill needed by Vite startup on older
+// Node 18 builds lives in scripts/vite-with-crypto.mjs, because Vite
+// touches crypto inside resolveConfig() — before this file is read.
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 
