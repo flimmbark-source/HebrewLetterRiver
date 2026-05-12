@@ -163,6 +163,10 @@
   --mode-vocab-bg:      var(--lr-aqua-100);
   --mode-vocab-surface: linear-gradient(135deg, #d8f5fa 0%, #b8ecf4 100%);
 
+  --mode-read:          var(--lr-coral-500);
+  --mode-read-bg:       var(--lr-coral-100);
+  --mode-read-surface:  linear-gradient(135deg, #fff0ec 0%, #ffd5cb 100%);
+
   /* =========================================================
      TYPOGRAPHY — PRIMITIVES
      ========================================================= */
@@ -311,6 +315,9 @@
   --app-mode-vocab: var(--mode-vocab);
   --app-mode-vocab-bg: var(--mode-vocab-bg);
   --app-mode-vocab-surface: var(--mode-vocab-surface);
+  --app-mode-read: var(--mode-read);
+  --app-mode-read-bg: var(--mode-read-bg);
+  --app-mode-read-surface: var(--mode-read-surface);
 }
 
 /* =========================================================
@@ -401,6 +408,10 @@ body.dark-mode, [data-theme="dark"] {
   --mode-vocab:         #73d7e6;
   --mode-vocab-bg:      rgba(74, 194, 221, 0.18);
   --mode-vocab-surface: linear-gradient(135deg, #15313a 0%, #1d3e4a 100%);
+
+  --mode-read:          #ff8466;
+  --mode-read-bg:       rgba(241, 90, 58, 0.18);
+  --mode-read-surface:  linear-gradient(135deg, #3a1a14 0%, #4a2018 100%);
 }
 
 /* =========================================================

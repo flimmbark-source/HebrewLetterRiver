@@ -228,6 +228,14 @@
 .vj-row-icon--green { background: #4f9b65; }
 .vj-row-icon--blue { background: #4e91c9; }
 
+.vj-row-done {
+  display: flex;
+  align-items: center;
+  color: #2f6b4c;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
 .vj-row-text,
 .vj-option span:nth-child(2),
 .vj-recommended-copy,

@@ -85,7 +85,7 @@ export default function BridgeBuilderView() {
       : config;
 
     if (preparedConfig?.packId && getLastMethodForPack(preparedConfig.packId) === 'read_context') {
-      navigate(`/read?packId=${encodeURIComponent(preparedConfig.packId)}`);
+      navigate(`/read?mode=pack_scene&packId=${encodeURIComponent(preparedConfig.packId)}`);
       return;
     }
 

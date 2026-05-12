@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useTutorial } from '../context/TutorialContext.jsx';
 import DualRoleConversationSession from '../components/conversation/DualRoleConversationSession.jsx';
 import DualRoleConversationCardGrid from '../components/conversation/DualRoleConversationCardGrid.jsx';
 import { buildDualRoleConversationCardItems } from '../components/conversation/dualRoleConversationCardData.js';
+import PackSceneSession from '../components/packScene/PackSceneSession.jsx';
 import { bridgeBuilderPacks } from '../data/bridgeBuilderPacks.js';
 import riverBackground from '../assets/Reading/River-Background.png';
 
@@ -36,6 +37,8 @@ export default function LearnView() {
   const { languageId: practiceLanguageId } = useLanguage();
   const { startTutorial, hasCompletedTutorial, currentTutorial } = useTutorial();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const mode = searchParams.get('mode');
   const contextPackId = searchParams.get('packId');
   const contextPack = useMemo(() => contextPackId ? getPackById(contextPackId) : null, [contextPackId]);
   const [selectedScenario, setSelectedScenario] = useState(null);
@@ -71,6 +74,15 @@ export default function LearnView() {
     setSelectedScript(item.script);
     setSelectedScenario(item.scenario);
   };
+
+  if (mode === 'pack_scene' && contextPackId) {
+    return (
+      <PackSceneSession
+        packId={contextPackId}
+        onExit={() => navigate('/bridge')}
+      />
+    );
+  }
 
   if (selectedScenario && selectedScript) {
     return (

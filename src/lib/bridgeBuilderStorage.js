@@ -384,5 +384,43 @@ export function markWordsQuizIntroduced(wordIds) {
   if (changed) saveState(STORAGE_KEY, all);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Pack Scene completion — extends the existing pack completion entry
+   ═══════════════════════════════════════════════════════════ */
+
+/**
+ * Mark a pack's Pack Scene as complete and store per-concept results.
+ *
+ * Extends the pack's existing completion entry rather than adding separate storage.
+ *
+ * @param {string} packId
+ * @param {{ sceneId: string, conceptResults: Object }} result
+ */
+export function markPackSceneComplete(packId, result = {}) {
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
+  entry.packSceneComplete = true;
+  entry.packSceneCompletedAt = new Date().toISOString();
+  entry.packSceneResults = result;
+  all[packId] = entry;
+  saveState(PACK_COMPLETION_KEY, all);
+}
+
+/**
+ * Get Pack Scene completion state for a pack.
+ *
+ * @param {string} packId
+ * @returns {{ packSceneComplete: boolean, packSceneCompletedAt: string|null, packSceneResults: Object|null }}
+ */
+export function getPackSceneCompletion(packId) {
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  const entry = all[packId] || {};
+  return {
+    packSceneComplete: entry.packSceneComplete || false,
+    packSceneCompletedAt: entry.packSceneCompletedAt || null,
+    packSceneResults: entry.packSceneResults || null,
+  };
+}
+
 // Future glossary hook: call getAllWordProgress() and join with bridgeBuilderWords
 // to render a full glossary view with mastery indicators.

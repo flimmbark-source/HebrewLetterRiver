@@ -1,0 +1,76 @@
+// Pack Scene blueprint for food_01 — language-independent scene logic.
+// No target-language text or app-language strings live here.
+// Line IDs reference rows in target-language realization files.
+// Concept IDs reference the concept registry.
+
+export const food_01Blueprint = {
+  packId: 'food_01',
+  archetype: 'choice',
+  domainId: 'cafe',
+  goalId: 'cafe_order_basic',
+  packConceptIds: ['coffee', 'water', 'bread'],
+  supportConceptIds: ['please', 'yes', 'thank-you', 'also', 'or'],
+
+  beats: [
+    {
+      id: 'spot_drink_offer',
+      role: 'notice_options',
+      actionType: 'spotPackWords',
+      activeLineId: 'server_drink_choice',
+      targetConceptIds: ['coffee', 'water'],
+    },
+    {
+      id: 'understand_drink_offer',
+      role: 'understand_cue',
+      actionType: 'meaningChoice',
+      cueLineId: 'server_drink_choice',
+      activeLineId: 'server_drink_choice',
+      targetConceptIds: ['coffee', 'water'],
+      options: [
+        { id: 'correct', meaningId: 'coffee_or_water', isCorrect: true },
+        { id: 'near', meaningId: 'bread_too', isCorrect: false },
+        { id: 'wrong', meaningId: 'here_you_go', isCorrect: false },
+      ],
+    },
+    {
+      id: 'answer_drink',
+      role: 'choose_or_build_response',
+      actionType: 'buildLine',
+      cueLineId: 'server_drink_choice',
+      answerLineIds: ['player_coffee_please', 'player_water_please'],
+      targetConceptIds: ['coffee', 'water', 'please'],
+      acceptedConceptSets: [
+        ['coffee', 'please'],
+        ['water', 'please'],
+      ],
+      tileDistractorPolicy: {
+        count: 2,
+        domainExclusions: ['cafe', 'food_ordering'],
+      },
+    },
+    {
+      id: 'accept_bread',
+      role: 'choose_or_build_response',
+      actionType: 'chooseReply',
+      cueLineId: 'server_bread_too',
+      targetConceptIds: ['yes', 'bread', 'please'],
+      options: [
+        { id: 'correct', lineId: 'player_yes_bread_please', isCorrect: true },
+        { id: 'wrong_home', lineId: 'distractor_i_am_home', isCorrect: false },
+        { id: 'wrong_father', lineId: 'distractor_my_father', isCorrect: false },
+      ],
+    },
+    {
+      id: 'close_exchange',
+      role: 'close_exchange',
+      actionType: 'chooseReply',
+      cueLineId: 'server_here_you_go',
+      targetConceptIds: ['thank-you'],
+      options: [
+        { id: 'correct', lineId: 'player_thank_you', isCorrect: true },
+        { id: 'wrong_house', lineId: 'distractor_house_is_big', isCorrect: false },
+        { id: 'wrong_father', lineId: 'distractor_my_father', isCorrect: false },
+      ],
+    },
+  ],
+};
