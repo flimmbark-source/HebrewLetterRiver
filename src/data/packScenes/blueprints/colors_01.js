@@ -37,6 +37,17 @@ export const colors_01Blueprint = {
   packConceptIds: ['red', 'blue', 'green', 'yellow'],
   supportConceptIds: ['thank-you'],
 
+  contentContract: {
+    vocabularyType: 'grounded-visual-property',
+    sceneModel: 'grounded-identification',
+    correctnessSource: 'visualCue',
+    answerPolicy: 'one-correct-per-beat',
+    coverage: 'all-pack-concepts-produced',
+    maxBeats: 6,
+    distractorPolicyNote:
+      'Same-category color distractors are fair because the colorCircle visual cue establishes ground truth.',
+  },
+
   beats: [
     colorIdentifyBeat('red'),
     colorIdentifyBeat('blue'),

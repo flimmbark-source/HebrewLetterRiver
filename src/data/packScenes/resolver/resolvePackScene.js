@@ -51,7 +51,7 @@ export function resolvePackScene({ packId, targetLanguageId, appLanguageId }) {
     return beatsResult;
   }
 
-  const finalCheck = validateResolvedScene(beatsResult.beats);
+  const finalCheck = validateResolvedScene(beatsResult.beats, blueprint);
   if (finalCheck.status !== 'ok') {
     return finalCheck;
   }

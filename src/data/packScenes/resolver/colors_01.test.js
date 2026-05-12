@@ -8,7 +8,7 @@ function tokenCount(line, conceptId) {
   return (line.tokens || []).filter((t) => t.conceptId === conceptId).length;
 }
 
-describe('Phase 3: colors_01 blueprint', () => {
+describe('Phase 3: colors_01 blueprint (grounded-identification)', () => {
   it('validates', () => {
     const result = validateBlueprint(colors_01Blueprint);
     expect(result.status).toBe('ok');
@@ -31,36 +31,47 @@ describe('Phase 3: colors_01 blueprint', () => {
     }
   });
 
-  it('accepts both red+please and blue+please as concept sets', () => {
-    const buildBeat = colors_01Blueprint.beats.find((b) => b.id === 'answer_color');
-    const sets = buildBeat.acceptedConceptSets.map((s) => [...s].sort().join(','));
-    expect(sets).toContain(['red', 'please'].sort().join(','));
-    expect(sets).toContain(['blue', 'please'].sort().join(','));
+  it('declares the grounded-identification contentContract', () => {
+    expect(colors_01Blueprint.contentContract.sceneModel).toBe('grounded-identification');
+    expect(colors_01Blueprint.contentContract.correctnessSource).toBe('visualCue');
+  });
+
+  it('produces every packConcept in at least one answer beat', () => {
+    for (const conceptId of colors_01Blueprint.packConceptIds) {
+      const found = colors_01Blueprint.beats.some(
+        (b) => b.actionType === 'chooseReply' && (b.targetConceptIds || []).includes(conceptId)
+      );
+      expect(found).toBe(true);
+    }
+  });
+
+  it('each identify beat has exactly one correct option', () => {
+    const identifyBeats = colors_01Blueprint.beats.filter((b) => b.id.startsWith('identify_'));
+    for (const beat of identifyBeats) {
+      const correctCount = beat.options.filter((opt) => opt.isCorrect).length;
+      expect(correctCount).toBe(1);
+    }
+  });
+
+  it('each identify beat visualCue.colorConceptId matches the target concept', () => {
+    const identifyBeats = colors_01Blueprint.beats.filter((b) => b.id.startsWith('identify_'));
+    for (const beat of identifyBeats) {
+      expect(beat.visualCue.type).toBe('colorCircle');
+      expect(beat.targetConceptIds).toContain(beat.visualCue.colorConceptId);
+    }
   });
 });
 
 describe('Phase 3: colors_01 Hebrew target lines', () => {
-  it('seller_color_choice has exactly one red token and one blue token', () => {
-    const line = colors_01Lines.seller_color_choice;
-    expect(tokenCount(line, 'red')).toBe(1);
-    expect(tokenCount(line, 'blue')).toBe(1);
-  });
-
-  it('player_red_please has exactly one red token and one please token', () => {
-    const line = colors_01Lines.player_red_please;
-    expect(tokenCount(line, 'red')).toBe(1);
-    expect(tokenCount(line, 'please')).toBe(1);
-  });
-
-  it('player_blue_please has exactly one blue token and one please token', () => {
-    const line = colors_01Lines.player_blue_please;
-    expect(tokenCount(line, 'blue')).toBe(1);
-    expect(tokenCount(line, 'please')).toBe(1);
+  it('each color line has exactly one token tagged with its color concept', () => {
+    expect(tokenCount(colors_01Lines.player_red, 'red')).toBe(1);
+    expect(tokenCount(colors_01Lines.player_blue, 'blue')).toBe(1);
+    expect(tokenCount(colors_01Lines.player_green, 'green')).toBe(1);
+    expect(tokenCount(colors_01Lines.player_yellow, 'yellow')).toBe(1);
   });
 
   it('player_thank_you has exactly one thank-you token', () => {
-    const line = colors_01Lines.player_thank_you;
-    expect(tokenCount(line, 'thank-you')).toBe(1);
+    expect(tokenCount(colors_01Lines.player_thank_you, 'thank-you')).toBe(1);
   });
 });
 
@@ -76,17 +87,18 @@ describe('Phase 3: colors_01 end-to-end resolution', () => {
     expect(result.scene.beats.length).toBe(colors_01Blueprint.beats.length);
   });
 
-  it('buildLine resolves with answerLines and tileBankTokens', () => {
+  it('each identify beat resolves with the colorCircle visualCue preserved', () => {
     const { scene } = resolvePackScene({
       packId: 'colors_01',
       targetLanguageId: 'hebrew',
       appLanguageId: 'english',
     });
-    const beat = scene.beats.find((b) => b.id === 'answer_color');
-    expect(beat.answerLines.length).toBe(2);
-    expect(beat.tileBankTokens.length).toBeGreaterThan(0);
-    const distractorTiles = beat.tileBankTokens.filter((t) => t.source === 'distractor');
-    expect(distractorTiles.length).toBe(2);
+    const identifyBeats = scene.beats.filter((b) => b.id.startsWith('identify_'));
+    expect(identifyBeats.length).toBe(4);
+    for (const beat of identifyBeats) {
+      expect(beat.visualCue).not.toBeNull();
+      expect(beat.visualCue.type).toBe('colorCircle');
+    }
   });
 
   it('chooseReply close_exchange options hydrate from target lines and distractor pool', () => {
@@ -102,17 +114,6 @@ describe('Phase 3: colors_01 end-to-end resolution', () => {
     const wrongHome = beat.options.find((o) => o.id === 'wrong_home');
     expect(wrongHome.targetText).toBe('אני בבית.');
     expect(wrongHome.supportText).toBe('I am at home.');
-  });
-
-  it('meaningChoice hydrates from supportMeanings (red_or_blue correct)', () => {
-    const { scene } = resolvePackScene({
-      packId: 'colors_01',
-      targetLanguageId: 'hebrew',
-      appLanguageId: 'english',
-    });
-    const beat = scene.beats.find((b) => b.id === 'understand_color_choice');
-    const correct = beat.options.find((o) => o.isCorrect);
-    expect(correct.text).toBe('Red or blue?');
   });
 });
 

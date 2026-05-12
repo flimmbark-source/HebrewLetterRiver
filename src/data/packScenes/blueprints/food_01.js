@@ -11,6 +11,17 @@ export const food_01Blueprint = {
   packConceptIds: ['coffee', 'water', 'bread'],
   supportConceptIds: ['please', 'yes', 'thank-you', 'also', 'or'],
 
+  contentContract: {
+    vocabularyType: 'transactional-food-and-drink',
+    sceneModel: 'transactional-choice',
+    correctnessSource: 'conversational-fit',
+    answerPolicy: 'mixed-valid-replies',
+    coverage: 'all-pack-concepts-meaningfully-used',
+    maxBeats: 6,
+    distractorPolicyNote:
+      'Avoid plausible valid café replies as wrong answers; use clearly out-of-scene distractors.',
+  },
+
   beats: [
     {
       id: 'spot_drink_offer',
