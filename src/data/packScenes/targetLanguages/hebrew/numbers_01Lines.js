@@ -1,5 +1,8 @@
 // Hebrew target-language realization for numbers_01.
-// Cardinal numbers in the citation form (masculine, used when counting).
+// Number forms match the Bridge Builder pack word list. We use the
+// feminine/short citation forms for 2..5 (שתיים, שלוש, ארבע, חמש) and
+// the masculine אחד for 1, with no counted noun — the abstract dots
+// are the referent, so there is no gender to agree with.
 // Distractor lines live in the shared distractor pool, not here.
 
 export const numbers_01Lines = {
@@ -28,44 +31,44 @@ export const numbers_01Lines = {
   player_two: {
     id: 'player_two',
     speaker: 'player',
-    targetText: 'שניים.',
+    targetText: 'שתיים.',
     direction: 'rtl',
-    transliteration: 'shnayim.',
+    transliteration: 'shtayim.',
     tokens: [
-      { text: 'שניים.', conceptId: 'two' },
+      { text: 'שתיים.', conceptId: 'two' },
     ],
   },
 
   player_three: {
     id: 'player_three',
     speaker: 'player',
-    targetText: 'שלושה.',
+    targetText: 'שלוש.',
     direction: 'rtl',
-    transliteration: 'shlosha.',
+    transliteration: 'shalosh.',
     tokens: [
-      { text: 'שלושה.', conceptId: 'three' },
+      { text: 'שלוש.', conceptId: 'three' },
     ],
   },
 
   player_four: {
     id: 'player_four',
     speaker: 'player',
-    targetText: 'ארבעה.',
+    targetText: 'ארבע.',
     direction: 'rtl',
-    transliteration: 'arba\'a.',
+    transliteration: 'arba.',
     tokens: [
-      { text: 'ארבעה.', conceptId: 'four' },
+      { text: 'ארבע.', conceptId: 'four' },
     ],
   },
 
   player_five: {
     id: 'player_five',
     speaker: 'player',
-    targetText: 'חמישה.',
+    targetText: 'חמש.',
     direction: 'rtl',
-    transliteration: 'chamisha.',
+    transliteration: 'chamesh.',
     tokens: [
-      { text: 'חמישה.', conceptId: 'five' },
+      { text: 'חמש.', conceptId: 'five' },
     ],
   },
 
