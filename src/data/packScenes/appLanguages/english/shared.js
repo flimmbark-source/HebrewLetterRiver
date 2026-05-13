@@ -13,6 +13,8 @@ export const englishShared = {
     coffee: 'coffee',
     water: 'water',
     bread: 'bread',
+    apple: 'apple',
+    food: 'food',
     red: 'red',
     blue: 'blue',
     green: 'green',

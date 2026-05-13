@@ -15,6 +15,8 @@ export const CONCEPTS = {
   coffee: 'coffee',
   water: 'water',
   bread: 'bread',
+  apple: 'apple',
+  food: 'food',
   please: 'please',
   want: 'want',
   yes: 'yes',

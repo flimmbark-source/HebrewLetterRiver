@@ -91,7 +91,7 @@ describe('Phase 2B: resolveAppStrings', () => {
   it('succeeds for english food_01 app language', () => {
     const result = resolveAppStrings(food_01Blueprint, 'english');
     expect(result.status).toBe('ok');
-    expect(result.appStrings.supportMeanings.coffee_or_water).toBe('Coffee or water?');
+    expect(result.appStrings.lineSupportMeanings.server_want_food).toBe('Want food?');
     expect(result.appStrings.lineSupportMeanings.distractor_i_am_home).toBe('I am at home.');
   });
 
@@ -124,23 +124,23 @@ describe('Phase 2B: resolveBeats', () => {
     return { target, strings, pool };
   }
 
-  it('hydrates meaningChoice options from supportMeanings', () => {
+  it('hydrates answer_drink buildLine with answer tiles', () => {
     const { target, strings, pool } = setupFood();
     const result = resolveBeats(food_01Blueprint, target.targetLines, pool, strings.appStrings);
     expect(result.status).toBe('ok');
-    const beat = result.beats.find((b) => b.actionType === 'meaningChoice');
-    expect(beat.options.find((o) => o.id === 'correct').text).toBe('Coffee or water?');
-    expect(beat.options.find((o) => o.id === 'correct').isCorrect).toBe(true);
+    const beat = result.beats.find((b) => b.id === 'answer_drink');
+    expect(beat.answerLines.length).toBe(2);
+    expect(beat.tileBankTokens.some((t) => t.conceptId === 'coffee')).toBe(true);
   });
 
   it('hydrates explicit chooseReply options from targetLines and distractor pool', () => {
     const { target, strings, pool } = setupFood();
     const result = resolveBeats(food_01Blueprint, target.targetLines, pool, strings.appStrings);
     expect(result.status).toBe('ok');
-    const beat = result.beats.find((b) => b.id === 'accept_bread');
+    const beat = result.beats.find((b) => b.id === 'accept_food');
     const correct = beat.options.find((o) => o.isCorrect);
-    expect(correct.targetText).toBe('כן, לחם בבקשה.');
-    expect(correct.supportText).toBe('Yes, bread please.');
+    expect(correct.targetText).toBe('כן, אוכל בבקשה.');
+    expect(correct.supportText).toBe('Yes, food please.');
     expect(correct.direction).toBe('rtl');
     const wrongHome = beat.options.find((o) => o.id === 'wrong_home');
     expect(wrongHome.targetText).toBe('אני בבית.');
@@ -179,7 +179,7 @@ describe('Phase 2B: resolveBeats', () => {
   it('returns invalid_resolved_scene when an option lineId is unresolvable', () => {
     const { target, strings, pool } = setupFood();
     const broken = JSON.parse(JSON.stringify(food_01Blueprint));
-    const beat = broken.beats.find((b) => b.id === 'accept_bread');
+    const beat = broken.beats.find((b) => b.id === 'accept_food');
     beat.options[0].lineId = 'player_does_not_exist';
     const result = resolveBeats(broken, target.targetLines, pool, strings.appStrings);
     expect(result.status).toBe('invalid_resolved_scene');

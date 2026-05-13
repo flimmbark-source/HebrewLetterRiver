@@ -16,15 +16,28 @@ export const food_01Lines = {
     ],
   },
 
-  server_bread_too: {
-    id: 'server_bread_too',
+  server_want_food: {
+    id: 'server_want_food',
     speaker: 'server',
-    targetText: 'גם לחם?',
+    targetText: 'רוצה אוכל?',
     direction: 'rtl',
-    transliteration: 'gam lechem?',
+    transliteration: 'rotse ochel?',
     tokens: [
-      { text: 'גם', conceptId: 'also' },
-      { text: 'לחם?', conceptId: 'bread' },
+      { text: 'רוצה', conceptId: 'want' },
+      { text: 'אוכל?', conceptId: 'food' },
+    ],
+  },
+
+  server_snack_choice: {
+    id: 'server_snack_choice',
+    speaker: 'server',
+    targetText: 'לחם או תפוח?',
+    direction: 'rtl',
+    transliteration: 'lechem o tapuach?',
+    tokens: [
+      { text: 'לחם', conceptId: 'bread' },
+      { text: 'או', conceptId: 'or' },
+      { text: 'תפוח?', conceptId: 'apple' },
     ],
   },
 
@@ -63,15 +76,39 @@ export const food_01Lines = {
     ],
   },
 
-  player_yes_bread_please: {
-    id: 'player_yes_bread_please',
+  player_yes_food_please: {
+    id: 'player_yes_food_please',
     speaker: 'player',
-    targetText: 'כן, לחם בבקשה.',
+    targetText: 'כן, אוכל בבקשה.',
     direction: 'rtl',
-    transliteration: 'ken, lechem bevakasha.',
+    transliteration: 'ken, ochel bevakasha.',
     tokens: [
       { text: 'כן,', conceptId: 'yes' },
+      { text: 'אוכל', conceptId: 'food' },
+      { text: 'בבקשה.', conceptId: 'please' },
+    ],
+  },
+
+  player_bread_please: {
+    id: 'player_bread_please',
+    speaker: 'player',
+    targetText: 'לחם בבקשה.',
+    direction: 'rtl',
+    transliteration: 'lechem bevakasha.',
+    tokens: [
       { text: 'לחם', conceptId: 'bread' },
+      { text: 'בבקשה.', conceptId: 'please' },
+    ],
+  },
+
+  player_apple_please: {
+    id: 'player_apple_please',
+    speaker: 'player',
+    targetText: 'תפוח בבקשה.',
+    direction: 'rtl',
+    transliteration: 'tapuach bevakasha.',
+    tokens: [
+      { text: 'תפוח', conceptId: 'apple' },
       { text: 'בבקשה.', conceptId: 'please' },
     ],
   },
