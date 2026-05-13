@@ -46,8 +46,8 @@ describe('Phase 2A: validateBlueprint', () => {
 
   it('fails when meaningChoice has no targetConceptIds', () => {
     const bp = clone(food_01Blueprint);
-    const beat = bp.beats.find((b) => b.actionType === 'meaningChoice');
-    delete beat.targetConceptIds;
+    bp.contentContract.maxBeats = 7;
+    bp.beats.push({ id: 'injected_meaning', actionType: 'meaningChoice', role: 'understand_cue' });
     const result = validateBlueprint(bp);
     expect(result.status).toBe('invalid_blueprint');
     expect(result.errors.some((e) => e.code === 'missing_target_concepts')).toBe(true);

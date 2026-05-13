@@ -1,34 +1,33 @@
 // English app-language strings for food_01.
-// supportMeanings keys come from blueprint meaningChoice option.meaningId.
 // lineSupportMeanings keys are target-language line IDs (scene + distractor).
 // prompts are keyed by beat id.
 
 export const food_01Strings = {
-  goalText: 'Choose a drink, then get bread.',
+  goalText: 'Order a drink, accept food, and choose a snack.',
   briefDescription:
-    "Order in a small cafe. Hear the server, choose a drink, accept bread, and close politely.",
+    'Order in a small cafe. Hear the server, choose a drink, accept food, choose a snack, and close politely.',
 
   prompts: {
     spot_drink_offer: 'Find the choice words.',
-    understand_drink_offer: 'What choice did the server give you?',
     answer_drink: 'Answer the server.',
-    accept_bread: 'How do you answer?',
+    accept_food: 'How do you answer?',
+    spot_snack_offer: 'Find the snack choices.',
+    answer_snack: 'Choose your snack.',
     close_exchange: 'Close politely.',
   },
 
-  supportMeanings: {
-    coffee_or_water: 'Coffee or water?',
-    bread_too: 'Bread too?',
-    here_you_go: 'Here you go.',
-  },
+  supportMeanings: {},
 
   lineSupportMeanings: {
     server_drink_choice: 'Coffee or water?',
-    server_bread_too: 'Also bread?',
+    server_want_food: 'Want food?',
+    server_snack_choice: 'Bread or apple?',
     server_here_you_go: 'Here you go.',
-    player_coffee_please: 'Coffee please.',
-    player_water_please: 'Water please.',
-    player_yes_bread_please: 'Yes, bread please.',
+    player_coffee_please: 'Coffee, please.',
+    player_water_please: 'Water, please.',
+    player_yes_food_please: 'Yes, food please.',
+    player_bread_please: 'Bread, please.',
+    player_apple_please: 'Apple, please.',
     player_thank_you: 'Thank you.',
     distractor_i_am_home: 'I am at home.',
     distractor_my_father: 'My father.',

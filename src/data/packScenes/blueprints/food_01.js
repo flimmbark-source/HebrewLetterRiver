@@ -8,7 +8,7 @@ export const food_01Blueprint = {
   archetype: 'choice',
   domainId: 'cafe',
   goalId: 'cafe_order_basic',
-  packConceptIds: ['coffee', 'water', 'bread'],
+  packConceptIds: ['coffee', 'water', 'bread', 'apple', 'food'],
   supportConceptIds: ['please', 'yes', 'thank-you', 'also', 'or'],
 
   contentContract: {
@@ -31,19 +31,6 @@ export const food_01Blueprint = {
       targetConceptIds: ['coffee', 'water'],
     },
     {
-      id: 'understand_drink_offer',
-      role: 'understand_cue',
-      actionType: 'meaningChoice',
-      cueLineId: 'server_drink_choice',
-      activeLineId: 'server_drink_choice',
-      targetConceptIds: ['coffee', 'water'],
-      options: [
-        { id: 'correct', meaningId: 'coffee_or_water', isCorrect: true },
-        { id: 'near', meaningId: 'bread_too', isCorrect: false },
-        { id: 'wrong', meaningId: 'here_you_go', isCorrect: false },
-      ],
-    },
-    {
       id: 'answer_drink',
       role: 'choose_or_build_response',
       actionType: 'buildLine',
@@ -60,16 +47,39 @@ export const food_01Blueprint = {
       },
     },
     {
-      id: 'accept_bread',
+      id: 'accept_food',
       role: 'choose_or_build_response',
       actionType: 'chooseReply',
-      cueLineId: 'server_bread_too',
-      targetConceptIds: ['yes', 'bread', 'please'],
+      cueLineId: 'server_want_food',
+      targetConceptIds: ['yes', 'food', 'please'],
       options: [
-        { id: 'correct', lineId: 'player_yes_bread_please', isCorrect: true },
+        { id: 'correct', lineId: 'player_yes_food_please', isCorrect: true },
         { id: 'wrong_home', lineId: 'distractor_i_am_home', isCorrect: false },
         { id: 'wrong_father', lineId: 'distractor_my_father', isCorrect: false },
       ],
+    },
+    {
+      id: 'spot_snack_offer',
+      role: 'notice_options',
+      actionType: 'spotPackWords',
+      activeLineId: 'server_snack_choice',
+      targetConceptIds: ['bread', 'apple'],
+    },
+    {
+      id: 'answer_snack',
+      role: 'choose_or_build_response',
+      actionType: 'buildLine',
+      cueLineId: 'server_snack_choice',
+      answerLineIds: ['player_bread_please', 'player_apple_please'],
+      targetConceptIds: ['bread', 'apple', 'please'],
+      acceptedConceptSets: [
+        ['bread', 'please'],
+        ['apple', 'please'],
+      ],
+      tileDistractorPolicy: {
+        count: 2,
+        domainExclusions: ['cafe', 'food_ordering'],
+      },
     },
     {
       id: 'close_exchange',
