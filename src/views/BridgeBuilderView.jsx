@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../data/bridgeBuilderPackConsolidation.js';
 import BridgeBuilderSetup from '../components/bridgeBuilder/BridgeBuilderSetup.jsx';
 import BridgeBuilderGame from '../components/bridgeBuilder/BridgeBuilderGame.jsx';
 import LoosePlanksGame from '../components/bridgeBuilder/LoosePlanksGame.jsx';
