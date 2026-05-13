@@ -9,6 +9,7 @@
  */
 
 import { bridgeBuilderPacks as sourceBridgeBuilderPacks } from './bridgeBuilderPacks.js';
+import { bridgeBuilderWords } from './bridgeBuilderWords.js';
 
 export const PACK_MERGES = {
   pronouns_01: ['pronouns_02'],
@@ -99,10 +100,71 @@ const MERGED_TO_CANONICAL = Object.freeze(
   )
 );
 
+const WORD_BY_ID = new Map(bridgeBuilderWords.map((word) => [word.id, word]));
+
 let applied = false;
 
 function uniqueStrings(values = []) {
   return Array.from(new Set(values.filter(Boolean)));
+}
+
+function normalizeKeyPart(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[׳׳'’`]/g, '')
+    .replace(/[()]/g, ' ')
+    .replace(/\b(to|a|an|the)\b/g, ' ')
+    .replace(/\b(m|f|masc|fem|masculine|feminine)\b/g, ' ')
+    .replace(/\s*\/\s*/g, '/')
+    .replace(/[^\p{L}\p{N}/]+/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getEnglishConceptFallback(wordId, word) {
+  const fromWord = normalizeKeyPart(word?.meaning || word?.translation || word?.en);
+  if (fromWord) return fromWord.split('/')[0].trim();
+
+  if (String(wordId).startsWith('bbct-')) {
+    return normalizeKeyPart(String(wordId).replace(/^bbct-/, ''));
+  }
+
+  return '';
+}
+
+function getWordConceptKeys(wordId) {
+  const word = WORD_BY_ID.get(wordId);
+  const keys = [];
+
+  const nativeScript = normalizeKeyPart(word?.nativeScript || word?.hebrew);
+  if (nativeScript) keys.push(`script:${nativeScript}`);
+
+  const transliteration = normalizeKeyPart(word?.transliteration);
+  if (transliteration) keys.push(`translit:${transliteration}`);
+
+  const englishFallback = getEnglishConceptFallback(wordId, word);
+  if (englishFallback) keys.push(`english:${englishFallback}`);
+
+  keys.push(`id:${wordId}`);
+  return keys;
+}
+
+function uniqueWordIdsByConcept(wordIds = []) {
+  const kept = [];
+  const seenKeys = new Set();
+
+  for (const wordId of wordIds.filter(Boolean)) {
+    const keys = getWordConceptKeys(wordId);
+    const duplicate = keys.some((key) => seenKeys.has(key));
+    if (duplicate) continue;
+
+    kept.push(wordId);
+    keys.forEach((key) => seenKeys.add(key));
+  }
+
+  return kept;
 }
 
 function getPackLookup(packs) {
@@ -139,12 +201,12 @@ export function applyJourneyPackConsolidation() {
     const availableMergedIds = mergedIds.filter((packId) => byId.has(packId));
     const mergedPacks = availableMergedIds.map((packId) => byId.get(packId));
 
-    canonicalPack.wordIds = uniqueStrings([
+    canonicalPack.wordIds = uniqueWordIdsByConcept([
       ...(canonicalPack.wordIds || []),
       ...mergedPacks.flatMap((pack) => pack.wordIds || []),
     ]);
 
-    canonicalPack.supportWordIds = uniqueStrings([
+    canonicalPack.supportWordIds = uniqueWordIdsByConcept([
       ...(canonicalPack.supportWordIds || []),
       ...mergedPacks.flatMap((pack) => pack.supportWordIds || []),
     ]);
