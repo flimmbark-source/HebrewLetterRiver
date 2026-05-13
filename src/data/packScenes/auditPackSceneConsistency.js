@@ -1,113 +1,133 @@
-// Pack Scene / Vocab Pack consistency audit.
+// Pack Scene / Bridge Builder consistency audit.
 //
-// For every registered Pack Scene, resolves the matching Bridge Builder pack's
-// consolidated wordIds, maps them to Pack Scene concept IDs via
-// BRIDGE_WORD_TO_PACK_SCENE_CONCEPT, and compares the result against the
-// blueprint's packConceptIds.
+// For each registered Pack Scene, this audit confirms:
 //
-// Error codes:
-//   missing_bridge_pack          — no Bridge Builder pack matches the packId
-//   missing_word_concept_mapping — a wordId has no entry in the concept map
-//   missing_pack_concept         — blueprint is missing a concept the pack has
-//   stale_pack_concept           — blueprint lists a concept the pack no longer has
+//   1. Every wordId in the consolidated Bridge Builder pack has an
+//      entry in bridgeWordConceptMap[packId].
+//   2. Every concept those wordIds map to appears in
+//      blueprint.packConceptIds.
+//   3. blueprint.packConceptIds contains no stale concepts — i.e. no
+//      concept that does not correspond to any wordId in the
+//      consolidated pack.
 //
-// Usage (real-world):  auditPackSceneConsistency()
-// Usage (override):    auditPackSceneConsistency({ getBlueprintFn, getPackFn })
+// supportConceptIds are intentionally ignored. They cover linguistic
+// glue (please, yes, thank-you, etc.) that does not need to come from
+// the pack itself.
 
-import { listBlueprintPackIds, getBlueprintForPack } from './blueprintRegistry.js';
-import { getConsolidatedPackById } from '../bridgeBuilderPackConsolidation.js';
-import { BRIDGE_WORD_TO_PACK_SCENE_CONCEPT } from './bridgeWordConceptMap.js';
+import { bridgeWordConceptMap } from './bridgeWordConceptMap.js';
+import { bridgeBuilderPacks } from '../bridgeBuilderPackConsolidation.js';
+import { getBlueprintForPack, listBlueprintPackIds } from './blueprintRegistry.js';
+
+function getConsolidatedPack(packId) {
+  return bridgeBuilderPacks.find((pack) => pack.id === packId) || null;
+}
+
+function err(code, message, extras = {}) {
+  return { code, message, ...extras };
+}
 
 /**
- * @param {object} [options]
- * @param {Function} [options.getBlueprintFn]  packId → blueprint  (default: registry)
- * @param {Function} [options.getPackFn]       packId → consolidated pack  (default: consolidation)
- * @param {object}   [options.conceptMap]      wordId → conceptId  (default: BRIDGE_WORD_TO_PACK_SCENE_CONCEPT)
- * @param {string[]} [options.packIds]         limit audit to these IDs  (default: all registered)
- * @returns {Array<AuditResult>}
+ * Audit a single Pack Scene against its consolidated Bridge Builder pack.
+ *
+ * @param {string} packId
+ * @returns {{ status: 'ok' } | { status: 'inconsistent', errors: Array }}
  */
-export function auditPackSceneConsistency({
-  getBlueprintFn = getBlueprintForPack,
-  getPackFn = getConsolidatedPackById,
-  conceptMap = BRIDGE_WORD_TO_PACK_SCENE_CONCEPT,
-  packIds = null,
-} = {}) {
-  const ids = packIds ?? listBlueprintPackIds();
-  const results = [];
+export function auditPackSceneForPack(packId) {
+  const errors = [];
 
-  for (const packId of ids) {
-    const blueprint = getBlueprintFn(packId);
-    const pack = getPackFn(packId);
-
-    if (!pack) {
-      results.push({
-        packId,
-        status: 'missing_bridge_pack',
-        errors: [{ code: 'missing_bridge_pack', packId }],
-        wordIds: [],
-        mappedConceptIds: [],
-        blueprintConceptIds: blueprint?.packConceptIds ?? [],
-      });
-      continue;
-    }
-
-    const errors = [];
-    const mappedConceptIds = [];
-    const conceptToWordId = {};
-
-    for (const wordId of pack.wordIds || []) {
-      if (!(wordId in conceptMap)) {
-        errors.push({ code: 'missing_word_concept_mapping', packId, wordId });
-      } else {
-        const conceptId = conceptMap[wordId];
-        if (!mappedConceptIds.includes(conceptId)) {
-          mappedConceptIds.push(conceptId);
-          conceptToWordId[conceptId] = wordId;
-        }
-      }
-    }
-
-    if (errors.length > 0) {
-      results.push({
-        packId,
-        status: 'mapping_error',
-        errors,
-        wordIds: pack.wordIds,
-        mappedConceptIds,
-        blueprintConceptIds: blueprint?.packConceptIds ?? [],
-      });
-      continue;
-    }
-
-    const mappedSet = new Set(mappedConceptIds);
-    const blueprintSet = new Set(blueprint?.packConceptIds ?? []);
-
-    for (const conceptId of mappedSet) {
-      if (!blueprintSet.has(conceptId)) {
-        errors.push({
-          code: 'missing_pack_concept',
-          packId,
-          conceptId,
-          sourceWordId: conceptToWordId[conceptId],
-        });
-      }
-    }
-
-    for (const conceptId of blueprintSet) {
-      if (!mappedSet.has(conceptId)) {
-        errors.push({ code: 'stale_pack_concept', packId, conceptId });
-      }
-    }
-
-    results.push({
-      packId,
-      status: errors.length > 0 ? 'mismatch' : 'ok',
-      errors,
-      wordIds: pack.wordIds,
-      mappedConceptIds,
-      blueprintConceptIds: blueprint?.packConceptIds ?? [],
-    });
+  const blueprint = getBlueprintForPack(packId);
+  if (!blueprint) {
+    errors.push(err('missing_blueprint', `No blueprint registered for pack '${packId}'`, { packId }));
+    return { status: 'inconsistent', errors };
   }
 
-  return results;
+  const pack = getConsolidatedPack(packId);
+  if (!pack) {
+    errors.push(
+      err('missing_consolidated_pack', `No consolidated Bridge Builder pack found for '${packId}'`, {
+        packId,
+      })
+    );
+    return { status: 'inconsistent', errors };
+  }
+
+  const wordMap = bridgeWordConceptMap[packId];
+  if (!wordMap) {
+    errors.push(
+      err(
+        'missing_word_concept_map',
+        `bridgeWordConceptMap has no entry for pack '${packId}'`,
+        { packId }
+      )
+    );
+    return { status: 'inconsistent', errors };
+  }
+
+  const wordIds = pack.wordIds || [];
+  const mappedConcepts = new Set();
+
+  for (const wordId of wordIds) {
+    const conceptId = wordMap[wordId];
+    if (!conceptId) {
+      errors.push(
+        err(
+          'unmapped_word_id',
+          `Bridge Builder wordId '${wordId}' in pack '${packId}' has no entry in bridgeWordConceptMap`,
+          { packId, wordId }
+        )
+      );
+      continue;
+    }
+    mappedConcepts.add(conceptId);
+  }
+
+  const blueprintPackConcepts = new Set(blueprint.packConceptIds || []);
+
+  for (const conceptId of mappedConcepts) {
+    if (!blueprintPackConcepts.has(conceptId)) {
+      errors.push(
+        err(
+          'missing_pack_concept_in_blueprint',
+          `Concept '${conceptId}' is mapped from a wordId in pack '${packId}' but is missing from blueprint.packConceptIds`,
+          { packId, conceptId }
+        )
+      );
+    }
+  }
+
+  for (const conceptId of blueprintPackConcepts) {
+    if (!mappedConcepts.has(conceptId)) {
+      errors.push(
+        err(
+          'stale_pack_concept_in_blueprint',
+          `Concept '${conceptId}' appears in blueprint.packConceptIds for pack '${packId}' but is not produced by any wordId in the consolidated pack`,
+          { packId, conceptId }
+        )
+      );
+    }
+  }
+
+  if (errors.length > 0) {
+    return { status: 'inconsistent', errors };
+  }
+  return { status: 'ok' };
+}
+
+/**
+ * Audit every registered Pack Scene blueprint.
+ *
+ * @returns {{ status: 'ok' } | { status: 'inconsistent', errors: Array }}
+ */
+export function auditAllRegisteredPackScenes() {
+  const errors = [];
+  for (const packId of listBlueprintPackIds()) {
+    const result = auditPackSceneForPack(packId);
+    if (result.status !== 'ok') {
+      for (const e of result.errors) errors.push(e);
+    }
+  }
+  if (errors.length > 0) {
+    return { status: 'inconsistent', errors };
+  }
+  return { status: 'ok' };
 }

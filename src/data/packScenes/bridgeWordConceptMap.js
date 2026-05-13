@@ -1,32 +1,54 @@
-// Maps Bridge Builder word IDs (from bridgeBuilderPacks wordIds) to Pack Scene
-// concept IDs (from blueprints packConceptIds).
+// Bridge Builder wordId → Pack Scene conceptId mapping.
 //
-// Add an entry here whenever a word from a registered Pack Scene's Bridge
-// Builder pack (after consolidation) needs to be recognised by the audit.
+// Each entry maps a Bridge Builder wordId (from bridgeBuilderWords.js,
+// including consolidated bbct- words) to the Pack Scene conceptId that
+// represents it inside its registered Pack Scene blueprint.
 //
-// Only pack target vocabulary goes here. Support concepts (please, yes,
-// thank-you, or, also) do not belong — they are not Bridge Builder pack words.
-//
-// When a new Pack Scene is registered, extend this map with every word ID
-// that appears in the matching Bridge Builder pack after consolidation.
-export const BRIDGE_WORD_TO_PACK_SCENE_CONCEPT = {
-  // food_01 (consolidated with food_02)
-  'bb-cafe':    'coffee',
-  'bb-mayim':   'water',
-  'bb-lechem':  'bread',
-  'bb-tapuach': 'apple',
-  'bbct-food':  'food',
+// Polysemy rule:
+//   When the same Bridge Builder word would mean different things in
+//   different scenes, the mapping reflects the scene it is scoped to.
+//   For example bb-kamah maps to 'how-much' here because shopping_01
+//   uses it as a price inquiry. A future pack that uses bb-kamah as a
+//   counting interrogative would need a separate 'how-many' concept
+//   and a per-pack mapping override.
 
-  // colors_01
-  'bb-adom':   'red',
-  'bb-kachol': 'blue',
-  'bb-yarok':  'green',
-  'bb-tsahov': 'yellow',
-
-  // numbers_01
-  'bb-echad':   'one',
-  'bb-shtayim': 'two',
-  'bb-shalosh': 'three',
-  'bb-arba':    'four',
-  'bb-chamesh': 'five',
+export const bridgeWordConceptMap = {
+  food_01: {
+    'bb-cafe': 'coffee',
+    'bb-mayim': 'water',
+    'bb-lechem': 'bread',
+    'bb-tapuach': 'apple',
+    'bbct-food': 'food',
+  },
+  colors_01: {
+    'bb-adom': 'red',
+    'bb-kachol': 'blue',
+    'bb-yarok': 'green',
+    'bb-tsahov': 'yellow',
+  },
+  numbers_01: {
+    'bb-echad': 'one',
+    'bb-shtayim': 'two',
+    'bb-shalosh': 'three',
+    'bb-arba': 'four',
+    'bb-chamesh': 'five',
+  },
+  shopping_01: {
+    'bb-kesef': 'money',
+    'bb-chanut': 'store',
+    'bb-kamah': 'how-much',
+    'bb-sakit': 'bag',
+    'bbct-buy': 'buy',
+    'bbct-pay': 'pay',
+  },
 };
+
+export function getConceptIdForWord(packId, wordId) {
+  const packMap = bridgeWordConceptMap[packId];
+  if (!packMap) return null;
+  return packMap[wordId] || null;
+}
+
+export function listMappedPackIds() {
+  return Object.keys(bridgeWordConceptMap);
+}

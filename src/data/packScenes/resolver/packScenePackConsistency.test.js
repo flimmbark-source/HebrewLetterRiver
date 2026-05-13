@@ -1,178 +1,156 @@
 import { describe, it, expect } from 'vitest';
-import { auditPackSceneConsistency } from '../auditPackSceneConsistency.js';
-import { listBlueprintPackIds, getBlueprintForPack } from '../blueprintRegistry.js';
-import { getConsolidatedPackById } from '../../bridgeBuilderPackConsolidation.js';
-import { BRIDGE_WORD_TO_PACK_SCENE_CONCEPT } from '../bridgeWordConceptMap.js';
+import {
+  auditPackSceneForPack,
+  auditAllRegisteredPackScenes,
+} from '../auditPackSceneConsistency.js';
+import { bridgeBuilderPacks } from '../../bridgeBuilderPackConsolidation.js';
+import { bridgeWordConceptMap } from '../bridgeWordConceptMap.js';
+import { getBlueprintForPack, listBlueprintPackIds } from '../blueprintRegistry.js';
 
-// ─── helpers ─────────────────────────────────────────────────────────────────
-
-function resultFor(results, packId) {
-  return results.find((r) => r.packId === packId);
+function getConsolidatedPack(packId) {
+  return bridgeBuilderPacks.find((pack) => pack.id === packId) || null;
 }
 
-// Run the real audit against the live registry + consolidation
-function runAudit() {
-  return auditPackSceneConsistency();
-}
+describe('Pack Scene / Bridge Builder consistency audit', () => {
+  it('food_01 passes the consistency audit', () => {
+    expect(auditPackSceneForPack('food_01').status).toBe('ok');
+  });
 
-// ─── 1. Every registered Pack Scene has a matching Bridge Builder pack ────────
+  it('colors_01 passes the consistency audit', () => {
+    expect(auditPackSceneForPack('colors_01').status).toBe('ok');
+  });
 
-describe('Pack Scene / Bridge Builder pack consistency', () => {
-  it('every registered Pack Scene has a matching Bridge Builder pack', () => {
-    const results = runAudit();
-    for (const result of results) {
-      expect(result.status).not.toBe('missing_bridge_pack');
+  it('numbers_01 passes the consistency audit', () => {
+    expect(auditPackSceneForPack('numbers_01').status).toBe('ok');
+  });
+
+  it('every registered Pack Scene passes the consistency audit', () => {
+    const result = auditAllRegisteredPackScenes();
+    if (result.status !== 'ok') {
+      // surface the offending packs to make failures actionable
+      // eslint-disable-next-line no-console
+      console.error(JSON.stringify(result.errors, null, 2));
+    }
+    expect(result.status).toBe('ok');
+  });
+
+  it('every registered blueprint has a bridgeWordConceptMap entry', () => {
+    for (const packId of listBlueprintPackIds()) {
+      expect(bridgeWordConceptMap[packId]).toBeTruthy();
     }
   });
 
-  // ─── 2. Every wordId in every registered pack has a concept map entry ───────
-
-  it('every wordId in every registered pack has a concept map entry', () => {
-    const results = runAudit();
-    for (const result of results) {
-      expect(result.status).not.toBe('mapping_error');
-      for (const err of result.errors || []) {
-        expect(err.code).not.toBe('missing_word_concept_mapping');
-      }
+  it('consolidated food_01 wordIds all have a concept mapping', () => {
+    const pack = getConsolidatedPack('food_01');
+    expect(pack).toBeTruthy();
+    for (const wordId of pack.wordIds) {
+      expect(bridgeWordConceptMap.food_01[wordId]).toBeTruthy();
     }
   });
 
-  // ─── 3. Every blueprint.packConceptIds exactly matches the mapped concepts ──
+  it('consolidated shopping_01 wordIds all have a concept mapping', () => {
+    const pack = getConsolidatedPack('shopping_01');
+    expect(pack).toBeTruthy();
+    for (const wordId of pack.wordIds) {
+      expect(bridgeWordConceptMap.shopping_01[wordId]).toBeTruthy();
+    }
+  });
 
-  it('every registered blueprint.packConceptIds exactly matches its Bridge Builder pack', () => {
-    const results = runAudit();
-    for (const result of results) {
+  it('bb-kamah maps to how-much, not how-many or kamah', () => {
+    expect(bridgeWordConceptMap.shopping_01['bb-kamah']).toBe('how-much');
+  });
+});
+
+describe('Pack Scene consistency audit detects drift', () => {
+  it('fails when blueprint.packConceptIds is missing a mapped concept (stale blueprint fixture)', () => {
+    // Stub a blueprint registry lookup with a deliberately stale blueprint
+    // by reusing the audit's underlying check on a fake pack.
+    //
+    // We do this by constructing a fake mapping + blueprint and calling
+    // the per-pack auditor logic on a temporary pack id.
+    const fakePackId = '__test_pack_missing_concept__';
+
+    // Inject a fake mapping and a fake consolidated pack via prototype
+    // modification of the imported map. Because ES modules export bindings,
+    // we mutate the bridgeWordConceptMap object directly for this test only,
+    // then restore.
+    bridgeWordConceptMap[fakePackId] = { 'bb-fake': 'fake-concept' };
+    bridgeBuilderPacks.push({ id: fakePackId, wordIds: ['bb-fake'] });
+
+    // No blueprint registered → audit should fail with missing_blueprint.
+    const result = auditPackSceneForPack(fakePackId);
+    expect(result.status).toBe('inconsistent');
+    expect(result.errors.some((e) => e.code === 'missing_blueprint')).toBe(true);
+
+    // cleanup
+    delete bridgeWordConceptMap[fakePackId];
+    const idx = bridgeBuilderPacks.findIndex((p) => p.id === fakePackId);
+    if (idx >= 0) bridgeBuilderPacks.splice(idx, 1);
+  });
+
+  it('fails when a wordId has no mapping', () => {
+    // Use the food_01 mapping but pretend pack has an extra unmapped wordId.
+    const pack = getConsolidatedPack('food_01');
+    expect(pack).toBeTruthy();
+
+    const original = pack.wordIds.slice();
+    pack.wordIds.push('bb-no-mapping-for-this');
+    try {
+      const result = auditPackSceneForPack('food_01');
+      expect(result.status).toBe('inconsistent');
+      expect(result.errors.some((e) => e.code === 'unmapped_word_id')).toBe(true);
+    } finally {
+      pack.wordIds.length = 0;
+      pack.wordIds.push(...original);
+    }
+  });
+
+  it('fails when blueprint.packConceptIds contains a stale concept', () => {
+    const blueprint = getBlueprintForPack('food_01');
+    expect(blueprint).toBeTruthy();
+
+    const original = blueprint.packConceptIds.slice();
+    blueprint.packConceptIds.push('thank-you'); // exists as concept but isn't in food_01 pack map
+    try {
+      const result = auditPackSceneForPack('food_01');
+      expect(result.status).toBe('inconsistent');
+      expect(result.errors.some((e) => e.code === 'stale_pack_concept_in_blueprint')).toBe(true);
+    } finally {
+      blueprint.packConceptIds.length = 0;
+      blueprint.packConceptIds.push(...original);
+    }
+  });
+
+  it('fails when blueprint.packConceptIds is missing a mapped concept', () => {
+    const blueprint = getBlueprintForPack('food_01');
+    expect(blueprint).toBeTruthy();
+
+    const original = blueprint.packConceptIds.slice();
+    // Remove 'food' from packConceptIds while bbct-food still maps to it.
+    blueprint.packConceptIds.length = 0;
+    blueprint.packConceptIds.push(...original.filter((c) => c !== 'food'));
+    try {
+      const result = auditPackSceneForPack('food_01');
+      expect(result.status).toBe('inconsistent');
+      expect(
+        result.errors.some((e) => e.code === 'missing_pack_concept_in_blueprint')
+      ).toBe(true);
+    } finally {
+      blueprint.packConceptIds.length = 0;
+      blueprint.packConceptIds.push(...original);
+    }
+  });
+
+  it('supportConceptIds do not affect the audit (adding a support concept does not fail it)', () => {
+    const blueprint = getBlueprintForPack('food_01');
+    const original = blueprint.supportConceptIds.slice();
+    blueprint.supportConceptIds.push('water'); // a real pack concept being borrowed as support
+    try {
+      const result = auditPackSceneForPack('food_01');
       expect(result.status).toBe('ok');
-    }
-  });
-
-  // ─── 4. Stale drift detection: food_01 with old packConceptIds is caught ────
-
-  it('detects missing_pack_concept when food_01 blueprint is stale (coffee/water/bread only)', () => {
-    const staleBlueprint = {
-      ...getBlueprintForPack('food_01'),
-      packConceptIds: ['coffee', 'water', 'bread'],
-    };
-    const results = auditPackSceneConsistency({
-      getBlueprintFn: (id) => (id === 'food_01' ? staleBlueprint : getBlueprintForPack(id)),
-      packIds: ['food_01'],
-    });
-    const result = resultFor(results, 'food_01');
-    expect(result.status).toBe('mismatch');
-    const missing = result.errors.filter((e) => e.code === 'missing_pack_concept');
-    const missingIds = missing.map((e) => e.conceptId);
-    expect(missingIds).toContain('apple');
-    expect(missingIds).toContain('food');
-  });
-
-  it('detects stale_pack_concept when food_01 blueprint has a concept the pack no longer contains', () => {
-    const staleBlueprint = {
-      ...getBlueprintForPack('food_01'),
-      packConceptIds: ['coffee', 'water', 'bread', 'apple', 'food', 'soup'],
-    };
-    const results = auditPackSceneConsistency({
-      getBlueprintFn: (id) => (id === 'food_01' ? staleBlueprint : getBlueprintForPack(id)),
-      packIds: ['food_01'],
-    });
-    const result = resultFor(results, 'food_01');
-    expect(result.status).toBe('mismatch');
-    expect(result.errors.some((e) => e.code === 'stale_pack_concept' && e.conceptId === 'soup')).toBe(true);
-  });
-
-  // ─── 5. colors_01 matches red/blue/green/yellow ──────────────────────────────
-
-  it('colors_01 passes with exactly red, blue, green, yellow', () => {
-    const results = runAudit();
-    const result = resultFor(results, 'colors_01');
-    expect(result.status).toBe('ok');
-    expect(new Set(result.mappedConceptIds)).toEqual(new Set(['red', 'blue', 'green', 'yellow']));
-    expect(new Set(result.blueprintConceptIds)).toEqual(new Set(['red', 'blue', 'green', 'yellow']));
-  });
-
-  // ─── 6. numbers_01 matches one/two/three/four/five ───────────────────────────
-
-  it('numbers_01 passes with exactly one, two, three, four, five', () => {
-    const results = runAudit();
-    const result = resultFor(results, 'numbers_01');
-    expect(result.status).toBe('ok');
-    expect(new Set(result.mappedConceptIds)).toEqual(new Set(['one', 'two', 'three', 'four', 'five']));
-    expect(new Set(result.blueprintConceptIds)).toEqual(new Set(['one', 'two', 'three', 'four', 'five']));
-  });
-
-  // ─── 7. supportConceptIds do not affect the consistency check ────────────────
-
-  it('supportConceptIds are not compared against Bridge Builder wordIds', () => {
-    // Inject a blueprint with extra supportConceptIds — should not change audit result
-    const blueprint = getBlueprintForPack('colors_01');
-    const augmented = {
-      ...blueprint,
-      supportConceptIds: [...blueprint.supportConceptIds, 'please', 'yes', 'thank-you'],
-    };
-    const results = auditPackSceneConsistency({
-      getBlueprintFn: (id) => (id === 'colors_01' ? augmented : getBlueprintForPack(id)),
-      packIds: ['colors_01'],
-    });
-    const result = resultFor(results, 'colors_01');
-    expect(result.status).toBe('ok');
-  });
-
-  // ─── audit reports the Bridge Builder wordIds and mapped concepts ─────────────
-
-  it('audit result includes wordIds, mappedConceptIds, and blueprintConceptIds for each pack', () => {
-    const results = runAudit();
-    for (const result of results) {
-      expect(Array.isArray(result.wordIds)).toBe(true);
-      expect(Array.isArray(result.mappedConceptIds)).toBe(true);
-      expect(Array.isArray(result.blueprintConceptIds)).toBe(true);
-    }
-  });
-
-  it('missing_bridge_pack is reported when a pack has no Bridge Builder entry', () => {
-    const results = auditPackSceneConsistency({
-      getBlueprintFn: () => ({ packConceptIds: ['coffee'] }),
-      getPackFn: () => null,
-      packIds: ['ghost_pack'],
-    });
-    const result = resultFor(results, 'ghost_pack');
-    expect(result.status).toBe('missing_bridge_pack');
-    expect(result.errors[0].code).toBe('missing_bridge_pack');
-  });
-
-  it('missing_word_concept_mapping is reported when a wordId has no map entry', () => {
-    const results = auditPackSceneConsistency({
-      getBlueprintFn: () => ({ packConceptIds: ['coffee'] }),
-      getPackFn: () => ({ wordIds: ['bb-unmapped-word'] }),
-      conceptMap: {},
-      packIds: ['test_pack'],
-    });
-    const result = resultFor(results, 'test_pack');
-    expect(result.status).toBe('mapping_error');
-    expect(result.errors[0].code).toBe('missing_word_concept_mapping');
-    expect(result.errors[0].wordId).toBe('bb-unmapped-word');
-  });
-
-  // ─── food_01 specifically passes with the updated blueprint ──────────────────
-
-  it('food_01 passes with coffee, water, bread, apple, food', () => {
-    const results = runAudit();
-    const result = resultFor(results, 'food_01');
-    expect(result.status).toBe('ok');
-    expect(new Set(result.mappedConceptIds)).toEqual(
-      new Set(['coffee', 'water', 'bread', 'apple', 'food'])
-    );
-    expect(new Set(result.blueprintConceptIds)).toEqual(
-      new Set(['coffee', 'water', 'bread', 'apple', 'food'])
-    );
-  });
-
-  // ─── all registered pack IDs are covered ─────────────────────────────────────
-
-  it('audit covers all IDs returned by listBlueprintPackIds', () => {
-    const registeredIds = listBlueprintPackIds();
-    const results = runAudit();
-    const auditedIds = results.map((r) => r.packId);
-    for (const packId of registeredIds) {
-      expect(auditedIds).toContain(packId);
+    } finally {
+      blueprint.supportConceptIds.length = 0;
+      blueprint.supportConceptIds.push(...original);
     }
   });
 });

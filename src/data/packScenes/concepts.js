@@ -38,6 +38,17 @@ export const CONCEPTS = {
   three: 'three',
   four: 'four',
   five: 'five',
+
+  // Shopping (transactional-choice).
+  // Polysemy note: 'how-much' is the price-inquiry reading of bb-kamah.
+  // A future quantity scene that uses bb-kamah as a counting interrogative
+  // would need a separate 'how-many' concept; do not collapse them here.
+  money: 'money',
+  store: 'store',
+  'how-much': 'how-much',
+  bag: 'bag',
+  buy: 'buy',
+  pay: 'pay',
 };
 
 export function isKnownConceptId(conceptId) {
