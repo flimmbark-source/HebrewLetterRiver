@@ -7,12 +7,8 @@ import DualRoleConversationSession from '../components/conversation/DualRoleConv
 import DualRoleConversationCardGrid from '../components/conversation/DualRoleConversationCardGrid.jsx';
 import { buildDualRoleConversationCardItems } from '../components/conversation/dualRoleConversationCardData.js';
 import PackSceneSession from '../components/packScene/PackSceneSession.jsx';
-import { bridgeBuilderPacks } from '../data/bridgeBuilderPacks.js';
+import { getCanonicalPackId, getConsolidatedPackById } from '../data/bridgeBuilderPackConsolidation.js';
 import riverBackground from '../assets/Reading/River-Background.png';
-
-function getPackById(packId) {
-  return bridgeBuilderPacks.find((pack) => pack.id === packId) || null;
-}
 
 function getContextualReadItem(pack, dualRoleItems) {
   if (!pack || !dualRoleItems.length) return null;
@@ -40,7 +36,14 @@ export default function LearnView() {
   const navigate = useNavigate();
   const mode = searchParams.get('mode');
   const contextPackId = searchParams.get('packId');
-  const contextPack = useMemo(() => contextPackId ? getPackById(contextPackId) : null, [contextPackId]);
+  const canonicalContextPackId = useMemo(
+    () => contextPackId ? getCanonicalPackId(contextPackId) : null,
+    [contextPackId]
+  );
+  const contextPack = useMemo(
+    () => canonicalContextPackId ? getConsolidatedPackById(canonicalContextPackId) : null,
+    [canonicalContextPackId]
+  );
   const [selectedScenario, setSelectedScenario] = useState(null);
   const [selectedScript, setSelectedScript] = useState(null);
 
@@ -75,10 +78,10 @@ export default function LearnView() {
     setSelectedScenario(item.scenario);
   };
 
-  if (mode === 'pack_scene' && contextPackId) {
+  if (mode === 'pack_scene' && canonicalContextPackId) {
     return (
       <PackSceneSession
-        packId={contextPackId}
+        packId={canonicalContextPackId}
         onExit={() => navigate('/bridge')}
       />
     );
