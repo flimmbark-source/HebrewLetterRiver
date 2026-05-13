@@ -4,6 +4,7 @@ import SpotPackWords from './SpotPackWords.jsx';
 import PackSceneBuildLine from './PackSceneBuildLine.jsx';
 import PackSceneNotAvailable from './PackSceneNotAvailable.jsx';
 import PackSceneDevError from './PackSceneDevError.jsx';
+import VisualCue from './VisualCue.jsx';
 import { resolvePackScene } from '../../data/packScenes/resolver/resolvePackScene.js';
 import { markPackSceneComplete } from '../../lib/bridgeBuilderStorage.js';
 
@@ -12,26 +13,6 @@ const SPEAKER_LABEL_KEYS = {
   friend: { key: 'packScene.speaker.friend', fallback: 'Friend:' },
   player: { key: 'packScene.speaker.player', fallback: 'You:' },
 };
-
-const COLOR_CIRCLE_STYLES = {
-  red: '#d94b3d',
-  blue: '#3275d1',
-  green: '#2f9d62',
-  yellow: '#f0c84b',
-};
-
-function VisualCue({ visualCue }) {
-  if (!visualCue || visualCue.type !== 'colorCircle') return null;
-  const fill = COLOR_CIRCLE_STYLES[visualCue.colorConceptId] || '#9ca3af';
-  return (
-    <div className="my-4 flex justify-center" aria-hidden="true">
-      <div
-        className="h-24 w-24 rounded-full border-[6px] border-white shadow-xl ring-1 ring-black/10"
-        style={{ backgroundColor: fill }}
-      />
-    </div>
-  );
-}
 
 function DialogueCue({ line, cueLabel, direction }) {
   if (!line) return null;
