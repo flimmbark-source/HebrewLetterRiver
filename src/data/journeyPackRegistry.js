@@ -1,4 +1,7 @@
-import { bridgeBuilderPacks } from './bridgeBuilderPacks.js';
+import {
+  bridgeBuilderPacks,
+  getCanonicalPackId,
+} from './bridgeBuilderPackConsolidation.js';
 import { languagePacks } from './languages/index.js';
 import { getBridgeBuilderWordsSync } from './bridgeBuilder/words/index.js';
 import { bridgeBuilderWords } from './bridgeBuilderWords.js';
@@ -14,7 +17,10 @@ export const JOURNEY_PACKS = [
 ];
 
 const PACK_BY_ID = Object.fromEntries(
-  bridgeBuilderPacks.map((pack) => [pack.id, pack])
+  bridgeBuilderPacks.flatMap((pack) => [
+    [pack.id, pack],
+    ...(pack.mergedPackIds || []).map((mergedId) => [mergedId, pack]),
+  ])
 );
 
 export function canonicalLanguageId(input) {
@@ -48,7 +54,7 @@ function getEquivalentWordId(wordId, targetPool) {
 }
 
 export function getPackWordIds(practiceLanguage, packId) {
-  const pack = PACK_BY_ID[packId];
+  const pack = PACK_BY_ID[getCanonicalPackId(packId)] || PACK_BY_ID[packId];
   if (!pack?.wordIds?.length) return [];
 
   const pool = getWordPool(practiceLanguage);
