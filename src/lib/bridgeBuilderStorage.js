@@ -15,6 +15,7 @@
  */
 
 import { loadState, saveState } from './storage.js';
+import { getCanonicalPackId, getPackIdFamily } from '../data/bridgeBuilderPackConsolidation.js';
 
 const STORAGE_KEY = 'bridgeBuilderProgress';
 
@@ -43,6 +44,50 @@ function createDefaultProgress(wordId) {
     quizKnown: false,
     quizKnownAt: null,
   };
+}
+
+function createDefaultCompletion() {
+  return {
+    bridgeBuilderComplete: false,
+    loosePlanksComplete: false,
+    deepScriptComplete: false,
+  };
+}
+
+function mergeCompletionEntries(entries = []) {
+  const merged = createDefaultCompletion();
+  for (const entry of entries) {
+    if (!entry) continue;
+    merged.bridgeBuilderComplete = merged.bridgeBuilderComplete || Boolean(entry.bridgeBuilderComplete);
+    merged.loosePlanksComplete = merged.loosePlanksComplete || Boolean(entry.loosePlanksComplete);
+    merged.deepScriptComplete = merged.deepScriptComplete || Boolean(entry.deepScriptComplete);
+    merged.quizMastered = merged.quizMastered || Boolean(entry.quizMastered);
+    merged.sentenceReady = merged.sentenceReady || Boolean(entry.sentenceReady);
+    merged.packSceneComplete = merged.packSceneComplete || Boolean(entry.packSceneComplete);
+
+    if (!merged.sentenceReadyAt && entry.sentenceReadyAt) merged.sentenceReadyAt = entry.sentenceReadyAt;
+    if (!merged.packSceneCompletedAt && entry.packSceneCompletedAt) {
+      merged.packSceneCompletedAt = entry.packSceneCompletedAt;
+    }
+    if (!merged.packSceneResults && entry.packSceneResults) {
+      merged.packSceneResults = entry.packSceneResults;
+    }
+  }
+  return merged;
+}
+
+function readMergedCompletion(all, packId) {
+  const family = getPackIdFamily(packId);
+  return mergeCompletionEntries(family.map((id) => all[id]));
+}
+
+function writeCompletionForPack(packId, updater) {
+  const canonicalId = getCanonicalPackId(packId);
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  const entry = all[canonicalId] || readMergedCompletion(all, canonicalId);
+  updater(entry);
+  all[canonicalId] = entry;
+  saveState(PACK_COMPLETION_KEY, all);
 }
 
 /**
@@ -271,7 +316,7 @@ const PACK_COMPLETION_KEY = 'bridgeBuilderPackCompletion';
  */
 export function getPackCompletion(packId) {
   const all = loadState(PACK_COMPLETION_KEY, {});
-  return all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
+  return readMergedCompletion(all, packId);
 }
 
 /**
@@ -279,40 +324,45 @@ export function getPackCompletion(packId) {
  * @returns {{ [packId: string]: { bridgeBuilderComplete: boolean, loosePlanksComplete: boolean } }}
  */
 export function getAllPackCompletions() {
-  return loadState(PACK_COMPLETION_KEY, {});
+  const all = loadState(PACK_COMPLETION_KEY, {});
+  const merged = { ...all };
+
+  for (const packId of Object.keys(all)) {
+    const canonicalId = getCanonicalPackId(packId);
+    merged[canonicalId] = mergeCompletionEntries([
+      merged[canonicalId],
+      readMergedCompletion(all, canonicalId),
+    ]);
+  }
+
+  return merged;
 }
 
 /**
  * Mark a pack's Bridge Builder pass as complete.
  */
 export function markBridgeBuilderComplete(packId) {
-  const all = loadState(PACK_COMPLETION_KEY, {});
-  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
-  entry.bridgeBuilderComplete = true;
-  all[packId] = entry;
-  saveState(PACK_COMPLETION_KEY, all);
+  writeCompletionForPack(packId, (entry) => {
+    entry.bridgeBuilderComplete = true;
+  });
 }
 
 /**
  * Mark a pack's Loose Planks pass as complete.
  */
 export function markLoosePlanksComplete(packId) {
-  const all = loadState(PACK_COMPLETION_KEY, {});
-  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
-  entry.loosePlanksComplete = true;
-  all[packId] = entry;
-  saveState(PACK_COMPLETION_KEY, all);
+  writeCompletionForPack(packId, (entry) => {
+    entry.loosePlanksComplete = true;
+  });
 }
 
 /**
  * Mark a pack's Deep Script run as complete.
  */
 export function markDeepScriptComplete(packId) {
-  const all = loadState(PACK_COMPLETION_KEY, {});
-  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
-  entry.deepScriptComplete = true;
-  all[packId] = entry;
-  saveState(PACK_COMPLETION_KEY, all);
+  writeCompletionForPack(packId, (entry) => {
+    entry.deepScriptComplete = true;
+  });
 }
 
 /**
@@ -349,14 +399,12 @@ export function markWordQuizKnown(wordId) {
  * of the pack's words are quiz-known to support sentence scaffolding.
  */
 export function setPackSentenceReady(packId) {
-  const all = loadState(PACK_COMPLETION_KEY, {});
-  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
-  if (!entry.sentenceReady) {
-    entry.sentenceReady = true;
-    entry.sentenceReadyAt = new Date().toISOString();
-    all[packId] = entry;
-    saveState(PACK_COMPLETION_KEY, all);
-  }
+  writeCompletionForPack(packId, (entry) => {
+    if (!entry.sentenceReady) {
+      entry.sentenceReady = true;
+      entry.sentenceReadyAt = new Date().toISOString();
+    }
+  });
 }
 
 /**
@@ -397,13 +445,11 @@ export function markWordsQuizIntroduced(wordIds) {
  * @param {{ sceneId: string, conceptResults: Object }} result
  */
 export function markPackSceneComplete(packId, result = {}) {
-  const all = loadState(PACK_COMPLETION_KEY, {});
-  const entry = all[packId] || { bridgeBuilderComplete: false, loosePlanksComplete: false, deepScriptComplete: false };
-  entry.packSceneComplete = true;
-  entry.packSceneCompletedAt = new Date().toISOString();
-  entry.packSceneResults = result;
-  all[packId] = entry;
-  saveState(PACK_COMPLETION_KEY, all);
+  writeCompletionForPack(packId, (entry) => {
+    entry.packSceneComplete = true;
+    entry.packSceneCompletedAt = new Date().toISOString();
+    entry.packSceneResults = result;
+  });
 }
 
 /**
@@ -413,12 +459,11 @@ export function markPackSceneComplete(packId, result = {}) {
  * @returns {{ packSceneComplete: boolean, packSceneCompletedAt: string|null, packSceneResults: Object|null }}
  */
 export function getPackSceneCompletion(packId) {
-  const all = loadState(PACK_COMPLETION_KEY, {});
-  const entry = all[packId] || {};
+  const completion = getPackCompletion(packId);
   return {
-    packSceneComplete: entry.packSceneComplete || false,
-    packSceneCompletedAt: entry.packSceneCompletedAt || null,
-    packSceneResults: entry.packSceneResults || null,
+    packSceneComplete: completion.packSceneComplete || false,
+    packSceneCompletedAt: completion.packSceneCompletedAt || null,
+    packSceneResults: completion.packSceneResults || null,
   };
 }
 
