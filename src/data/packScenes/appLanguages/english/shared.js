@@ -29,5 +29,11 @@ export const englishShared = {
     three: 'three',
     four: 'four',
     five: 'five',
+    money: 'money',
+    store: 'store',
+    'how-much': 'how much',
+    bag: 'bag',
+    buy: 'buy',
+    pay: 'pay',
   },
 };
