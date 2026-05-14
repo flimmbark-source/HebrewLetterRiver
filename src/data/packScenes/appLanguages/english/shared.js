@@ -10,6 +10,10 @@ export const englishShared = {
   briefExit: 'Back',
   recapFinish: 'Continue',
   conceptDisplayNames: {
+    hello: 'hello',
+    'good-morning': 'good morning',
+    'good-night': 'good night',
+    'you-are-welcome': "you're welcome",
     coffee: 'coffee',
     water: 'water',
     bread: 'bread',

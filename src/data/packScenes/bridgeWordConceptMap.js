@@ -13,6 +13,13 @@
 //   and a per-pack mapping override.
 
 export const bridgeWordConceptMap = {
+  greetings_01: {
+    'bb-shalom': 'hello',
+    'bb-todah': 'thank-you',
+    'bb-boker-tov': 'good-morning',
+    'bb-layla-tov': 'good-night',
+    'bb-bevakasha': 'you-are-welcome',
+  },
   food_01: {
     'bb-cafe': 'coffee',
     'bb-mayim': 'water',

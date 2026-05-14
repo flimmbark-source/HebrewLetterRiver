@@ -109,6 +109,54 @@ function ObjectGlyphCue({ objectConceptId }) {
   );
 }
 
+// ─── Day Part Cue ─────────────────────────────────────────────────────────────
+// morning → sun with 8 rays; night → right-facing crescent moon with 3 stars.
+// No text, no labels. Pure silhouette SVGs in the shared fill/stroke palette.
+
+const DAY_PART_SVG = {
+  morning: (
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="32" cy="32" r="12" fill={FILL} stroke={STROKE} strokeWidth={SW} />
+      <line x1="32" y1="10" x2="32" y2="18" stroke={STROKE} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="32" y1="46" x2="32" y2="54" stroke={STROKE} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="10" y1="32" x2="18" y2="32" stroke={STROKE} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="46" y1="32" x2="54" y2="32" stroke={STROKE} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="22" y1="22" x2="16" y2="16" stroke={STROKE} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="42" y1="22" x2="48" y2="16" stroke={STROKE} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="22" y1="42" x2="16" y2="48" stroke={STROKE} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="42" y1="42" x2="48" y2="48" stroke={STROKE} strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  ),
+  night: (
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path
+        d="M 32 12 C 52 12 60 20 60 32 C 60 44 52 52 32 52 C 42 48 48 40 48 32 C 48 24 42 16 32 12 Z"
+        fill={FILL}
+        stroke={STROKE}
+        strokeWidth={SW}
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="16" r="2.5" fill={FILL} stroke={STROKE} strokeWidth="1.5" />
+      <circle cx="8" cy="30" r="2" fill={FILL} stroke={STROKE} strokeWidth="1.5" />
+      <circle cx="16" cy="44" r="2" fill={FILL} stroke={STROKE} strokeWidth="1.5" />
+    </svg>
+  ),
+};
+
+function DayPartCue({ dayPart }) {
+  const glyph = DAY_PART_SVG[dayPart] ?? DAY_PART_SVG.morning;
+  return (
+    <div
+      className="my-4 flex justify-center"
+      aria-hidden="true"
+      data-visual-cue="dayPart"
+      data-day-part={dayPart}
+    >
+      <div className="h-24 w-24">{glyph}</div>
+    </div>
+  );
+}
+
 export default function VisualCue({ visualCue }) {
   if (!visualCue) return null;
   if (visualCue.type === 'colorCircle') {
@@ -119,6 +167,9 @@ export default function VisualCue({ visualCue }) {
   }
   if (visualCue.type === 'objectGlyph') {
     return <ObjectGlyphCue objectConceptId={visualCue.objectConceptId} />;
+  }
+  if (visualCue.type === 'dayPart') {
+    return <DayPartCue dayPart={visualCue.dayPart} />;
   }
   return null;
 }

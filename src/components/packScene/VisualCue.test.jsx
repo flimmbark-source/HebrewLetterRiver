@@ -111,4 +111,47 @@ describe('VisualCue', () => {
     // An SVG is still rendered (the thing fallback)
     expect(container.querySelector('svg')).not.toBeNull();
   });
+
+  it('renders a dayPart wrapper with data-visual-cue="dayPart"', () => {
+    render(<VisualCue visualCue={{ type: 'dayPart', dayPart: 'morning' }} />);
+    const el = container.querySelector('[data-visual-cue="dayPart"]');
+    expect(el).not.toBeNull();
+  });
+
+  it('dayPart carries data-day-part matching the dayPart value', () => {
+    for (const dp of ['morning', 'night']) {
+      render(<VisualCue visualCue={{ type: 'dayPart', dayPart: dp }} />);
+      const el = container.querySelector('[data-visual-cue="dayPart"]');
+      expect(el.getAttribute('data-day-part')).toBe(dp);
+    }
+  });
+
+  it('dayPart renders an SVG element', () => {
+    render(<VisualCue visualCue={{ type: 'dayPart', dayPart: 'night' }} />);
+    const svg = container.querySelector('svg');
+    expect(svg).not.toBeNull();
+  });
+
+  it('dayPart renders no text content (no language leakage)', () => {
+    for (const dp of ['morning', 'night']) {
+      render(<VisualCue visualCue={{ type: 'dayPart', dayPart: dp }} />);
+      expect((container.textContent || '').trim()).toBe('');
+    }
+  });
+
+  it('dayPart morning and night produce visually distinct SVG markup', () => {
+    render(<VisualCue visualCue={{ type: 'dayPart', dayPart: 'morning' }} />);
+    const morningSvg = container.innerHTML;
+    render(<VisualCue visualCue={{ type: 'dayPart', dayPart: 'night' }} />);
+    const nightSvg = container.innerHTML;
+    expect(morningSvg).not.toBe(nightSvg);
+  });
+
+  it('dayPart falls back gracefully for an unregistered dayPart value', () => {
+    render(<VisualCue visualCue={{ type: 'dayPart', dayPart: 'afternoon' }} />);
+    const el = container.querySelector('[data-visual-cue="dayPart"]');
+    expect(el).not.toBeNull();
+    expect(el.getAttribute('data-day-part')).toBe('afternoon');
+    expect(container.querySelector('svg')).not.toBeNull();
+  });
 });

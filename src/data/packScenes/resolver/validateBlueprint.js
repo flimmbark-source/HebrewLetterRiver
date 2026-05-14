@@ -29,6 +29,10 @@ const REQUIRED_TOP_LEVEL_FIELDS = [
   'supportConceptIds',
 ];
 
+// Fields that are required to be present but may legitimately be empty arrays.
+// e.g. supportConceptIds: [] is valid for scenes that need no borrowed support vocabulary.
+const FIELDS_ALLOWING_EMPTY_ARRAY = new Set(['supportConceptIds']);
+
 function pushError(errors, code, message, beatId) {
   const out = { code, message };
   if (beatId) out.beatId = beatId;
@@ -185,7 +189,7 @@ export function validateBlueprint(blueprint) {
       pushError(errors, 'missing_field', `Blueprint is missing required field: ${field}`);
       continue;
     }
-    if (Array.isArray(value) && value.length === 0) {
+    if (Array.isArray(value) && value.length === 0 && !FIELDS_ALLOWING_EMPTY_ARRAY.has(field)) {
       pushError(errors, 'empty_field', `Blueprint field ${field} cannot be empty`);
     }
   }

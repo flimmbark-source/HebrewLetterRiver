@@ -11,7 +11,7 @@
 //
 // New cue types must be added here AND validated by archetype rules.
 
-export const SUPPORTED_VISUAL_CUE_TYPES = new Set(['colorCircle', 'countDots', 'objectGlyph']);
+export const SUPPORTED_VISUAL_CUE_TYPES = new Set(['colorCircle', 'countDots', 'objectGlyph', 'dayPart']);
 
 export const COUNT_DOTS_CONCEPT_BY_COUNT = {
   1: 'one',
@@ -22,6 +22,15 @@ export const COUNT_DOTS_CONCEPT_BY_COUNT = {
 };
 
 export const COUNT_DOTS_MAX = 5;
+
+// dayPart values and their corresponding pack concept IDs.
+// Used by both the renderer (VisualCue.jsx) and the validator (validationRules.js).
+export const SUPPORTED_DAY_PARTS = new Set(['morning', 'night']);
+
+export const DAY_PART_CONCEPT_MAP = {
+  morning: 'good-morning',
+  night: 'good-night',
+};
 
 // Concept IDs that have a registered objectGlyph renderer.
 // Any objectGlyph beat must use one of these IDs.
