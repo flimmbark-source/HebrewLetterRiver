@@ -7,10 +7,11 @@
 // Supported types so far:
 //   colorCircle  — a solid color swatch; correctness = colorConceptId
 //   countDots    — N dots (1..COUNT_DOTS_MAX); correctness = the matching number concept
+//   objectGlyph  — a simple icon for a concrete object; correctness = objectConceptId
 //
 // New cue types must be added here AND validated by archetype rules.
 
-export const SUPPORTED_VISUAL_CUE_TYPES = new Set(['colorCircle', 'countDots']);
+export const SUPPORTED_VISUAL_CUE_TYPES = new Set(['colorCircle', 'countDots', 'objectGlyph']);
 
 export const COUNT_DOTS_CONCEPT_BY_COUNT = {
   1: 'one',

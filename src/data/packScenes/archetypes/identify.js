@@ -128,6 +128,29 @@ export const identifyArchetype = {
           }
         }
 
+        if (cue.type === 'objectGlyph') {
+          if (!cue.objectConceptId || typeof cue.objectConceptId !== 'string') {
+            errors.push(
+              err(
+                'invalid_object_glyph_cue',
+                'objectGlyph visualCue must include objectConceptId',
+                beat.id
+              )
+            );
+            continue;
+          }
+          const targets = beat.targetConceptIds || [];
+          if (!targets.includes(cue.objectConceptId)) {
+            errors.push(
+              err(
+                'visual_cue_concept_mismatch',
+                `objectGlyph.objectConceptId '${cue.objectConceptId}' must appear in beat.targetConceptIds`,
+                beat.id
+              )
+            );
+          }
+        }
+
         if (cue.type === 'countDots') {
           if (!Number.isInteger(cue.count)) {
             errors.push(

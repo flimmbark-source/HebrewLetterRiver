@@ -39,6 +39,13 @@ export const CONCEPTS = {
   four: 'four',
   five: 'five',
 
+  // Everyday objects (grounded-identification via objectGlyph).
+  book: 'book',
+  phone: 'phone',
+  table: 'table',
+  door: 'door',
+  thing: 'thing',
+
   // Shopping (transactional-choice).
   // Polysemy note: 'how-much' is the price-inquiry reading of bb-kamah.
   // A future quantity scene that uses bb-kamah as a counting interrogative

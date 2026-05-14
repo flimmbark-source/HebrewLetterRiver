@@ -33,6 +33,13 @@ export const bridgeWordConceptMap = {
     'bb-arba': 'four',
     'bb-chamesh': 'five',
   },
+  everyday_objects_01: {
+    'bb-sefer': 'book',
+    'bb-telefon': 'phone',
+    'bb-shulchan': 'table',
+    'bb-delet': 'door',
+    'bbct-thing': 'thing',
+  },
   shopping_01: {
     'bb-kesef': 'money',
     'bb-chanut': 'store',
