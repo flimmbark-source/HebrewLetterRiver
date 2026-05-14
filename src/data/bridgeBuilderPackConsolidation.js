@@ -44,7 +44,7 @@ const CONSOLIDATED_COPY = {
   },
   adjectives_01: {
     title: 'Adjectives',
-    description: 'Good, bad, big, small, beautiful, strange, and other describing words',
+    description: 'Good, beautiful, great, bad, wonderful, ugly, strange, and other quality-describing words',
   },
   everyday_objects_01: {
     title: 'Everyday Objects',
