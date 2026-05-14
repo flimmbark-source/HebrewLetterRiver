@@ -23,6 +23,7 @@
 import {
   COUNT_DOTS_CONCEPT_BY_COUNT,
   COUNT_DOTS_MAX,
+  SUPPORTED_OBJECT_GLYPH_CONCEPT_IDS,
   SUPPORTED_VISUAL_CUE_TYPES,
 } from '../visualCueConstants.js';
 
@@ -134,6 +135,17 @@ export const identifyArchetype = {
               err(
                 'invalid_object_glyph_cue',
                 'objectGlyph visualCue must include objectConceptId',
+                beat.id
+              )
+            );
+            continue;
+          }
+          if (!SUPPORTED_OBJECT_GLYPH_CONCEPT_IDS.has(cue.objectConceptId)) {
+            errors.push(
+              err(
+                'unsupported_object_glyph_concept',
+                `objectGlyph.objectConceptId '${cue.objectConceptId}' is not a supported object glyph ID; ` +
+                  `must be one of: ${[...SUPPORTED_OBJECT_GLYPH_CONCEPT_IDS].join(', ')}`,
                 beat.id
               )
             );

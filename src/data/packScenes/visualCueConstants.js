@@ -22,3 +22,13 @@ export const COUNT_DOTS_CONCEPT_BY_COUNT = {
 };
 
 export const COUNT_DOTS_MAX = 5;
+
+// Concept IDs that have a registered objectGlyph renderer.
+// Any objectGlyph beat must use one of these IDs.
+export const SUPPORTED_OBJECT_GLYPH_CONCEPT_IDS = new Set([
+  'book',
+  'phone',
+  'table',
+  'door',
+  'thing',
+]);

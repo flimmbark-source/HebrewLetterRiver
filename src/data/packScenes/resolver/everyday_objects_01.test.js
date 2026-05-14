@@ -118,6 +118,28 @@ describe('everyday_objects_01 objectGlyph validation rules', () => {
     expect(result.errors.some((e) => e.code === 'invalid_object_glyph_cue')).toBe(true);
   });
 
+  it('fails when objectGlyph.objectConceptId is not a supported object glyph ID', () => {
+    // 'red' is a registered concept but is not in SUPPORTED_OBJECT_GLYPH_CONCEPT_IDS
+    const bad = {
+      ...everyday_objects_01Blueprint,
+      packConceptIds: ['red'],
+      beats: [
+        {
+          id: 'identify_red',
+          role: 'choose_or_build_response',
+          actionType: 'chooseReply',
+          cueLineId: 'friend_what_is_this',
+          visualCue: { type: 'objectGlyph', objectConceptId: 'red' },
+          targetConceptIds: ['red'],
+          options: [{ id: 'correct', lineId: 'player_red', isCorrect: true }],
+        },
+      ],
+    };
+    const result = validateBlueprint(bad);
+    expect(result.status).toBe('invalid_blueprint');
+    expect(result.errors.some((e) => e.code === 'unsupported_object_glyph_concept')).toBe(true);
+  });
+
   it('fails when objectGlyph.objectConceptId is not in beat.targetConceptIds', () => {
     const bad = {
       ...everyday_objects_01Blueprint,
@@ -136,6 +158,26 @@ describe('everyday_objects_01 objectGlyph validation rules', () => {
     const result = validateBlueprint(bad);
     expect(result.status).toBe('invalid_blueprint');
     expect(result.errors.some((e) => e.code === 'visual_cue_concept_mismatch')).toBe(true);
+  });
+
+  it('validates when objectGlyph is well-formed', () => {
+    const good = {
+      ...everyday_objects_01Blueprint,
+      packConceptIds: ['book'],
+      beats: [
+        {
+          id: 'identify_book',
+          role: 'choose_or_build_response',
+          actionType: 'chooseReply',
+          cueLineId: 'friend_what_is_this',
+          visualCue: { type: 'objectGlyph', objectConceptId: 'book' },
+          targetConceptIds: ['book'],
+          options: [{ id: 'correct', lineId: 'player_book', isCorrect: true }],
+        },
+      ],
+    };
+    const result = validateBlueprint(good);
+    expect(result.status).toBe('ok');
   });
 });
 

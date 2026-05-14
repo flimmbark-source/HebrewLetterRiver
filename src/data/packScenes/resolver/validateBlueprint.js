@@ -54,6 +54,7 @@ function collectReferencedConceptIds(blueprint) {
     if (beat.visualCue) {
       if (beat.visualCue.colorConceptId) push(beat.visualCue.colorConceptId, `${where}.visualCue.colorConceptId`);
       if (beat.visualCue.conceptId) push(beat.visualCue.conceptId, `${where}.visualCue.conceptId`);
+      if (beat.visualCue.objectConceptId) push(beat.visualCue.objectConceptId, `${where}.visualCue.objectConceptId`);
     }
     for (const set of beat.acceptedConceptSets || []) {
       if (Array.isArray(set)) {
