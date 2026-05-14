@@ -15,7 +15,10 @@ export const PACK_MERGES = {
   pronouns_01: ['pronouns_02'],
   family_01: ['family_02'],
   food_01: ['food_02'],
-  adjectives_01: ['adjectives_02', 'adjectives_03'],
+  // The old physical_descriptions_01 source pack exists only as a staging pack
+  // from the Foundations Pack Scene planning pass. Fold it into adjectives_01
+  // so the learner sees a single clean beginner adjective pack: big/small/tall/short.
+  adjectives_01: ['physical_descriptions_01'],
   everyday_objects_01: ['everyday_objects_02'],
   time_days_01: ['time_days_02', 'time_days_03'],
   weather_01: ['weather_02'],
@@ -44,7 +47,7 @@ const CONSOLIDATED_COPY = {
   },
   adjectives_01: {
     title: 'Adjectives',
-    description: 'Good, beautiful, great, bad, wonderful, ugly, strange, and other quality-describing words',
+    description: 'Big, small, tall, and short',
   },
   everyday_objects_01: {
     title: 'Everyday Objects',
@@ -89,6 +92,32 @@ const CONSOLIDATED_COPY = {
   quantity_words_01: {
     title: 'Quantity & Reference Words',
     description: 'Many, few, all, every, something, nothing, and everything',
+  },
+};
+
+// Some source packs were split for Pack Scene integrity rather than duplicate cleanup.
+// These overrides keep all original adjective/describing word IDs assigned to active
+// packs while allowing adjectives_01 to be the clean comparison-cue pack.
+const RUNTIME_PACK_OVERRIDES = {
+  adjectives_01: {
+    title: 'Adjectives',
+    description: 'Big, small, tall, and short',
+    wordIds: ['bb-gadol', 'bb-katan', 'bb-gavoha', 'bb-namuch'],
+  },
+  adjectives_02: {
+    title: 'Evaluation Adjectives',
+    description: 'Good, beautiful, great, nice, bad, terrible, and wonderful',
+    wordIds: ['bb-tov', 'bb-yafe', 'bbct-great', 'bbct-nice', 'bbct-bad', 'bbct-terrible', 'bbct-wonderful'],
+  },
+  adjectives_03: {
+    title: 'Appearance & Strange',
+    description: 'Ugly and strange',
+    wordIds: ['bbct-ugly', 'bbct-strange'],
+  },
+  describing_people_01: {
+    title: 'Describing People',
+    description: 'Young and old',
+    wordIds: ['bb-tsair', 'bb-zaken'],
   },
 };
 
@@ -171,6 +200,26 @@ function getPackLookup(packs) {
   return new Map(packs.map((pack) => [pack.id, pack]));
 }
 
+function applyRuntimePackOverrides(byId, removedPackIds) {
+  for (const [packId, override] of Object.entries(RUNTIME_PACK_OVERRIDES)) {
+    if (removedPackIds.has(packId)) continue;
+    const pack = byId.get(packId);
+    if (!pack) continue;
+
+    if (override.title) pack.title = override.title;
+    if (override.description) pack.description = override.description;
+    if (Array.isArray(override.wordIds)) {
+      pack.wordIds = uniqueWordIdsByConcept(override.wordIds);
+    }
+    if (Array.isArray(override.supportWordIds)) {
+      pack.supportWordIds = uniqueWordIdsByConcept(override.supportWordIds);
+    }
+
+    pack.targetsNewCount = pack.wordIds.length;
+    pack.supportReviewCount = Array.isArray(pack.supportWordIds) ? pack.supportWordIds.length : 0;
+  }
+}
+
 export function getCanonicalPackId(packId) {
   return MERGED_TO_CANONICAL[packId] || packId;
 }
@@ -227,6 +276,8 @@ export function applyJourneyPackConsolidation() {
       removedPackIds.add(mergedId);
     }
   }
+
+  applyRuntimePackOverrides(byId, removedPackIds);
 
   for (const pack of sourceBridgeBuilderPacks) {
     if (pack.unlockAfter && MERGED_TO_CANONICAL[pack.unlockAfter]) {
