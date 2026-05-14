@@ -13,6 +13,13 @@
 //   and a per-pack mapping override.
 
 export const bridgeWordConceptMap = {
+  greetings_01: {
+    'bb-shalom': 'hello',
+    'bb-todah': 'thank-you',
+    'bb-boker-tov': 'good-morning',
+    'bb-layla-tov': 'good-night',
+    'bb-bevakasha': 'you-are-welcome',
+  },
   food_01: {
     'bb-cafe': 'coffee',
     'bb-mayim': 'water',
@@ -32,6 +39,13 @@ export const bridgeWordConceptMap = {
     'bb-shalosh': 'three',
     'bb-arba': 'four',
     'bb-chamesh': 'five',
+  },
+  everyday_objects_01: {
+    'bb-sefer': 'book',
+    'bb-telefon': 'phone',
+    'bb-shulchan': 'table',
+    'bb-delet': 'door',
+    'bbct-thing': 'thing',
   },
   shopping_01: {
     'bb-kesef': 'money',

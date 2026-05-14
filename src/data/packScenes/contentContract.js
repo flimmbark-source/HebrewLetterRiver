@@ -27,6 +27,7 @@ export const KNOWN_CORRECTNESS_SOURCES = new Set([
   'visualCue',
   'textCue',
   'social-protocol',
+  'mixed',
 ]);
 
 export const KNOWN_ANSWER_POLICIES = new Set([

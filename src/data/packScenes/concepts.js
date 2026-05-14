@@ -39,6 +39,22 @@ export const CONCEPTS = {
   four: 'four',
   five: 'five',
 
+  // Everyday objects (grounded-identification via objectGlyph).
+  book: 'book',
+  phone: 'phone',
+  table: 'table',
+  door: 'door',
+  thing: 'thing',
+
+  // Greetings and courtesy (social-exchange).
+  // Polysemy notes:
+  //   bb-shalom → 'hello' in greetings_01 (the peace/goodbye readings are not taught here).
+  //   bb-bevakasha → 'you-are-welcome' in greetings_01 (the 'please' reading lives in food/shopping).
+  hello: 'hello',
+  'good-morning': 'good-morning',
+  'good-night': 'good-night',
+  'you-are-welcome': 'you-are-welcome',
+
   // Shopping (transactional-choice).
   // Polysemy note: 'how-much' is the price-inquiry reading of bb-kamah.
   // A future quantity scene that uses bb-kamah as a counting interrogative

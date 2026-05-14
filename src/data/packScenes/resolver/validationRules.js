@@ -1,7 +1,20 @@
 // Universal beat validation rules. These run regardless of archetype.
 //
-// Each rule receives (beat, context) and returns either null (ok) or an
-// error object { code, beatId, message }. The rules are pure and synchronous.
+// Each rule receives (beat) and returns either:
+//   null                     — no error
+//   { code, beatId, message }  — a single error
+//   Array<{ code, beatId, message }> — multiple errors (visual cue rules)
+//
+// Rules are pure and synchronous.
+
+import {
+  SUPPORTED_VISUAL_CUE_TYPES,
+  SUPPORTED_OBJECT_GLYPH_CONCEPT_IDS,
+  SUPPORTED_DAY_PARTS,
+  DAY_PART_CONCEPT_MAP,
+  COUNT_DOTS_CONCEPT_BY_COUNT,
+  COUNT_DOTS_MAX,
+} from '../visualCueConstants.js';
 
 const ACTION_TYPES = new Set(['spotPackWords', 'meaningChoice', 'buildLine', 'chooseReply']);
 
@@ -129,13 +142,151 @@ const universalRules = [
     }
     return null;
   },
+
+  // Visual cue validation — applies to all archetypes.
+  // Returns an array of errors (may be empty or have multiple items).
+  function visualCueIsWellFormed(beat) {
+    const cue = beat.visualCue;
+    if (!cue) return null;
+
+    const errors = [];
+
+    if (!cue.type || !SUPPORTED_VISUAL_CUE_TYPES.has(cue.type)) {
+      errors.push(
+        err(
+          'unsupported_visual_cue_type',
+          beat.id,
+          `visualCue.type must be one of: ${[...SUPPORTED_VISUAL_CUE_TYPES].join(', ')}`
+        )
+      );
+      return errors;
+    }
+
+    if (cue.type === 'colorCircle') {
+      if (!cue.colorConceptId || typeof cue.colorConceptId !== 'string') {
+        errors.push(
+          err('invalid_color_circle_cue', beat.id, 'colorCircle visualCue must include colorConceptId')
+        );
+        return errors;
+      }
+      const targets = beat.targetConceptIds || [];
+      if (!targets.includes(cue.colorConceptId)) {
+        errors.push(
+          err(
+            'visual_cue_concept_mismatch',
+            beat.id,
+            `colorCircle.colorConceptId '${cue.colorConceptId}' must appear in beat.targetConceptIds`
+          )
+        );
+      }
+    }
+
+    if (cue.type === 'objectGlyph') {
+      if (!cue.objectConceptId || typeof cue.objectConceptId !== 'string') {
+        errors.push(
+          err('invalid_object_glyph_cue', beat.id, 'objectGlyph visualCue must include objectConceptId')
+        );
+        return errors;
+      }
+      if (!SUPPORTED_OBJECT_GLYPH_CONCEPT_IDS.has(cue.objectConceptId)) {
+        errors.push(
+          err(
+            'unsupported_object_glyph_concept',
+            beat.id,
+            `objectGlyph.objectConceptId '${cue.objectConceptId}' is not a supported object glyph ID; ` +
+              `must be one of: ${[...SUPPORTED_OBJECT_GLYPH_CONCEPT_IDS].join(', ')}`
+          )
+        );
+        return errors;
+      }
+      const targets = beat.targetConceptIds || [];
+      if (!targets.includes(cue.objectConceptId)) {
+        errors.push(
+          err(
+            'visual_cue_concept_mismatch',
+            beat.id,
+            `objectGlyph.objectConceptId '${cue.objectConceptId}' must appear in beat.targetConceptIds`
+          )
+        );
+      }
+    }
+
+    if (cue.type === 'countDots') {
+      if (!Number.isInteger(cue.count)) {
+        errors.push(err('invalid_count_dots_cue', beat.id, 'countDots visualCue must have an integer count'));
+        return errors;
+      }
+      if (cue.count < 1 || cue.count > COUNT_DOTS_MAX) {
+        errors.push(
+          err(
+            'invalid_count_dots_cue',
+            beat.id,
+            `countDots.count must be between 1 and ${COUNT_DOTS_MAX} (got ${cue.count})`
+          )
+        );
+        return errors;
+      }
+      const expectedConcept = COUNT_DOTS_CONCEPT_BY_COUNT[cue.count];
+      if (!cue.conceptId || cue.conceptId !== expectedConcept) {
+        errors.push(
+          err(
+            'visual_cue_concept_mismatch',
+            beat.id,
+            `countDots.conceptId must equal '${expectedConcept}' for count ${cue.count}`
+          )
+        );
+        return errors;
+      }
+      const targets = beat.targetConceptIds || [];
+      if (!targets.includes(cue.conceptId)) {
+        errors.push(
+          err(
+            'visual_cue_concept_mismatch',
+            beat.id,
+            `countDots.conceptId '${cue.conceptId}' must appear in beat.targetConceptIds`
+          )
+        );
+      }
+    }
+
+    if (cue.type === 'dayPart') {
+      if (!cue.dayPart || !SUPPORTED_DAY_PARTS.has(cue.dayPart)) {
+        errors.push(
+          err(
+            'invalid_day_part_cue',
+            beat.id,
+            `dayPart visualCue must include a valid dayPart; must be one of: ${[...SUPPORTED_DAY_PARTS].join(', ')}`
+          )
+        );
+        return errors;
+      }
+      const expectedConcept = DAY_PART_CONCEPT_MAP[cue.dayPart];
+      const targets = beat.targetConceptIds || [];
+      if (!targets.includes(expectedConcept)) {
+        errors.push(
+          err(
+            'visual_cue_concept_mismatch',
+            beat.id,
+            `dayPart '${cue.dayPart}' requires targetConceptIds to include '${expectedConcept}'`
+          )
+        );
+      }
+    }
+
+    return errors.length > 0 ? errors : null;
+  },
 ];
 
 export function runUniversalBeatRules(beat) {
   const errors = [];
   for (const rule of universalRules) {
     const result = rule(beat);
-    if (result) errors.push(result);
+    if (!result) continue;
+    if (Array.isArray(result)) {
+      errors.push(...result);
+    } else {
+      errors.push(result);
+    }
   }
   return errors;
 }
