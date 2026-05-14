@@ -104,20 +104,37 @@ const RUNTIME_PACK_OVERRIDES = {
     description: 'Big, small, tall, and short',
     wordIds: ['bb-gadol', 'bb-katan', 'bb-gavoha', 'bb-namuch'],
   },
+  numbers_01: {
+    unlockAfter: 'adjectives_01',
+  },
   adjectives_02: {
+    sectionId: 'people_social',
     title: 'Evaluation Adjectives',
     description: 'Good, beautiful, great, nice, bad, terrible, and wonderful',
     wordIds: ['bb-tov', 'bb-yafe', 'bbct-great', 'bbct-nice', 'bbct-bad', 'bbct-terrible', 'bbct-wonderful'],
+    order: 14,
+    unlockAfter: 'describing_people_01',
   },
   adjectives_03: {
+    sectionId: 'people_social',
     title: 'Appearance & Strange',
     description: 'Ugly and strange',
     wordIds: ['bbct-ugly', 'bbct-strange'],
+    order: 15,
+    unlockAfter: 'adjectives_02',
   },
   describing_people_01: {
     title: 'Describing People',
     description: 'Young and old',
     wordIds: ['bb-tsair', 'bb-zaken'],
+  },
+  community_places_01: {
+    order: 16,
+    unlockAfter: 'adjectives_03',
+  },
+  activities_01: {
+    order: 17,
+    unlockAfter: 'community_places_01',
   },
 };
 
@@ -206,8 +223,14 @@ function applyRuntimePackOverrides(byId, removedPackIds) {
     const pack = byId.get(packId);
     if (!pack) continue;
 
+    if (override.sectionId) pack.sectionId = override.sectionId;
     if (override.title) pack.title = override.title;
+    if (override.theme) pack.theme = override.theme;
     if (override.description) pack.description = override.description;
+    if (Number.isFinite(override.order)) pack.order = override.order;
+    if (Object.prototype.hasOwnProperty.call(override, 'unlockAfter')) {
+      pack.unlockAfter = override.unlockAfter;
+    }
     if (Array.isArray(override.wordIds)) {
       pack.wordIds = uniqueWordIdsByConcept(override.wordIds);
     }
