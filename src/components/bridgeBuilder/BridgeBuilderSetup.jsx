@@ -2,6 +2,7 @@ import React, { useMemo, useState, useCallback, useRef } from 'react';
 import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
 import { getPacksBySection, getPackById } from '../../data/bridgeBuilderPacks.js';
 import VocabJourneyPanel from './VocabJourneyPanel.jsx';
+import { writeRememberedPackId } from './vocabJourneyModel.js';
 import {
   getAllWordProgress,
   getPackProgress,
@@ -524,6 +525,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
 
     if (!target || !target.unlocked) return;
 
+    writeRememberedPackId(packId);
     setSelectedJourneyPackId(packId);
     setActiveSubview('journey');
 

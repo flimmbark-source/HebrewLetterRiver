@@ -20,7 +20,7 @@ function readRememberedPackId() {
   }
 }
 
-function writeRememberedPackId(packId) {
+export function writeRememberedPackId(packId) {
   if (!packId) return;
   try {
     if (typeof window !== 'undefined') {
