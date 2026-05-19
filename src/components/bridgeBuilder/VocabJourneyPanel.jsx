@@ -19,7 +19,6 @@ import { useLocalization } from '../../context/LocalizationContext.jsx';
 import { useLanguage } from '../../context/LanguageContext.jsx';
 import { loadBridgeBuilderWords } from '../../data/bridgeBuilder/words/index.js';
 
-const MAX_TODAYS_REVIEW_WORDS = 6;
 
 function Icon({ children, className = '', filled = false }) {
   return (
@@ -537,8 +536,6 @@ export default function VocabJourneyPanel({
   const localizedRecommendedAction = useMemo(() => localizeRecommendedAction(recommendedAction, t), [recommendedAction, t]);
   const journeyStats = useMemo(() => getJourneyStats(sectionData), [sectionData]);
   const [isPackSheetOpen, setIsPackSheetOpen] = useState(false);
-  const rawReviewCount = (dueReviewCount || 0) + (weakReviewCount || 0);
-  const reviewCount = Math.min(rawReviewCount, MAX_TODAYS_REVIEW_WORDS);
 
   if (!currentPack) {
     return (
@@ -608,34 +605,6 @@ export default function VocabJourneyPanel({
       </div>
 
       <div className="vj-main-grid">
-        <div className="vj-left-column">
-          <button type="button" className="vj-support-row" onClick={onReview} disabled={reviewCount <= 0}>
-            <span className="vj-row-icon vj-row-icon--green"><Icon filled>event_available</Icon></span>
-            <span className="vj-row-text">
-              <strong>{t('bridgeBuilder.vocabJourney.todaysReviewWords', 'Today’s Review — {{count}} words', { count: reviewCount })}</strong>
-              <small>{reviewCount > 0 ? t('bridgeBuilder.vocabJourney.keepWordsStrong', 'Keep your words strong.') : t('bridgeBuilder.vocabJourney.completePackToUnlockReview', 'Complete a pack to unlock review.')}</small>
-            </span>
-            <Icon>chevron_right</Icon>
-          </button>
-          <button type="button" className="vj-support-row" onClick={() => onLaunchPackMethod(currentPack, 'read_context')}>
-            <span className="vj-row-icon vj-row-icon--blue"><Icon filled>menu_book</Icon></span>
-            <span className="vj-row-text">
-              <strong>{t('bridgeBuilder.vocabJourney.readInContextTitle', 'Read in Context')}</strong>
-              <small>
-                {currentCompletion?.packSceneComplete
-                  ? t('bridgeBuilder.vocabJourney.readInContextDone', 'Scene complete — play again anytime.')
-                  : t('bridgeBuilder.vocabJourney.readInContextSubtitle', 'Practice this pack in sentence context.')}
-              </small>
-            </span>
-            {currentCompletion?.packSceneComplete && (
-              <span className="vj-row-done" aria-label={t('bridgeBuilder.vocabJourney.packSceneDone', 'Completed')}>
-                <Icon filled>check_circle</Icon>
-              </span>
-            )}
-            <Icon>chevron_right</Icon>
-          </button>
-        </div>
-
         <aside className="vj-river-path" style={{ backgroundImage: `url(${riverPathMap})` }}>
           <div className="vj-path-overlay">
             {journeyStops.map((stop) => {
