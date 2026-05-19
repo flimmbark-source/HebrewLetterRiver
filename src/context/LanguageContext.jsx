@@ -63,7 +63,7 @@ export function LanguageProvider({ children }) {
     defaultLanguageId
   );
   const initialAppId = getValidAppLanguageId(
-    storedApp?.id ?? legacyPreferences?.appId ?? legacyPreferences?.id,
+    storedApp?.id ?? legacyPreferences?.appId,
     defaultAppLanguageId
   );
   const initialConfirmed =
