@@ -258,18 +258,8 @@ export function getLearningPathItems(currentStage, selectedStage = currentStage,
 }
 
 export function getTodayPlanRows({ primaryState, statistics, navigate, openGame, t }) {
-  const reviewCount = statistics?.dueToday ?? 5;
   const bridgePack = getCurrentBridgePackSummary(t);
-  const rows = [
-    {
-      id: 'review',
-      icon: 'event_available',
-      tone: 'green',
-      title: t('home.scenic.dailyReview', 'Daily Review'),
-      subtitle: t('home.scenic.reviewDueToday', '{{count}} due today', { count: reviewCount || 0 }),
-      action: () => navigate('/daily')
-    }
-  ];
+  const rows = [];
 
   if (primaryState.kind === 'letters') {
     rows.push(
