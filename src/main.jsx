@@ -31,6 +31,7 @@ function shouldForceServiceWorkerReset() {
 async function resetServiceWorkersAndCaches() {
   if (typeof window === 'undefined') return;
   const forceReset = shouldForceServiceWorkerReset();
+  if (!forceReset) return;
 
   try {
     // Timeout for the entire SW reset operation (5 seconds max)
@@ -52,7 +53,7 @@ async function resetServiceWorkersAndCaches() {
           );
         }
 
-        if (forceReset && 'caches' in window) {
+        if ('caches' in window) {
           const cacheKeys = await window.caches.keys();
           await Promise.all(
             cacheKeys
