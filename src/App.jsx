@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import HomeView from './views/HomeView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import LearnView from './views/LearnView.jsx';
@@ -18,6 +18,8 @@ import { ExperimentProvider } from './context/ExperimentContext.jsx';
 import { TutorialProvider, useTutorial } from './context/TutorialContext.jsx';
 import { PremiumProvider } from './context/PremiumContext.jsx';
 import { getFormattedLanguageName } from './lib/languageUtils.js';
+import { applyRouteMeta } from './lib/routeMeta.js';
+import { trackException, trackPageView } from './lib/telemetry.js';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import OfflineIndicator from './components/OfflineIndicator.jsx';
 import MigrationInitializer from './components/MigrationInitializer.jsx';
@@ -151,6 +153,27 @@ function LanguageOnboardingModal() {
   );
 }
 
+function NotFoundView() {
+  const { t } = useLocalization();
+
+  return (
+    <section className="card-elevated mx-auto my-8 max-w-xl p-6 text-center sm:p-8" aria-labelledby="not-found-title">
+      <p className="text-sm font-bold uppercase tracking-wide" style={{ color: 'var(--app-muted)' }}>
+        {t('app.notFound.eyebrow', 'Page not found')}
+      </p>
+      <h1 id="not-found-title" className="mt-2 text-3xl font-bold" style={{ color: 'var(--app-on-surface)' }}>
+        {t('app.notFound.title', 'This river bend does not exist yet')}
+      </h1>
+      <p className="mt-3 text-base" style={{ color: 'var(--app-muted)' }}>
+        {t('app.notFound.body', 'The page you opened is not part of Letter River. Return home to continue learning.')}
+      </p>
+      <Link className="btn-cta mt-6 inline-flex px-6 py-3" to="/home">
+        {t('app.notFound.home', 'Go home')}
+      </Link>
+    </section>
+  );
+}
+
 function Shell() {
   const { closeGame, isVisible: isGameVisible, isGameRunning, showPlayModal, setShowPlayModal } = useGame();
   const { interfaceLanguagePack, t } = useLocalization();
@@ -161,6 +184,11 @@ function Shell() {
   const [inDeepScript, setInDeepScript] = React.useState(false);
   const location = useLocation();
   const { appFontClass } = useFontSettings();
+
+  React.useEffect(() => {
+    applyRouteMeta(location.pathname);
+    trackPageView(location.pathname, document.title);
+  }, [location.pathname]);
 
   React.useEffect(() => {
     const applyGlobalTheme = (darkModeEnabled) => {
@@ -179,6 +207,7 @@ function Shell() {
         applyGlobalTheme(darkModeEnabled);
       } catch (error) {
         console.error('Failed to apply theme from game settings', error);
+        trackException(error, { context: 'applyThemeFromSettings' });
       }
     };
 
@@ -252,6 +281,7 @@ function Shell() {
             <Route path="/settings" element={<SettingsView />} />
             <Route path="/debug" element={<DebugDashboardView />} />
             <Route path="/play" element={<Navigate to="/home" replace />} />
+            <Route path="*" element={<NotFoundView />} />
           </Routes>
         </div>
       </main>
@@ -301,7 +331,7 @@ function Shell() {
 
 export default function App() {
   return (
-    <ErrorBoundary>
+    <ErrorBoundary onError={(error) => trackException(error, { fatal: true, context: 'react-error-boundary' })}>
       <MigrationInitializer>
         <LanguageProvider>
           <ExperimentProvider>

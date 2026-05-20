@@ -117,6 +117,13 @@ function normalizeSentence(sentence) {
     .trim();
 }
 
+function formatCanonicalSentence(sentence) {
+  return sentence
+    .replace(/\s+([.,!?;:])/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /**
  * Check if user input matches a pattern
  * @param {string} userInput - User's typed sentence
@@ -154,5 +161,5 @@ export function getCanonicalFromPattern(pattern) {
 
   const tokens = parsePattern(pattern);
   const variants = generateVariants(tokens);
-  return variants[0] || '';
+  return formatCanonicalSentence(variants[0] || '');
 }

@@ -1,9 +1,4 @@
-/**
- * Cafe Talk Validation Tests
- *
- * Run with: node src/data/readingTexts/cafeTalk/validateCafeTalk.test.js
- */
-
+import { describe, expect, it } from 'vitest';
 import { assertCafeTalkValid } from './validateCafeTalk.js';
 import { hebrewCafeTalkTexts } from './hebrew.js';
 import { arabicCafeTalkTexts } from './arabic.js';
@@ -33,16 +28,8 @@ const cafeTalkByLanguage = {
   amharic: amharicCafeTalkTexts
 };
 
-console.log('Running Cafe Talk validation tests...\n');
-
-try {
-  assertCafeTalkValid(cafeTalkByLanguage);
-  console.log('✅ All Cafe Talk validation tests passed!\n');
-  process.exit(0);
-} catch (error) {
-  console.error('❌ Cafe Talk validation failed:\n');
-  console.error(error.message);
-  console.error('\nPlease complete all __TODO__ placeholders in Cafe Talk files.');
-  console.error('See: src/data/readingTexts/cafeTalk/<language>.js\n');
-  process.exit(1);
-}
+describe('Cafe Talk validation', () => {
+  it('has complete and valid Cafe Talk reading texts', () => {
+    expect(() => assertCafeTalkValid(cafeTalkByLanguage)).not.toThrow();
+  });
+});
