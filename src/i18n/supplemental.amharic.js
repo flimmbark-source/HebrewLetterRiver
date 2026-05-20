@@ -94,7 +94,7 @@ export const amharicSupplementalDictionary = {
       noPacks: 'ጥቅሎች ገና አልተገኙም።',
       allPacks: 'ሁሉም ጥቅሎች',
       currentPack: 'የአሁኑ ጥቅል',
-      currentGoal: 'የአሁኑ ግብ፦ {{goal}}',
+      currentGoal: 'ለበለጠ ዝርዝር ይጫኑ',
       learnEverydayWords: '{{count}} ዕለታዊ ቃላትን ይማሩ',
       tapForPackDetails: 'የጥቅሉን ዝርዝር ለማየት ይንኩ',
       openDetailsFor: 'የ{{title}} ዝርዝርን ክፈት',

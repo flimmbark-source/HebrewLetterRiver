@@ -7,8 +7,6 @@
    the current app CSS still consumes these values.
    ============================================================= */
 
-/* ---- Google Fonts (exactly what index.html ships with) ---- */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Baloo+2:wght@500;600;700;800&family=Heebo:wght@400;500;700;800&family=Frank+Ruhl+Libre:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
 :root {
   /* =========================================================

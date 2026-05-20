@@ -94,7 +94,7 @@ export const russianSupplementalDictionary = {
       noPacks: 'Пока нет доступных наборов.',
       allPacks: 'Все наборы',
       currentPack: 'Текущий набор',
-      currentGoal: 'Текущая цель: {{goal}}',
+      currentGoal: 'Нажмите для подробностей',
       learnEverydayWords: 'Выучи {{count}} повседневных слов',
       tapForPackDetails: 'Нажми, чтобы увидеть детали набора',
       openDetailsFor: 'Открыть детали для {{title}}',

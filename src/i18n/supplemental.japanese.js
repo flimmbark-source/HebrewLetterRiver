@@ -94,7 +94,7 @@ export const japaneseSupplementalDictionary = {
       noPacks: '利用できるパックはまだありません。',
       allPacks: 'すべてのパック',
       currentPack: '現在のパック',
-      currentGoal: '現在の目標: {{goal}}',
+      currentGoal: '詳細を見る',
       learnEverydayWords: '日常の言葉を{{count}}語学ぶ',
       tapForPackDetails: 'タップしてパックの詳細を見る',
       openDetailsFor: '{{title}}の詳細を開く',

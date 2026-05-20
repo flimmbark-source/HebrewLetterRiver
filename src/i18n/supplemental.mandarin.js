@@ -94,7 +94,7 @@ export const mandarinSupplementalDictionary = {
       noPacks: '暂时没有可用的词包。',
       allPacks: '所有词包',
       currentPack: '当前词包',
-      currentGoal: '当前目标：{{goal}}',
+      currentGoal: '点击查看更多详情',
       learnEverydayWords: '学习 {{count}} 个日常词语',
       tapForPackDetails: '点按查看词包详情',
       openDetailsFor: '打开 {{title}} 的详情',

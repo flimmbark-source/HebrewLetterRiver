@@ -94,7 +94,7 @@ export const hebrewSupplementalDictionary = {
       noPacks: 'אין עדיין חבילות זמינות.',
       allPacks: 'כל החבילות',
       currentPack: 'החבילה הנוכחית',
-      currentGoal: 'היעד הנוכחי: {{goal}}',
+      currentGoal: 'לחץ לפרטים נוספים',
       learnEverydayWords: 'למד {{count}} מילים יומיומיות',
       tapForPackDetails: 'הקש כדי לראות פרטי חבילה',
       openDetailsFor: 'פתח פרטים עבור {{title}}',

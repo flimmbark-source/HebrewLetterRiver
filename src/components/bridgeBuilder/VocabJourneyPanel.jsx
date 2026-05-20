@@ -587,7 +587,7 @@ export default function VocabJourneyPanel({
             <span className="vj-badge">{t('bridgeBuilder.vocabJourney.currentPack', 'Current Pack')}</span>
             <h2>{localizedPackTitle}</h2>
             <p className="vj-learn-line"><Icon filled>eco</Icon>{t('bridgeBuilder.vocabJourney.learnEverydayWords', 'Learn {{count}} everyday words', { count: currentPack.targetsNewCount || currentPack.wordIds?.length || 8 })}</p>
-            <p className="vj-goal-line">{t('bridgeBuilder.vocabJourney.currentGoal', 'Current goal: {{goal}}', { goal: localizedStageInfo.label })}</p>
+            <p className="vj-goal-line">{t('bridgeBuilder.vocabJourney.currentGoal', 'Press for more details')}</p>
             <p className="vj-card-details-hint"><Icon>expand_more</Icon>{t('bridgeBuilder.vocabJourney.tapForPackDetails', 'Tap for pack details')}</p>
             <button
               type="button"
