@@ -94,7 +94,7 @@ export const arabicSupplementalDictionary = {
       noPacks: 'لا توجد حزم متاحة بعد.',
       allPacks: 'كل الحزم',
       currentPack: 'الحزمة الحالية',
-      currentGoal: 'الهدف الحالي: {{goal}}',
+      currentGoal: 'اضغط لمزيد من التفاصيل',
       learnEverydayWords: 'تعلم {{count}} كلمات يومية',
       tapForPackDetails: 'اضغط لرؤية تفاصيل الحزمة',
       openDetailsFor: 'فتح تفاصيل {{title}}',
