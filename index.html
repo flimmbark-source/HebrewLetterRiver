@@ -99,15 +99,29 @@
        rule is registered. 3s timeout ensures icons are never hidden forever. -->
   <script>
     (function () {
+      // fonts.ready fires when layout is complete but NOT when font binaries have
+      // finished downloading — with font-display:swap the font is still in-flight
+      // when fonts.ready resolves. On a slow mobile connection this causes ms-ready
+      // to be added before the font arrives, revealing icon text.
+      //
+      // fonts.load() waits for the specific font binary. It can return [] on the
+      // first call if the @font-face hasn't been registered yet, so we poll.
+      // The 8-second fallback timeout ensures icons are never hidden forever.
+      var done = false;
       var reveal = function () {
+        if (done) return;
+        done = true;
         document.documentElement.classList.add('ms-ready');
       };
-      var t = setTimeout(reveal, 3000);
-      if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(function () {
-          clearTimeout(t);
-          reveal();
-        });
+      var t = setTimeout(reveal, 8000);
+      if (document.fonts && document.fonts.load) {
+        var attempts = 0;
+        (function tryLoad() {
+          document.fonts.load('1em "Material Symbols Outlined"').then(function (faces) {
+            if (faces.length > 0) { clearTimeout(t); reveal(); }
+            else if (++attempts < 20) { setTimeout(tryLoad, 200); }
+          }).catch(function () { clearTimeout(t); reveal(); });
+        }());
       }
     })();
   </script>
