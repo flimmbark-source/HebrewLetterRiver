@@ -117,6 +117,12 @@
   gap: 8px;
   width: min(420px, 100%);
   margin: 0 auto 14px;
+  /* Lock the visual order to App-then-Learning regardless of the inherited
+     text direction. In RTL (e.g. Hebrew app interface) a grid would otherwise
+     reverse columns, putting the App dropdown on the right and the Learning
+     dropdown on the left — users then click the wrong control and report the
+     app language as "stuck". */
+  direction: ltr;
 }
 
 .scenic-language-select {
