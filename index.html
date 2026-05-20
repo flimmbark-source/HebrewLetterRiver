@@ -52,9 +52,24 @@
       }
     })();
   </script>
-  <meta name="theme-color" content="#1a7a55" />
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a7a55" />
+  <meta name="description" content="Letter River is a playful language-learning app that guides learners from letters to words, reading, and conversation through compact practice modes." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://letterriver.netlify.app/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Letter River" />
+  <meta property="og:title" content="Letter River" />
+  <meta property="og:description" content="Move from letters to words, reading, and conversation through calm, game-like language practice." />
+  <meta property="og:url" content="https://letterriver.netlify.app/" />
+  <meta property="og:image" content="https://letterriver.netlify.app/icon-512.svg" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Letter River" />
+  <meta name="twitter:description" content="A playful language-learning app for letters, words, reading, and conversation." />
+  <meta name="twitter:image" content="https://letterriver.netlify.app/icon-512.svg" />
+
   <title>Letter River</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -86,7 +101,19 @@
   <link rel="apple-touch-icon" href="/favicon.ico" />
 </head>
 <body class="min-h-screen arcade-bg">
-  <div id="root"></div>
+  <div id="root">
+    <main style="max-width: 42rem; margin: 0 auto; padding: 2rem; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #2c2418;">
+      <h1>Letter River</h1>
+      <p>Letter River is a playful language-learning app that guides learners from letters to words, reading, and conversation through compact practice modes.</p>
+      <p>JavaScript is required to use the interactive learning app.</p>
+    </main>
+  </div>
+  <noscript>
+    <main style="max-width: 42rem; margin: 0 auto; padding: 2rem; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #2c2418;">
+      <h1>Letter River</h1>
+      <p>Letter River needs JavaScript enabled to run its interactive lessons and practice games.</p>
+    </main>
+  </noscript>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
