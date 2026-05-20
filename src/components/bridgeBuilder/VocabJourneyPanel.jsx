@@ -177,8 +177,8 @@ function CurrentPackDetailSheet({
   stage,
   recommendedAction,
   onLaunchRecommended,
+  onLaunchBridgeBuilder,
   onLaunchLoosePlanks,
-  onLaunchDeepScript,
   onLaunchReadContext,
   packSceneComplete,
 }) {
@@ -236,14 +236,14 @@ function CurrentPackDetailSheet({
 
         <div className="vj-option-list">
           <h3>{t('bridgeBuilder.vocabJourney.moreWaysToLearn', 'More ways to learn')}</h3>
+          <button type="button" className="vj-option" onClick={onLaunchBridgeBuilder}>
+            <span className="vj-option-icon vj-option-icon--orange"><Icon filled>architecture</Icon></span>
+            <span><strong>{t('bridgeBuilder.vocabJourney.optionBridgeBuilderTitle', 'Learn — Bridge Builder')}</strong><small>{t('bridgeBuilder.vocabJourney.optionBridgeBuilderSubtitle', 'Build vocabulary with guided lessons.')}</small></span>
+            <Icon>chevron_right</Icon>
+          </button>
           <button type="button" className="vj-option" onClick={onLaunchLoosePlanks}>
             <span className="vj-option-icon vj-option-icon--teal"><Icon filled>view_stream</Icon></span>
             <span><strong>{t('bridgeBuilder.vocabJourney.optionLoosePlanksTitle', 'Strengthen — Loose Planks')}</strong><small>{t('bridgeBuilder.vocabJourney.optionLoosePlanksSubtitle', 'Reinforce with targeted practice.')}</small></span>
-            <Icon>chevron_right</Icon>
-          </button>
-          <button type="button" className="vj-option" onClick={onLaunchDeepScript}>
-            <span className="vj-option-icon vj-option-icon--purple"><Icon filled>ink_pen</Icon></span>
-            <span><strong>{t('bridgeBuilder.vocabJourney.optionDeepScriptTitle', 'Challenge — Deep Script')}</strong><small>{t('bridgeBuilder.vocabJourney.optionDeepScriptSubtitle', 'Test depth with writing and recall.')}</small></span>
             <Icon>chevron_right</Icon>
           </button>
           <button type="button" className="vj-option" onClick={onLaunchReadContext}>
@@ -660,8 +660,8 @@ export default function VocabJourneyPanel({
         stage={localizedStageInfo}
         recommendedAction={localizedRecommendedAction}
         onLaunchRecommended={() => onLaunchPackMethod(currentPack, recommendedAction.method)}
+        onLaunchBridgeBuilder={() => onLaunchPackMethod(currentPack, 'bridge_builder')}
         onLaunchLoosePlanks={() => onLaunchPackMethod(currentPack, 'loose_planks')}
-        onLaunchDeepScript={() => onLaunchPackMethod(currentPack, 'deep_script')}
         onLaunchReadContext={() => onLaunchPackMethod(currentPack, 'read_context')}
         packSceneComplete={currentCompletion?.packSceneComplete || false}
       />
