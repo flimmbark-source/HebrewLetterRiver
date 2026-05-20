@@ -2,6 +2,15 @@
    Must stay above the tailwind directives so @import resolves at the top. */
 @import './colors_and_type.css';
 
+/* Keep Material Symbols icons invisible until the font is confirmed loaded.
+   Without this, slow mobile connections show raw ligature names like "arrow_back"
+   during the font-display block period and beyond.
+   The ms-ready class is added by the inline script in index.html once the font
+   loads (or after a 3s timeout so icons never stay hidden forever). */
+html:not(.ms-ready) .material-symbols-outlined {
+  visibility: hidden;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

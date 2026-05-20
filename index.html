@@ -97,6 +97,27 @@
     media="print"
     onload="this.media='all'"
   />
+  <!-- Reveal Material Symbols icons once the font is ready.
+       The CSS hides .material-symbols-outlined until the ms-ready class lands on
+       <html>, preventing ligature names (e.g. "arrow_back") from ever flashing
+       as text on slow connections. Falls back to showing icons after 3s so they
+       are never hidden forever if the font fails to load. -->
+  <script>
+    (function () {
+      var t = setTimeout(function () {
+        document.documentElement.classList.add('ms-ready');
+      }, 3000);
+      if (document.fonts && document.fonts.load) {
+        document.fonts.load('400 1em "Material Symbols Outlined"').then(function () {
+          clearTimeout(t);
+          document.documentElement.classList.add('ms-ready');
+        }).catch(function () {
+          clearTimeout(t);
+          document.documentElement.classList.add('ms-ready');
+        });
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/vocab-journey-path-overrides.css" />
   <link rel="stylesheet" href="/vocab-journey-subview-tabs-override.css" />
   <link rel="stylesheet" href="/vocab-journey-mobile-layout-fix.css" />
