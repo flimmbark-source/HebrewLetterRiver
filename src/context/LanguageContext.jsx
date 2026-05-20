@@ -74,53 +74,27 @@ export function LanguageProvider({ children }) {
   const [appLanguageId, setAppLanguageIdState] = useState(initialAppId);
   const [hasSelectedLanguage, setHasSelectedLanguage] = useState(initialConfirmed);
 
-  const syncLegacyLanguagePreference = useCallback((nextPracticeId, nextAppId, isConfirmed) => {
-    saveState(LEGACY_STORAGE_KEY, {
-      id: nextPracticeId,
-      practiceId: nextPracticeId,
-      appId: nextAppId,
-      confirmed: isConfirmed
-    });
+  const setLanguageId = useCallback((nextId) => {
+    setLanguageIdState((current) => getValidLanguageId(nextId, current));
   }, []);
 
-  const setLanguageId = useCallback((nextId) => {
-    setLanguageIdState((current) => {
-      const resolved = getValidLanguageId(nextId, current);
-      syncLegacyLanguagePreference(resolved, appLanguageId, hasSelectedLanguage);
-      return resolved;
-    });
-  }, [appLanguageId, hasSelectedLanguage, syncLegacyLanguagePreference]);
-
   const selectLanguage = useCallback((nextId) => {
-    setLanguageIdState((current) => {
-      const resolved = getValidLanguageId(nextId, current);
-      syncLegacyLanguagePreference(resolved, appLanguageId, true);
-      return resolved;
-    });
+    setLanguageIdState((current) => getValidLanguageId(nextId, current));
     setHasSelectedLanguage(true);
-  }, [appLanguageId, syncLegacyLanguagePreference]);
+  }, []);
 
   const setAppLanguageId = useCallback((nextId) => {
-    setAppLanguageIdState((current) => {
-      const resolved = getValidAppLanguageId(nextId, current);
-      syncLegacyLanguagePreference(languageId, resolved, hasSelectedLanguage);
-      return resolved;
-    });
-  }, [languageId, hasSelectedLanguage, syncLegacyLanguagePreference]);
+    setAppLanguageIdState((current) => getValidAppLanguageId(nextId, current));
+  }, []);
 
   const selectAppLanguage = useCallback((nextId) => {
-    setAppLanguageIdState((current) => {
-      const resolved = getValidAppLanguageId(nextId, current);
-      syncLegacyLanguagePreference(languageId, resolved, true);
-      return resolved;
-    });
+    setAppLanguageIdState((current) => getValidAppLanguageId(nextId, current));
     setHasSelectedLanguage(true);
-  }, [languageId, syncLegacyLanguagePreference]);
+  }, []);
 
   const markLanguageSelected = useCallback(() => {
     setHasSelectedLanguage(true);
-    syncLegacyLanguagePreference(languageId, appLanguageId, true);
-  }, [appLanguageId, languageId, syncLegacyLanguagePreference]);
+  }, []);
 
   useEffect(() => {
     saveState(PRACTICE_STORAGE_KEY, { id: languageId, confirmed: hasSelectedLanguage });
@@ -129,6 +103,15 @@ export function LanguageProvider({ children }) {
   useEffect(() => {
     saveState(APP_STORAGE_KEY, { id: appLanguageId, confirmed: hasSelectedLanguage });
   }, [appLanguageId, hasSelectedLanguage]);
+
+  useEffect(() => {
+    saveState(LEGACY_STORAGE_KEY, {
+      id: languageId,
+      practiceId: languageId,
+      appId: appLanguageId,
+      confirmed: hasSelectedLanguage
+    });
+  }, [languageId, appLanguageId, hasSelectedLanguage]);
 
   const languageOptions = useMemo(() => buildLanguageOptions(), []);
   const appLanguageOptions = useMemo(() => buildLanguageOptions(SUPPORTED_APP_LANGUAGE_IDS), []);
