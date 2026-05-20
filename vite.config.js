@@ -26,13 +26,13 @@ export default defineConfig({
         // Runtime caching strategies
         runtimeCaching: [
           {
-            // Cache Google Fonts
+            // Cache Google Fonts CSS (one entry per unique URL)
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'google-fonts-cache',
               expiration: {
-                maxEntries: 10,
+                maxEntries: 20,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               },
               cacheableResponse: {
@@ -41,13 +41,17 @@ export default defineConfig({
             }
           },
           {
-            // Cache Google Fonts webfonts
+            // Cache Google Fonts webfont binaries.
+            // The app uses many font families each with multiple unicode-range
+            // subsets — easily 50+ individual woff2 files. The old limit of 10
+            // caused constant LRU eviction, forcing re-fetches that fail on slow
+            // mobile connections. 100 entries covers all fonts comfortably.
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'gstatic-fonts-cache',
               expiration: {
-                maxEntries: 10,
+                maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               },
               cacheableResponse: {

@@ -3,12 +3,13 @@
 @import './colors_and_type.css';
 
 /* Keep Material Symbols icons invisible until the font is confirmed loaded.
-   Without this, slow mobile connections show raw ligature names like "arrow_back"
-   during the font-display block period and beyond.
-   The ms-ready class is added by the inline script in index.html once the font
-   loads (or after a 3s timeout so icons never stay hidden forever). */
+   color:transparent rather than visibility:hidden — iOS Safari can skip
+   downloading fonts for visibility:hidden elements, which is exactly the
+   wrong behaviour here. color:transparent forces the browser to render
+   (and therefore fetch) the font while keeping the text invisible.
+   ms-ready is added by the inline script in index.html once the font loads. */
 html:not(.ms-ready) .material-symbols-outlined {
-  visibility: hidden;
+  color: transparent !important;
 }
 
 @tailwind base;
