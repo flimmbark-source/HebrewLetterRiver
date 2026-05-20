@@ -3500,8 +3500,8 @@
   z-index: 2;
 }
 
-.ds-explore-door--forward:hover { transform: translateX(-50%); }
-.ds-explore-door--forward:active { transform: translateX(-50%); }
+.ds-explore-door--forward:hover { transform: translateX(-50%) scale(1.03); }
+.ds-explore-door--forward:active { transform: translateX(-50%) scale(1); }
 
 .ds-explore-door--forward .ds-explore-door-arch {
   width: 100%;
