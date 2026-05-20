@@ -73,16 +73,11 @@
   <title>Letter River</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- Critical UI fonts: loaded synchronously. Weights match the Letter River
-       design system (Nunito 400-800, Baloo 2 500-800, Heebo 400-800).
-       Material Symbols uses display=block so icons are invisible while loading
-       rather than showing raw ligature names (e.g. "arrow_back") on slow mobile. -->
+  <!-- Critical UI fonts + Material Symbols in one request.
+       display=swap is fine for text fonts; icons are hidden by CSS until the
+       Font Loading API confirms the font is ready (see inline script below). -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Baloo+2:wght@500;600;700;800&family=Heebo:wght@400;500;700;800&family=Frank+Ruhl+Libre:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Baloo+2:wght@500;600;700;800&family=Heebo:wght@400;500;700;800&family=Frank+Ruhl+Libre:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
     rel="stylesheet"
   />
   <!-- Secondary: script-specific + accessibility fonts, loaded async -->
@@ -98,22 +93,20 @@
     onload="this.media='all'"
   />
   <!-- Reveal Material Symbols icons once the font is ready.
-       The CSS hides .material-symbols-outlined until the ms-ready class lands on
-       <html>, preventing ligature names (e.g. "arrow_back") from ever flashing
-       as text on slow connections. Falls back to showing icons after 3s so they
-       are never hidden forever if the font fails to load. -->
+       CSS keeps .material-symbols-outlined invisible until ms-ready lands on <html>.
+       document.fonts.ready fires when all page fonts have loaded or timed out —
+       more reliable than fonts.load() which can resolve empty before the @font-face
+       rule is registered. 3s timeout ensures icons are never hidden forever. -->
   <script>
     (function () {
-      var t = setTimeout(function () {
+      var reveal = function () {
         document.documentElement.classList.add('ms-ready');
-      }, 3000);
-      if (document.fonts && document.fonts.load) {
-        document.fonts.load('400 1em "Material Symbols Outlined"').then(function () {
+      };
+      var t = setTimeout(reveal, 3000);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () {
           clearTimeout(t);
-          document.documentElement.classList.add('ms-ready');
-        }).catch(function () {
-          clearTimeout(t);
-          document.documentElement.classList.add('ms-ready');
+          reveal();
         });
       }
     })();
