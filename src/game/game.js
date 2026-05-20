@@ -406,13 +406,6 @@ export function setupGame({ onReturnToMenu, onGameStart, onGameReset, languagePa
     }
   }
 
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(() => {
-        // ignore registration failures during development
-      });
-    });
-  }
 
   let deferredPrompt = null;
 

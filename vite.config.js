@@ -36,7 +36,7 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               },
               cacheableResponse: {
-                statuses: [0, 200]
+                statuses: [200]
               }
             }
           },
@@ -46,6 +46,8 @@ export default defineConfig({
             // subsets — easily 50+ individual woff2 files. The old limit of 10
             // caused constant LRU eviction, forcing re-fetches that fail on slow
             // mobile connections. 100 entries covers all fonts comfortably.
+            // Only cache status 200 — opaque status-0 responses can permanently
+            // cache a corrupt/partial download with no way to clear it.
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
@@ -55,7 +57,7 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               },
               cacheableResponse: {
-                statuses: [0, 200]
+                statuses: [200]
               }
             }
           },

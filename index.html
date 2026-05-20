@@ -119,7 +119,7 @@
         (function tryLoad() {
           document.fonts.load('1em "Material Symbols Outlined"').then(function (faces) {
             if (faces.length > 0) { clearTimeout(t); reveal(); }
-            else if (++attempts < 20) { setTimeout(tryLoad, 200); }
+            else if (++attempts < 39) { setTimeout(tryLoad, 200); }
           }).catch(function () { clearTimeout(t); reveal(); });
         }());
       }
