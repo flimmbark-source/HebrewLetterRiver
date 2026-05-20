@@ -72,6 +72,7 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
     loadDeepScriptWords(languageId).then(() => setLangDSWordsReady(true));
   }, [languageId, isHebrew]);
   const [wordSourceMode, setWordSourceMode] = useState('pack'); // pack | random (standalone only)
+  const [selectedPackId, setSelectedPackId] = useState(null); // null = random seen pack
   const [expeditionMode, setExpeditionMode] = useState('words'); // words | sentences
   const [screen, setScreen] = useState('kit_select'); // kit_select | exploring | combat | sentence_combat | end
   const [isPauseMenuOpen, setIsPauseMenuOpen] = useState(false);
@@ -108,9 +109,15 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
       return langDSWords;
     }
     if (bridgeBuilderPacks.length === 0) return [];
-    const pack = bridgeBuilderPacks[Math.floor(Math.random() * bridgeBuilderPacks.length)];
+    let pack;
+    if (selectedPackId) {
+      pack = bridgeBuilderPacks.find(p => p.id === selectedPackId);
+    }
+    if (!pack) {
+      pack = bridgeBuilderPacks[Math.floor(Math.random() * bridgeBuilderPacks.length)];
+    }
     return convertBBWordsForDS(getWordsByIds(pack.wordIds));
-  }, [isHebrew, langDSWords]);
+  }, [isHebrew, langDSWords, selectedPackId]);
 
   const markWordsSeen = useCallback((wordIds = []) => {
     if (wordIds.length === 0) return;
@@ -667,6 +674,8 @@ export default function DeepScriptMode({ onBack, packWords, onRunComplete, isGui
           expeditionMode={expeditionMode}
           onExpeditionModeChange={setExpeditionMode}
           sentenceModeAvailable={sentenceModeAvailable}
+          selectedPackId={selectedPackId}
+          onSelectedPackIdChange={setSelectedPackId}
         />
       </div>
     );

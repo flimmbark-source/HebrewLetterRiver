@@ -123,6 +123,22 @@ export function canPlaySentenceMode() {
 }
 
 /**
+ * Get packs the player has seen at least once (Introduced, Learned, or Mastered).
+ * These are eligible to be selected for a Word Pack expedition.
+ *
+ * @returns {Array<Object>} — array of pack definitions
+ */
+export function getSeenPacks() {
+  const allWordProgress = getAllWordProgress();
+  const allCompletions = getAllPackCompletions();
+
+  return bridgeBuilderPacks.filter((pack) => {
+    const state = getPackState(pack, allWordProgress, allCompletions);
+    return state !== PACK_STATES.UNSEEN;
+  });
+}
+
+/**
  * Pick a random eligible pack for Sentence mode.
  *
  * @returns {Object | null} — a random eligible pack, or null if none available
