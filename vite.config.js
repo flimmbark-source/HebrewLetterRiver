@@ -26,14 +26,18 @@ export default defineConfig({
         // Runtime caching strategies
         runtimeCaching: [
           {
-            // Cache Google Fonts CSS (one entry per unique URL)
+            // Font CSS should not be locked behind a year-long CacheFirst rule.
+            // If a cached stylesheet points to stale or failed font binaries, icon
+            // ligatures can leak as words after reload. NetworkFirst refreshes the
+            // CSS while still keeping a cached copy for offline starts.
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'NetworkFirst',
             options: {
-              cacheName: 'google-fonts-cache',
+              cacheName: 'google-fonts-styles-v3',
+              networkTimeoutSeconds: 3,
               expiration: {
                 maxEntries: 20,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
               },
               cacheableResponse: {
                 statuses: [200]
@@ -41,19 +45,13 @@ export default defineConfig({
             }
           },
           {
-            // Cache Google Fonts webfont binaries.
-            // The app uses many font families each with multiple unicode-range
-            // subsets — easily 50+ individual woff2 files. The old limit of 10
-            // caused constant LRU eviction, forcing re-fetches that fail on slow
-            // mobile connections. 100 entries covers all fonts comfortably.
-            // Only cache status 200 — opaque status-0 responses can permanently
-            // cache a corrupt/partial download with no way to clear it.
-            // Cache name versioned so existing users with old opaque-cached entries
-            // get a fresh cache automatically on the next SW update.
+            // Cache Google Fonts webfont binaries after a successful network load.
+            // The cache name is bumped so users with older font-cache entries get a
+            // clean cache after this service worker deploys.
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'gstatic-fonts-cache-v2',
+              cacheName: 'gstatic-fonts-cache-v3',
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
