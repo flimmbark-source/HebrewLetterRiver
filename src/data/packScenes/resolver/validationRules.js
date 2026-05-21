@@ -11,6 +11,9 @@ import {
   SUPPORTED_VISUAL_CUE_TYPES,
   SUPPORTED_OBJECT_GLYPH_CONCEPT_IDS,
   SUPPORTED_DAY_PARTS,
+  SUPPORTED_COMPARISON_CONCEPT_IDS,
+  SUPPORTED_CHARACTER_CONCEPT_IDS,
+  SUPPORTED_FAMILY_CONCEPT_IDS,
   DAY_PART_CONCEPT_MAP,
   COUNT_DOTS_CONCEPT_BY_COUNT,
   COUNT_DOTS_MAX,
@@ -24,6 +27,34 @@ function err(code, beatId, message) {
 
 function isNonEmptyArray(value) {
   return Array.isArray(value) && value.length > 0;
+}
+
+function validateConceptCue({ cue, beat, errors, cueType, fieldName, supportedSet, errorCode }) {
+  const conceptId = cue[fieldName];
+  if (!conceptId || typeof conceptId !== 'string') {
+    errors.push(err(errorCode, beat.id, `${cueType} visualCue must include ${fieldName}`));
+    return;
+  }
+  if (!supportedSet.has(conceptId)) {
+    errors.push(
+      err(
+        `unsupported_${cueType}_concept`,
+        beat.id,
+        `${cueType}.${fieldName} '${conceptId}' is not supported; must be one of: ${[...supportedSet].join(', ')}`
+      )
+    );
+    return;
+  }
+  const targets = beat.targetConceptIds || [];
+  if (!targets.includes(conceptId)) {
+    errors.push(
+      err(
+        'visual_cue_concept_mismatch',
+        beat.id,
+        `${cueType}.${fieldName} '${conceptId}' must appear in beat.targetConceptIds`
+      )
+    );
+  }
 }
 
 const universalRules = [
@@ -209,6 +240,42 @@ const universalRules = [
           )
         );
       }
+    }
+
+    if (cue.type === 'comparisonCue') {
+      validateConceptCue({
+        cue,
+        beat,
+        errors,
+        cueType: 'comparisonCue',
+        fieldName: 'conceptId',
+        supportedSet: SUPPORTED_COMPARISON_CONCEPT_IDS,
+        errorCode: 'invalid_comparison_cue',
+      });
+    }
+
+    if (cue.type === 'characterCue') {
+      validateConceptCue({
+        cue,
+        beat,
+        errors,
+        cueType: 'characterCue',
+        fieldName: 'conceptId',
+        supportedSet: SUPPORTED_CHARACTER_CONCEPT_IDS,
+        errorCode: 'invalid_character_cue',
+      });
+    }
+
+    if (cue.type === 'familyCue') {
+      validateConceptCue({
+        cue,
+        beat,
+        errors,
+        cueType: 'familyCue',
+        fieldName: 'conceptId',
+        supportedSet: SUPPORTED_FAMILY_CONCEPT_IDS,
+        errorCode: 'invalid_family_cue',
+      });
     }
 
     if (cue.type === 'countDots') {
