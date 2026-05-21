@@ -26,8 +26,10 @@ import MigrationInitializer from './components/MigrationInitializer.jsx';
 import PWAInstallPrompt from './components/PWAInstallPrompt.jsx';
 import PlayModeModal from './components/PlayModeModal.jsx';
 import OnboardingFlow from './components/OnboardingFlow.jsx';
+import Icon from './components/Icon.jsx';
 import { useFontSettings } from './hooks/useFontSettings.js';
 import './components/AppBottomNav.css';
+import './components/material-symbols-safe.css';
 
 function LanguageOnboardingModal() {
   const {
@@ -292,7 +294,7 @@ function Shell() {
             onClick={handleNavClick}
             className={({ isActive }) => `bottom-nav__item nav-item flex flex-col items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95 ${isActive ? 'nav-item-active' : ''}`}
           >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>home</span>
+            <Icon name="home" size={25} filled />
             <span>{t('app.nav.home', 'Home')}</span>
           </NavLink>
 
@@ -302,7 +304,7 @@ function Shell() {
             disabled={isPlayDisabled}
             className={`bottom-nav__item nav-item flex flex-col items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 ${isPlayActive ? 'nav-item-active' : ''}`}
           >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>videogame_asset</span>
+            <Icon name="videogame_asset" size={25} filled />
             <span>{t('app.nav.play', 'Play')}</span>
           </button>
 
@@ -311,7 +313,7 @@ function Shell() {
             onClick={handleNavClick}
             className={({ isActive }) => `bottom-nav__item nav-item flex flex-col items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95 ${isActive ? 'nav-item-active' : ''}`}
           >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>emoji_events</span>
+            <Icon name="emoji_events" size={25} filled />
             <span>{t('app.nav.achievements', 'Awards')}</span>
           </NavLink>
 
@@ -320,7 +322,7 @@ function Shell() {
             onClick={handleNavClick}
             className={({ isActive }) => `bottom-nav__item nav-item flex flex-col items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-wide transition-all duration-200 active:scale-95 ${isActive ? 'nav-item-active' : ''}`}
           >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}>settings</span>
+            <Icon name="settings" size={25} />
             <span>{t('app.nav.settings', 'Settings')}</span>
           </NavLink>
         </nav>
