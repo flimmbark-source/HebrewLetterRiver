@@ -1,0 +1,37 @@
+.material-symbols-outlined {
+  display: inline-block;
+  width: 1em;
+  min-width: 1em;
+  height: 1em;
+  overflow: hidden;
+  font-family: 'Material Symbols Outlined', sans-serif !important;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'liga';
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+  text-rendering: optimizeLegibility;
+  vertical-align: -0.125em;
+}
+
+.app-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  vertical-align: -0.125em;
+}
+
+html:not(.ms-ready) .material-symbols-outlined,
+html.ms-failed .material-symbols-outlined {
+  color: transparent !important;
+  text-shadow: none !important;
+}
