@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import Icon from './Icon.jsx';
 import { celebrate } from '../lib/celebration.js';
 import { saveState } from '../lib/storage.js';
 
@@ -33,16 +34,12 @@ export default function FirstSessionSuccess({ lettersLearned = 0, starsEarned = 
           className="mx-auto flex h-20 w-20 items-center justify-center rounded-full"
           style={{ background: 'var(--app-primary-container)' }}
         >
-          <span
-            className="material-symbols-outlined text-4xl"
-            style={{
-              color: 'var(--app-primary)',
-              fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 48"
-            }}
-            aria-hidden="true"
-          >
-            celebration
-          </span>
+          <Icon
+            name="celebration"
+            className="text-4xl"
+            style={{ color: 'var(--app-primary)' }}
+            filled
+          />
         </div>
 
         <h2
@@ -95,25 +92,23 @@ export default function FirstSessionSuccess({ lettersLearned = 0, starsEarned = 
           </p>
           <div className="mt-2 space-y-2">
             <div className="flex items-center gap-3">
-              <span
-                className="material-symbols-outlined text-lg"
-                style={{ color: 'var(--app-primary)', fontVariationSettings: "'FILL' 1, 'wght' 500" }}
-                aria-hidden="true"
-              >
-                event_repeat
-              </span>
+              <Icon
+                name="event_repeat"
+                className="text-lg"
+                style={{ color: 'var(--app-primary)' }}
+                filled
+              />
               <p className="text-sm" style={{ color: 'var(--app-on-surface)' }}>
                 Come back tomorrow for your daily quests
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <span
-                className="material-symbols-outlined text-lg"
-                style={{ color: 'var(--app-mode-bridge, #f59e0b)', fontVariationSettings: "'FILL' 1, 'wght' 500" }}
-                aria-hidden="true"
-              >
-                extension
-              </span>
+              <Icon
+                name="extension"
+                className="text-lg"
+                style={{ color: 'var(--app-mode-bridge, #f59e0b)' }}
+                filled
+              />
               <p className="text-sm" style={{ color: 'var(--app-on-surface)' }}>
                 Try Vocab Builder for word practice
               </p>

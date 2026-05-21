@@ -24,6 +24,7 @@ import {
   sortPackData,
 } from './bridgeBuilderSetupHelpers.js';
 import SkillCheckScreen from '../SkillCheckScreen.jsx';
+import Icon from '../Icon.jsx';
 import { bridgeBuilderWords, getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import { allSentences } from '../../data/sentences/index.ts';
 import { applyQuizMastery } from '../../lib/quizMastery.js';
@@ -169,7 +170,7 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
           aria-label={`${pack.title} — ${support}`}
         >
           <span className={`bbs-node-circle bbs-node-circle--${state} bbs-node-circle--${accent}`}>
-            <span className="material-symbols-outlined bbs-node-icon">{icon}</span>
+            <Icon name={icon} className="bbs-node-icon" />
           </span>
           {unlocked && state !== 'locked' && (
             <span
@@ -180,19 +181,19 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
                 className={`bbs-completion-mode ${comp.bridgeBuilderComplete ? 'bbs-completion-mode--done' : ''}`}
                 title={comp.bridgeBuilderComplete ? 'Bridge Builder complete' : 'Bridge Builder not complete'}
               >
-                <span className="material-symbols-outlined bbs-completion-mode-icon">conversion_path</span>
+                <Icon name="conversion_path" className="bbs-completion-mode-icon" />
               </span>
               <span
                 className={`bbs-completion-mode ${comp.loosePlanksComplete ? 'bbs-completion-mode--done' : ''}`}
                 title={comp.loosePlanksComplete ? 'Floating Planks complete' : 'Floating Planks not complete'}
               >
-                <span className="material-symbols-outlined bbs-completion-mode-icon">water</span>
+                <Icon name="water" className="bbs-completion-mode-icon" />
               </span>
               <span
                 className={`bbs-completion-mode ${comp.deepScriptComplete ? 'bbs-completion-mode--done' : ''}`}
                 title={comp.deepScriptComplete ? 'Deep Script complete' : 'Deep Script not complete'}
               >
-                <span className="material-symbols-outlined bbs-completion-mode-icon">ink_pen</span>
+                <Icon name="ink_pen" className="bbs-completion-mode-icon" />
               </span>
             </span>
           )}
@@ -215,28 +216,28 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
             className={`bbs-method ${lastMethod === 'vocab' ? 'bbs-method--last' : ''}`}
             onClick={() => handleLaunch('vocab')}
           >
-            <span className="material-symbols-outlined bbs-method-ic">conversion_path</span>
+            <Icon name="conversion_path" className="bbs-method-ic" />
             <div className="bbs-method-text">
               <span className="bbs-method-name">
                 {lastMethod === 'vocab' ? 'Continue Vocab Builder' : 'Vocab Builder'}
               </span>
               <span className="bbs-method-sub">Structured pack practice</span>
             </div>
-            <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
+            <Icon name="arrow_forward" className="bbs-method-go" />
           </button>
           <button
             type="button"
             className={`bbs-method ${lastMethod === 'deep_script' ? 'bbs-method--last' : ''}`}
             onClick={() => handleLaunch('deep_script')}
           >
-            <span className="material-symbols-outlined bbs-method-ic">ink_pen</span>
+            <Icon name="ink_pen" className="bbs-method-ic" />
             <div className="bbs-method-text">
               <span className="bbs-method-name">
                 {lastMethod === 'deep_script' ? 'Continue Deep Script' : 'Deep Script Floor'}
               </span>
               <span className="bbs-method-sub">A dungeon floor built from this pack</span>
             </div>
-            <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
+            <Icon name="arrow_forward" className="bbs-method-go" />
           </button>
           {pack.wordIds.length >= 3 && (
             <button
@@ -245,12 +246,12 @@ function PathNode({ pack, progress, unlocked, isCurrent, isExpanded, lastMethod,
               onClick={() => unlocked && onQuizLaunch(pack)}
               disabled={!unlocked}
             >
-              <span className="material-symbols-outlined bbs-method-ic">quiz</span>
+              <Icon name="quiz" className="bbs-method-ic" />
               <div className="bbs-method-text">
                 <span className="bbs-method-name">Quick Word Check</span>
                 <span className="bbs-method-sub">Already know these? Skip the intro</span>
               </div>
-              <span className="material-symbols-outlined bbs-method-go">arrow_forward</span>
+              <Icon name="arrow_forward" className="bbs-method-go" />
             </button>
           )}
           {lastMethod && (
@@ -303,7 +304,7 @@ function SectionBlock({ section, sectionProgress, unlocked, packData, activePack
       {/* Section header */}
       <div className="bbs-block-header">
         <div className={`bbs-block-icon bbs-block-icon--${accent}`}>
-          <span className="material-symbols-outlined" style={{ fontSize: 22 }}>{meta.icon}</span>
+          <Icon name={meta.icon} style={{ fontSize: 22 }} />
         </div>
         <div className="bbs-block-info">
           <div className="bbs-block-top">
@@ -377,7 +378,7 @@ function ProgressDots({ completion, modeOverride, unlocked, packId, onDotClick }
             aria-label={dot.label} aria-pressed={dot.override}
             onClick={(e) => { e.stopPropagation(); if (unlocked && onDotClick) onDotClick(packId, dot.mode); }}>
             <span className={cls} />
-            <span className="material-symbols-outlined bbs-dot-mode-icon" aria-hidden="true">{dot.icon}</span>
+            <Icon name={dot.icon} className="bbs-dot-mode-icon" aria-hidden="true" />
           </button>
         );
       })}
@@ -441,7 +442,7 @@ function ReviewCard({ dueCount, weakCount, onPlay }) {
     <div className="bbs-review-wrap">
       <div className={`bbs-review-card ${!available ? 'bbs-review-card--disabled' : ''}`}>
         <div className="bbs-review-icon-wrap">
-          <span className="material-symbols-outlined" style={{ fontSize: 36, color: 'var(--m3-primary)', fontVariationSettings: "'FILL' 1" }}>casino</span>
+          <Icon name="casino" filled style={{ fontSize: 36, color: 'var(--m3-primary)' }} />
         </div>
         <div className="bbs-review-info">
           <h3 className="bbs-review-title">Review Due Now</h3>
@@ -756,7 +757,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
           <div className="bbs-guided">
             {!Object.values(packCompletions).some(c => c.quizMastered || c.sentenceReady) && (
               <div className="bbs-skill-check-banner">
-                <span className="material-symbols-outlined bbs-skill-check-icon">quiz</span>
+                <Icon name="quiz" className="bbs-skill-check-icon" />
                 <div className="bbs-skill-check-text">
                   <span className="bbs-skill-check-title">{`Already know some ${languageName}?`}</span>
                   <span className="bbs-skill-check-sub">Take a quick skill check to unlock packs you've mastered</span>
@@ -768,7 +769,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
             )}
             {quizResult && (
               <div className="bbs-quiz-result-banner">
-                <span className="material-symbols-outlined" style={{ fontSize: 18, flexShrink: 0 }}>star</span>
+                <Icon name="star" style={{ fontSize: 18, flexShrink: 0 }} />
                 <span className="bbs-quiz-result-text">
                   {quizResult.type === 'pack' ? (
                     <>

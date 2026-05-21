@@ -8,6 +8,7 @@ import DualRoleConversationCardGrid from '../components/conversation/DualRoleCon
 import { buildDualRoleConversationCardItems } from '../components/conversation/dualRoleConversationCardData.js';
 import PackSceneSession from '../components/packScene/PackSceneSession.jsx';
 import { getCanonicalPackId, getConsolidatedPackById } from '../data/bridgeBuilderPackConsolidation.js';
+import Icon from '../components/Icon.jsx';
 import riverBackground from '../assets/Reading/River-Background.png';
 
 function getContextualReadItem(pack, dualRoleItems) {
@@ -174,7 +175,7 @@ export default function LearnView() {
               onClick={() => startConversationItem(contextualReadItem)}
             >
               <span>{t('read.contextualPack.start', 'Start contextual reading')}</span>
-              <span className="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+              <Icon name="chevron_right" aria-hidden="true" />
             </button>
           ) : (
             <div className="rounded-xl p-3 text-sm" style={{ border: '1px solid var(--app-card-border)', background: 'var(--app-card-bg)', color: 'var(--app-muted)' }}>

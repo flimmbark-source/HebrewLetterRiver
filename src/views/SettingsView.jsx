@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Icon from '../components/Icon.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
@@ -16,23 +17,11 @@ const LANGUAGE_FLAGS = {
   bengali: '🇧🇩', mandarin: '🇨🇳', japanese: '🇯🇵', amharic: '🇪🇹',
 };
 
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
-
 function Toggle({ id, label, icon, checked, onChange }) {
   return (
     <label htmlFor={id} className="group flex cursor-pointer items-center justify-between">
       <div className="flex items-center gap-4">
-        <Icon style={{ color: 'var(--app-muted)', transition: 'color 0.15s' }}>{icon}</Icon>
+        <Icon name={icon} style={{ color: 'var(--app-muted)', transition: 'color 0.15s' }} />
         <span className="font-semibold" style={{ color: 'var(--app-on-surface)' }}>{label}</span>
       </div>
       <div className="relative inline-flex items-center">
@@ -269,7 +258,7 @@ export default function SettingsView() {
       <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between px-6 backdrop-blur-xl" style={{ background: 'var(--app-nav-bg)' }}>
         <div className="flex items-center gap-4">
           <button className="transition hover:opacity-80 active:scale-95" style={{ color: 'var(--app-primary)' }} onClick={() => navigate('/')} type="button" aria-label="Back to Home">
-            <Icon>arrow_back</Icon>
+            <Icon name="arrow_back" />
           </button>
           <h1 className="text-lg font-bold" style={{ color: 'var(--app-primary)' }}>Settings</h1>
         </div>
@@ -284,7 +273,7 @@ export default function SettingsView() {
               <img src={playerAvatar} alt="Profile avatar" className="h-full w-full object-cover" />
             </div>
             <button type="button" onClick={() => setIsProfileEditorOpen(true)} className="absolute -bottom-1 -right-1 rounded-full border p-1" style={{ borderColor: 'var(--app-card-bg)', background: 'var(--app-primary)', color: 'var(--app-on-primary)' }}>
-              <Icon className="text-[14px]">edit</Icon>
+              <Icon name="edit" className="text-[14px]" />
             </button>
             <div className="absolute -bottom-1 left-0 rounded-full px-2 py-0.5 text-[10px] font-bold shadow-md" style={{ background: 'var(--app-secondary)', color: 'var(--app-on-primary)' }}>LVL {level}</div>
           </div>
@@ -308,13 +297,13 @@ export default function SettingsView() {
             <div className="stable-card rounded-xl p-5 shadow-sm" style={{ background: 'var(--app-card-bg)', border: '1px solid var(--app-card-border)' }}>
               <label htmlFor="settings-app-language-select" className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <Icon style={{ color: 'var(--app-primary)' }}>language</Icon>
+                  <Icon name="language" style={{ color: 'var(--app-primary)' }} />
                   <div>
                     <p className="line-clamp-1-stable text-xs font-medium" style={{ color: 'var(--app-muted)' }}>App Language</p>
                     <p className="line-clamp-1-stable font-bold" style={{ color: 'var(--app-on-surface)' }}>{displayLanguageOptions.find((option) => option.id === appLanguageId)?.name}</p>
                   </div>
                 </div>
-                <Icon style={{ color: 'var(--app-outline-variant)' }}>expand_more</Icon>
+                <Icon name="expand_more" style={{ color: 'var(--app-outline-variant)' }} />
               </label>
               <select id="settings-app-language-select" value={appLanguageId} onChange={(event) => selectAppLanguage(event.target.value)} className="mt-3 w-full rounded-lg px-3 py-2 text-sm font-semibold" style={{ border: '1px solid var(--app-input-border)', background: 'var(--app-input-bg)', color: 'var(--app-on-surface)' }}>
                 {displayLanguageOptions.map((option) => (
@@ -357,7 +346,7 @@ export default function SettingsView() {
                 </div>
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-4">
-                    <Icon style={{ color: 'var(--app-muted)' }}>text_format</Icon>
+                    <Icon name="text_format" style={{ color: 'var(--app-muted)' }} />
                     <InfoButton settingKey="appFont">App Font</InfoButton>
                   </div>
                   <select id="settings-app-font-select" value={appFont} onChange={(event) => setAppFont(event.target.value)} className="rounded-md px-2 py-1 font-bold" style={{ border: '1px solid var(--app-input-border)', color: 'var(--app-primary)', background: 'var(--app-input-bg)' }}>
@@ -375,7 +364,7 @@ export default function SettingsView() {
                 <div style={{ borderBottom: '1px solid var(--app-card-border)' }}>
                   <div className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-4">
-                      <Icon style={{ color: 'var(--app-muted)' }}>text_fields</Icon>
+                      <Icon name="text_fields" style={{ color: 'var(--app-muted)' }} />
                       <InfoButton settingKey="gameFont">Game Font</InfoButton>
                     </div>
                     <select id="settings-font-select" value={gameFont} onChange={(event) => setGameFont(event.target.value)} className="rounded-md px-2 py-1 font-bold" style={{ border: '1px solid var(--app-input-border)', color: 'var(--app-primary)', background: 'var(--app-input-bg)' }}>
@@ -397,7 +386,7 @@ export default function SettingsView() {
                 <div className="space-y-6 p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <Icon style={{ color: 'var(--app-muted)' }}>format_list_numbered</Icon>
+                      <Icon name="format_list_numbered" style={{ color: 'var(--app-muted)' }} />
                       <InfoButton settingKey="startingLetters">Starting Letters</InfoButton>
                     </div>
                     <select id="settings-starting-letters-select" value={startingLetters} onChange={(event) => setStartingLetters(parseInt(event.target.value, 10))} className="rounded-md pl-2 pr-8 py-1 font-bold" style={{ border: '1px solid var(--app-input-border)', color: 'var(--app-primary)', background: 'var(--app-input-bg)' }}>
@@ -434,7 +423,7 @@ export default function SettingsView() {
                 setSoundEnabled(val);
               }} />
               <div className="flex items-center gap-4">
-                <Icon style={{ color: 'var(--app-muted)' }}>tune</Icon>
+                <Icon name="tune" style={{ color: 'var(--app-muted)' }} />
                 <span className="flex-1 font-semibold" style={{ color: 'var(--app-on-surface)' }}>Volume</span>
                 <input
                   type="range"

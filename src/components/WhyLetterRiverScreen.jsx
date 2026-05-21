@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Icon from './Icon.jsx';
 import { loadState, saveState } from '../lib/storage.js';
 
 const blocks = [
@@ -66,16 +67,12 @@ export default function WhyLetterRiverScreen({ onContinue }) {
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
                 style={{ background: 'var(--app-primary-container)' }}
               >
-                <span
-                  className="material-symbols-outlined text-xl"
-                  style={{
-                    color: 'var(--app-primary)',
-                    fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24"
-                  }}
-                  aria-hidden="true"
-                >
-                  {block.icon}
-                </span>
+                <Icon
+                  name={block.icon}
+                  className="text-xl"
+                  style={{ color: 'var(--app-primary)' }}
+                  filled
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold" style={{ color: 'var(--app-on-surface)' }}>

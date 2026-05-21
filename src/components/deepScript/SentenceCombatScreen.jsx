@@ -12,6 +12,7 @@ import {
   playGear, playVictory, playDefeat,
 } from './dsSounds.js';
 import { useFontSettings } from '../../hooks/useFontSettings.js';
+import Icon from '../Icon.jsx';
 
 /**
  * SentenceCombatScreen — Deep Script sentence-mode battle.
@@ -328,7 +329,7 @@ export default function SentenceCombatScreen({
             disabled={combat.phase !== 'active'}
           >
             <div className="ds-ability-icon-center">
-              <span className="material-symbols-outlined" style={{ fontSize: 22 }}>dictionary</span>
+              <Icon name="dictionary" style={{ fontSize: 22 }} />
             </div>
             <div className="ds-ability-effect">Pack Words</div>
           </button>
@@ -340,7 +341,7 @@ export default function SentenceCombatScreen({
             disabled={combat.phase !== 'active'}
           >
             <div className="ds-ability-icon-center">
-              <span className="material-symbols-outlined" style={{ fontSize: 22 }}>link</span>
+              <Icon name="link" style={{ fontSize: 22 }} />
             </div>
             <div className="ds-ability-effect">Connectors</div>
           </button>

@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from './Icon.jsx';
 import ShareButton from './ShareButton.jsx';
 
 /**
@@ -88,12 +89,7 @@ export default function AchievementShareCard({
           className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/10 hover:text-white"
           aria-label="Dismiss"
         >
-          <span
-            className="material-symbols-outlined text-xl"
-            style={{ fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}
-          >
-            close
-          </span>
+          <Icon name="close" className="text-xl" />
         </button>
 
         {/* Trophy icon */}

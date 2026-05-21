@@ -2,18 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useProgress, STREAK_MILESTONES } from '../context/ProgressContext.jsx';
 import { on } from '../lib/eventBus.js';
 import Modal from './ui/Modal.jsx';
-
-function Icon({ children, className = '', filled = false, style = {} }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24`, ...style }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
+import Icon from './Icon.jsx';
 
 export default function StreakMilestoneModal() {
   const { streak, claimStreakMilestone } = useProgress();
@@ -75,9 +64,7 @@ export default function StreakMilestoneModal() {
         <div className="relative z-10">
           {/* Flame icon */}
           <div className="mb-4 flex justify-center">
-            <Icon className="text-7xl" filled style={{ color: '#f97316' }}>
-              local_fire_department
-            </Icon>
+            <Icon name="local_fire_department" className="text-7xl" filled style={{ color: '#f97316' }} />
           </div>
 
           <h2
@@ -119,7 +106,7 @@ export default function StreakMilestoneModal() {
             </button>
           ) : (
             <div className="mt-6 flex items-center justify-center gap-2 py-4">
-              <Icon className="text-xl" filled style={{ color: 'var(--app-primary)' }}>check_circle</Icon>
+              <Icon name="check_circle" className="text-xl" filled style={{ color: 'var(--app-primary)' }} />
               <span className="text-base font-bold" style={{ color: 'var(--app-primary)' }}>
                 Claimed!
               </span>

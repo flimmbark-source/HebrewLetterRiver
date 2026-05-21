@@ -7,6 +7,7 @@ import PackSceneDevError from './PackSceneDevError.jsx';
 import VisualCue from './VisualCue.jsx';
 import { resolvePackScene } from '../../data/packScenes/resolver/resolvePackScene.js';
 import { markPackSceneComplete } from '../../lib/bridgeBuilderStorage.js';
+import Icon from '../Icon.jsx';
 
 const SPEAKER_LABEL_KEYS = {
   server: { key: 'packScene.speaker.server', fallback: 'Server:' },
@@ -229,7 +230,7 @@ function PackSceneBrief({ scene, onStart, onExit }) {
             className="flex h-9 w-9 items-center justify-center rounded-full bg-white/78 text-[#315846] shadow-sm transition hover:bg-white"
             aria-label={t('packScene.brief.back', 'Back')}
           >
-            <span className="material-symbols-outlined text-xl" aria-hidden="true">arrow_back</span>
+            <Icon name="arrow_back" className="text-xl" aria-hidden="true" />
           </button>
           <h1 className="text-lg font-bold text-[#1b352b]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
             {t('packScene.brief.title', 'Practice in Context')}
@@ -393,7 +394,7 @@ function PackSceneBeatScreen({ scene, beat, onResult, onExit, beatIndex, totalBe
           className="flex h-9 w-9 items-center justify-center rounded-full bg-white/78 text-[#315846] shadow-sm transition hover:bg-white"
           aria-label={t('packScene.scene.exit', 'Exit scene')}
         >
-          <span className="material-symbols-outlined text-xl" aria-hidden="true">close</span>
+          <Icon name="close" className="text-xl" aria-hidden="true" />
         </button>
         <div className="text-center" dir={directionConfig.supportDirection}>
           <div className="text-sm font-bold text-[#183d2e]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>

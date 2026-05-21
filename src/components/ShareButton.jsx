@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import Icon from './Icon.jsx';
 import { shareResult, canNativeShare } from '../lib/shareService.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { emit } from '../lib/eventBus.js';
@@ -81,13 +82,7 @@ export default function ShareButton({ data, surface, className = '', children })
         backdropFilter: 'blur(8px)',
       }}
     >
-      <span
-        className="material-symbols-outlined text-lg"
-        style={{ fontVariationSettings: "'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}
-        aria-hidden="true"
-      >
-        {icon}
-      </span>
+      <Icon name={icon} className="text-lg" />
       {label}
     </button>
   );

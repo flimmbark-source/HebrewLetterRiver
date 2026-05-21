@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import badgesCatalog from '../data/badges.json';
+import Icon from '../components/Icon.jsx';
 import { useProgress, STAR_LEVEL_SIZE } from '../context/ProgressContext.jsx';
 import { DEFAULT_PROFILE_NAME } from '../data/profileAvatars.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
@@ -11,14 +12,6 @@ const SECTION_GROUPS = [
 ];
 
 const DEFAULT_FALLBACK_GROUP = { key: 'moreAchievements', label: 'More Achievements', sections: [] };
-
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span className={`material-symbols-outlined ${className}`} style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}>
-      {children}
-    </span>
-  );
-}
 
 function formatBadgeNameFromId(id = '') {
   return id
@@ -219,7 +212,7 @@ export default function AchievementsView() {
                 {recentBadge ? getBadgeCopy(recentBadge, t, gameName, recentBadge?.tiers?.[0]?.goal ?? 1).summary : 'Completed 5 different language paths.'}
               </p>
             </div>
-            <div className="ml-4 flex h-20 w-20 items-center justify-center rounded-full shadow-sm" style={{ background: 'var(--app-mode-bridge-bg)' }}><Icon className="text-4xl" style={{ color: 'var(--app-mode-bridge)' }} filled>emoji_events</Icon></div>
+            <div className="ml-4 flex h-20 w-20 items-center justify-center rounded-full shadow-sm" style={{ background: 'var(--app-mode-bridge-bg)' }}><Icon name="emoji_events" className="text-4xl" style={{ color: 'var(--app-mode-bridge)' }} filled /></div>
           </div>
 
           {milestones.map((badge, index) => {
@@ -232,7 +225,7 @@ export default function AchievementsView() {
               : { surface: 'var(--app-mode-planks-surface)', border: 'var(--app-mode-planks-bg)', accent: 'var(--app-mode-planks)', bg: 'var(--app-mode-planks-bg)' };
             return (
               <div key={badge.id} className="stable-card flex flex-col rounded-xl p-5" style={{ background: mColors.surface, border: `1px solid ${mColors.border}` }}>
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full shadow-sm" style={{ background: mColors.bg }}><Icon style={{ color: mColors.accent }} filled>{index === 0 ? 'history_edu' : 'auto_awesome'}</Icon></div>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full shadow-sm" style={{ background: mColors.bg }}><Icon name={index === 0 ? 'history_edu' : 'auto_awesome'} style={{ color: mColors.accent }} filled /></div>
                 <div>
                   <h4 className="line-clamp-1-stable mb-1 text-lg font-bold leading-tight" style={{ color: 'var(--app-on-surface)' }}>{getBadgeCopy(badge, t, gameName, goal).name}</h4>
                   <p className="line-clamp-2-stable text-xs" style={{ color: 'var(--app-muted)' }}>{getBadgeCopy(badge, t, gameName, goal).summary}</p>
@@ -271,8 +264,8 @@ export default function AchievementsView() {
                   return (
                     <div key={badge.id} className="stable-card flex items-center gap-5 rounded-xl p-4 transition-all duration-200" style={{ border: `1px solid ${bc.bg}`, background: 'var(--app-card-bg)' }}>
                       <div className="relative">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-full shadow-sm" style={{ background: bc.bg }}><Icon style={{ color: bc.accent }}>workspace_premium</Icon></div>
-                        <div className="absolute -bottom-1 -right-1 rounded-full p-1 shadow-sm" style={{ background: 'var(--app-card-bg)' }}><Icon className="text-[14px]" style={{ color: bc.accent }}>lock</Icon></div>
+                        <div className="flex h-14 w-14 items-center justify-center rounded-full shadow-sm" style={{ background: bc.bg }}><Icon name="workspace_premium" style={{ color: bc.accent }} /></div>
+                        <div className="absolute -bottom-1 -right-1 rounded-full p-1 shadow-sm" style={{ background: 'var(--app-card-bg)' }}><Icon name="lock" className="text-[14px]" style={{ color: bc.accent }} /></div>
                       </div>
                       <div className="flex-1">
                         <div className="mb-1 flex items-end justify-between">
@@ -305,7 +298,7 @@ export default function AchievementsView() {
             aria-expanded={isAllAchievementsExpanded}
           >
             <h3 className="text-lg font-bold" style={{ color: 'var(--app-primary)' }}>All Achievements ({totalAchievementCount})</h3>
-            <Icon style={{ color: 'var(--app-primary)' }}>{isAllAchievementsExpanded ? 'expand_less' : 'expand_more'}</Icon>
+            <Icon name={isAllAchievementsExpanded ? 'expand_less' : 'expand_more'} style={{ color: 'var(--app-primary)' }} />
           </button>
 
           {isAllAchievementsExpanded ? (

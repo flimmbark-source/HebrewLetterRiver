@@ -18,19 +18,8 @@ import './VocabJourneyWordPopup.css';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import { useLanguage } from '../../context/LanguageContext.jsx';
 import { loadBridgeBuilderWords } from '../../data/bridgeBuilder/words/index.js';
+import Icon from '../Icon.jsx';
 
-
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 function localizeStageInfo(stageInfo, t) {
   const stageLabelKeys = {
@@ -156,7 +145,7 @@ function SheetProgress({ steps, t }) {
       {steps.map((step, index) => (
         <div key={step.id} className="vj-sheet-progress-step">
           <span className={`vj-sheet-progress-node ${step.complete ? 'is-complete' : ''}`}>
-            {step.complete ? <Icon>check</Icon> : index + 1}
+            {step.complete ? <Icon name="check" /> : index + 1}
           </span>
           <span className="vj-sheet-progress-label">{step.label}</span>
         </div>
@@ -207,10 +196,10 @@ function CurrentPackDetailSheet({
           <img src={cafeArt} alt="" loading="lazy" />
           <div className="vj-sheet-hero-fade" />
           <button type="button" className="vj-sheet-nav-btn vj-sheet-nav-btn--left" onClick={onClose} aria-label={t('bridgeBuilder.vocabJourney.closePackDetails', 'Close pack details')}>
-            <Icon>arrow_back</Icon>
+            <Icon name="arrow_back" />
           </button>
           <button type="button" className="vj-sheet-nav-btn vj-sheet-nav-btn--right" aria-label={t('bridgeBuilder.vocabJourney.savePack', 'Save pack')}>
-            <Icon>bookmark</Icon>
+            <Icon name="bookmark" />
           </button>
         </div>
 
@@ -230,24 +219,24 @@ function CurrentPackDetailSheet({
               <strong>{recommendedAction.title}</strong>
               <small>{recommendedAction.subtitle}</small>
             </span>
-            <span className="vj-orange-circle"><Icon>chevron_right</Icon></span>
+            <span className="vj-orange-circle"><Icon name="chevron_right" /></span>
           </button>
         </div>
 
         <div className="vj-option-list">
           <h3>{t('bridgeBuilder.vocabJourney.moreWaysToLearn', 'More ways to learn')}</h3>
           <button type="button" className="vj-option" onClick={onLaunchBridgeBuilder}>
-            <span className="vj-option-icon vj-option-icon--orange"><Icon filled>architecture</Icon></span>
+            <span className="vj-option-icon vj-option-icon--orange"><Icon name="architecture" filled /></span>
             <span><strong>{t('bridgeBuilder.vocabJourney.optionBridgeBuilderTitle', 'Learn — Bridge Builder')}</strong><small>{t('bridgeBuilder.vocabJourney.optionBridgeBuilderSubtitle', 'Build vocabulary with guided lessons.')}</small></span>
-            <Icon>chevron_right</Icon>
+            <Icon name="chevron_right" />
           </button>
           <button type="button" className="vj-option" onClick={onLaunchLoosePlanks}>
-            <span className="vj-option-icon vj-option-icon--teal"><Icon filled>view_stream</Icon></span>
+            <span className="vj-option-icon vj-option-icon--teal"><Icon name="view_stream" filled /></span>
             <span><strong>{t('bridgeBuilder.vocabJourney.optionLoosePlanksTitle', 'Strengthen — Loose Planks')}</strong><small>{t('bridgeBuilder.vocabJourney.optionLoosePlanksSubtitle', 'Reinforce with targeted practice.')}</small></span>
-            <Icon>chevron_right</Icon>
+            <Icon name="chevron_right" />
           </button>
           <button type="button" className="vj-option" onClick={onLaunchReadContext}>
-            <span className="vj-option-icon vj-option-icon--blue"><Icon filled>menu_book</Icon></span>
+            <span className="vj-option-icon vj-option-icon--blue"><Icon name="menu_book" filled /></span>
             <span>
               <strong>{t('bridgeBuilder.vocabJourney.optionReadTitle', 'Read in Context')}</strong>
               <small>
@@ -258,10 +247,10 @@ function CurrentPackDetailSheet({
             </span>
             {packSceneComplete && (
               <span className="vj-row-done" aria-label={t('bridgeBuilder.vocabJourney.packSceneDone', 'Completed')}>
-                <Icon filled>check_circle</Icon>
+                <Icon name="check_circle" filled />
               </span>
             )}
-            <Icon>chevron_right</Icon>
+            <Icon name="chevron_right" />
           </button>
         </div>
       </section>
@@ -364,7 +353,7 @@ function SectionPackTray({
             <p>{t('bridgeBuilder.vocabJourney.pickPackInSection', 'Pick a pack from this section.')}</p>
           </div>
           <button type="button" className="vj-pack-drawer-close" onClick={onToggleExpanded} aria-label={t('common.close', 'Close')}>
-            <Icon>close</Icon>
+            <Icon name="close" />
           </button>
         </header>
         <div className="vj-pack-drawer-list">
@@ -416,17 +405,17 @@ function PathStopButton({ stop, locked, statusLabel, t, onPress }) {
   return (
     <button type="button" className="vj-path-stop-action" onClick={onPress} disabled={locked}>
       <span className="vj-path-icon">
-        <Icon filled>{locked ? 'lock' : stop.icon}</Icon>
+        <Icon name={locked ? 'lock' : stop.icon} filled />
       </span>
       <span className="vj-path-copy">
         <strong>{t(`bridgeBuilder.sections.${stop.id}.title`, stop.title)}</strong>
         <small>{statusLabel}</small>
       </span>
       {locked
-        ? <Icon>lock</Icon>
+        ? <Icon name="lock" />
         : stop.status === 'Complete'
-          ? <Icon className="vj-path-check" filled>check_circle</Icon>
-          : <Icon>chevron_right</Icon>}
+          ? <Icon name="check_circle" className="vj-path-check" filled />
+          : <Icon name="chevron_right" />}
     </button>
   );
 }
@@ -547,7 +536,7 @@ export default function VocabJourneyPanel({
         </div>
         <div className="vj-main-grid" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
           <p style={{ color: '#666', marginBottom: '1.5rem' }}>{t('bridgeBuilder.vocabJourney.noPacks', 'No packs available yet.')}</p>
-          <button type="button" className="vj-main-cta" onClick={onOpenBrowse}><Icon filled>arrow_forward</Icon><span>{t('bridgeBuilder.vocabJourney.allPacks', 'All Packs')}</span></button>
+          <button type="button" className="vj-main-cta" onClick={onOpenBrowse}><Icon name="arrow_forward" filled /><span>{t('bridgeBuilder.vocabJourney.allPacks', 'All Packs')}</span></button>
         </div>
       </section>
     );
@@ -559,7 +548,7 @@ export default function VocabJourneyPanel({
         <div className="vj-hero-scrim" />
         <div className="vj-brand-row">
           <LetterRiverBrand label={t('app.brand.name', 'Letter River')} className="vj-brand" />
-          <div className="vj-streak-pill"><Icon filled>auto_stories</Icon><span>{journeyStats.completedPacks}</span></div>
+          <div className="vj-streak-pill"><Icon name="auto_stories" filled /><span>{journeyStats.completedPacks}</span></div>
         </div>
 
         <div className="vj-hero-copy">
@@ -586,9 +575,9 @@ export default function VocabJourneyPanel({
           <div className="vj-card-copy">
             <span className="vj-badge">{t('bridgeBuilder.vocabJourney.currentPack', 'Current Pack')}</span>
             <h2>{localizedPackTitle}</h2>
-            <p className="vj-learn-line"><Icon filled>eco</Icon>{t('bridgeBuilder.vocabJourney.learnEverydayWords', 'Learn {{count}} everyday words', { count: currentPack.targetsNewCount || currentPack.wordIds?.length || 8 })}</p>
+            <p className="vj-learn-line"><Icon name="eco" filled />{t('bridgeBuilder.vocabJourney.learnEverydayWords', 'Learn {{count}} everyday words', { count: currentPack.targetsNewCount || currentPack.wordIds?.length || 8 })}</p>
             <p className="vj-goal-line">{t('bridgeBuilder.vocabJourney.currentGoal', 'Press for more details')}</p>
-            <p className="vj-card-details-hint"><Icon>expand_more</Icon>{t('bridgeBuilder.vocabJourney.tapForPackDetails', 'Tap for pack details')}</p>
+            <p className="vj-card-details-hint"><Icon name="expand_more" />{t('bridgeBuilder.vocabJourney.tapForPackDetails', 'Tap for pack details')}</p>
             <button
               type="button"
               className="vj-main-cta"
@@ -597,7 +586,7 @@ export default function VocabJourneyPanel({
                 onLaunchPackMethod(currentPack, recommendedAction.method);
               }}
             >
-              <Icon filled>conversion_path</Icon><span>{localizedRecommendedAction.ctaLabel}</span><Icon>chevron_right</Icon>
+              <Icon name="conversion_path" filled /><span>{localizedRecommendedAction.ctaLabel}</span><Icon name="chevron_right" />
             </button>
           </div>
           <img className="vj-cafe-art" src={cafeArt} alt="" loading="lazy" />

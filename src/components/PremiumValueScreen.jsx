@@ -1,18 +1,7 @@
 import React from 'react';
+import Icon from './Icon.jsx';
 import { PLAN_PRICES, startCheckout, completeCheckout } from '../lib/checkoutService.js';
 import { usePremium } from '../context/PremiumContext.jsx';
-
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 const BENEFITS = [
   { icon: 'waves', title: 'Unlimited Letter River', desc: 'Always free — no limits ever' },
@@ -48,7 +37,7 @@ export default function PremiumValueScreen({ onClose, onSelectPlan }) {
       <div className="mx-auto max-w-lg space-y-6 px-4 py-8">
         <div className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg, #D4A017, #F5D76E)' }}>
-            <Icon className="text-3xl" filled style={{ color: '#fff' }}>workspace_premium</Icon>
+            <Icon name="workspace_premium" className="text-3xl" filled style={{ color: '#fff' }} />
           </div>
           <h2 className="text-2xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif', color: 'var(--app-on-surface)' }}>
             You're Premium!
@@ -71,7 +60,7 @@ export default function PremiumValueScreen({ onClose, onSelectPlan }) {
       {/* Hero */}
       <div className="text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg, var(--app-primary), #145e42)' }}>
-          <Icon className="text-3xl" filled style={{ color: '#fff' }}>workspace_premium</Icon>
+          <Icon name="workspace_premium" className="text-3xl" filled style={{ color: '#fff' }} />
         </div>
         <h2 className="text-2xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif', color: 'var(--app-on-surface)' }}>
           Letter River Premium
@@ -90,7 +79,7 @@ export default function PremiumValueScreen({ onClose, onSelectPlan }) {
             style={{ background: 'var(--app-surface)', border: '1px solid var(--app-card-border)' }}
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style={{ background: 'var(--app-primary)', opacity: 0.15 }}>
-              <Icon className="text-lg" filled style={{ color: 'var(--app-primary)' }}>{benefit.icon}</Icon>
+              <Icon name={benefit.icon} className="text-lg" filled style={{ color: 'var(--app-primary)' }} />
             </div>
             <div className="min-w-0">
               <p className="text-sm font-bold" style={{ color: 'var(--app-on-surface)' }}>{benefit.title}</p>

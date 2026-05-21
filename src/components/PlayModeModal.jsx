@@ -3,19 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import Modal from './ui/Modal.jsx';
+import Icon from './Icon.jsx';
 import './PlayModeModal.css';
-
-function ModeIcon({ children, className = '' }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 export default function PlayModeModal() {
   const { showPlayModal, setShowPlayModal, openGame } = useGame();
@@ -52,14 +41,14 @@ export default function PlayModeModal() {
       className="play-mode-modal"
     >
       <button className="play-mode-close" onClick={handleClose} type="button" aria-label={t('app.playMode.close', 'Close')}>
-        <ModeIcon className="text-lg">close</ModeIcon>
+        <Icon name="close" className="text-lg" filled />
       </button>
       <h2 id="play-mode-title" className="play-mode-title">{t('app.playMode.title', 'Choose Your Mode')}</h2>
 
       <div className="play-mode-options">
         <button type="button" className="play-mode-card play-mode-card--river" onClick={handleLetterRiver}>
           <div className="play-mode-icon">
-            <ModeIcon className="text-2xl">waves</ModeIcon>
+            <Icon name="waves" className="text-2xl" filled />
           </div>
           <div className="play-mode-info">
             <div className="play-mode-name">{t('app.playMode.letterRiver.name', 'Letter River')}</div>
@@ -69,7 +58,7 @@ export default function PlayModeModal() {
 
         <button type="button" className="play-mode-card play-mode-card--bridge" onClick={handleBridgeBuilder}>
           <div className="play-mode-icon">
-            <ModeIcon className="text-2xl">extension</ModeIcon>
+            <Icon name="extension" className="text-2xl" filled />
           </div>
           <div className="play-mode-info">
             <div className="play-mode-name">{t('app.playMode.vocabBuilder.name', 'Vocab Builder')}</div>
@@ -79,7 +68,7 @@ export default function PlayModeModal() {
 
         <button type="button" className="play-mode-card play-mode-card--deep" onClick={handleDeepScript}>
           <div className="play-mode-icon">
-            <ModeIcon className="text-2xl">explore</ModeIcon>
+            <Icon name="explore" className="text-2xl" filled />
           </div>
           <div className="play-mode-info">
             <div className="play-mode-name">{t('app.playMode.deepScript.name', 'Deep Script')}</div>
@@ -89,7 +78,7 @@ export default function PlayModeModal() {
 
         <button type="button" className="play-mode-card play-mode-card--read" onClick={handleConversation}>
           <div className="play-mode-icon">
-            <ModeIcon className="text-2xl">forum</ModeIcon>
+            <Icon name="forum" className="text-2xl" filled />
           </div>
           <div className="play-mode-info">
             <div className="play-mode-name">{t('app.playMode.conversation.name', 'Conversation')}</div>

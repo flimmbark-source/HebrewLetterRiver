@@ -3,18 +3,7 @@ import { PLAN_PRICES, startCheckout, completeCheckout } from '../lib/checkoutSer
 import { usePremium } from '../context/PremiumContext.jsx';
 import { useProgress } from '../context/ProgressContext.jsx';
 import { emit } from '../lib/eventBus.js';
-
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
+import Icon from './Icon.jsx';
 
 const PLAN_ORDER = ['monthly', 'annual', 'lifetime'];
 
@@ -71,7 +60,7 @@ export default function PaywallModal({ isOpen, onClose, surface = 'unknown', fea
             {contextTitle}
           </h2>
           <button type="button" onClick={onClose} className="rounded-full p-2 transition-colors" style={{ color: 'var(--app-muted)' }}>
-            <Icon>close</Icon>
+            <Icon name="close" />
           </button>
         </div>
 
@@ -84,7 +73,7 @@ export default function PaywallModal({ isOpen, onClose, surface = 'unknown', fea
             { icon: 'bar_chart', text: 'Advanced learning statistics' },
           ].map((item) => (
             <div key={item.icon} className="flex items-center gap-3">
-              <Icon className="text-lg" filled style={{ color: 'var(--app-primary)' }}>{item.icon}</Icon>
+              <Icon name={item.icon} className="text-lg" filled style={{ color: 'var(--app-primary)' }} />
               <span className="text-sm font-medium" style={{ color: 'var(--app-on-surface)' }}>{item.text}</span>
             </div>
           ))}
