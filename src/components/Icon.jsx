@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Award,
+  BadgeCheck,
   BookOpen,
   CalendarCheck,
   ChevronDown,
@@ -8,6 +9,7 @@ import {
   ChevronRight,
   ChevronUp,
   Compass,
+  Dumbbell,
   Flame,
   Gamepad2,
   Home,
@@ -32,6 +34,7 @@ import {
 const MATERIAL_ICON_MAP = {
   auto_stories: BookOpen,
   calendar_month: CalendarCheck,
+  center_focus_strong: Target,
   check_circle: CalendarCheck,
   chevron_left: ChevronLeft,
   chevron_right: ChevronRight,
@@ -39,6 +42,7 @@ const MATERIAL_ICON_MAP = {
   expand_less: ChevronUp,
   expand_more: ChevronDown,
   explore: Compass,
+  fitness_center: Dumbbell,
   foundation: Landmark,
   emoji_events: Award,
   home: Home,
@@ -61,6 +65,7 @@ const MATERIAL_ICON_MAP = {
   star: Star,
   stars: Star,
   target: Target,
+  task_alt: BadgeCheck,
   trending_up: TrendingUp,
   videogame_asset: Gamepad2,
   waves: Waves,
@@ -100,6 +105,7 @@ export default function Icon({
       className={`material-symbols-outlined ${className}`.trim()}
       style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
       aria-hidden="true"
+      {...props}
     >
       {iconName}
     </span>
