@@ -1,5 +1,8 @@
 import { greetings_01Blueprint } from './blueprints/greetings_01.js';
+import { pronouns_01Blueprint } from './blueprints/pronouns_01.js';
+import { family_01Blueprint } from './blueprints/family_01.js';
 import { food_01Blueprint } from './blueprints/food_01.js';
+import { adjectives_01Blueprint } from './blueprints/adjectives_01.js';
 import { colors_01Blueprint } from './blueprints/colors_01.js';
 import { numbers_01Blueprint } from './blueprints/numbers_01.js';
 import { shopping_01Blueprint } from './blueprints/shopping_01.js';
@@ -7,7 +10,10 @@ import { everyday_objects_01Blueprint } from './blueprints/everyday_objects_01.j
 
 const BLUEPRINTS = {
   [greetings_01Blueprint.packId]: greetings_01Blueprint,
+  [pronouns_01Blueprint.packId]: pronouns_01Blueprint,
+  [family_01Blueprint.packId]: family_01Blueprint,
   [food_01Blueprint.packId]: food_01Blueprint,
+  [adjectives_01Blueprint.packId]: adjectives_01Blueprint,
   [colors_01Blueprint.packId]: colors_01Blueprint,
   [numbers_01Blueprint.packId]: numbers_01Blueprint,
   [shopping_01Blueprint.packId]: shopping_01Blueprint,

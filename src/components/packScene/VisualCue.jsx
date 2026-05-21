@@ -43,18 +43,12 @@ function CountDotsCue({ count }) {
   );
 }
 
-// ─── Object Glyph ────────────────────────────────────────────────────────────
-// Each glyph is a minimal inline SVG that suggests the object's silhouette
-// without showing any text or target-language content.
-// The 64×64 viewBox is shared across all glyphs for consistent sizing.
-// Fill / stroke colours match the countDots palette for visual cohesion.
-
 const FILL = '#183d2e';
 const STROKE = 'white';
-const SW = '3'; // strokeWidth
+const SW = '3';
+const ACTIVE = '#d98818';
 
 const OBJECT_GLYPH_SVG = {
-  // Book: portrait rectangle with a vertical spine line and ruled page lines
   book: (
     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <rect x="9" y="8" width="46" height="48" rx="3" fill={FILL} stroke={STROKE} strokeWidth={SW} />
@@ -64,7 +58,6 @@ const OBJECT_GLYPH_SVG = {
       <line x1="29" y1="38" x2="48" y2="38" stroke={STROKE} strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   ),
-  // Phone: narrow portrait rounded-rect with speaker notch and home button
   phone: (
     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <rect x="18" y="5" width="28" height="54" rx="7" fill={FILL} stroke={STROKE} strokeWidth={SW} />
@@ -72,7 +65,6 @@ const OBJECT_GLYPH_SVG = {
       <circle cx="32" cy="49" r="3.5" fill={STROKE} />
     </svg>
   ),
-  // Table: wide horizontal tabletop with two legs below
   table: (
     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <rect x="6" y="19" width="52" height="9" rx="3" fill={FILL} stroke={STROKE} strokeWidth={SW} />
@@ -80,14 +72,12 @@ const OBJECT_GLYPH_SVG = {
       <rect x="44" y="28" width="7" height="24" rx="2" fill={FILL} stroke={STROKE} strokeWidth="2.5" />
     </svg>
   ),
-  // Door: tall portrait rectangle with a small knob circle
   door: (
     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <rect x="13" y="6" width="38" height="55" rx="3" fill={FILL} stroke={STROKE} strokeWidth={SW} />
       <circle cx="43" cy="33" r="3.5" fill={STROKE} />
     </svg>
   ),
-  // Thing: ellipse with a dashed border — suggests "unknown / generic object"
   thing: (
     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <ellipse cx="32" cy="33" rx="23" ry="21" fill={FILL} stroke={STROKE} strokeWidth={SW} strokeDasharray="7 4" />
@@ -98,20 +88,11 @@ const OBJECT_GLYPH_SVG = {
 function ObjectGlyphCue({ objectConceptId }) {
   const glyph = OBJECT_GLYPH_SVG[objectConceptId] ?? OBJECT_GLYPH_SVG.thing;
   return (
-    <div
-      className="my-4 flex justify-center"
-      aria-hidden="true"
-      data-visual-cue="objectGlyph"
-      data-object-concept={objectConceptId}
-    >
+    <div className="my-4 flex justify-center" aria-hidden="true" data-visual-cue="objectGlyph" data-object-concept={objectConceptId}>
       <div className="h-24 w-24">{glyph}</div>
     </div>
   );
 }
-
-// ─── Day Part Cue ─────────────────────────────────────────────────────────────
-// morning → sun with 8 rays; night → right-facing crescent moon with 3 stars.
-// No text, no labels. Pure silhouette SVGs in the shared fill/stroke palette.
 
 const DAY_PART_SVG = {
   morning: (
@@ -129,13 +110,7 @@ const DAY_PART_SVG = {
   ),
   night: (
     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path
-        d="M 32 12 C 52 12 60 20 60 32 C 60 44 52 52 32 52 C 42 48 48 40 48 32 C 48 24 42 16 32 12 Z"
-        fill={FILL}
-        stroke={STROKE}
-        strokeWidth={SW}
-        strokeLinejoin="round"
-      />
+      <path d="M 32 12 C 52 12 60 20 60 32 C 60 44 52 52 32 52 C 42 48 48 40 48 32 C 48 24 42 16 32 12 Z" fill={FILL} stroke={STROKE} strokeWidth={SW} strokeLinejoin="round" />
       <circle cx="12" cy="16" r="2.5" fill={FILL} stroke={STROKE} strokeWidth="1.5" />
       <circle cx="8" cy="30" r="2" fill={FILL} stroke={STROKE} strokeWidth="1.5" />
       <circle cx="16" cy="44" r="2" fill={FILL} stroke={STROKE} strokeWidth="1.5" />
@@ -146,30 +121,110 @@ const DAY_PART_SVG = {
 function DayPartCue({ dayPart }) {
   const glyph = DAY_PART_SVG[dayPart] ?? DAY_PART_SVG.morning;
   return (
-    <div
-      className="my-4 flex justify-center"
-      aria-hidden="true"
-      data-visual-cue="dayPart"
-      data-day-part={dayPart}
-    >
+    <div className="my-4 flex justify-center" aria-hidden="true" data-visual-cue="dayPart" data-day-part={dayPart}>
       <div className="h-24 w-24">{glyph}</div>
+    </div>
+  );
+}
+
+function Marker({ x, y }) {
+  return <circle cx={x} cy={y} r="5" fill={ACTIVE} stroke={STROKE} strokeWidth="2" />;
+}
+
+function Person({ x, y, scale = 1, active = false }) {
+  const fill = active ? ACTIVE : FILL;
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`}>
+      <circle cx="0" cy="-14" r="8" fill={fill} stroke={STROKE} strokeWidth="2.5" />
+      <path d="M -14 15 C -11 0 -7 -5 0 -5 C 7 -5 11 0 14 15 Z" fill={fill} stroke={STROKE} strokeWidth="2.5" strokeLinejoin="round" />
+    </g>
+  );
+}
+
+function ComparisonCue({ conceptId }) {
+  const isHeight = conceptId === 'tall' || conceptId === 'short';
+  const leftTarget = conceptId === 'big' || conceptId === 'tall';
+  const left = isHeight ? { x: 21, y: 12, w: 13, h: 40 } : { x: 10, y: 17, w: 25, h: 25 };
+  const right = isHeight ? { x: 42, y: 27, w: 13, h: 25 } : { x: 46, y: 25, w: 16, h: 16 };
+  const shape = isHeight ? 'rect' : 'circle';
+  const draw = (box, active) => shape === 'rect'
+    ? <rect x={box.x} y={box.y} width={box.w} height={box.h} rx="4" fill={active ? ACTIVE : FILL} stroke={STROKE} strokeWidth={SW} />
+    : <circle cx={box.x + box.w / 2} cy={box.y + box.h / 2} r={box.w / 2} fill={active ? ACTIVE : FILL} stroke={STROKE} strokeWidth={SW} />;
+  return (
+    <div className="my-4 flex justify-center" aria-hidden="true" data-visual-cue="comparisonCue" data-concept={conceptId}>
+      <div className="h-24 w-24">
+        <svg viewBox="0 0 72 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {draw(left, leftTarget)}
+          {draw(right, !leftTarget)}
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function CharacterCue({ conceptId }) {
+  const active = (id) => id === conceptId;
+  return (
+    <div className="my-4 flex justify-center" aria-hidden="true" data-visual-cue="characterCue" data-concept={conceptId}>
+      <div className="h-24 w-32">
+        <svg viewBox="0 0 96 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <Person x="22" y="34" active={active('i') || active('we')} />
+          <Person x="48" y="34" active={active('you-m') || active('you-f')} />
+          <Person x="74" y="34" active={active('he') || active('she') || active('they')} />
+          {(active('we') || active('they')) && <Person x={active('we') ? '10' : '86'} y="38" scale="0.78" active />}
+          {active('i') && <Marker x="22" y="7" />}
+          {(active('you-m') || active('you-f')) && <Marker x="48" y="7" />}
+          {(active('he') || active('she') || active('they')) && <Marker x="74" y="7" />}
+          {active('you-f') || active('she') ? <path d="M 42 12 L 54 12" stroke={STROKE} strokeWidth="2.5" strokeLinecap="round" /> : null}
+          {active('you-m') || active('he') ? <path d="M 43 8 L 53 16" stroke={STROKE} strokeWidth="2.5" strokeLinecap="round" /> : null}
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function HouseIcon({ active = false }) {
+  return (
+    <g>
+      <path d="M 14 34 L 32 18 L 50 34 V 55 H 14 Z" fill={active ? ACTIVE : FILL} stroke={STROKE} strokeWidth={SW} strokeLinejoin="round" />
+      <rect x="27" y="40" width="10" height="15" rx="2" fill={STROKE} />
+    </g>
+  );
+}
+
+function FamilyCue({ conceptId }) {
+  const active = (id) => id === conceptId;
+  return (
+    <div className="my-4 flex justify-center" aria-hidden="true" data-visual-cue="familyCue" data-concept={conceptId}>
+      <div className="h-24 w-32">
+        <svg viewBox="0 0 96 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {active('home') ? <HouseIcon active /> : null}
+          {!active('home') && <>
+            <Person x="22" y="36" scale={active('child') ? 0.72 : 1} active={active('mom') || active('parent') || active('family') || active('neighbor')} />
+            <Person x="48" y="36" scale={active('child') ? 0.72 : 1} active={active('dad') || active('friend') || active('family')} />
+            <Person x="74" y="36" scale={active('child') ? 0.72 : 1} active={active('child') || active('stranger') || active('family')} />
+            {active('mom') && <Marker x="22" y="7" />}
+            {active('dad') && <Marker x="48" y="7" />}
+            {active('child') && <Marker x="74" y="7" />}
+            {active('parent') && <path d="M 16 8 H 28" stroke={ACTIVE} strokeWidth="5" strokeLinecap="round" />}
+            {active('friend') && <path d="M 31 18 C 38 12 42 12 48 18 C 54 12 58 12 65 18" stroke={ACTIVE} strokeWidth="4" strokeLinecap="round" fill="none" />}
+            {active('neighbor') && <path d="M 4 56 H 32 M 64 56 H 92" stroke={ACTIVE} strokeWidth="4" strokeLinecap="round" />}
+            {active('stranger') && <path d="M 68 7 H 80 M 74 1 V 13" stroke={ACTIVE} strokeWidth="3" strokeLinecap="round" />}
+          </>}
+        </svg>
+      </div>
     </div>
   );
 }
 
 export default function VisualCue({ visualCue }) {
   if (!visualCue) return null;
-  if (visualCue.type === 'colorCircle') {
-    return <ColorCircleCue colorConceptId={visualCue.colorConceptId} />;
-  }
-  if (visualCue.type === 'countDots') {
-    return <CountDotsCue count={visualCue.count} />;
-  }
-  if (visualCue.type === 'objectGlyph') {
-    return <ObjectGlyphCue objectConceptId={visualCue.objectConceptId} />;
-  }
-  if (visualCue.type === 'dayPart') {
-    return <DayPartCue dayPart={visualCue.dayPart} />;
-  }
+  if (visualCue.type === 'colorCircle') return <ColorCircleCue colorConceptId={visualCue.colorConceptId} />;
+  if (visualCue.type === 'countDots') return <CountDotsCue count={visualCue.count} />;
+  if (visualCue.type === 'objectGlyph') return <ObjectGlyphCue objectConceptId={visualCue.objectConceptId} />;
+  if (visualCue.type === 'dayPart') return <DayPartCue dayPart={visualCue.dayPart} />;
+  if (visualCue.type === 'comparisonCue') return <ComparisonCue conceptId={visualCue.conceptId} />;
+  if (visualCue.type === 'characterCue') return <CharacterCue conceptId={visualCue.conceptId} />;
+  if (visualCue.type === 'familyCue') return <FamilyCue conceptId={visualCue.conceptId} />;
   return null;
 }
