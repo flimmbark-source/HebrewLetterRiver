@@ -10,9 +10,9 @@ export default function TodayPlanCard({ rows, t }) {
           <button
             key={row.id}
             type="button"
+            disabled={row.locked}
             className={`scenic-plan-row ${row.locked ? 'scenic-plan-row--locked' : 'btn-press'}`}
             onClick={row.locked ? undefined : row.action}
-            aria-disabled={row.locked ? 'true' : undefined}
           >
             <span className={`scenic-plan-row__icon scenic-tone-${row.tone}`}>
               <Icon name={row.icon} size={22} filled />
