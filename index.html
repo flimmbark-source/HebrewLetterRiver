@@ -92,51 +92,56 @@
     media="print"
     onload="this.media='all'"
   />
-  <!-- Reveal Material Symbols icons once the font is ready.
-       CSS keeps .material-symbols-outlined invisible until ms-ready lands on <html>.
-       document.fonts.ready fires when all page fonts have loaded or timed out —
-       more reliable than fonts.load() which can resolve empty before the @font-face
-       rule is registered. 3s timeout ensures icons are never hidden forever. -->
+  <!-- Reveal Material Symbols icons only once the font is confirmed ready.
+       If the font cannot be confirmed, ms-failed is added instead. CSS keeps
+       the ligature text hidden so words like home and play_arrow never leak
+       into the UI. -->
   <script>
     (function () {
-      // fonts.ready fires when layout is complete but NOT when font binaries have
-      // finished downloading — with font-display:swap the font is still in-flight
-      // when fonts.ready resolves. On a slow mobile connection this causes ms-ready
-      // to be added before the font arrives, revealing icon text.
-      //
-      // fonts.load() waits for the specific font binary. It can return [] on the
-      // first call if the @font-face hasn't been registered yet, so we poll.
-      // fonts.check() is used as a secondary guard — it returns true only when the
-      // font is genuinely available for rendering, guarding against iOS Safari
-      // returning a non-empty faces array before the binary is decoded.
-      //
-      // The .catch handler retries rather than revealing immediately: a rejection
-      // usually means the font request itself failed (e.g. the service worker
-      // served a corrupt cached response). Retrying gives the network a chance to
-      // serve a fresh copy. Icons stay hidden until the font is confirmed ready.
-      // The 15-second hard fallback is a last resort for very slow connections.
       var done = false;
+      var timeoutId = null;
+      var maxAttempts = 75;
+
       var reveal = function () {
         if (done) return;
         done = true;
+        if (timeoutId) clearTimeout(timeoutId);
+        document.documentElement.classList.remove('ms-failed');
         document.documentElement.classList.add('ms-ready');
       };
-      var t = setTimeout(reveal, 15000);
-      if (document.fonts && document.fonts.load) {
-        var attempts = 0;
-        (function tryLoad() {
-          document.fonts.load('1em "Material Symbols Outlined"').then(function (faces) {
-            var ready = faces.length > 0;
-            if (ready && document.fonts.check) { ready = document.fonts.check('1em "Material Symbols Outlined"'); }
-            if (ready) { clearTimeout(t); reveal(); }
-            else if (++attempts < 74) { setTimeout(tryLoad, 200); }
-          }).catch(function () {
-            // Retry on error rather than revealing — a rejection often means the
-            // cached font response was corrupt; the next attempt may hit the network.
-            if (++attempts < 74) { setTimeout(tryLoad, 200); }
-          });
-        }());
+
+      var fail = function () {
+        if (done) return;
+        done = true;
+        document.documentElement.classList.remove('ms-ready');
+        document.documentElement.classList.add('ms-failed');
+      };
+
+      if (!document.fonts || !document.fonts.load) {
+        fail();
+        return;
       }
+
+      timeoutId = setTimeout(fail, 15000);
+      var attempts = 0;
+
+      (function tryLoad() {
+        document.fonts.load('1em "Material Symbols Outlined"').then(function (faces) {
+          var ready = faces.length > 0;
+          if (ready && document.fonts.check) { ready = document.fonts.check('1em "Material Symbols Outlined"'); }
+          if (ready) {
+            reveal();
+            return;
+          }
+          attempts += 1;
+          if (attempts < maxAttempts) { setTimeout(tryLoad, 200); }
+          else { fail(); }
+        }).catch(function () {
+          attempts += 1;
+          if (attempts < maxAttempts) { setTimeout(tryLoad, 200); }
+          else { fail(); }
+        });
+      }());
     })();
   </script>
   <link rel="stylesheet" href="/vocab-journey-path-overrides.css" />
