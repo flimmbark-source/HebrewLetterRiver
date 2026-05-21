@@ -1,19 +1,8 @@
 import React, { useMemo } from 'react';
+import Icon from './Icon.jsx';
 import { useProgress, STREAK_MILESTONES } from '../context/ProgressContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { getJerusalemDateKey } from '../lib/time.js';
-
-function Icon({ children, className = '', filled = false, style = {} }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24`, ...style }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 function getStreakMessage(current, t) {
   if (current === 0) return t('streak.startJourney', 'Start your journey!');
@@ -81,12 +70,11 @@ export default function StreakCard() {
           <div className="flex items-center gap-4">
             <div className="flex items-center justify-center">
               <Icon
+                name="local_fire_department"
                 className={getFlameSize(streak.current)}
                 filled={streak.current > 0}
                 style={{ color: getFlameColor(streak.current) }}
-              >
-                local_fire_department
-              </Icon>
+              />
             </div>
 
             <div>
@@ -123,7 +111,7 @@ export default function StreakCard() {
                 { count: freezesAvailable }
               )}
             >
-              <Icon className="text-base" style={{ color: 'var(--app-primary)' }}>ac_unit</Icon>
+              <Icon name="ac_unit" className="text-base" style={{ color: 'var(--app-primary)' }} />
               <span className="text-xs font-bold" style={{ color: 'var(--app-primary)' }}>
                 {freezesAvailable}
               </span>
@@ -140,12 +128,11 @@ export default function StreakCard() {
             }}
           >
             <Icon
+              name={completedToday ? 'check_circle' : 'schedule'}
               className="text-sm"
               filled
               style={{ color: completedToday ? '#22c55e' : '#f59e0b' }}
-            >
-              {completedToday ? 'check_circle' : 'schedule'}
-            </Icon>
+            />
             <span
               className="text-xs font-bold"
               style={{ color: completedToday ? '#22c55e' : '#f59e0b' }}
@@ -177,7 +164,7 @@ export default function StreakCard() {
               opacity: canAffordRepair ? 1 : 0.6
             }}
           >
-            <Icon className="text-base" filled>build</Icon>
+            <Icon name="build" className="text-base" filled />
             <span>{t('streak.repair', 'Repair streak (20 stars)')}</span>
             {streak.preBreakCurrent && (
               <span className="opacity-80">

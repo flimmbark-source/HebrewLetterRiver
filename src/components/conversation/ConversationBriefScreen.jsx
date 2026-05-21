@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import PracticeSegmentPath from './PracticeSegmentPath.jsx';
+import Icon from '../Icon.jsx';
 import riverBackground from '../../assets/Reading/River-Background.png';
 
 function getDifficultyLabel(difficulty, t) {
@@ -56,14 +57,14 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
             className="flex h-9 w-9 items-center justify-center rounded-full bg-white/78 text-[#315846] shadow-sm transition hover:bg-white"
             aria-label={t('conversation.brief.back', 'Back to scenarios')}
           >
-            <span className="material-symbols-outlined text-xl" aria-hidden="true">arrow_back</span>
+            <Icon name="arrow_back" className="text-xl" aria-hidden="true" />
           </button>
           <h1 className="truncate text-center text-lg font-bold text-[#1b352b] md:text-2xl" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
             {routeTitle}
           </h1>
           <div className="flex justify-end">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/78 text-[#315846] shadow-sm">
-              <span className="material-symbols-outlined text-xl" aria-hidden="true">menu_book</span>
+              <Icon name="menu_book" className="text-xl" aria-hidden="true" />
             </span>
           </div>
         </header>
@@ -73,16 +74,16 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
             <section className="text-center md:mx-auto md:max-w-[560px]">
               <div className="mt-1 grid grid-cols-3 gap-2 md:mt-0 md:gap-3">
                 <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
-                  <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">eco</span>
+                  <Icon name="eco" className="text-base text-[#2f6b4c]" aria-hidden="true" />
                   <div className="mt-0 text-sm font-bold text-[#183d2e] md:text-base">{getDifficultyLabel(scenario.metadata.difficulty, t)}</div>
                 </div>
                 <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
-                  <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">eco</span>
+                  <Icon name="eco" className="text-base text-[#2f6b4c]" aria-hidden="true" />
                   <div className="mt-0 text-base font-bold leading-none text-[#183d2e] md:text-lg">{scenario.metadata.lineCount}</div>
                   <div className="text-[10px] font-semibold text-[#4e665b] md:text-xs">{t('conversation.brief.phrases', 'Phrases')}</div>
                 </div>
                 <div className="rounded-2xl border border-[#d8cdb7] bg-[#fff9ea]/90 px-2 py-2 shadow-sm md:py-3">
-                  <span className="material-symbols-outlined text-base text-[#2f6b4c]" aria-hidden="true">waves</span>
+                  <Icon name="waves" className="text-base text-[#2f6b4c]" aria-hidden="true" />
                   <div className="mt-0 text-base font-bold leading-none text-[#183d2e] md:text-lg">{scenario.defaultPlan.beats.length}</div>
                   <div className="text-[10px] font-semibold text-[#4e665b] md:text-xs">{t('conversation.brief.totalBeats', 'Beats')}</div>
                 </div>
@@ -115,7 +116,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
                     style={{ background: 'linear-gradient(180deg, #d98818, #b96a10)', boxShadow: '0 12px 28px rgba(175, 101, 14, 0.28)' }}
                   >
                     <span>{t('read.route.begin', 'Begin Route')}</span>
-                    <span className="material-symbols-outlined text-xl" aria-hidden="true">eco</span>
+                    <Icon name="eco" className="text-xl" aria-hidden="true" />
                   </button>
                 </aside>
               )}

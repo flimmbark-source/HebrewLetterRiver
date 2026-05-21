@@ -1,20 +1,9 @@
 import React, { useMemo } from 'react';
+import Icon from './Icon.jsx';
 import { useProgress } from '../context/ProgressContext.jsx';
 import { useSRS } from '../context/SRSContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
 import { useLocalization } from '../context/LocalizationContext.jsx';
-
-function Icon({ children, className = '', filled = false, style = {} }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24`, ...style }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 export default function DailyReviewCard() {
   const { getWeakestLetter } = useProgress();
@@ -65,12 +54,11 @@ export default function DailyReviewCard() {
           {t('dailyReview.title', 'Daily Review')}
         </h3>
         <Icon
+          name={allCaughtUp ? 'check_circle' : 'assignment'}
           className="text-lg"
           style={{ color: allCaughtUp ? '#22c55e' : 'var(--app-primary)' }}
           filled={allCaughtUp}
-        >
-          {allCaughtUp ? 'check_circle' : 'assignment'}
-        </Icon>
+        />
       </div>
 
       {allCaughtUp ? (
@@ -79,7 +67,7 @@ export default function DailyReviewCard() {
             className="flex h-10 w-10 items-center justify-center rounded-full"
             style={{ background: 'rgba(34, 197, 94, 0.1)' }}
           >
-            <Icon className="text-xl" filled style={{ color: '#22c55e' }}>done_all</Icon>
+            <Icon name="done_all" className="text-xl" filled style={{ color: '#22c55e' }} />
           </div>
           <div>
             <p className="text-sm font-bold" style={{ color: 'var(--app-on-surface)' }}>
@@ -106,7 +94,7 @@ export default function DailyReviewCard() {
                 className="flex h-9 w-9 items-center justify-center rounded-full"
                 style={{ background: 'var(--app-mode-river-bg)' }}
               >
-                <Icon className="text-lg" style={{ color: 'var(--app-mode-river)' }}>waves</Icon>
+                <Icon name="waves" className="text-lg" style={{ color: 'var(--app-mode-river)' }} />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-bold" style={{ color: 'var(--app-on-surface)' }}>
@@ -125,9 +113,7 @@ export default function DailyReviewCard() {
                   </p>
                 )}
               </div>
-              <Icon className="text-base" style={{ color: 'var(--app-mode-river)' }}>
-                arrow_forward
-              </Icon>
+              <Icon name="arrow_forward" className="text-base" style={{ color: 'var(--app-mode-river)' }} />
             </button>
           )}
 
@@ -145,7 +131,7 @@ export default function DailyReviewCard() {
                 className="flex h-9 w-9 items-center justify-center rounded-full"
                 style={{ background: 'var(--app-mode-bridge-bg)' }}
               >
-                <Icon className="text-lg" style={{ color: 'var(--app-mode-bridge)' }}>extension</Icon>
+                <Icon name="extension" className="text-lg" style={{ color: 'var(--app-mode-bridge)' }} />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-bold" style={{ color: 'var(--app-on-surface)' }}>
@@ -156,9 +142,7 @@ export default function DailyReviewCard() {
                   )}
                 </p>
               </div>
-              <Icon className="text-base" style={{ color: 'var(--app-mode-bridge)' }}>
-                arrow_forward
-              </Icon>
+              <Icon name="arrow_forward" className="text-base" style={{ color: 'var(--app-mode-bridge)' }} />
             </button>
           )}
         </div>

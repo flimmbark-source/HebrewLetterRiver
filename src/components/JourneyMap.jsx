@@ -4,6 +4,7 @@ import { useProgress } from '../context/ProgressContext.jsx';
 import { useSRS } from '../context/SRSContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
 import { PROGRESS_TERMS, getStageForUser } from '../lib/progressTerms.js';
+import Icon from './Icon.jsx';
 
 /**
  * PATH-02: Journey Map
@@ -13,18 +14,6 @@ import { PROGRESS_TERMS, getStageForUser } from '../lib/progressTerms.js';
  */
 
 const STAGE_ORDER = ['letters', 'words', 'reading', 'conversation'];
-
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 export default function JourneyMap() {
   const { player } = useProgress();
@@ -114,9 +103,9 @@ export default function JourneyMap() {
                   aria-label={`${stage.label}${isCurrent ? ' (current)' : ''}${isCompleted ? ' (completed)' : ''}`}
                 >
                   {isCompleted ? (
-                    <Icon className="text-base" filled style={{ color: nodeColor }}>check</Icon>
+                    <Icon name="check" className="text-base" filled style={{ color: nodeColor }} />
                   ) : (
-                    <Icon className="text-base" filled={isCurrent} style={{ color: nodeColor }}>{stage.icon}</Icon>
+                    <Icon name={stage.icon} className="text-base" filled={isCurrent} style={{ color: nodeColor }} />
                   )}
                 </button>
 

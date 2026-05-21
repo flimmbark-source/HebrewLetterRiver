@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from './Icon.jsx';
 
 const goals = [
   {
@@ -62,16 +63,12 @@ export default function OnboardingGoalScreen({ onSelect }) {
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full"
                 style={{ background: 'var(--app-primary-container)' }}
               >
-                <span
-                  className="material-symbols-outlined text-2xl"
-                  style={{
-                    color: 'var(--app-primary)',
-                    fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24"
-                  }}
-                  aria-hidden="true"
-                >
-                  {goal.icon}
-                </span>
+                <Icon
+                  name={goal.icon}
+                  className="text-2xl"
+                  style={{ color: 'var(--app-primary)' }}
+                  filled
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-base font-bold" style={{ color: 'var(--app-on-surface)' }}>
@@ -81,16 +78,11 @@ export default function OnboardingGoalScreen({ onSelect }) {
                   {goal.description}
                 </p>
               </div>
-              <span
-                className="material-symbols-outlined shrink-0 text-xl"
-                style={{
-                  color: 'var(--app-muted)',
-                  fontVariationSettings: "'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24"
-                }}
-                aria-hidden="true"
-              >
-                arrow_forward
-              </span>
+              <Icon
+                name="arrow_forward"
+                className="shrink-0 text-xl"
+                style={{ color: 'var(--app-muted)' }}
+              />
             </button>
           ))}
         </div>

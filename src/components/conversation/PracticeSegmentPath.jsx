@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
 import verticalRiverRoutePath from '../../assets/Reading/vertical-river-route-path.png';
+import Icon from '../Icon.jsx';
 
 function getDefaultStopTitle(index) {
   if (index === 0) return 'Warm-up Phrases';
@@ -60,11 +61,11 @@ export default function PracticeSegmentPath({ scenario, segments, selectedRouteS
     <div className="space-y-2">
       <div className="flex items-center justify-center gap-2 text-center">
         <span className="h-px w-8 bg-[#a6a06f]" aria-hidden="true" />
-        <span className="material-symbols-outlined text-sm text-[#87945d]" aria-hidden="true">eco</span>
+        <Icon name="eco" className="text-sm text-[#87945d]" aria-hidden="true" />
         <h3 className="text-sm font-bold text-[#183d2e]" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif' }}>
           {t('read.route.chooseStop', 'Choose a Route Stop')}
         </h3>
-        <span className="material-symbols-outlined text-sm text-[#87945d]" aria-hidden="true">eco</span>
+        <Icon name="eco" className="text-sm text-[#87945d]" aria-hidden="true" />
         <span className="h-px w-8 bg-[#a6a06f]" aria-hidden="true" />
       </div>
 
@@ -112,9 +113,7 @@ export default function PracticeSegmentPath({ scenario, segments, selectedRouteS
                   </div>
 
                   <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#ded3ba] bg-[#fffaf0] text-[#2f6b4c] transition group-hover:translate-x-0.5">
-                    <span className="material-symbols-outlined text-base" aria-hidden="true">
-                      {isSelected ? 'check' : 'radio_button_unchecked'}
-                    </span>
+                    <Icon name={isSelected ? 'check' : 'radio_button_unchecked'} className="text-base" aria-hidden="true" />
                   </span>
                 </div>
               </button>

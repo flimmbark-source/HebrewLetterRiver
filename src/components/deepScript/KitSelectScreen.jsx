@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getSeenPacks } from '../../lib/packProgression.js';
+import Icon from '../Icon.jsx';
 
 /**
  * KitSelectScreen — pre-run screen for standalone (non-guided) Deep Script runs.
@@ -40,7 +41,7 @@ export default function KitSelectScreen({
         {/* Header */}
         <div className="ds-header">
           <button className="ds-back-btn" onClick={onBack} type="button">
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back</span>
+            <Icon name="arrow_back" style={{ fontSize: 20 }} />
           </button>
           <h1 className="ds-screen-title">Deep Script</h1>
         </div>
@@ -60,11 +61,11 @@ export default function KitSelectScreen({
           >
             {expeditionMode === 'words' && (
               <div className="ds-kit-check">
-                <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                <Icon name="check_circle" filled style={{ fontSize: 20 }} />
               </div>
             )}
             <div className={`ds-kit-icon ${expeditionMode === 'words' ? 'ds-kit-icon--selected' : ''}`}>
-              <span className="material-symbols-outlined" style={{ fontSize: 28 }}>spellcheck</span>
+              <Icon name="spellcheck" style={{ fontSize: 28 }} />
             </div>
             <div className="ds-kit-info">
               <div className="ds-kit-name">Words</div>
@@ -80,13 +81,11 @@ export default function KitSelectScreen({
           >
             {expeditionMode === 'sentences' && sentenceModeAvailable && (
               <div className="ds-kit-check">
-                <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                <Icon name="check_circle" filled style={{ fontSize: 20 }} />
               </div>
             )}
             <div className={`ds-kit-icon ${expeditionMode === 'sentences' ? 'ds-kit-icon--selected' : ''} ${!sentenceModeAvailable ? 'ds-kit-icon--locked' : ''}`}>
-              <span className="material-symbols-outlined" style={{ fontSize: 28 }}>
-                {sentenceModeAvailable ? 'format_align_left' : 'lock'}
-              </span>
+              <Icon name={sentenceModeAvailable ? 'format_align_left' : 'lock'} style={{ fontSize: 28 }} />
             </div>
             <div className="ds-kit-info">
               <div className="ds-kit-name">Sentences</div>
@@ -111,7 +110,7 @@ export default function KitSelectScreen({
       {/* Header */}
       <div className="ds-header">
         <button className="ds-back-btn" onClick={handleBackToMode} type="button">
-          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back</span>
+          <Icon name="arrow_back" style={{ fontSize: 20 }} />
         </button>
         <h1 className="ds-screen-title">Deep Script</h1>
       </div>
@@ -139,11 +138,11 @@ export default function KitSelectScreen({
           >
             {wordSourceMode === 'pack' && (
               <div className="ds-kit-check">
-                <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                <Icon name="check_circle" filled style={{ fontSize: 20 }} />
               </div>
             )}
             <div className={`ds-kit-icon ${wordSourceMode === 'pack' ? 'ds-kit-icon--selected' : ''}`}>
-              <span className="material-symbols-outlined" style={{ fontSize: 28 }}>inventory_2</span>
+              <Icon name="inventory_2" style={{ fontSize: 28 }} />
             </div>
             <div className="ds-kit-info">
               <div className="ds-kit-name">Word Pack</div>
@@ -182,11 +181,11 @@ export default function KitSelectScreen({
         >
           {wordSourceMode === 'random' && (
             <div className="ds-kit-check">
-              <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+              <Icon name="check_circle" filled style={{ fontSize: 20 }} />
             </div>
           )}
           <div className={`ds-kit-icon ${wordSourceMode === 'random' ? 'ds-kit-icon--selected' : ''}`}>
-            <span className="material-symbols-outlined" style={{ fontSize: 28 }}>shuffle</span>
+            <Icon name="shuffle" style={{ fontSize: 28 }} />
           </div>
           <div className="ds-kit-info">
             <div className="ds-kit-name">Random</div>
@@ -207,7 +206,7 @@ export default function KitSelectScreen({
           onClick={() => onSelect()}
         >
           Begin Expedition
-          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>east</span>
+          <Icon name="east" style={{ fontSize: 20 }} />
         </button>
       </div>
     </div>

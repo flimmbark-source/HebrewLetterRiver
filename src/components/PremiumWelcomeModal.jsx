@@ -1,19 +1,8 @@
 import React from 'react';
+import Icon from './Icon.jsx';
 import { loadState, saveState } from '../lib/storage.js';
 import { usePremium } from '../context/PremiumContext.jsx';
 import { celebrate } from '../lib/celebration.js';
-
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 const UNLOCKED_FEATURES = [
   { icon: 'extension', text: 'All vocabulary packs are now unlocked' },
@@ -48,7 +37,7 @@ export default function PremiumWelcomeModal() {
       >
         {/* Premium icon */}
         <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg, #D4A017, #F5D76E)' }}>
-          <Icon className="text-4xl" filled style={{ color: '#fff' }}>workspace_premium</Icon>
+          <Icon name="workspace_premium" className="text-4xl" filled style={{ color: '#fff' }} />
         </div>
 
         <h2 className="text-2xl font-bold" style={{ fontFamily: '"Baloo 2", system-ui, sans-serif', color: 'var(--app-on-surface)' }}>
@@ -63,7 +52,7 @@ export default function PremiumWelcomeModal() {
           {UNLOCKED_FEATURES.map((feature) => (
             <div key={feature.icon} className="flex items-center gap-3">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(212, 160, 23, 0.15)' }}>
-                <Icon className="text-base" filled style={{ color: '#D4A017' }}>{feature.icon}</Icon>
+                <Icon name={feature.icon} className="text-base" filled style={{ color: '#D4A017' }} />
               </div>
               <span className="text-sm font-medium" style={{ color: 'var(--app-on-surface)' }}>{feature.text}</span>
             </div>

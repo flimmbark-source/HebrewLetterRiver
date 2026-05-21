@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useLocalization } from '../../context/LocalizationContext.jsx';
+import Icon from '../Icon.jsx';
 
 function getRouteAccent(item) {
   const haystack = `${item.metadata?.title || ''} ${item.metadata?.subtitle || ''} ${item.metadata?.theme || ''}`.toLowerCase();
@@ -59,9 +60,7 @@ export default function DualRoleConversationCardGrid({ items, onSelect, classNam
                 className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border bg-white/70 text-[#315846] shadow-inner sm:h-20 sm:w-20"
                 style={{ borderColor: 'rgba(56, 93, 72, 0.10)' }}
               >
-                <span className="material-symbols-outlined text-4xl" aria-hidden="true">
-                  {accent.icon}
-                </span>
+                <Icon name={accent.icon} className="text-4xl" aria-hidden="true" />
               </div>
 
               <div className="min-w-0 flex-1">
@@ -85,16 +84,16 @@ export default function DualRoleConversationCardGrid({ items, onSelect, classNam
 
                 <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-semibold text-[#51685d] sm:text-xs">
                   <span className="inline-flex items-center gap-1">
-                    <span className="material-symbols-outlined text-sm" aria-hidden="true">psychiatry</span>
+                    <Icon name="psychiatry" className="text-sm" aria-hidden="true" />
                     {item.metadata.lineCount} {t('conversation.list.phrases', 'phrases')}
                   </span>
                   <span className="inline-flex items-center gap-1">
-                    <span className="material-symbols-outlined text-sm" aria-hidden="true">waves</span>
+                    <Icon name="waves" className="text-sm" aria-hidden="true" />
                     {item.metadata.beatsCount} {t('conversation.list.beats', 'beats')}
                   </span>
                   {hasProgress && (
                     <span className="inline-flex items-center gap-1 text-[#2f7d4c]">
-                      <span className="material-symbols-outlined text-sm" aria-hidden="true">check_circle</span>
+                      <Icon name="check_circle" className="text-sm" aria-hidden="true" />
                       {item.stats.practicedLines}/{item.stats.totalLines} {t('conversation.list.practiced', 'practiced')}
                     </span>
                   )}

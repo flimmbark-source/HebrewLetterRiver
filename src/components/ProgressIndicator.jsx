@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from './Icon.jsx';
 
 /**
  * PATH-03: Pack & Module Progress
@@ -72,17 +73,14 @@ export default function ProgressIndicator({ status = 'not_started', percentage =
 
       {/* Center icon */}
       {status === 'mastered' ? (
-        <span
-          className="material-symbols-outlined"
+        <Icon
+          name="check"
           style={{
             fontSize: dim.icon,
-            color,
-            fontVariationSettings: "'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24"
+            color
           }}
-          aria-hidden="true"
-        >
-          check
-        </span>
+          filled
+        />
       ) : status === 'not_started' ? (
         <span
           style={{

@@ -1,19 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Icon from '../components/Icon.jsx';
 import { getEventLog, getEventCounts, getFunnelMetrics, clearAnalytics } from '../lib/eventLog.js';
 import { useExperiment } from '../context/ExperimentContext.jsx';
-
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 export default function DebugDashboardView() {
   const navigate = useNavigate();
@@ -81,7 +70,7 @@ export default function DebugDashboardView() {
             type="button"
             aria-label="Back to Home"
           >
-            <Icon>arrow_back</Icon>
+            <Icon name="arrow_back" />
           </button>
           <h1 className="text-lg font-bold" style={{ color: 'var(--app-primary)' }}>
             Debug Dashboard

@@ -1,18 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { loadState, saveState } from '../lib/storage.js';
 import { useProgress } from '../context/ProgressContext.jsx';
-
-function Icon({ children, className = '', filled = false, style = {} }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24`, ...style }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
+import Icon from './Icon.jsx';
 
 const REMINDER_STORAGE_KEY = 'reminders';
 
@@ -82,9 +71,7 @@ export default function ReminderPrompt() {
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
           style={{ background: 'var(--app-primary-container)' }}
         >
-          <Icon className="text-lg" filled style={{ color: 'var(--app-primary)' }}>
-            notifications_active
-          </Icon>
+          <Icon name="notifications_active" className="text-lg" filled style={{ color: 'var(--app-primary)' }} />
         </div>
         <div className="flex-1">
           <p

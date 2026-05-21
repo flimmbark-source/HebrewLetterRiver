@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from '../Icon.jsx';
 
 /**
  * Reusable empty-state component.
@@ -24,18 +25,15 @@ export default function EmptyState({
       className={`flex flex-col items-center justify-center py-12 px-6 text-center ${className}`}
     >
       {icon && (
-        <span
-          className="material-symbols-outlined mb-4"
+        <Icon
+          name={icon}
+          className="mb-4"
           style={{
             fontSize: '56px',
             color: 'var(--app-muted)',
             opacity: 0.45,
-            fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48",
           }}
-          aria-hidden="true"
-        >
-          {icon}
-        </span>
+        />
       )}
       {title && (
         <h3

@@ -4,6 +4,7 @@ import { useProgress } from '../context/ProgressContext.jsx';
 import { useSRS } from '../context/SRSContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
 import { getRecommendation } from '../lib/progressTerms.js';
+import Icon from './Icon.jsx';
 
 /**
  * PATH-01: "Continue Learning" Card
@@ -11,18 +12,6 @@ import { getRecommendation } from '../lib/progressTerms.js';
  * A dominant recommendation card for HomeView that tells the user
  * what to do next, based on SRS due items, daily quests, streak, and weak letters.
  */
-
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 export default function ContinueLearningCard() {
   const { player, streak, daily } = useProgress();
@@ -76,7 +65,7 @@ export default function ContinueLearningCard() {
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
           style={{ background: 'rgba(255, 255, 255, 0.15)' }}
         >
-          <Icon className="text-2xl" filled>{recommendation.icon}</Icon>
+          <Icon name={recommendation.icon} className="text-2xl" filled />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -88,7 +77,7 @@ export default function ContinueLearningCard() {
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-transform group-hover:translate-x-0.5"
           style={{ background: 'rgba(255, 255, 255, 0.2)' }}
         >
-          <Icon className="text-xl">arrow_forward</Icon>
+          <Icon name="arrow_forward" className="text-xl" />
         </div>
       </div>
     </button>

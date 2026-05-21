@@ -10,6 +10,7 @@ import BuildLine from './modules/BuildLine.jsx';
 import { findDictionaryEntryForWord } from '../../lib/sentenceDictionaryLookup.ts';
 import { sentenceTransliterationLookup, sentenceMeaningsLookup } from '../../data/conversation/scenarioFactory.ts';
 import SentenceIntroPopup from '../SentenceIntroPopup.jsx';
+import Icon from '../Icon.jsx';
 import { useConversationIntro } from '../../hooks/useConversationIntro.js';
 import riverBackground from '../../assets/Reading/River-Background.png';
 
@@ -198,7 +199,7 @@ export default function ConversationBeatScreen({
               className="flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-[#315846] shadow-sm transition hover:bg-white"
               aria-label={t('conversation.beat.exit', 'Exit')}
             >
-              <span className="material-symbols-outlined text-xl" aria-hidden="true">arrow_back</span>
+              <Icon name="arrow_back" className="text-xl" aria-hidden="true" />
             </button>
 
             <div className="min-w-0 text-center">
@@ -227,7 +228,7 @@ export default function ConversationBeatScreen({
               aria-expanded={showTravelNotes}
               aria-label={t('conversation.beat.travelNotes', 'Travel Notes')}
             >
-              <span className="material-symbols-outlined text-lg" aria-hidden="true">menu_book</span>
+              <Icon name="menu_book" className="text-lg" aria-hidden="true" />
             </button>
           </div>
 
@@ -265,7 +266,7 @@ export default function ConversationBeatScreen({
                   : t('conversation.beat.travelNotesHint', 'Words and pronunciation are available here if you need support.')}
               </span>
             </span>
-            <span className="material-symbols-outlined text-[#315846]" aria-hidden="true">expand_less</span>
+            <Icon name="expand_less" className="text-[#315846]" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -429,7 +430,7 @@ export default function ConversationBeatScreen({
             style={{ background: 'linear-gradient(180deg, #d98818, #b96a10)', boxShadow: '0 12px 28px rgba(175, 101, 14, 0.28)' }}
           >
             {t('conversation.beat.next', 'Continue')}
-            <span className="material-symbols-outlined text-xl" aria-hidden="true">east</span>
+            <Icon name="east" className="text-xl" aria-hidden="true" />
           </button>
         </div>
       </div>

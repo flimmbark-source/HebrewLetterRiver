@@ -4,6 +4,7 @@ import { useProgress } from '../context/ProgressContext.jsx';
 import { useSRS } from '../context/SRSContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
 import { getSessionRecommendation } from '../lib/progressTerms.js';
+import Icon from './Icon.jsx';
 
 /**
  * PATH-05: End-of-Session Next Step
@@ -19,18 +20,6 @@ import { getSessionRecommendation } from '../lib/progressTerms.js';
  * @param {Array}  props.sessionResults.lettersImproved   - [{ id, symbol, name }]
  * @param {Array}  props.sessionResults.weakLetters       - [{ id, symbol, name, accuracy }]
  */
-
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 export default function SessionNextStep({ sessionResults }) {
   const { player, streak, daily } = useProgress();
@@ -82,7 +71,7 @@ export default function SessionNextStep({ sessionResults }) {
       <div className="mb-3 space-y-1">
         {practicedCount > 0 && (
           <div className="flex items-center gap-2 text-sm" style={{ color: '#6c3b14' }}>
-            <Icon className="text-base" style={{ color: '#10B981' }} filled>check_circle</Icon>
+            <Icon name="check_circle" className="text-base" style={{ color: '#10B981' }} filled />
             <span>
               {practicedCount} letter{practicedCount === 1 ? '' : 's'} practiced
               {improvedCount > 0 && `, ${improvedCount} improved`}
@@ -91,7 +80,7 @@ export default function SessionNextStep({ sessionResults }) {
         )}
         {weakLetters.length > 0 && (
           <div className="flex items-center gap-2 text-sm" style={{ color: '#6c3b14' }}>
-            <Icon className="text-base" style={{ color: '#E57373' }}>error</Icon>
+            <Icon name="error" className="text-base" style={{ color: '#E57373' }} />
             <span>
               {weakLetters.map(l => l.symbol || l.name || l.id).join(', ')} need{weakLetters.length === 1 ? 's' : ''} more practice
             </span>
@@ -111,12 +100,12 @@ export default function SessionNextStep({ sessionResults }) {
           border: '1px solid rgba(255, 255, 255, 0.5)'
         }}
       >
-        <Icon className="text-xl" filled>{recommendation.icon}</Icon>
+        <Icon name={recommendation.icon} className="text-xl" filled />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold leading-tight">{recommendation.title}</p>
           <p className="text-xs font-medium opacity-70">{recommendation.description}</p>
         </div>
-        <Icon className="text-lg">arrow_forward</Icon>
+        <Icon name="arrow_forward" className="text-lg" />
       </button>
     </div>
   );
