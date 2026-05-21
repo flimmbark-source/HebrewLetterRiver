@@ -3,6 +3,7 @@ import { useProgress } from '../context/ProgressContext.jsx';
 import { useGame } from '../context/GameContext.jsx';
 import { formatJerusalemTime, millisUntilNextJerusalemMidnight } from '../lib/time.js';
 import { useLocalization } from '../context/LocalizationContext.jsx';
+import Icon from '../components/Icon.jsx';
 
 const MODE_LABELS = {
   letterRiver: 'Letter River',
@@ -17,18 +18,6 @@ const TASK_COLORS = {
   streak: { accent: 'var(--app-mode-planks)', bg: 'var(--app-mode-planks-bg)', surface: 'var(--app-mode-planks-surface)', icon: 'trending_up' },
   default: { accent: 'var(--app-mode-vocab)', bg: 'var(--app-mode-vocab-bg)', surface: 'var(--app-mode-vocab-surface)', icon: 'task_alt' },
 };
-
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 function TaskCard({ task, onClaim, claiming }) {
   const percentage = Math.min((task.progress ?? 0) / task.goal, 1) * 100;
@@ -55,7 +44,7 @@ function TaskCard({ task, onClaim, claiming }) {
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-sm" style={{ background: tc.bg }}>
-            <Icon className="text-xl" style={{ color: tc.accent }} filled>{tc.icon}</Icon>
+            <Icon name={tc.icon} className="text-xl" style={{ color: tc.accent }} filled />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -96,7 +85,7 @@ function TaskCard({ task, onClaim, claiming }) {
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold" style={{ color: tc.accent }}>Quest reward</span>
             <span className="flex items-center gap-1 text-xs font-bold" style={{ color: tc.accent }}>
-              +{formattedReward} <Icon className="text-sm" filled>star</Icon>
+              +{formattedReward} <Icon name="star" className="text-sm" filled />
             </span>
           </div>
           {task.rewardClaimed ? (
