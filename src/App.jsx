@@ -26,6 +26,7 @@ import MigrationInitializer from './components/MigrationInitializer.jsx';
 import PWAInstallPrompt from './components/PWAInstallPrompt.jsx';
 import PlayModeModal from './components/PlayModeModal.jsx';
 import OnboardingFlow from './components/OnboardingFlow.jsx';
+import MaterialSymbolFallbacks from './components/MaterialSymbolFallbacks.jsx';
 import Icon from './components/Icon.jsx';
 import { useFontSettings } from './hooks/useFontSettings.js';
 import './components/AppBottomNav.css';
@@ -265,6 +266,7 @@ function Shell() {
   return (
     <div className={`app-shell ${appFontClass}`}>
       <a className="skip-link" href="#main-content">Skip to content</a>
+      <MaterialSymbolFallbacks />
       <LanguageOnboardingModal />
       <OnboardingFlow />
       <OfflineIndicator />
