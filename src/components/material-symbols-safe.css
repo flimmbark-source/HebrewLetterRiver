@@ -31,14 +31,21 @@
   vertical-align: -0.125em;
 }
 
-html:not(.ms-ready) .material-symbols-outlined,
-html.ms-failed .material-symbols-outlined {
+/*
+   src/index.css still contains an older safety rule that hides Material
+   Symbols with color: transparent before ms-ready. Use a higher-specificity
+   rule here so fallback glyphs keep the element's intended color while the
+   ligature text itself is moved out of view.
+*/
+html:not(.ms-ready) body .material-symbols-outlined,
+html.ms-failed body .material-symbols-outlined {
+  color: inherit !important;
   text-indent: -9999px;
   text-shadow: none !important;
 }
 
-html:not(.ms-ready) .material-symbols-outlined::before,
-html.ms-failed .material-symbols-outlined::before {
+html:not(.ms-ready) body .material-symbols-outlined::before,
+html.ms-failed body .material-symbols-outlined::before {
   content: attr(data-fallback-icon);
   position: absolute;
   inset: 0;
@@ -53,7 +60,7 @@ html.ms-failed .material-symbols-outlined::before {
   text-indent: 0;
 }
 
-html:not(.ms-ready) .material-symbols-outlined:not([data-fallback-icon])::before,
-html.ms-failed .material-symbols-outlined:not([data-fallback-icon])::before {
+html:not(.ms-ready) body .material-symbols-outlined:not([data-fallback-icon])::before,
+html.ms-failed body .material-symbols-outlined:not([data-fallback-icon])::before {
   content: '•';
 }
