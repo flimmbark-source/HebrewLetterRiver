@@ -1,18 +1,7 @@
 import React from 'react';
 import LetterRiverBrand from '../LetterRiverBrand.jsx';
+import Icon from '../Icon.jsx';
 import { HOME_ASSETS } from './homeAssets.js';
-
-function Icon({ children, className = '', filled = false }) {
-  return (
-    <span
-      className={`material-symbols-outlined ${className}`}
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 function CompactLanguageSelect({ id, label, value, options, onChange, icon }) {
   const selectedName = options.find((option) => option.id === value)?.name ?? value;
@@ -24,7 +13,7 @@ function CompactLanguageSelect({ id, label, value, options, onChange, icon }) {
         <small>{label}</small>
         <strong>{selectedName}</strong>
       </span>
-      <Icon className="scenic-language-select__chevron">expand_more</Icon>
+      <Icon name="chevron_right" className="scenic-language-select__chevron" size={18} />
       <select
         id={id}
         value={value}
@@ -70,7 +59,7 @@ export default function ScenicHomeHero({
             className="scenic-home-hero__streak"
             aria-label={t('home.scenic.streakAria', '{{count}} day streak', { count: streakDays })}
           >
-            <Icon filled>local_fire_department</Icon>
+            <Icon name="local_fire_department" size={23} filled />
             <span>{streakDays}</span>
           </div>
           <button
@@ -79,7 +68,7 @@ export default function ScenicHomeHero({
             onClick={onProfileClick}
             aria-label={t('home.scenic.profileAria', 'Edit profile')}
           >
-            <Icon filled>person</Icon>
+            <Icon name="person" size={23} filled />
           </button>
         </div>
       </div>
