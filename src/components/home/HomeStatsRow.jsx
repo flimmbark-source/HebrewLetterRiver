@@ -1,16 +1,5 @@
 import React from 'react';
-
-function Icon({ children, filled = true }) {
-  return (
-    <span
-      className="material-symbols-outlined"
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
+import Icon from '../Icon.jsx';
 
 export default function HomeStatsRow({ stats, t }) {
   return (
@@ -18,7 +7,7 @@ export default function HomeStatsRow({ stats, t }) {
       {stats.map((stat) => (
         <div key={stat.id} className="scenic-stat-card">
           <span className={`scenic-stat-card__icon scenic-tone-${stat.tone}`}>
-            <Icon>{stat.icon}</Icon>
+            <Icon name={stat.icon} size={22} filled />
           </span>
           <span>
             <strong>{stat.title}</strong>

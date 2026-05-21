@@ -1,17 +1,6 @@
 import React from 'react';
+import Icon from '../Icon.jsx';
 import { getLearningPathItems } from './homeState.js';
-
-function Icon({ children, filled = false }) {
-  return (
-    <span
-      className="material-symbols-outlined"
-      style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
-      aria-hidden="true"
-    >
-      {children}
-    </span>
-  );
-}
 
 export default function HomeLearningPath({ currentStage, selectedStage, onSelectStage, t }) {
   const items = getLearningPathItems(currentStage, selectedStage, t);
@@ -32,7 +21,7 @@ export default function HomeLearningPath({ currentStage, selectedStage, onSelect
               title={item.status}
             >
               <div className="scenic-path-node__icon">
-                <Icon filled={item.state !== 'upcoming' || item.isSelected}>{item.icon}</Icon>
+                <Icon name={item.icon} size={24} filled={item.state !== 'upcoming' || item.isSelected} />
               </div>
               <strong>{item.label}</strong>
             </button>

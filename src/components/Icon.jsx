@@ -1,27 +1,70 @@
 import React from 'react';
 import {
   Award,
+  BookOpen,
+  CalendarCheck,
+  ChevronDown,
+  ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  Compass,
   Flame,
+  Gamepad2,
   Home,
+  Landmark,
   Lock,
+  Map,
+  MessageCircle,
+  Mountain,
   Play,
+  RefreshCw,
+  Route,
+  Search,
   Settings,
+  Shield,
+  Star,
+  Target,
+  TrendingUp,
   User,
   Waves,
 } from 'lucide-react';
 
 const MATERIAL_ICON_MAP = {
+  auto_stories: BookOpen,
+  calendar_month: CalendarCheck,
+  check_circle: CalendarCheck,
+  chevron_left: ChevronLeft,
   chevron_right: ChevronRight,
+  event_available: CalendarCheck,
+  expand_less: ChevronUp,
+  expand_more: ChevronDown,
+  explore: Compass,
+  foundation: Landmark,
   emoji_events: Award,
   home: Home,
+  keyboard_arrow_down: ChevronDown,
+  keyboard_arrow_left: ChevronLeft,
+  keyboard_arrow_right: ChevronRight,
+  keyboard_arrow_up: ChevronUp,
+  landscape: Mountain,
   local_fire_department: Flame,
   lock: Lock,
+  map: Map,
+  menu_book: BookOpen,
   person: User,
   play_arrow: Play,
+  restart_alt: RefreshCw,
+  route: Route,
+  search: Search,
   settings: Settings,
-  videogame_asset: Play,
+  shield: Shield,
+  star: Star,
+  stars: Star,
+  target: Target,
+  trending_up: TrendingUp,
+  videogame_asset: Gamepad2,
   waves: Waves,
+  chat_bubble: MessageCircle,
 };
 
 export default function Icon({
@@ -57,7 +100,6 @@ export default function Icon({
       className={`material-symbols-outlined ${className}`.trim()}
       style={{ fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24` }}
       aria-hidden="true"
-      {...props}
     >
       {iconName}
     </span>
