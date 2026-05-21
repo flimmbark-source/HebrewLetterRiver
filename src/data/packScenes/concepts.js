@@ -26,6 +26,32 @@ export const CONCEPTS = {
   or: 'or',
   also: 'also',
 
+  // Pronouns (grounded via characterCue).
+  i: 'i',
+  'you-m': 'you-m',
+  'you-f': 'you-f',
+  he: 'he',
+  she: 'she',
+  we: 'we',
+  they: 'they',
+
+  // Family and nearby people (grounded via familyCue).
+  mom: 'mom',
+  dad: 'dad',
+  family: 'family',
+  home: 'home',
+  friend: 'friend',
+  child: 'child',
+  parent: 'parent',
+  neighbor: 'neighbor',
+  stranger: 'stranger',
+
+  // Comparison adjectives (grounded via comparisonCue).
+  big: 'big',
+  small: 'small',
+  tall: 'tall',
+  short: 'short',
+
   // Colors (grounded-visual-property)
   red: 'red',
   blue: 'blue',
