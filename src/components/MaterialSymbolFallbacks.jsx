@@ -7,10 +7,8 @@ const FALLBACK_ICONS = {
   arrow_forward: '>',
   arrow_upward: '^',
   auto_stories: 'B',
-  bolt: '*',
   calendar_month: 'C',
   cancel: 'x',
-  celebration: '*',
   chat_bubble: 'o',
   check: 'v',
   check_circle: 'v',
@@ -19,16 +17,12 @@ const FALLBACK_ICONS = {
   close: 'x',
   delete: 'x',
   edit: '/',
-  emoji_events: '*',
   error: '!',
   event_available: 'v',
   expand_less: '^',
   expand_more: 'v',
-  explore: '*',
   flag: 'F',
   foundation: '#',
-  headset_mic: 'H',
-  hearing: '~',
   help: '?',
   home: 'H',
   info: 'i',
@@ -38,8 +32,6 @@ const FALLBACK_ICONS = {
   keyboard_arrow_up: '^',
   landscape: '^',
   language: 'A',
-  lightbulb: '*',
-  local_fire_department: '*',
   lock: 'L',
   login: '>',
   logout: '<',
@@ -54,22 +46,17 @@ const FALLBACK_ICONS = {
   pause: 'II',
   person: 'P',
   play_arrow: '>',
-  psychology: '*',
   quiz: '?',
   refresh: 'R',
   remove: '-',
   restart_alt: 'R',
   route: '~',
   schedule: 'T',
-  school: '*',
   search: '?',
-  settings: '*',
   share: '^',
   shield: 'S',
   skip_next: '>',
   skip_previous: '<',
-  star: '*',
-  stars: '*',
   target: 'o',
   translate: 'A',
   trending_up: '^',
@@ -82,8 +69,6 @@ const FALLBACK_ICONS = {
   waves: '~',
 };
 
-const DEFAULT_FALLBACK = '*';
-
 function normalizeIconName(value) {
   return String(value || '').trim().replace(/\s+/g, '_');
 }
@@ -94,7 +79,7 @@ function applyMaterialSymbolFallbacks(root = document) {
     if (!iconName) return;
 
     element.dataset.iconName = iconName;
-    element.dataset.fallbackIcon = FALLBACK_ICONS[iconName] || DEFAULT_FALLBACK;
+    element.dataset.fallbackIcon = FALLBACK_ICONS[iconName] || '';
   });
 }
 
