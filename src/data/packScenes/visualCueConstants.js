@@ -5,13 +5,25 @@
 // scene's correctness source is the cue itself (not an app-language hint).
 //
 // Supported types so far:
-//   colorCircle  — a solid color swatch; correctness = colorConceptId
-//   countDots    — N dots (1..COUNT_DOTS_MAX); correctness = the matching number concept
-//   objectGlyph  — a simple icon for a concrete object; correctness = objectConceptId
+//   colorCircle    — a solid color swatch; correctness = colorConceptId
+//   countDots      — N dots (1..COUNT_DOTS_MAX); correctness = the matching number concept
+//   objectGlyph    — a simple icon for a concrete object; correctness = objectConceptId
+//   dayPart        — morning/night icon; correctness = the matching greeting concept
+//   comparisonCue  — two size/height forms; correctness = conceptId
+//   characterCue   — speaker/listener/referent/group role cue; correctness = conceptId
+//   familyCue      — family/proximity/home cue; correctness = conceptId
 //
 // New cue types must be added here AND validated by archetype rules.
 
-export const SUPPORTED_VISUAL_CUE_TYPES = new Set(['colorCircle', 'countDots', 'objectGlyph', 'dayPart']);
+export const SUPPORTED_VISUAL_CUE_TYPES = new Set([
+  'colorCircle',
+  'countDots',
+  'objectGlyph',
+  'dayPart',
+  'comparisonCue',
+  'characterCue',
+  'familyCue',
+]);
 
 export const COUNT_DOTS_CONCEPT_BY_COUNT = {
   1: 'one',
@@ -40,4 +52,28 @@ export const SUPPORTED_OBJECT_GLYPH_CONCEPT_IDS = new Set([
   'table',
   'door',
   'thing',
+]);
+
+export const SUPPORTED_COMPARISON_CONCEPT_IDS = new Set(['big', 'small', 'tall', 'short']);
+
+export const SUPPORTED_CHARACTER_CONCEPT_IDS = new Set([
+  'i',
+  'you-m',
+  'you-f',
+  'he',
+  'she',
+  'we',
+  'they',
+]);
+
+export const SUPPORTED_FAMILY_CONCEPT_IDS = new Set([
+  'mom',
+  'dad',
+  'family',
+  'home',
+  'friend',
+  'child',
+  'parent',
+  'neighbor',
+  'stranger',
 ]);
