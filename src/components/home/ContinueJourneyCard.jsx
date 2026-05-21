@@ -1,8 +1,5 @@
 import React from 'react';
-
-function Icon({ children }) {
-  return <span className="material-symbols-outlined" aria-hidden="true">{children}</span>;
-}
+import Icon from '../Icon.jsx';
 
 export default function ContinueJourneyCard({ state, t }) {
   return (
@@ -18,7 +15,7 @@ export default function ContinueJourneyCard({ state, t }) {
             <span style={{ width: `${state.progress}%` }} />
           </div>
           <button type="button" className="scenic-cta btn-press" onClick={state.action}>
-            <Icon>play_arrow</Icon>
+            <Icon name="play_arrow" size={20} filled />
             <span>{state.cta}</span>
           </button>
         </div>
