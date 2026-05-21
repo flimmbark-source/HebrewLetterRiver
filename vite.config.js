@@ -48,10 +48,12 @@ export default defineConfig({
             // mobile connections. 100 entries covers all fonts comfortably.
             // Only cache status 200 — opaque status-0 responses can permanently
             // cache a corrupt/partial download with no way to clear it.
+            // Cache name versioned so existing users with old opaque-cached entries
+            // get a fresh cache automatically on the next SW update.
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'gstatic-fonts-cache',
+              cacheName: 'gstatic-fonts-cache-v2',
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year

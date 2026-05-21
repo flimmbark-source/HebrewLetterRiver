@@ -106,21 +106,35 @@
       //
       // fonts.load() waits for the specific font binary. It can return [] on the
       // first call if the @font-face hasn't been registered yet, so we poll.
-      // The 8-second fallback timeout ensures icons are never hidden forever.
+      // fonts.check() is used as a secondary guard — it returns true only when the
+      // font is genuinely available for rendering, guarding against iOS Safari
+      // returning a non-empty faces array before the binary is decoded.
+      //
+      // The .catch handler retries rather than revealing immediately: a rejection
+      // usually means the font request itself failed (e.g. the service worker
+      // served a corrupt cached response). Retrying gives the network a chance to
+      // serve a fresh copy. Icons stay hidden until the font is confirmed ready.
+      // The 15-second hard fallback is a last resort for very slow connections.
       var done = false;
       var reveal = function () {
         if (done) return;
         done = true;
         document.documentElement.classList.add('ms-ready');
       };
-      var t = setTimeout(reveal, 8000);
+      var t = setTimeout(reveal, 15000);
       if (document.fonts && document.fonts.load) {
         var attempts = 0;
         (function tryLoad() {
           document.fonts.load('1em "Material Symbols Outlined"').then(function (faces) {
-            if (faces.length > 0) { clearTimeout(t); reveal(); }
-            else if (++attempts < 39) { setTimeout(tryLoad, 200); }
-          }).catch(function () { clearTimeout(t); reveal(); });
+            var ready = faces.length > 0;
+            if (ready && document.fonts.check) { ready = document.fonts.check('1em "Material Symbols Outlined"'); }
+            if (ready) { clearTimeout(t); reveal(); }
+            else if (++attempts < 74) { setTimeout(tryLoad, 200); }
+          }).catch(function () {
+            // Retry on error rather than revealing — a rejection often means the
+            // cached font response was corrupt; the next attempt may hit the network.
+            if (++attempts < 74) { setTimeout(tryLoad, 200); }
+          });
         }());
       }
     })();
