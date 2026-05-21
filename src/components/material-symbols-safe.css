@@ -1,4 +1,5 @@
 .material-symbols-outlined {
+  position: relative;
   display: inline-block;
   width: 1em;
   min-width: 1em;
@@ -34,4 +35,26 @@ html:not(.ms-ready) .material-symbols-outlined,
 html.ms-failed .material-symbols-outlined {
   color: transparent !important;
   text-shadow: none !important;
+}
+
+html:not(.ms-ready) .material-symbols-outlined::before,
+html.ms-failed .material-symbols-outlined::before {
+  content: attr(data-fallback-icon);
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+  color: var(--material-symbol-fallback-color, currentColor);
+  font-family: var(--font-body, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  font-size: 0.9em;
+  font-weight: 800;
+  line-height: 1;
+  text-indent: 0;
+}
+
+html:not(.ms-ready) .material-symbols-outlined:not([data-fallback-icon])::before,
+html.ms-failed .material-symbols-outlined:not([data-fallback-icon])::before {
+  content: '•';
 }
