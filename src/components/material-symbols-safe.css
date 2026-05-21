@@ -62,5 +62,5 @@ html.ms-failed body .material-symbols-outlined::before {
 
 html:not(.ms-ready) body .material-symbols-outlined:not([data-fallback-icon])::before,
 html.ms-failed body .material-symbols-outlined:not([data-fallback-icon])::before {
-  content: '•';
+  content: '';
 }
