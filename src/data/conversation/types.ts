@@ -259,4 +259,21 @@ export interface TurnStep {
   stepType: TurnStepType;
   /** Module to use for this step */
   moduleId: ConversationModuleType;
+  /** Configuration for this step */
+  config?: Record<string, any>;
+}
+
+/**
+ * Dual-role session state
+ * Extends the regular session with turn tracking
+ */
+export interface DualRoleSessionState extends ConversationSessionState {
+  /** The dual-role script being practiced */
+  script: DualRoleConversationScript;
+  /** Current turn index in the script */
+  currentTurnIndex: number;
+  /** Current step within the turn (0 = introduce, 1 = reinforce) */
+  currentStepInTurn: number;
+  /** All steps expanded from the script */
+  steps: TurnStep[];
 }
