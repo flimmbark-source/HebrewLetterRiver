@@ -30,6 +30,12 @@ export const conversationModules: ConversationModule[] = [
     icon: '🗣️'
   },
   {
+    id: 'speechLineRecognition',
+    nameKey: 'conversation.modules.speechLineRecognition.name',
+    descriptionKey: 'conversation.modules.speechLineRecognition.description',
+    icon: '🎙️'
+  },
+  {
     id: 'guidedReplyChoice',
     nameKey: 'conversation.modules.guidedReplyChoice.name',
     descriptionKey: 'conversation.modules.guidedReplyChoice.description',
