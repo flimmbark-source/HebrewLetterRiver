@@ -447,13 +447,26 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
     e.preventDefault();
     if (!playAreaRef.current) return;
 
-    const rect = playAreaRef.current.getBoundingClientRect();
+    const playRect = playAreaRef.current.getBoundingClientRect();
+
+    // Sync the logical position to the actual visual center before computing
+    // the drag offset. CSS animations (e.g. ds-bubble-float) apply a
+    // translateY via `transform`, shifting the visual center away from
+    // capsule.x/y. Without this sync the offset is wrong and the bubble
+    // jumps when the animation stops once the dragging class is applied.
+    const el = bubbleElsRef.current.get(capsule.id);
+    if (el) {
+      const elRect = el.getBoundingClientRect();
+      capsule.x = elRect.left - playRect.left + elRect.width / 2;
+      capsule.y = elRect.top - playRect.top + elRect.height / 2;
+    }
+
     dragStateRef.current = {
       isDragging: true,
       capsuleIndex: index,
       capsuleType: capsule.type,
-      offsetX: e.clientX - rect.left - capsule.x,
-      offsetY: e.clientY - rect.top - capsule.y,
+      offsetX: e.clientX - playRect.left - capsule.x,
+      offsetY: e.clientY - playRect.top - capsule.y,
       rafId: null,
     };
 
@@ -830,7 +843,9 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
           return (
             <div
               key={capsule.id}
-              className={`absolute select-none transition-all cursor-grab active:cursor-grabbing ${
+              className={`absolute select-none cursor-grab active:cursor-grabbing ${
+                isDragging ? '' : 'transition-all'
+              } ${
                 capsule.shaking ? 'animate-shake' : ''
               } ${
                 isPopping ? 'animate-pop' : ''
