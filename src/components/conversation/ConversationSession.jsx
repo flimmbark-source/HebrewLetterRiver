@@ -24,6 +24,38 @@ const SEGMENT_MODULE_SEQUENCE = [
   'typeInput'
 ];
 
+const VOICE_WARMUP_MODULE_SEQUENCE = [
+  'speechLineRecognition'
+];
+
+function buildPlanFromSegment({ scenarioId, segment, moduleSequence, planNameSuffix = '' }) {
+  if (!segment?.pairs?.length) {
+    return null;
+  }
+
+  const beats = [];
+  for (const pair of segment.pairs) {
+    for (const moduleId of moduleSequence) {
+      beats.push({
+        lineId: pair.shortSentenceId,
+        moduleId
+      });
+    }
+    for (const moduleId of moduleSequence) {
+      beats.push({
+        lineId: pair.longSentenceId,
+        moduleId
+      });
+    }
+  }
+
+  return {
+    scenarioId,
+    beats,
+    planName: `${segment.plan?.planName ?? segment.id ?? 'segment'}${planNameSuffix}`
+  };
+}
+
 export default function ConversationSession({ scenario, onExit }) {
   console.log('[ConversationSession] Component rendering, current screen will be checked below');
 
@@ -35,32 +67,30 @@ export default function ConversationSession({ scenario, onExit }) {
   const [activePlan, setActivePlan] = useState(scenario.defaultPlan);
 
   const buildSegmentPlan = useCallback((segment) => {
-    if (!segment?.pairs?.length) {
-      return null;
-    }
-
-    const beats = [];
-    for (const pair of segment.pairs) {
-      for (const moduleId of SEGMENT_MODULE_SEQUENCE) {
-        beats.push({
-          lineId: pair.shortSentenceId,
-          moduleId
-        });
-      }
-      for (const moduleId of SEGMENT_MODULE_SEQUENCE) {
-        beats.push({
-          lineId: pair.longSentenceId,
-          moduleId
-        });
-      }
-    }
-
-    return {
+    return buildPlanFromSegment({
       scenarioId: scenario.metadata.id,
-      beats,
-      planName: segment.plan?.planName ?? segment.id ?? 'segment'
-    };
+      segment,
+      moduleSequence: SEGMENT_MODULE_SEQUENCE
+    });
   }, [scenario.metadata.id]);
+
+  const buildVoiceWarmupPlan = useCallback((segment) => {
+    return buildPlanFromSegment({
+      scenarioId: scenario.metadata.id,
+      segment,
+      moduleSequence: VOICE_WARMUP_MODULE_SEQUENCE,
+      planNameSuffix: '-voice-warmup'
+    });
+  }, [scenario.metadata.id]);
+
+  const startPlan = useCallback((nextPlan) => {
+    setActivePlan(nextPlan);
+    setSessionId(null); // Reset session to use new plan
+    setScreen('beat');
+    setCurrentBeatIndex(0);
+    setAttemptHistory([]);
+    setSavedLineIds([]);
+  }, []);
 
   console.log('[ConversationSession] Current state:', {
     screen,
@@ -102,13 +132,17 @@ export default function ConversationSession({ scenario, onExit }) {
     console.log('First 5 beat lineIds:', segment.plan?.beats?.slice(0, 5).map(b => b.lineId));
 
     const nextPlan = buildSegmentPlan(segment) ?? segment.plan ?? scenario.defaultPlan;
-    setActivePlan(nextPlan);
-    setSessionId(null); // Reset session to use new plan
-    setScreen('beat');
-    setCurrentBeatIndex(0);
-    setAttemptHistory([]);
-    setSavedLineIds([]);
-  }, [buildSegmentPlan, scenario.defaultPlan]);
+    startPlan(nextPlan);
+  }, [buildSegmentPlan, scenario.defaultPlan, startPlan]);
+
+  const handleStartVoiceWarmup = useCallback((segment) => {
+    console.log('=== Starting Voice Warm-Up Segment ===');
+    console.log('Segment ID:', segment?.id);
+
+    const nextPlan = buildVoiceWarmupPlan(segment);
+    if (!nextPlan) return;
+    startPlan(nextPlan);
+  }, [buildVoiceWarmupPlan, startPlan]);
 
   // Handle beat completion
   const handleBeatComplete = useCallback((attemptResult) => {
@@ -178,6 +212,7 @@ export default function ConversationSession({ scenario, onExit }) {
         scenario={scenario}
         onStart={handleStart}
         onStartSegment={handleStartSegment}
+        onStartVoiceWarmup={handleStartVoiceWarmup}
         onBack={onExit}
       />
     );
