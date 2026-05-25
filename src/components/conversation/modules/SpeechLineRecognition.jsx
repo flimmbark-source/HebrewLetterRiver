@@ -181,7 +181,7 @@ export default function SpeechLineRecognition({ line, onResult }) {
         </p>
       </div>
 
-      <div className="relative rounded-[1.5rem] border border-[#d8cdb7] bg-white/75 p-4 pt-12 text-center shadow-sm">
+      <div className="relative rounded-[1.5rem] border border-[#d8cdb7] bg-white/75 p-4 text-center shadow-sm">
         <div className="absolute left-3 top-3">
           <SpeakButton
             nativeText={line.he}
