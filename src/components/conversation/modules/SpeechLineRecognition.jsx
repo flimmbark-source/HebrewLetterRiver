@@ -7,63 +7,6 @@ function getSpeechRecognition() {
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
 }
 
-function isSpeechDebugEnabled() {
-  if (typeof window === 'undefined') return false;
-
-  try {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('speech-debug') === '1' || window.localStorage.getItem('LETTER_RIVER_SPEECH_DEBUG') === '1';
-  } catch {
-    return false;
-  }
-}
-
-function getMicrophonePolicyState() {
-  if (typeof document === 'undefined') return 'unavailable';
-
-  try {
-    if (document.permissionsPolicy?.allowsFeature) {
-      return document.permissionsPolicy.allowsFeature('microphone');
-    }
-
-    if (document.featurePolicy?.allowsFeature) {
-      return document.featurePolicy.allowsFeature('microphone');
-    }
-  } catch (error) {
-    return `error: ${error?.name || 'unknown'}`;
-  }
-
-  return 'unavailable';
-}
-
-function getSpeechDebugSnapshot() {
-  if (typeof window === 'undefined') return {};
-
-  return {
-    href: window.location.href,
-    isSecureContext: window.isSecureContext,
-    topLevel: window.top === window.self,
-    permissionsPolicyMicrophone: getMicrophonePolicyState(),
-    hasMediaDevices: Boolean(navigator.mediaDevices),
-    hasGetUserMedia: Boolean(navigator.mediaDevices?.getUserMedia),
-    hasSpeechRecognition: Boolean(window.SpeechRecognition),
-    hasWebkitSpeechRecognition: Boolean(window.webkitSpeechRecognition),
-    displayModeStandalone: Boolean(window.matchMedia?.('(display-mode: standalone)')?.matches),
-    visibilityState: document.visibilityState,
-    userAgent: navigator.userAgent
-  };
-}
-
-function describeError(error) {
-  if (!error) return null;
-
-  return {
-    name: error.name,
-    message: error.message,
-    code: error.code
-  };
-}
-
 function normalizeSpeechText(value = '') {
   return value
     .toLowerCase()
@@ -139,28 +82,9 @@ export default function SpeechLineRecognition({ line, onResult }) {
   const [transcript, setTranscript] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const speechDebugEnabled = useMemo(() => isSpeechDebugEnabled(), []);
-  const [debugEntries, setDebugEntries] = useState(() => (
-    isSpeechDebugEnabled()
-      ? [{ at: new Date().toISOString(), label: 'mounted', data: getSpeechDebugSnapshot() }]
-      : []
-  ));
 
   const Recognition = useMemo(() => getSpeechRecognition(), []);
   const isSupported = Boolean(Recognition);
-
-  const addDebugEntry = useCallback((label, data = {}) => {
-    if (!speechDebugEnabled) return;
-
-    setDebugEntries((entries) => [
-      ...entries.slice(-29),
-      {
-        at: new Date().toISOString(),
-        label,
-        data
-      }
-    ]);
-  }, [speechDebugEnabled]);
 
   useEffect(() => {
     if (recognitionRef.current) {
@@ -172,8 +96,7 @@ export default function SpeechLineRecognition({ line, onResult }) {
     setTranscript('');
     setErrorMessage('');
     setHasSubmitted(false);
-    addDebugEntry('line reset', { lineId: line.id, snapshot: getSpeechDebugSnapshot() });
-  }, [addDebugEntry, line.id]);
+  }, [line.id]);
 
   const speechResult = useMemo(() => {
     return scoreSpeech({
@@ -184,29 +107,14 @@ export default function SpeechLineRecognition({ line, onResult }) {
   }, [line, transcript]);
 
   const stopListening = useCallback(() => {
-    addDebugEntry('stop listening tapped');
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
     setIsListening(false);
-  }, [addDebugEntry]);
+  }, []);
 
   const startListening = useCallback(async () => {
-    addDebugEntry('start tapped', {
-      hasRecognition: Boolean(Recognition),
-      isListening,
-      hasSubmitted,
-      snapshot: getSpeechDebugSnapshot()
-    });
-
-    if (!Recognition || isListening || hasSubmitted) {
-      addDebugEntry('start blocked by guard', {
-        hasRecognition: Boolean(Recognition),
-        isListening,
-        hasSubmitted
-      });
-      return;
-    }
+    if (!Recognition || isListening || hasSubmitted) return;
 
     setErrorMessage('');
     setTranscript('');
@@ -214,16 +122,7 @@ export default function SpeechLineRecognition({ line, onResult }) {
 
     const mediaDevices = typeof navigator !== 'undefined' ? navigator.mediaDevices : null;
 
-    if (navigator.permissions?.query) {
-      navigator.permissions.query({ name: 'microphone' })
-        .then((result) => addDebugEntry('permission query result', { state: result.state }))
-        .catch((error) => addDebugEntry('permission query error', describeError(error)));
-    } else {
-      addDebugEntry('permission query unavailable');
-    }
-
     if (!mediaDevices?.getUserMedia) {
-      addDebugEntry('getUserMedia unavailable');
       setErrorMessage(
         t(
           'conversation.modules.speechLineRecognition.micCheckUnsupported',
@@ -235,19 +134,9 @@ export default function SpeechLineRecognition({ line, onResult }) {
     }
 
     try {
-      addDebugEntry('before getUserMedia');
       const stream = await mediaDevices.getUserMedia({ audio: true });
-      addDebugEntry('getUserMedia success', {
-        audioTracks: stream.getAudioTracks().map((track) => ({
-          label: track.label,
-          enabled: track.enabled,
-          muted: track.muted,
-          readyState: track.readyState
-        }))
-      });
       stream.getTracks().forEach((track) => track.stop());
     } catch (error) {
-      addDebugEntry('getUserMedia error', describeError(error));
       setErrorMessage(
         error?.name === 'NotFoundError' || error?.name === 'DevicesNotFoundError'
           ? t(
@@ -269,24 +158,15 @@ export default function SpeechLineRecognition({ line, onResult }) {
     recognition.maxAlternatives = 3;
     recognition.continuous = false;
 
-    recognition.onstart = () => addDebugEntry('recognition start');
-    recognition.onaudiostart = () => addDebugEntry('recognition audio start');
-    recognition.onspeechstart = () => addDebugEntry('recognition speech start');
-    recognition.onspeechend = () => addDebugEntry('recognition speech end');
-    recognition.onaudioend = () => addDebugEntry('recognition audio end');
-    recognition.onnomatch = () => addDebugEntry('recognition no match');
-
     recognition.onresult = (event) => {
       const heard = Array.from(event.results)
         .map((result) => result[0]?.transcript ?? '')
         .join(' ')
         .trim();
-      addDebugEntry('recognition result', { heard });
       setTranscript(heard);
     };
 
     recognition.onerror = (event) => {
-      addDebugEntry('recognition error', { error: event.error, message: event.message });
       setErrorMessage(
         event.error === 'not-allowed' || event.error === 'service-not-allowed'
           ? t(
@@ -304,18 +184,14 @@ export default function SpeechLineRecognition({ line, onResult }) {
     };
 
     recognition.onend = () => {
-      addDebugEntry('recognition end');
       setIsListening(false);
     };
 
     recognitionRef.current = recognition;
 
     try {
-      addDebugEntry('before recognition.start');
       recognition.start();
-      addDebugEntry('recognition.start returned');
-    } catch (error) {
-      addDebugEntry('recognition.start threw', describeError(error));
+    } catch {
       setErrorMessage(
         t(
           'conversation.modules.speechLineRecognition.voiceStartFailed',
@@ -324,7 +200,7 @@ export default function SpeechLineRecognition({ line, onResult }) {
       );
       setIsListening(false);
     }
-  }, [Recognition, addDebugEntry, hasSubmitted, isListening, t]);
+  }, [Recognition, hasSubmitted, isListening, t]);
 
   const submitTranscript = useCallback(() => {
     if (hasSubmitted || !transcript.trim()) return;
@@ -353,11 +229,6 @@ export default function SpeechLineRecognition({ line, onResult }) {
       score: 0
     });
   }, [hasSubmitted, line.he, onResult, stopListening, t]);
-
-  const copyDebugEntries = useCallback(() => {
-    if (!navigator.clipboard?.writeText) return;
-    navigator.clipboard.writeText(JSON.stringify(debugEntries, null, 2)).catch(() => {});
-  }, [debugEntries]);
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4 text-[#173d2e]">
@@ -402,7 +273,7 @@ export default function SpeechLineRecognition({ line, onResult }) {
           <button
             type="button"
             onClick={isListening ? stopListening : startListening}
-            disabled={(!isSupported && !speechDebugEnabled) || hasSubmitted}
+            disabled={!isSupported || hasSubmitted}
             className={`flex-1 rounded-2xl px-4 py-3 text-base font-bold text-white shadow-md transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-55 ${isListening ? 'bg-[#a06413]' : 'bg-[#2f6b4c]'}`}
           >
             {isListening
@@ -434,22 +305,6 @@ export default function SpeechLineRecognition({ line, onResult }) {
           <div className="mt-3 rounded-2xl border border-[#c77912]/40 bg-[#fff3d9] p-3 text-sm font-semibold text-[#8a560f]">
             {errorMessage}
           </div>
-        )}
-
-        {speechDebugEnabled && (
-          <details className="mt-3 rounded-2xl border border-[#9ca3af] bg-white/90 p-3 text-left text-xs text-[#1f2937]">
-            <summary className="cursor-pointer font-bold">Speech debug ({debugEntries.length})</summary>
-            <button
-              type="button"
-              onClick={copyDebugEntries}
-              className="mt-2 rounded-lg border border-[#9ca3af] bg-white px-3 py-2 text-xs font-bold text-[#1f2937]"
-            >
-              Copy debug
-            </button>
-            <pre className="mt-2 max-h-56 overflow-auto whitespace-pre-wrap break-words rounded-xl bg-[#f3f4f6] p-2">
-              {JSON.stringify(debugEntries, null, 2)}
-            </pre>
-          </details>
         )}
 
         {transcript && !hasSubmitted && (
