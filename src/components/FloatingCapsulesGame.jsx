@@ -64,18 +64,6 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
   const playAreaRef = useRef(null);
   const [playAreaBounds, setPlayAreaBounds] = useState({ width: 0, height: 0 });
 
-  const getBubbleDragTransform = useCallback((capsule) => (
-    `translate3d(${capsule.x}px, ${capsule.y}px, 0) translate(-50%, -50%) scale(1.12)`
-  ), []);
-
-  const applyBubbleDragPosition = useCallback((el, capsule) => {
-    if (!el || !capsule) return;
-    el.style.left = '0px';
-    el.style.top = '0px';
-    el.style.transform = getBubbleDragTransform(capsule);
-    el.style.willChange = 'transform';
-  }, [getBubbleDragTransform]);
-
   // Measure bounds accurately after layout is complete
   const updateBounds = useCallback(() => {
     if (!playAreaRef.current) return;
@@ -487,15 +475,13 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
     };
 
     if (bubbleMode && el) {
-      el.classList.remove('ds-bubble--pop-on', 'ds-bubble--shake');
-      el.classList.add('ds-bubble--dragging');
-      applyBubbleDragPosition(el, capsule);
+      el.style.willChange = 'left, top';
     }
 
     safelySetPointerCapture(e.currentTarget, e.pointerId);
     // Force one re-render so the dragging class is applied
     forceUpdate(n => n + 1);
-  }, [gameStarted, bubbleMode, applyBubbleDragPosition]);
+  }, [gameStarted, bubbleMode]);
 
   const handlePointerMove = useCallback((e) => {
     const drag = dragStateRef.current;
@@ -518,25 +504,18 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       drag.rafId = null;
       const el = bubbleElsRef.current.get(capsule.id);
       if (el) {
-        if (bubbleMode) {
-          applyBubbleDragPosition(el, capsule);
-        } else {
-          el.style.left = `${capsule.x}px`;
-          el.style.top = `${capsule.y}px`;
-        }
+        el.style.left = `${capsule.x}px`;
+        el.style.top = `${capsule.y}px`;
       }
     });
-  }, [bubbleMode, applyBubbleDragPosition]);
+  }, []);
 
   const resetDragState = useCallback(() => {
     const drag = dragStateRef.current;
     const capsule = capsulesRef.current[drag.capsuleIndex];
     const el = capsule ? bubbleElsRef.current.get(capsule.id) : null;
 
-    if (bubbleMode && el && capsule) {
-      el.style.left = `${capsule.x}px`;
-      el.style.top = `${capsule.y}px`;
-      el.style.transform = '';
+    if (el) {
       el.style.willChange = '';
     }
 
@@ -552,7 +531,7 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
       dragStateRef.current.rafId = null;
     }
     forceUpdate(n => n + 1);
-  }, [bubbleMode]);
+  }, []);
 
   const handlePointerUp = useCallback((e) => {
     if (!dragStateRef.current.isDragging) return;
@@ -866,10 +845,9 @@ export default function FloatingCapsulesGame({ wordPairs, onComplete, bubbleMode
                 }}
                 className={`ds-bubble ${animCls}`}
                 style={{
-                  left: isDragging ? 0 : capsule.x,
-                  top: isDragging ? 0 : capsule.y,
-                  transform: isDragging ? getBubbleDragTransform(capsule) : undefined,
-                  willChange: isDragging ? 'transform' : undefined,
+                  left: capsule.x,
+                  top: capsule.y,
+                  willChange: isDragging ? 'left, top' : undefined,
                   touchAction: 'none',
                   '--bubble-color': bubbleColor,
                   '--bubble-glow': bubbleGlow,
