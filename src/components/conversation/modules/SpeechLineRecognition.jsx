@@ -182,13 +182,13 @@ export default function SpeechLineRecognition({ line, onResult }) {
       </div>
 
       <div className="relative rounded-[1.5rem] border border-[#d8cdb7] bg-white/75 p-4 text-center shadow-sm">
-        <div className="absolute left-3 top-3">
+        <div className="absolute left-3 top-[5px]">
           <SpeakButton
             nativeText={line.he}
             nativeLocale="he-IL"
             transliteration={line.tl}
             variant="icon"
-            className="!rounded-full !border-[#d8cdb7] !bg-[#fff8e8] !p-2 !text-base !text-[#214d39] hover:!bg-white"
+            className="!rounded-full !border-transparent !bg-transparent !p-2 !text-base !text-[#214d39] hover:!bg-transparent"
           />
         </div>
         <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#6c7469]">
