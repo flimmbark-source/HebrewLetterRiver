@@ -8,28 +8,6 @@ import './styles/skeleton.css';
 
 const SW_RESET_FLAG_KEY = 'hlr.forceSwReset';
 const SW_RESET_QUERY_PARAM = 'reset-sw';
-const SPEECH_DEBUG_FLAG_KEY = 'LETTER_RIVER_SPEECH_DEBUG';
-const SPEECH_DEBUG_QUERY_PARAM = 'speech-debug';
-
-function persistSpeechDebugFlag() {
-  if (typeof window === 'undefined') return;
-
-  try {
-    const query = new URLSearchParams(window.location.search);
-    const speechDebugValue = query.get(SPEECH_DEBUG_QUERY_PARAM);
-
-    if (speechDebugValue === '1') {
-      window.localStorage.setItem(SPEECH_DEBUG_FLAG_KEY, '1');
-      return;
-    }
-
-    if (speechDebugValue === '0') {
-      window.localStorage.removeItem(SPEECH_DEBUG_FLAG_KEY);
-    }
-  } catch {
-    // Ignore storage/query failures; debug mode is optional.
-  }
-}
 
 function shouldForceServiceWorkerReset() {
   if (typeof window === 'undefined') return false;
@@ -106,7 +84,6 @@ async function resetServiceWorkersAndCaches() {
 }
 
 console.info('[Bootstrap] Starting app initialization');
-persistSpeechDebugFlag();
 resetServiceWorkersAndCaches().catch((error) => {
   console.warn('[PWA] Failed to reset service workers/caches:', error);
 });
