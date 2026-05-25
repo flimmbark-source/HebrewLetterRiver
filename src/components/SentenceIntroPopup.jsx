@@ -1,19 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import FloatingCapsulesGame from './FloatingCapsulesGame';
+import './deepScript/DeepScript.css';
 import { markSentenceIntroduced } from '../lib/introducedSentenceStorage';
 import { markWordsSeen } from '../lib/seenWordsStorage';
-
-/**
- * SentenceIntroPopup - Modal overlay that shows the word-matching mini-game
- * for introducing new sentences to learners.
- *
- * This component:
- * - Creates a full-screen modal overlay
- * - Traps focus for accessibility
- * - Prevents interaction with underlying content
- * - Manages the mini-game lifecycle
- * - Persists completion to storage
- */
 
 export default function SentenceIntroPopup({
   sentenceId,
@@ -28,40 +17,30 @@ export default function SentenceIntroPopup({
   const previousFocusRef = useRef(null);
 
   useEffect(() => {
-    // Store currently focused element to restore later
     previousFocusRef.current = document.activeElement;
-
-    // Prevent scrolling on body
     document.body.style.overflow = 'hidden';
 
-    // Trigger fade-in animation
     requestAnimationFrame(() => {
       setIsVisible(true);
     });
 
-    // Focus the overlay
     if (overlayRef.current) {
       overlayRef.current.focus();
     }
 
-    // Mark words as seen immediately when the game starts (when player sees them)
     const wordIds = wordPairs.map(pair => pair.wordId).filter(Boolean);
     if (wordIds.length > 0) {
       markWordsSeen(wordIds);
     }
 
     return () => {
-      // Restore scrolling
       document.body.style.overflow = '';
-
-      // Restore focus
       if (previousFocusRef.current) {
         previousFocusRef.current.focus();
       }
     };
   }, [wordPairs]);
 
-  // Trap focus within modal
   const handleKeyDown = (e) => {
     if (e.key === 'Tab') {
       const focusableElements = overlayRef.current?.querySelectorAll(
@@ -85,37 +64,21 @@ export default function SentenceIntroPopup({
       }
     }
 
-    // Escape key handling (could show confirmation dialog)
     if (e.key === 'Escape') {
-      handleSkip();
-    }
-  };
-
-  const handleSkip = () => {
-    const confirmSkip = window.confirm(
-      'Are you sure you want to skip this introduction? You can always practice these words later.'
-    );
-
-    if (confirmSkip) {
       handleClose();
     }
   };
 
   const handleGameComplete = (stats) => {
-    // Save sentence completion to storage
     markSentenceIntroduced(sentenceId, {
       completionTime: stats.completionTime,
       mismatchCount: stats.mismatchCount
     });
 
-    // Words are already marked as seen when the game starts (in useEffect)
-
-    // Notify parent
     if (onComplete) {
       onComplete(stats);
     }
 
-    // Close after a brief delay for user to see completion
     setTimeout(() => {
       handleClose();
     }, 300);
@@ -128,7 +91,6 @@ export default function SentenceIntroPopup({
     }, 200);
   };
 
-  // Cap word pairs to 8 for manageability
   const cappedWordPairs = wordPairs.slice(0, 8);
 
   return (
@@ -143,13 +105,11 @@ export default function SentenceIntroPopup({
       aria-modal="true"
       aria-labelledby="intro-popup-title"
     >
-      {/* Modal container - responsive sizing */}
       <div
         className={`relative w-[90vw] h-[70vh] md:w-[45vw] md:h-[80vh] max-w-4xl bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ${
           isClosing ? 'scale-95 opacity-0' : isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}
       >
-        {/* Header */}
         <div className="absolute top-0 left-0 right-0 z-20 p-3 bg-gradient-to-b from-slate-800/95 to-transparent pointer-events-none">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
@@ -158,9 +118,8 @@ export default function SentenceIntroPopup({
               </h2>
             </div>
 
-            {/* Skip button */}
             <button
-              onClick={handleSkip}
+              onClick={handleClose}
               className="pointer-events-auto px-3 py-1.5 text-xs text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-slate-700/50 flex-shrink-0"
               aria-label="Skip introduction"
             >
@@ -169,11 +128,11 @@ export default function SentenceIntroPopup({
           </div>
         </div>
 
-        {/* Game area */}
         <div className="absolute inset-0 pt-14 pb-4">
           <FloatingCapsulesGame
             wordPairs={cappedWordPairs}
             onComplete={handleGameComplete}
+            bubbleMode
           />
         </div>
       </div>
