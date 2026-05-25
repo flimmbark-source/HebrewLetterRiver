@@ -59,9 +59,9 @@ function createWarmupPlan({ lineIds, routeStop, routeStopIndex }) {
       routeStop,
       routeStopIndex,
       lineId,
-      moduleId: 'shadowRepeat',
+      moduleId: 'speechLineRecognition',
       order: lineIndex * 2 + 1,
-      routeBeatRole: 'fluencySupport'
+      routeBeatRole: 'speechLineRecognition'
     })
   ]);
 }
@@ -140,9 +140,9 @@ function createExchangePlan({ lineIds, routeStop, routeStopIndex }) {
       routeStop,
       routeStopIndex,
       lineId: thirdLineId,
-      moduleId: 'shadowRepeat',
+      moduleId: 'speechLineRecognition',
       order: 3,
-      routeBeatRole: 'fluencySupport'
+      routeBeatRole: 'speechLineRecognition'
     })
   ];
 }
@@ -150,9 +150,9 @@ function createExchangePlan({ lineIds, routeStop, routeStopIndex }) {
 /**
  * Builds an intentional beat sequence for a visible river route stop.
  *
- * Stop 1: Warm-up Phrases — read/match and fluency support.
+ * Stop 1: Warm-up Phrases — read/match and speech recognition.
  * Stop 2: Build the Scene — read/match, build a line, then choose a reply.
- * Stop 3: Full Exchange — choose replies and build a key line.
+ * Stop 3: Full Exchange — choose replies, build a key line, and speak it.
  */
 export function buildRouteStopBeatPlan({ scenario, routeStop, segments, fallbackSteps = [] }) {
   const segmentsToUse = Array.isArray(segments) ? segments.filter(Boolean) : [];
