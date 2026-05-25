@@ -10,15 +10,21 @@ function getDifficultyLabel(difficulty, t) {
   return t('conversation.list.difficulty.hard', 'Hard');
 }
 
-function isVoiceWarmupScenario(scenario, onStartVoiceWarmup) {
-  return Boolean(
-    scenario?.metadata?.id === 'conversation-greetings-introductions'
-    && typeof onStartVoiceWarmup === 'function'
-  );
-}
+function isGreetingsWarmupScenario(scenario, onStartVoiceWarmup) {
+  const id = scenario?.metadata?.id ?? '';
+  const theme = scenario?.metadata?.theme ?? '';
+  const titleKey = scenario?.metadata?.titleKey ?? '';
+  const firstLineId = scenario?.segments?.[0]?.pairs?.[0]?.shortSentenceId ?? scenario?.lines?.[0]?.id ?? '';
 
-function isVoiceWarmupStopSelected(selectedRouteStop) {
-  return selectedRouteStop?.index === 0;
+  return Boolean(
+    typeof onStartVoiceWarmup === 'function'
+    && (
+      id === 'conversation-greetings-introductions'
+      || theme === 'Greetings & Introductions'
+      || titleKey.includes('greetings-introductions')
+      || firstLineId.startsWith('greetings-')
+    )
+  );
 }
 
 export default function ConversationBriefScreen({ scenario, onStartSegment, onStartVoiceWarmup, onBack }) {
@@ -26,8 +32,8 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onSt
   const [selectedRouteStop, setSelectedRouteStop] = useState(null);
   const hasSegments = scenario.segments && scenario.segments.length > 0;
   const canSelectSegments = hasSegments && typeof onStartSegment === 'function';
-  const showVoiceWarmupButton = isVoiceWarmupScenario(scenario, onStartVoiceWarmup);
-  const canStartVoiceWarmup = showVoiceWarmupButton && isVoiceWarmupStopSelected(selectedRouteStop);
+  const warmupRouteStop = scenario.segments?.[0] ?? null;
+  const showVoiceWarmupButton = isGreetingsWarmupScenario(scenario, onStartVoiceWarmup) && Boolean(warmupRouteStop);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -53,8 +59,8 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onSt
   };
 
   const handleBeginVoiceWarmup = () => {
-    if (!canStartVoiceWarmup) return;
-    onStartVoiceWarmup(selectedRouteStop);
+    if (!showVoiceWarmupButton || !warmupRouteStop) return;
+    onStartVoiceWarmup(warmupRouteStop);
   };
 
   return (
@@ -141,15 +147,10 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onSt
                     <button
                       type="button"
                       onClick={handleBeginVoiceWarmup}
-                      disabled={!canStartVoiceWarmup}
-                      className="relative z-10 flex w-full items-center justify-center gap-2 rounded-2xl border border-[#2f6b4c]/25 bg-[#fffaf0]/94 px-5 py-3 text-sm font-bold text-[#214d39] shadow-sm transition hover:bg-white active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 md:px-5 md:py-3"
+                      className="relative z-10 flex w-full items-center justify-center gap-2 rounded-2xl border border-[#2f6b4c]/25 bg-[#fffaf0]/94 px-5 py-3 text-sm font-bold text-[#214d39] shadow-sm transition hover:bg-white active:scale-[0.99] md:px-5 md:py-3"
                     >
                       <Icon name="mic" className="text-lg" aria-hidden="true" />
-                      <span>
-                        {canStartVoiceWarmup
-                          ? t('conversation.brief.voiceWarmup', 'Try Voice Warm-Up')
-                          : t('conversation.brief.voiceWarmupSelect', 'Select Warm-Up for Voice')}
-                      </span>
+                      <span>{t('conversation.brief.voiceWarmup', 'Try Voice Warm-Up')}</span>
                     </button>
                   )}
                 </aside>
