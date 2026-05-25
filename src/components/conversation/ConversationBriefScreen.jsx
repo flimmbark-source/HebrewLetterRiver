@@ -10,30 +10,11 @@ function getDifficultyLabel(difficulty, t) {
   return t('conversation.list.difficulty.hard', 'Hard');
 }
 
-function isGreetingsWarmupScenario(scenario, onStartVoiceWarmup) {
-  const id = scenario?.metadata?.id ?? '';
-  const theme = scenario?.metadata?.theme ?? '';
-  const titleKey = scenario?.metadata?.titleKey ?? '';
-  const firstLineId = scenario?.segments?.[0]?.pairs?.[0]?.shortSentenceId ?? scenario?.lines?.[0]?.id ?? '';
-
-  return Boolean(
-    typeof onStartVoiceWarmup === 'function'
-    && (
-      id === 'conversation-greetings-introductions'
-      || theme === 'Greetings & Introductions'
-      || titleKey.includes('greetings-introductions')
-      || firstLineId.startsWith('greetings-')
-    )
-  );
-}
-
-export default function ConversationBriefScreen({ scenario, onStartSegment, onStartVoiceWarmup, onBack }) {
+export default function ConversationBriefScreen({ scenario, onStartSegment, onBack }) {
   const { t } = useLocalization();
   const [selectedRouteStop, setSelectedRouteStop] = useState(null);
   const hasSegments = scenario.segments && scenario.segments.length > 0;
   const canSelectSegments = hasSegments && typeof onStartSegment === 'function';
-  const warmupRouteStop = scenario.segments?.[0] ?? null;
-  const showVoiceWarmupButton = isGreetingsWarmupScenario(scenario, onStartVoiceWarmup) && Boolean(warmupRouteStop);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -56,11 +37,6 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onSt
   const handleBeginRoute = () => {
     if (!selectedRouteStop) return;
     onStartSegment(selectedRouteStop);
-  };
-
-  const handleBeginVoiceWarmup = () => {
-    if (!showVoiceWarmupButton || !warmupRouteStop) return;
-    onStartVoiceWarmup(warmupRouteStop);
   };
 
   return (
@@ -142,17 +118,6 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onSt
                     <span>{t('read.route.begin', 'Begin Route')}</span>
                     <Icon name="eco" className="text-xl" aria-hidden="true" />
                   </button>
-
-                  {showVoiceWarmupButton && (
-                    <button
-                      type="button"
-                      onClick={handleBeginVoiceWarmup}
-                      className="relative z-10 flex w-full items-center justify-center gap-2 rounded-2xl border border-[#2f6b4c]/25 bg-[#fffaf0]/94 px-5 py-3 text-sm font-bold text-[#214d39] shadow-sm transition hover:bg-white active:scale-[0.99] md:px-5 md:py-3"
-                    >
-                      <Icon name="mic" className="text-lg" aria-hidden="true" />
-                      <span>{t('conversation.brief.voiceWarmup', 'Try Voice Warm-Up')}</span>
-                    </button>
-                  )}
                 </aside>
               )}
             </div>
