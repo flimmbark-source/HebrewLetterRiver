@@ -235,10 +235,10 @@ function applyRuntimePackOverrides(byId, removedPackIds) {
       pack.unlockAfter = override.unlockAfter;
     }
     if (Array.isArray(override.wordIds)) {
-      pack.wordIds = uniqueWordIdsByConcept(override.wordIds);
+      pack.wordIds = uniqueStrings(override.wordIds);
     }
     if (Array.isArray(override.supportWordIds)) {
-      pack.supportWordIds = uniqueWordIdsByConcept(override.supportWordIds);
+      pack.supportWordIds = uniqueStrings(override.supportWordIds);
     }
 
     pack.targetsNewCount = pack.wordIds.length;
