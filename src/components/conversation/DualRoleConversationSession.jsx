@@ -14,13 +14,6 @@ import {
 } from '../../data/conversation/dualRoleConversation.ts';
 import { buildRouteStopBeatPlan } from '../../data/conversation/routeBeatPlanner.js';
 
-/**
- * DualRoleConversationSession
- *
- * Orchestrates dual-role conversation practice where the learner plays both
- * sides of a dialogue (Speaker A and Speaker B). Each turn alternates roles
- * and uses paired Introduce+Reinforce module sequences.
- */
 export default function DualRoleConversationSession({
   scenario,
   script,
@@ -109,6 +102,30 @@ export default function DualRoleConversationSession({
     resetToBeatScreen(segmentSteps);
   }, [buildStepsForRouteStop, resetToBeatScreen]);
 
+  const handleStartVoiceWarmup = useCallback((segmentOrRouteStop) => {
+    const routeSteps = buildStepsForRouteStop(segmentOrRouteStop);
+    const seenLineIds = new Set();
+    const voiceSteps = routeSteps
+      .filter((step) => {
+        if (!step?.lineId || seenLineIds.has(step.lineId)) return false;
+        seenLineIds.add(step.lineId);
+        return true;
+      })
+      .map((step, index) => ({
+        ...step,
+        id: `${step.id || 'voice-warmup'}-speech-${index}`,
+        moduleId: 'speechLineRecognition',
+        stepType: 'reinforce',
+        config: {
+          ...step.config,
+          routeBeatRole: 'speechLineRecognition',
+          voiceWarmup: true
+        }
+      }));
+
+    resetToBeatScreen(voiceSteps.length > 0 ? voiceSteps : routeSteps);
+  }, [buildStepsForRouteStop, resetToBeatScreen]);
+
   const handleBeatComplete = useCallback((attemptResult) => {
     const updatedHistory = [...attemptHistory, attemptResult];
     setAttemptHistory(updatedHistory);
@@ -190,6 +207,7 @@ export default function DualRoleConversationSession({
         scenario={briefScenario}
         onStart={handleStart}
         onStartSegment={handleStartSegment}
+        onStartVoiceWarmup={handleStartVoiceWarmup}
         onBack={onExit}
       />
     );

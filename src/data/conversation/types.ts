@@ -37,6 +37,7 @@ export interface ConversationLine {
 export type ConversationModuleType =
   | 'listenMeaningChoice'
   | 'shadowRepeat'
+  | 'speechLineRecognition'
   | 'guidedReplyChoice'
   | 'typeInput';
 

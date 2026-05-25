@@ -107,7 +107,7 @@ export default function ConversationBriefScreen({ scenario, onStartSegment, onBa
               </section>
 
               {canSelectSegments && (
-                <aside className="mt-3 md:mt-[2.2rem] md:flex md:self-start">
+                <aside className="mt-3 flex flex-col gap-2 md:mt-[2.2rem] md:self-start">
                   <button
                     type="button"
                     onClick={handleBeginRoute}
