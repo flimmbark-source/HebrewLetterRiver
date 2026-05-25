@@ -18,12 +18,32 @@ function isSpeechDebugEnabled() {
   }
 }
 
+function getMicrophonePolicyState() {
+  if (typeof document === 'undefined') return 'unavailable';
+
+  try {
+    if (document.permissionsPolicy?.allowsFeature) {
+      return document.permissionsPolicy.allowsFeature('microphone');
+    }
+
+    if (document.featurePolicy?.allowsFeature) {
+      return document.featurePolicy.allowsFeature('microphone');
+    }
+  } catch (error) {
+    return `error: ${error?.name || 'unknown'}`;
+  }
+
+  return 'unavailable';
+}
+
 function getSpeechDebugSnapshot() {
   if (typeof window === 'undefined') return {};
 
   return {
     href: window.location.href,
     isSecureContext: window.isSecureContext,
+    topLevel: window.top === window.self,
+    permissionsPolicyMicrophone: getMicrophonePolicyState(),
     hasMediaDevices: Boolean(navigator.mediaDevices),
     hasGetUserMedia: Boolean(navigator.mediaDevices?.getUserMedia),
     hasSpeechRecognition: Boolean(window.SpeechRecognition),
