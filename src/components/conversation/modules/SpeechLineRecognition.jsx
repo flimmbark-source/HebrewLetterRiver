@@ -181,34 +181,22 @@ export default function SpeechLineRecognition({ line, onResult }) {
         </p>
       </div>
 
-      <div className="rounded-[1.5rem] border border-[#d8cdb7] bg-white/75 p-4 text-center shadow-sm">
+      <div className="relative rounded-[1.5rem] border border-[#d8cdb7] bg-white/75 p-4 pt-12 text-center shadow-sm">
+        <div className="absolute left-3 top-3">
+          <SpeakButton
+            nativeText={line.he}
+            nativeLocale="he-IL"
+            transliteration={line.tl}
+            variant="icon"
+            className="!rounded-full !border-[#d8cdb7] !bg-[#fff8e8] !p-2 !text-base !text-[#214d39] hover:!bg-white"
+          />
+        </div>
         <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#6c7469]">
           {t('conversation.modules.speechLineRecognition.targetLabel', 'Target line')}
         </div>
         <div className="mt-2 text-3xl font-bold leading-tight text-[#183d2e]" dir="rtl">
           {line.he}
         </div>
-        {line.tl && (
-          <div className="mt-2 text-base italic text-[#2f6b4c]">
-            {line.tl}
-          </div>
-        )}
-        <div className="mt-2 text-sm text-[#4e665b]">
-          {line.en}
-        </div>
-      </div>
-
-      <div className="flex items-center justify-center gap-3 rounded-[1.25rem] border border-[#d8cdb7] bg-[#fff8e8]/90 p-3">
-        <SpeakButton
-          nativeText={line.he}
-          nativeLocale="he-IL"
-          transliteration={line.tl}
-          variant="iconWithLabel"
-          className="!px-4 !py-2 !text-sm"
-        />
-        <span className="text-sm font-semibold text-[#4e665b]">
-          {t('conversation.modules.speechLineRecognition.listenHint', 'Replay before speaking')}
-        </span>
       </div>
 
       {!isSupported && (
