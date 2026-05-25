@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SpeakButton from '../../SpeakButton.jsx';
 import { useLocalization } from '../../../context/LocalizationContext.jsx';
 
@@ -85,6 +85,18 @@ export default function SpeechLineRecognition({ line, onResult }) {
 
   const Recognition = useMemo(() => getSpeechRecognition(), []);
   const isSupported = Boolean(Recognition);
+
+  useEffect(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
+
+    setIsListening(false);
+    setTranscript('');
+    setErrorMessage('');
+    setHasSubmitted(false);
+  }, [line.id]);
 
   const speechResult = useMemo(() => {
     return scoreSpeech({
