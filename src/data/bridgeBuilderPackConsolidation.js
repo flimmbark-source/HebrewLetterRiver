@@ -99,6 +99,9 @@ const CONSOLIDATED_COPY = {
 // These overrides keep all original adjective/describing word IDs assigned to active
 // packs while allowing adjectives_01 to be the clean comparison-cue pack.
 const RUNTIME_PACK_OVERRIDES = {
+  pronouns_01: {
+    wordIds: ['bb-ani', 'bb-atah', 'bb-at', 'bbct-he', 'bbct-she', 'bbct-we', 'bbct-they'],
+  },
   adjectives_01: {
     title: 'Adjectives',
     description: 'Big, small, tall, and short',
