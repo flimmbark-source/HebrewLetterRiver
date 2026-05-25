@@ -82,6 +82,8 @@ export default function SpeechLineRecognition({ line, onResult }) {
   const [transcript, setTranscript] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [showMicHelp, setShowMicHelp] = useState(false);
+  const [isCheckingMicAccess, setIsCheckingMicAccess] = useState(false);
 
   const Recognition = useMemo(() => getSpeechRecognition(), []);
   const isSupported = Boolean(Recognition);
@@ -96,6 +98,8 @@ export default function SpeechLineRecognition({ line, onResult }) {
     setTranscript('');
     setErrorMessage('');
     setHasSubmitted(false);
+    setShowMicHelp(false);
+    setIsCheckingMicAccess(false);
   }, [line.id]);
 
   const speechResult = useMemo(() => {
@@ -113,10 +117,70 @@ export default function SpeechLineRecognition({ line, onResult }) {
     setIsListening(false);
   }, []);
 
+  const checkMicrophoneAccess = useCallback(async () => {
+    if (isCheckingMicAccess) return;
+
+    const mediaDevices = typeof navigator !== 'undefined' ? navigator.mediaDevices : null;
+
+    if (!mediaDevices?.getUserMedia) {
+      setShowMicHelp(false);
+      setErrorMessage(
+        t(
+          'conversation.modules.speechLineRecognition.micCheckUnsupported',
+          'This browser cannot open the microphone permission prompt here. Try Chrome on Android, or use Skip for now.'
+        )
+      );
+      return;
+    }
+
+    setIsCheckingMicAccess(true);
+    setErrorMessage('');
+
+    try {
+      const stream = await mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+      setShowMicHelp(false);
+      setErrorMessage(
+        t(
+          'conversation.modules.speechLineRecognition.micCheckReady',
+          'Microphone access is available. Tap Start speaking again when you are ready.'
+        )
+      );
+    } catch (error) {
+      setShowMicHelp(true);
+
+      if (error?.name === 'NotFoundError' || error?.name === 'DevicesNotFoundError') {
+        setErrorMessage(
+          t(
+            'conversation.modules.speechLineRecognition.noMicrophoneFound',
+            'I could not find a microphone on this device. You can still skip this voice attempt.'
+          )
+        );
+      } else if (error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError') {
+        setErrorMessage(
+          t(
+            'conversation.modules.speechLineRecognition.micPermissionDenied',
+            'Chrome is not allowing microphone access yet. If you blocked it before, open Chrome site settings for Letter River and allow the microphone.'
+          )
+        );
+      } else {
+        setErrorMessage(
+          t(
+            'conversation.modules.speechLineRecognition.micCheckFailed',
+            'Microphone access could not be checked. Try again, or skip this voice attempt for now.'
+          )
+        );
+      }
+    } finally {
+      setIsCheckingMicAccess(false);
+    }
+  }, [isCheckingMicAccess, t]);
+
   const startListening = useCallback(() => {
     if (!Recognition || isListening || hasSubmitted) return;
 
     setErrorMessage('');
+    setShowMicHelp(false);
     setTranscript('');
 
     const recognition = new Recognition();
@@ -134,11 +198,28 @@ export default function SpeechLineRecognition({ line, onResult }) {
     };
 
     recognition.onerror = (event) => {
-      setErrorMessage(
-        event.error === 'not-allowed'
-          ? t('conversation.modules.speechLineRecognition.micBlocked', 'Microphone access was blocked. You can still skip this voice attempt.')
-          : t('conversation.modules.speechLineRecognition.error', 'I could not hear that clearly. Try once more or skip for now.')
-      );
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        setShowMicHelp(true);
+        setErrorMessage(
+          t(
+            'conversation.modules.speechLineRecognition.voiceAccessUnavailable',
+            'Voice access could not start. Chrome may need microphone permission, or speech recognition may be unavailable on this device.'
+          )
+        );
+      } else if (event.error === 'audio-capture') {
+        setShowMicHelp(true);
+        setErrorMessage(
+          t(
+            'conversation.modules.speechLineRecognition.noMicrophoneFound',
+            'I could not find a microphone on this device. You can still skip this voice attempt.'
+          )
+        );
+      } else {
+        setShowMicHelp(false);
+        setErrorMessage(
+          t('conversation.modules.speechLineRecognition.error', 'I could not hear that clearly. Try once more or skip for now.')
+        );
+      }
       setIsListening(false);
     };
 
@@ -147,8 +228,20 @@ export default function SpeechLineRecognition({ line, onResult }) {
     };
 
     recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
+
+    try {
+      recognition.start();
+      setIsListening(true);
+    } catch {
+      setShowMicHelp(true);
+      setErrorMessage(
+        t(
+          'conversation.modules.speechLineRecognition.voiceStartFailed',
+          'Voice access could not start. Tap Check microphone access, or skip this voice attempt for now.'
+        )
+      );
+      setIsListening(false);
+    }
   }, [Recognition, hasSubmitted, isListening, t]);
 
   const submitTranscript = useCallback(() => {
@@ -253,6 +346,30 @@ export default function SpeechLineRecognition({ line, onResult }) {
         {errorMessage && (
           <div className="mt-3 rounded-2xl border border-[#c77912]/40 bg-[#fff3d9] p-3 text-sm font-semibold text-[#8a560f]">
             {errorMessage}
+          </div>
+        )}
+
+        {showMicHelp && !hasSubmitted && (
+          <div className="mt-3 rounded-2xl border border-[#d8cdb7] bg-white/80 p-3 text-sm font-semibold text-[#4e665b] shadow-sm">
+            <div className="font-bold text-[#183d2e]">
+              {t('conversation.modules.speechLineRecognition.micHelpTitle', 'Check microphone access')}
+            </div>
+            <p className="mt-1">
+              {t(
+                'conversation.modules.speechLineRecognition.micHelpBody',
+                'Tap the button below so Chrome can ask for microphone permission. If Chrome still refuses, open Chrome site settings for Letter River and allow the microphone.'
+              )}
+            </p>
+            <button
+              type="button"
+              onClick={checkMicrophoneAccess}
+              disabled={isCheckingMicAccess}
+              className="mt-3 w-full rounded-2xl border border-[#2f6b4c]/30 bg-[#e7f2ea] px-4 py-3 text-sm font-bold text-[#214d39] shadow-sm transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-55"
+            >
+              {isCheckingMicAccess
+                ? t('conversation.modules.speechLineRecognition.checkingMicAccess', 'Checking...')
+                : t('conversation.modules.speechLineRecognition.checkMicAccess', 'Check microphone access')}
+            </button>
           </div>
         )}
 
