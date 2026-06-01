@@ -2,7 +2,7 @@ import React, { useMemo, useState, useCallback, useRef } from 'react';
 import { getSectionsInOrder } from '../../data/bridgeBuilderSections.js';
 import { getPacksBySection, getPackById } from '../../data/bridgeBuilderPacks.js';
 import VocabJourneyPanel from './VocabJourneyPanel.jsx';
-import { writeRememberedPackId } from './vocabJourneyModel.js';
+import { writeRememberedPackId, readRememberedPackId } from './vocabJourneyModel.js';
 import {
   getAllWordProgress,
   getPackProgress,
@@ -472,7 +472,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
   const [expandedPack, setExpandedPack] = useState(null);
   const [modeOverrides, setModeOverrides] = useState({});
   const [lastMethods, setLastMethods] = useState(() => getLastStudyMethods());
-  const [selectedJourneyPackId, setSelectedJourneyPackId] = useState(null);
+  const [selectedJourneyPackId, setSelectedJourneyPackId] = useState(() => readRememberedPackId());
   // Incremented after quiz mastery is applied to force re-read of storage
   const [progressRevision, setProgressRevision] = useState(0);
   const [showSkillCheck, setShowSkillCheck] = useState(false);

@@ -10,7 +10,7 @@ import { getPackWordIds } from '../../data/journeyPackRegistry.js';
 
 const LAST_JOURNEY_PACK_KEY = 'bbs_last_journey_pack_id';
 
-function readRememberedPackId() {
+export function readRememberedPackId() {
   try {
     return typeof window !== 'undefined'
       ? window.localStorage.getItem(LAST_JOURNEY_PACK_KEY)
