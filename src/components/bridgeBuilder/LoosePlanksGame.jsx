@@ -102,6 +102,11 @@ export default function LoosePlanksGame({ sessionConfig, wordPool, onBack, onNex
     for (let i = 0; i < allWords.length; i += 3) {
       wordGroups.push(allWords.slice(i, i + 3));
     }
+    // Merge a lone last word into the previous group so no round has a single plank.
+    if (wordGroups.length >= 2 && wordGroups[wordGroups.length - 1].length === 1) {
+      const last = wordGroups.pop();
+      wordGroups[wordGroups.length - 1] = [...wordGroups[wordGroups.length - 1], ...last];
+    }
     // Track which type each word has been assigned so far
     const wordFirstType = {}; // wordId → 'translit' | 'translation'
     const roundList = [];
