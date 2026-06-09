@@ -12,7 +12,7 @@ const audienceCards = [
     body: 'Build early Hebrew confidence for daily life in Israel without starting from a wall of grammar.'
   },
   {
-    icon: 'bookA',
+    icon: 'dictionary',
     title: 'Adult beginners',
     body: 'Practice letters, sounds, and recognition in short sessions that feel approachable after a long day.'
   },
