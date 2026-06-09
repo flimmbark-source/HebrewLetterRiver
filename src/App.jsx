@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import LandingView from './views/LandingView.jsx';
 import HomeView from './views/HomeView.jsx';
 import AchievementsView from './views/AchievementsView.jsx';
 import LearnView from './views/LearnView.jsx';
@@ -33,6 +34,7 @@ import './components/AppBottomNav.css';
 import './components/material-symbols-safe.css';
 
 function LanguageOnboardingModal() {
+  const location = useLocation();
   const {
     hasSelectedLanguage,
     languageId,
@@ -56,7 +58,7 @@ function LanguageOnboardingModal() {
     setPendingAppId(appLanguageId);
   }, [appLanguageId]);
 
-  if (hasSelectedLanguage) return null;
+  if (location.pathname === '/' || hasSelectedLanguage) return null;
 
   const isContinueDisabled = currentTutorial?.id === 'firstTime' && currentStepIndex < 3;
 
@@ -187,6 +189,7 @@ function Shell() {
   const [inDeepScript, setInDeepScript] = React.useState(false);
   const location = useLocation();
   const { appFontClass } = useFontSettings();
+  const isPublicLanding = location.pathname === '/';
 
   React.useEffect(() => {
     applyRouteMeta(location.pathname);
@@ -272,10 +275,10 @@ function Shell() {
       <OfflineIndicator />
       <PWAInstallPrompt />
       <PlayModeModal />
-      <main id="main-content" className={`flex-1 main-content app-main ${fontClass}`} dir={direction} tabIndex={-1}>
+      <main id="main-content" className={`flex-1 main-content app-main ${fontClass}`} dir={isPublicLanding ? 'ltr' : direction} tabIndex={-1}>
         <div className="page-scroll">
           <Routes>
-            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/" element={<LandingView />} />
             <Route path="/home" element={<HomeView />} />
             <Route path="/achievements" element={<AchievementsView />} />
             <Route path="/read" element={<LearnView />} />
@@ -289,7 +292,7 @@ function Shell() {
           </Routes>
         </div>
       </main>
-      {!(isGameVisible && isGameRunning) && !inConversationPractice && !inDeepScript && (
+      {!isPublicLanding && !(isGameVisible && isGameRunning) && !inConversationPractice && !inDeepScript && (
         <nav className="bottom-nav" aria-label={t('app.nav.primary', 'Primary navigation')}>
           <NavLink
             to="/home"
