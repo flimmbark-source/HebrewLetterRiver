@@ -93,10 +93,11 @@ export default function BridgeBuilderView() {
     if (!isHebrew) {
       setSessionConfig({
         ...preparedConfig,
+        languageId,
         selectedWordIds: getLanguageAwareWordIds(preparedConfig),
       });
     } else {
-      setSessionConfig(preparedConfig);
+      setSessionConfig({ ...preparedConfig, languageId });
     }
   };
 
@@ -190,6 +191,7 @@ export default function BridgeBuilderView() {
         key={sessionConfig.packId || 'review'}
         sessionConfig={sessionConfig}
         wordPool={activeWordPool}
+        languageId={languageId}
         onBack={handleBackToSetup}
         onRoundComplete={handleBridgeBuilderComplete}
         onNext={sessionConfig.sessionType === 'guided_pack' ? handleNextFromBridgeBuilder : undefined}

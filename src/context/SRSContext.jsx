@@ -156,10 +156,11 @@ export function SRSProvider({ children }) {
     let updatedItem = null;
 
     setProgress(prev => {
-      const currentItem = prev[itemType]?.[itemId];
+      // Auto-create the item if it doesn't exist yet (e.g., Bridge Builder vocabulary)
+      const currentItem = prev[itemType]?.[itemId] ?? createSRSItem(itemId, itemType);
 
       if (!currentItem) {
-        console.error('[SRS] Item not found for review:', itemId, itemType);
+        console.error('[SRS] Cannot create item for review:', itemId, itemType);
         return prev;
       }
 
@@ -239,8 +240,17 @@ export function SRSProvider({ children }) {
       }
     });
 
+    // Track vocabulary performance from Bridge Builder sessions.
+    // reviewItem auto-creates the SRS item on first encounter.
+    const offBridgeWordResult = on('bridge:word-result', (payload) => {
+      const { wordId, languageId: eventLanguageId, grade } = payload || {};
+      if (!wordId || eventLanguageId !== languageId) return;
+      reviewItem(wordId, 'vocabulary', grade, 0);
+    });
+
     return () => {
       offLetterResult();
+      offBridgeWordResult();
     };
   }, [progress, languageId, isHydrationComplete, addItem, reviewItem]);
 

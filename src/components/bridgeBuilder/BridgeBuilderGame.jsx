@@ -3,6 +3,9 @@ import useBridgeBuilderGame from './useBridgeBuilderGame.js';
 import { useFontSettings } from '../../hooks/useFontSettings.js';
 import { getNativeScript } from '../../lib/vocabLanguageAdapter.js';
 import { getTextDirection } from '../../lib/vocabLanguageAdapter.js';
+import SpeakButton from '../SpeakButton.jsx';
+import { getLocaleForTts } from '../../lib/languageUtils.js';
+import ttsService from '../../lib/ttsService.js';
 import './BridgeBuilder.css';
 
 /* ─── HUD (compact strip) ──────────────────────────────── */
@@ -145,7 +148,7 @@ function EndScreen({ score, bridgeSegments, isGameOver, onRestart, onBack, onNex
 
 /* ─── Main ─────────────────────────────────────────────── */
 
-export default function BridgeBuilderGame({ sessionConfig, wordPool, onBack, onRoundComplete, onNext }) {
+export default function BridgeBuilderGame({ sessionConfig, wordPool, onBack, onRoundComplete, onNext, languageId = 'hebrew' }) {
   const { getGameFontClass, getNativeScriptFontClass } = useFontSettings();
   const {
     phase,
@@ -198,6 +201,16 @@ export default function BridgeBuilderGame({ sessionConfig, wordPool, onBack, onR
       setDisplaySegment(currentSegment);
     }
   }, [wordIndex, currentSegment]);
+
+  // Auto-play TTS when a word is first introduced in teach mode
+  useEffect(() => {
+    if (phase === 'meaningTeach' && currentWord) {
+      const nativeText = getNativeScript(currentWord);
+      if (nativeText) {
+        ttsService.speakSmart({ nativeText, nativeLocale: getLocaleForTts(languageId), mode: 'word' });
+      }
+    }
+  }, [phase, currentWord, languageId]);
 
   // Notify parent when round completes successfully (not game over)
   const notifiedRef = useRef(false);
@@ -261,6 +274,13 @@ export default function BridgeBuilderGame({ sessionConfig, wordPool, onBack, onR
         {currentWord && (
           <div className={`bb-prompt ${promptVisible ? 'bb-prompt--visible' : ''}`} dir={getTextDirection(currentWord.languageId || 'hebrew')}>
             <span className={`bb-prompt-hebrew ${getNativeScriptFontClass(`${currentWord.id}-hebrew`, currentWord.languageId)}`}>{getNativeScript(currentWord)}</span>
+            <SpeakButton
+              nativeText={getNativeScript(currentWord)}
+              nativeLocale={getLocaleForTts(languageId)}
+              transliteration={currentWord.transliteration}
+              variant="icon"
+              className="bb-speak-btn"
+            />
           </div>
         )}
       </div>

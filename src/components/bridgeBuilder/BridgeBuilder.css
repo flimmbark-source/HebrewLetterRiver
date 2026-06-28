@@ -84,6 +84,9 @@
   opacity: 0;
   transform: translateY(8px);
   transition: opacity 0.4s ease, transform 0.4s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .bb-prompt--visible {
   opacity: 1;
@@ -102,6 +105,17 @@
   color: #3e1f04;
   direction: rtl;
   white-space: nowrap;
+}
+
+/* Speak button sits beside the word prompt */
+.bb-speak-btn {
+  margin-inline-start: 8px;
+  border-color: #d4a76a !important;
+  background: #fffdf0 !important;
+  color: #3e1f04 !important;
+  border-radius: 10px !important;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════

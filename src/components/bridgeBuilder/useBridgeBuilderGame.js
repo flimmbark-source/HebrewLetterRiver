@@ -42,6 +42,13 @@ const TRANSLIT_CHOICES = 3;
 const MEANING_CHOICES = 3;
 const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
 
+// SRS grade constants for word outcomes
+const WORD_GRADE = {
+  TAUGHT: 2,       // shown the answer (not tested)
+  CORRECT: 3,      // correct but had errors
+  CORRECT_EASY: 4, // correct on first try
+};
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -81,12 +88,28 @@ function pickNextWord(sessionStates, allWords, lastWordId) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-function buildTransliterationChoices(word) {
-  const distractors = buildMisspelledTransliterationDistractors(
-    word.transliteration,
-    TRANSLIT_CHOICES - 1
-  );
-  return shuffle([word.transliteration, ...distractors]);
+function buildTransliterationChoices(word, sessionWords) {
+  const correct = word.transliteration;
+  const needed = TRANSLIT_CHOICES - 1;
+
+  // Use other session words' real transliterations as distractors — these are
+  // semantically plausible and force the learner to recall the specific word,
+  // rather than just spotting a nonsensical typo.
+  const sessionDistractors = (sessionWords || [])
+    .filter(w => w.id !== word.id)
+    .map(w => w.transliteration)
+    .filter(t => t && t !== correct);
+
+  const chosen = shuffle([...new Set(sessionDistractors)]).slice(0, needed);
+
+  // Fall back to typo distractors only when the session has too few words
+  if (chosen.length < needed) {
+    const typos = buildMisspelledTransliterationDistractors(correct, needed - chosen.length);
+    const exclude = new Set([correct, ...chosen]);
+    chosen.push(...typos.filter(t => !exclude.has(t)));
+  }
+
+  return shuffle([correct, ...chosen.slice(0, needed)]);
 }
 
 function buildMisspelledTransliterationDistractors(correctTransliteration, count) {
@@ -158,7 +181,7 @@ function buildMeaningChoices(word, packWords, wordPool) {
  * @param {string[]} sessionConfig.selectedWordIds
  */
 export default function useBridgeBuilderGame(sessionConfig, wordPool) {
-  const { sessionType, selectedWordIds } = sessionConfig;
+  const { sessionType, selectedWordIds, languageId: sessionLanguageId } = sessionConfig;
   const isGuidedPack = sessionType === 'guided_pack';
   const activeWords = wordPool || defaultBridgeBuilderWords;
 
@@ -203,6 +226,7 @@ export default function useBridgeBuilderGame(sessionConfig, wordPool) {
 
   const timerRef = useRef(null);
   const meaningOutcomeRef = useRef('untested'); // 'teach' | 'choice' | 'untested'
+  const meaningErrorCountRef = useRef(0);
 
   const isRoundComplete = phase === 'roundComplete';
   const isGameOver = hearts <= 0;
@@ -235,13 +259,13 @@ export default function useBridgeBuilderGame(sessionConfig, wordPool) {
   useEffect(() => {
     if (phase === 'promptIntro' && currentWord) {
       timerRef.current = setTimeout(() => {
-        const choices = buildTransliterationChoices(currentWord);
+        const choices = buildTransliterationChoices(currentWord, allSessionWords);
         setTranslitChoices(choices);
         setPhase('transliterationChoice');
       }, 800);
       return () => clearTimeout(timerRef.current);
     }
-  }, [phase, currentWord]);
+  }, [phase, currentWord, allSessionWords]);
 
   // After transliteration resolved, move to meaning phase
   useEffect(() => {
@@ -276,6 +300,21 @@ export default function useBridgeBuilderGame(sessionConfig, wordPool) {
   useEffect(() => {
     if (phase === 'wordComplete' && currentWord) {
       timerRef.current = setTimeout(() => {
+        // Emit SRS event so the vocabulary item is added/reviewed in the SRS system.
+        // Grade reflects quality of recall: taught=2, correct-with-errors=3, clean=4.
+        const srsGrade =
+          meaningOutcomeRef.current === 'teach'
+            ? WORD_GRADE.TAUGHT
+            : meaningErrorCountRef.current > 0
+            ? WORD_GRADE.CORRECT
+            : WORD_GRADE.CORRECT_EASY;
+        emit('bridge:word-result', {
+          wordId: currentWord.id,
+          languageId: sessionLanguageId || 'hebrew',
+          grade: srsGrade,
+          sessionType,
+        });
+
         if (hearts <= 0) {
           setPhase('roundComplete');
           return;
@@ -314,6 +353,7 @@ export default function useBridgeBuilderGame(sessionConfig, wordPool) {
             setSelectedChoice(null);
             setChoiceResult(null);
             meaningOutcomeRef.current = 'untested';
+            meaningErrorCountRef.current = 0;
             setPhase('promptIntro');
           }
         }
@@ -398,6 +438,7 @@ export default function useBridgeBuilderGame(sessionConfig, wordPool) {
     } else {
       setStreak(0);
       setHearts(h => h - 1);
+      meaningErrorCountRef.current += 1;
       // Wrong plank breaks — remove it from choices, let player retry
       setTimeout(() => {
         setMeaningChoices(prev => prev.filter(c => c !== choice));
@@ -422,6 +463,7 @@ export default function useBridgeBuilderGame(sessionConfig, wordPool) {
     setHearts(MAX_HEARTS);
     setBridgeSegments([]);
     meaningOutcomeRef.current = 'untested';
+    meaningErrorCountRef.current = 0;
     setSelectedChoice(null);
     setChoiceResult(null);
     setPhase('promptIntro');
