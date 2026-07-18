@@ -190,6 +190,30 @@ export function seedJourneyFromLegacyPlayer(source) {
   };
 }
 
+/**
+ * The persisted journey frontier: the highest stage stored as unlocked.
+ * Cheap (no live criteria evaluation) — safe to call during hydration.
+ */
+export function getPersistedJourneyStageId(player) {
+  const journey = normalizeJourney(player?.journey);
+  return journey.unlockedStages[journey.unlockedStages.length - 1] ?? 'letters';
+}
+
+/**
+ * Daily-quest mode mix for a journey stage: the current stage's primary
+ * mode carries the day, with reinforcement modes joining as they unlock.
+ */
+export function getDailyQuestModesForStage(stageId) {
+  switch (stageId) {
+    case 'letters':
+      return ['letterRiver', 'letterRiver', 'letterRiver'];
+    case 'words':
+      return ['letterRiver', 'bridgeBuilder', 'bridgeBuilder'];
+    default:
+      return ['letterRiver', 'bridgeBuilder', 'deepScript'];
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════
    Deterministic unlock evaluation
    ═══════════════════════════════════════════════════════════ */

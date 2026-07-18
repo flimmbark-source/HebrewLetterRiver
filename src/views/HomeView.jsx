@@ -120,8 +120,8 @@ export default function HomeView() {
   );
 
   const planRows = useMemo(
-    () => getTodayPlanRows({ primaryState: actualTodayState, statistics, navigate, openGame, t }),
-    [actualTodayState, statistics, navigate, openGame, t]
+    () => getTodayPlanRows({ journey, primaryState: actualTodayState, statistics, navigate, openGame, t }),
+    [journey, actualTodayState, statistics, navigate, openGame, t]
   );
 
   const stats = useMemo(

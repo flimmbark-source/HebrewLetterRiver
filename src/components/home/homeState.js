@@ -1,7 +1,7 @@
 import { HOME_ASSETS } from './homeAssets.js';
 import { getStageForUser } from '../../lib/progressTerms.js';
 import { bridgeBuilderPacks } from '../../data/bridgeBuilderPacks.js';
-import { getAllWordProgress, getPackProgress } from '../../lib/bridgeBuilderStorage.js';
+import { getAllWordProgress, getPackProgress, getDueReviewWordIds } from '../../lib/bridgeBuilderStorage.js';
 
 const STAGE_ORDER = ['letters', 'words', 'reading', 'conversation'];
 
@@ -323,78 +323,95 @@ export function getLearningPathItems(journey, selectedStage, t = (key, fallback)
   });
 }
 
-export function getTodayPlanRows({ primaryState, statistics, navigate, openGame, t }) {
+/**
+ * Today's Plan — a three-beat session built from journey state:
+ *   warm-up (due reviews) → core (current stage's next unit) → reinforce.
+ */
+export function getTodayPlanRows({ journey, primaryState, statistics, navigate, openGame, t }) {
   const bridgePack = getCurrentBridgePackSummary(t);
+  const currentStageId = journey?.currentStageId ?? primaryState?.currentStage ?? 'letters';
+  const stageIndex = Math.max(0, STAGE_ORDER.indexOf(currentStageId));
 
-  const letterRiverRow = {
-    id: 'letter-river',
-    icon: 'waves',
-    tone: 'blue',
-    title: t('home.scenic.letters.planTitle', 'Letter River'),
-    subtitle: t('home.scenic.letters.chooseLetters', 'Choose letters to practice'),
-    action: () => openGame({ autostart: false })
+  const rows = [];
+
+  // ① Warm-up: spaced-repetition reviews that are due today.
+  const srsDue = Number.isFinite(statistics?.dueToday) ? statistics.dueToday : 0;
+  const wordReviewsDue = stageIndex >= 1 ? getDueReviewWordIds().length : 0;
+  const reviewCount = srsDue + wordReviewsDue;
+  if (reviewCount > 0) {
+    rows.push({
+      id: 'warmup-review',
+      step: t('home.scenic.plan.warmup', 'Warm-up'),
+      icon: 'event_available',
+      tone: 'green',
+      title: t('home.scenic.plan.reviewTitle', 'Daily Review'),
+      subtitle: t('home.scenic.plan.reviewSubtitle', '{{count}} items ready to review', { count: reviewCount }),
+      action: wordReviewsDue > 0 ? () => navigate('/bridge') : () => openGame({ autostart: false })
+    });
+  }
+
+  // ② Core: the next unit in the current journey stage.
+  const coreByStage = {
+    letters: {
+      id: 'core-letter-river',
+      icon: 'waves',
+      title: t('home.scenic.letters.planTitle', 'Letter River'),
+      subtitle: t('home.scenic.letters.chooseLetters', 'Choose letters to practice'),
+      action: () => openGame({ autostart: false })
+    },
+    words: {
+      id: 'core-bridge-builder',
+      icon: 'foundation',
+      title: t('home.scenic.words.planTitle', 'Bridge Builder'),
+      subtitle: bridgePack.continueLine,
+      action: () => navigate('/bridge')
+    },
+    reading: {
+      id: 'core-reading',
+      icon: 'menu_book',
+      title: t('home.scenic.reading.planTitle', 'Sentences & Reading'),
+      subtitle: t('home.scenic.reading.subtitle', 'Read texts built from words you know'),
+      action: () => navigate('/read')
+    },
+    conversation: {
+      id: 'core-conversation',
+      icon: 'chat_bubble',
+      title: t('home.scenic.conversation.title', 'Conversation'),
+      subtitle: t('home.scenic.conversation.contextSubtitle', 'Practice words in context'),
+      action: () => navigate('/read')
+    }
   };
-  const bridgeRow = (tone) => ({
-    id: 'bridge-builder',
-    icon: 'foundation',
-    tone,
-    title: t('home.scenic.words.planTitle', 'Bridge Builder'),
-    subtitle: bridgePack.continueLine,
-    action: () => navigate('/bridge')
+  rows.push({
+    ...coreByStage[currentStageId] ?? coreByStage.letters,
+    step: t('home.scenic.plan.core', 'Core'),
+    tone: 'blue'
   });
-  // Deep Script is the reinforcement lane: it strengthens material from every
-  // stage rather than being a stage of its own.
-  const deepScriptRow = {
-    id: 'deep-script',
-    icon: 'explore',
-    tone: 'green',
-    title: t('home.scenic.deepScript.planTitle', 'Deep Script'),
-    subtitle: t('home.scenic.deepScript.reinforceSubtitle', 'Reinforce: letters, words, and sentences'),
-    action: () => navigate('/deep-script')
-  };
 
-  if (primaryState.kind === 'letters' || primaryState.kind === 'locked') {
-    return [letterRiverRow, bridgeRow('purple')];
+  // ③ Reinforce: strengthen earlier material. Deep Script once words are in
+  // play; before that, daily quests keep beginners in the loop.
+  if (stageIndex >= 1) {
+    rows.push({
+      id: 'reinforce-deep-script',
+      step: t('home.scenic.plan.reinforce', 'Reinforce'),
+      icon: 'explore',
+      tone: 'purple',
+      title: t('home.scenic.deepScript.planTitle', 'Deep Script'),
+      subtitle: t('home.scenic.deepScript.reinforceSubtitle', 'Reinforce: letters, words, and sentences'),
+      action: () => navigate('/deep-script')
+    });
+  } else {
+    rows.push({
+      id: 'reinforce-daily-quests',
+      step: t('home.scenic.plan.reinforce', 'Reinforce'),
+      icon: 'task_alt',
+      tone: 'purple',
+      title: t('home.scenic.plan.questsTitle', 'Daily Quests'),
+      subtitle: t('home.scenic.plan.questsSubtitle', 'Earn stars with today’s quests'),
+      action: () => navigate('/daily')
+    });
   }
 
-  if (primaryState.kind === 'reading') {
-    return [
-      {
-        id: 'reading',
-        icon: 'menu_book',
-        tone: 'blue',
-        title: t('home.scenic.reading.planTitle', 'Sentences & Reading'),
-        subtitle: t('home.scenic.reading.subtitle', 'Read texts built from words you know'),
-        action: () => navigate('/read')
-      },
-      bridgeRow('purple'),
-      deepScriptRow
-    ];
-  }
-
-  if (primaryState.kind === 'conversation') {
-    return [
-      {
-        id: 'conversation',
-        icon: 'chat_bubble',
-        tone: 'blue',
-        title: t('home.scenic.conversation.title', 'Conversation'),
-        subtitle: t('home.scenic.conversation.contextSubtitle', 'Practice words in context'),
-        action: () => navigate('/read')
-      },
-      {
-        id: 'reading-review',
-        icon: 'menu_book',
-        tone: 'purple',
-        title: t('home.scenic.conversation.reviewTitle', 'Reading Review'),
-        subtitle: t('home.scenic.conversation.contextDetail', 'Short dialogues and sentences'),
-        action: () => navigate('/read')
-      },
-      deepScriptRow
-    ];
-  }
-
-  return [bridgeRow('blue'), deepScriptRow];
+  return rows;
 }
 
 export function getHomeStats({ statistics, streak, daily, t }) {

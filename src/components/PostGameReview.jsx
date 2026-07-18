@@ -5,6 +5,7 @@ import { useProgress } from '../context/ProgressContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import ShareCard from './ShareCard.jsx';
 import ShareButton from './ShareButton.jsx';
+import JourneyNextStep from './JourneyNextStep.jsx';
 
 /**
  * Post-Game Review Screen
@@ -248,6 +249,9 @@ export default function PostGameReview({
             </div>
           </div>
         )}
+
+        {/* Journey: ready-to-advance moment or progress toward the next stage */}
+        <JourneyNextStep onBeforeNavigate={onHome} />
 
         {/* Share Card & Button */}
         <div className="mb-6">

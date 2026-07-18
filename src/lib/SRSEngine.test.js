@@ -337,11 +337,13 @@ describe('SRSEngine', () => {
       const now = Date.now();
       const dayMs = 24 * 60 * 60 * 1000;
 
+      // Due dates land mid-bucket: getForecast captures its own Date.now(),
+      // so items due exactly on a bucket boundary are timing-sensitive.
       const items = [
-        { ...mockItem, dueDate: now + 1 * dayMs },
-        { ...mockItem, dueDate: now + 1 * dayMs },
-        { ...mockItem, dueDate: now + 2 * dayMs },
-        { ...mockItem, dueDate: now + 5 * dayMs }
+        { ...mockItem, dueDate: now + 1.5 * dayMs },
+        { ...mockItem, dueDate: now + 1.5 * dayMs },
+        { ...mockItem, dueDate: now + 2.5 * dayMs },
+        { ...mockItem, dueDate: now + 5.5 * dayMs }
       ];
 
       const forecast = engine.getForecast(items, 7);

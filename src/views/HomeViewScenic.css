@@ -512,6 +512,20 @@
   cursor: pointer;
 }
 
+.scenic-plan-row__step {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(47, 140, 87, 0.14);
+  color: #1e6f42;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  vertical-align: 2px;
+}
+
 .scenic-continue-card__info {
   margin-top: 6px;
   border: 0;

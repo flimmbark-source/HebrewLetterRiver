@@ -12,7 +12,9 @@ import {
   JOURNEY_STAGE_ORDER,
   createDefaultJourney,
   normalizeJourney,
-  seedJourneyFromLegacyPlayer
+  seedJourneyFromLegacyPlayer,
+  getPersistedJourneyStageId,
+  getDailyQuestModesForStage
 } from '../lib/learningJourney.js';
 
 export const STAR_LEVEL_SIZE = 50;
@@ -295,22 +297,27 @@ function createLanguageAssets(languagePack, localization = {}) {
     };
   }
 
-  function generateDaily(dateKey, focusLetterInfo, constraint) {
+  function generateDaily(dateKey, focusLetterInfo, constraint, journeyStageId = 'letters') {
     const focusLetter = focusLetterInfo ?? fallbackLetterInfo;
     const selectedConstraint = constraint ?? pickConstraint();
 
-    // Pick one quest per mode: letterRiver, bridgeBuilder, deepScript
+    // Quest mix follows the learning journey: the current stage's primary
+    // mode carries the day, reinforcement modes join once unlocked.
     const byMode = { letterRiver: [], bridgeBuilder: [], deepScript: [] };
     for (const tmpl of dailyTemplates) {
       const m = tmpl.mode ?? 'letterRiver';
       if (byMode[m]) byMode[m].push(tmpl);
     }
-    const selectedTemplates = Object.values(byMode).map(
-      (pool) => {
+    const usedIds = new Set();
+    const selectedTemplates = getDailyQuestModesForStage(journeyStageId)
+      .map((mode) => {
+        const pool = (byMode[mode] ?? []).filter((tmpl) => !usedIds.has(tmpl.id));
         const shuffled = [...pool].sort(() => Math.random() - 0.5);
-        return shuffled[0];
-      }
-    ).filter(Boolean);
+        const pick = shuffled[0];
+        if (pick) usedIds.add(pick.id);
+        return pick;
+      })
+      .filter(Boolean);
 
     const rewardDistribution = distributeRewardStars(DAILY_REWARD_STARS, selectedTemplates.length);
     const tasks = selectedTemplates.map((template, index) => {
@@ -539,21 +546,30 @@ export function ProgressProvider({ children }) {
           removeState('daily');
         }
       }
+      const journeyStageId = getPersistedJourneyStageId(currentPlayer);
       if (source && source.dateKey === todayKey) {
-        // Check if cached quests cover all 3 modes; regenerate if not (migration)
-        const taskModes = new Set((source.tasks ?? []).map(t => t.mode).filter(Boolean));
-        const hasAllModes = taskModes.has('letterRiver') && taskModes.has('bridgeBuilder') && taskModes.has('deepScript');
-        if (hasAllModes || (source.tasks ?? []).some(t => t.rewardClaimed)) {
+        // Keep cached quests when they match today's journey stage mix, or
+        // whenever the player has already made progress on them — never
+        // throw away partially earned quests.
+        const expectedModes = [...getDailyQuestModesForStage(journeyStageId)].sort();
+        const actualModes = (source.tasks ?? []).map((task) => task.mode ?? 'letterRiver').sort();
+        const matchesStageMix =
+          expectedModes.length === actualModes.length &&
+          expectedModes.every((mode, index) => mode === actualModes[index]);
+        const hasActivity = (source.tasks ?? []).some(
+          (task) => task.rewardClaimed || task.completed || (task.progress ?? 0) > 0
+        );
+        if (matchesStageMix || hasActivity) {
           const normalized = assets.normalizeDailyData(source);
           if (!stored) {
             saveState(`${storagePrefix}.daily`, normalized);
           }
           return normalized;
         }
-        // Fall through to regenerate with all 3 modes
+        // Fall through to regenerate with the stage-appropriate mix
       }
       const weakest = assets.getWeakestLetter(currentPlayer?.letters);
-      return assets.generateDaily(todayKey, weakest, pickConstraint());
+      return assets.generateDaily(todayKey, weakest, pickConstraint(), journeyStageId);
     },
     [storagePrefix, assets]
   );
@@ -640,11 +656,11 @@ export function ProgressProvider({ children }) {
     const key = getJerusalemDateKey();
     if (daily.dateKey !== key) {
       const weakest = assets.getWeakestLetter(player.letters);
-      setDaily(assets.generateDaily(key, weakest, pickConstraint()));
+      setDaily(assets.generateDaily(key, weakest, pickConstraint(), getPersistedJourneyStageId(playerRef.current)));
     }
     const timeout = setTimeout(() => {
       const weakest = assets.getWeakestLetter(player.letters);
-      setDaily(assets.generateDaily(getJerusalemDateKey(), weakest, pickConstraint()));
+      setDaily(assets.generateDaily(getJerusalemDateKey(), weakest, pickConstraint(), getPersistedJourneyStageId(playerRef.current)));
     }, millisUntilNextJerusalemMidnight());
     return () => clearTimeout(timeout);
   }, [daily.dateKey, player.letters, assets]);

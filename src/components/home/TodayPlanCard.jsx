@@ -18,7 +18,10 @@ export default function TodayPlanCard({ rows, t }) {
               <Icon name={row.icon} size={22} filled />
             </span>
             <span className="scenic-plan-row__text">
-              <strong>{row.title}</strong>
+              <strong>
+                {row.step && <span className="scenic-plan-row__step">{row.step}</span>}
+                {row.title}
+              </strong>
               <small>{row.subtitle}</small>
             </span>
             <span className="scenic-plan-row__end">

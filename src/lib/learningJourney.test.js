@@ -5,6 +5,8 @@ import {
   normalizeJourney,
   seedJourneyFromLegacyPlayer,
   getJourneyStageStates,
+  getPersistedJourneyStageId,
+  getDailyQuestModesForStage,
   WORDS_UNLOCK_LETTER_RATIO
 } from './learningJourney.js';
 
@@ -116,5 +118,40 @@ describe('getJourneyStageStates', () => {
       languagePack: makeLanguagePack(10)
     });
     expect(view.stages.map((s) => s.id)).toEqual(JOURNEY_STAGE_ORDER);
+  });
+});
+
+describe('getPersistedJourneyStageId', () => {
+  it('returns letters for a fresh player', () => {
+    expect(getPersistedJourneyStageId({ journey: createDefaultJourney() })).toBe('letters');
+    expect(getPersistedJourneyStageId(null)).toBe('letters');
+  });
+
+  it('returns the highest persisted stage', () => {
+    const player = {
+      journey: { unlockedStages: ['letters', 'words', 'reading'], introsSeen: [], advancedAt: {} }
+    };
+    expect(getPersistedJourneyStageId(player)).toBe('reading');
+  });
+});
+
+describe('getDailyQuestModesForStage', () => {
+  it('keeps beginners in Letter River', () => {
+    expect(getDailyQuestModesForStage('letters')).toEqual(['letterRiver', 'letterRiver', 'letterRiver']);
+  });
+
+  it('leans on Bridge Builder in the words stage', () => {
+    expect(getDailyQuestModesForStage('words')).toEqual(['letterRiver', 'bridgeBuilder', 'bridgeBuilder']);
+  });
+
+  it('spreads across all modes from the reading stage on', () => {
+    expect(getDailyQuestModesForStage('reading')).toEqual(['letterRiver', 'bridgeBuilder', 'deepScript']);
+    expect(getDailyQuestModesForStage('conversation')).toEqual(['letterRiver', 'bridgeBuilder', 'deepScript']);
+  });
+
+  it('always yields exactly three quests', () => {
+    for (const stageId of JOURNEY_STAGE_ORDER) {
+      expect(getDailyQuestModesForStage(stageId)).toHaveLength(3);
+    }
   });
 });
