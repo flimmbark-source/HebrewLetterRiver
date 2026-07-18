@@ -8,6 +8,12 @@ import { differenceInJerusalemDays, getJerusalemDateKey, millisUntilNextJerusale
 import { useToast } from './ToastContext.jsx';
 import { useLocalization } from './LocalizationContext.jsx';
 import { DEFAULT_PROFILE_NAME, PROFILE_AVATARS } from '../data/profileAvatars.js';
+import {
+  JOURNEY_STAGE_ORDER,
+  createDefaultJourney,
+  normalizeJourney,
+  seedJourneyFromLegacyPlayer
+} from '../lib/learningJourney.js';
 
 export const STAR_LEVEL_SIZE = 50;
 export const DAILY_REWARD_STARS = 30;
@@ -60,7 +66,8 @@ const defaultPlayer = {
   latestBadge: null,
   recentAchievementClaims: [],
   modesPlayed: [],
-  recentModesPlayed: []
+  recentModesPlayed: [],
+  journey: null
 };
 
 const MAX_RECENT_MODES = 12;
@@ -435,7 +442,7 @@ export function ProgressProvider({ children }) {
         removeState('player');
       }
     }
-    if (!source) return { ...defaultPlayer };
+    if (!source) return { ...defaultPlayer, journey: createDefaultJourney() };
     const storedTotal = Number.isFinite(source?.totalStarsEarned) ? source.totalStarsEarned : source?.stars ?? 0;
     const { level, levelProgress, total } = calculateLevelInfo(storedTotal);
     const hydrated = {
@@ -459,7 +466,8 @@ export function ProgressProvider({ children }) {
           summaryKey: source.latestBadge.summaryKey ?? badge.summaryKey
         };
       })(),
-      recentAchievementClaims: normalizeRecentAchievementClaims(source.recentAchievementClaims)
+      recentAchievementClaims: normalizeRecentAchievementClaims(source.recentAchievementClaims),
+      journey: source.journey ? normalizeJourney(source.journey) : seedJourneyFromLegacyPlayer(source)
     };
     if (!stored) {
       saveState(`${storagePrefix}.player`, hydrated);
@@ -1552,6 +1560,49 @@ export function ProgressProvider({ children }) {
     };
   }, [assets]);
 
+  const unlockJourneyStages = useCallback((stageIds) => {
+    const requested = (Array.isArray(stageIds) ? stageIds : [stageIds]).filter((id) =>
+      JOURNEY_STAGE_ORDER.includes(id)
+    );
+    if (requested.length === 0) return;
+    setPlayer((prev) => {
+      const journey = normalizeJourney(prev.journey);
+      const newly = requested.filter((id) => !journey.unlockedStages.includes(id));
+      if (newly.length === 0) return prev;
+      const unlockedSet = new Set([...journey.unlockedStages, ...newly]);
+      const now = new Date().toISOString();
+      const advancedAt = { ...journey.advancedAt };
+      newly.forEach((id) => {
+        advancedAt[id] = now;
+        emit('journey:stageUnlocked', { stageId: id });
+      });
+      return {
+        ...prev,
+        journey: {
+          ...journey,
+          unlockedStages: JOURNEY_STAGE_ORDER.filter((id) => unlockedSet.has(id)),
+          advancedAt
+        }
+      };
+    });
+  }, []);
+
+  const markJourneyIntroSeen = useCallback((stageId) => {
+    if (!JOURNEY_STAGE_ORDER.includes(stageId)) return;
+    setPlayer((prev) => {
+      const journey = normalizeJourney(prev.journey);
+      if (journey.introsSeen.includes(stageId)) return prev;
+      const introsSeen = new Set([...journey.introsSeen, stageId]);
+      return {
+        ...prev,
+        journey: {
+          ...journey,
+          introsSeen: JOURNEY_STAGE_ORDER.filter((id) => introsSeen.has(id))
+        }
+      };
+    });
+  }, []);
+
   const value = useMemo(
     () => ({
       player,
@@ -1570,6 +1621,8 @@ export function ProgressProvider({ children }) {
       claimStreakMilestone,
       STREAK_MILESTONES,
       applyStarsToPlayer,
+      unlockJourneyStages,
+      markJourneyIntroSeen,
       updatePlayerProfile: ({ name, avatar }) => {
         setPlayer((prev) => ({
           ...prev,
@@ -1578,7 +1631,7 @@ export function ProgressProvider({ children }) {
         }));
       }
     }),
-    [assets, player, badges, activeBadges, streak, daily, lastSession, claimBadgeReward, claimDailyReward, repairStreak, useStreakFreeze, claimStreakMilestone, applyStarsToPlayer]
+    [assets, player, badges, activeBadges, streak, daily, lastSession, claimBadgeReward, claimDailyReward, repairStreak, useStreakFreeze, claimStreakMilestone, applyStarsToPlayer, unlockJourneyStages, markJourneyIntroSeen]
   );
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;

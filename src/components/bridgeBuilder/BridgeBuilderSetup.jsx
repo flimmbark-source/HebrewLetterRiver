@@ -24,6 +24,7 @@ import {
   sortPackData,
 } from './bridgeBuilderSetupHelpers.js';
 import SkillCheckScreen from '../SkillCheckScreen.jsx';
+import JourneyModeBanner from '../JourneyModeBanner.jsx';
 import Icon from '../Icon.jsx';
 import { bridgeBuilderWords, getWordsByIds } from '../../data/bridgeBuilderWords.js';
 import { allSentences } from '../../data/sentences/index.ts';
@@ -654,6 +655,7 @@ export default function BridgeBuilderSetup({ onPlay, onBack }) {
     )}
     
     <div className="bbs-screen">
+      <JourneyModeBanner stageId="words" className="mx-3 mt-2" />
       <div ref={contentScrollRef} className={`bbs-content ${activeSubview === 'journey' ? 'bbs-content--journey' : ''}`}>
 {activeSubview === 'journey' && (
     <VocabJourneyPanel

@@ -8,7 +8,9 @@ export default function ContinueJourneyCard({ state, t }) {
       <div className="scenic-continue-card__body">
         <img className="scenic-continue-card__thumb" src={state.image} alt="" aria-hidden="true" />
         <div className="scenic-continue-card__content">
-          <h3>{state.title}</h3>
+          <h3>
+            {state.locked && <Icon name="lock" size={16} filled />} {state.title}
+          </h3>
           <p className="scenic-continue-card__subtitle">{state.subtitle}</p>
           <p className="scenic-continue-card__detail">{state.detail}</p>
           <div className="scenic-progress" aria-hidden="true">
@@ -18,6 +20,21 @@ export default function ContinueJourneyCard({ state, t }) {
             <Icon name="play_arrow" size={20} filled />
             <span>{state.cta}</span>
           </button>
+          {state.secondaryCta && (
+            <button
+              type="button"
+              className="scenic-continue-card__secondary"
+              onClick={state.secondaryCta.action}
+            >
+              {state.secondaryCta.label}
+            </button>
+          )}
+          {state.infoAction && (
+            <button type="button" className="scenic-continue-card__info" onClick={state.infoAction}>
+              <Icon name="info" size={15} />
+              <span>{t('home.scenic.aboutStage', 'What do I learn here?')}</span>
+            </button>
+          )}
         </div>
       </div>
     </section>
