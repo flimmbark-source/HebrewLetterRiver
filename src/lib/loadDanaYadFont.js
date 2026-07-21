@@ -2,6 +2,7 @@ import danaYadArchiveUrl from '../data/dana-yad-alefalefalef.zip?url';
 
 const FONT_FAMILY = 'Dana Yad';
 const FONT_FILENAME = 'DanaYadAlefAlefAlef-Normal.woff';
+const FONT_VALUE = 'dana-yad';
 const EOCD_SIGNATURE = 0x06054b50;
 const CENTRAL_DIRECTORY_SIGNATURE = 0x02014b50;
 const LOCAL_FILE_SIGNATURE = 0x04034b50;
@@ -148,11 +149,35 @@ function isDanaYadSelected() {
   try {
     const rawSettings = window.localStorage.getItem('gameSettings');
     if (!rawSettings) return false;
-    return JSON.parse(rawSettings).gameFont === 'dana-yad';
+    return JSON.parse(rawSettings).gameFont === FONT_VALUE;
   } catch (error) {
     console.warn('[Fonts] Could not read the selected game font:', error);
     return false;
   }
+}
+
+function ensureInGameFontOption() {
+  const select = document.getElementById('game-font-select');
+  if (!select || select.querySelector(`option[value="${FONT_VALUE}"]`)) return;
+
+  const option = document.createElement('option');
+  option.value = FONT_VALUE;
+  option.textContent = FONT_FAMILY;
+  select.appendChild(option);
+
+  if (isDanaYadSelected()) select.value = FONT_VALUE;
+}
+
+function observeInGameFontSelector() {
+  ensureInGameFontOption();
+
+  if (typeof MutationObserver === 'undefined' || !document.documentElement) return;
+
+  const observer = new MutationObserver(ensureInGameFontOption);
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+  });
 }
 
 export function initializeDanaYadFont() {
@@ -163,6 +188,7 @@ export function initializeDanaYadFont() {
     if (isDanaYadSelected()) ensureDanaYadFontLoaded();
   };
 
+  observeInGameFontSelector();
   loadWhenSelected();
   window.addEventListener('gameSettingsChanged', loadWhenSelected);
   window.addEventListener('storage', loadWhenSelected);
