@@ -138,12 +138,16 @@ export default function SettingsView() {
   const playerName = player?.name || DEFAULT_PROFILE_NAME;
   const playerAvatar = player?.avatar || PROFILE_AVATARS[0];
 
-  const fontOptions = [
+  const appFontOptions = [
     { value: 'default', label: 'Default' },
     { value: 'lexend', label: 'Lexend / Noto Sans' },
     { value: 'comic-sans', label: 'Comic Sans' },
     { value: 'arial', label: 'Arial' },
     { value: 'verdana', label: 'Verdana' }
+  ];
+  const gameFontOptions = [
+    ...appFontOptions,
+    { value: 'dana-yad', label: 'Dana Yad' }
   ];
 
   const displayLanguageOptions = useMemo(
@@ -350,7 +354,7 @@ export default function SettingsView() {
                     <InfoButton settingKey="appFont">App Font</InfoButton>
                   </div>
                   <select id="settings-app-font-select" value={appFont} onChange={(event) => setAppFont(event.target.value)} className="rounded-md px-2 py-1 font-bold" style={{ border: '1px solid var(--app-input-border)', color: 'var(--app-primary)', background: 'var(--app-input-bg)' }}>
-                    {fontOptions.map((option) => (
+                    {appFontOptions.map((option) => (
                       <option key={option.value} value={option.value}>{option.label}</option>
                     ))}
                   </select>
@@ -368,7 +372,7 @@ export default function SettingsView() {
                       <InfoButton settingKey="gameFont">Game Font</InfoButton>
                     </div>
                     <select id="settings-font-select" value={gameFont} onChange={(event) => setGameFont(event.target.value)} className="rounded-md px-2 py-1 font-bold" style={{ border: '1px solid var(--app-input-border)', color: 'var(--app-primary)', background: 'var(--app-input-bg)' }}>
-                      {fontOptions.map((option) => (
+                      {gameFontOptions.map((option) => (
                         <option key={option.value} value={option.value}>{option.label}</option>
                       ))}
                     </select>
