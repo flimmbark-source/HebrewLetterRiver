@@ -1,9 +1,16 @@
 import { HOME_ASSETS } from './homeAssets.js';
 import { getStageForUser } from '../../lib/progressTerms.js';
 import { bridgeBuilderPacks } from '../../data/bridgeBuilderPacks.js';
-import { getAllWordProgress, getPackProgress } from '../../lib/bridgeBuilderStorage.js';
+import { getAllWordProgress, getPackProgress, getDueReviewWordIds } from '../../lib/bridgeBuilderStorage.js';
 
 const STAGE_ORDER = ['letters', 'words', 'reading', 'conversation'];
+
+const STAGE_IMAGES = {
+  letters: HOME_ASSETS.cardLetters,
+  words: HOME_ASSETS.cardBridgeBuilder,
+  reading: HOME_ASSETS.cardReading,
+  conversation: HOME_ASSETS.cardReading
+};
 
 function clampPercent(value, fallback = 30) {
   const numeric = Number.isFinite(value) ? value : fallback;
@@ -74,28 +81,6 @@ function getDailyCounts(daily) {
   return { completed, total };
 }
 
-function getRecentModeIds(player) {
-  return player?.recentModesPlayed ?? player?.modesPlayed ?? [];
-}
-
-function hasRecentDeepScript(player) {
-  return getRecentModeIds(player)
-    .slice(-4)
-    .some((mode) => mode === 'deep_script' || mode === 'deepScript' || mode === 'Deep Script');
-}
-
-function stageStatusKey(index, currentIndex) {
-  if (index < currentIndex) return 'complete';
-  if (index === currentIndex) return 'inProgress';
-  return 'available';
-}
-
-function stageState(index, currentIndex) {
-  if (index < currentIndex) return 'complete';
-  if (index === currentIndex) return 'current';
-  return 'available';
-}
-
 function getCurrentBridgePackSummary(t) {
   const allProgress = getAllWordProgress();
   const packSummaries = bridgeBuilderPacks.map((pack) => ({
@@ -130,33 +115,86 @@ function getCurrentBridgePackSummary(t) {
   };
 }
 
-export function getCurrentHomeStage({ player, statistics }) {
+/** Primary action for each journey stage. */
+function getStageAction(stageId, { openGame, navigate }) {
+  switch (stageId) {
+    case 'letters':
+      return () => openGame({ autostart: false });
+    case 'words':
+      return () => navigate('/bridge');
+    case 'reading':
+    case 'conversation':
+    default:
+      return () => navigate('/read');
+  }
+}
+
+function findJourneyStage(journey, stageId) {
+  return journey?.stages?.find((stage) => stage.id === stageId) ?? null;
+}
+
+export function getCurrentHomeStage({ player, statistics, journey }) {
+  if (journey?.currentStageId) return journey.currentStageId;
+  // Legacy fallback when journey state isn't available yet.
   const stage = getStageForUser(player, statistics);
-  if (stage === 'conversation') return 'conversation';
-  if (stage === 'reading') return 'reading';
-  if (stage === 'words' || hasRecentDeepScript(player)) return 'words';
-  return 'letters';
+  return STAGE_ORDER.includes(stage) ? stage : 'letters';
 }
 
 export function getHomeStateForStage({
   selectedStage,
+  journey,
   player,
   statistics,
   languagePack,
   practiceLanguageName,
   t,
   openGame,
-  navigate
+  navigate,
+  onTestOut,
+  onShowStageInfo
 }) {
   const letterProgress = getLetterProgress(player, languagePack);
   const bridgePack = getCurrentBridgePackSummary(t);
+  const currentStage = getCurrentHomeStage({ player, statistics, journey });
+  const stageState = findJourneyStage(journey, selectedStage);
+  const currentStageState = findJourneyStage(journey, currentStage);
+  const infoAction = stageState && onShowStageInfo ? () => onShowStageInfo(selectedStage) : null;
+
+  // Locked stage: show what it teaches, what it takes to unlock, and a way in.
+  if (stageState && !stageState.unlocked) {
+    return {
+      kind: 'locked',
+      selectedStage,
+      currentStage,
+      locked: true,
+      lockedStage: stageState,
+      image: STAGE_IMAGES[selectedStage],
+      title: stageState.label,
+      subtitle: t('home.scenic.lockedSubtitle', 'Locked · {{requirement}}', {
+        requirement: stageState.requirement
+      }),
+      detail: stageState.progressLine,
+      progress: Math.max(6, stageState.unlockProgress.percent),
+      cta: currentStageState
+        ? t('home.scenic.lockedCta', 'Keep going in {{stage}}', { stage: currentStageState.label })
+        : t('home.scenic.common.continue', 'Continue'),
+      action: getStageAction(currentStage, { openGame, navigate }),
+      secondaryCta: onTestOut
+        ? {
+            label: t('home.scenic.testOut', 'Already know this? Test out'),
+            action: () => onTestOut(selectedStage)
+          }
+        : null,
+      infoAction
+    };
+  }
 
   if (selectedStage === 'letters') {
     return {
       kind: 'letters',
       selectedStage: 'letters',
-      currentStage: 'letters',
-      image: HOME_ASSETS.cardLetters,
+      currentStage,
+      image: STAGE_IMAGES.letters,
       title: t('home.scenic.letters.title', 'Letter River'),
       subtitle: t('home.scenic.letters.chooseLetters', 'Choose letters to practice'),
       detail: t('home.scenic.letters.progressSummary', 'Seen {{seen}} · Practiced {{practiced}} · Mastered {{mastered}}', {
@@ -166,7 +204,8 @@ export function getHomeStateForStage({
       }),
       progress: letterProgress.progressPercent,
       cta: t('home.scenic.common.continue', 'Continue'),
-      action: () => openGame({ autostart: false })
+      action: getStageAction('letters', { openGame, navigate }),
+      infoAction
     };
   }
 
@@ -174,45 +213,52 @@ export function getHomeStateForStage({
     return {
       kind: 'words',
       selectedStage: 'words',
-      currentStage: 'words',
-      image: HOME_ASSETS.cardBridgeBuilder,
+      currentStage,
+      image: STAGE_IMAGES.words,
       title: t('home.scenic.words.title', 'Bridge Builder'),
       subtitle: bridgePack.continueLine,
       detail: bridgePack.progressLine,
       progress: bridgePack.progressPercent,
       cta: t('home.scenic.common.continue', 'Continue'),
       currentPackTitle: bridgePack.title,
-      action: () => navigate('/bridge')
+      action: getStageAction('words', { openGame, navigate }),
+      infoAction
     };
   }
 
   if (selectedStage === 'reading') {
+    // Stage progress toward conversation = reading scenes completed.
+    const conversationState = findJourneyStage(journey, 'conversation');
     return {
-      kind: 'deepScript',
+      kind: 'reading',
       selectedStage: 'reading',
-      currentStage: 'reading',
-      image: HOME_ASSETS.cardDeepScript,
-      title: t('home.scenic.deepScript.title', 'Deep Script'),
-      subtitle: t('home.scenic.deepScript.compactSubtitle', 'Pack floors and random runs'),
-      detail: t('home.scenic.deepScript.compactDetail', 'Reinforce letters, words, and reading'),
-      progress: 45,
-      cta: t('home.scenic.deepScript.cta', 'Start challenge'),
+      currentStage,
+      image: STAGE_IMAGES.reading,
+      title: t('home.scenic.reading.title', 'Sentences & Reading'),
+      subtitle: t('home.scenic.reading.subtitle', 'Read texts built from words you know'),
+      detail: conversationState
+        ? conversationState.progressLine
+        : t('home.scenic.reading.detail', 'Sentence structure and guided reading'),
+      progress: conversationState ? Math.max(10, conversationState.unlockProgress.percent) : 45,
+      cta: t('home.scenic.common.continue', 'Continue'),
       currentPackTitle: bridgePack.title,
-      action: () => navigate('/deep-script')
+      action: getStageAction('reading', { openGame, navigate }),
+      infoAction
     };
   }
 
   return {
     kind: 'conversation',
     selectedStage: 'conversation',
-    currentStage: 'conversation',
-    image: HOME_ASSETS.cardReading,
+    currentStage,
+    image: STAGE_IMAGES.conversation,
     title: t('home.scenic.conversation.title', 'Conversation'),
     subtitle: t('home.scenic.conversation.contextSubtitle', 'Practice words in context'),
     detail: t('home.scenic.conversation.contextDetail', 'Short dialogues and sentences'),
     progress: 72,
     cta: t('home.scenic.common.continue', 'Continue'),
-    action: () => navigate('/read')
+    action: getStageAction('conversation', { openGame, navigate }),
+    infoAction
   };
 }
 
@@ -221,130 +267,149 @@ export function getHomePrimaryState(args) {
   return getHomeStateForStage({ ...args, selectedStage });
 }
 
-export function getLearningPathItems(currentStage, selectedStage = currentStage, t = (key, fallback) => fallback ?? key) {
-  const currentIndex = Math.max(0, STAGE_ORDER.indexOf(currentStage));
+/**
+ * Build the learning-path nodes from journey state.
+ * Falls back to heuristic-only display when journey data is unavailable.
+ */
+export function getLearningPathItems(journey, selectedStage, t = (key, fallback) => fallback ?? key) {
+  const currentStageId = journey?.currentStageId ?? 'letters';
+  const currentIndex = Math.max(0, STAGE_ORDER.indexOf(currentStageId));
 
-  return STAGE_ORDER.map((stage, index) => {
-    const statusKey = stageStatusKey(index, currentIndex);
-    const labelKey = stage === 'reading' ? 'deepScript' : stage;
-    const status = t(`home.scenic.${statusKey}`, {
-      complete: 'Complete',
-      inProgress: 'In Progress',
-      available: 'Available'
-    }[statusKey]);
-    const label = t(`home.scenic.stages.${labelKey}`, {
+  return STAGE_ORDER.map((stageId, index) => {
+    const stageState = findJourneyStage(journey, stageId);
+    const unlocked = stageState ? stageState.unlocked : index <= currentIndex;
+    const label = stageState?.label ?? t(`home.scenic.stages.${stageId}`, {
       letters: 'Letters',
       words: 'Words',
-      deepScript: 'Deep Script',
+      reading: 'Sentences & Reading',
       conversation: 'Conversation'
-    }[labelKey]);
+    }[stageId]);
+
+    let state;
+    let status;
+    let hint = '';
+    if (!unlocked) {
+      state = 'locked';
+      status = t('home.scenic.lockedStatus', 'Locked');
+      hint = stageState?.remainingLine ?? '';
+    } else if (index < currentIndex) {
+      state = 'complete';
+      status = t('home.scenic.complete', 'Complete');
+    } else if (index === currentIndex) {
+      state = 'current';
+      status = t('home.scenic.inProgress', 'In Progress');
+    } else {
+      state = 'available';
+      status = t('home.scenic.available', 'Available');
+    }
 
     return {
-      stage,
+      stage: stageId,
       label,
-      icon: {
+      icon: stageState?.icon ?? {
         letters: 'waves',
-        words: 'landscape',
-        reading: 'explore',
+        words: 'foundation',
+        reading: 'menu_book',
         conversation: 'chat_bubble'
-      }[stage],
+      }[stageId],
       status,
-      state: stageState(index, currentIndex),
-      isSelected: stage === selectedStage,
+      hint,
+      state,
+      locked: !unlocked,
+      isSelected: stageId === selectedStage,
       selectedLabel: t('home.scenic.selected', 'Selected'),
       ariaLabel: t('home.scenic.stageAria', 'Show {{label}} progress, {{status}}', { label, status })
     };
   });
 }
 
-export function getTodayPlanRows({ primaryState, statistics, navigate, openGame, t }) {
+/**
+ * Today's Plan — a three-beat session built from journey state:
+ *   warm-up (due reviews) → core (current stage's next unit) → reinforce.
+ */
+export function getTodayPlanRows({ journey, primaryState, statistics, navigate, openGame, t }) {
   const bridgePack = getCurrentBridgePackSummary(t);
+  const currentStageId = journey?.currentStageId ?? primaryState?.currentStage ?? 'letters';
+  const stageIndex = Math.max(0, STAGE_ORDER.indexOf(currentStageId));
+
   const rows = [];
 
-  if (primaryState.kind === 'letters') {
-    rows.push(
-      {
-        id: 'letter-river',
-        icon: 'waves',
-        tone: 'blue',
-        title: t('home.scenic.letters.planTitle', 'Letter River'),
-        subtitle: t('home.scenic.letters.chooseLetters', 'Choose letters to practice'),
-        action: () => openGame({ autostart: false })
-      },
-      {
-        id: 'bridge-builder',
-        icon: 'foundation',
-        tone: 'purple',
-        title: t('home.scenic.words.planTitle', 'Bridge Builder'),
-        subtitle: bridgePack.continueLine,
-        action: () => navigate('/bridge')
-      }
-    );
-    return rows;
+  // ① Warm-up: spaced-repetition reviews that are due today.
+  const srsDue = Number.isFinite(statistics?.dueToday) ? statistics.dueToday : 0;
+  const wordReviewsDue = stageIndex >= 1 ? getDueReviewWordIds().length : 0;
+  const reviewCount = srsDue + wordReviewsDue;
+  if (reviewCount > 0) {
+    rows.push({
+      id: 'warmup-review',
+      step: t('home.scenic.plan.warmup', 'Warm-up'),
+      icon: 'event_available',
+      tone: 'green',
+      title: t('home.scenic.plan.reviewTitle', 'Daily Review'),
+      subtitle: t('home.scenic.plan.reviewSubtitle', '{{count}} items ready to review', { count: reviewCount }),
+      action: wordReviewsDue > 0 ? () => navigate('/bridge') : () => openGame({ autostart: false })
+    });
   }
 
-  if (primaryState.kind === 'deepScript') {
-    rows.push(
-      {
-        id: 'deep-script',
-        icon: 'explore',
-        tone: 'blue',
-        title: t('home.scenic.deepScript.planTitle', 'Deep Script'),
-        subtitle: t('home.scenic.deepScript.compactDetail', 'Reinforce letters, words, and reading'),
-        action: () => navigate('/deep-script')
-      },
-      {
-        id: 'bridge-builder',
-        icon: 'foundation',
-        tone: 'purple',
-        title: t('home.scenic.words.planTitle', 'Bridge Builder'),
-        subtitle: bridgePack.continueLine,
-        action: () => navigate('/bridge')
-      }
-    );
-    return rows;
-  }
-
-  if (primaryState.kind === 'conversation') {
-    rows.push(
-      {
-        id: 'conversation',
-        icon: 'chat_bubble',
-        tone: 'blue',
-        title: t('home.scenic.conversation.title', 'Conversation'),
-        subtitle: t('home.scenic.conversation.contextSubtitle', 'Practice words in context'),
-        action: () => navigate('/read')
-      },
-      {
-        id: 'reading-review',
-        icon: 'menu_book',
-        tone: 'purple',
-        title: t('home.scenic.conversation.reviewTitle', 'Reading Review'),
-        subtitle: t('home.scenic.conversation.contextDetail', 'Short dialogues and sentences'),
-        action: () => navigate('/read')
-      }
-    );
-    return rows;
-  }
-
-  rows.push(
-    {
-      id: 'bridge-builder',
+  // ② Core: the next unit in the current journey stage.
+  const coreByStage = {
+    letters: {
+      id: 'core-letter-river',
+      icon: 'waves',
+      title: t('home.scenic.letters.planTitle', 'Letter River'),
+      subtitle: t('home.scenic.letters.chooseLetters', 'Choose letters to practice'),
+      action: () => openGame({ autostart: false })
+    },
+    words: {
+      id: 'core-bridge-builder',
       icon: 'foundation',
-      tone: 'blue',
       title: t('home.scenic.words.planTitle', 'Bridge Builder'),
       subtitle: bridgePack.continueLine,
       action: () => navigate('/bridge')
     },
-    {
-      id: 'deep-script',
+    reading: {
+      id: 'core-reading',
+      icon: 'menu_book',
+      title: t('home.scenic.reading.planTitle', 'Sentences & Reading'),
+      subtitle: t('home.scenic.reading.subtitle', 'Read texts built from words you know'),
+      action: () => navigate('/read')
+    },
+    conversation: {
+      id: 'core-conversation',
+      icon: 'chat_bubble',
+      title: t('home.scenic.conversation.title', 'Conversation'),
+      subtitle: t('home.scenic.conversation.contextSubtitle', 'Practice words in context'),
+      action: () => navigate('/read')
+    }
+  };
+  rows.push({
+    ...coreByStage[currentStageId] ?? coreByStage.letters,
+    step: t('home.scenic.plan.core', 'Core'),
+    tone: 'blue'
+  });
+
+  // ③ Reinforce: strengthen earlier material. Deep Script once words are in
+  // play; before that, daily quests keep beginners in the loop.
+  if (stageIndex >= 1) {
+    rows.push({
+      id: 'reinforce-deep-script',
+      step: t('home.scenic.plan.reinforce', 'Reinforce'),
       icon: 'explore',
       tone: 'purple',
-      title: t('home.scenic.deepScript.title', 'Deep Script'),
-      subtitle: t('home.scenic.deepScript.compactDetail', 'Reinforce letters, words, and reading'),
+      title: t('home.scenic.deepScript.planTitle', 'Deep Script'),
+      subtitle: t('home.scenic.deepScript.reinforceSubtitle', 'Reinforce: letters, words, and sentences'),
       action: () => navigate('/deep-script')
-    }
-  );
+    });
+  } else {
+    rows.push({
+      id: 'reinforce-daily-quests',
+      step: t('home.scenic.plan.reinforce', 'Reinforce'),
+      icon: 'task_alt',
+      tone: 'purple',
+      title: t('home.scenic.plan.questsTitle', 'Daily Quests'),
+      subtitle: t('home.scenic.plan.questsSubtitle', 'Earn stars with today’s quests'),
+      action: () => navigate('/daily')
+    });
+  }
 
   return rows;
 }

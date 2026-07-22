@@ -9,6 +9,7 @@ import { buildDualRoleConversationCardItems } from '../components/conversation/d
 import PackSceneSession from '../components/packScene/PackSceneSession.jsx';
 import { getCanonicalPackId, getConsolidatedPackById } from '../data/bridgeBuilderPackConsolidation.js';
 import Icon from '../components/Icon.jsx';
+import JourneyModeBanner from '../components/JourneyModeBanner.jsx';
 import riverBackground from '../assets/Reading/River-Background.png';
 
 function getContextualReadItem(pack, dualRoleItems) {
@@ -103,6 +104,7 @@ export default function LearnView() {
 
   return (
     <div className="river-logbook-page -mx-3 -mt-2 space-y-5 sm:mx-0 sm:mt-0">
+      <JourneyModeBanner stageId={contextPack ? 'reading' : 'conversation'} className="mx-3 sm:mx-0" />
       <section
         className="relative overflow-hidden rounded-[2rem] border px-5 pb-5 pt-8 shadow-xl sm:px-6 sm:pt-10"
         style={{

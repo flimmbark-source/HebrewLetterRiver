@@ -5,6 +5,8 @@ import App from './App.jsx';
 import './index.css';
 import './styles/main.css';
 import './styles/skeleton.css';
+import './styles/danaYad.css';
+import { initializeDanaYadFont } from './lib/loadDanaYadFont.js';
 
 const SW_RESET_FLAG_KEY = 'hlr.forceSwReset';
 const SW_RESET_QUERY_PARAM = 'reset-sw';
@@ -82,6 +84,8 @@ async function resetServiceWorkersAndCaches() {
     }
   }
 }
+
+initializeDanaYadFont();
 
 console.info('[Bootstrap] Starting app initialization');
 resetServiceWorkersAndCaches().catch((error) => {

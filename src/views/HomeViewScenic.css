@@ -483,6 +483,63 @@
   color: #17251f;
 }
 
+.scenic-path-node--locked .scenic-path-node__icon {
+  background: #cfc6b5;
+  color: rgba(16, 47, 37, 0.55);
+  border-style: dashed;
+  border-color: rgba(16, 47, 37, 0.28);
+  box-shadow: none;
+}
+
+.scenic-path-node--locked strong {
+  color: rgba(16, 47, 37, 0.6);
+}
+
+.scenic-path-node--locked small {
+  color: rgba(16, 47, 37, 0.55);
+  font-weight: 650;
+}
+
+.scenic-continue-card__secondary {
+  margin-top: 8px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #0b63bf;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.scenic-plan-row__step {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(47, 140, 87, 0.14);
+  color: #1e6f42;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  vertical-align: 2px;
+}
+
+.scenic-continue-card__info {
+  margin-top: 6px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: rgba(16, 47, 37, 0.65);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .scenic-stats-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
