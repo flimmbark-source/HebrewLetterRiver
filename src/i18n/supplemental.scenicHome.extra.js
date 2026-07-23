@@ -104,7 +104,9 @@ export const extraScenicHomeSupplementalDictionaries = {
       letters: { title: 'الحروف الأولى', subtitle: 'تم تعلّم {{learned}}/{{total}} حرفًا من {{language}}', detail: 'التالي: تدرّب على {{symbols}}', cta: 'تابع نهر الحروف', planTitle: 'تدريب نهر الحروف', planSubtitle: 'أساسيات الأبجدية' },
       words: { title: 'بناء الجسر', subtitle: 'الحزمة 3 · تم تعلّم {{learned}}/{{total}} عنصرًا من {{language}}', detail: 'التالي: قوّ كلماتك', cta: 'تابع التعلّم', planTitle: 'بناء الجسر', planSubtitle: 'قوّ مجموعة كلماتك' },
       deepScript: { title: 'Deep Script', subtitle: 'جولة مفردات في {{language}}', detail: 'التالي: تابع جولتك', cta: 'استئناف Deep Script', planTitle: 'استئناف Deep Script', planSubtitle: 'تابع جولة المفردات', lockedSubtitle: 'يفتح بعد الكلمات' },
-      conversation: { title: 'تدريب المحادثة', subtitle: 'محادثة في {{language}}', detail: 'تدرّب على الدورين في السياق', cta: 'تابع المحادثة', planTitle: 'تدريب المحادثة', planSubtitle: 'تدرّب على الدورين', lockedSubtitle: 'يفتح بعد Deep Script', reviewTitle: 'مراجعة القراءة', reviewSubtitle: 'راجع القراءة في السياق' }
+      conversation: { title: 'تدريب المحادثة', subtitle: 'محادثة في {{language}}', detail: 'تدرّب على الدورين في السياق', cta: 'تابع المحادثة', planTitle: 'تدريب المحادثة', planSubtitle: 'تدرّب على الدورين', lockedSubtitle: 'يفتح بعد Deep Script', reviewTitle: 'مراجعة القراءة', reviewSubtitle: 'راجع القراءة في السياق' },
+      reading: { title: 'الجمل والقراءة', subtitle: 'اقرأ نصوصًا مبنية من كلمات تعرفها', planTitle: 'الجمل والقراءة', planSubtitle: 'اقرأ نصوصًا مبنية من كلمات تعرفها' },
+      plan: { step: 'الخطوة {{n}}', warmup: 'إحماء', core: 'تركيز اليوم', reinforce: 'تعزيز', intro: 'مسارك اليوم: نفّذ كل خطوة بالترتيب.', questsTitle: 'مهام يومية', questsSubtitle: 'اكسب النجوم بمهام اليوم' }
     })
   },
   russian: {
@@ -115,7 +117,9 @@ export const extraScenicHomeSupplementalDictionaries = {
       letters: { title: 'Первые буквы', subtitle: 'Выучено {{learned}}/{{total}} букв {{language}}', detail: 'Далее: практика {{symbols}}', cta: 'Продолжить Реку букв', planTitle: 'Практика Реки букв', planSubtitle: 'Основы алфавита' },
       words: { title: 'Строитель мостов', subtitle: 'Набор 3 · выучено {{learned}}/{{total}} элементов {{language}}', detail: 'Далее: укрепи словарь', cta: 'Продолжить обучение', planTitle: 'Строитель мостов', planSubtitle: 'Укрепи набор слов' },
       deepScript: { title: 'Deep Script', subtitle: 'Словарный забег на {{language}}', detail: 'Далее: продолжи забег', cta: 'Возобновить Deep Script', planTitle: 'Возобновить Deep Script', planSubtitle: 'Продолжи словарный забег', lockedSubtitle: 'Откроется после слов' },
-      conversation: { title: 'Разговорная практика', subtitle: 'Разговор на {{language}}', detail: 'Практикуй обе роли в контексте', cta: 'Продолжить разговор', planTitle: 'Разговорная практика', planSubtitle: 'Практикуй обе роли', lockedSubtitle: 'Откроется после Deep Script', reviewTitle: 'Повторение чтения', reviewSubtitle: 'Вернуться к чтению в контексте' }
+      conversation: { title: 'Разговорная практика', subtitle: 'Разговор на {{language}}', detail: 'Практикуй обе роли в контексте', cta: 'Продолжить разговор', planTitle: 'Разговорная практика', planSubtitle: 'Практикуй обе роли', lockedSubtitle: 'Откроется после Deep Script', reviewTitle: 'Повторение чтения', reviewSubtitle: 'Вернуться к чтению в контексте' },
+      reading: { title: 'Предложения и чтение', subtitle: 'Читай тексты из знакомых слов', planTitle: 'Предложения и чтение', planSubtitle: 'Читай тексты из знакомых слов' },
+      plan: { step: 'Шаг {{n}}', warmup: 'Разминка', core: 'Фокус дня', reinforce: 'Закрепление', intro: 'Твой маршрут на сегодня — выполняй шаги по порядку.', questsTitle: 'Ежедневные задания', questsSubtitle: 'Зарабатывай звёзды за сегодняшние задания' }
     })
   },
   japanese: {
@@ -126,7 +130,9 @@ export const extraScenicHomeSupplementalDictionaries = {
       letters: { title: '最初の文字', subtitle: '{{language}}の文字 {{learned}}/{{total}} を学習済み', detail: '次: {{symbols}} を練習', cta: 'レターリバーを続ける', planTitle: 'レターリバー練習', planSubtitle: 'アルファベットの基礎' },
       words: { title: 'ブリッジビルダー', subtitle: 'パック3 · {{language}}の項目 {{learned}}/{{total}} を学習済み', detail: '次: 単語セットを強化', cta: '学習を続ける', planTitle: 'ブリッジビルダー', planSubtitle: '単語セットを強化' },
       deepScript: { title: 'Deep Script', subtitle: '{{language}}の語彙ラン', detail: '次: ランを続ける', cta: 'Deep Scriptを再開', planTitle: 'Deep Scriptを再開', planSubtitle: '語彙ランを続ける', lockedSubtitle: '単語の後に解放' },
-      conversation: { title: '会話練習', subtitle: '{{language}}の会話', detail: '文脈の中で両方の役を練習', cta: '会話を続ける', planTitle: '会話練習', planSubtitle: '両方の役を練習', lockedSubtitle: 'Deep Scriptの後に解放', reviewTitle: '読解復習', reviewSubtitle: '文脈読解を復習' }
+      conversation: { title: '会話練習', subtitle: '{{language}}の会話', detail: '文脈の中で両方の役を練習', cta: '会話を続ける', planTitle: '会話練習', planSubtitle: '両方の役を練習', lockedSubtitle: 'Deep Scriptの後に解放', reviewTitle: '読解復習', reviewSubtitle: '文脈読解を復習' },
+      reading: { title: '文と読解', subtitle: '知っている単語で作られた文を読もう', planTitle: '文と読解', planSubtitle: '知っている単語で作られた文を読もう' },
+      plan: { step: 'ステップ{{n}}', warmup: 'ウォームアップ', core: '今日の重点', reinforce: '定着', intro: '今日のルート：各ステップを順番に進めよう。', questsTitle: 'デイリークエスト', questsSubtitle: '今日のクエストで星を獲得' }
     })
   },
   mandarin: {
@@ -137,7 +143,9 @@ export const extraScenicHomeSupplementalDictionaries = {
       letters: { title: '最初的字母', subtitle: '已学习 {{learned}}/{{total}} 个 {{language}} 字母', detail: '下一步：练习 {{symbols}}', cta: '继续字母之河', planTitle: '字母之河练习', planSubtitle: '字母基础' },
       words: { title: '桥梁建造者', subtitle: '第 3 包 · 已学习 {{learned}}/{{total}} 个 {{language}} 项目', detail: '下一步：巩固你的词汇', cta: '继续学习', planTitle: '桥梁建造者', planSubtitle: '巩固你的词汇组' },
       deepScript: { title: 'Deep Script', subtitle: '{{language}} 词汇挑战', detail: '下一步：继续挑战', cta: '继续 Deep Script', planTitle: '继续 Deep Script', planSubtitle: '继续词汇挑战', lockedSubtitle: '学完词汇后解锁' },
-      conversation: { title: '对话练习', subtitle: '{{language}} 对话', detail: '在语境中练习两个角色', cta: '继续对话', planTitle: '对话练习', planSubtitle: '练习两个角色', lockedSubtitle: 'Deep Script 后解锁', reviewTitle: '阅读复习', reviewSubtitle: '复习语境阅读' }
+      conversation: { title: '对话练习', subtitle: '{{language}} 对话', detail: '在语境中练习两个角色', cta: '继续对话', planTitle: '对话练习', planSubtitle: '练习两个角色', lockedSubtitle: 'Deep Script 后解锁', reviewTitle: '阅读复习', reviewSubtitle: '复习语境阅读' },
+      reading: { title: '句子与阅读', subtitle: '阅读由你已知词汇构成的文本', planTitle: '句子与阅读', planSubtitle: '阅读由你已知词汇构成的文本' },
+      plan: { step: '第 {{n}} 步', warmup: '热身', core: '今日重点', reinforce: '巩固', intro: '今天的路线——按顺序完成每一步。', questsTitle: '每日任务', questsSubtitle: '完成今日任务赢取星星' }
     })
   },
   amharic: {
@@ -148,7 +156,9 @@ export const extraScenicHomeSupplementalDictionaries = {
       letters: { title: 'መጀመሪያ ፊደላት', subtitle: '{{learned}}/{{total}} የ{{language}} ፊደላት ተማሩ', detail: 'ቀጣይ፦ {{symbols}} ተለማመድ', cta: 'የፊደል ወንዝን ቀጥል', planTitle: 'የፊደል ወንዝ ልምምድ', planSubtitle: 'የፊደል መሠረቶች' },
       words: { title: 'ድልድይ ገንቢ', subtitle: 'ጥቅል 3 · {{learned}}/{{total}} የ{{language}} ነገሮች ተማሩ', detail: 'ቀጣይ፦ ቃላትህን አጠናክር', cta: 'መማርን ቀጥል', planTitle: 'ድልድይ ገንቢ', planSubtitle: 'የቃላት ስብስብህን አጠናክር' },
       deepScript: { title: 'Deep Script', subtitle: 'የ{{language}} ቃላት ጉዞ', detail: 'ቀጣይ፦ ጉዞህን ቀጥል', cta: 'Deep Script ቀጥል', planTitle: 'Deep Script ቀጥል', planSubtitle: 'የቃላት ጉዞህን ቀጥል', lockedSubtitle: 'ከቃላት በኋላ ይከፈታል' },
-      conversation: { title: 'የውይይት ልምምድ', subtitle: 'የ{{language}} ውይይት', detail: 'ሁለቱንም ሚናዎች በአውድ ውስጥ ተለማመድ', cta: 'ውይይትን ቀጥል', planTitle: 'የውይይት ልምምድ', planSubtitle: 'ሁለቱንም ሚናዎች ተለማመድ', lockedSubtitle: 'ከDeep Script በኋላ ይከፈታል', reviewTitle: 'የንባብ ክለሳ', reviewSubtitle: 'በአውድ ውስጥ ንባብን ክለስ' }
+      conversation: { title: 'የውይይት ልምምድ', subtitle: 'የ{{language}} ውይይት', detail: 'ሁለቱንም ሚናዎች በአውድ ውስጥ ተለማመድ', cta: 'ውይይትን ቀጥል', planTitle: 'የውይይት ልምምድ', planSubtitle: 'ሁለቱንም ሚናዎች ተለማመድ', lockedSubtitle: 'ከDeep Script በኋላ ይከፈታል', reviewTitle: 'የንባብ ክለሳ', reviewSubtitle: 'በአውድ ውስጥ ንባብን ክለስ' },
+      reading: { title: 'ዓረፍተ ነገሮችና ንባብ', subtitle: 'ከምታውቃቸው ቃላት የተሠሩ ጽሑፎችን አንብብ', planTitle: 'ዓረፍተ ነገሮችና ንባብ', planSubtitle: 'ከምታውቃቸው ቃላት የተሠሩ ጽሑፎችን አንብብ' },
+      plan: { step: 'ደረጃ {{n}}', warmup: 'ማሟሟቅ', core: 'የዛሬ ትኩረት', reinforce: 'ማጠናከር', intro: 'የዛሬ መንገድህ — እያንዳንዱን ደረጃ በቅደም ተከተል አድርግ።', questsTitle: 'የዕለት ተልእኮዎች', questsSubtitle: 'በዛሬ ተልእኮዎች ኮከቦችን አግኝ' }
     })
   },
   hindi: {
@@ -159,7 +169,9 @@ export const extraScenicHomeSupplementalDictionaries = {
       letters: { title: 'पहले अक्षर', subtitle: '{{language}} के {{learned}}/{{total}} अक्षर सीखे गए', detail: 'अगला: {{symbols}} का अभ्यास', cta: 'लेटर रिवर जारी रखें', planTitle: 'लेटर रिवर अभ्यास', planSubtitle: 'वर्णमाला की नींव' },
       words: { title: 'ब्रिज बिल्डर', subtitle: 'पैक 3 · {{language}} के {{learned}}/{{total}} आइटम सीखे गए', detail: 'अगला: अपने शब्दों को मजबूत करें', cta: 'सीखना जारी रखें', planTitle: 'ब्रिज बिल्डर', planSubtitle: 'अपने शब्द समूह को मजबूत करें' },
       deepScript: { title: 'Deep Script', subtitle: '{{language}} शब्दावली रन', detail: 'अगला: अपना रन जारी रखें', cta: 'Deep Script फिर शुरू करें', planTitle: 'Deep Script फिर शुरू करें', planSubtitle: 'अपना शब्दावली रन जारी रखें', lockedSubtitle: 'शब्दों के बाद खुलता है' },
-      conversation: { title: 'बातचीत अभ्यास', subtitle: '{{language}} बातचीत', detail: 'संदर्भ में दोनों भूमिकाओं का अभ्यास करें', cta: 'बातचीत जारी रखें', planTitle: 'बातचीत अभ्यास', planSubtitle: 'दोनों भूमिकाओं का अभ्यास करें', lockedSubtitle: 'Deep Script के बाद खुलता है', reviewTitle: 'पठन समीक्षा', reviewSubtitle: 'संदर्भ पठन दोहराएँ' }
+      conversation: { title: 'बातचीत अभ्यास', subtitle: '{{language}} बातचीत', detail: 'संदर्भ में दोनों भूमिकाओं का अभ्यास करें', cta: 'बातचीत जारी रखें', planTitle: 'बातचीत अभ्यास', planSubtitle: 'दोनों भूमिकाओं का अभ्यास करें', lockedSubtitle: 'Deep Script के बाद खुलता है', reviewTitle: 'पठन समीक्षा', reviewSubtitle: 'संदर्भ पठन दोहराएँ' },
+      reading: { title: 'वाक्य और पठन', subtitle: 'जिन शब्दों को आप जानते हैं उनसे बने पाठ पढ़ें', planTitle: 'वाक्य और पठन', planSubtitle: 'जिन शब्दों को आप जानते हैं उनसे बने पाठ पढ़ें' },
+      plan: { step: 'चरण {{n}}', warmup: 'वार्म-अप', core: 'आज का फोकस', reinforce: 'सुदृढ़ीकरण', intro: 'आज का आपका रास्ता — हर चरण क्रम से करें।', questsTitle: 'दैनिक क्वेस्ट', questsSubtitle: 'आज की क्वेस्ट से सितारे कमाएँ' }
     })
   },
   bengali: {
@@ -170,7 +182,9 @@ export const extraScenicHomeSupplementalDictionaries = {
       letters: { title: 'প্রথম অক্ষর', subtitle: '{{language}}-এর {{learned}}/{{total}} অক্ষর শেখা হয়েছে', detail: 'পরবর্তী: {{symbols}} অনুশীলন করো', cta: 'লেটার রিভার চালিয়ে যাও', planTitle: 'লেটার রিভার অনুশীলন', planSubtitle: 'বর্ণমালার ভিত্তি' },
       words: { title: 'ব্রিজ বিল্ডার', subtitle: 'প্যাক ৩ · {{language}}-এর {{learned}}/{{total}} আইটেম শেখা হয়েছে', detail: 'পরবর্তী: তোমার শব্দগুলো শক্ত করো', cta: 'শেখা চালিয়ে যাও', planTitle: 'ব্রিজ বিল্ডার', planSubtitle: 'তোমার শব্দ সেট শক্ত করো' },
       deepScript: { title: 'Deep Script', subtitle: '{{language}} শব্দভান্ডার রান', detail: 'পরবর্তী: তোমার রান চালিয়ে যাও', cta: 'Deep Script আবার শুরু করো', planTitle: 'Deep Script আবার শুরু করো', planSubtitle: 'তোমার শব্দভান্ডার রান চালিয়ে যাও', lockedSubtitle: 'শব্দের পরে খুলবে' },
-      conversation: { title: 'কথোপকথন অনুশীলন', subtitle: '{{language}} কথোপকথন', detail: 'প্রসঙ্গে দুই ভূমিকাই অনুশীলন করো', cta: 'কথোপকথন চালিয়ে যাও', planTitle: 'কথোপকথন অনুশীলন', planSubtitle: 'দুই ভূমিকাই অনুশীলন করো', lockedSubtitle: 'Deep Script-এর পরে খুলবে', reviewTitle: 'পঠন পুনরাবৃত্তি', reviewSubtitle: 'প্রসঙ্গভিত্তিক পঠন আবার করো' }
+      conversation: { title: 'কথোপকথন অনুশীলন', subtitle: '{{language}} কথোপকথন', detail: 'প্রসঙ্গে দুই ভূমিকাই অনুশীলন করো', cta: 'কথোপকথন চালিয়ে যাও', planTitle: 'কথোপকথন অনুশীলন', planSubtitle: 'দুই ভূমিকাই অনুশীলন করো', lockedSubtitle: 'Deep Script-এর পরে খুলবে', reviewTitle: 'পঠন পুনরাবৃত্তি', reviewSubtitle: 'প্রসঙ্গভিত্তিক পঠন আবার করো' },
+      reading: { title: 'বাক্য ও পঠন', subtitle: 'তুমি জানো এমন শব্দ দিয়ে তৈরি লেখা পড়ো', planTitle: 'বাক্য ও পঠন', planSubtitle: 'তুমি জানো এমন শব্দ দিয়ে তৈরি লেখা পড়ো' },
+      plan: { step: 'ধাপ {{n}}', warmup: 'ওয়ার্ম-আপ', core: 'আজকের লক্ষ্য', reinforce: 'দৃঢ়করণ', intro: 'আজকের তোমার পথ — প্রতিটি ধাপ ক্রমে করো।', questsTitle: 'দৈনিক কোয়েস্ট', questsSubtitle: 'আজকের কোয়েস্টে তারা অর্জন করো' }
     })
   }
 };

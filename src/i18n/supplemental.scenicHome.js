@@ -68,6 +68,21 @@ export const scenicHomeSupplementalDictionaries = {
           lockedSubtitle: 'Unlocks after Deep Script',
           reviewTitle: 'Reading Review',
           reviewSubtitle: 'Revisit Cafe Talk'
+        },
+        reading: {
+          title: 'Sentences & Reading',
+          subtitle: 'Read texts built from words you know',
+          planTitle: 'Sentences & Reading',
+          planSubtitle: 'Read texts built from words you know'
+        },
+        plan: {
+          step: 'Step {{n}}',
+          warmup: 'Warm-up',
+          core: 'Today’s focus',
+          reinforce: 'Reinforce',
+          intro: 'Your route for today — do each step in order.',
+          questsTitle: 'Daily Quests',
+          questsSubtitle: 'Earn stars with today’s quests'
         }
       }
     }
@@ -79,7 +94,9 @@ export const scenicHomeSupplementalDictionaries = {
       letters: { title: 'Primeras letras', subtitle: '{{learned}}/{{total}} letras de {{language}} aprendidas', detail: 'Siguiente: practica {{symbols}}', cta: 'Continuar Río de Letras', planTitle: 'Práctica de Río de Letras', planSubtitle: 'Fundamentos del alfabeto' },
       words: { title: 'Bridge Builder', subtitle: 'Pack 3 · {{learned}}/{{total}} elementos de {{language}} aprendidos', detail: 'Siguiente: refuerza tus palabras', cta: 'Continuar aprendizaje', planTitle: 'Bridge Builder', planSubtitle: 'Refuerza tu vocabulario' },
       deepScript: { title: 'Deep Script', subtitle: 'Recorrido de vocabulario en {{language}}', detail: 'Siguiente: continúa tu recorrido', cta: 'Reanudar Deep Script', planTitle: 'Reanudar Deep Script', planSubtitle: 'Continúa tu recorrido de vocabulario', lockedSubtitle: 'Se desbloquea después de palabras' },
-      conversation: { title: 'Práctica de conversación', subtitle: 'Charla de café en {{language}}', detail: 'Practica ambos roles en contexto', cta: 'Continuar conversación', planTitle: 'Práctica de conversación', planSubtitle: 'Practica ambos roles', lockedSubtitle: 'Se desbloquea después de Deep Script', reviewTitle: 'Revisión de lectura', reviewSubtitle: 'Revisita Charla de café' }
+      conversation: { title: 'Práctica de conversación', subtitle: 'Charla de café en {{language}}', detail: 'Practica ambos roles en contexto', cta: 'Continuar conversación', planTitle: 'Práctica de conversación', planSubtitle: 'Practica ambos roles', lockedSubtitle: 'Se desbloquea después de Deep Script', reviewTitle: 'Revisión de lectura', reviewSubtitle: 'Revisita Charla de café' },
+      reading: { title: 'Frases y lectura', subtitle: 'Lee textos hechos con palabras que ya conoces', planTitle: 'Frases y lectura', planSubtitle: 'Lee textos hechos con palabras que ya conoces' },
+      plan: { step: 'Paso {{n}}', warmup: 'Calentamiento', core: 'Enfoque de hoy', reinforce: 'Refuerzo', intro: 'Tu ruta de hoy: haz cada paso en orden.', questsTitle: 'Misiones diarias', questsSubtitle: 'Gana estrellas con las misiones de hoy' }
     } }
   },
   french: {
@@ -89,7 +106,9 @@ export const scenicHomeSupplementalDictionaries = {
       letters: { title: 'Premières lettres', subtitle: '{{learned}}/{{total}} lettres de {{language}} apprises', detail: 'Ensuite : pratique {{symbols}}', cta: 'Continuer Rivière des Lettres', planTitle: 'Pratique Rivière des Lettres', planSubtitle: 'Bases de l’alphabet' },
       words: { title: 'Bridge Builder', subtitle: 'Pack 3 · {{learned}}/{{total}} éléments de {{language}} appris', detail: 'Ensuite : renforce tes mots', cta: 'Continuer', planTitle: 'Bridge Builder', planSubtitle: 'Renforce ton vocabulaire' },
       deepScript: { title: 'Deep Script', subtitle: 'Parcours de vocabulaire en {{language}}', detail: 'Ensuite : continue ton parcours', cta: 'Reprendre Deep Script', planTitle: 'Reprendre Deep Script', planSubtitle: 'Continue ton parcours de vocabulaire', lockedSubtitle: 'Se débloque après les mots' },
-      conversation: { title: 'Pratique de conversation', subtitle: 'Conversation café en {{language}}', detail: 'Pratique les deux rôles en contexte', cta: 'Continuer la conversation', planTitle: 'Pratique de conversation', planSubtitle: 'Pratique les deux rôles', lockedSubtitle: 'Se débloque après Deep Script', reviewTitle: 'Révision de lecture', reviewSubtitle: 'Revoir Conversation café' }
+      conversation: { title: 'Pratique de conversation', subtitle: 'Conversation café en {{language}}', detail: 'Pratique les deux rôles en contexte', cta: 'Continuer la conversation', planTitle: 'Pratique de conversation', planSubtitle: 'Pratique les deux rôles', lockedSubtitle: 'Se débloque après Deep Script', reviewTitle: 'Révision de lecture', reviewSubtitle: 'Revoir Conversation café' },
+      reading: { title: 'Phrases et lecture', subtitle: 'Lis des textes formés de mots que tu connais', planTitle: 'Phrases et lecture', planSubtitle: 'Lis des textes formés de mots que tu connais' },
+      plan: { step: 'Étape {{n}}', warmup: 'Échauffement', core: 'Objectif du jour', reinforce: 'Renforcement', intro: 'Ton parcours du jour : fais chaque étape dans l’ordre.', questsTitle: 'Quêtes quotidiennes', questsSubtitle: 'Gagne des étoiles avec les quêtes du jour' }
     } }
   },
   portuguese: {
@@ -99,7 +118,9 @@ export const scenicHomeSupplementalDictionaries = {
       letters: { title: 'Primeiras letras', subtitle: '{{learned}}/{{total}} letras de {{language}} aprendidas', detail: 'Próximo: pratique {{symbols}}', cta: 'Continuar Rio de Letras', planTitle: 'Prática Rio de Letras', planSubtitle: 'Fundamentos do alfabeto' },
       words: { title: 'Bridge Builder', subtitle: 'Pacote 3 · {{learned}}/{{total}} itens de {{language}} aprendidos', detail: 'Próximo: fortaleça suas palavras', cta: 'Continuar aprendendo', planTitle: 'Bridge Builder', planSubtitle: 'Fortaleça seu vocabulário' },
       deepScript: { title: 'Deep Script', subtitle: 'Jornada de vocabulário em {{language}}', detail: 'Próximo: continue sua jornada', cta: 'Retomar Deep Script', planTitle: 'Retomar Deep Script', planSubtitle: 'Continue sua jornada de vocabulário', lockedSubtitle: 'Desbloqueia depois das palavras' },
-      conversation: { title: 'Prática de conversação', subtitle: 'Conversa de café em {{language}}', detail: 'Pratique os dois papéis em contexto', cta: 'Continuar conversação', planTitle: 'Prática de conversação', planSubtitle: 'Pratique os dois papéis', lockedSubtitle: 'Desbloqueia depois do Deep Script', reviewTitle: 'Revisão de leitura', reviewSubtitle: 'Revisite Conversa de café' }
+      conversation: { title: 'Prática de conversação', subtitle: 'Conversa de café em {{language}}', detail: 'Pratique os dois papéis em contexto', cta: 'Continuar conversação', planTitle: 'Prática de conversação', planSubtitle: 'Pratique os dois papéis', lockedSubtitle: 'Desbloqueia depois do Deep Script', reviewTitle: 'Revisão de leitura', reviewSubtitle: 'Revisite Conversa de café' },
+      reading: { title: 'Frases e leitura', subtitle: 'Leia textos feitos com palavras que você conhece', planTitle: 'Frases e leitura', planSubtitle: 'Leia textos feitos com palavras que você conhece' },
+      plan: { step: 'Passo {{n}}', warmup: 'Aquecimento', core: 'Foco de hoje', reinforce: 'Reforço', intro: 'Sua rota de hoje: faça cada passo em ordem.', questsTitle: 'Missões diárias', questsSubtitle: 'Ganhe estrelas com as missões de hoje' }
     } }
   },
   hebrew: {
@@ -109,7 +130,9 @@ export const scenicHomeSupplementalDictionaries = {
       letters: { title: 'אותיות ראשונות', subtitle: '{{learned}}/{{total}} אותיות ב{{language}} נלמדו', detail: 'הבא: לתרגל {{symbols}}', cta: 'המשך Letter River', planTitle: 'תרגול Letter River', planSubtitle: 'יסודות האלפבית' },
       words: { title: 'Bridge Builder', subtitle: 'חבילה 3 · {{learned}}/{{total}} פריטי {{language}} נלמדו', detail: 'הבא: לחזק את המילים שלך', cta: 'המשך ללמוד', planTitle: 'Bridge Builder', planSubtitle: 'חזק את אוצר המילים' },
       deepScript: { title: 'Deep Script', subtitle: 'מסלול אוצר מילים ב{{language}}', detail: 'הבא: המשך את המסלול', cta: 'המשך Deep Script', planTitle: 'המשך Deep Script', planSubtitle: 'המשך את מסלול אוצר המילים', lockedSubtitle: 'נפתח אחרי מילים' },
-      conversation: { title: 'תרגול שיחה', subtitle: 'שיחת קפה ב{{language}}', detail: 'תרגל את שני התפקידים בהקשר', cta: 'המשך שיחה', planTitle: 'תרגול שיחה', planSubtitle: 'תרגל את שני התפקידים', lockedSubtitle: 'נפתח אחרי Deep Script', reviewTitle: 'חזרת קריאה', reviewSubtitle: 'חזור לשיחת קפה' }
+      conversation: { title: 'תרגול שיחה', subtitle: 'שיחת קפה ב{{language}}', detail: 'תרגל את שני התפקידים בהקשר', cta: 'המשך שיחה', planTitle: 'תרגול שיחה', planSubtitle: 'תרגל את שני התפקידים', lockedSubtitle: 'נפתח אחרי Deep Script', reviewTitle: 'חזרת קריאה', reviewSubtitle: 'חזור לשיחת קפה' },
+      reading: { title: 'משפטים וקריאה', subtitle: 'קרא טקסטים הבנויים ממילים שאתה מכיר', planTitle: 'משפטים וקריאה', planSubtitle: 'קרא טקסטים הבנויים ממילים שאתה מכיר' },
+      plan: { step: 'שלב {{n}}', warmup: 'חימום', core: 'המיקוד של היום', reinforce: 'חיזוק', intro: 'המסלול שלך להיום — בצע כל שלב לפי הסדר.', questsTitle: 'משימות יומיות', questsSubtitle: 'צבור כוכבים עם המשימות של היום' }
     } }
   }
 };

@@ -324,11 +324,16 @@ export function getLearningPathItems(journey, selectedStage, t = (key, fallback)
 }
 
 /**
- * Today's Plan — a three-beat session built from journey state:
+ * Today's Plan — a guided, three-beat session built from journey state:
  *   warm-up (due reviews) → core (current stage's next unit) → reinforce.
+ *
+ * Each row is labelled with a running "Step N · <phase>" tag and a plain-
+ * language subtitle so the card reads as an ordered walkthrough of the app
+ * rather than a list of unexplained mode names. Every string resolves through
+ * a translation key that exists in the scenic-home dictionaries, so no English
+ * copy leaks into other languages.
  */
 export function getTodayPlanRows({ journey, primaryState, statistics, navigate, openGame, t }) {
-  const bridgePack = getCurrentBridgePackSummary(t);
   const currentStageId = journey?.currentStageId ?? primaryState?.currentStage ?? 'letters';
   const stageIndex = Math.max(0, STAGE_ORDER.indexOf(currentStageId));
 
@@ -341,49 +346,50 @@ export function getTodayPlanRows({ journey, primaryState, statistics, navigate, 
   if (reviewCount > 0) {
     rows.push({
       id: 'warmup-review',
-      step: t('home.scenic.plan.warmup', 'Warm-up'),
+      phase: 'warmup',
       icon: 'event_available',
       tone: 'green',
-      title: t('home.scenic.plan.reviewTitle', 'Daily Review'),
-      subtitle: t('home.scenic.plan.reviewSubtitle', '{{count}} items ready to review', { count: reviewCount }),
+      title: t('home.scenic.dailyReview', 'Daily Review'),
+      subtitle: t('home.scenic.itemsReady', '{{count}} items ready to review', { count: reviewCount }),
       action: wordReviewsDue > 0 ? () => navigate('/bridge') : () => openGame({ autostart: false })
     });
   }
 
-  // ② Core: the next unit in the current journey stage.
+  // ② Core: the next unit in the current journey stage. Subtitles say what the
+  // mode teaches, not just what to tap.
   const coreByStage = {
     letters: {
       id: 'core-letter-river',
       icon: 'waves',
-      title: t('home.scenic.letters.planTitle', 'Letter River'),
-      subtitle: t('home.scenic.letters.chooseLetters', 'Choose letters to practice'),
+      title: t('home.scenic.letters.planTitle', 'Letter River Practice'),
+      subtitle: t('home.scenic.letters.planSubtitle', 'Alphabet foundations'),
       action: () => openGame({ autostart: false })
     },
     words: {
       id: 'core-bridge-builder',
       icon: 'foundation',
       title: t('home.scenic.words.planTitle', 'Bridge Builder'),
-      subtitle: bridgePack.continueLine,
+      subtitle: t('home.scenic.words.planSubtitle', 'Strengthen your word set'),
       action: () => navigate('/bridge')
     },
     reading: {
       id: 'core-reading',
       icon: 'menu_book',
       title: t('home.scenic.reading.planTitle', 'Sentences & Reading'),
-      subtitle: t('home.scenic.reading.subtitle', 'Read texts built from words you know'),
+      subtitle: t('home.scenic.reading.planSubtitle', 'Read texts built from words you know'),
       action: () => navigate('/read')
     },
     conversation: {
       id: 'core-conversation',
       icon: 'chat_bubble',
-      title: t('home.scenic.conversation.title', 'Conversation'),
-      subtitle: t('home.scenic.conversation.contextSubtitle', 'Practice words in context'),
+      title: t('home.scenic.conversation.planTitle', 'Conversation Practice'),
+      subtitle: t('home.scenic.conversation.planSubtitle', 'Practice both roles'),
       action: () => navigate('/read')
     }
   };
   rows.push({
-    ...coreByStage[currentStageId] ?? coreByStage.letters,
-    step: t('home.scenic.plan.core', 'Core'),
+    ...(coreByStage[currentStageId] ?? coreByStage.letters),
+    phase: 'core',
     tone: 'blue'
   });
 
@@ -392,17 +398,17 @@ export function getTodayPlanRows({ journey, primaryState, statistics, navigate, 
   if (stageIndex >= 1) {
     rows.push({
       id: 'reinforce-deep-script',
-      step: t('home.scenic.plan.reinforce', 'Reinforce'),
+      phase: 'reinforce',
       icon: 'explore',
       tone: 'purple',
-      title: t('home.scenic.deepScript.planTitle', 'Deep Script'),
-      subtitle: t('home.scenic.deepScript.reinforceSubtitle', 'Reinforce: letters, words, and sentences'),
+      title: t('home.scenic.deepScript.planTitle', 'Resume Deep Script'),
+      subtitle: t('home.scenic.deepScript.planSubtitle', 'Continue your vocab run'),
       action: () => navigate('/deep-script')
     });
   } else {
     rows.push({
       id: 'reinforce-daily-quests',
-      step: t('home.scenic.plan.reinforce', 'Reinforce'),
+      phase: 'reinforce',
       icon: 'task_alt',
       tone: 'purple',
       title: t('home.scenic.plan.questsTitle', 'Daily Quests'),
@@ -411,7 +417,17 @@ export function getTodayPlanRows({ journey, primaryState, statistics, navigate, 
     });
   }
 
-  return rows;
+  // Assign numbered, plain-language step tags in running order so the plan reads
+  // as "do this, then this" instead of internal pedagogy jargon.
+  const phaseLabels = {
+    warmup: t('home.scenic.plan.warmup', 'Warm-up'),
+    core: t('home.scenic.plan.core', 'Today’s focus'),
+    reinforce: t('home.scenic.plan.reinforce', 'Reinforce')
+  };
+  return rows.map((row, index) => ({
+    ...row,
+    step: `${t('home.scenic.plan.step', 'Step {{n}}', { n: index + 1 })} · ${phaseLabels[row.phase]}`
+  }));
 }
 
 export function getHomeStats({ statistics, streak, daily, t }) {

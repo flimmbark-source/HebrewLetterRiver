@@ -5,6 +5,9 @@ export default function TodayPlanCard({ rows, t }) {
   return (
     <section className="scenic-panel scenic-plan-card">
       <h2>{t('home.scenic.todayPlanTitle', 'Today Plan')}</h2>
+      <p className="scenic-plan-card__intro">
+        {t('home.scenic.plan.intro', 'Your route for today — do each step in order.')}
+      </p>
       <div className="scenic-plan-card__rows">
         {rows.map((row) => (
           <button
