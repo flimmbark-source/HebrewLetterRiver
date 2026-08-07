@@ -1,12 +1,18 @@
 const DEFAULT_META = {
-  title: 'Letter River',
-  description: 'Letter River is a playful language-learning app that guides learners from letters to words, reading, and conversation through compact practice modes.',
+  title: 'Letter River | Learn Hebrew Through Play',
+  description: 'Letter River is a game-based Hebrew learning app that helps beginners practice letters, sounds, and early reading with short, motivating lessons.',
   canonicalPath: '/',
   robots: 'index, follow'
 };
 
 const ROUTE_META = {
-  '/home': DEFAULT_META,
+  '/': DEFAULT_META,
+  '/home': {
+    title: 'Demo | Letter River',
+    description: 'Try the Letter River learning demo and continue your Hebrew practice path.',
+    canonicalPath: '/home',
+    robots: 'noindex, follow'
+  },
   '/achievements': {
     title: 'Achievements | Letter River',
     description: 'Review streaks, progress, and learning milestones in Letter River.',
@@ -109,5 +115,5 @@ export function applyRouteMeta(pathname) {
 }
 
 export function isKnownRoute(pathname) {
-  return Boolean(ROUTE_META[pathname] || pathname === '/');
+  return Boolean(ROUTE_META[pathname]);
 }
