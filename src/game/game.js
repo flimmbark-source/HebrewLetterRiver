@@ -1596,7 +1596,14 @@ function startClickMode(itemEl, payload) {
     waveCorrectCount = 0;
 
     let roundItems = [];
-    const itemPool = getModePool(gameMode);
+    // Use the combined pool across every selected mode. getModePool(gameMode)
+    // only returns the first selected mode's items (and without a sourceMode
+    // tag), which drops other modes' seen letters from subsequent waves and
+    // makes getEvenlyDistributedItems return nothing when multiple modes are
+    // selected — collapsing the wave into a single fallback letter.
+    const itemPool = selectedModeIds.size > 0
+      ? getCombinedModePool(selectedModeIds)
+      : getModePool(gameMode);
     const isFirstWaveOfLevel = !hasIntroducedForItemInLevel;
 
     if (isRandomLettersModeActive()) {
