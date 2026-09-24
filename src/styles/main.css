@@ -1625,6 +1625,7 @@ body.no-scroll {
   margin-top: 4px;
 }
 
+
 .primary-cta {
   position: relative;
   display: inline-flex;
@@ -1639,12 +1640,18 @@ body.no-scroll {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   transition: all 0.12s ease-out;
-  line-height: 1;
+  /* Uppercase + letter-spacing makes these labels wide. Leave a little
+     leading so a label that does wrap (longer locales) is still readable
+     rather than having its two lines collide. */
+  line-height: 1.15;
 }
 
 @media (max-width: 640px) {
   .primary-cta {
-    padding: 9px 32px;
+    /* The generous inline padding is what pushed "Start Game" onto two
+       lines inside the narrow setup column; let it shrink on small screens
+       so the label stays on one line. */
+    padding: 10px clamp(14px, 5vw, 32px);
     font-size: 18px;
   }
 }
@@ -1714,10 +1721,16 @@ body.no-scroll {
 
 /* Apply consistent typography to existing button IDs */
 #start-button {
-  padding: 12px var(--space-3); /* 12px vertical, 24px horizontal */
+  /* This button lives in the narrow right-hand column of the setup grid.
+     24px of inline padding left too little room for the label itself and
+     pushed "Start Game" onto two lines, so take the full column width and
+     keep the padding small. Longer labels in other locales may still wrap,
+     which the line-height keeps readable. */
+  width: 100%;
+  padding: 12px 10px;
   font-size: var(--text-base); /* 16px */
   font-weight: var(--font-semibold); /* 600 */
-  line-height: 1;
+  line-height: 1.15;
   min-height: 44px; /* WCAG touch target minimum */
 }
 

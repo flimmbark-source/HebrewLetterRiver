@@ -10,6 +10,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { setupGame } from '../game/game.js';
 import { useLocalization } from './LocalizationContext.jsx';
+import Icon from '../components/Icon.jsx';
 import { useTutorial } from './TutorialContext.jsx';
 import { ErrorBoundary } from '../ErrorBoundary.jsx';
 import { on } from '../lib/eventBus.js';
@@ -213,6 +214,22 @@ export function GameProvider({ children }) {
     setOptions(null); // Clear options to prevent stale vocab data
     gameApiRef.current = null; // Clear game API to force fresh setup next time
   }, []);
+
+  // Escape closes the setup modal, which otherwise can only be dismissed by
+  // tapping the backdrop -- an affordance most people never discover. While a
+  // round is actually running Escape is ignored, so a stray keypress can't
+  // throw away the learner's progress; the pause control handles that case.
+  useEffect(() => {
+    if (!isVisible || isGameRunning) return undefined;
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeGame();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isVisible, isGameRunning, closeGame]);
 
   const contextValue = useMemo(
     () => ({ openGame, closeGame, isVisible, isGameRunning, showPlayModal, setShowPlayModal }),
@@ -614,16 +631,27 @@ function GameCanvas({ fontClass, loadedSettings }) {
 
             <button
               id="accessibility-btn"
-              className="absolute left-2 top-1 text-2xl transition p-2 rounded-lg hover:bg-emerald-100/50 active:bg-emerald-200/50"
+              className="absolute left-2 top-1 flex items-center justify-center transition p-2 rounded-lg hover:bg-emerald-100/50 active:bg-emerald-200/50"
               aria-label={t('game.accessibility.gear')}
               style={{ color: 'var(--app-primary)', minWidth: '44px', minHeight: '44px', zIndex: 10 }}            >
-              ⚙️
+              <Icon name="settings" size={22} />
             </button>
             <div id="setup-view" className="flex flex-col h-full">
               <div
                 className="relative flex items-center justify-center px-3 py-2 border-b-2"
                 style={{ borderColor: 'var(--app-primary-container)' }}
               >
+                {/* Without this the only way out of setup is tapping the
+                    backdrop, which nobody discovers on a phone. */}
+                <button
+                  type="button"
+                  onClick={closeGame}
+                  className="absolute right-2 top-1 flex items-center justify-center rounded-lg p-2 text-2xl leading-none transition hover:bg-emerald-100/50 active:bg-emerald-200/50"
+                  style={{ color: 'var(--app-primary)', minWidth: '44px', minHeight: '44px', zIndex: 10 }}
+                  aria-label={t('common.close', 'Close')}
+                >
+                  <Icon name="close" size={22} />
+                </button>
                 <div className="flex flex-col items-center flex-1 text-center gap-1">
                   <h1
                     className={`modal-title text-xl sm:text-2xl font-bold ${fontClass}`}
@@ -671,7 +699,7 @@ function GameCanvas({ fontClass, loadedSettings }) {
                         className="goal-badge__icon"
                         aria-hidden="true"
                       >
-                        🎯
+                        <Icon name="target" size={18} />
                       </span>
                     </div>
                     <div

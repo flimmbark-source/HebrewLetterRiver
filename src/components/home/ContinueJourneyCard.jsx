@@ -1,6 +1,26 @@
 import React from 'react';
 import Icon from '../Icon.jsx';
 
+/**
+ * Progress details arrive as one interpolated string, e.g.
+ * "Seen 4 · Practiced 2 · Mastered 1". In the narrow column beside the
+ * thumbnail that wraps mid-pair and orphans a number on its own line. Split
+ * on the separator so each label keeps its value, and let the line break
+ * only between pairs. A detail with no separator renders unchanged.
+ */
+function ProgressDetail({ text }) {
+  if (typeof text !== 'string' || !text.includes('\u00b7')) return text ?? null;
+
+  const parts = text.split('\u00b7').map((part) => part.trim()).filter(Boolean);
+
+  return parts.map((part, index) => (
+    <React.Fragment key={`${index}-${part}`}>
+      {index > 0 && <span aria-hidden="true"> · </span>}
+      <span style={{ whiteSpace: 'nowrap' }}>{part}</span>
+    </React.Fragment>
+  ));
+}
+
 export default function ContinueJourneyCard({ state, t }) {
   return (
     <section className="scenic-panel scenic-continue-card">
@@ -12,7 +32,9 @@ export default function ContinueJourneyCard({ state, t }) {
             {state.locked && <Icon name="lock" size={16} filled />} {state.title}
           </h3>
           <p className="scenic-continue-card__subtitle">{state.subtitle}</p>
-          <p className="scenic-continue-card__detail">{state.detail}</p>
+          <p className="scenic-continue-card__detail">
+            <ProgressDetail text={state.detail} />
+          </p>
           <div className="scenic-progress" aria-hidden="true">
             <span style={{ width: `${state.progress}%` }} />
           </div>
