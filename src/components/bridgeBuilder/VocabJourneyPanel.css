@@ -71,7 +71,9 @@
   color: #173b31;
   font-family: "Baloo 2", system-ui, sans-serif;
   font-size: clamp(2.1rem, 7vw, 3.4rem);
-  line-height: 0.95;
+  /* 0.95 is tighter than the font's own ink, so on narrow screens where this
+     title wraps the descenders spilled past the line box. */
+  line-height: 1.05;
   font-weight: 900;
   letter-spacing: -0.03em;
 }

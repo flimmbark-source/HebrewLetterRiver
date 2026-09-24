@@ -1255,6 +1255,28 @@ body.no-scroll {
   }
 }
 
+/* === Full-screen overlay scrolling ===================================
+   A `flex items-center justify-center` overlay centres its card, but as
+   soon as the card is taller than the viewport the overflow spills off
+   BOTH ends and neither can be scrolled to -- centred flex items cannot
+   scroll past the start edge. On a 320x568 phone that put the onboarding
+   "Let's start!" button off-screen with no way to reach it, which is a
+   dead end in the first-run flow.
+
+   Aligning to the start and letting the card's own auto margins do the
+   centring keeps the card centred whenever it fits, and makes the overlay
+   scroll normally when it does not. ------------------------------------ */
+.overlay-center-scroll {
+  align-items: flex-start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.overlay-center-scroll > * {
+  margin-block: auto;
+  flex-shrink: 0;
+}
+
 /* === Touch target sizing =============================================
    WCAG 2.2 (2.5.8) asks for at least a 24x24 CSS px target, and 44x44 is
    the comfortable mobile standard. A few controls here are deliberately

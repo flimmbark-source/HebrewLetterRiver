@@ -282,17 +282,6 @@ export default function TutorialSpotlight({
   const currentOffsets = stepYOffsetByTutorial[tutorialId] || {};
   const stepYOffset = currentOffsets[stepIndex] ?? 0;
 
-  if (!targetRect) {
-    return {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: `translate(-50%, calc(-50% + ${stepYOffset}px))`,
-      maxWidth: '90vw',
-      width: '400px'
-    };
-}
-
     const calloutWidth = 340;
     const edgePadding = 16;
     const topOffset = 100;
@@ -303,6 +292,37 @@ export default function TutorialSpotlight({
 
     const h = calloutHeight || 240;
 
+    // The bottom nav is fixed above the page, so the callout has to stop
+    // short of it -- otherwise the offsets below can park the callout on top
+    // of the nav, or past it entirely where its own Next button cannot be
+    // reached. When the nav is hidden (during a running game) the whole
+    // viewport is available.
+    const navEl = document.querySelector('nav.bottom-nav');
+    const navRect = navEl ? navEl.getBoundingClientRect() : null;
+    const bottomLimit =
+      navRect && navRect.height > 0 && navRect.top < vh
+        ? navRect.top - edgePadding
+        : vh - edgePadding;
+
+    // Every branch runs its result through this. The per-step nudges above
+    // are hand-tuned pixel values that assume a tall screen; without a clamp
+    // they push the callout off-screen on smaller ones.
+    const clampTop = (top) =>
+      Math.max(edgePadding, Math.min(top, Math.max(edgePadding, bottomLimit - h)));
+
+    if (!targetRect) {
+      return {
+        position: 'fixed',
+        top: `${clampTop((vh - h) / 2 + stepYOffset)}px`,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '400px',
+        maxWidth: `calc(100vw - ${edgePadding * 2}px)`,
+        maxHeight: `${Math.max(120, bottomLimit - edgePadding)}px`,
+        overflowY: 'auto'
+      };
+    }
+
     const targetOffscreen =
       targetRect.bottom < 0 ||
       targetRect.top > vh ||
@@ -310,15 +330,15 @@ export default function TutorialSpotlight({
       targetRect.left > vw;
 
     if (targetOffscreen) {
-      let top = topOffset + stepYOffset;
-      top = Math.max(edgePadding, Math.min(top, vh - h - edgePadding));
       return {
         position: 'fixed',
-        top: `${top}px`,
+        top: `${clampTop(topOffset + stepYOffset)}px`,
         left: '50%',
         transform: 'translateX(-50%)',
         width: `${calloutWidth}px`,
-        maxWidth: `calc(100vw - ${edgePadding * 2}px)`
+        maxWidth: `calc(100vw - ${edgePadding * 2}px)`,
+        maxHeight: `${Math.max(120, bottomLimit - edgePadding)}px`,
+        overflowY: 'auto'
       };
     }
 
@@ -332,32 +352,34 @@ export default function TutorialSpotlight({
     );
 
     if (isInLowerHalf) {
-      let top = topOffset + stepYOffset;
-      top = Math.max(edgePadding, Math.min(top, vh - h - edgePadding));
       return {
         position: 'fixed',
-        top: `${top}px`,
+        top: `${clampTop(topOffset + stepYOffset)}px`,
         left: '50%',
         transform: 'translateX(-50%)',
         width: `${calloutWidth}px`,
-        maxWidth: `calc(100vw - ${edgePadding * 2}px)`
+        maxWidth: `calc(100vw - ${edgePadding * 2}px)`,
+        maxHeight: `${Math.max(120, bottomLimit - edgePadding)}px`,
+        overflowY: 'auto'
       };
     }
 
     let top = targetRect.bottom + gap + stepYOffset;
 
-    if (top + h + edgePadding > vh) {
+    // Prefer flipping above the target when it would otherwise run into the
+    // nav, rather than just clamping it down onto the highlighted element.
+    if (top + h > bottomLimit) {
       top = targetRect.top - gap - h + stepYOffset;
     }
 
-    top = Math.max(edgePadding, Math.min(top, vh - h - edgePadding));
-
     return {
       position: 'fixed',
-      top: `${top}px`,
+      top: `${clampTop(top)}px`,
       left: `${clampedLeft}px`,
       width: `${calloutWidth}px`,
-      maxWidth: `calc(100vw - ${edgePadding * 2}px)`
+      maxWidth: `calc(100vw - ${edgePadding * 2}px)`,
+      maxHeight: `${Math.max(120, bottomLimit - edgePadding)}px`,
+      overflowY: 'auto'
     };
   };
 
