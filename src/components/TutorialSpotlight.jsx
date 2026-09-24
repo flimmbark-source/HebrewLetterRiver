@@ -451,7 +451,7 @@ export default function TutorialSpotlight({
 
           <button
             onClick={onSkip}
-            className="block w-full mt-2 text-xs text-slate-400 hover:text-slate-300 transition-colors"
+            className="block w-full mt-1 py-3 text-xs text-slate-400 hover:text-slate-300 transition-colors"
           >
             {t('tutorial.skip')}
           </button>

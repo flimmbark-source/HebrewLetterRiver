@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLocalization } from '../context/LocalizationContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { loadState } from '../lib/storage.js';
 import { useTutorial } from '../context/TutorialContext.jsx';
 import DualRoleConversationSession from '../components/conversation/DualRoleConversationSession.jsx';
 import DualRoleConversationCardGrid from '../components/conversation/DualRoleConversationCardGrid.jsx';
@@ -32,8 +33,8 @@ function getContextualReadItem(pack, dualRoleItems) {
 
 export default function LearnView() {
   const { t } = useLocalization();
-  const { languageId: practiceLanguageId } = useLanguage();
-  const { startTutorial, hasCompletedTutorial, currentTutorial } = useTutorial();
+  const { languageId: practiceLanguageId, hasSelectedLanguage } = useLanguage();
+  const { startTutorial, hasCompletedTutorial, currentTutorial, skipTutorial } = useTutorial();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const mode = searchParams.get('mode');
@@ -49,12 +50,32 @@ export default function LearnView() {
   const [selectedScenario, setSelectedScenario] = useState(null);
   const [selectedScript, setSelectedScript] = useState(null);
 
-  // Auto-trigger readIntro tutorial on first visit
+  // Auto-trigger readIntro tutorial on first visit.
+  // Wait until first-run onboarding is finished: starting it earlier stacks the
+  // spotlight on top of the language/goal screens, leaving two competing modal
+  // layers before the learner has even picked a language.
+  const onboardingCompleted = loadState('onboarding.completed', false);
+  const readyForTutorial = hasSelectedLanguage && onboardingCompleted;
+
   useEffect(() => {
-    if (!hasCompletedTutorial('readIntro') && !currentTutorial) {
+    if (readyForTutorial && !hasCompletedTutorial('readIntro') && !currentTutorial) {
       startTutorial('readIntro');
     }
-  }, [hasCompletedTutorial, startTutorial, currentTutorial]);
+  }, [readyForTutorial, hasCompletedTutorial, startTutorial, currentTutorial]);
+
+  const currentTutorialIdRef = React.useRef(null);
+  const skipTutorialRef = React.useRef(skipTutorial);
+  currentTutorialIdRef.current = currentTutorial?.id ?? null;
+  skipTutorialRef.current = skipTutorial;
+
+  // The spotlight anchors to elements that only exist on this route, so stop it
+  // when the learner navigates away instead of leaving it floating over other views.
+  useEffect(() => () => {
+    if (currentTutorialIdRef.current === 'readIntro') {
+      skipTutorialRef.current?.();
+    }
+  }, []);
+
 
   useEffect(() => {
     if (selectedScenario && selectedScript) {

@@ -451,7 +451,7 @@ export default function SettingsView() {
           <button className="btn-press w-full rounded-xl py-4 text-sm font-extrabold uppercase tracking-widest transition-colors" style={{ background: 'var(--app-error-bg)', color: 'var(--app-error-text)' }} type="button">
             Log Out
           </button>
-          <p className="mt-8 text-center text-[10px] font-medium" style={{ color: 'var(--app-muted)' }}>River Mint Language App — Version {APP_VERSION}</p>
+          <p className="mt-8 text-center text-[10px] font-medium" style={{ color: 'var(--app-muted)' }}>Letter River — Version {APP_VERSION}</p>
         </section>
       </main>
       <ProfileEditorModal

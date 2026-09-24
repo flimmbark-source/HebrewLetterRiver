@@ -1255,6 +1255,30 @@ body.no-scroll {
   }
 }
 
+/* === Touch target sizing =============================================
+   WCAG 2.2 (2.5.8) asks for at least a 24x24 CSS px target, and 44x44 is
+   the comfortable mobile standard. A few controls here are deliberately
+   small glyphs, so rather than inflate the visible art we stretch an
+   invisible ::after over the shortfall: the control keeps its exact size
+   and position in the layout, and only the region that accepts a tap
+   grows to 44x44. ----------------------------------------------------- */
+.goal-badge__info-icon::after,
+.goal-icon-button::after,
+.scenic-continue-card__info::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(44px, 100%);
+  height: max(44px, 100%);
+  transform: translate(-50%, -50%);
+}
+
+.goal-icon-button,
+.scenic-continue-card__info {
+  position: relative;
+}
+
 .goal-badge__info-icon {
   position: absolute;
   top: 4px;
@@ -3012,10 +3036,11 @@ body.dark-mode #accessibility-view select {
 
 /* === Font-sizing stabilization === */
 
-/* Pin heading heights so font changes don't resize them */
+/* Reserve a consistent minimum heading height so font changes don't jostle
+   layout. Never cap the height: a heading that wraps must be allowed to grow,
+   otherwise its second line overflows and collides with the text below it. */
 h1, h2, h3, h4 {
   min-block-size: 1.4em;
-  max-block-size: 1.4em;
 }
 
 /* Prevent card containers from growing when text wraps differently */

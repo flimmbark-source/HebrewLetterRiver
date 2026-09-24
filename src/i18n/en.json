@@ -31,7 +31,7 @@
     "nav": {
       "home": "Home",
       "play": "Play",
-      "achievements": "Achievements",
+      "achievements": "Awards",
       "read": "Read",
       "settings": "Settings"
     },
@@ -39,7 +39,7 @@
       "label": "App Language",
       "helper": "Set the interface language.",
       "onboardingTitle": "Choose Your Languages",
-      "onboardingSubtitle": "This app was developed to allow you to practice the alphabets of other langauges in your own native tongue.",
+      "onboardingSubtitle": "This app was developed to allow you to practice the alphabets of other languages in your own native tongue.",
       "confirm": "Start learning"
     },
     "practicePicker": {
